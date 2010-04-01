@@ -3718,17 +3718,47 @@ decode_dsp32alu_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1)
       SET_ASTATREG (az, acc == 0);
       SET_ASTATREG (an, 0);
     }
-  else if (HL == 0 && aop == 3 && aopcde == 12)
+  else if (aop == 3 && aopcde == 12)
     {
-      bu32 val = (DREG (src0) & 0x7FFFFFFF);
-      TRACE_INSN (cpu, "R%i.L = R%i (RND);", src0, dst0);
+      bs32 signRes;
+      bs32 res = DREG (src0);
+      bs32 ovX;
+      bool sBit_a, sBit_b;
 
-      val += 0x8000;
+      TRACE_INSN (cpu, "R%i.%s = R%i (RND);", dst0, HL == 0 ? "L" : "H", src0);
 
-      SET_DREG (dst0, (DREG (dst0) & 0xFFFF0000) |
-		      (val >> 16) |
-		      ((DREG (src0) & 0x80000000) >> 16));
-      /* XXX: ASTAT ? */
+      sBit_b = !!(res & 0x80000000);
+
+      res += 0x8000;
+      sBit_a = !!(res & 0x80000000);
+
+      /* Overflow if the sign bit changed when we rounded */
+      if (res && (sBit_b != sBit_a))
+	{
+	  ovX = 1;
+	  if(!sBit_a)
+	    res = 0x7FFF;
+	  else
+	    res = 0x8000;
+	}
+      else
+	{
+	  res = res >> 16;
+	ovX = 0;
+	}
+
+      if (!HL)
+	SET_DREG (dst0, REG_H_L (DREG (dst0), res));
+      else
+	SET_DREG (dst0, REG_H_L (res << 16, DREG (dst0)));
+
+      SET_ASTATREG(az, res == 0);
+      SET_ASTATREG(an, res < 0);
+      if (ovX)
+	{
+	  SET_ASTATREG(v, ovX);
+	  SET_ASTATREG(vs, ovX);
+	}
     }
   else if (aop == 3 && HL == 0 && aopcde == 15)
     {
@@ -3771,19 +3801,6 @@ decode_dsp32alu_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1)
 
       SET_AREG (0, saturate_s40 (-get_extended_acc (cpu, 0)));
       SET_AREG (1, saturate_s40 (-get_extended_acc (cpu, 1)));
-      /* XXX: what ASTAT flags need updating ?  */
-    }
-  else if (HL == 1 && aop == 3 && aopcde == 12)
-    {
-      bu32 val = (DREG (src0) & 0x7FFFFFFF);
-      TRACE_INSN (cpu, "R%i.H = R%i (RND);", src0, dst0);
-
-      val += 0x8000;
-
-      SET_DREG (dst0, (DREG (dst0) & 0xFFFF) |
-		      (val & 0x7FFF0000) |
-		      (DREG (src0) & 0x80000000));
-
       /* XXX: what ASTAT flags need updating ?  */
     }
   else if ((aop == 0 || aop == 1) && (HL == 0 || HL == 1) && aopcde == 14)
