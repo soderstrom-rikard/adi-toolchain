@@ -4395,14 +4395,16 @@ decode_dsp32shift_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1)
   else if (sop == 0 && sopcde == 7)
     {
       bu16 sv1 = (bu16)signbits(DREG (src1), 32);
-      bu16 sv0 = (bu16)(DREG (src0) & 0xffff);
+      bu16 sv0 = (bu16)DREG (src0);
+      bu16 dst_lo;
 
       TRACE_INSN (cpu, "R%i.L = EXPADJ (R%i, R%i.L);", dst0, src1, src0);
 
       if ((sv1 & 0x1f) < (sv0 & 0x1f))
-	SET_DREG_L (dst0, sv1);
+	dst_lo = sv1;
       else
-	SET_DREG_L (dst0, sv0);
+	dst_lo = sv0;
+      STORE (DREG (dst0), REG_H_L (DREG (dst0), dst_lo));
     }
   else if (sop == 1 && sopcde == 7)
     {
@@ -4413,7 +4415,7 @@ decode_dsp32shift_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1)
       bs16 src1_hi = (DREG (src1) & 0xFFFF0000) >> 16;
       bs16 src1_lo = (DREG (src1) & 0xFFFF);
       bu16 src0_lo = (DREG (src0) & 0xFFFF);
-      bu16 tmp_hi, tmp_lo;
+      bu16 tmp_hi, tmp_lo, tmp;
 
       TRACE_INSN (cpu, "R%i.L = EXPADJ (R%i, R%i.L) (V);", dst0, src1, src0);
 
@@ -4422,14 +4424,15 @@ decode_dsp32shift_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1)
 
       if ((tmp_hi & 0xf) < (tmp_lo & 0xf))
 	if ((tmp_hi & 0xf) < (src0_lo & 0xf))
-	  SET_DREG_L (dst0, tmp_hi);
+	  tmp = tmp_hi;
 	else
-	  SET_DREG_L (dst0, src0_lo);
+	  tmp = src0_lo;
       else
 	if ((tmp_lo & 0xf) < (src0_lo & 0xf))
-	  SET_DREG_L (dst0, tmp_lo);
+	  tmp = tmp_lo;
 	else
-	  SET_DREG_L (dst0, src0_lo);
+	  tmp = src0_lo;
+      STORE (DREG (dst0), REG_H_L (DREG (dst0), tmp));
     }
   else if (sop == 2 && sopcde == 7)
     {
