@@ -1312,8 +1312,7 @@ decode_macfunc (SIM_CPU *cpu, int which, int op, int h0, int h1, int src0,
   int sat = 0;
 
   /* Sign extend accumulator if necessary.  */
-  if (mmod == 0 || mmod == M_T || mmod == M_IS || mmod == M_ISS2
-      || mmod == M_S2RND)
+  if (mmod == M_T || mmod == M_IS || mmod == M_ISS2 || mmod == M_S2RND)
     acc |= -(acc & 0x80000000);
 
   if (op != 3)
