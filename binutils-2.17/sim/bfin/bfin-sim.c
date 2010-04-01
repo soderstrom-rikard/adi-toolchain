@@ -3736,7 +3736,7 @@ decode_dsp32alu_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1)
       if (res && (sBit_b != sBit_a))
 	{
 	  ovX = 1;
-	  if(!sBit_a)
+	  if (!sBit_a)
 	    res = 0x7FFF;
 	  else
 	    res = 0x8000;
@@ -3744,7 +3744,7 @@ decode_dsp32alu_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1)
       else
 	{
 	  res = res >> 16;
-	ovX = 0;
+	  ovX = 0;
 	}
 
       if (!HL)
@@ -3754,11 +3754,9 @@ decode_dsp32alu_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1)
 
       SET_ASTATREG(az, res == 0);
       SET_ASTATREG(an, res < 0);
+      SET_ASTATREG(v, ovX);
       if (ovX)
-	{
-	  SET_ASTATREG(v, ovX);
-	  SET_ASTATREG(vs, ovX);
-	}
+	SET_ASTATREG(vs, ovX);
     }
   else if (aop == 3 && HL == 0 && aopcde == 15)
     {
