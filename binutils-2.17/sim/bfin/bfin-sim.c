@@ -310,6 +310,16 @@ get_allreg_name (int grp, int reg)
   return greg_names[(grp << 3) | reg];
 }
 
+/* aop * 4 + x * 2 + s */
+const char * const amod0amod2_names[] =
+{
+  "",       "(S)",      "(CO)",      "(SCO)",
+  "(ill1)", "(ill2)",    "(ill3)",    "(ill4)",
+  "(ASR)",  "(S, ASR)", "(CO, ASR)", "(SCO, ASR)"
+  "(ASL)",  "(S, ASL)", "(CO, ASL)", "(SCO, ASL)",
+};
+
+
 static bu32 *
 get_allreg (SIM_CPU *cpu, int grp, int reg)
 {
@@ -3842,22 +3852,26 @@ decode_dsp32alu_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1)
       SET_DREG (dst1, val1);
       /* ASTAT ? */
     }
-  else if (HL == 0 && aopcde == 1)
+  else if (aopcde == 1)
     {
-      if (aop == 0)
+      TRACE_INSN (cpu, "R%i = R%i %s R%i, R%i = R%i %s R%i %s;",
+		  dst1, src0, HL ? "+|-" : "+|+", src1, dst0, src0, HL ? "-|+" : "-|-", src1,
+		  amod0amod2_names[aop * 4 + x * 2 + s]);
+      if (aop == 0 && HL == 0)
 	{
 	  /* dregs = dregs +|+ dregs, dregs = dregs -|- dregs (amod0) */
 	  bu32 d0, d1;
-	  TRACE_INSN (cpu, "R%i = R%i +|+ R%i, R%i = R%i -|- R%i (amod0);",
-		      dst1, src0, src1, dst0, src0, src1);
+
 	  d1 = addadd16 (cpu, DREG (src0), DREG (src1), s, 0);
 	  d0 = subsub16 (cpu, DREG (src0), DREG (src1), s, x);
 	  STORE (DREG (dst0), d0);
 	  STORE (DREG (dst1), d1);
 	}
       else
-	unhandled_instruction (cpu,
-	  "dregs = dregs +|+ dregs, dregs = dregs -|- dregs (amod0, amod2)");
+        {
+	  bu32 d0, d1;
+	  unhandled_instruction (cpu, "Add / Subtract (Quad Vector)");
+        }
     }
   else if ((aop == 0 || aop == 1 || aop == 2) && aopcde == 11)
     {
@@ -4100,8 +4114,6 @@ decode_dsp32alu_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1)
       TRACE_INSN (cpu, "R%i = MAX (R%i, R%i);", dst0, src0, src1);
       SET_DREG (dst0, max2x16 (cpu, DREG (src0), DREG (src1)));
     }
-  else if (HL == 1 && aopcde == 1)
-    unhandled_instruction (cpu, "dregs = dregs +|- dregs, dregs = dregs -|+ dregs (amod0, amod2)");
   else if (aop == 0 && aopcde == 24)
     {
       TRACE_INSN (cpu, "R%i = BYTEPACK (R%i, R%i);", dst0, src0, src1);
