@@ -6,9 +6,11 @@
 	.macro start
 	.text
 	# Pad with EMUEXCPT to make sure "jump to 0" always fails
+__panic:
 	.rep 0x10
 	.word 0x0025
 	.endr
+	jump __panic;
 
 	.global __pass
 __pass:
