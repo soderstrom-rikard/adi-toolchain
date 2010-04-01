@@ -213,7 +213,7 @@ fmtconst_val (const_forms_t cf, bu32 x, bu32 pc)
   if (0 && constant_formats[cf].reloc)
     {
       bu32 ea = (((constant_formats[cf].pcrel
-		   ? SIGNEXTEND (x, constant_formats[cf].nbits)
+		   ? (bu32)SIGNEXTEND (x, constant_formats[cf].nbits)
 		   : x) + constant_formats[cf].offset)
 		 << constant_formats[cf].scale);
       if (constant_formats[cf].pcrel)
@@ -1919,7 +1919,7 @@ decode_CC2stat_0 (SIM_CPU *cpu, bu16 iw0)
     [24] = "V",
     [25] = "VS",
   };
-  astat_name = cbit < ARRAY_SIZE (astat_names) ? astat_names[cbit] : NULL;
+  astat_name = cbit < (int)ARRAY_SIZE (astat_names) ? astat_names[cbit] : NULL;
   if (!astat_name)
     astat_name = "INVALID";
 
@@ -3783,22 +3783,22 @@ decode_dsp32alu_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1)
   else if (aop == 0 && aopcde == 12)
     {
       bs16 tmp0_hi = DREG(src0) >> 16;
-      bs16 tmp0_lo = DREG(src0) & 0xFFFF;
+      bs16 tmp0_lo = DREG(src0);
       bs16 tmp1_hi = DREG(src1) >> 16;
-      bs16 tmp1_lo = DREG(src1) & 0xFFFF;
+      bs16 tmp1_lo = DREG(src1);
 
       TRACE_INSN (cpu, "R%i.L = R%i.H = SIGN(R%i.H) * R%i.H + SIGN(R%i.L) & R%i.L;",
-	dst0, dst0, src0, src1, src0, src1 );
+		  dst0, dst0, src0, src1, src0, src1 );
 
-      if (((tmp0_hi) >> 15) & 1 != 0)
+      if ((tmp0_hi >> 15) & 1)
 	tmp1_hi = ~tmp1_hi + 1;
 
-      if (((tmp0_lo) >> 15) & 1 != 0)
+      if ((tmp0_lo >> 15) & 1)
 	tmp1_lo = ~tmp1_lo + 1;
 
       tmp1_hi = tmp1_hi + tmp1_lo;
 
-      STORE (DREG (dst0), (tmp1_hi << 16) | (tmp1_hi & 0xFFFF));
+      STORE (DREG (dst0), REG_H_L (tmp1_hi << 16, tmp1_hi));
     }
   else if (aopcde == 0)
     {
@@ -4066,8 +4066,8 @@ decode_dsp32alu_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1)
   else if (aop == 2 && aopcde == 6)
     {
       bu32 in = DREG (src0);
-      bu32 hi = (in & 0x80000000 ? -(bs16)(in >> 16) : in >> 16) << 16;
-      bu32 lo = (in & 0x8000 ? -(bs16)(in & 0xFFFF) : in) & 0xFFFF;
+      bu32 hi = (in & 0x80000000 ? (bu32)-(bs16)(in >> 16) : in >> 16) << 16;
+      bu32 lo = (in & 0x8000 ? (bu32)-(bs16)(in & 0xFFFF) : in) & 0xFFFF;
       int v;
 
       TRACE_INSN (cpu, "R%i = ABS R%i (V);", dst0, src0);
