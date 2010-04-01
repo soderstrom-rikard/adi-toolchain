@@ -3781,7 +3781,25 @@ decode_dsp32alu_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1)
 	}
     }
   else if (aop == 0 && aopcde == 12)
-    unhandled_instruction (cpu, "dregs_hi=dregs_lo=SIGN(dregs_hi)*dregs_hi + SIGN(dregs_lo)*dregs_lo)");
+    {
+      bs16 tmp0_hi = DREG(src0) >> 16;
+      bs16 tmp0_lo = DREG(src0) & 0xFFFF;
+      bs16 tmp1_hi = DREG(src1) >> 16;
+      bs16 tmp1_lo = DREG(src1) & 0xFFFF;
+
+      TRACE_INSN (cpu, "R%i.L = R%i.H = SIGN(R%i.H) * R%i.H + SIGN(R%i.L) & R%i.L;",
+	dst0, dst0, src0, src1, src0, src1 );
+
+      if (((tmp0_hi) >> 15) & 1 != 0)
+	tmp1_hi = ~tmp1_hi + 1;
+
+      if (((tmp0_lo) >> 15) & 1 != 0)
+	tmp1_lo = ~tmp1_lo + 1;
+
+      tmp1_hi = tmp1_hi + tmp1_lo;
+
+      STORE (DREG (dst0), (tmp1_hi << 16) | (tmp1_hi & 0xFFFF));
+    }
   else if (aopcde == 0)
     {
       bu32 s0 = DREG (src0);
@@ -3901,7 +3919,12 @@ decode_dsp32alu_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1)
   else if (aop == 1 && aopcde == 17)
     unhandled_instruction (cpu, "dregs = A0 + A1, dregs = A0 - A1 amod1");
   else if (aop == 0 && aopcde == 18)
+    {
+      TRACE_INSN (cpu, "SAA (R%i:%i, R%i:%i)%s", src0 + 1, src0, src1 + 1, src1,
+	s ? " (R)" :"");
+
     unhandled_instruction (cpu, "SAA (dregs_pair, dregs_pair) aligndir");
+    }
   else if (aop == 3 && aopcde == 18)
     {
       TRACE_INSN (cpu, "DISALGNEXCPT");
