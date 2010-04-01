@@ -355,14 +355,23 @@ _cec_raise (SIM_CPU *cpu, struct bfin_cec *cec, int ivg)
 
   cec->ilat |= (1 << ivg);
 
-  if (ivg == IVG_EMU || ivg == IVG_RST)
-    goto process_int;
-  if (ivg <= IVG_EVX && curr_ivg <= IVG_EVX && ivg >= curr_ivg)
+  if (ivg <= IVG_EVX)
     {
-      /* Double fault ! :( */
-      /* XXX: should there be some status registers we update ? */
-      sim_io_error (sd, "%s: double fault at 0x%08x ! :(", __func__, PCREG);
-      excp_to_sim_halt (sim_stopped, SIM_SIGABRT);
+      /* These two are always processed.  */
+      if (ivg == IVG_EMU || ivg == IVG_RST)
+	goto process_int;
+
+      /* Anything lower might trigger a double fault.  */
+      if (curr_ivg <= ivg)
+	{
+	  /* Double fault ! :( */
+	  /* XXX: should there be some status registers we update ? */
+	  sim_io_error (sd, "%s: double fault at 0x%08x ! :(", __func__, PCREG);
+	  excp_to_sim_halt (sim_stopped, SIM_SIGABRT);
+	}
+
+      /* No double fault -> always process.  */
+      goto process_int;
     }
   else if (irpten && curr_ivg != IVG_USER)
     {
