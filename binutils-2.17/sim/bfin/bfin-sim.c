@@ -75,6 +75,334 @@ unhandled_instruction (SIM_CPU *cpu, const char *insn)
     illegal_instruction (cpu);
 }
 
+typedef enum
+{
+  c_0, c_1, c_4, c_2, c_uimm2, c_uimm3, c_imm3, c_pcrel4,
+  c_imm4, c_uimm4s4, c_uimm4s4d, c_uimm4, c_uimm4s2, c_negimm5s4, c_imm5, c_imm5d, c_uimm5, c_imm6,
+  c_imm7, c_imm7d, c_imm8, c_uimm8, c_pcrel8, c_uimm8s4, c_pcrel8s4, c_lppcrel10, c_pcrel10,
+  c_pcrel12, c_imm16s4, c_luimm16, c_imm16, c_imm16d, c_huimm16, c_rimm16, c_imm16s2, c_uimm16s4,
+  c_uimm16s4d, c_uimm16, c_pcrel24, c_uimm32, c_imm32, c_huimm32, c_huimm32e,
+} const_forms_t;
+
+static const struct
+{
+  const char *name;
+  const int nbits;
+  const char reloc;
+  const char issigned;
+  const char pcrel;
+  const char scale;
+  const char offset;
+  const char negative;
+  const char positive;
+  const char decimal;
+  const char leading;
+  const char exact;
+} constant_formats[] =
+{
+  { "0",          0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0},
+  { "1",          0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0},
+  { "4",          0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0},
+  { "2",          0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0},
+  { "uimm2",      2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+  { "uimm3",      3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+  { "imm3",       3, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0},
+  { "pcrel4",     4, 1, 0, 1, 1, 0, 0, 0, 0, 0, 0},
+  { "imm4",       4, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0},
+  { "uimm4s4",    4, 0, 0, 0, 2, 0, 0, 1, 0, 0, 0},
+  { "uimm4s4d",   4, 0, 0, 0, 2, 0, 0, 1, 1, 0, 0},
+  { "uimm4",      4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+  { "uimm4s2",    4, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0},
+  { "negimm5s4",  5, 0, 1, 0, 2, 0, 1, 0, 0, 0, 0},
+  { "imm5",       5, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0},
+  { "imm5d",      5, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0},
+  { "uimm5",      5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+  { "imm6",       6, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0},
+  { "imm7",       7, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0},
+  { "imm7d",      7, 0, 1, 0, 0, 0, 0, 0, 1, 3, 0},
+  { "imm8",       8, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0},
+  { "uimm8",      8, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+  { "pcrel8",     8, 1, 0, 1, 1, 0, 0, 0, 0, 0, 0},
+  { "uimm8s4",    8, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0},
+  { "pcrel8s4",   8, 1, 1, 1, 2, 0, 0, 0, 0, 0, 0},
+  { "lppcrel10", 10, 1, 0, 1, 1, 0, 0, 0, 0, 0, 0},
+  { "pcrel10",   10, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0},
+  { "pcrel12",   12, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0},
+  { "imm16s4",   16, 0, 1, 0, 2, 0, 0, 0, 0, 0, 0},
+  { "luimm16",   16, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+  { "imm16",     16, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0},
+  { "imm16d",    16, 0, 1, 0, 0, 0, 0, 0, 1, 3, 0},
+  { "huimm16",   16, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+  { "rimm16",    16, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0},
+  { "imm16s2",   16, 0, 1, 0, 1, 0, 0, 0, 0, 0, 0},
+  { "uimm16s4",  16, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0},
+  { "uimm16s4d", 16, 0, 0, 0, 2, 0, 0, 0, 1, 0, 0},
+  { "uimm16",    16, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+  { "pcrel24",   24, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0},
+  { "uimm32",    32, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+  { "imm32",     32, 0, 1, 0, 0, 0, 0, 0, 1, 3, 0},
+  { "huimm32",   32, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+  { "huimm32e",  32, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1},
+};
+
+static const char *
+fmtconst_str (const_forms_t cf, bs32 x, bu32 pc)
+{
+  static char buf[60];
+
+  if (constant_formats[cf].reloc)
+    {
+      bu32 ea = (((constant_formats[cf].pcrel ? SIGNEXTEND (x, constant_formats[cf].nbits)
+		      : x) + constant_formats[cf].offset) << constant_formats[cf].scale);
+      if (constant_formats[cf].pcrel)
+	ea += pc;
+     /*if (outf->symbol_at_address_func (ea, outf) || !constant_formats[cf].exact)
+       {
+	  outf->print_address_func (ea, outf);
+	  return "";
+       }
+     else*/
+       {
+	  sprintf (buf, "%#x", x);
+	  return buf;
+       }
+    }
+
+  /* Negative constants have an implied sign bit.  */
+  if (constant_formats[cf].negative)
+    {
+      int nb = constant_formats[cf].nbits + 1;
+
+      x = x | (1 << constant_formats[cf].nbits);
+      x = SIGNEXTEND (x, nb);
+    }
+  else
+    x = constant_formats[cf].issigned ? SIGNEXTEND (x, constant_formats[cf].nbits) : x;
+
+  if (constant_formats[cf].offset)
+    x += constant_formats[cf].offset;
+
+  if (constant_formats[cf].scale)
+    x <<= constant_formats[cf].scale;
+
+  if (constant_formats[cf].decimal)
+    {
+      if (constant_formats[cf].leading)
+	{
+	  char ps[10];
+	  sprintf (ps, "%%%ii", constant_formats[cf].leading);
+	  sprintf (buf, ps, x);
+	}
+      else
+	sprintf (buf, "%i", x);
+    }
+  else
+    {
+      if (constant_formats[cf].issigned && x < 0)
+	sprintf (buf, "-0x%x", abs (x));
+      else
+	sprintf (buf, "0x%x", x);
+    }
+
+  return buf;
+}
+
+static bu32
+fmtconst_val (const_forms_t cf, bu32 x, bu32 pc)
+{
+  if (0 && constant_formats[cf].reloc)
+    {
+      bu32 ea = (((constant_formats[cf].pcrel
+		   ? SIGNEXTEND (x, constant_formats[cf].nbits)
+		   : x) + constant_formats[cf].offset)
+		 << constant_formats[cf].scale);
+      if (constant_formats[cf].pcrel)
+	ea += pc;
+
+      return ea;
+    }
+
+  /* Negative constants have an implied sign bit.  */
+  if (constant_formats[cf].negative)
+    {
+      int nb = constant_formats[cf].nbits + 1;
+      x = x | (1 << constant_formats[cf].nbits);
+      x = SIGNEXTEND (x, nb);
+    }
+  else if (constant_formats[cf].issigned)
+    x = SIGNEXTEND (x, constant_formats[cf].nbits);
+
+  x += constant_formats[cf].offset;
+  x <<= constant_formats[cf].scale;
+
+  return x;
+}
+
+#define uimm16s4(x)	fmtconst_val (c_uimm16s4, x, 0)
+#define uimm16s4_str(x)	fmtconst_str (c_uimm16s4, x, 0)
+#define uimm16s4d(x)	fmtconst_val (c_uimm16s4d, x, 0)
+#define pcrel4(x)	fmtconst_val (c_pcrel4, x, pc)
+#define pcrel8(x)	fmtconst_val (c_pcrel8, x, pc)
+#define pcrel8s4(x)	fmtconst_val (c_pcrel8s4, x, pc)
+#define pcrel10(x)	fmtconst_val (c_pcrel10, x, pc)
+#define pcrel12(x)	fmtconst_val (c_pcrel12, x, pc)
+#define negimm5s4(x)	fmtconst_val (c_negimm5s4, x, 0)
+#define negimm5s4_str(x)	fmtconst_str (c_negimm5s4, x, 0)
+#define rimm16(x)	fmtconst_val (c_rimm16, x, 0)
+#define huimm16(x)	fmtconst_val (c_huimm16, x, 0)
+#define imm16(x)	fmtconst_val (c_imm16, x, 0)
+#define imm16_str(x)	fmtconst_str (c_imm16, x, 0)
+#define imm16d(x)	fmtconst_val (c_imm16d, x, 0)
+#define uimm2(x)	fmtconst_val (c_uimm2, x, 0)
+#define uimm3(x)	fmtconst_val (c_uimm3, x, 0)
+#define uimm3_str(x)	fmtconst_str (c_uimm3, x, 0)
+#define luimm16(x)	fmtconst_val (c_luimm16, x, 0)
+#define luimm16_str(x)	fmtconst_str (c_luimm16, x, 0)
+#define uimm4(x)	fmtconst_val (c_uimm4, x, 0)
+#define uimm4_str(x)	fmtconst_str (c_uimm4, x, 0)
+#define uimm5(x)	fmtconst_val (c_uimm5, x, 0)
+#define uimm5_str(x)	fmtconst_str (c_uimm5, x, 0)
+#define imm16s2(x)	fmtconst_val (c_imm16s2, x, 0)
+#define imm16s2_str(x)	fmtconst_str (c_imm16s2, x, 0)
+#define uimm8(x)	fmtconst_val (c_uimm8, x, 0)
+#define imm16s4(x)	fmtconst_val (c_imm16s4, x, 0)
+#define imm16s4_str(x)	fmtconst_str (c_imm16s4, x, 0)
+#define uimm4s2(x)	fmtconst_val (c_uimm4s2, x, 0)
+#define uimm4s2_str(x)	fmtconst_str (c_uimm4s2, x, 0)
+#define uimm4s4(x)	fmtconst_val (c_uimm4s4, x, 0)
+#define uimm4s4_str(x)	fmtconst_str (c_uimm4s4, x, 0)
+#define uimm4s4d(x)	fmtconst_val (c_uimm4s4d, x, 0)
+#define lppcrel10(x)	fmtconst_val (c_lppcrel10, x, pc)
+#define imm3(x)		fmtconst_val (c_imm3, x, 0)
+#define imm3_str(x)	fmtconst_str (c_imm3, x, 0)
+#define imm4(x)		fmtconst_val (c_imm4, x, 0)
+#define uimm8s4(x)	fmtconst_val (c_uimm8s4, x, 0)
+#define imm5(x)		fmtconst_val (c_imm5, x, 0)
+#define imm5d(x)	fmtconst_val (c_imm5d, x, 0)
+#define imm6(x)		fmtconst_val (c_imm6, x, 0)
+#define imm7(x)		fmtconst_val (c_imm7, x, 0)
+#define imm7_str(x)	fmtconst_str (c_imm7, x, 0)
+#define imm7d(x)	fmtconst_val (c_imm7d, x, 0)
+#define imm8(x)		fmtconst_val (c_imm8, x, 0)
+#define pcrel24(x)	fmtconst_val (c_pcrel24, x, pc)
+#define pcrel24_str(x)	fmtconst_str (c_pcrel24, x, pc)
+#define uimm16(x)	fmtconst_val (c_uimm16, x, 0)
+#define uimm32(x)	fmtconst_val (c_uimm32, x, 0)
+#define imm32(x)	fmtconst_val (c_imm32, x, 0)
+#define huimm32(x)	fmtconst_val (c_huimm32, x, 0)
+#define huimm32e(x)	fmtconst_val (c_huimm32e, x, 0)
+
+/* Table C-4. Core Register Encoding Map */
+const char * const greg_names[] =
+{
+  "R0",    "R1",      "R2",     "R3",    "R4",    "R5",    "R6",     "R7",
+  "P0",    "P1",      "P2",     "P3",    "P4",    "P5",    "SP",     "FP",
+  "I0",    "I1",      "I2",     "I3",    "M0",    "M1",    "M2",     "M3",
+  "B0",    "B1",      "B2",     "B3",    "L0",    "L1",    "L2",     "L3",
+  "A0.X",  "A0.W",    "A1.X",   "A1.W",  "<res>", "<res>", "ASTAT",  "RETS",
+  "<res>", "<res>",   "<res>",  "<res>", "<res>", "<res>", "<res>",  "<res>",
+  "LC0",   "LT0",     "LB0",    "LC1",   "LT1",   "LB1",   "CYCLES", "CYCLES2",
+  "USP",   "SEQSTAT", "SYSCFG", "RETI",  "RETX",  "RETN",  "RETE",   "EMUDAT",
+};
+static const char *
+get_allreg_name (int grp, int reg)
+{
+  return greg_names[(grp << 3) | reg];
+}
+
+static bu32 *
+get_allreg (SIM_CPU *cpu, int grp, int reg)
+{
+  int fullreg = (grp << 3) | reg;
+  /* REG_R0, REG_R1, REG_R2, REG_R3, REG_R4, REG_R5, REG_R6, REG_R7,
+     REG_P0, REG_P1, REG_P2, REG_P3, REG_P4, REG_P5, REG_SP, REG_FP,
+     REG_I0, REG_I1, REG_I2, REG_I3, REG_M0, REG_M1, REG_M2, REG_M3,
+     REG_B0, REG_B1, REG_B2, REG_B3, REG_L0, REG_L1, REG_L2, REG_L3,
+     REG_A0x, REG_A0w, REG_A1x, REG_A1w, , , REG_ASTAT, REG_RETS,
+     , , , , , , , ,
+     REG_LC0, REG_LT0, REG_LB0, REG_LC1, REG_LT1, REG_LB1, REG_CYCLES,
+     REG_CYCLES2,
+     REG_USP, REG_SEQSTAT, REG_SYSCFG, REG_RETI, REG_RETX, REG_RETN, REG_RETE,
+     REG_LASTREG */
+  switch (fullreg >> 2)
+    {
+    case 0: case 1: return &DREG (reg);
+    case 2: case 3: return &PREG (reg);
+    case 4: return &IREG (reg & 3);
+    case 5: return &MREG (reg & 3);
+    case 6: return &BREG (reg & 3);
+    case 7: return &LREG (reg & 3);
+    default:
+      switch (fullreg)
+	{
+	case 32: return &AXREG (0);
+	case 33: return &AWREG (0);
+	case 34: return &AXREG (1);
+	case 35: return &AWREG (1);
+	case 39: return &RETSREG;
+	case 48: return &LCREG (0);
+	case 49: return &LTREG (0);
+	case 50: return &LBREG (0);
+	case 51: return &LCREG (1);
+	case 52: return &LTREG (1);
+	case 53: return &LBREG (1);
+	case 54: return &CYCLESREG;
+	case 55: return &CYCLES2REG;
+	case 56: return &USPREG;
+	case 57: return &SEQSTATREG;
+	case 58: return &SYSCFGREG;
+	case 59: return &RETIREG;
+	case 60: return &RETXREG;
+	case 61: return &RETNREG;
+	case 62: return &RETEREG;
+	case 63: return &EMUDAT_INREG;
+	}
+      return 0;
+    }
+}
+
+static const char *
+get_store_name (SIM_CPU *cpu, bu32 *p)
+{
+  if (p >= &DREG (0) && p <= &CYCLESREG)
+    return greg_names[p - &DREG (0)];
+  else if (p == &AXREG (0))
+    return greg_names[4 * 8 + 0];
+  else if (p == &AWREG (0))
+    return greg_names[4 * 8 + 1];
+  else if (p == &AXREG (1))
+    return greg_names[4 * 8 + 2];
+  else if (p == &AWREG (1))
+    return greg_names[4 * 8 + 3];
+  else if (p == &ASTATREG (av0))
+    return "ASTAT[av0]";
+  else if (p == &ASTATREG (av0s))
+    return "ASTAT[av0s]";
+  else if (p == &ASTATREG (av1))
+    return "ASTAT[av1]";
+  else if (p == &ASTATREG (av1s))
+    return "ASTAT[av1s]";
+  else
+    /* XXX: Worry about this when we start to STORE() it.  */
+    abort ();
+}
+
+static void
+queue_store (SIM_CPU *cpu, bu32 *addr, bu32 val)
+{
+  struct store *s = &BFIN_CPU_STATE.stores[BFIN_CPU_STATE.n_stores];
+  s->addr = addr;
+  s->val = val;
+  TRACE_REGISTER (cpu, "queuing write %s = %#x",
+		  get_store_name (cpu, addr), val);
+  ++BFIN_CPU_STATE.n_stores;
+}
+#define STORE(X, Y) \
+  do { \
+    if (BFIN_CPU_STATE.n_stores == 20) abort (); \
+    queue_store (cpu, &(X), (Y)); \
+  } while (0)
+
 static void
 setflags_nz (SIM_CPU *cpu, bu32 val)
 {
@@ -636,318 +964,6 @@ ones (bu32 val)
     ret += !!(val & (1 << i));
 
   return ret;
-}
-
-typedef enum
-{
-  c_0, c_1, c_4, c_2, c_uimm2, c_uimm3, c_imm3, c_pcrel4,
-  c_imm4, c_uimm4s4, c_uimm4s4d, c_uimm4, c_uimm4s2, c_negimm5s4, c_imm5, c_imm5d, c_uimm5, c_imm6,
-  c_imm7, c_imm7d, c_imm8, c_uimm8, c_pcrel8, c_uimm8s4, c_pcrel8s4, c_lppcrel10, c_pcrel10,
-  c_pcrel12, c_imm16s4, c_luimm16, c_imm16, c_imm16d, c_huimm16, c_rimm16, c_imm16s2, c_uimm16s4,
-  c_uimm16s4d, c_uimm16, c_pcrel24, c_uimm32, c_imm32, c_huimm32, c_huimm32e,
-} const_forms_t;
-
-static const struct
-{
-  const char *name;
-  const int nbits;
-  const char reloc;
-  const char issigned;
-  const char pcrel;
-  const char scale;
-  const char offset;
-  const char negative;
-  const char positive;
-  const char decimal;
-  const char leading;
-  const char exact;
-} constant_formats[] =
-{
-  { "0",          0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0},
-  { "1",          0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0},
-  { "4",          0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0},
-  { "2",          0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0},
-  { "uimm2",      2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-  { "uimm3",      3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-  { "imm3",       3, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0},
-  { "pcrel4",     4, 1, 0, 1, 1, 0, 0, 0, 0, 0, 0},
-  { "imm4",       4, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0},
-  { "uimm4s4",    4, 0, 0, 0, 2, 0, 0, 1, 0, 0, 0},
-  { "uimm4s4d",   4, 0, 0, 0, 2, 0, 0, 1, 1, 0, 0},
-  { "uimm4",      4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-  { "uimm4s2",    4, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0},
-  { "negimm5s4",  5, 0, 1, 0, 2, 0, 1, 0, 0, 0, 0},
-  { "imm5",       5, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0},
-  { "imm5d",      5, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0},
-  { "uimm5",      5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-  { "imm6",       6, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0},
-  { "imm7",       7, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0},
-  { "imm7d",      7, 0, 1, 0, 0, 0, 0, 0, 1, 3, 0},
-  { "imm8",       8, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0},
-  { "uimm8",      8, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-  { "pcrel8",     8, 1, 0, 1, 1, 0, 0, 0, 0, 0, 0},
-  { "uimm8s4",    8, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0},
-  { "pcrel8s4",   8, 1, 1, 1, 2, 0, 0, 0, 0, 0, 0},
-  { "lppcrel10", 10, 1, 0, 1, 1, 0, 0, 0, 0, 0, 0},
-  { "pcrel10",   10, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0},
-  { "pcrel12",   12, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0},
-  { "imm16s4",   16, 0, 1, 0, 2, 0, 0, 0, 0, 0, 0},
-  { "luimm16",   16, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-  { "imm16",     16, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0},
-  { "imm16d",    16, 0, 1, 0, 0, 0, 0, 0, 1, 3, 0},
-  { "huimm16",   16, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-  { "rimm16",    16, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0},
-  { "imm16s2",   16, 0, 1, 0, 1, 0, 0, 0, 0, 0, 0},
-  { "uimm16s4",  16, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0},
-  { "uimm16s4d", 16, 0, 0, 0, 2, 0, 0, 0, 1, 0, 0},
-  { "uimm16",    16, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-  { "pcrel24",   24, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0},
-  { "uimm32",    32, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-  { "imm32",     32, 0, 1, 0, 0, 0, 0, 0, 1, 3, 0},
-  { "huimm32",   32, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-  { "huimm32e",  32, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1},
-};
-
-static const char *
-fmtconst_str (const_forms_t cf, bs32 x, bu32 pc)
-{
-  static char buf[60];
-
-  if (constant_formats[cf].reloc)
-    {
-      bu32 ea = (((constant_formats[cf].pcrel ? SIGNEXTEND (x, constant_formats[cf].nbits)
-		      : x) + constant_formats[cf].offset) << constant_formats[cf].scale);
-      if (constant_formats[cf].pcrel)
-	ea += pc;
-     /*if (outf->symbol_at_address_func (ea, outf) || !constant_formats[cf].exact)
-       {
-	  outf->print_address_func (ea, outf);
-	  return "";
-       }
-     else*/
-       {
-	  sprintf (buf, "%#x", x);
-	  return buf;
-       }
-    }
-
-  /* Negative constants have an implied sign bit.  */
-  if (constant_formats[cf].negative)
-    {
-      int nb = constant_formats[cf].nbits + 1;
-
-      x = x | (1 << constant_formats[cf].nbits);
-      x = SIGNEXTEND (x, nb);
-    }
-  else
-    x = constant_formats[cf].issigned ? SIGNEXTEND (x, constant_formats[cf].nbits) : x;
-
-  if (constant_formats[cf].offset)
-    x += constant_formats[cf].offset;
-
-  if (constant_formats[cf].scale)
-    x <<= constant_formats[cf].scale;
-
-  if (constant_formats[cf].decimal)
-    {
-      if (constant_formats[cf].leading)
-	{
-	  char ps[10];
-	  sprintf (ps, "%%%ii", constant_formats[cf].leading);
-	  sprintf (buf, ps, x);
-	}
-      else
-	sprintf (buf, "%i", x);
-    }
-  else
-    {
-      if (constant_formats[cf].issigned && x < 0)
-	sprintf (buf, "-0x%x", abs (x));
-      else
-	sprintf (buf, "0x%x", x);
-    }
-
-  return buf;
-}
-
-static bu32
-fmtconst_val (const_forms_t cf, bu32 x, bu32 pc)
-{
-  if (0 && constant_formats[cf].reloc)
-    {
-      bu32 ea = (((constant_formats[cf].pcrel
-		   ? SIGNEXTEND (x, constant_formats[cf].nbits)
-		   : x) + constant_formats[cf].offset)
-		 << constant_formats[cf].scale);
-      if (constant_formats[cf].pcrel)
-	ea += pc;
-
-      return ea;
-    }
-
-  /* Negative constants have an implied sign bit.  */
-  if (constant_formats[cf].negative)
-    {
-      int nb = constant_formats[cf].nbits + 1;
-      x = x | (1 << constant_formats[cf].nbits);
-      x = SIGNEXTEND (x, nb);
-    }
-  else if (constant_formats[cf].issigned)
-    x = SIGNEXTEND (x, constant_formats[cf].nbits);
-
-  x += constant_formats[cf].offset;
-  x <<= constant_formats[cf].scale;
-
-  return x;
-}
-
-#define uimm16s4(x)	fmtconst_val (c_uimm16s4, x, 0)
-#define uimm16s4_str(x)	fmtconst_str (c_uimm16s4, x, 0)
-#define uimm16s4d(x)	fmtconst_val (c_uimm16s4d, x, 0)
-#define pcrel4(x)	fmtconst_val (c_pcrel4, x, pc)
-#define pcrel8(x)	fmtconst_val (c_pcrel8, x, pc)
-#define pcrel8s4(x)	fmtconst_val (c_pcrel8s4, x, pc)
-#define pcrel10(x)	fmtconst_val (c_pcrel10, x, pc)
-#define pcrel12(x)	fmtconst_val (c_pcrel12, x, pc)
-#define negimm5s4(x)	fmtconst_val (c_negimm5s4, x, 0)
-#define negimm5s4_str(x)	fmtconst_str (c_negimm5s4, x, 0)
-#define rimm16(x)	fmtconst_val (c_rimm16, x, 0)
-#define huimm16(x)	fmtconst_val (c_huimm16, x, 0)
-#define imm16(x)	fmtconst_val (c_imm16, x, 0)
-#define imm16_str(x)	fmtconst_str (c_imm16, x, 0)
-#define imm16d(x)	fmtconst_val (c_imm16d, x, 0)
-#define uimm2(x)	fmtconst_val (c_uimm2, x, 0)
-#define uimm3(x)	fmtconst_val (c_uimm3, x, 0)
-#define uimm3_str(x)	fmtconst_str (c_uimm3, x, 0)
-#define luimm16(x)	fmtconst_val (c_luimm16, x, 0)
-#define luimm16_str(x)	fmtconst_str (c_luimm16, x, 0)
-#define uimm4(x)	fmtconst_val (c_uimm4, x, 0)
-#define uimm4_str(x)	fmtconst_str (c_uimm4, x, 0)
-#define uimm5(x)	fmtconst_val (c_uimm5, x, 0)
-#define uimm5_str(x)	fmtconst_str (c_uimm5, x, 0)
-#define imm16s2(x)	fmtconst_val (c_imm16s2, x, 0)
-#define imm16s2_str(x)	fmtconst_str (c_imm16s2, x, 0)
-#define uimm8(x)	fmtconst_val (c_uimm8, x, 0)
-#define imm16s4(x)	fmtconst_val (c_imm16s4, x, 0)
-#define imm16s4_str(x)	fmtconst_str (c_imm16s4, x, 0)
-#define uimm4s2(x)	fmtconst_val (c_uimm4s2, x, 0)
-#define uimm4s2_str(x)	fmtconst_str (c_uimm4s2, x, 0)
-#define uimm4s4(x)	fmtconst_val (c_uimm4s4, x, 0)
-#define uimm4s4_str(x)	fmtconst_str (c_uimm4s4, x, 0)
-#define uimm4s4d(x)	fmtconst_val (c_uimm4s4d, x, 0)
-#define lppcrel10(x)	fmtconst_val (c_lppcrel10, x, pc)
-#define imm3(x)		fmtconst_val (c_imm3, x, 0)
-#define imm3_str(x)	fmtconst_str (c_imm3, x, 0)
-#define imm4(x)		fmtconst_val (c_imm4, x, 0)
-#define uimm8s4(x)	fmtconst_val (c_uimm8s4, x, 0)
-#define imm5(x)		fmtconst_val (c_imm5, x, 0)
-#define imm5d(x)	fmtconst_val (c_imm5d, x, 0)
-#define imm6(x)		fmtconst_val (c_imm6, x, 0)
-#define imm7(x)		fmtconst_val (c_imm7, x, 0)
-#define imm7_str(x)	fmtconst_str (c_imm7, x, 0)
-#define imm7d(x)	fmtconst_val (c_imm7d, x, 0)
-#define imm8(x)		fmtconst_val (c_imm8, x, 0)
-#define pcrel24(x)	fmtconst_val (c_pcrel24, x, pc)
-#define pcrel24_str(x)	fmtconst_str (c_pcrel24, x, pc)
-#define uimm16(x)	fmtconst_val (c_uimm16, x, 0)
-#define uimm32(x)	fmtconst_val (c_uimm32, x, 0)
-#define imm32(x)	fmtconst_val (c_imm32, x, 0)
-#define huimm32(x)	fmtconst_val (c_huimm32, x, 0)
-#define huimm32e(x)	fmtconst_val (c_huimm32e, x, 0)
-
-/* Table C-4. Core Register Encoding Map */
-const char * const greg_names[] =
-{
-  "R0",    "R1",      "R2",     "R3",    "R4",    "R5",    "R6",     "R7",
-  "P0",    "P1",      "P2",     "P3",    "P4",    "P5",    "SP",     "FP",
-  "I0",    "I1",      "I2",     "I3",    "M0",    "M1",    "M2",     "M3",
-  "B0",    "B1",      "B2",     "B3",    "L0",    "L1",    "L2",     "L3",
-  "A0.X",  "A0.W",    "A1.X",   "A1.W",  "<res>", "<res>", "ASTAT",  "RETS",
-  "<res>", "<res>",   "<res>",  "<res>", "<res>", "<res>", "<res>",  "<res>",
-  "LC0",   "LT0",     "LB0",    "LC1",   "LT1",   "LB1",   "CYCLES", "CYCLES2",
-  "USP",   "SEQSTAT", "SYSCFG", "RETI",  "RETX",  "RETN",  "RETE",   "EMUDAT",
-};
-static const char *
-get_allreg_name (int grp, int reg)
-{
-  return greg_names[(grp << 3) | reg];
-}
-
-static bu32 *
-get_allreg (SIM_CPU *cpu, int grp, int reg)
-{
-  int fullreg = (grp << 3) | reg;
-  /* REG_R0, REG_R1, REG_R2, REG_R3, REG_R4, REG_R5, REG_R6, REG_R7,
-     REG_P0, REG_P1, REG_P2, REG_P3, REG_P4, REG_P5, REG_SP, REG_FP,
-     REG_I0, REG_I1, REG_I2, REG_I3, REG_M0, REG_M1, REG_M2, REG_M3,
-     REG_B0, REG_B1, REG_B2, REG_B3, REG_L0, REG_L1, REG_L2, REG_L3,
-     REG_A0x, REG_A0w, REG_A1x, REG_A1w, , , REG_ASTAT, REG_RETS,
-     , , , , , , , ,
-     REG_LC0, REG_LT0, REG_LB0, REG_LC1, REG_LT1, REG_LB1, REG_CYCLES,
-     REG_CYCLES2,
-     REG_USP, REG_SEQSTAT, REG_SYSCFG, REG_RETI, REG_RETX, REG_RETN, REG_RETE,
-     REG_LASTREG */
-  switch (fullreg >> 2)
-    {
-    case 0: case 1: return &DREG (reg);
-    case 2: case 3: return &PREG (reg);
-    case 4: return &IREG (reg & 3);
-    case 5: return &MREG (reg & 3);
-    case 6: return &BREG (reg & 3);
-    case 7: return &LREG (reg & 3);
-    default:
-      switch (fullreg)
-	{
-	case 32: return &AXREG (0);
-	case 33: return &AWREG (0);
-	case 34: return &AXREG (1);
-	case 35: return &AWREG (1);
-	case 39: return &RETSREG;
-	case 48: return &LCREG (0);
-	case 49: return &LTREG (0);
-	case 50: return &LBREG (0);
-	case 51: return &LCREG (1);
-	case 52: return &LTREG (1);
-	case 53: return &LBREG (1);
-	case 54: return &CYCLESREG;
-	case 55: return &CYCLES2REG;
-	case 56: return &USPREG;
-	case 57: return &SEQSTATREG;
-	case 58: return &SYSCFGREG;
-	case 59: return &RETIREG;
-	case 60: return &RETXREG;
-	case 61: return &RETNREG;
-	case 62: return &RETEREG;
-	case 63: return &EMUDAT_INREG;
-	}
-      return 0;
-    }
-}
-
-static const char *
-get_store_name (SIM_CPU *cpu, bu32 *p)
-{
-  if (p >= &DREG (0) && p <= &CYCLESREG)
-    return greg_names[p - &DREG (0)];
-  else if (p == &AXREG (0))
-    return greg_names[4 * 8 + 0];
-  else if (p == &AWREG (0))
-    return greg_names[4 * 8 + 1];
-  else if (p == &AXREG (1))
-    return greg_names[4 * 8 + 2];
-  else if (p == &AWREG (1))
-    return greg_names[4 * 8 + 3];
-  else if (p == &ASTATREG (av0))
-    return "ASTAT[av0]";
-  else if (p == &ASTATREG (av0s))
-    return "ASTAT[av0s]";
-  else if (p == &ASTATREG (av1))
-    return "ASTAT[av1]";
-  else if (p == &ASTATREG (av1s))
-    return "ASTAT[av1s]";
-  else
-    /* XXX: Worry about this when we start to STORE() it.  */
-    abort ();
 }
 
 static bu32
@@ -5151,7 +5167,7 @@ interp_insn_bfin (SIM_CPU *cpu, bu32 pc)
       /* XXX: This is missing register tracing.  */
       bu32 *addr = BFIN_CPU_STATE.stores[i].addr;
       *addr = BFIN_CPU_STATE.stores[i].val;
-      TRACE_REGISTER (cpu, "wrote %s = %#x", get_store_name (cpu, addr), *addr);
+      TRACE_REGISTER (cpu, "dequeuing write %s = %#x", get_store_name (cpu, addr), *addr);
     }
 
   return insn_len;

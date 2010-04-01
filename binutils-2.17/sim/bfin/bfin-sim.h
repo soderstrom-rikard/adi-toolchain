@@ -45,12 +45,6 @@ struct store {
   bu32 *addr;
   bu32 val;
 };
-#define STORE(X, Y) \
-  do { \
-    if (BFIN_CPU_STATE.n_stores == 20) abort (); \
-    BFIN_CPU_STATE.stores[BFIN_CPU_STATE.n_stores].addr = &(X); \
-    BFIN_CPU_STATE.stores[BFIN_CPU_STATE.n_stores++].val = (Y); \
-  } while (0)
 
 struct bfin_cpu_state
 {
