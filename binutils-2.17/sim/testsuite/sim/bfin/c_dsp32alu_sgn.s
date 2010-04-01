@@ -1,12 +1,9 @@
 //Original:/testcases/core/c_dsp32alu_sgn/c_dsp32alu_sgn.dsp
 // Spec Reference: dsp32alu dreg_lo(hi) = rnd dregs
 # mach: bfin
-# xfail: "need to implement these instructions in sim" bfin-*
 
 .include "testutils.inc"
 	start
-
-
 
 imm32 r0, 0x456789ab;
 imm32 r1, 0x6689abcd;
