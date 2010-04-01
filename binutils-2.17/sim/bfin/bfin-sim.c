@@ -1152,13 +1152,27 @@ decode_multfunc (SIM_CPU *cpu, int h0, int h1, int src0, int src1, int mmod,
 }
 
 static bu40
-saturate_s40 (bu64 val)
+saturate_s40_astat (bu64 val, bu32 *v)
 {
   if ((bs64)val < -((bs64)1 << 39))
-    val = -((bs64)1 << 39);
+    {
+      *v = 1;
+      return -((bs64)1 << 39);
+    }
   else if ((bs64)val >= ((bs64)1 << 39) - 1)
-    val = ((bu64)1 << 39) - 1;
+    {
+      *v = 1;
+      return ((bu64)1 << 39) - 1;
+    }
+  *v = 0; /* no overflow */
   return val;
+}
+
+static bu40
+saturate_s40 (bu64 val)
+{
+  bu32 v;
+  return saturate_s40_astat (val, &v);
 }
 
 static bu32
@@ -3722,7 +3736,7 @@ decode_dsp32alu_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1)
     {
       bs40 src_acc = get_extended_acc (cpu, aop);
 
-      TRACE_INSN (cpu, "A%i = - A%i %#lx %#lx;", HL, aop, src_acc, -src_acc);
+      TRACE_INSN (cpu, "A%i = - A%i;", HL, aop);
 
       SET_AREG (HL, saturate_s40 (-src_acc));
 
@@ -3806,8 +3820,9 @@ decode_dsp32alu_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1)
     }
   else if ((aop == 0 || aop == 1 || aop == 2) && aopcde == 11)
     {
-      bu64 acc0 = get_extended_acc (cpu, 0);
-      bu64 acc1 = get_extended_acc (cpu, 1);
+      bs40 acc0 = get_extended_acc (cpu, 0);
+      bs40 acc1 = get_extended_acc (cpu, 1);
+      bu32 v;
 
       if (aop == 0)
 	TRACE_INSN (cpu, "R%i = (A0 += A1);", dst0);
@@ -3817,12 +3832,15 @@ decode_dsp32alu_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1)
 	TRACE_INSN (cpu, "A0 += A1%s;", s ? " (W32)" : "");
 
       acc0 += acc1;
-      acc0 = saturate_s40 (acc0);
+      acc0 = saturate_s40_astat (acc0, &v);
       STORE (AXREG (0), acc0 >> 32);
       STORE (AWREG (0), acc0);
+      SET_ASTATREG (av0, v && acc1);
+      if (v)
+	SET_ASTATREG (av0s, v);
       if (aop == 2 && s == 1)	/* A0 += A1 (W32) */
 	{
-	  if (acc0 & (bu64)0x8000000000)
+	  if (acc0 & (bs40)0x8000000000)
 	    STORE (AXREG (0), 0x80);
 	  else
 	    STORE (AXREG (0), 0x0);
