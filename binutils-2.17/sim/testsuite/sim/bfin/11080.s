@@ -1,6 +1,6 @@
+# Blackfin testcase for DISALGNEXCPT
 # mach: bfin
 
-#include "test.h"
 .include "testutils.inc"
 	start
 
