@@ -3575,17 +3575,30 @@ decode_dsp32alu_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1)
   else if (aop == 3 && HL == 0 && aopcde == 16)
     {
       int i;
+      bu32 az;
+
       TRACE_INSN (cpu, "A1 = ABS A1 , A0 = ABS A0;");
+
+      az = 0;
       for (i = 0; i < 2; ++i)
 	{
-	  bu32 aw = AWREG (i);
-	  bu8 ax = AXREG (i);
-	  if (ax & 0x80)
-	    aw = -aw, ax = -ax;
-	  SET_AWREG (i, aw);
-	  SET_AXREG (i, ax);
+	  bu32 av;
+	  bs40 acc = get_extended_acc (cpu, i);
+
+	  if (acc >> 39)
+	    acc = -acc;
+	  av = acc == ((bs40)1 << 39);
+	  if (av)
+	    acc = ((bs40)1 << 39) - 1;
+
+	  SET_AREG (i, acc);
+	  SET_ASTATREG (av[i], av);
+	  if (av)
+	    SET_ASTATREG (avs[i], av);
+	  az |= (acc == 0);
 	}
-      /* XXX: what ASTAT flags need updating ?  */
+      SET_ASTATREG (az, az);
+      SET_ASTATREG (an, 0);
     }
   else if (aop == 0 && aopcde == 23)
     {
@@ -3618,17 +3631,24 @@ decode_dsp32alu_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1)
     }
   else if ((aop == 0 || aop == 1) && aopcde == 16)
     {
-      bu32 aw = AWREG (aop);
-      bu8 ax = AXREG (aop);
-      TRACE_INSN (cpu, "A%i = ABS A%i;", HL, aop);
-      if (ax & 0x80)
-	aw = -aw, ax = -ax;
-      SET_AWREG (HL, aw);
-      SET_AXREG (HL, ax);
+      bu32 av;
+      bs40 acc;
 
-      SET_ASTATREG (az, AWREG (HL) == 0 && AXREG (HL) == 0);
+      TRACE_INSN (cpu, "A%i = ABS A%i;", HL, aop);
+
+      acc = get_extended_acc (cpu, aop);
+      if (acc >> 39)
+	acc = -acc;
+      av = acc == ((bs40)1 << 39);
+      if (av)
+	acc = ((bs40)1 << 39) - 1;
+      SET_AREG (HL, acc);
+
+      SET_ASTATREG (av[HL], av);
+      if (av)
+   	SET_ASTATREG (avs[HL], av);
+      SET_ASTATREG (az, acc == 0);
       SET_ASTATREG (an, 0);
-      /* XXX: need to check AV[01] and AV[01]S */
     }
   else if (HL == 0 && aop == 3 && aopcde == 12)
     {

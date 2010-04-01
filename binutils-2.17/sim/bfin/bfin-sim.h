@@ -61,7 +61,9 @@ struct bfin_cpu_state
   bu32 pc, emudat[2];
   /* These ASTAT flags need not be bu32, but it makes pointers easier.  */
   bu32 ac0, ac0_copy, ac1, an, aq;
-  bu32 av0, av0s, av1, av1s, az, cc, v, v_copy, vs;
+  union { struct { bu32 av0;  bu32 av1;  }; bu32 av [2]; };
+  union { struct { bu32 av0s; bu32 av1s; }; bu32 avs[2]; };
+  bu32 az, cc, v, v_copy, vs;
   bu32 rnd_mod;
   bu32 v_internal;
 
