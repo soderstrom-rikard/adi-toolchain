@@ -5661,6 +5661,7 @@ else
   hardware="core pal glue \
 	bfin_cec \
 	bfin_ctimer \
+	bfin_dma \
 	bfin_ebiu_amc \
 	bfin_ebiu_sdc \
 	bfin_evt \

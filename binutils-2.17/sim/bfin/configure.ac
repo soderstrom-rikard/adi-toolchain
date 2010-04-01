@@ -17,6 +17,7 @@ SIM_AC_OPTION_ENVIRONMENT
 SIM_AC_OPTION_HARDWARE(yes,,\
 	bfin_cec \
 	bfin_ctimer \
+	bfin_dma \
 	bfin_ebiu_amc \
 	bfin_ebiu_sdc \
 	bfin_evt \

@@ -54,6 +54,18 @@ static inline void dv_store_4 (void *ptr, bu32 val)
   dv_store_2 (ptr, val);
 }
 
+#define dv_w1c(ptr, val, bits) (*(ptr) &= ~((val) & (bits)))
+
+static inline void dv_w1c_2 (bu16 *ptr, bu16 val, bu16 bits)
+{
+  dv_w1c (ptr, val, bits);
+}
+
+static inline void dv_w1c_4 (bu32 *ptr, bu32 val, bu32 bits)
+{
+  dv_w1c (ptr, val, bits);
+}
+
 static inline void *
 dv_get_state (SIM_CPU *cpu, const char *device_name)
 {
