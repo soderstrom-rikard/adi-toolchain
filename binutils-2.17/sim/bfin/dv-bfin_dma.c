@@ -102,94 +102,56 @@ bfin_dma_process_desc (struct hw *me, struct bfin_dma *dma)
   dma->curr_x_count = dma->x_count;
 }
 
-static bool
-bfin_dma_pump_out (struct hw *me, struct bfin_dma *dma, struct hw *peer)
-{
-  bu8 buf[1024];
-  unsigned ret, nr_bytes, ele_count;
-
-  do {
-    nr_bytes = MIN (sizeof (buf), dma->curr_x_count * dma->ele_size);
-
-    ret = sim_read (hw_system (me), dma->curr_addr, buf, nr_bytes);
-    if (ret != nr_bytes)
-      {
-	dma->irq_status |= DMA_ERR;
-	return false;
-      }
-
-    ret = hw_dma_write_buffer(peer, buf, 0, 0, nr_bytes, 0);
-    /* Ignore partial writes.  */
-    ele_count = ret / dma->ele_size;
-    /* Has the DMA stalled ?  abort for now.  */
-    if (!ele_count)
-      return false;
-
-    dma->curr_addr += ele_count * dma->x_modify;
-    dma->curr_x_count -= ele_count;
-  } while (dma->curr_x_count);
-
-  return true;
-}
-
-static bool
-bfin_dma_pump_in (struct hw *me, struct bfin_dma *dma, struct hw *peer)
-{
-  bu8 buf[1024];
-  unsigned ret, nr_bytes, ele_count;
-
-  do {
-    nr_bytes = MIN (sizeof (buf), dma->curr_x_count * dma->ele_size);
-
-    ret = hw_dma_read_buffer(peer, buf, 0, 0, nr_bytes);
-    /* XXX: How to handle partial reads ?  */
-    /* Has the DMA stalled ?  abort for now.  */
-    if (!ret)
-      return false;
-
-    ret = sim_write (hw_system (me), dma->curr_addr, buf, nr_bytes);
-    /* Ignore partial writes.  */
-    ele_count = ret / dma->ele_size;
-
-    dma->curr_addr += ele_count * dma->x_modify;
-    dma->curr_x_count -= ele_count;
-  } while (dma->curr_x_count);
-
-  return true;
-}
-
+/* Chew through the DMA over and over.  */
 static void
-bfin_dma_transfer (struct hw *me, struct bfin_dma *dma)
+bfin_dma_hw_event_callback (struct hw *me, void *data)
 {
-//  struct bfin_dma *dma_peer;
+  struct bfin_dma *dma = data;
   struct hw *peer;
-  bool ret;
-
-  dma->irq_status |= DMA_RUN;
-  bfin_dma_process_desc (me, dma);
+  bu8 buf[1024];
+  unsigned ret, nr_bytes, ele_count;
 
   peer = bfin_dma_get_peer (me, dma);
+  nr_bytes = MIN (sizeof (buf), dma->curr_x_count * dma->ele_size);
 
-#if 0
-  dma_peer = hw_data (peer);
-  if (!bfin_dma_enabled (dma_peer))
-    /* Need to wait for our peer.  */
-    return;
-#endif
-
-  /* Start pumping data!  */
+  /* Pumping a chunk!  */
   if (dma->src)
-    ret = bfin_dma_pump_in (me, dma, peer);
+    {
+      ret = hw_dma_read_buffer(peer, buf, 0, 0, nr_bytes);
+      /* XXX: How to handle partial DMA transfers ?  */
+      /* Has the DMA stalled ?  abort for now.  */
+      if (ret != nr_bytes)
+	goto error;
+      ret = sim_write (hw_system (me), dma->curr_addr, buf, nr_bytes);
+    }
   else
-    ret = bfin_dma_pump_out (me, dma, peer);
+    {
+      ret = sim_read (hw_system (me), dma->curr_addr, buf, nr_bytes);
+      if (ret != nr_bytes)
+	goto error;
+      ret = hw_dma_write_buffer(peer, buf, 0, 0, nr_bytes, 0);
+    }
 
-  /* Not ready and/or finished.  */
-  if (!ret)
-    return;
+  /* Ignore partial writes.  */
+  ele_count = ret / dma->ele_size;
+  dma->curr_addr += ele_count * dma->x_modify;
+  dma->curr_x_count -= ele_count;
 
-  /* Done!  Yeah!  */
-  /* XXX: Should this toggle Enable in dma->config ?  */
-  dma->irq_status = (dma->irq_status & ~DMA_RUN) | DMA_DONE;
+  if (!dma->curr_x_count)
+    {
+      /* XXX: This would be the time to process the next descriptor.  */
+      /* XXX: Should this toggle Enable in dma->config ?  */
+      dma->irq_status = (dma->irq_status & ~DMA_RUN) | DMA_DONE;
+    }
+  else
+    /* Still got work to do, so schedule again.  */
+    hw_event_queue_schedule (me, 1, bfin_dma_hw_event_callback, dma);
+
+  return;
+
+ error:
+  /* Don't reschedule on errors ...  */
+  dma->irq_status |= DMA_ERR;
 }
 
 static unsigned
@@ -216,12 +178,15 @@ bfin_dma_io_write_buffer (struct hw *me, const void *source,
   value16p = valuep;
   value32p = valuep;
 
+  /* XXX: All registers are RO when DMA is enabled (except IRQ_STATUS).
+          But does the HW discard writes or send up IVGHW ?  The sim
+          simply discards atm ... */
   switch (mmr_off)
     {
-    case mmr_offset(next_desc_ptr): /* XXX: RO when DMA is enabled.  */
-    case mmr_offset(start_addr): /* XXX: RO when DMA is enabled.  */
-    case mmr_offset(curr_desc_ptr): /* XXX: RO when DMA is enabled.  */
-    case mmr_offset(curr_addr): /* XXX: RO when DMA is enabled.  */
+    case mmr_offset(next_desc_ptr):
+    case mmr_offset(start_addr):
+    case mmr_offset(curr_desc_ptr):
+    case mmr_offset(curr_addr):
       /* Don't require 32bit access as all DMA MMRs can be used as 16bit.  */
       if (!bfin_dma_enabled (dma))
 	{
@@ -231,15 +196,15 @@ bfin_dma_io_write_buffer (struct hw *me, const void *source,
 	   *value16p = value;
 	}
       break;
-    case mmr_offset(x_count): /* XXX: RO when DMA is enabled.  */
-    case mmr_offset(x_modify): /* XXX: RO when DMA is enabled.  */
-    case mmr_offset(y_count): /* XXX: RO when DMA is enabled.  */
-    case mmr_offset(y_modify): /* XXX: RO when DMA is enabled.  */
-    case mmr_offset(peripheral_map): /* XXX: RO when DMA is enabled.  */
+    case mmr_offset(x_count):
+    case mmr_offset(x_modify):
+    case mmr_offset(y_count):
+    case mmr_offset(y_modify):
+    case mmr_offset(peripheral_map):
       if (!bfin_dma_enabled (dma))
 	*value16p = value;
       break;
-    case mmr_offset(config): /* XXX: RO when DMA is enabled.  */
+    case mmr_offset(config):
       if (!bfin_dma_enabled (dma) || !(value & DMAEN))
 	{
 	  if (nr_bytes == 4)
@@ -247,9 +212,12 @@ bfin_dma_io_write_buffer (struct hw *me, const void *source,
 	  else
 	    *value16p = value;
 
-	  /* XXX: Be nice to do this async ...  */
 	  if (bfin_dma_enabled (dma))
-	    bfin_dma_transfer (me, dma);
+	    {
+	      dma->irq_status |= DMA_RUN;
+	      bfin_dma_process_desc (me, dma);
+	      hw_event_queue_schedule (me, 1, bfin_dma_hw_event_callback, dma);
+	    }
 	}
       break;
     case mmr_offset(irq_status):
@@ -257,7 +225,6 @@ bfin_dma_io_write_buffer (struct hw *me, const void *source,
       break;
     case mmr_offset(curr_x_count):
     case mmr_offset(curr_y_count):
-      /* XXX: Should we throw Hardware Error when enabled ?  */
       if (!bfin_dma_enabled (dma))
 	*value16p = value;
       break;
