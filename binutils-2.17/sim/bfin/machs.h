@@ -40,8 +40,8 @@ struct bfin_memory_layout {
 };
 struct bfin_model_data {
   address_word async_bank_size;
-  const struct bfin_memory_layout *mem, *core_mmrs;
-  size_t mem_count, core_mmrs_count;
+  const struct bfin_memory_layout *mem;
+  size_t mem_count;
 };
 
 #define DEFAULT_MODEL "bf537"

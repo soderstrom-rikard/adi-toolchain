@@ -43,19 +43,9 @@ static const struct bfin_memory_layout bf537_mem[] = {
 	LAYOUT (0xFFA10000, 0x4000, read_write_exec),
 };
 
-#define CORE_MMRS(_addr, _len) { .addr = _addr, .len = _len, .mask = access_read_write_io, }
-static const struct bfin_memory_layout core_mmrs[] = {
-	CORE_MMRS (0xFFE02000, 4 * 16),	/* EVT0 ... EVT15 */
-	CORE_MMRS (0xFFE02104, 4 * 4),	/* CEC (IMASK/...) */
-	CORE_MMRS (0xFFE03000, 4 * 4),	/* Core Timers */
-	CORE_MMRS (0xFFE05000, 1 * 4),	/* DSPID */
-};
-
 static const struct bfin_model_data bfin_model_data[] =
 {
   [MODEL_BF537] = {
-	.core_mmrs       = core_mmrs,
-	.core_mmrs_count = ARRAY_SIZE (core_mmrs),
 	.mem             = bf537_mem,
 	.mem_count       = ARRAY_SIZE (bf537_mem),
 	.async_bank_size = 1 * 1024 * 1024,
@@ -231,7 +221,7 @@ bfin_prepare_run (SIM_CPU *cpu)
 static const MODEL bfin_models[] =
 {
   { "bf537", & bfin_mach, MODEL_BF537, NULL, bfin_model_init },
-  { 0 }
+  { 0, NULL, 0, NULL, NULL, }
 };
 
 static const MACH_IMP_PROPERTIES bfin_imp_properties =

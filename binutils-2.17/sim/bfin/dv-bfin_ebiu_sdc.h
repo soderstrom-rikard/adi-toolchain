@@ -25,16 +25,16 @@
 #define BFIN_COREMMR_EBIU_SDC_SIZE	(4 * 4)
 
 /* EBIU_SDBCTL Masks */
-#define EBE			0x0001		/* Enable SDRAM External Bank */
-#define EBSZ_16		0x0000		/* SDRAM External Bank Size = 16MB */
-#define EBSZ_32		0x0002		/* SDRAM External Bank Size = 32MB */
-#define EBSZ_64		0x0004		/* SDRAM External Bank Size = 64MB */
-#define EBSZ_128	0x0006		/* SDRAM External Bank Size = 128MB */
-#define EBSZ_256	0x0008		/* SDRAM External Bank Size = 256MB */
-#define EBSZ_512	0x000A		/* SDRAM External Bank Size = 512MB */
-#define EBCAW_8		0x0000		/* SDRAM External Bank Column Address Width = 8 Bits */
-#define EBCAW_9		0x0010		/* SDRAM External Bank Column Address Width = 9 Bits */
-#define EBCAW_10	0x0020		/* SDRAM External Bank Column Address Width = 10 Bits */
-#define EBCAW_11	0x0030		/* SDRAM External Bank Column Address Width = 11 Bits */
+#define EBE		0x0001	/* Enable SDRAM External Bank */
+#define EBSZ_16		0x0000	/* Size = 16MB */
+#define EBSZ_32		0x0002	/* Size = 32MB */
+#define EBSZ_64		0x0004	/* Size = 64MB */
+#define EBSZ_128	0x0006	/* Size = 128MB */
+#define EBSZ_256	0x0008	/* Size = 256MB */
+#define EBSZ_512	0x000A	/* Size = 512MB */
+#define EBCAW_8		0x0000	/* Column Address Width = 8 Bits */
+#define EBCAW_9		0x0010	/* Column Address Width = 9 Bits */
+#define EBCAW_10	0x0020	/* Column Address Width = 10 Bits */
+#define EBCAW_11	0x0030	/* Column Address Width = 11 Bits */
 
 #endif
