@@ -692,6 +692,50 @@ algn (bu32 l, bu32 h, bu32 aln)
     return (l >> (8 * aln)) | (h << (32 - 8 * aln));
 }
 
+static bu40
+rot40 (bu40 val, int shift, bu32 *cc)
+{
+  const int nbits = 40;
+  bu40 ret;
+
+  shift = CLAMP (shift, -nbits, nbits);
+  if (shift == 0)
+    return val;
+
+  /* Reduce everything to rotate left.  */
+  if (shift < 0)
+    shift += nbits + 1;
+
+  ret = shift == nbits ? 0 : val << shift;
+  ret |= shift == 1 ? 0 : val >> ((nbits + 1) - shift);
+  ret |= (bu40)*cc << (shift - 1);
+  *cc = (val >> (nbits - shift)) & 1;
+
+  return ret;
+}
+
+static bu32
+rot32 (bu32 val, int shift, bu32 *cc)
+{
+  const int nbits = 32;
+  bu32 ret;
+
+  shift = CLAMP (shift, -nbits, nbits);
+  if (shift == 0)
+    return val;
+
+  /* Reduce everything to rotate left.  */
+  if (shift < 0)
+    shift += nbits + 1;
+
+  ret = shift == nbits ? 0 : val << shift;
+  ret |= shift == 1 ? 0 : val >> ((nbits + 1) - shift);
+  ret |= (bu32)*cc << (shift - 1);
+  *cc = (val >> (nbits - shift)) & 1;
+
+  return ret;
+}
+
 static bu32
 add32 (SIM_CPU *cpu, bu32 a, bu32 b, int carry, int sat)
 {
@@ -1121,7 +1165,7 @@ cycles_inc (SIM_CPU *cpu, bu32 inc)
 static bu64
 get_unextended_acc (SIM_CPU *cpu, int which)
 {
-  return ((bu64)AXREG (which) << 32) | AWREG (which);
+  return ((bu64)(AXREG (which) & 0xff) << 32) | AWREG (which);
 }
 
 static bu64
@@ -4318,10 +4362,17 @@ decode_dsp32shift_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1)
     }
   else if (sop == 2 && sopcde == 3 && (HLs == 1 || HLs == 0))
     {
-      /* HLs == 1 : A1 = ROT A1 BY dregs_lo
-       * HLs == 0 : A0 = ROT A0 BY dregs_lo
-       */
-      unhandled_instruction (cpu, "An = ROT An BY dregs_lo");
+      int shift = imm6 (DREG (src0) & 0xFFFF);
+      bu32 cc = CCREG;
+      bu40 acc = get_unextended_acc (cpu, HLs);
+
+      TRACE_INSN (cpu, "A%i = ROT A%i BY R%i.L;", HLs, HLs, src0);
+      TRACE_DECODE (cpu, "A%i:%#lx shift:%i CC:%i", HLs, acc, shift, cc);
+
+      acc = rot40 (acc, shift, &cc);
+      SET_AREG (HLs, acc);
+      if (shift)
+	SET_CCREG (cc);
     }
   else if (sop == 0 && sopcde == 3 && (HLs == 0 || HLs == 1))
     {
@@ -4408,28 +4459,18 @@ decode_dsp32shift_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1)
     }
   else if (sop == 3 && sopcde == 2)
     {
-      int t = imm6 (DREG (src0) & 0xFFFF);
+      int shift = imm6 (DREG (src0) & 0xFFFF);
+      bu32 src = DREG (src1);
+      bu32 ret, cc = CCREG;
 
       TRACE_INSN (cpu, "R%i = ROT R%i BY R%i.L;", dst0, src1, src0);
+      TRACE_DECODE (cpu, "R%i:%#x R%i:%#x shift:%i CC:%i",
+		    dst0, DREG (dst0), src1, src, shift, cc);
 
-      /* Reduce everything to rotate left.  */
-      if (t < 0)
-	t += 33;
-
-      if (t > 0)
-	{
-	  int oldcc = CCREG;
-	  bu32 srcval = DREG (src1);
-	  bu32 result;
-	  result = t == 32 ? 0 : srcval << t;
-	  result |= t == 1 ? 0 : srcval >> (33 - t);
-	  result |= oldcc << (t - 1);
-	  STORE (DREG (dst0), result);
-	  SET_CCREG ((srcval >> (32 - t)) & 1);
-	}
-      else
-	STORE (DREG (dst0), DREG (src1));
-
+      ret = rot32 (src, shift, &cc);
+      STORE (DREG (dst0), ret);
+      if (shift)
+	SET_CCREG (cc);
     }
   else if (sop == 2 && sopcde == 1)
     {
@@ -4831,8 +4872,20 @@ decode_dsp32shiftimm_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1)
       else
 	STORE (DREG (dst0), (v & 0xFFFF0000) | result);
     }
-  else if (sop == 2 && sopcde == 3 && HLs == 1)
-    unhandled_instruction (cpu, "A1 = ROT A1 BY imm6");
+  else if (sop == 2 && sopcde == 3 && (HLs == 1 || HLs == 0))
+    {
+      int shift = imm6 (immag);
+      bu32 cc = CCREG;
+      bu40 acc = get_unextended_acc (cpu, HLs);
+
+      TRACE_INSN (cpu, "A%i = ROT A%i BY %i;", HLs, HLs, shift);
+      TRACE_DECODE (cpu, "A%i:%#lx shift:%i CC:%i", HLs, acc, shift, cc);
+
+      acc = rot40 (acc, shift, &cc);
+      SET_AREG (HLs, acc);
+      if (shift)
+	SET_CCREG (cc);
+    }
   else if (sop == 0 && sopcde == 3 && bit8 == 1)
     {
       /* Arithmetic shift, so shift in sign bit copies.  */
@@ -4878,8 +4931,6 @@ decode_dsp32shiftimm_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1)
 
       SET_AREG (HLs, acc);
     }
-  else if (sop == 2 && sopcde == 3 && HLs == 0)
-    unhandled_instruction (cpu, "A0 = ROT A0 BY imm6");
   else if (sop == 1 && sopcde == 1 && bit8 == 0)
     {
       int count = imm5 (immag);
@@ -4970,27 +5021,18 @@ decode_dsp32shiftimm_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1)
     }
   else if (sop == 3 && sopcde == 2)
     {
-      int t = imm6 (immag);
+      int shift = imm6 (immag);
+      bu32 src = DREG (src1);
+      bu32 ret, cc = CCREG;
 
-      TRACE_INSN (cpu, "R%i = ROT R%i BY %i;", dst0, src1, t);
+      TRACE_INSN (cpu, "R%i = ROT R%i BY %i;", dst0, src1, shift);
+      TRACE_DECODE (cpu, "R%i:%#x R%i:%#x shift:%i CC:%i",
+		    dst0, DREG (dst0), src1, src, shift, cc);
 
-      /* Reduce everything to rotate left.  */
-      if (t < 0)
-	t += 33;
-
-      if (t > 0)
-	{
-	  int oldcc = CCREG;
-	  bu32 srcval = DREG (src1);
-	  bu32 result;
-	  result = t == 32 ? 0 : srcval << t;
-	  result |= t == 1 ? 0 : srcval >> (33 - t);
-	  result |= oldcc << (t - 1);
-	  STORE (DREG (dst0), result);
-	  SET_CCREG ((srcval >> (32 - t)) & 1);
-	}
-      else
-	STORE (DREG (dst0), DREG (src1));
+      ret = rot32 (src, shift, &cc);
+      STORE (DREG (dst0), ret);
+      if (shift)
+	SET_CCREG (cc);
     }
   else if (sop == 0 && sopcde == 2)
     {
