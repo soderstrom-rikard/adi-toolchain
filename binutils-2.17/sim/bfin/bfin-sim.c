@@ -1146,6 +1146,8 @@ get_extended_cycles (SIM_CPU *cpu)
   return ((bu64)CYCLES2SHDREG << 32) | CYCLESREG;
 }
 
+/* We can't re-use sim_events_time() because the CYCLES registers may be
+   written/cleared/reset/stopped/started at any time by software.  */
 static void
 cycles_inc (SIM_CPU *cpu, bu32 inc)
 {
@@ -5186,7 +5188,12 @@ _interp_insn_bfin (SIM_CPU *cpu, bu32 pc)
     {
       iw1 = IFETCH (pc + 2);
       if ((iw0 & BIT_MULTI_INS) && (iw0 & 0xe800) != 0xe800 /* not linkage */)
-	insn_len = 8;
+	{
+	  SIM_DESC sd = CPU_STATE (cpu);
+	  trace_prefix (sd, cpu, NULL_CIA, pc, TRACE_LINENUM_P (cpu),
+			NULL, 0, "|| %#lx", sim_events_time (sd));
+	  insn_len = 8;
+	}
       else
 	insn_len = 4;
       TRACE_EXTRACT (cpu, "%s: iw0:%#x iw1:%#x insn_len:%i", __func__,
