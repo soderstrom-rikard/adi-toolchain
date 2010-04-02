@@ -166,6 +166,9 @@ bfin_ebiu_sdc_finish (struct hw *me)
   sdc->sdbctl = 0x00000000;
   sdc->sdrrc = 0x081A;
   sdc->sdstat = 0x0008;
+
+  /* XXX: We boot with 64M external memory by default ...  */
+  sdc->sdbctl |= EBE | EBSZ_64 | EBCAW_10;
 }
 
 const struct hw_descriptor dv_bfin_ebiu_sdc_descriptor[] = {
