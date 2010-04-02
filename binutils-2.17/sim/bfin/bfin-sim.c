@@ -5078,7 +5078,7 @@ decode_psedoDEBUG_0 (SIM_CPU *cpu, bu16 iw0)
     {
       TRACE_INSN (cpu, "DBG A%i;", reg);
       sim_io_printf (sd, "DBG : A%i = %#"PRIx64"\n", reg,
-		     get_extended_acc (cpu, reg));
+		     get_extended_acc (cpu, reg) & 0xffffffffffll);
     }
   else if (reg == 3 && fn == 3)
     {
