@@ -3249,7 +3249,7 @@ decode_dsp32mac_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1)
   int h01 = ((iw1 >> 15) & 0x1);
 
   bu32 res0, res1;
-  bu32 res = DREG(dst);
+  bu32 res = DREG (dst);
 
   TRACE_EXTRACT (cpu, "%s: M:%i mmod:%i MM:%i P:%i w1:%i op1:%i h01:%i h11:%i "
 		      "w0:%i op0:%i h00:%i h10:%i dst:%i src0:%i src1:%i",
@@ -3276,29 +3276,29 @@ decode_dsp32mac_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1)
   if (w0)
     {
       if (P)
-	STORE (DREG(dst), res0);
+	STORE (DREG (dst), res0);
       else
 	{
 	  if (res0 & 0xffff0000)
 	    unhandled_instruction (cpu, "dsp32mac0");
-	  res = REG_H_L(res, res0);
+	  res = REG_H_L (res, res0);
 	}
     }
 
   if (w1)
     {
       if (P)
-	STORE (DREG(dst + 1), res1);
+	STORE (DREG (dst + 1), res1);
       else
 	{
 	  if (res1 & 0xffff0000)
 	    unhandled_instruction (cpu, "dsp32mac1");
-	  res = REG_H_L(res1 << 16, res);
+	  res = REG_H_L (res1 << 16, res);
 	}
     }
 
    if (!P && (w0 || w1))
-    STORE (DREG(dst), res);
+    STORE (DREG (dst), res);
 }
 
 static void
@@ -3428,8 +3428,8 @@ decode_dsp32alu_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1)
     }
   else if ((aop == 1 || aop == 0) && aopcde == 5)
     {
-      bs32 val0 = DREG(src0);
-      bs32 val1 = DREG(src1);
+      bs32 val0 = DREG (src0);
+      bs32 val1 = DREG (src1);
       bs32 res;
       bs32 signRes;
       bs32 ovX, sBit1, sBit2, sBitRes1, sBitRes2;
@@ -3489,9 +3489,9 @@ decode_dsp32alu_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1)
       res >>= 16;
 
       if (HL)
-	STORE(DREG(dst0), REG_H_L (res << 16, DREG(dst0)));
+	STORE (DREG (dst0), REG_H_L (res << 16, DREG (dst0)));
       else
-	STORE(DREG(dst0), REG_H_L (DREG(dst0), res));
+	STORE (DREG (dst0), REG_H_L (DREG (dst0), res));
 
       SET_ASTATREG (az, res == 0);
       SET_ASTATREG (an, res & 0x8000);
@@ -3500,8 +3500,8 @@ decode_dsp32alu_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1)
     }
   else if ((aop == 2 || aop == 3) && aopcde == 5)
     {
-      bs32 val0 = DREG(src0);
-      bs32 val1 = DREG(src1);
+      bs32 val0 = DREG (src0);
+      bs32 val1 = DREG (src1);
       bs32 res;
 
       TRACE_INSN (cpu, "R%i.%s = R%i %s R%i (RND20)", dst0, HL ? "L" : "H",
@@ -3519,9 +3519,9 @@ decode_dsp32alu_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1)
       /* Don't worry about overflows, since we are shifting right */
 
       if (HL)
-	STORE(DREG(dst0), REG_H_L (res << 16, DREG(dst0)));
+	STORE (DREG (dst0), REG_H_L (res << 16, DREG (dst0)));
       else
-	STORE(DREG(dst0), REG_H_L (DREG(dst0), res));
+	STORE (DREG (dst0), REG_H_L (DREG (dst0), res));
 
       SET_ASTATREG (az, res == 0);
       SET_ASTATREG (an, res & 0x8000);
@@ -3800,11 +3800,11 @@ decode_dsp32alu_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1)
       else
 	SET_DREG (dst0, REG_H_L (res << 16, DREG (dst0)));
 
-      SET_ASTATREG(az, res == 0);
-      SET_ASTATREG(an, res < 0);
-      SET_ASTATREG(v, ovX);
+      SET_ASTATREG (az, res == 0);
+      SET_ASTATREG (an, res < 0);
+      SET_ASTATREG (v, ovX);
       if (ovX)
-	SET_ASTATREG(vs, ovX);
+	SET_ASTATREG (vs, ovX);
     }
   else if (aop == 3 && HL == 0 && aopcde == 15)
     {
@@ -3876,10 +3876,10 @@ decode_dsp32alu_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1)
     }
   else if (aop == 0 && aopcde == 12)
     {
-      bs16 tmp0_hi = DREG(src0) >> 16;
-      bs16 tmp0_lo = DREG(src0);
-      bs16 tmp1_hi = DREG(src1) >> 16;
-      bs16 tmp1_lo = DREG(src1);
+      bs16 tmp0_hi = DREG (src0) >> 16;
+      bs16 tmp0_lo = DREG (src0);
+      bs16 tmp1_hi = DREG (src1) >> 16;
+      bs16 tmp1_lo = DREG (src1);
 
       TRACE_INSN (cpu, "R%i.L = R%i.H = SIGN(R%i.H) * R%i.H + SIGN(R%i.L) & R%i.L;",
 		  dst0, dst0, src0, src1, src0, src1 );
@@ -4545,7 +4545,7 @@ decode_dsp32shift_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1)
     }
   else if (sop == 0 && sopcde == 7)
     {
-      bu16 sv1 = (bu16)signbits(DREG (src1), 32);
+      bu16 sv1 = (bu16)signbits (DREG (src1), 32);
       bu16 sv0 = (bu16)DREG (src0);
       bu16 dst_lo;
 
@@ -4570,8 +4570,8 @@ decode_dsp32shift_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1)
 
       TRACE_INSN (cpu, "R%i.L = EXPADJ (R%i, R%i.L) (V);", dst0, src1, src0);
 
-      tmp_hi = signbits(src1_hi, 16);
-      tmp_lo = signbits(src1_lo, 16);
+      tmp_hi = signbits (src1_hi, 16);
+      tmp_lo = signbits (src1_lo, 16);
 
       if ((tmp_hi & 0xf) < (tmp_lo & 0xf))
 	if ((tmp_hi & 0xf) < (src0_lo & 0xf))
@@ -4595,7 +4595,7 @@ decode_dsp32shift_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1)
 
       TRACE_INSN (cpu, "R%i.L = EXPADJ (R%i.L, R%i.L);", dst0, src1, src0);
 
-      tmp = signbits(DREG (src1) & 0xFFFF, 16);
+      tmp = signbits (DREG (src1) & 0xFFFF, 16);
 
       if ((tmp & 0xf) < (src0_lo & 0xf))
 	SET_DREG_L (dst0, tmp);
@@ -4609,7 +4609,7 @@ decode_dsp32shift_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1)
 
       TRACE_INSN (cpu, "R%i.L = EXPADJ (R%i.H, R%i.L);", dst0, src1, src0);
 
-      tmp = signbits((DREG (src1) & 0xFFFF0000) >> 16, 16);
+      tmp = signbits ((DREG (src1) & 0xFFFF0000) >> 16, 16);
 
       if ((tmp & 0xf) < (src0_lo & 0xf))
 	SET_DREG_L (dst0, tmp);
