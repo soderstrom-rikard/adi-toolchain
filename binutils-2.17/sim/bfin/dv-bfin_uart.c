@@ -28,6 +28,8 @@
 struct bfin_uart
 {
   bu32 base;
+  char saved_byte;
+  int saved_count;
 
   /* These are aliased to DLL.  */
   bu16 BFIN_MMR_16(thr), BFIN_MMR_16(rbr);
@@ -130,6 +132,54 @@ bfin_uart_io_write_buffer (struct hw *me, const void *source,
   return nr_bytes;
 }
 
+/* Switch between socket and stdin on the fly.  */
+static bu16
+bfin_uart_get_next_byte (struct hw *me, struct bfin_uart *uart)
+{
+  SIM_DESC sd = hw_system (me);
+  int status = dv_sockser_status (sd);
+
+  if (status & DV_SOCKSER_DISCONNECTED)
+    {
+      if (uart->saved_count > 0)
+	{
+	  uart->rbr = uart->saved_byte;
+	  --uart->saved_count;
+	}
+      else
+	{
+	  char byte;
+	  int ret = sim_io_read_stdin (sd, &byte, 1);
+	  if (ret > 0)
+	    uart->rbr = byte;
+	}
+    }
+  else
+    uart->rbr = dv_sockser_read (sd);
+
+  return uart->rbr;
+}
+
+static bu16
+bfin_uart_get_status (struct hw *me, struct bfin_uart *uart)
+{
+  SIM_DESC sd = hw_system (me);
+  int status = dv_sockser_status (sd);
+
+  if (status & DV_SOCKSER_DISCONNECTED)
+    {
+      if (uart->saved_count <= 0)
+	uart->saved_count = sim_io_poll_read (sd, 0/*STDIN*/,
+					      &uart->saved_byte, 1);
+      uart->lsr |= TEMT | THRE | (uart->saved_count > 0 ? DR : 0);
+    }
+  else
+    uart->lsr |= (status & DV_SOCKSER_INPUT_EMPTY ? 0 : DR) |
+		 (status & DV_SOCKSER_OUTPUT_EMPTY ? TEMT | THRE : 0);
+
+  return uart->lsr;
+}
+
 static unsigned
 bfin_uart_io_read_buffer (struct hw *me, void *dest,
 			 int space, address_word addr, unsigned nr_bytes)
@@ -152,12 +202,7 @@ bfin_uart_io_read_buffer (struct hw *me, void *dest,
 	dv_store_2 (dest, uart->dll);
       else
 	{
-	  SIM_DESC sd = hw_system (me);
-	  int status = dv_sockser_status (sd);
-
-	  if (!(status & DV_SOCKSER_DISCONNECTED))
-	    uart->rbr = dv_sockser_read (sd);
-
+	  uart->rbr = bfin_uart_get_next_byte (me, uart);
 	  dv_store_2 (dest, uart->rbr);
 	}
       break;
@@ -168,24 +213,11 @@ bfin_uart_io_read_buffer (struct hw *me, void *dest,
 	dv_store_2 (dest, uart->ier);
       break;
     case mmr_offset(lsr):
-      {
-	/* XXX: Reads are destructive ...  */
-	SIM_DESC sd = hw_system (me);
-	int status = dv_sockser_status (sd);
-
-	if (status & DV_SOCKSER_DISCONNECTED)
-	  /* XXX: Peek/poll stdin ?  */
-	  uart->lsr |= TEMT | THRE;
-	else
-	  uart->lsr |=
-		(status & DV_SOCKSER_INPUT_EMPTY ? 0 : DR) |
-		(status & DV_SOCKSER_OUTPUT_EMPTY ? TEMT | THRE : 0);
-
-	dv_store_2 (dest, *valuep);
-	uart->lsr = 0;
-
-	break;
-      }
+      /* XXX: Reads are destructive on most parts, but not all ...  */
+      uart->lsr |= bfin_uart_get_status (me, uart);
+      dv_store_2 (dest, *valuep);
+      uart->lsr = 0;
+      break;
     case mmr_offset(iir):
       /* XXX: Reads are destructive ...  */
     case mmr_offset(lcr):
