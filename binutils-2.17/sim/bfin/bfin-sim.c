@@ -3267,7 +3267,19 @@ decode_dsp32mac_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1)
   if (((1 << mmod) & (P ? 0x313 : 0x1b57)) == 0)
     unhandled_instruction (cpu, "dsp32mac");
 
-  /* XXX: Missing TRACE_INSN.  */
+  /* XXX: Missing TRACE_INSN - this is as good as it gets for now  */
+  if (w0 && w1 && P)
+    TRACE_INSN (cpu, "R%i:%i = macfunc", dst + 1, dst);
+  else if (w0 && P)
+    TRACE_INSN (cpu, "R%i = macfunc", dst);
+  else if (w1 && P)
+    TRACE_INSN (cpu, "R%i = macfunc", dst+1);
+
+  if (w0 && !P)
+    TRACE_INSN (cpu, "R%i.L = macfunc", dst);
+  else if (w1 && !P)
+    TRACE_INSN (cpu, "R%i.H = macfunc", dst);
+
 
   if (w1 == 1 || op1 != 3)
     res1 = decode_macfunc (cpu, 1, op1, h01, h11, src0, src1, mmod, MM, P);
