@@ -399,8 +399,8 @@ _cec_raise (SIM_CPU *cpu, struct bfin_cec *cec, int ivg)
 	  excp_to_sim_halt (sim_stopped, SIM_SIGTRAP);
 	  break;
 	case IVG_RST:
-	  /* XXX: this should reset the core.  */
-	  sim_io_error (sd, "%s: raise 1 (core reset) not implemented", __func__);
+	  /* Have the core reset simply exit (i.e. "shutdown").  */
+	  excp_to_sim_halt (sim_exited, 0);
 	  break;
 	case IVG_NMI:
 	  SET_RETNREG (PCREG);
