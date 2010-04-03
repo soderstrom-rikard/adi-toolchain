@@ -33,4 +33,8 @@
 #define EVT4         (EVT0 + 4 * 4)
 #define EVT5         (EVT0 + 4 * 5)
 #define EVT6         (EVT0 + 4 * 6)
+
 #define EVT_OVERRIDE 0xFFE02100
+#define IMASK        (EVT_OVERRIDE + 4 * 1)
+#define IPEND        (EVT_OVERRIDE + 4 * 2)
+#define ILAT         (EVT_OVERRIDE + 4 * 3)

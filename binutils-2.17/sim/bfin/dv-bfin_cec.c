@@ -33,6 +33,8 @@ struct bfin_cec
 #define mmr_base()      offsetof(struct bfin_cec, evt_override)
 #define mmr_offset(mmr) (offsetof(struct bfin_cec, mmr) - mmr_base())
 
+static void _cec_raise (SIM_CPU *, struct bfin_cec *, int);
+
 static void
 _cec_imask_write (struct bfin_cec *cec, bu32 value)
 {
@@ -58,6 +60,8 @@ bfin_cec_io_write_buffer (struct hw *me, const void *source,
       break;
     case mmr_offset(imask):
       _cec_imask_write (cec, value);
+      /* Check for pending interrupts that are now enabled.  */
+      _cec_raise (hw_system_cpu (me), cec, -1);
       break;
     case mmr_offset(ipend):
     case mmr_offset(ilat):
@@ -139,8 +143,8 @@ const struct hw_descriptor dv_bfin_cec_descriptor[] = {
 
 #define CEC_STATE(cpu) ((struct bfin_cec *) dv_get_state (cpu, "/core/bfin_cec"))
 
-#define __cec_get_ivg(cec, mmr) (ffs ((cec)->mmr & ~IVG_IRPTEN_B) - 1)
-#define _cec_get_ivg(cec) __cec_get_ivg (cec, ipend)
+#define __cec_get_ivg(val) (ffs ((val) & ~(IVG_EMU_B | IVG_IRPTEN_B)) - 1)
+#define _cec_get_ivg(cec) __cec_get_ivg ((cec)->ipend)
 
 int
 cec_get_ivg (SIM_CPU *cpu)
@@ -187,7 +191,6 @@ cec_require_supervisor (SIM_CPU *cpu)
 }
 
 extern void bfin_trap (SIM_CPU *);
-static void _cec_raise (SIM_CPU *, struct bfin_cec *, int);
 
 #define excp_to_sim_halt(reason, sigrc) \
   sim_engine_halt (CPU_STATE (cpu), cpu, NULL, PCREG, reason, sigrc)
@@ -299,6 +302,9 @@ void cec_sti (SIM_CPU *cpu, bu32 ints)
   _cec_imask_write (cec, ints);
 
   TRACE_EVENTS (cpu, "STI changed IMASK from %#x to %#x", old_mask, cec->imask);
+
+  /* Check for pending interrupts that are now enabled.  */
+  _cec_raise (cpu, cec, -1);
 }
 
 static void
@@ -340,7 +346,7 @@ _cec_raise (SIM_CPU *cpu, struct bfin_cec *cec, int ivg)
       if (irpten)
 	goto done; /* All interrupts are masked anyways.  */
 
-      ivg = __cec_get_ivg (cec, ilat);
+      ivg = __cec_get_ivg (cec->ilat & cec->imask);
       if (ivg < 0)
 	goto done; /* Nothing latched.  */
 
