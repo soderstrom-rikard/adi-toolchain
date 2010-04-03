@@ -211,25 +211,19 @@ sim_engine_run (SIM_DESC sd,
 		int nr_cpus, /* ignore */
 		int siggnal) /* ignore */
 {
-  sim_cia cia;
-  sim_cpu *cpu;
+  int i;
+
   SIM_ASSERT (STATE_MAGIC (sd) == SIM_MAGIC_NUMBER);
-  cpu = STATE_CPU (sd, 0);
-  cia = CIA_GET (cpu);
+
   while (1)
-    {
-      cia = step_once (cpu);
-      /* process any events */
-      if (sim_events_tick (sd))
-	{
-	  /* XXX: a lot of things fail with this:
-	     - single stepping
-	     - stepping over break points
-	     - restarting the same instruction after an event
-	  CIA_SET (cpu, cia); */
+    for (i = 0; i < MAX_NR_PROCESSORS; ++i)
+      {
+	SIM_CPU *cpu = STATE_CPU (sd, i);
+	step_once (cpu);
+	/* process any events */
+	if (sim_events_tick (sd))
 	  sim_events_process (sd);
-	}
-    }
+      }
 }
 
 /* Cover function of sim_state_free to free the cpu buffers as well.  */
