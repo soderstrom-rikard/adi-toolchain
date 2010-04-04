@@ -55,15 +55,24 @@ static inline void dv_store_4 (void *ptr, bu32 val)
 }
 
 #define dv_w1c(ptr, val, bits) (*(ptr) &= ~((val) & (bits)))
-
 static inline void dv_w1c_2 (bu16 *ptr, bu16 val, bu16 bits)
 {
   dv_w1c (ptr, val, bits);
 }
-
 static inline void dv_w1c_4 (bu32 *ptr, bu32 val, bu32 bits)
 {
   dv_w1c (ptr, val, bits);
+}
+
+#define dv_w1c_partial(ptr, val, bits) \
+  (*(ptr) = ((val) | (*(ptr) & (bits))) & ~((val) & (bits)))
+static inline void dv_w1c_2_partial (bu16 *ptr, bu16 val, bu16 bits)
+{
+  dv_w1c_partial (ptr, val, bits);
+}
+static inline void dv_w1c_4_partial (bu32 *ptr, bu32 val, bu32 bits)
+{
+  dv_w1c_partial (ptr, val, bits);
 }
 
 static inline void *

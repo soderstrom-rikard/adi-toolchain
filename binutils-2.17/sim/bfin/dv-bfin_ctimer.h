@@ -24,4 +24,10 @@
 #define BFIN_COREMMR_CTIMER_BASE	0xFFE03000
 #define BFIN_COREMMR_CTIMER_SIZE	(4 * 4)
 
+/* TCNTL Masks */
+#define TMPWR		(1 << 0)
+#define TMREN		(1 << 1)
+#define TAUTORLD	(1 << 2)
+#define TINT		(1 << 3)
+
 #endif

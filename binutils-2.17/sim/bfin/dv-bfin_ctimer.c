@@ -25,6 +25,7 @@
 struct bfin_ctimer
 {
   bu32 base;
+  struct hw_event *handler;
 
   /* Order after here is important -- matches hardware MMR layout.  */
   bu32 tcntl, tperiod, tscale, tcount;
@@ -32,9 +33,33 @@ struct bfin_ctimer
 #define mmr_base()      offsetof(struct bfin_ctimer, tcntl)
 #define mmr_offset(mmr) (offsetof(struct bfin_ctimer, mmr) - mmr_base())
 
+static bool
+bfin_ctimer_enabled (struct bfin_ctimer *ctimer)
+{
+  return (ctimer->tcntl & TMPWR) && (ctimer->tcntl & TMREN);
+}
+
+static void
+bfin_ctimer_tick (struct hw *me, void *data)
+{
+  struct bfin_ctimer *ctimer = data;
+
+  if (--ctimer->tcount)
+    goto reschedule;
+
+  ctimer->tcntl |= TINT;
+  if (ctimer->tcntl & TAUTORLD)
+    ctimer->tcount = ctimer->tperiod;
+
+  /* XXX: generate an interrupt here ...  */
+
+ reschedule:
+  hw_event_queue_schedule (me, ctimer->tscale + 1, bfin_ctimer_tick, ctimer);
+}
+
 static unsigned
 bfin_ctimer_io_write_buffer (struct hw *me, const void *source,
-			  int space, address_word addr, unsigned nr_bytes)
+			     int space, address_word addr, unsigned nr_bytes)
 {
   struct bfin_ctimer *ctimer = hw_data (me);
   bu32 mmr_off;
@@ -51,9 +76,37 @@ bfin_ctimer_io_write_buffer (struct hw *me, const void *source,
 
   switch (mmr_off)
     {
+    case mmr_offset(tcntl):
+      /* XXX: docs say TINT is sticky, but hardware doesnt seem to be ?  */
+      dv_w1c_4_partial (valuep, value, TINT);
+
+      if (bfin_ctimer_enabled (ctimer) && !ctimer->handler)
+	{
+	  ctimer->handler = hw_event_queue_schedule (me, ctimer->tscale + 1,
+						     bfin_ctimer_tick, ctimer);
+	}
+      else if (!bfin_ctimer_enabled (ctimer) && ctimer->handler)
+	{
+	  hw_event_queue_deschedule (me, ctimer->handler);
+	  ctimer->handler = NULL;
+	}
+
+      break;
     case mmr_offset(tcount):
+      /* Writes are discarded when enabled.  */
+      if (!bfin_ctimer_enabled (ctimer))
+	*valuep = value;
+      break;
     case mmr_offset(tperiod):
-    default:
+      /* Writes are discarded when enabled.  */
+      if (!bfin_ctimer_enabled (ctimer))
+	{
+	  /* Writes are mirrored into TCOUNT.  */
+	  ctimer->tcount = value;
+	  *valuep = value;
+	}
+      break;
+    case mmr_offset(tscale):
       *valuep = value;
       break;
     }
@@ -63,7 +116,7 @@ bfin_ctimer_io_write_buffer (struct hw *me, const void *source,
 
 static unsigned
 bfin_ctimer_io_read_buffer (struct hw *me, void *dest,
-			 int space, address_word addr, unsigned nr_bytes)
+			    int space, address_word addr, unsigned nr_bytes)
 {
   struct bfin_ctimer *ctimer = hw_data (me);
   bu32 mmr_off;
