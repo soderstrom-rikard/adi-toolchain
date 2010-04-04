@@ -20,6 +20,7 @@
 
 #include "sim-main.h"
 #include "devices.h"
+#include "dv-bfin_cec.h"
 #include "dv-bfin_ctimer.h"
 
 struct bfin_ctimer
@@ -51,7 +52,7 @@ bfin_ctimer_tick (struct hw *me, void *data)
   if (ctimer->tcntl & TAUTORLD)
     ctimer->tcount = ctimer->tperiod;
 
-  /* XXX: generate an interrupt here ...  */
+  hw_port_event (me, IVG_IVTMR, 1);
 
  reschedule:
   hw_event_queue_schedule (me, ctimer->tscale + 1, bfin_ctimer_tick, ctimer);
@@ -132,6 +133,10 @@ bfin_ctimer_io_read_buffer (struct hw *me, void *dest,
   return nr_bytes;
 }
 
+static const struct hw_port_descriptor bfin_ctimer_ports[] = {
+  { "ivtmr", IVG_IVTMR, 0, output_port, },
+};
+
 static void
 attach_bfin_ctimer_regs (struct hw *me, struct bfin_ctimer *ctimer)
 {
@@ -170,6 +175,7 @@ bfin_ctimer_finish (struct hw *me)
   set_hw_data (me, ctimer);
   set_hw_io_read_buffer (me, bfin_ctimer_io_read_buffer);
   set_hw_io_write_buffer (me, bfin_ctimer_io_write_buffer);
+  set_hw_ports (me, bfin_ctimer_ports);
 
   attach_bfin_ctimer_regs (me, ctimer);
 

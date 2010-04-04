@@ -254,6 +254,7 @@ bfin_hw_tree_init (SIM_DESC sd)
 {
   dv_bfin_hw_parse (sd, cec, CEC);
   dv_bfin_hw_parse (sd, ctimer, CTIMER);
+  sim_hw_parse (sd, "/core/bfin_ctimer > ivtmr ivtmr /core/bfin_cec");
   dv_bfin_hw_parse (sd, evt, EVT);
   dv_bfin_hw_parse (sd, mmu, MMU);
   dv_bfin_hw_parse (sd, trace, TRACE);

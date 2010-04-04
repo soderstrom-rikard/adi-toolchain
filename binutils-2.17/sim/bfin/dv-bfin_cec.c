@@ -90,6 +90,38 @@ bfin_cec_io_read_buffer (struct hw *me, void *dest,
   return nr_bytes;
 }
 
+static const struct hw_port_descriptor bfin_cec_ports[] = {
+  { "emu",   IVG_EMU,   0, input_port, },
+  { "rst",   IVG_RST,   0, input_port, },
+  { "nmi",   IVG_NMI,   0, input_port, },
+  { "evx",   IVG_EVX,   0, input_port, },
+  { "ivhw",  IVG_IVHW,  0, input_port, },
+  { "ivtmr", IVG_IVTMR, 0, input_port, },
+  { "ivg7",  IVG7,      0, input_port, },
+  { "ivg8",  IVG8,      0, input_port, },
+  { "ivg9",  IVG9,      0, input_port, },
+  { "ivg10", IVG10,     0, input_port, },
+  { "ivg11", IVG11,     0, input_port, },
+  { "ivg12", IVG12,     0, input_port, },
+  { "ivg13", IVG13,     0, input_port, },
+  { "ivg14", IVG14,     0, input_port, },
+  { "ivg15", IVG15,     0, input_port, },
+};
+
+static void
+bfin_cec_port_event (struct hw *me, int my_port, struct hw *source,
+		     int source_port, int level)
+{
+  SIM_CPU *cpu = hw_system_cpu (me);
+  if (cpu == NULL)
+    {
+      /* XXX: Why does gdb make use do this ?  */
+      SIM_DESC sd = hw_system (me);
+      cpu = STATE_CPU (sd, 0);
+    }
+  _cec_raise (cpu, hw_data (me), my_port);
+}
+
 static void
 attach_bfin_cec_regs (struct hw *me, struct bfin_cec *cec)
 {
@@ -128,6 +160,8 @@ bfin_cec_finish (struct hw *me)
   set_hw_data (me, cec);
   set_hw_io_read_buffer (me, bfin_cec_io_read_buffer);
   set_hw_io_write_buffer (me, bfin_cec_io_write_buffer);
+  set_hw_ports (me, bfin_cec_ports);
+  set_hw_port_event (me, bfin_cec_port_event);
 
   attach_bfin_cec_regs (me, cec);
 
