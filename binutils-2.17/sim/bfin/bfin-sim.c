@@ -4380,7 +4380,9 @@ decode_dsp32shift_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1)
       else
 	SET_DREG (dst0, REG_H_L (val << 16, DREG (dst0)));
 
-      /* XXX: ASTAT */
+      SET_ASTATREG (az, !((val & 0xFFFF0000) == 0) || ((val & 0xFFFF) == 0));
+      SET_ASTATREG (an, (!!(val & 0x80000000)) ^ (!!(val & 0x8000)));
+      SET_ASTATREG (v, 0);
     }
   else if (sop == 2 && sopcde == 3 && (HLs == 1 || HLs == 0))
     {
