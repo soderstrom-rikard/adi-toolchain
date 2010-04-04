@@ -1921,7 +1921,7 @@ decode_CCflag_0 (SIM_CPU *cpu, bu16 iw0)
 	  break;
 	case 4:	/* unsigned */
 	  op = "<=";
-	  cc = srcop <= dstop;;
+	  cc = srcop <= dstop;
 	  break;
 	}
 
@@ -3284,7 +3284,6 @@ decode_dsp32mac_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1)
   else if (w1 && !P)
     TRACE_INSN (cpu, "R%i.H = macfunc", dst);
 
-
   if (w1 == 1 || op1 != 3)
     res1 = decode_macfunc (cpu, 1, op1, h01, h11, src0, src1, mmod, MM, P);
 
@@ -3904,7 +3903,7 @@ decode_dsp32alu_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1)
       bs16 tmp1_lo = DREG (src1);
 
       TRACE_INSN (cpu, "R%i.L = R%i.H = SIGN(R%i.H) * R%i.H + SIGN(R%i.L) & R%i.L;",
-		  dst0, dst0, src0, src1, src0, src1 );
+		  dst0, dst0, src0, src1, src0, src1);
 
       if ((tmp0_hi >> 15) & 1)
 	tmp1_hi = ~tmp1_hi + 1;
@@ -5100,7 +5099,7 @@ decode_psedoDEBUG_0 (SIM_CPU *cpu, bu16 iw0)
     {
       TRACE_INSN (cpu, "DBG A%i;", reg);
       sim_io_printf (sd, "DBG : A%i = %#"PRIx64"\n", reg,
-		     get_extended_acc (cpu, reg) & 0xffffffffffll);
+		     get_unextended_acc (cpu, reg));
     }
   else if (reg == 3 && fn == 3)
     {
