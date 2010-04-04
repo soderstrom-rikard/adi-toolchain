@@ -565,8 +565,8 @@ dagsub (SIM_CPU *cpu, int dagno, bs32 M)
   return res;
 }
 
-static bu32
-ashiftrt (SIM_CPU *cpu, bu32 val, int cnt, int size)
+static bu40
+ashiftrt (SIM_CPU *cpu, bu40 val, int cnt, int size)
 {
   int real_cnt = cnt > size ? size : cnt;
   bu32 sgn = ~((val >> (size - 1)) - 1);
