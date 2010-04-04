@@ -27,7 +27,7 @@
 
 	.macro _atest acc:req, val_x:req, val_w:req, cc:req, shift:req, exp_x:req, exp_w:req, expcc:req
 	atest_setup \acc, \val_x, \val_w, \cc, \shift
-	DBG \acc;
+	_DBG \acc;
 	\acc = ROT \acc BY \shift;
 	atest_check \acc, \exp_x, \exp_w, \expcc
 
