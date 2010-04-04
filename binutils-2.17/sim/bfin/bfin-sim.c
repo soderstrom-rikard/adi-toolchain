@@ -1899,11 +1899,11 @@ decode_CCflag_0 (SIM_CPU *cpu, bu16 iw0)
       int flgn = result >> 31;
       int overflow = (flgs ^ flgo) & (flgn ^ flgs);
       int az = result == 0;
-      int ac0 = srcop < dstop;
+      int ac0 = (dstop - srcop) >> 31;
 
       switch (opc)
 	{
-	case 0:
+	case 0: /* signed */
 	  op = "==";
 	  cc = az;
 	  break;
@@ -1917,11 +1917,11 @@ decode_CCflag_0 (SIM_CPU *cpu, bu16 iw0)
 	  break;
 	case 3:	/* unsigned */
 	  op = "<";
-	  cc = ac0;
+	  cc = srcop < dstop;
 	  break;
 	case 4:	/* unsigned */
 	  op = "<=";
-	  cc = ac0 | az;
+	  cc = srcop <= dstop;;
 	  break;
 	}
 
