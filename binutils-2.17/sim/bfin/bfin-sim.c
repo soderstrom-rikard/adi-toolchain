@@ -40,6 +40,25 @@
 #define M_IH    11
 #define M_IU    12
 
+/* Valid flag settings */
+#define is_macmod_pmove(x) (((x) == 0) || \
+			    ((x) == M_IS) || \
+			    ((x) == M_FU) || \
+			    ((x) == M_S2RND) || \
+			    ((x) == M_ISS2) || \
+			    ((x) == M_IU))
+
+#define is_macmod_hmove(x) (((x) == 0) ||\
+			    ((x) == M_IS) || \
+			    ((x) == M_FU) || \
+			    ((x) == M_IU) || \
+			    ((x) == M_T) || \
+			    ((x) == M_TFU) || \
+			    ((x) == M_S2RND) || \
+			    ((x) == M_ISS2) || \
+			    ((x) == M_IH))
+
+
 #define HOST_LONG_WORD_SIZE (sizeof(long)*8)
 
 #define SIGNEXTEND(v, n) (((bs32)(v) << (HOST_LONG_WORD_SIZE - (n))) >> (HOST_LONG_WORD_SIZE - (n)))
@@ -601,7 +620,7 @@ lshiftrt (SIM_CPU *cpu, bu64 val, int cnt, int size)
       val &= 0xFFFFFFFF;
       break;
     case 40:
-      val &= 0xFFFFFFFFFF;
+      val &= 0xFFFFFFFFFFull;
       break;
     default:
       illegal_instruction (cpu);
@@ -669,8 +688,8 @@ lshift (SIM_CPU *cpu, bu64 val, int cnt, int size, bool saturate)
 	new_val = sgn == 0 ? 0x7fffffff : 0x80000000;
       break;
     case 40:
-      new_val &= 0xFFFFFFFFFF;
-      masked &= 0xFFFFFFFFFF;
+      new_val &= 0xFFFFFFFFFFull;
+      masked &= 0xFFFFFFFFFFull;
       break;
     default:
       illegal_instruction (cpu);
@@ -1247,6 +1266,7 @@ decode_multfunc (SIM_CPU *cpu, int h0, int h1, int src0, int src1, int mmod,
     }
 
   val1 = val;
+
   if (mmod == 0 || mmod == M_IS || mmod == M_T || mmod == M_S2RND
       || mmod == M_ISS2 || mmod == M_IH)
     val1 |= -(val1 & 0x80000000);
@@ -3351,6 +3371,11 @@ decode_dsp32mult_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1)
     illegal_instruction (cpu);
   if (((1 << mmod) & (P ? 0x313 : 0x1b57)) == 0)
     illegal_instruction (cpu);
+  if (P && ((dst & 1) || (op1 != 0) || (op0 != 0) || !is_macmod_pmove(mmod)))
+    illegal_instruction (cpu);
+  if (!P && ((op1 != 0) || (op0 != 0) || !is_macmod_hmove(mmod)))
+    illegal_instruction (cpu);
+
 
   if (w0 && w1 && P)
     TRACE_INSN (cpu, "R%i:%i = dsp32mult", dst + 1, dst);
@@ -3626,7 +3651,7 @@ decode_dsp32alu_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1)
       if (s == 1)
 	{
 	  /* A0 -= A1 (W32) */
-	  if (acc0 & (bu64)0x8000000000)
+	  if (acc0 & (bu64)0x8000000000ll)
 	    STORE (AXREG (0), 0x80);
 	  else
 	    STORE (AXREG (0), 0x0);
@@ -4023,7 +4048,7 @@ decode_dsp32alu_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1)
 	SET_ASTATREG (av0s, v);
       if (aop == 2 && s == 1)	/* A0 += A1 (W32) */
 	{
-	  if (acc0 & (bs40)0x8000000000)
+	  if (acc0 & (bs40)0x8000000000ll)
 	    STORE (AXREG (0), 0x80);
 	  else
 	    STORE (AXREG (0), 0x0);
