@@ -1470,6 +1470,11 @@ decode_macfunc (SIM_CPU *cpu, int which, int op, int h0, int h1, int src0,
 	    acc = 0x7fffffffffull, sat = 1;
 	  break;
 	case M_TFU:
+	  if (acc > 0xFFFFFFFFFFull)
+	    acc = 0x0, sat = 1;
+	  if (MM && acc > 0xFFFFFFFF)
+	    acc &= 0xFFFFFFFF;
+	  break;
 	case M_FU:
 	case M_IU:
 	  if (acc > 0xFFFFFFFFFFull)
