@@ -438,12 +438,13 @@ _cec_raise (SIM_CPU *cpu, struct bfin_cec *cec, int ivg)
       cec->ipend |= (1 << ivg);
       cec->ilat &= ~(1 << ivg);
 
+      oldpc = PCREG;
       switch (ivg)
 	{
 	case IVG_EMU:
 	  /* Signal the JTAG ICE.  */
 	  /* XXX: what happens with 'raise 0' ?  */
-	  SET_RETEREG (PCREG);
+	  SET_RETEREG (oldpc);
 	  excp_to_sim_halt (sim_stopped, SIM_SIGTRAP);
 	  break;
 	case IVG_RST:
@@ -451,21 +452,23 @@ _cec_raise (SIM_CPU *cpu, struct bfin_cec *cec, int ivg)
 	  excp_to_sim_halt (sim_exited, 0);
 	  break;
 	case IVG_NMI:
-	  SET_RETNREG (PCREG);
+	  /* XXX: Should check this.  */
+	  SET_RETNREG (oldpc);
 	  break;
 	case IVG_EVX:
-	  SET_RETXREG (PCREG);
+	  /* Exceptions point to the excepting instruction, not after.  */
+	  SET_RETXREG (oldpc);
 	  break;
 	case IVG_IRPTEN:
 	  /* XXX: what happens with 'raise 4' ?  */
 	  sim_io_error (sd, "%s: what to do with 'raise 4' ?", __func__);
 	  break;
 	default:
-	  SET_RETIREG (PCREG | (ivg == curr_ivg ? 1 : 0));
+	  /* Interrupts return to the following instruction.  */
+	  oldpc += BFIN_CPU_STATE.insn_len;
+	  SET_RETIREG (oldpc | (ivg == curr_ivg ? 1 : 0));
 	  break;
 	}
-
-      oldpc = PCREG;
 
       /* If EVT_OVERRIDE is in effect, use the reset address.  */
       if ((cec->evt_override & 0x1ff) & (1 << ivg))

@@ -67,6 +67,9 @@ struct bfin_cpu_state
      the same as jumping (think RTS rather than JUMP).  */
   bool flow_change;
 
+  /* Used by the CEC to figure out where to return to.  */
+  bu32 insn_len;
+
   /* Needed for supporting the DISALGNEXCPT instruction */
   int dis_algn_expt;
 

@@ -5240,6 +5240,7 @@ _interp_insn_bfin (SIM_CPU *cpu, bu32 pc)
       insn_len = 2;
       TRACE_EXTRACT (cpu, "%s: iw0:%#x", __func__, iw0);
     }
+  BFIN_CPU_STATE.insn_len = insn_len;
 
   if ((iw0 & 0xf7ff) == 0xc003 && iw1 == 0x1800)
     TRACE_INSN (cpu, "MNOP;");
@@ -5336,6 +5337,8 @@ interp_insn_bfin (SIM_CPU *cpu, bu32 pc)
   DIS_ALGN_EXPT &= ~1;
 
   insn_len = _interp_insn_bfin (cpu, pc);
+
+  BFIN_CPU_STATE.insn_len = 0;
 
   /* Proper display of multiple issue instructions.  */
   if (insn_len == 8)
