@@ -963,24 +963,21 @@ const unsigned char *
 bfin_breakpoint_from_pc (CORE_ADDR *pcptr, int *lenptr)
 {
   unsigned short iw;
-  static unsigned char bfin_breakpoint_16bit[] = {0xa1, 0x00};
-  static unsigned char bfin_breakpoint_32bit[] = {0xa1, 0x00, 0x00, 0x00};
-
+  static unsigned char bfin_breakpoint[] = {0xa1, 0x00, 0x00, 0x00};
+  static unsigned char bfin_sim_breakpoint[] = {0x25, 0x00, 0x00, 0x00};
 
   iw = read_memory_unsigned_integer (*pcptr, 2);
 
   if ((iw & 0xf000) >= 0xc000)
-    {
-      /* 32-bit instruction.  */
-      *lenptr = sizeof (bfin_breakpoint_32bit);
-      return bfin_breakpoint_32bit;
-    }
+    /* 32-bit instruction.  */
+    *lenptr = 4;
   else
-    {
-      /* 16-bit instruction.  */
-      *lenptr = sizeof (bfin_breakpoint_16bit);
-      return bfin_breakpoint_16bit;
-    }
+    *lenptr = 2;
+
+  if (strcmp (target_shortname, "sim") == 0)
+    return bfin_sim_breakpoint;
+  else
+    return bfin_breakpoint;
 }
 
 static void
