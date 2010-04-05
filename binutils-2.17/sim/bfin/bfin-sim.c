@@ -3356,7 +3356,22 @@ decode_dsp32mult_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1)
   if (((1 << mmod) & (P ? 0x313 : 0x1b57)) == 0)
     illegal_instruction (cpu);
 
-  /* XXX: Missing TRACE_INSN.  */
+  if (w0 && w1 && P)
+    TRACE_INSN (cpu, "R%i:%i = dsp32mult", dst + 1, dst);
+  else if (w0 && w1 && !P)
+    TRACE_INSN (cpu, "R%i.L = R%i.%s * R%i.%s, R%i.H = R%i.%s * R%i.%s",
+      dst, src0, h01 ? "L" : "H" , src1, h11 ? "L" : "H",
+      dst, src0, h00 ? "L" : "H" , src1, h10 ? "L" : "H");
+  else if (w0 && P)
+    TRACE_INSN (cpu, "R%i = dsp32mult", dst);
+  else if (w1 && P)
+    TRACE_INSN (cpu, "R%i = dsp32mult", dst+1);
+  else if (w0 && !P)
+    TRACE_INSN (cpu, "R%i.L = R%i.%s * R%i.%s",
+      dst, src0, h00 ? "L" : "H" , src1, h10 ? "L" : "H");
+  else if (w1 && !P)
+    TRACE_INSN (cpu, "R%i.H = R%i.%s * R%i.%s",
+      dst, src0, h01 ? "L" : "H" , src1, h11 ? "L" : "H");
 
   if (w1)
     {
