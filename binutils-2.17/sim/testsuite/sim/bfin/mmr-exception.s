@@ -20,16 +20,24 @@
 	RTI;
 	dbg_fail
 
+_ivg9:
+	# Invalid MMR
+	imm32 P0, 0xFFEE0000
+1:	[P0] = R0;
+9:	dbg_fail
+
 _evx:
+	# Make sure SEQSTAT is set to correct value
 	R0 = SEQSTAT;
 	R0 = R0.B;
 	R1 = 0x2e (x);
 	CC = R0 == R1;
-	IF !CC JUMP 1f;
-	dbg_pass
+	IF !CC JUMP 9b;
 
-_ivg9:
-	# Invalid MMR
-	imm32 P0, 0xFFEE0000
-	[P0] = R0;
-1:	dbg_fail
+	# Make sure RETX is set to correct address
+	loadsym R0, 1b;
+	R1 = RETX;
+	CC = R0 == R1;
+	IF !CC JUMP 9b;
+
+	dbg_pass
