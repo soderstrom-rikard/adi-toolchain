@@ -1525,25 +1525,21 @@ decode_ProgCtrl_0 (SIM_CPU *cpu, bu16 iw0, bu32 pc)
     {
       TRACE_INSN (cpu, "RTI;");
       cec_return (cpu, -1);
-      BFIN_CPU_STATE.flow_change = true;
     }
   else if (prgfunc == 1 && poprnd == 2)
     {
       TRACE_INSN (cpu, "RTX;");
       cec_return (cpu, IVG_EVX);
-      BFIN_CPU_STATE.flow_change = true;
     }
   else if (prgfunc == 1 && poprnd == 3)
     {
       TRACE_INSN (cpu, "RTN;");
       cec_return (cpu, IVG_NMI);
-      BFIN_CPU_STATE.flow_change = true;
     }
   else if (prgfunc == 1 && poprnd == 4)
     {
       TRACE_INSN (cpu, "RTE;");
       cec_return (cpu, IVG_EMU);
-      BFIN_CPU_STATE.flow_change = true;
     }
   else if (prgfunc == 2 && poprnd == 0)
     {

@@ -310,9 +310,13 @@ cec_exception (SIM_CPU *cpu, int excp)
 
 bu32 cec_cli (SIM_CPU *cpu)
 {
-  struct bfin_cec *cec = CEC_STATE (cpu);
+  struct bfin_cec *cec;
   bu32 old_mask;
 
+  if (STATE_ENVIRONMENT (CPU_STATE (cpu)) != OPERATING_ENVIRONMENT)
+    return 0;
+
+  cec = CEC_STATE (cpu);
   _cec_require_supervisor (cpu, cec);
 
   /* XXX: what about IPEND[4] ?  */
@@ -326,9 +330,13 @@ bu32 cec_cli (SIM_CPU *cpu)
 
 void cec_sti (SIM_CPU *cpu, bu32 ints)
 {
-  struct bfin_cec *cec = CEC_STATE (cpu);
+  struct bfin_cec *cec;
   bu32 old_mask;
 
+  if (STATE_ENVIRONMENT (CPU_STATE (cpu)) != OPERATING_ENVIRONMENT)
+    return;
+
+  cec = CEC_STATE (cpu);
   _cec_require_supervisor (cpu, cec);
 
   /* XXX: what about IPEND[4] ?  */
@@ -492,22 +500,56 @@ _cec_raise (SIM_CPU *cpu, struct bfin_cec *cec, int ivg)
 void
 cec_raise (SIM_CPU *cpu, int ivg)
 {
-  struct bfin_cec *cec = CEC_STATE (cpu);
+  SIM_DESC sd = CPU_STATE (cpu);
+  struct bfin_cec *cec;
+
+  if (STATE_ENVIRONMENT (sd) != OPERATING_ENVIRONMENT)
+    {
+      if (ivg == IVG_EMU)
+	cec_exception (cpu, VEC_EXCPT01);
+      return;
+    }
 
   if (ivg > IVG15 || ivg < -1)
-    sim_io_error (CPU_STATE (cpu), "%s: ivg %i out of range !", __func__, ivg);
+    sim_io_error (sd, "%s: ivg %i out of range !", __func__, ivg);
 
+  cec = CEC_STATE (cpu);
   _cec_require_supervisor (cpu, cec);
 
   _cec_raise (cpu, cec, ivg);
 }
 
+static bu32
+cec_read_ret_reg (SIM_CPU *cpu, int ivg)
+{
+  switch (ivg)
+    {
+    case IVG_EMU: return RETEREG;
+    case IVG_NMI: return RETNREG;
+    case IVG_EVX: return RETXREG;
+    default:      return RETIREG;
+    }
+}
+
 void
 cec_return (SIM_CPU *cpu, int ivg)
 {
-  struct bfin_cec *cec = CEC_STATE (cpu);
+  SIM_DESC sd = CPU_STATE (cpu);
+  struct bfin_cec *cec;
   int curr_ivg;
-  bu32 oldpc;
+  bu32 oldpc, newpc;
+
+  oldpc = PCREG;
+
+  BFIN_CPU_STATE.flow_change = true;
+  if (STATE_ENVIRONMENT (sd) != OPERATING_ENVIRONMENT)
+    {
+      SET_PCREG (cec_read_ret_reg (cpu, ivg));
+      TRACE_BRANCH (cpu, oldpc, PCREG, -1, "CEC changed PC");
+      return;
+    }
+
+  cec = CEC_STATE (cpu);
 
   /* XXX: This isn't entirely correct ...  */
   cec->ipend &= ~IVG_EMU_B;
@@ -519,11 +561,9 @@ cec_return (SIM_CPU *cpu, int ivg)
   TRACE_EVENTS (cpu, "returning from EVT%i (should be EVT%i)", curr_ivg, ivg);
 
   if (ivg > IVG15 || ivg < 0)
-    sim_io_error (CPU_STATE (cpu), "%s: ivg %i out of range !", __func__, ivg);
+    sim_io_error (sd, "%s: ivg %i out of range !", __func__, ivg);
 
   _cec_require_supervisor (cpu, cec);
-
-  oldpc = PCREG;
 
   switch (ivg)
     {
@@ -532,44 +572,41 @@ cec_return (SIM_CPU *cpu, int ivg)
       /* XXX: What does the hardware do ?  */
       if (curr_ivg != IVG_EMU)
 	cec_exception (cpu, VEC_ILL_RES);
-      SET_PCREG (RETEREG);
       break;
     case IVG_NMI:
       /* RTN -- only valid in NMI.  */
       /* XXX: What does the hardware do ?  */
       if (curr_ivg != IVG_NMI)
 	cec_exception (cpu, VEC_ILL_RES);
-      SET_PCREG (RETNREG);
       break;
     case IVG_EVX:
       /* RTX -- only valid in exception.  */
       /* XXX: What does the hardware do ?  */
       if (curr_ivg != IVG_EVX)
 	cec_exception (cpu, VEC_ILL_RES);
-      SET_PCREG (RETXREG);
       break;
     default:
       /* RTI -- not valid in emulation, nmi, exception, or user.  */
       /* XXX: What does the hardware do ?  */
       if (curr_ivg < IVG_IVHW && curr_ivg != IVG_RST)
 	cec_exception (cpu, VEC_ILL_RES);
-      SET_PCREG (RETIREG);
       break;
     case IVG_IRPTEN:
       /* XXX: Is this even possible ?  */
       excp_to_sim_halt (sim_stopped, SIM_SIGABRT);
       break;
     }
+  newpc = cec_read_ret_reg (cpu, ivg);
 
   /* XXX: Does this nested trick work on EMU/NMI/EVX ?  */
-  if (PCREG & 1)
+  if (newpc & 1)
     /* XXX: Delayed clear shows bad PCREG register trace above ?  */
-    PCREG &= ~1;
+    newpc &= ~1;
   else
     cec->ipend &= ~(1 << ivg);
+  SET_PCREG (newpc);
 
   TRACE_BRANCH (cpu, oldpc, PCREG, -1, "CEC changed PC (from EVT%i)", ivg);
-  BFIN_CPU_STATE.flow_change = true;
 
   /* Disable global interrupt mask to let any interrupt take over.  */
   cec_irpten_disable (cpu, cec);
@@ -594,8 +631,14 @@ cec_push_reti (SIM_CPU *cpu)
   /* XXX: Need to check hardware with popped RETI value
      and bit 1 is set (when handling nested interrupts).
      Also need to check behavior wrt SNEN in SYSCFG.  */
-  struct bfin_cec *cec = CEC_STATE (cpu);
+  struct bfin_cec *cec;
+
+  if (STATE_ENVIRONMENT (CPU_STATE (cpu)) != OPERATING_ENVIRONMENT)
+    return;
+
   TRACE_EVENTS (cpu, "pushing RETI");
+
+  cec = CEC_STATE (cpu);
   cec_irpten_disable (cpu, cec);
   /* Check for pending interrupts.  */
   _cec_raise (cpu, cec, -1);
@@ -607,7 +650,13 @@ cec_pop_reti (SIM_CPU *cpu)
   /* XXX: Need to check hardware with popped RETI value
      and bit 1 is set (when handling nested interrupts).
      Also need to check behavior wrt SNEN in SYSCFG.  */
-  struct bfin_cec *cec = CEC_STATE (cpu);
+  struct bfin_cec *cec;
+
+  if (STATE_ENVIRONMENT (CPU_STATE (cpu)) != OPERATING_ENVIRONMENT)
+    return;
+
   TRACE_EVENTS (cpu, "popping RETI");
+
+  cec = CEC_STATE (cpu);
   cec_irpten_enable (cpu, cec);
 }
