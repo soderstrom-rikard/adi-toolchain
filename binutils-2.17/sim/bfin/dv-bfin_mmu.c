@@ -233,8 +233,5 @@ void
 mmu_check_addr (SIM_CPU *cpu, bu32 addr, bool write, bool inst, int size)
 {
   if (addr & (size - 1))
-    {
-      mmu_process_fault (cpu, addr, write, inst, true);
-      cec_exception (cpu, inst ? VEC_MISALI_I : VEC_MISALI_D);
-    }
+    mmu_process_fault (cpu, addr, write, inst, true);
 }
