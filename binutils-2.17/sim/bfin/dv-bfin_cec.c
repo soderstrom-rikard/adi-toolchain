@@ -262,7 +262,7 @@ cec_exception (SIM_CPU *cpu, int excp)
 
   if (excp <= 0x3f)
     {
-      SET_SEQSTATREG ((SEQSTATREG & ~0x3f) | excp);
+      SET_EXCAUSE (excp);
       if (STATE_ENVIRONMENT (sd) == OPERATING_ENVIRONMENT)
 	{
 	  if (excp < 0x10)
@@ -413,7 +413,8 @@ _cec_raise (SIM_CPU *cpu, struct bfin_cec *cec, int ivg)
       if (curr_ivg <= ivg)
 	{
 	  /* Double fault ! :( */
-	  /* XXX: should there be some status registers we update ? */
+	  SET_EXCAUSE (VEC_UNCOV);
+	  /* XXX: SET_RETXREG (...); */
 	  sim_io_error (sd, "%s: double fault at 0x%08x ! :(", __func__, PCREG);
 	  excp_to_sim_halt (sim_stopped, SIM_SIGABRT);
 	}

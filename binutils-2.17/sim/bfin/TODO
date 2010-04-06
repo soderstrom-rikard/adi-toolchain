@@ -12,3 +12,7 @@ model the loop buffer ?  this means no ifetches because they're cached.
 see page 4-26 in Blackfin PRM under hardware loops.
 
 handle DSPID at 0xffe05000
+
+CEC should handle multiple exceptions at same address.  would need
+exception processing to be delayed ?  at least needs a stack for
+the CEC to pop things off.

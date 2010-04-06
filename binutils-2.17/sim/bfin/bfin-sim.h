@@ -110,6 +110,10 @@ struct bfin_cpu_state
 #define EMUDAT_OUTREG	(BFIN_CPU_STATE.emudat[1])
 #define DIS_ALGN_EXPT	(BFIN_CPU_STATE.dis_algn_expt)
 
+#define EXCAUSE_MASK		0x3f
+#define EXCAUSE			(SEQSTATREG & EXCAUSE_MASK)
+#define SET_EXCAUSE(excp)	SET_SEQSTATREG ((SEQSTATREG & ~EXCAUSE_MASK) | (excp))
+
 #define _SET_CORE32REG_IDX(reg, p, x, val) \
   do \
     { \
