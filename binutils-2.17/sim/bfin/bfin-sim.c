@@ -1404,8 +1404,9 @@ extract_mult (SIM_CPU *cpu, bu64 res, int mmod, int fullword)
     switch (mmod)
       {
       case 0:
-      case M_IH:
 	return saturate_s16 (rnd16 (res));
+      case M_IH:
+	return saturate_s32((rnd16 (res))) & 0xFFFF;
       case M_IS:
 	return saturate_s16 (res);
       case M_FU:
@@ -1435,7 +1436,7 @@ decode_macfunc (SIM_CPU *cpu, int which, int op, int h0, int h1, int src0,
   int sat = 0;
 
   /* Sign extend accumulator if necessary.  */
-  if (mmod == M_T || mmod == M_IS || mmod == M_ISS2 || mmod == M_S2RND)
+  if (mmod == M_T || mmod == M_IS || mmod == M_ISS2 || mmod == M_S2RND || mmod == M_IH)
     acc |= -(acc & 0x80000000);
 
   if (op != 3)
@@ -1462,6 +1463,7 @@ decode_macfunc (SIM_CPU *cpu, int which, int op, int h0, int h1, int src0,
 	case 0:
 	case M_T:
 	case M_IS:
+	case M_IH:
 	case M_ISS2:
 	case M_S2RND:
 	  if ((bs64)acc < -0x8000000000ll)
