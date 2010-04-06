@@ -1759,7 +1759,6 @@ decode_PushPopReg_0 (SIM_CPU *cpu, bu16 iw0)
     {
       TRACE_INSN (cpu, "%s = [SP++];", reg_name);
 
-      /* XXX: If SP triggers an exception, should it be updated ?  */
       value = GET_LONG (sp);
       reg_write (cpu, grp, reg, value);
       if (grp == 7 && reg == 3)
@@ -1771,7 +1770,6 @@ decode_PushPopReg_0 (SIM_CPU *cpu, bu16 iw0)
     {
       TRACE_INSN (cpu, "[--SP] = %s;", reg_name);
 
-      /* XXX: If SP triggers an exception, should it be updated ?  */
       sp -= 4;
       value = reg_read (cpu, grp, reg);
       if (grp == 7 && reg == 3)
@@ -1779,6 +1777,9 @@ decode_PushPopReg_0 (SIM_CPU *cpu, bu16 iw0)
 
       PUT_LONG (sp, value);
     }
+
+  /* Note: SP update must be delayed until after all reads/writes; see
+           comments in decode_PushPopMultiple_0() for more info.  */
   reg_set_sp (cpu, sp);
 }
 
@@ -1847,6 +1848,10 @@ decode_PushPopMultiple_0 (SIM_CPU *cpu, bu16 iw0)
 	    sp += 4;
 	  }
     }
+
+  /* Note: SP update must be delayed until after all reads/writes so that
+           if an exception does occur, the insn may be re-executed as the
+           SP has not yet changed.  */
   reg_set_sp (cpu, sp);
 }
 
