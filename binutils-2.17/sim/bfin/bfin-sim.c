@@ -1936,7 +1936,12 @@ decode_CCflag_0 (SIM_CPU *cpu, bu16 iw0)
       int flgn = result >> 31;
       int overflow = (flgs ^ flgo) & (flgn ^ flgs);
       int az = result == 0;
-      int ac0 = (dstop - srcop) >> 31;
+      int ac0 = dstop <= srcop;
+      int an;
+      if (issigned)
+	an = (flgn && !overflow) || (!flgn && overflow);
+      else
+	an = dstop > srcop;
 
       switch (opc)
 	{
@@ -1946,19 +1951,19 @@ decode_CCflag_0 (SIM_CPU *cpu, bu16 iw0)
 	  break;
 	case 1:	/* signed */
 	  op = "<";
-	  cc = (flgn && !overflow) || (!flgn && overflow);
+	  cc = an;
 	  break;
 	case 2:	/* signed */
 	  op = "<=";
-	  cc = (flgn && !overflow) || (!flgn && overflow) || az;
+	  cc = an || az;
 	  break;
 	case 3:	/* unsigned */
 	  op = "<";
-	  cc = srcop < dstop;
+	  cc = !ac0;
 	  break;
 	case 4:	/* unsigned */
 	  op = "<=";
-	  cc = srcop <= dstop;
+	  cc = !ac0 || az;
 	  break;
 	}
 
@@ -1973,7 +1978,7 @@ decode_CCflag_0 (SIM_CPU *cpu, bu16 iw0)
       if (!G)
 	{
 	  SET_ASTATREG (az, az);
-	  SET_ASTATREG (an, flgn);
+	  SET_ASTATREG (an, an);
 	  SET_ASTATREG (ac0, ac0);
 	}
     }
