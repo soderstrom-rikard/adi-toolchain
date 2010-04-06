@@ -1432,11 +1432,16 @@ static bu32
 decode_macfunc (SIM_CPU *cpu, int which, int op, int h0, int h1, int src0,
 		int src1, int mmod, int MM, int fullword)
 {
-  bu64 acc = get_extended_acc (cpu, which);
+  bu64 acc;
   int sat = 0;
 
-  /* Sign extend accumulator if necessary.  */
-  if (mmod == M_T || mmod == M_IS || mmod == M_ISS2 || mmod == M_S2RND || mmod == M_IH)
+  /* Sign extend accumulator if necessary, otherwise unsigned */
+  if (mmod == 0 || mmod == M_T || mmod == M_IS || mmod == M_ISS2 || mmod == M_S2RND || mmod == M_IH)
+    acc = get_extended_acc (cpu, which);
+  else
+    acc = get_unextended_acc (cpu, which);
+
+  if ( mmod == M_T || mmod == M_IS || mmod == M_ISS2 || mmod == M_S2RND || mmod == M_IH)
     acc |= -(acc & 0x80000000);
 
   if (op != 3)
@@ -1478,8 +1483,12 @@ decode_macfunc (SIM_CPU *cpu, int which, int op, int h0, int h1, int src0,
 	  break;
 	case M_FU:
 	case M_IU:
+	  if (acc & 0x8000000000000000ull)
+	    acc = 0x0, sat = 1;
 	  if (acc > 0xFFFFFFFFFFull)
 	    acc = 0xFFFFFFFFFFull, sat = 1;
+	  if (MM && acc > 0xFFFFFFFF)
+	    acc &= 0xFFFFFFFF;
 	  break;
 	case M_IH:
 	  if ((bs64)acc < -0x80000000ll)
