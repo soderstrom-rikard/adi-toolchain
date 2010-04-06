@@ -76,7 +76,8 @@
 	dmm_check RETI
 	dmm_check RETX
 	dmm_check RETN
-	dmm_check RETE
+	# RETE likes to change on the fly with an ICE
+	# dmm_check RETE
 	# CYCLES can be user mode, but screws kernel
 	dmm_check CYCLES
 	dmm_check CYCLES2
