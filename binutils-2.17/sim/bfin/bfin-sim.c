@@ -1463,7 +1463,6 @@ decode_macfunc (SIM_CPU *cpu, int which, int op, int h0, int h1, int src0,
 	case 0:
 	case M_T:
 	case M_IS:
-	case M_IH:
 	case M_ISS2:
 	case M_S2RND:
 	  if ((bs64)acc < -0x8000000000ll)
@@ -1481,6 +1480,12 @@ decode_macfunc (SIM_CPU *cpu, int which, int op, int h0, int h1, int src0,
 	case M_IU:
 	  if (acc > 0xFFFFFFFFFFull)
 	    acc = 0xFFFFFFFFFFull, sat = 1;
+	  break;
+	case M_IH:
+	  if ((bs64)acc < -0x80000000ll)
+	    acc = -0x80000000ull, sat = 1;
+	  else if ((bs64)acc >= 0x7fffffffll)
+	    acc = 0x7fffffffull, sat = 1;
 	  break;
 	default:
 	  unhandled_instruction (cpu, "macfunc");
