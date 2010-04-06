@@ -44,7 +44,7 @@ struct bfin_mmu
 
   char _dpad4[0x1000 - 0x400 - (4 * 2)];
 
-  bu32 idk;
+  bu32 idk;	/* Filler MMR; hardware simply ignores.  */
   bu32 imem_control, icplb_fault_status, icplb_fault_addr;
   char _ipad0[0x100 - 0x0 - (4 * 4)];
   bu32 icplb_addr[16];
@@ -194,7 +194,10 @@ bfin_mmu_finish (struct hw *me)
   attach_bfin_mmu_regs (me, mmu);
 
   /* Initialize the MMU.  */
-  /* XXX: Should set up imem/dmem control.  */
+  mmu->sram_base_address = 0xff800000 - 0;
+			   /*(4 * 1024 * 1024 * CPU_INDEX (hw_system_cpu (me)));*/
+  mmu->dmem_control = 0x00000001;
+  mmu->imem_control = 0x00000001;
 }
 
 const struct hw_descriptor dv_bfin_mmu_descriptor[] = {
