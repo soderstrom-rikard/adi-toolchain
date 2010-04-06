@@ -433,13 +433,14 @@ _cec_raise (SIM_CPU *cpu, struct bfin_cec *cec, int ivg)
   else if (ivg < curr_ivg || (snen && ivg == curr_ivg))
     {
       /* Do transition! */
-      bu32 oldpc;
+      bu32 oldpc, nextpc;
 
  process_int:
       cec->ipend |= (1 << ivg);
       cec->ilat &= ~(1 << ivg);
 
       oldpc = PCREG;
+      nextpc = hwloop_get_next_pc (cpu, oldpc, BFIN_CPU_STATE.insn_len);
       switch (ivg)
 	{
 	case IVG_EMU:
@@ -458,7 +459,10 @@ _cec_raise (SIM_CPU *cpu, struct bfin_cec *cec, int ivg)
 	  break;
 	case IVG_EVX:
 	  /* Exceptions point to the excepting instruction, not after.  */
-	  SET_RETXREG (oldpc);
+	  if ((SEQSTATREG & EXCAUSE_MASK) >= 0x20)
+	    SET_RETXREG (oldpc);
+	  else
+	    SET_RETXREG (nextpc);
 	  break;
 	case IVG_IRPTEN:
 	  /* XXX: what happens with 'raise 4' ?  */
@@ -466,13 +470,12 @@ _cec_raise (SIM_CPU *cpu, struct bfin_cec *cec, int ivg)
 	  break;
 	default:
 	  /* Interrupts return to the following instruction.  */
-	  oldpc += BFIN_CPU_STATE.insn_len;
-	  SET_RETIREG (oldpc | (ivg == curr_ivg ? 1 : 0));
+	  SET_RETIREG (nextpc | (ivg == curr_ivg ? 1 : 0));
 	  break;
 	}
 
-      /* If EVT_OVERRIDE is in effect, use the reset address.  */
-      if ((cec->evt_override & 0x1ff) & (1 << ivg))
+      /* If EVT_OVERRIDE is in effect (IVG7+), use the reset address.  */
+      if ((cec->evt_override & 0xff80) & (1 << ivg))
 	SET_PCREG (cec_get_reset_evt (cpu));
       else
 	SET_PCREG (cec_get_evt (cpu, ivg));
