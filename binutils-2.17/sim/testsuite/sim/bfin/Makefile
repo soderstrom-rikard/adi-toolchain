@@ -15,7 +15,7 @@ DO_SIM = bfin-elf-gcc -msim $(FLAGS) -nostdlib
 %.s.x: %.s ; $(DO_SIM)
 %.S.x: %.S ; $(DO_SIM)
 
-DO_HOST = bfin-linux-uclibc-gcc -Wa,--defsym,BFIN_HOST=1 $(FLAGS)
+DO_HOST = bfin-linux-uclibc-gcc -Wa,--defsym,BFIN_HOST=1 $(FLAGS) -static
 %.s.X: %.s ; $(DO_HOST)
 %.S.X: %.S ; $(DO_HOST)
 
