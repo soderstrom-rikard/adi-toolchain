@@ -1384,7 +1384,7 @@ signbits (bu64 val, int size)
    we want to extract, either a 32 bit multiply or a 40 bit accumulator.  */
 
 static bu32
-extract_mult (SIM_CPU *cpu, bu64 res, int mmod, int fullword)
+extract_mult (SIM_CPU *cpu, bu64 res, int mmod, int MM, int fullword)
 {
   if (fullword)
     switch (mmod)
@@ -1412,6 +1412,8 @@ extract_mult (SIM_CPU *cpu, bu64 res, int mmod, int fullword)
       case M_FU:
 	return saturate_u16 (rnd16 (res));
       case M_IU:
+	if (MM)
+	  return saturate_s16 (res);
 	return saturate_u16 (res);
 
       case M_T:
@@ -1441,7 +1443,7 @@ decode_macfunc (SIM_CPU *cpu, int which, int op, int h0, int h1, int src0,
   else
     acc = get_unextended_acc (cpu, which);
 
-  if ( mmod == M_T || mmod == M_IS || mmod == M_ISS2 || mmod == M_S2RND || mmod == M_IH)
+  if (MM && (mmod == M_T || mmod == M_IS || mmod == M_ISS2 || mmod == M_S2RND || mmod == M_IH))
     acc |= -(acc & 0x80000000);
 
   if (op != 3)
@@ -1470,8 +1472,8 @@ decode_macfunc (SIM_CPU *cpu, int which, int op, int h0, int h1, int src0,
 	case M_IS:
 	case M_ISS2:
 	case M_S2RND:
-	  if ((bs64)acc < -0x8000000000ll)
-	    acc = -0x8000000000ull, sat = 1;
+	  if ((bs64)acc < -((bs64)1 << 39))
+	    acc = -((bu64)1 << 39), sat = 1;
 	  else if ((bs64)acc >= 0x7fffffffffll)
 	    acc = 0x7fffffffffull, sat = 1;
 	  break;
@@ -1516,7 +1518,7 @@ decode_macfunc (SIM_CPU *cpu, int which, int op, int h0, int h1, int src0,
       STORE (ASTATREG (av0s), ASTATREG (av0s) | sat);
     }
 
-  return extract_mult (cpu, acc, mmod, fullword);
+  return extract_mult (cpu, acc, mmod, MM, fullword);
 }
 
 bu32
@@ -3431,7 +3433,7 @@ decode_dsp32mult_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1)
       bu64 r = decode_multfunc (cpu, h01, h11, src0, src1, mmod, MM, &sat);
       STORE (ASTATREG (av1), sat);
       STORE (ASTATREG (av1s), ASTATREG (av1s) | sat);
-      res1 = extract_mult (cpu, r, mmod, P);
+      res1 = extract_mult (cpu, r, mmod, MM, P);
     }
 
   if (w0)
@@ -3440,7 +3442,7 @@ decode_dsp32mult_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1)
       bu64 r = decode_multfunc (cpu, h00, h10, src0, src1, mmod, 0, &sat);
       STORE (ASTATREG (av0), sat);
       STORE (ASTATREG (av0s), ASTATREG (av0s) | sat);
-      res0 = extract_mult (cpu, r, mmod, P);
+      res0 = extract_mult (cpu, r, mmod, 0, P);
     }
 
   if (w0)
