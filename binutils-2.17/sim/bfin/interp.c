@@ -45,8 +45,6 @@
 #include "dv-bfin_trace.h"
 #include "dv-bfin_uart.h"
 
-static char **prog_argv;
-
 /* Count the number of arguments in an argv.  */
 static int
 count_argc (char **argv)
@@ -90,7 +88,7 @@ void
 bfin_trap (SIM_CPU *cpu)
 {
   SIM_DESC sd = CPU_STATE (cpu);
-  char **argv = prog_argv /*STATE_PROG_ARGV (sd)*/;
+  char **argv = STATE_PROG_ARGV (sd);
   host_callback *cb = STATE_CALLBACK (sd);
   CB_SYSCALL sc;
 
@@ -138,7 +136,7 @@ bfin_trap (SIM_CPU *cpu)
 	    char *argn = argv[sc.arg1];
 	    int len = strlen (argn);
 	    int written = sc.write_mem (cb, &sc, sc.arg2, argn, len + 1);
-	    if (written == len)
+	    if (written == len + 1)
 	      sc.result = sc.arg2;
 	    else
 	      sc.result = -1;
@@ -392,9 +390,14 @@ sim_create_inferior (SIM_DESC sd, struct bfd *abfd,
     addr = 0;
   sim_pc_set (cpu, addr);
 
-  /* Record the program's arguments.  */
-  /* STATE_PROG_ARGV (sd) = argv; */
-  prog_argv = argv;
+  /* Standalone mode (i.e. `bfin-...-run`) will take care of the argv
+     for us in sim_open() -> sim_parse_args().  But in debug mode (i.e.
+     'target sim' with `bfin-...-gdb`), we need to handle it.  */
+  if (STATE_OPEN_KIND (sd) == SIM_OPEN_DEBUG)
+    {
+      free (STATE_PROG_ARGV (sd));
+      STATE_PROG_ARGV (sd) = dupargv (argv);
+    }
 
   return SIM_RC_OK;
 }
