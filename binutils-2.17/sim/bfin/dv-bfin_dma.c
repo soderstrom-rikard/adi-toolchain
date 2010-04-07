@@ -27,7 +27,7 @@ struct bfin_dma
 {
   bu32 base;
   unsigned ele_size;
-  const char *src, *dst;
+  const char *peer;
 
   /* Order after here is important -- matches hardware MMR layout.  */
   bu32 next_desc_ptr, start_addr;
@@ -57,7 +57,7 @@ bfin_dma_enabled (struct bfin_dma *dma)
 static struct hw *
 bfin_dma_get_peer (struct hw *me, struct bfin_dma *dma)
 {
-  return hw_tree_find_device (me, dma->src ? dma->src : dma->dst);
+  return hw_tree_find_device (me, dma->peer);
 }
 
 static void
@@ -115,7 +115,7 @@ bfin_dma_hw_event_callback (struct hw *me, void *data)
   nr_bytes = MIN (sizeof (buf), dma->curr_x_count * dma->ele_size);
 
   /* Pumping a chunk!  */
-  if (dma->src)
+  if (dma->config & WNR)
     {
       ret = hw_dma_read_buffer(peer, buf, 0, 0, nr_bytes);
       /* XXX: How to handle partial DMA transfers ?  */
@@ -339,14 +339,12 @@ attach_bfin_dma_regs (struct hw *me, struct bfin_dma *dma)
   if (!hw_find_reg_array_property (me, "reg", 0, &reg))
     hw_abort (me, "\"reg\" property must contain three addr/size entries");
 
-  if (hw_find_property (me, "src"))
-    dma->src = hw_find_string_property (me, "src");
-  else if (hw_find_property (me, "dst"))
-    dma->dst = hw_find_string_property (me, "dst");
-  else
-    hw_abort (me, "Missing \"src\" or \"dst\" property");
-  if (dma->src == NULL && dma->dst == NULL)
-    hw_abort (me, "\"src\" and \"dst\" properties must name a device");
+  if (hw_find_property (me, "peer") == NULL)
+    hw_abort (me, "Missing \"peer\" property");
+
+  dma->peer = hw_find_string_property (me, "peer");
+  if (dma->peer == NULL)
+    hw_abort (me, "\"peer\" property must name a device");
 
   hw_unit_address_to_attach_address (hw_parent (me),
 				     &reg.address,

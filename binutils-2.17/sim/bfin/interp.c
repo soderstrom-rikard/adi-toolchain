@@ -267,14 +267,14 @@ bfin_hw_tree_init (SIM_DESC sd)
 
   /* XXX: Should be pushed to the model code.  */
   sim_hw_parse (sd, "/core/bfin_dma@0/reg %#x %i", 0xFFC00F00, 0x40); /* MDMA D0 */
-  sim_hw_parse (sd, "/core/bfin_dma@0/src /core/bfin_dma@1");
+  sim_hw_parse (sd, "/core/bfin_dma@0/peer /core/bfin_dma@1");
   sim_hw_parse (sd, "/core/bfin_dma@1/reg %#x %i", 0xFFC00F40, 0x40); /* MDMA S0 */
-  sim_hw_parse (sd, "/core/bfin_dma@1/dst /core/bfin_dma@0");
+  sim_hw_parse (sd, "/core/bfin_dma@1/peer /core/bfin_dma@0");
 
   sim_hw_parse (sd, "/core/bfin_dma@2/reg %#x %i", 0xFFC00F80, 0x40); /* MDMA D1 */
-  sim_hw_parse (sd, "/core/bfin_dma@2/src /core/bfin_dma@3");
+  sim_hw_parse (sd, "/core/bfin_dma@2/peer /core/bfin_dma@3");
   sim_hw_parse (sd, "/core/bfin_dma@3/reg %#x %i", 0xFFC00FC0, 0x40); /* MDMA S1 */
-  sim_hw_parse (sd, "/core/bfin_dma@3/dst /core/bfin_dma@2");
+  sim_hw_parse (sd, "/core/bfin_dma@3/peer /core/bfin_dma@2");
 }
 
 static void
