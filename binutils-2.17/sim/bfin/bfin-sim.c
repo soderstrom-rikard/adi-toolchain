@@ -3997,6 +3997,7 @@ decode_dsp32alu_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1)
     }
   else if (aopcde == 0)
     {
+      const char * const amods[] = { "", " (S)", " (CO)", " (SCO)" };
       bu32 s0 = DREG (src0);
       bu32 s1 = DREG (src1);
       bu32 s0h = s0 >> 16;
@@ -4004,7 +4005,9 @@ decode_dsp32alu_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1)
       bu32 s1h = s1 >> 16;
       bu32 s1l = s1 & 0xFFFF;
       bu32 t0, t1;
-      TRACE_INSN (cpu, "R%i = R%i +-|+- R%i (amod0);", dst0, src0, src1);
+      TRACE_INSN (cpu, "R%i = R%i %c|%c R%i%s;", dst0, src0,
+		  (aop & 2) ? '-' : '+', (aop & 1) ? '-' : '+', src1,
+		  amods[s + (x << 1)]);
       if (aop & 2)
 	t0 = sub16 (cpu, s0h, s1h, &ASTATREG (ac1), 0, s, 0);
       else
