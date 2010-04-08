@@ -459,11 +459,15 @@ bfin_user_init (SIM_DESC sd, SIM_CPU *cpu, char **argv, char **env)
 
   /* Figure out how much storage the argv/env strings need.  */
   argc = count_argc (argv);
+  if (argc == -1)
+    argc = 0;
   argv_flat = argc; /* NUL bytes */
   for (i = 0; i < argc; ++i)
     argv_flat += strlen (argv[i]);
 
   envc = count_argc (env);
+  if (envc == -1)
+    envc = 0;
   env_flat = envc; /* NUL bytes */
   for (i = 0; i < envc; ++i)
     env_flat += strlen (env[i]);
