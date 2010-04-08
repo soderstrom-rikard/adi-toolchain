@@ -194,10 +194,15 @@ _cec_is_supervisor_mode (struct bfin_cec *cec)
 bool
 cec_is_supervisor_mode (SIM_CPU *cpu)
 {
-  if (STATE_ENVIRONMENT (CPU_STATE (cpu)) == OPERATING_ENVIRONMENT)
-    return _cec_is_supervisor_mode (CEC_STATE (cpu));
-  else
-    return true;
+  switch (STATE_ENVIRONMENT (CPU_STATE (cpu)))
+    {
+    case OPERATING_ENVIRONMENT:
+      return _cec_is_supervisor_mode (CEC_STATE (cpu));
+    case USER_ENVIRONMENT:
+      return false;
+    default:
+      return true;
+    }
 }
 static bool
 _cec_is_user_mode (struct bfin_cec *cec)
@@ -207,10 +212,7 @@ _cec_is_user_mode (struct bfin_cec *cec)
 bool
 cec_is_user_mode (SIM_CPU *cpu)
 {
-  if (STATE_ENVIRONMENT (CPU_STATE (cpu)) == OPERATING_ENVIRONMENT)
-    return !cec_is_supervisor_mode (cpu);
-  else
-    return false;
+  return !cec_is_supervisor_mode (cpu);
 }
 static void
 _cec_require_supervisor (SIM_CPU *cpu, struct bfin_cec *cec)
@@ -223,8 +225,6 @@ cec_require_supervisor (SIM_CPU *cpu)
 {
   _cec_require_supervisor (cpu, CEC_STATE (cpu));
 }
-
-extern void bfin_trap (SIM_CPU *);
 
 #define excp_to_sim_halt(reason, sigrc) \
   sim_engine_halt (CPU_STATE (cpu), cpu, NULL, PCREG, reason, sigrc)
@@ -277,7 +277,7 @@ cec_exception (SIM_CPU *cpu, int excp)
   switch (excp)
     {
     case VEC_SYS:
-      bfin_trap (cpu);
+      bfin_syscall (cpu);
       break;
 
     case VEC_EXCPT01:	/* userspace gdb breakpoint */
@@ -310,14 +310,13 @@ cec_exception (SIM_CPU *cpu, int excp)
 
 bu32 cec_cli (SIM_CPU *cpu)
 {
-  struct bfin_cec *cec;
+  struct bfin_cec *cec = CEC_STATE (cpu);
   bu32 old_mask;
+
+  _cec_require_supervisor (cpu, cec);
 
   if (STATE_ENVIRONMENT (CPU_STATE (cpu)) != OPERATING_ENVIRONMENT)
     return 0;
-
-  cec = CEC_STATE (cpu);
-  _cec_require_supervisor (cpu, cec);
 
   /* XXX: what about IPEND[4] ?  */
   old_mask = cec->imask;
@@ -330,14 +329,13 @@ bu32 cec_cli (SIM_CPU *cpu)
 
 void cec_sti (SIM_CPU *cpu, bu32 ints)
 {
-  struct bfin_cec *cec;
+  struct bfin_cec *cec = CEC_STATE (cpu);
   bu32 old_mask;
+
+  _cec_require_supervisor (cpu, cec);
 
   if (STATE_ENVIRONMENT (CPU_STATE (cpu)) != OPERATING_ENVIRONMENT)
     return;
-
-  cec = CEC_STATE (cpu);
-  _cec_require_supervisor (cpu, cec);
 
   /* XXX: what about IPEND[4] ?  */
   old_mask = cec->imask;

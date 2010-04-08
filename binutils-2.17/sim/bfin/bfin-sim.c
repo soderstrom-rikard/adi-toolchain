@@ -386,7 +386,7 @@ get_allreg (SIM_CPU *cpu, int grp, int reg)
 	case 62: return &RETEREG;
 	case 63: return &EMUDAT_INREG;
 	}
-      return 0;
+      abort ();
     }
 }
 
@@ -1073,7 +1073,8 @@ ones (bu32 val)
 static bu32
 reg_get_sp (SIM_CPU *cpu)
 {
-  if (cec_is_user_mode (cpu))
+  if (STATE_ENVIRONMENT (CPU_STATE (cpu)) == OPERATING_ENVIRONMENT &&
+      cec_is_user_mode (cpu))
     return USPREG;
   else
     return SPREG;
@@ -1082,7 +1083,8 @@ reg_get_sp (SIM_CPU *cpu)
 static void
 reg_set_sp (SIM_CPU *cpu, bu32 sp)
 {
-  if (cec_is_user_mode (cpu))
+  if (STATE_ENVIRONMENT (CPU_STATE (cpu)) == OPERATING_ENVIRONMENT &&
+      cec_is_user_mode (cpu))
     SET_USPREG (sp);
   else
     SET_SPREG (sp);

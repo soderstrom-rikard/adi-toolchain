@@ -302,6 +302,7 @@ do { \
 
 #define IFETCH(taddr) __GET_MEM(taddr, 16, true)
 
+extern void bfin_syscall (SIM_CPU *);
 extern bu32 interp_insn_bfin (SIM_CPU *, bu32);
 extern bu32 hwloop_get_next_pc (SIM_CPU *, bu32, bu32);
 

@@ -31,7 +31,11 @@
 #include "gdb/signals.h"
 #include "sim-main.h"
 #include "sim-hw.h"
+
 #include "targ-vals.h"
+#include "bfin-linux-errno.h"
+#define TARGET_SYS_ioctl 1000 /* XXX: hack for simple uClibc stdio!  */
+#include "bfin-linux-scnos.h"
 
 #include "devices.h"
 #include "dv-bfin_cec.h"
@@ -81,32 +85,57 @@ syscall_write_mem (host_callback *cb, struct cb_syscall *sc,
   return sim_core_write_buffer (sd, cpu, write_map, buf, taddr, bytes);
 }
 
+static int
+bfin_scno_linux_to_sim (unsigned int scno)
+{
+  int ret;
+
+  if (scno > ARRAY_SIZE (scno_linux_to_sim_map))
+    return -1;
+
+  ret = scno_linux_to_sim_map[scno];
+  if (ret == 0)
+    ret = -1;
+
+  return ret;
+}
+
 /* Simulate a monitor trap, put the result into r0 and errno into r1
    return offset by which to adjust pc.  */
 
 void
-bfin_trap (SIM_CPU *cpu)
+bfin_syscall (SIM_CPU *cpu)
 {
   SIM_DESC sd = CPU_STATE (cpu);
   char **argv = STATE_PROG_ARGV (sd);
   host_callback *cb = STATE_CALLBACK (sd);
+  bu32 args[4];
   CB_SYSCALL sc;
 
   CB_SYSCALL_INIT (&sc);
-  sc.func = PREG (0);
-#if 0 /* this isnt the linux system call interface */
-  sc.arg1 = DREG (0);
-  sc.arg2 = DREG (1);
-  sc.arg3 = DREG (2);
-  sc.arg4 = DREG (3);
-  /*sc.arg5 = DREG (4);*/
-  /*sc.arg6 = DREG (5);*/
-#else
-  sc.arg1 = GET_LONG (DREG (0));
-  sc.arg2 = GET_LONG (DREG (0) + 4);
-  sc.arg3 = GET_LONG (DREG (0) + 8);
-  sc.arg4 = GET_LONG (DREG (0) + 12);
-#endif
+
+  if (STATE_ENVIRONMENT (sd) == USER_ENVIRONMENT)
+    {
+      /* Linux syscall.  */
+      sc.func = bfin_scno_linux_to_sim (PREG (0));
+      sc.arg1 = args[0] = DREG (0);
+      sc.arg2 = args[1] = DREG (1);
+      sc.arg3 = args[2] = DREG (2);
+      sc.arg4 = args[3] = DREG (3);
+      /*sc.arg5 = args[4] = DREG (4);*/
+      /*sc.arg6 = args[5] = DREG (5);*/
+    }
+  else
+    {
+      /* libgloss syscall.  */
+      sc.func = PREG (0);
+      sc.arg1 = args[0] = GET_LONG (DREG (0));
+      sc.arg2 = args[1] = GET_LONG (DREG (0) + 4);
+      sc.arg3 = args[2] = GET_LONG (DREG (0) + 8);
+      sc.arg4 = args[3] = GET_LONG (DREG (0) + 12);
+      /*sc.arg5 = args[4] = GET_LONG (DREG (0) + 16);*/
+      /*sc.arg6 = args[5] = GET_LONG (DREG (0) + 20);*/
+    }
   sc.p1 = (PTR) sd;
   sc.p2 = (PTR) cpu;
   sc.read_mem = syscall_read_mem;
@@ -146,12 +175,41 @@ bfin_trap (SIM_CPU *cpu)
       }
       break;
 
+    case TARGET_SYS_ioctl:
+      /* XXX: hack just enough to get basic stdio w/uClibc ...  */
+      if (DREG (0) < 2 && DREG (1) == 0x5401)
+	{
+	  sc.result = 0;
+	  sc.errcode = 0;
+	}
+      else
+	{
+	  sc.result = -1;
+	  sc.errcode = errno_sim_to_linux_map[TARGET_EINVAL];
+	}
+      break;
+
     default:
       cb_syscall (cb, &sc);
     }
 
-  SET_DREG (0, sc.result);
-  /*SET_DREG (1, sc.errcode);*/
+  TRACE_EVENTS (cpu, "syscall_%i(%#x, %#x, %#x, %#x) = %li (error = %i)",
+		PREG (0), args[0], args[1], args[2], args[3],
+		sc.result, sc.errcode);
+
+  if (STATE_ENVIRONMENT (sd) == USER_ENVIRONMENT)
+    {
+      if (sc.result == -1)
+	SET_DREG (0, -errno_sim_to_linux_map[sc.errcode]);
+      else
+	SET_DREG (0, sc.result);
+    }
+  else
+    {
+      SET_DREG (0, sc.result);
+      /* Blackfin libgloss only expects R0 to be updated, not R1.  */
+      /*SET_DREG (1, sc.errcode);*/
+    }
 }
 
 void
@@ -320,6 +378,10 @@ sim_open (SIM_OPEN_KIND kind, host_callback *callback,
       return 0;
     }
 
+  /* XXX: Default to the Virtual environment.  */
+  if (STATE_ENVIRONMENT (sd) == ALL_ENVIRONMENT)
+    STATE_ENVIRONMENT (sd) = VIRTUAL_ENVIRONMENT;
+
   /* getopt will print the error message so we just have to exit if this fails.
      FIXME: Hmmm...  in the case of gdb we need getopt to call
      print_filtered.  */
@@ -376,6 +438,71 @@ sim_close (SIM_DESC sd, int quitting)
   /* Nothing to do.  */
 }
 
+static void
+bfin_user_init (SIM_DESC sd, SIM_CPU *cpu, char **argv, char **env)
+{
+ /* Linux starts the user app with the stack:
+       argc
+       argv[0]       -- pointers to the actual strings
+       argv[0..N]
+       NULL
+       env[0]
+       env[0..N]
+       NULL
+       argv[0..N][0..M] -- actual strings
+       env[0..N][0..M]
+     So set things up the same way.  */
+  int i, argc, envc;
+  bu32 argv_flat, env_flat;
+  bu32 sp, sp_flat;
+  unsigned char null[4] = { 0, 0, 0, 0 };
+
+  /* Figure out how much storage the argv/env strings need.  */
+  argc = count_argc (argv);
+  argv_flat = argc; /* NUL bytes */
+  for (i = 0; i < argc; ++i)
+    argv_flat += strlen (argv[i]);
+
+  envc = count_argc (env);
+  env_flat = envc; /* NUL bytes */
+  for (i = 0; i < envc; ++i)
+    env_flat += strlen (env[i]);
+
+  /* Figure out how much stack space we need w/argc/argv/env.  */
+  sp = SPREG - ((1 + argc + 1 + envc + 1) * 4) - argv_flat - env_flat;
+  /* Align the SP.  */
+  sp &= ~(4 - 1);
+  SPREG = sp;
+
+  /* First push the argc value.  */
+  /* XXX: Missing host -> target endian ...  */
+  sim_write (sd, sp, (void *)&argc, 4);
+  sp += 4;
+
+  /* Then the actual argv strings so we know where to point argv[].  */
+  sp_flat = sp + ((argc + 1 + envc + 1) * 4);
+  for (i = 0; i < argc; ++i)
+    {
+      unsigned len = strlen (argv[i]) + 1;
+      sim_write (sd, sp_flat, argv[i], len);
+      sim_write (sd, sp, (void *)&sp_flat, 4);
+      sp_flat += len;
+      sp += 4;
+    }
+  sim_write (sd, sp, null, 4);
+  sp += 4;
+
+  /* Then the actual env strings so we know where to point env[].  */
+  for (i = 0; i < envc; ++i)
+    {
+      unsigned len = strlen (env[i]) + 1;
+      sim_write (sd, sp_flat, env[i], len);
+      sim_write (sd, sp, (void *)&sp_flat, 4);
+      sp_flat += len;
+      sp += 4;
+    }
+}
+
 SIM_RC
 sim_create_inferior (SIM_DESC sd, struct bfd *abfd,
 		     char **argv, char **env)
@@ -397,6 +524,13 @@ sim_create_inferior (SIM_DESC sd, struct bfd *abfd,
     {
       free (STATE_PROG_ARGV (sd));
       STATE_PROG_ARGV (sd) = dupargv (argv);
+    }
+
+  switch (STATE_ENVIRONMENT (sd))
+    {
+    case USER_ENVIRONMENT:
+      bfin_user_init (sd, cpu, argv, env);
+      break;
     }
 
   return SIM_RC_OK;
