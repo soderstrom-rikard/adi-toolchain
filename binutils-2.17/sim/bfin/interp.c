@@ -27,6 +27,8 @@
 #include <string.h>
 #include <signal.h>
 
+#include <unistd.h>	/* dup2 */
+
 #include "gdb/callback.h"
 #include "gdb/signals.h"
 #include "sim-main.h"
@@ -36,6 +38,7 @@
 #include "bfin-linux-errno.h"
 #define TARGET_SYS_ioctl 1000 /* XXX: hack for simple uClibc stdio!  */
 #define TARGET_SYS_mmap2 1001 /* XXX: this gets us malloc()  */
+#define TARGET_SYS_dup2  1002
 #include "bfin-linux-scnos.h"
 
 #include "devices.h"
@@ -182,9 +185,9 @@ bfin_syscall (SIM_CPU *cpu)
 
     case TARGET_SYS_ioctl:
       /* XXX: hack just enough to get basic stdio w/uClibc ...  */
-      if ((sc.arg1 == 0 || sc.arg1 == 1) && sc.arg2 == 0x5401)
+      if (sc.arg2 == 0x5401)
 	{
-	  sc.result = 0;
+	  sc.result = !isatty (sc.arg1);
 	  sc.errcode = 0;
 	}
       else
@@ -207,6 +210,12 @@ bfin_syscall (SIM_CPU *cpu)
 	  sc.result = -1;
 	  sc.errcode = TARGET_ENOSYS;
 	}
+      break;
+
+    case TARGET_SYS_dup2:
+      sc.result = dup2 (sc.arg1, sc.arg2);
+      if (sc.result == -1)
+	sc.errcode = cb->get_errno (cb);
       break;
 
     default:
