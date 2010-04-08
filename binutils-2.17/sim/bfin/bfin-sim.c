@@ -2933,25 +2933,30 @@ decode_LDSTiiFP_0 (SIM_CPU *cpu, bu16 iw0)
      +---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
      | 1 | 0 | 1 | 1 | 1 | 0 |.W.|.offset............|.reg...........|
      +---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+  */
-  int reg = ((iw0 >> 0) & 0xf);
+  /* This isn't exactly a grp:reg as this insn only supports Dregs & Pregs,
+     but for our usage, it's functionality the same thing.  */
+  int reg = ((iw0 >> 0) & 0x7);
+  int grp = ((iw0 >> 3) & 0x1);
   int offset = ((iw0 >> 4) & 0x1f);
   int W = ((iw0 >> 9) & 0x1);
   bu32 imm = negimm5s4 (offset);
   bu32 ea = FPREG + imm;
   const char *imm_str = negimm5s4_str (offset);
+  const char *reg_name = get_allreg_name (grp, reg);
 
-  TRACE_EXTRACT (cpu, "%s: W:%i offset:%#x reg:%i", __func__, W, offset, reg);
+  TRACE_EXTRACT (cpu, "%s: W:%i offset:%#x grp:%i reg:%i", __func__,
+		 W, offset, grp, reg);
   TRACE_DECODE (cpu, "%s: negimm5s4:%#x", __func__, imm);
 
   if (W == 0)
     {
-      TRACE_INSN (cpu, "%s = [FP + %s];", get_allreg_name (0, reg), imm_str);
-      reg_write (cpu, 0, reg, GET_LONG (ea));
+      TRACE_INSN (cpu, "%s = [FP + %s];", reg_name, imm_str);
+      reg_write (cpu, grp, reg, GET_LONG (ea));
     }
   else
     {
-      TRACE_INSN (cpu, "[FP + %s] = %s;", imm_str, get_allreg_name (0, reg));
-      PUT_LONG (ea, reg_read (cpu, 0, reg));
+      TRACE_INSN (cpu, "[FP + %s] = %s;", imm_str, reg_name);
+      PUT_LONG (ea, reg_read (cpu, grp, reg));
     }
 }
 
