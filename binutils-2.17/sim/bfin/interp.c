@@ -35,6 +35,7 @@
 #include "targ-vals.h"
 #include "bfin-linux-errno.h"
 #define TARGET_SYS_ioctl 1000 /* XXX: hack for simple uClibc stdio!  */
+#define TARGET_SYS_mmap2 1001 /* XXX: this gets us malloc()  */
 #include "bfin-linux-scnos.h"
 
 #include "devices.h"
@@ -113,7 +114,7 @@ bfin_syscall (SIM_CPU *cpu)
   SIM_DESC sd = CPU_STATE (cpu);
   char **argv = STATE_PROG_ARGV (sd);
   host_callback *cb = STATE_CALLBACK (sd);
-  bu32 args[4];
+  bu32 args[6];
   CB_SYSCALL sc;
 
   CB_SYSCALL_INIT (&sc);
@@ -126,8 +127,8 @@ bfin_syscall (SIM_CPU *cpu)
       sc.arg2 = args[1] = DREG (1);
       sc.arg3 = args[2] = DREG (2);
       sc.arg4 = args[3] = DREG (3);
-      /*sc.arg5 = args[4] = DREG (4);*/
-      /*sc.arg6 = args[5] = DREG (5);*/
+      /*sc.arg5 =*/ args[4] = DREG (4);
+      /*sc.arg6 =*/ args[5] = DREG (5);
     }
   else
     {
@@ -181,7 +182,7 @@ bfin_syscall (SIM_CPU *cpu)
 
     case TARGET_SYS_ioctl:
       /* XXX: hack just enough to get basic stdio w/uClibc ...  */
-      if (DREG (0) < 2 && DREG (1) == 0x5401)
+      if ((sc.arg1 == 0 || sc.arg1 == 1) && sc.arg2 == 0x5401)
 	{
 	  sc.result = 0;
 	  sc.errcode = 0;
@@ -189,7 +190,22 @@ bfin_syscall (SIM_CPU *cpu)
       else
 	{
 	  sc.result = -1;
-	  sc.errcode = errno_sim_to_linux_map[TARGET_EINVAL];
+	  sc.errcode = TARGET_EINVAL;
+	}
+      break;
+
+    case TARGET_SYS_mmap2:
+      /* XXX: support enough of mmap to get malloc()  */
+      if (sc.arg4 & 0x20 /*MAP_ANONYMOUS*/)
+	{
+	  static bu32 heap = BFIN_DEFAULT_MEM_SIZE / 2;
+	  sc.result = heap;
+	  heap += (sc.arg2 & ~31) + 31;
+	}
+      else
+	{
+	  sc.result = -1;
+	  sc.errcode = TARGET_ENOSYS;
 	}
       break;
 
@@ -197,8 +213,8 @@ bfin_syscall (SIM_CPU *cpu)
       cb_syscall (cb, &sc);
     }
 
-  TRACE_EVENTS (cpu, "syscall_%i(%#x, %#x, %#x, %#x) = %li (error = %i)",
-		PREG (0), args[0], args[1], args[2], args[3],
+  TRACE_EVENTS (cpu, "syscall_%i(%#x, %#x, %#x, %#x, %#x, %#x) = %li (error = %i)",
+		PREG (0), args[0], args[1], args[2], args[3], args[4], args[5],
 		sc.result, sc.errcode);
 
   if (STATE_ENVIRONMENT (sd) == USER_ENVIRONMENT)
