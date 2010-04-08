@@ -4005,6 +4005,7 @@ decode_dsp32alu_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1)
       bu32 s1h = s1 >> 16;
       bu32 s1l = s1 & 0xFFFF;
       bu32 t0, t1;
+      bu32 astat;
       TRACE_INSN (cpu, "R%i = R%i %c|%c R%i%s;", dst0, src0,
 		  (aop & 2) ? '-' : '+', (aop & 1) ? '-' : '+', src1,
 		  amods[s + (x << 1)]);
@@ -4012,10 +4013,12 @@ decode_dsp32alu_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1)
 	t0 = sub16 (cpu, s0h, s1h, &ASTATREG (ac1), 0, s, 0);
       else
 	t0 = add16 (cpu, s0h, s1h, &ASTATREG (ac1), 0, s, 0);
+      astat = ASTAT;
       if (aop & 1)
 	t1 = sub16 (cpu, s0l, s1l, &ASTATREG (ac0), 0, s, 0);
       else
 	t1 = add16 (cpu, s0l, s1l, &ASTATREG (ac0), 0, s, 0);
+      SET_ASTAT (astat | ASTAT);
       t0 &= 0xFFFF;
       t1 &= 0xFFFF;
       if (x)
