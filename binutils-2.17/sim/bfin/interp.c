@@ -51,7 +51,7 @@
 
 /* Count the number of arguments in an argv.  */
 static int
-count_argc (char **argv)
+count_argc (char * const *argv)
 {
   int i;
 
@@ -72,6 +72,8 @@ syscall_read_mem (host_callback *cb, struct cb_syscall *sc,
   SIM_DESC sd = (SIM_DESC) sc->p1;
   SIM_CPU *cpu = (SIM_CPU *) sc->p2;
 
+  TRACE_CORE (cpu, "DBUS FETCH (syscall) %i bytes @ 0x%08lx", bytes, taddr);
+
   return sim_core_read_buffer (sd, cpu, read_map, buf, taddr, bytes);
 }
 
@@ -81,6 +83,8 @@ syscall_write_mem (host_callback *cb, struct cb_syscall *sc,
 {
   SIM_DESC sd = (SIM_DESC) sc->p1;
   SIM_CPU *cpu = (SIM_CPU *) sc->p2;
+
+  TRACE_CORE (cpu, "DBUS STORE (syscall) %i bytes @ 0x%08lx", bytes, taddr);
 
   return sim_core_write_buffer (sd, cpu, write_map, buf, taddr, bytes);
 }
@@ -438,8 +442,22 @@ sim_close (SIM_DESC sd, int quitting)
   /* Nothing to do.  */
 }
 
+static const char stat_map[] =
+/* Linux kernel 32bit layout:  */
+"st_dev,2:space,2:st_ino,4:st_mode,2:st_nlink,2:st_uid,2:st_gid,2:st_rdev,2:"
+"space,2:st_size,4:st_blksize,4:st_blocks,4:st_atime,4:st_atimensec,4:"
+"st_mtime,4:st_mtimensec,4:st_ctime,4:st_ctimensec,4:space,4:space,4";
+/* uClibc public ABI 32bit layout:
+"st_dev,8:space,2:space,2:st_ino,4:st_mode,4:st_nlink,4:st_uid,4:st_gid,4:"
+"st_rdev,8:space,2:space,2:st_size,4:st_blksiez,4:st_blocks,4:st_atime,4:"
+"st_atimensec,4:st_mtime,4:st_mtimensec,4:st_ctime,4:st_ctimensec,4:space,4:"
+"space,4"; */
+
+/* Some utils don't like having a NULL environ.  */
+static char * const simple_env[] = { "HOME=/", "PATH=/bin", NULL };
+
 static void
-bfin_user_init (SIM_DESC sd, SIM_CPU *cpu, char **argv, char **env)
+bfin_user_init (SIM_DESC sd, SIM_CPU *cpu, char * const *argv, char * const *env)
 {
  /* Linux starts the user app with the stack:
        argc
@@ -457,6 +475,8 @@ bfin_user_init (SIM_DESC sd, SIM_CPU *cpu, char **argv, char **env)
   bu32 sp, sp_flat;
   unsigned char null[4] = { 0, 0, 0, 0 };
 
+  host_callback *cb = STATE_CALLBACK (sd);
+
   /* Figure out how much storage the argv/env strings need.  */
   argc = count_argc (argv);
   if (argc == -1)
@@ -465,9 +485,9 @@ bfin_user_init (SIM_DESC sd, SIM_CPU *cpu, char **argv, char **env)
   for (i = 0; i < argc; ++i)
     argv_flat += strlen (argv[i]);
 
+  if (!env)
+    env = simple_env;
   envc = count_argc (env);
-  if (envc == -1)
-    envc = 0;
   env_flat = envc; /* NUL bytes */
   for (i = 0; i < envc; ++i)
     env_flat += strlen (env[i]);
@@ -505,6 +525,9 @@ bfin_user_init (SIM_DESC sd, SIM_CPU *cpu, char **argv, char **env)
       sp_flat += len;
       sp += 4;
     }
+
+  /* Set some callbacks.  */
+  cb->stat_map = stat_map;
 }
 
 SIM_RC
