@@ -192,7 +192,6 @@ struct bfin_cpu_state
 #define SET_RETNREG(val) _SET_CORE32REG (RETN, val)
 #define SET_RETEREG(val) _SET_CORE32REG (RETE, val)
 #define SET_PCREG(val) _SET_CORE32REG (PC, val)
-#define INC_PCREG(val) _SET_CORE32REG (PC, PCREG + (val))
 
 #define AZ_BIT		0
 #define AN_BIT		1

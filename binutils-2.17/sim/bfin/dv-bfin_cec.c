@@ -26,6 +26,9 @@
 struct bfin_cec
 {
   bu32 base;
+  SIM_CPU *cpu;
+  struct hw *me;
+  struct hw_event *pending;
 
   /* Order after here is important -- matches hardware MMR layout.  */
   bu32 evt_override, imask, ipend, ilat, iprio;
@@ -34,6 +37,27 @@ struct bfin_cec
 #define mmr_offset(mmr) (offsetof(struct bfin_cec, mmr) - mmr_base())
 
 static void _cec_raise (SIM_CPU *, struct bfin_cec *, int);
+
+static void
+bfin_cec_hw_event_callback (struct hw *me, void *data)
+{
+  struct bfin_cec *cec = data;
+  hw_event_queue_deschedule (me, cec->pending);
+  _cec_raise (cec->cpu, cec, -1);
+  cec->pending = NULL;
+}
+static void
+bfin_cec_check_pending (struct hw *me, struct bfin_cec *cec)
+{
+  if (cec->pending)
+    return;
+  cec->pending = hw_event_queue_schedule (me, 0, bfin_cec_hw_event_callback, cec);
+}
+static void
+_cec_check_pending (SIM_CPU *cpu, struct bfin_cec *cec)
+{
+  bfin_cec_check_pending (cec->me, cec);
+}
 
 static void
 _cec_imask_write (struct bfin_cec *cec, bu32 value)
@@ -60,8 +84,7 @@ bfin_cec_io_write_buffer (struct hw *me, const void *source,
       break;
     case mmr_offset(imask):
       _cec_imask_write (cec, value);
-      /* Check for pending interrupts that are now enabled.  */
-      _cec_raise (hw_system_cpu (me), cec, -1);
+      bfin_cec_check_pending (me, cec);
       break;
     case mmr_offset(ipend):
     case mmr_offset(ilat):
@@ -112,14 +135,8 @@ static void
 bfin_cec_port_event (struct hw *me, int my_port, struct hw *source,
 		     int source_port, int level)
 {
-  SIM_CPU *cpu = hw_system_cpu (me);
-  if (cpu == NULL)
-    {
-      /* XXX: Why does gdb make use do this ?  */
-      SIM_DESC sd = hw_system (me);
-      cpu = STATE_CPU (sd, 0);
-    }
-  _cec_raise (cpu, hw_data (me), my_port);
+  struct bfin_cec *cec = hw_data (me);
+  _cec_raise (cec->cpu, cec, my_port);
 }
 
 static void
@@ -148,6 +165,9 @@ attach_bfin_cec_regs (struct hw *me, struct bfin_cec *cec)
 		     0, attach_space, attach_address, attach_size, me);
 
   cec->base = attach_address;
+  /* XXX: should take from the device tree.  */
+  cec->cpu = STATE_CPU (hw_system (me), 0);
+  cec->me = me;
 }
 
 static void
@@ -175,10 +195,45 @@ const struct hw_descriptor dv_bfin_cec_descriptor[] = {
   {NULL, NULL},
 };
 
+static const char * const excp_decoded[] = {
+  [VEC_SYS        ] = "Custom exception 0 (system call)",
+  [VEC_EXCPT01    ] = "Custom exception 1 (software breakpoint)",
+  [VEC_EXCPT02    ] = "Custom exception 2 (KGDB hook)",
+  [VEC_EXCPT03    ] = "Custom exception 3 (userspace stack overflow)",
+  [VEC_EXCPT04    ] = "Custom exception 4 (dump trace buffer)",
+  [VEC_EXCPT05    ] = "Custom exception 5",
+  [VEC_EXCPT06    ] = "Custom exception 6",
+  [VEC_EXCPT07    ] = "Custom exception 7",
+  [VEC_EXCPT08    ] = "Custom exception 8",
+  [VEC_EXCPT09    ] = "Custom exception 9",
+  [VEC_EXCPT10    ] = "Custom exception 10",
+  [VEC_EXCPT11    ] = "Custom exception 11",
+  [VEC_EXCPT12    ] = "Custom exception 12",
+  [VEC_EXCPT13    ] = "Custom exception 13",
+  [VEC_EXCPT14    ] = "Custom exception 14",
+  [VEC_EXCPT15    ] = "Custom exception 15",
+  [VEC_STEP       ] = "Hardware single step",
+  [VEC_OVFLOW     ] = "Trace buffer overflow",
+  [VEC_UNDEF_I    ] = "Undefined instruction",
+  [VEC_ILGAL_I    ] = "Illegal instruction combo (multi-issue)",
+  [VEC_CPLB_VL    ] = "DCPLB protection violation",
+  [VEC_MISALI_D   ] = "Unaligned data access",
+  [VEC_UNCOV      ] = "Unrecoverable event (double fault)",
+  [VEC_CPLB_M     ] = "DCPLB miss",
+  [VEC_CPLB_MHIT  ] = "Multiple DCPLB hit",
+  [VEC_WATCH      ] = "Watchpoint match",
+  [VEC_ISTRU_VL   ] = "ADSP-BF535 only",
+  [VEC_MISALI_I   ] = "Unaligned instruction access",
+  [VEC_CPLB_I_VL  ] = "ICPLB protection violation",
+  [VEC_CPLB_I_M   ] = "ICPLB miss",
+  [VEC_CPLB_I_MHIT] = "Multiple ICPLB hit",
+  [VEC_ILL_RES    ] = "Illegal supervisor resource",
+};
+
 #define CEC_STATE(cpu) ((struct bfin_cec *) dv_get_state (cpu, "/core/bfin_cec"))
 
-#define __cec_get_ivg(val) (ffs ((val) & ~(IVG_EMU_B | IVG_IRPTEN_B)) - 1)
-#define _cec_get_ivg(cec) __cec_get_ivg ((cec)->ipend)
+#define __cec_get_ivg(val) (ffs ((val) & ~IVG_IRPTEN_B) - 1)
+#define _cec_get_ivg(cec) __cec_get_ivg ((cec)->ipend & ~IVG_EMU_B)
 
 int
 cec_get_ivg (SIM_CPU *cpu)
@@ -258,6 +313,15 @@ cec_exception (SIM_CPU *cpu, int excp)
     case VEC_SIM_ABORT:
       excp_to_sim_halt (sim_exited, 1);
       return;
+    case VEC_SIM_TRAP:
+      /* GDB expects us to step over EMUEXCPT.  */
+      /* XXX: What about hwloops and EMUEXCPT at the end?
+              Pretty sure gdb doesn't handle this already...  */
+      SET_PCREG (PCREG + 2);
+      /* Only trap when we are running in gdb.  */
+      if (STATE_OPEN_KIND (sd) == SIM_OPEN_DEBUG)
+	excp_to_sim_halt (sim_stopped, SIM_SIGTRAP);
+      return;
     }
 
   if (excp <= 0x3f)
@@ -265,8 +329,6 @@ cec_exception (SIM_CPU *cpu, int excp)
       SET_EXCAUSE (excp);
       if (STATE_ENVIRONMENT (sd) == OPERATING_ENVIRONMENT)
 	{
-	  if (excp < 0x10)
-	    INC_PCREG (2);
 	  _cec_raise (cpu, CEC_STATE (cpu), IVG_EVX);
 	  return;
 	}
@@ -299,7 +361,8 @@ cec_exception (SIM_CPU *cpu, int excp)
       break;
 
     default:
-      sim_io_eprintf (sd, "Unhandled exception %#x at 0x%08x\n", excp, PCREG);
+      sim_io_eprintf (sd, "Unhandled exception %#x at 0x%08x (%s)\n",
+		      excp, PCREG, excp_decoded[excp]);
       sigrc = SIM_SIGILL;
       break;
     }
@@ -344,7 +407,7 @@ void cec_sti (SIM_CPU *cpu, bu32 ints)
   TRACE_EVENTS (cpu, "STI changed IMASK from %#x to %#x", old_mask, cec->imask);
 
   /* Check for pending interrupts that are now enabled.  */
-  _cec_raise (cpu, cec, -1);
+  _cec_check_pending (cpu, cec);
 }
 
 static void
@@ -431,14 +494,21 @@ _cec_raise (SIM_CPU *cpu, struct bfin_cec *cec, int ivg)
   else if (ivg < curr_ivg || (snen && ivg == curr_ivg))
     {
       /* Do transition! */
-      bu32 oldpc, nextpc;
+      bu32 oldpc;
 
  process_int:
       cec->ipend |= (1 << ivg);
       cec->ilat &= ~(1 << ivg);
 
+      /* Interrupts are processed in between insns which means the return
+         point is the insn-to-be-executed (which is the current PC).  But
+         exceptions are handled while executing an insn, so we may have to
+         advance the PC ourselves when setting RETX.
+         XXX: Advancing the PC should only be for "service" exceptions, and
+              handling them after executing the insn should be OK, which
+              means we might be able to use the event interface for it.  */
+
       oldpc = PCREG;
-      nextpc = hwloop_get_next_pc (cpu, oldpc, BFIN_CPU_STATE.insn_len);
       switch (ivg)
 	{
 	case IVG_EMU:
@@ -446,6 +516,8 @@ _cec_raise (SIM_CPU *cpu, struct bfin_cec *cec, int ivg)
 	  /* XXX: what happens with 'raise 0' ?  */
 	  SET_RETEREG (oldpc);
 	  excp_to_sim_halt (sim_stopped, SIM_SIGTRAP);
+	  /* XXX: Need an easy way for gdb to signal it isnt here.  */
+	  cec->ipend &= ~IVG_EMU_B;
 	  break;
 	case IVG_RST:
 	  /* Have the core reset simply exit (i.e. "shutdown").  */
@@ -460,15 +532,19 @@ _cec_raise (SIM_CPU *cpu, struct bfin_cec *cec, int ivg)
 	  if ((SEQSTATREG & EXCAUSE_MASK) >= 0x20)
 	    SET_RETXREG (oldpc);
 	  else
-	    SET_RETXREG (nextpc);
+	    {
+	      bu32 nextpc = hwloop_get_next_pc (cpu, oldpc,
+						BFIN_CPU_STATE.insn_len);
+	      SET_RETXREG (nextpc);
+	    }
+
 	  break;
 	case IVG_IRPTEN:
 	  /* XXX: what happens with 'raise 4' ?  */
 	  sim_io_error (sd, "%s: what to do with 'raise 4' ?", __func__);
 	  break;
 	default:
-	  /* Interrupts return to the following instruction.  */
-	  SET_RETIREG (nextpc | (ivg == curr_ivg ? 1 : 0));
+	  SET_RETIREG (oldpc | (ivg == curr_ivg ? 1 : 0));
 	  break;
 	}
 
@@ -505,28 +581,6 @@ _cec_raise (SIM_CPU *cpu, struct bfin_cec *cec, int ivg)
   TRACE_EVENTS (cpu, "now at EVT%i", _cec_get_ivg (cec));
 }
 
-void
-cec_raise (SIM_CPU *cpu, int ivg)
-{
-  SIM_DESC sd = CPU_STATE (cpu);
-  struct bfin_cec *cec;
-
-  if (STATE_ENVIRONMENT (sd) != OPERATING_ENVIRONMENT)
-    {
-      if (ivg == IVG_EMU)
-	cec_exception (cpu, VEC_EXCPT01);
-      return;
-    }
-
-  if (ivg > IVG15 || ivg < -1)
-    sim_io_error (sd, "%s: ivg %i out of range !", __func__, ivg);
-
-  cec = CEC_STATE (cpu);
-  _cec_require_supervisor (cpu, cec);
-
-  _cec_raise (cpu, cec, ivg);
-}
-
 static bu32
 cec_read_ret_reg (SIM_CPU *cpu, int ivg)
 {
@@ -537,6 +591,24 @@ cec_read_ret_reg (SIM_CPU *cpu, int ivg)
     case IVG_EVX: return RETXREG;
     default:      return RETIREG;
     }
+}
+
+void
+cec_latch (SIM_CPU *cpu, int ivg)
+{
+  struct bfin_cec *cec;
+
+  if (STATE_ENVIRONMENT (CPU_STATE (cpu)) != OPERATING_ENVIRONMENT)
+    {
+      bu32 oldpc = PCREG;
+      SET_PCREG (cec_read_ret_reg (cpu, ivg));
+      TRACE_BRANCH (cpu, oldpc, PCREG, -1, "CEC changed PC");
+      return;
+    }
+
+  cec = CEC_STATE (cpu);
+  cec->ilat |= (1 << ivg);
+  _cec_check_pending (cpu, cec);
 }
 
 void
@@ -633,7 +705,7 @@ cec_return (SIM_CPU *cpu, int ivg)
     }
 
   /* Check for pending interrupts before we return to usermode.  */
-  _cec_raise (cpu, cec, -1);
+  _cec_check_pending (cpu, cec);
 }
 
 void
@@ -652,7 +724,7 @@ cec_push_reti (SIM_CPU *cpu)
   cec = CEC_STATE (cpu);
   cec_irpten_disable (cpu, cec);
   /* Check for pending interrupts.  */
-  _cec_raise (cpu, cec, -1);
+  _cec_check_pending (cpu, cec);
 }
 
 void

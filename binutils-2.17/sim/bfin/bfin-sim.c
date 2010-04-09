@@ -1578,10 +1578,7 @@ decode_ProgCtrl_0 (SIM_CPU *cpu, bu16 iw0, bu32 pc)
   else if (prgfunc == 2 && poprnd == 5)
     {
       TRACE_INSN (cpu, "EMUEXCPT;");
-      /* XXX: Since this goes async, we touch this directly.
-         Not entirely sure this is correct ...  */
-      SET_PCREG (pc + 2);
-      cec_raise (cpu, IVG_EMU);
+      cec_exception (cpu, VEC_SIM_TRAP);
     }
   else if (prgfunc == 3)
     {
@@ -1637,7 +1634,7 @@ decode_ProgCtrl_0 (SIM_CPU *cpu, bu16 iw0, bu32 pc)
     {
       int raise = uimm4 (poprnd);
       TRACE_INSN (cpu, "RAISE %s;", uimm4_str (raise));
-      cec_raise (cpu, raise);
+      cec_latch (cpu, raise);
     }
   else if (prgfunc == 10)
     {

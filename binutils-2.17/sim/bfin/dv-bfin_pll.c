@@ -160,10 +160,12 @@ bfin_pll_finish (struct hw *me)
   pll->pll_lockcnt = 0x0200;
 
   /* XXX: slow it down!  */
-//  pll->pll_div = 0x3f;
-//  pll->pll_ctl = 0x201;
-
-  pll->chipid = 3;	/* XXX: incorrect.  */
+  pll->pll_ctl = 0xa800;
+  pll->pll_div = 0x4;
+  pll->vr_ctl = 0x40fb;
+  pll->pll_stat = 0xa2;
+  pll->pll_lockcnt = 0x300;
+  pll->chipid = 0x327c80cb;
 }
 
 const struct hw_descriptor dv_bfin_pll_descriptor[] = {

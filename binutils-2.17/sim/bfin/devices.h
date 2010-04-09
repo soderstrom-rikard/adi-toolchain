@@ -75,13 +75,18 @@ static inline void dv_w1c_4_partial (bu32 *ptr, bu32 val, bu32 bits)
   dv_w1c_partial (ptr, val, bits);
 }
 
-static inline void *
-dv_get_state (SIM_CPU *cpu, const char *device_name)
+static inline struct hw *
+dv_get_device (SIM_CPU *cpu, const char *device_name)
 {
   SIM_DESC sd = CPU_STATE (cpu);
   void *root = STATE_HW (sd);
-  struct hw *hw = hw_tree_find_device (root, device_name);
-  return hw_data (hw);
+  return hw_tree_find_device (root, device_name);
+}
+
+static inline void *
+dv_get_state (SIM_CPU *cpu, const char *device_name)
+{
+  return hw_data (dv_get_device (cpu, device_name));
 }
 
 #define dv_bfin_hw_parse(sd, dv, DV) \
