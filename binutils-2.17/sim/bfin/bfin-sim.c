@@ -1627,6 +1627,7 @@ decode_ProgCtrl_0 (SIM_CPU *cpu, bu16 iw0, bu32 pc)
       TRACE_BRANCH (cpu, pc, newpc, -1, "JUMP (Preg)");
       SET_PCREG (newpc);
       BFIN_CPU_STATE.did_jump = true;
+      PROFILE_BRANCH_TAKEN (cpu);
     }
   else if (prgfunc == 6)
     {
@@ -1638,6 +1639,7 @@ decode_ProgCtrl_0 (SIM_CPU *cpu, bu16 iw0, bu32 pc)
       SET_RETSREG (hwloop_get_next_pc (cpu, pc, 2));
       SET_PCREG (newpc);
       BFIN_CPU_STATE.did_jump = true;
+      PROFILE_BRANCH_TAKEN (cpu);
     }
   else if (prgfunc == 7)
     {
@@ -1647,6 +1649,7 @@ decode_ProgCtrl_0 (SIM_CPU *cpu, bu16 iw0, bu32 pc)
       SET_RETSREG (hwloop_get_next_pc (cpu, pc, 2));
       SET_PCREG (newpc);
       BFIN_CPU_STATE.did_jump = true;
+      PROFILE_BRANCH_TAKEN (cpu);
     }
   else if (prgfunc == 8)
     {
@@ -1655,6 +1658,7 @@ decode_ProgCtrl_0 (SIM_CPU *cpu, bu16 iw0, bu32 pc)
       TRACE_BRANCH (cpu, pc, newpc, -1, "JUMP (PC + Preg)");
       SET_PCREG (newpc);
       BFIN_CPU_STATE.did_jump = true;
+      PROFILE_BRANCH_TAKEN (cpu);
     }
   else if (prgfunc == 9)
     {
@@ -2121,7 +2125,10 @@ decode_BRCC_0 (SIM_CPU *cpu, bu16 iw0, bu32 pc)
       TRACE_BRANCH (cpu, pc, newpc, -1, "Conditional JUMP");
       SET_PCREG (newpc);
       BFIN_CPU_STATE.did_jump = true;
+      PROFILE_BRANCH_TAKEN (cpu);
     }
+  else
+    PROFILE_BRANCH_UNTAKEN (cpu);
 }
 
 static void
@@ -2143,6 +2150,7 @@ decode_UJUMP_0 (SIM_CPU *cpu, bu16 iw0, bu32 pc)
 
   SET_PCREG (newpc);
   BFIN_CPU_STATE.did_jump = true;
+  PROFILE_BRANCH_TAKEN (cpu);
 }
 
 static void
@@ -3156,6 +3164,7 @@ decode_CALLa_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1, bu32 pc)
 
   SET_PCREG (newpc);
   BFIN_CPU_STATE.did_jump = true;
+  PROFILE_BRANCH_TAKEN (cpu);
 }
 
 static void

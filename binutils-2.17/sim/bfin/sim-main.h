@@ -80,14 +80,30 @@ struct sim_state {
 #define TRACE_INSN(cpu, fmt, ...) MAYBE_TRACE (INSN, cpu, fmt, ## __VA_ARGS__)
 #define TRACE_DECODE(cpu, fmt, ...) MAYBE_TRACE (DECODE, cpu, fmt, ## __VA_ARGS__)
 #define TRACE_EXTRACT(cpu, fmt, ...) MAYBE_TRACE (EXTRACT, cpu, fmt, ## __VA_ARGS__)
-#define TRACE_MEMORY(cpu, fmt, ...) MAYBE_TRACE (MEMORY, cpu, fmt, ## __VA_ARGS__)
-#define TRACE_CORE(cpu, fmt, ...) MAYBE_TRACE (CORE, cpu, fmt, ## __VA_ARGS__)
+#define TRACE_CORE(cpu, addr, size, map, val) \
+  do { \
+    MAYBE_TRACE (CORE, cpu, "%cBUS %s %i bytes @ 0x%08x: 0x%0*x", \
+		 map == exec_map ? 'I' : 'D', \
+		 map == write_map ? "STORE" : "FETCH", \
+		 size, addr, size * 2, val); \
+    PROFILE_COUNT_CORE (cpu, addr, size, map); \
+  } while (0)
 #define TRACE_EVENTS(cpu, fmt, ...) MAYBE_TRACE (EVENTS, cpu, fmt, ## __VA_ARGS__)
 #define TRACE_BRANCH(cpu, oldpc, newpc, hwloop, fmt, ...) \
   do { \
     MAYBE_TRACE (BRANCH, cpu, fmt " to %#x", ## __VA_ARGS__, newpc); \
     if (STATE_ENVIRONMENT (CPU_STATE (cpu)) == OPERATING_ENVIRONMENT) \
       bfin_trace_queue (cpu, oldpc, newpc, hwloop); \
+  } while (0)
+#define PROFILE_BRANCH_TAKEN(cpu) \
+  do { \
+    if (PROFILE_MODEL_P (cpu)) \
+      ++ PROFILE_MODEL_TAKEN_COUNT (CPU_PROFILE_DATA (cpu)); \
+  } while (0)
+#define PROFILE_BRANCH_UNTAKEN(cpu) \
+  do { \
+    if (PROFILE_MODEL_P (cpu)) \
+      ++ PROFILE_MODEL_UNTAKEN_COUNT (CPU_PROFILE_DATA (cpu)); \
   } while (0)
 
 extern void trace_register PARAMS ((SIM_DESC sd,

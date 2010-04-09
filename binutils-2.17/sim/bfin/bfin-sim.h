@@ -273,34 +273,31 @@ do { \
 				 (void *)&__v, __taddr, __bytes); \
   if (__cnt != __bytes) \
     mmu_process_fault (cpu, __taddr, true, false, false); \
-  TRACE_MEMORY (cpu, "DBUS STORE %i bytes @ 0x%08x: 0x%0*x", \
-		size / 8, __taddr, size / 4, __v); \
+  TRACE_CORE (cpu, __taddr, __bytes, write_map, __v); \
 } while (0)
 #define PUT_BYTE(taddr, v) __PUT_MEM(taddr, v, 8)
 #define PUT_WORD(taddr, v) __PUT_MEM(taddr, v, 16)
 #define PUT_LONG(taddr, v) __PUT_MEM(taddr, v, 32)
 
-#define __GET_MEM(taddr, size, inst) \
+#define __GET_MEM(taddr, size, inst, map) \
 ({ \
   bu##size __ret; \
   bu32 __taddr = (taddr); \
   int __cnt, __bytes = size / 8; \
   mmu_check_addr (cpu, __taddr, false, inst, __bytes); \
-  __cnt = sim_core_read_buffer (CPU_STATE(cpu), cpu, read_map, \
+  __cnt = sim_core_read_buffer (CPU_STATE(cpu), cpu, map, \
 				(void *)&__ret, __taddr, __bytes); \
   if (__cnt != __bytes) \
     mmu_process_fault (cpu, __taddr, false, inst, false); \
-  TRACE_MEMORY (cpu, "%cBUS FETCH %i bytes @ 0x%08x: 0x%0*x", \
-		inst ? 'I' : 'D', \
-		size / 8, __taddr, size / 4, __ret); \
+  TRACE_CORE (cpu, __taddr, __bytes, map, __ret); \
   __ret; \
 })
-#define _GET_MEM(taddr, size) __GET_MEM(taddr, size, false)
+#define _GET_MEM(taddr, size) __GET_MEM(taddr, size, false, read_map)
 #define GET_BYTE(taddr) _GET_MEM(taddr, 8)
 #define GET_WORD(taddr) _GET_MEM(taddr, 16)
 #define GET_LONG(taddr) _GET_MEM(taddr, 32)
 
-#define IFETCH(taddr) __GET_MEM(taddr, 16, true)
+#define IFETCH(taddr) __GET_MEM(taddr, 16, true, exec_map)
 
 extern void bfin_syscall (SIM_CPU *);
 extern bu32 interp_insn_bfin (SIM_CPU *, bu32);
