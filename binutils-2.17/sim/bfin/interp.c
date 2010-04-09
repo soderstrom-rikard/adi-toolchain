@@ -195,12 +195,16 @@ bfin_syscall (SIM_CPU *cpu)
       break;
 
     case CB_SYS_mmap2:
-      /* XXX: support enough of mmap to get malloc()  */
+      /* XXX: Support enough of mmap to get malloc().  No one checks
+              munmap() return value in malloc(), so skip that syscall.  */
       if (sc.arg4 & 0x20 /*MAP_ANONYMOUS*/)
 	{
 	  static bu32 heap = BFIN_DEFAULT_MEM_SIZE / 2;
 	  sc.result = heap;
-	  heap += (sc.arg2 & ~31) + 31;
+	  heap += sc.arg2;
+	  /* Keep it page aligned.  */
+	  if (heap & (4096 - 1))
+	    heap = (heap & ~(4096 - 1)) + 4096;
 	}
       else
 	{
