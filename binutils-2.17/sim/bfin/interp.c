@@ -26,7 +26,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <signal.h>
-
+#include <errno.h>
 #include <unistd.h>	/* dup2 */
 
 #include "gdb/callback.h"
@@ -34,12 +34,16 @@
 #include "sim-main.h"
 #include "sim-hw.h"
 
+/* XXX: common gdb code doesn't define these by default.  */
+#define CB_SYS_argc    100
+#define CB_SYS_argn    101
+#define CB_SYS_argnlen 102
 #include "targ-vals.h"
-#include "bfin-linux-errno.h"
-#define TARGET_SYS_ioctl 1000 /* XXX: hack for simple uClibc stdio!  */
-#define TARGET_SYS_mmap2 1001 /* XXX: this gets us malloc()  */
-#define TARGET_SYS_dup2  1002
-#include "bfin-linux-scnos.h"
+
+#define CB_SYS_ioctl 200 /* XXX: hack for simple uClibc stdio!  */
+#define CB_SYS_mmap2 201 /* XXX: this gets us malloc()  */
+#define CB_SYS_dup2  202
+#include "targ-linux.h"
 
 #include "devices.h"
 #include "dv-bfin_cec.h"
@@ -93,21 +97,6 @@ syscall_write_mem (host_callback *cb, struct cb_syscall *sc,
   return sim_core_write_buffer (sd, cpu, write_map, buf, taddr, bytes);
 }
 
-static int
-bfin_scno_linux_to_sim (unsigned int scno)
-{
-  int ret;
-
-  if (scno > ARRAY_SIZE (scno_linux_to_sim_map))
-    return -1;
-
-  ret = scno_linux_to_sim_map[scno];
-  if (ret == 0)
-    ret = -1;
-
-  return ret;
-}
-
 /* Simulate a monitor trap, put the result into r0 and errno into r1
    return offset by which to adjust pc.  */
 
@@ -125,7 +114,7 @@ bfin_syscall (SIM_CPU *cpu)
   if (STATE_ENVIRONMENT (sd) == USER_ENVIRONMENT)
     {
       /* Linux syscall.  */
-      sc.func = bfin_scno_linux_to_sim (PREG (0));
+      sc.func = PREG (0);
       sc.arg1 = args[0] = DREG (0);
       sc.arg2 = args[1] = DREG (1);
       sc.arg3 = args[2] = DREG (2);
@@ -141,8 +130,8 @@ bfin_syscall (SIM_CPU *cpu)
       sc.arg2 = args[1] = GET_LONG (DREG (0) + 4);
       sc.arg3 = args[2] = GET_LONG (DREG (0) + 8);
       sc.arg4 = args[3] = GET_LONG (DREG (0) + 12);
-      /*sc.arg5 = args[4] = GET_LONG (DREG (0) + 16);*/
-      /*sc.arg6 = args[5] = GET_LONG (DREG (0) + 20);*/
+      /*sc.arg5 =*/ args[4] = GET_LONG (DREG (0) + 16);
+      /*sc.arg6 =*/ args[5] = GET_LONG (DREG (0) + 20);
     }
   sc.p1 = (PTR) sd;
   sc.p2 = (PTR) cpu;
@@ -150,15 +139,15 @@ bfin_syscall (SIM_CPU *cpu)
   sc.write_mem = syscall_write_mem;
 
   /* Common cb_syscall() handles most functions.  */
-  switch (sc.func)
+  switch (cb_target_to_host_syscall (cb, sc.func))
     {
-    case TARGET_SYS_exit:
+    case CB_SYS_exit:
       sim_engine_halt (sd, cpu, NULL, PCREG, sim_exited, sc.arg1);
 
-    case TARGET_SYS_argc:
+    case CB_SYS_argc:
       sc.result = count_argc (argv);
       break;
-    case TARGET_SYS_argnlen:
+    case CB_SYS_argnlen:
       {
 	if (sc.arg1 < count_argc (argv))
 	  sc.result = strlen (argv[sc.arg1]);
@@ -166,7 +155,7 @@ bfin_syscall (SIM_CPU *cpu)
 	  sc.result = -1;
       }
       break;
-    case TARGET_SYS_argn:
+    case CB_SYS_argn:
       {
 	if (sc.arg1 < count_argc (argv))
 	  {
@@ -183,7 +172,7 @@ bfin_syscall (SIM_CPU *cpu)
       }
       break;
 
-    case TARGET_SYS_ioctl:
+    case CB_SYS_ioctl:
       /* XXX: hack just enough to get basic stdio w/uClibc ...  */
       if (sc.arg2 == 0x5401)
 	{
@@ -197,7 +186,7 @@ bfin_syscall (SIM_CPU *cpu)
 	}
       break;
 
-    case TARGET_SYS_mmap2:
+    case CB_SYS_mmap2:
       /* XXX: support enough of mmap to get malloc()  */
       if (sc.arg4 & 0x20 /*MAP_ANONYMOUS*/)
 	{
@@ -212,7 +201,7 @@ bfin_syscall (SIM_CPU *cpu)
 	}
       break;
 
-    case TARGET_SYS_dup2:
+    case CB_SYS_dup2:
       sc.result = dup2 (sc.arg1, sc.arg2);
       if (sc.result == -1)
 	sc.errcode = cb->get_errno (cb);
@@ -229,7 +218,7 @@ bfin_syscall (SIM_CPU *cpu)
   if (STATE_ENVIRONMENT (sd) == USER_ENVIRONMENT)
     {
       if (sc.result == -1)
-	SET_DREG (0, -errno_sim_to_linux_map[sc.errcode]);
+	SET_DREG (0, -cb_host_to_target_errno (cb, ENOSYS));
       else
 	SET_DREG (0, sc.result);
     }
@@ -559,6 +548,10 @@ bfin_user_init (SIM_DESC sd, SIM_CPU *cpu, char * const *argv, char * const *env
     }
 
   /* Set some callbacks.  */
+  cb->syscall_map = cb_linux_syscall_map;
+  cb->errno_map = cb_linux_errno_map;
+  cb->open_map = cb_linux_open_map;
+  cb->signal_map = cb_linux_signal_map;
   cb->stat_map = stat_map;
 }
 
