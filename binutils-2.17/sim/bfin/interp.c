@@ -40,9 +40,17 @@
 #define CB_SYS_argnlen 102
 #include "targ-vals.h"
 
-#define CB_SYS_ioctl 200 /* XXX: hack for simple uClibc stdio!  */
-#define CB_SYS_mmap2 201 /* XXX: this gets us malloc()  */
-#define CB_SYS_dup2  202
+#define CB_SYS_ioctl    200 /* XXX: hack for simple uClibc stdio!  */
+#define CB_SYS_mmap2    201 /* XXX: this gets us malloc()  */
+#define CB_SYS_dup2     202
+#define CB_SYS_getuid   203
+#define CB_SYS_getuid32 205
+#define CB_SYS_getgid   206
+#define CB_SYS_getgid32 207
+#define CB_SYS_setuid   208
+#define CB_SYS_setuid32 209
+#define CB_SYS_setgid   210
+#define CB_SYS_setgid32 211
 #include "targ-linux.h"
 
 #include "devices.h"
@@ -203,22 +211,47 @@ bfin_syscall (SIM_CPU *cpu)
 
     case CB_SYS_dup2:
       sc.result = dup2 (sc.arg1, sc.arg2);
-      if (sc.result == -1)
-	sc.errcode = cb->get_errno (cb);
-      break;
+      goto sys_finish;
+
+    case CB_SYS_getuid:
+    case CB_SYS_getuid32:
+      sc.result = getuid ();
+      goto sys_finish;
+    case CB_SYS_getgid:
+    case CB_SYS_getgid32:
+      sc.result = getgid ();
+      goto sys_finish;
+    case CB_SYS_setuid:
+      sc.arg1 &= 0xffff;
+    case CB_SYS_setuid32:
+      sc.result = setuid (sc.arg1);
+      goto sys_finish;
+    case CB_SYS_setgid:
+      sc.arg1 &= 0xffff;
+    case CB_SYS_setgid32:
+      sc.result = setgid (sc.arg1);
+      goto sys_finish;
 
     default:
       cb_syscall (cb, &sc);
+      break;
+
+    sys_finish:
+      if (sc.result == -1)
+	sc.errcode = cb->get_errno (cb);
     }
 
   TRACE_EVENTS (cpu, "syscall_%i(%#x, %#x, %#x, %#x, %#x, %#x) = %li (error = %i)",
-		PREG (0), args[0], args[1], args[2], args[3], args[4], args[5],
+		sc.func, args[0], args[1], args[2], args[3], args[4], args[5],
 		sc.result, sc.errcode);
 
   if (STATE_ENVIRONMENT (sd) == USER_ENVIRONMENT)
     {
       if (sc.result == -1)
-	SET_DREG (0, -cb_host_to_target_errno (cb, ENOSYS));
+	{
+	  sim_io_eprintf (sd, "bfin-sim: unimplemented syscall %i\n", sc.func);
+	  SET_DREG (0, -cb_host_to_target_errno (cb, ENOSYS));
+	}
       else
 	SET_DREG (0, sc.result);
     }
