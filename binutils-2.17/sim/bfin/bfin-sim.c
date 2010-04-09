@@ -338,7 +338,6 @@ const char * const amod0amod2_names[] =
   "(ASL)",  "(S, ASL)", "(CO, ASL)", "(SCO, ASL)",
 };
 
-
 static bu32 *
 get_allreg (SIM_CPU *cpu, int grp, int reg)
 {
@@ -1070,26 +1069,6 @@ ones (bu32 val)
   return ret;
 }
 
-static bu32
-reg_get_sp (SIM_CPU *cpu)
-{
-  if (STATE_ENVIRONMENT (CPU_STATE (cpu)) == OPERATING_ENVIRONMENT &&
-      cec_is_user_mode (cpu))
-    return USPREG;
-  else
-    return SPREG;
-}
-
-static void
-reg_set_sp (SIM_CPU *cpu, bu32 sp)
-{
-  if (STATE_ENVIRONMENT (CPU_STATE (cpu)) == OPERATING_ENVIRONMENT &&
-      cec_is_user_mode (cpu))
-    SET_USPREG (sp);
-  else
-    SET_SPREG (sp);
-}
-
 static void
 reg_check_sup (SIM_CPU *cpu, int grp, int reg)
 {
@@ -1131,10 +1110,7 @@ reg_write (SIM_CPU *cpu, int grp, int reg, bu32 value)
 
   TRACE_REGISTER (cpu, "wrote %s = %#x", get_allreg_name (grp, reg), value);
 
-  if (whichreg == &SPREG)
-    reg_set_sp (cpu, value);
-  else
-    *whichreg = value;
+  *whichreg = value;
 }
 
 static bu32
@@ -1159,10 +1135,7 @@ reg_read (SIM_CPU *cpu, int grp, int reg)
     /* sign extend if necessary */
     value |= 0xFFFFFF00;
 
-  if (whichreg == &SPREG)
-    return reg_get_sp (cpu);
-  else
-    return value;
+  return value;
 }
 
 static bu64
@@ -1758,7 +1731,7 @@ decode_PushPopReg_0 (SIM_CPU *cpu, bu16 iw0)
   int W = ((iw0 >> 6) & 0x1);
   const char *reg_name = get_allreg_name (grp, reg);
   bu32 value;
-  bu32 sp = reg_get_sp (cpu);
+  bu32 sp = SPREG;
 
   TRACE_EXTRACT (cpu, "%s: W:%i grp:%i reg:%i", __func__, W, grp, reg);
   TRACE_DECODE (cpu, "%s: reg:%s", __func__, reg_name);
@@ -1788,7 +1761,7 @@ decode_PushPopReg_0 (SIM_CPU *cpu, bu16 iw0)
 
   /* Note: SP update must be delayed until after all reads/writes; see
            comments in decode_PushPopMultiple_0() for more info.  */
-  reg_set_sp (cpu, sp);
+  SET_SPREG (sp);
 }
 
 static void
@@ -1804,7 +1777,7 @@ decode_PushPopMultiple_0 (SIM_CPU *cpu, bu16 iw0)
   int dr = ((iw0 >> 3) & 0x7);
   int W = ((iw0 >> 6) & 0x1);
   int i;
-  bu32 sp = reg_get_sp (cpu);
+  bu32 sp = SPREG;
 
   TRACE_EXTRACT (cpu, "%s: d:%i p:%i W:%i dr:%i pr:%i",
 		 __func__, d, p, W, dr, pr);
@@ -1860,7 +1833,7 @@ decode_PushPopMultiple_0 (SIM_CPU *cpu, bu16 iw0)
   /* Note: SP update must be delayed until after all reads/writes so that
            if an exception does occur, the insn may be re-executed as the
            SP has not yet changed.  */
-  reg_set_sp (cpu, sp);
+  SET_SPREG (sp);
 }
 
 static void
@@ -3272,7 +3245,7 @@ decode_linkage_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1)
   if (R == 0)
     {
       int size = uimm16s4 (framesize);
-      sp = reg_get_sp (cpu);
+      sp = SPREG;
       TRACE_INSN (cpu, "LINK %s;", uimm16s4_str (framesize));
       sp -= 4;
       PUT_LONG (sp, RETSREG);
@@ -3291,7 +3264,7 @@ decode_linkage_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1)
       SET_RETSREG (GET_LONG (sp));
       sp += 4;
     }
-  reg_set_sp (cpu, sp);
+  SET_SPREG (sp);
 }
 
 static void

@@ -23,6 +23,7 @@
 #include "sim-main.h"
 #include "gdb/sim-bfin.h"
 #include "bfd.h"
+#include "dv-bfin_cec.h"
 
 static const MACH bfin_mach;
 
@@ -164,6 +165,17 @@ bfin_reg_fetch (SIM_CPU *cpu, int rn, unsigned char *buf, int len)
     value = CCREG;
   else
     return 0; // will be an error in gdb
+
+  /* Handle our KSP/USP shadowing in SP.  While in supervisor mode, we
+     have the normal SP/USP behavior.  User mode is tricky though.  */
+  if (STATE_ENVIRONMENT (CPU_STATE (cpu)) == OPERATING_ENVIRONMENT
+      && cec_is_user_mode (cpu))
+    {
+      if (rn == SIM_BFIN_SP_REGNUM)
+	value = KSPREG;
+      else if (rn == SIM_BFIN_USP_REGNUM)
+	value = SPREG;
+    }
 
   bfin_store_unsigned_integer (buf, 4, value);
 

@@ -403,6 +403,8 @@ bfin_initialize_cpu (SIM_DESC sd, SIM_CPU *cpu)
 
   /* Set default stack to top of scratch pad.  */
   SET_SPREG (BFIN_DEFAULT_MEM_SIZE);
+  SET_KSPREG (BFIN_DEFAULT_MEM_SIZE);
+  SET_USPREG (BFIN_DEFAULT_MEM_SIZE);
 
   /* This is what the hardware likes.  */
   SET_SYSCFGREG (0x30);

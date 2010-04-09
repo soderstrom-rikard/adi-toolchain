@@ -46,12 +46,17 @@ struct store {
   bu32 val;
 };
 
+/* The KSP/USP handling wrt SP may not follow the hardware exactly (the hw
+   looks at current mode and uses either SP or USP based on that.  We instead
+   always operate on SP and mirror things in KSP and USP.  During a CEC
+   transition, we take care of syncing the values.  This lowers the simulation
+   complexity and speeds things up a bit.  */
 struct bfin_cpu_state
 {
   bu32 dpregs[16], iregs[4], mregs[4], bregs[4], lregs[4], cycles[3];
   bu32 ax[2], aw[2];
   bu32 lt[2], lc[2], lb[2];
-  bu32 usp, seqstat, syscfg, rets, reti, retx, retn, rete;
+  bu32 ksp, usp, seqstat, syscfg, rets, reti, retx, retn, rete;
   bu32 pc, emudat[2];
   /* These ASTAT flags need not be bu32, but it makes pointers easier.  */
   bu32 ac0, ac0_copy, ac1, an, aq;
@@ -97,6 +102,7 @@ struct bfin_cpu_state
 #define CYCLESREG	(BFIN_CPU_STATE.cycles[0])
 #define CYCLES2REG	(BFIN_CPU_STATE.cycles[1])
 #define CYCLES2SHDREG	(BFIN_CPU_STATE.cycles[2])
+#define KSPREG		(BFIN_CPU_STATE.ksp)
 #define USPREG		(BFIN_CPU_STATE.usp)
 #define SEQSTATREG	(BFIN_CPU_STATE.seqstat)
 #define SYSCFGREG	(BFIN_CPU_STATE.syscfg)
@@ -176,6 +182,7 @@ struct bfin_cpu_state
 #define SET_CYCLESREG(val) _SET_CORE32REG (CYCLES, val)
 #define SET_CYCLES2REG(val) _SET_CORE32REG (CYCLES2, val)
 #define SET_CYCLES2SHDREG(val) _SET_CORE32REG (CYCLES2SHD, val)
+#define SET_KSPREG(val) _SET_CORE32REG (KSP, val)
 #define SET_USPREG(val) _SET_CORE32REG (USP, val)
 #define SET_SEQSTATREG(val) _SET_CORE32REG (SEQSTAT, val)
 #define SET_SYSCFGREG(val) _SET_CORE32REG (SYSCFG, val)

@@ -489,13 +489,16 @@ _cec_raise (SIM_CPU *cpu, struct bfin_cec *cec, int ivg)
   DIS_ALGN_EXPT &= ~1;
 
   /* When going from user to super, we set LSB in LB regs to avoid
-     misbehavior and/or malicious code.  */
+     misbehavior and/or malicious code.
+     Also need to load SP alias with KSP.  */
   if (curr_ivg == IVG_USER)
     {
       int i;
       for (i = 0; i < 2; ++i)
 	if (!(LBREG (i) & 1))
 	  SET_LBREG (i, LBREG (i) | 1);
+      SET_USPREG (SPREG);
+      SET_SPREG (KSPREG);
     }
 
  done:
@@ -617,13 +620,16 @@ cec_return (SIM_CPU *cpu, int ivg)
   cec_irpten_disable (cpu, cec);
 
   /* When going from super to user, we clear LSB in LB regs in case
-     it was set on the transition up.  */
+     it was set on the transition up.
+     Also need to load SP alias with USP.  */
   if (_cec_get_ivg (cec) == -1)
     {
       int i;
       for (i = 0; i < 2; ++i)
 	if (LBREG (i) & 1)
 	  SET_LBREG (i, LBREG (i) & ~1);
+      SET_KSPREG (SPREG);
+      SET_SPREG (USPREG);
     }
 
   /* Check for pending interrupts before we return to usermode.  */
