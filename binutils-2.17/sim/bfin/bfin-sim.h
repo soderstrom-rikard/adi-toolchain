@@ -273,8 +273,8 @@ do { \
 				 (void *)&__v, __taddr, __bytes); \
   if (__cnt != __bytes) \
     mmu_process_fault (cpu, __taddr, true, false, false); \
-  TRACE_CORE (cpu, "DBUS STORE %i bytes @ 0x%08x: 0x%0*x", \
-	      size / 8, __taddr, size / 4, __v); \
+  TRACE_MEMORY (cpu, "DBUS STORE %i bytes @ 0x%08x: 0x%0*x", \
+		size / 8, __taddr, size / 4, __v); \
 } while (0)
 #define PUT_BYTE(taddr, v) __PUT_MEM(taddr, v, 8)
 #define PUT_WORD(taddr, v) __PUT_MEM(taddr, v, 16)
@@ -290,9 +290,9 @@ do { \
 				(void *)&__ret, __taddr, __bytes); \
   if (__cnt != __bytes) \
     mmu_process_fault (cpu, __taddr, false, inst, false); \
-  TRACE_CORE (cpu, "%cBUS FETCH %i bytes @ 0x%08x: 0x%0*x", \
-	      inst ? 'I' : 'D', \
-	      size / 8, __taddr, size / 4, __ret); \
+  TRACE_MEMORY (cpu, "%cBUS FETCH %i bytes @ 0x%08x: 0x%0*x", \
+		inst ? 'I' : 'D', \
+		size / 8, __taddr, size / 4, __ret); \
   __ret; \
 })
 #define _GET_MEM(taddr, size) __GET_MEM(taddr, size, false)

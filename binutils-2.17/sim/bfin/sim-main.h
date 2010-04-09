@@ -80,6 +80,7 @@ struct sim_state {
 #define TRACE_INSN(cpu, fmt, ...) MAYBE_TRACE (INSN, cpu, fmt, ## __VA_ARGS__)
 #define TRACE_DECODE(cpu, fmt, ...) MAYBE_TRACE (DECODE, cpu, fmt, ## __VA_ARGS__)
 #define TRACE_EXTRACT(cpu, fmt, ...) MAYBE_TRACE (EXTRACT, cpu, fmt, ## __VA_ARGS__)
+#define TRACE_MEMORY(cpu, fmt, ...) MAYBE_TRACE (MEMORY, cpu, fmt, ## __VA_ARGS__)
 #define TRACE_CORE(cpu, fmt, ...) MAYBE_TRACE (CORE, cpu, fmt, ## __VA_ARGS__)
 #define TRACE_EVENTS(cpu, fmt, ...) MAYBE_TRACE (EVENTS, cpu, fmt, ## __VA_ARGS__)
 #define TRACE_BRANCH(cpu, oldpc, newpc, hwloop, fmt, ...) \
