@@ -89,7 +89,7 @@ split_device_specifier (struct hw *current,
     {
       struct hw *aliases = hw_tree_find_device (current, "/aliases");
       char alias[32];
-      int len = 0;
+      unsigned len = 0;
       while (device_specifier[len] != '\0'
 	     && device_specifier[len] != '/'
 	     && device_specifier[len] != ':'
@@ -1117,7 +1117,7 @@ print_properties (struct hw *me,
 		if ((property->sizeof_array % sizeof (signed_cell)) == 0)
 		  {
 		    unsigned_cell *w = (unsigned_cell*) property->array;
-		    int cell_nr;
+		    unsigned cell_nr;
 		    for (cell_nr = 0;
 			 cell_nr < (property->sizeof_array / sizeof (unsigned_cell));
 			 cell_nr++)

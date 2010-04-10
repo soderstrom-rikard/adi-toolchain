@@ -585,7 +585,7 @@ hw_add_range_array_property (struct hw *me,
 			   * sizeof (unsigned_cell));
   unsigned_cell *cells = hw_zalloc (me, sizeof_cells);
   unsigned_cell *cell;
-  int i;
+  unsigned i;
   
   /* copy the property elements over */
   cell = cells;
@@ -678,7 +678,7 @@ hw_add_reg_array_property (struct hw *me,
 			   * sizeof (unsigned_cell));
   unsigned_cell *cells = hw_zalloc (me, sizeof_cells);
   unsigned_cell *cell;
-  int i;
+  unsigned i;
   
   /* copy the property elements over */
   cell = cells;
@@ -778,8 +778,8 @@ hw_add_string_array_property (struct hw *me,
 			      const string_property_spec *strings,
 			      unsigned nr_strings)
 {
-  int sizeof_array;
-  int string_nr;
+  unsigned sizeof_array;
+  unsigned string_nr;
   char *array;
   char *chp;
   if (nr_strings == 0)
@@ -842,7 +842,7 @@ hw_find_string_array_property (struct hw *me,
       ASSERT (((char*)node->array)[node->sizeof_array - 1] == '\0');
       {
 	const char *chp = node->array;
-	int nr_entries = 0;
+	unsigned nr_entries = 0;
 	/* count the number of strings, keeping an eye out for the one
 	   we're looking for */
 	*string = chp;
