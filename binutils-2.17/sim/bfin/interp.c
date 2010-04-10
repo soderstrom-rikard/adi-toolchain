@@ -53,6 +53,11 @@
 #define CB_SYS_setgid32 211
 #include "targ-linux.h"
 
+#include "elf/common.h"
+#include "elf/external.h"
+#include "elf/internal.h"
+#include "elf/bfin.h"
+
 #include "devices.h"
 #include "dv-bfin_cec.h"
 #include "dv-bfin_ctimer.h"
@@ -203,8 +208,7 @@ bfin_syscall (SIM_CPU *cpu)
 	  sc.result = heap;
 	  heap += sc.arg2;
 	  /* Keep it page aligned.  */
-	  if (heap & (4096 - 1))
-	    heap = (heap & ~(4096 - 1)) + 4096;
+	  heap = ALIGN (heap, 4096);
 	}
       else
 	{
@@ -517,25 +521,100 @@ static const char stat_map[] =
 static char * const simple_env[] = { "HOME=/", "PATH=/bin", NULL };
 
 static void
-bfin_user_init (SIM_DESC sd, SIM_CPU *cpu, char * const *argv, char * const *env)
+bfin_user_init (SIM_DESC sd, SIM_CPU *cpu, struct bfd *abfd,
+		char * const *argv, char * const *env)
 {
- /* Linux starts the user app with the stack:
+  /* XXX: Missing host -> target endian ...  */
+  /* Linux starts the user app with the stack:
        argc
-       argv[0]       -- pointers to the actual strings
-       argv[0..N]
+       argv[0]          -- pointers to the actual strings
+       argv[1..N]
        NULL
        env[0]
-       env[0..N]
+       env[1..N]
        NULL
-       argv[0..N][0..M] -- actual strings
+       auxvt[0].type    -- ELF Auxiliary Vector Table
+       auxvt[0].value
+       auxvt[1..N]
+       AT_NULL
+       0
+       argv[0..N][0..M] -- actual argv/env strings
        env[0..N][0..M]
+       FDPIC loadmaps   -- for FDPIC apps
      So set things up the same way.  */
   int i, argc, envc;
   bu32 argv_flat, env_flat;
+
   bu32 sp, sp_flat;
+
+  Elf32_External_Ehdr ehdr;
+  Elf_Internal_Phdr *phdrs;
+  long phdr_size;
+  int phdrc;
+  bu32 fdpic, pt_dynamic;
+  bu32 auxvt, auxvt_size;
+
   unsigned char null[4] = { 0, 0, 0, 0 };
 
   host_callback *cb = STATE_CALLBACK (sd);
+
+  /* See if this an FDPIC ELF.  */
+  phdrs = NULL;
+  auxvt = 0;
+  if (!abfd)
+    goto skip_fdpic_init;
+  if (bfd_seek (abfd, 0, SEEK_SET) != 0)
+    goto skip_fdpic_init;
+  if (bfd_bread (&ehdr, sizeof (ehdr), abfd) != sizeof (ehdr))
+    goto skip_fdpic_init;
+  if (!(ehdr.e_flags[0] & EF_BFIN_FDPIC))
+    goto skip_fdpic_init;
+
+  /* Grab the Program Headers to set up the loadsegs on the stack.  */
+  phdr_size = bfd_get_elf_phdr_upper_bound (abfd);
+  if (phdr_size == -1)
+    goto skip_fdpic_init;
+  phdrs = xmalloc (phdr_size);
+  phdrc = bfd_get_elf_phdrs (abfd, phdrs);
+  if (phdrc == -1)
+    goto skip_fdpic_init;
+  sp = SPREG;
+  /* XXX: Static FDPIC loads with lma==vma.  */
+  fdpic = 0;
+  for (i = phdrc; i >= 0; --i)
+    if (phdrs[i].p_type == PT_LOAD)
+      {
+	bu32 v;
+	sp -= 12;
+	v = phdrs[i].p_paddr;
+	sim_write (sd, sp+0, (void *)&v, 4); /* loadseg.addr */
+	v = phdrs[i].p_vaddr;
+	sim_write (sd, sp+4, (void *)&v, 4); /* loadseg.p_vaddr */
+	v = phdrs[i].p_memsz;
+	sim_write (sd, sp+8, (void *)&v, 4); /* loadseg.p_memsz */
+	++fdpic;
+      }
+    else if (phdrs[i].p_type == PT_DYNAMIC)
+      pt_dynamic = phdrs[i].p_paddr;
+    else if (phdrs[i].p_type == PT_INTERP)
+      sim_io_eprintf (sd, "bfin-sim: dynamic FDPIC not supported\n");
+
+  /* Push the summary loadmap info onto the stack last.  */
+  sp -= 4;
+  sim_write (sd, sp+0, null, 2); /* loadmap.version */
+  sim_write (sd, sp+2, (void *)&fdpic, 2); /* loadmap.nsegs */
+
+  /* Finally setup the registers required by the FDPIC ABI.  */
+  SET_DREG (7, 0); /* Zero out FINI funcptr -- ldso will set this up.  */
+  SET_PREG (0, sp); /* Exec loadmap addr.  */
+  /* XXX: Only static FDPIC is supported atm.  */
+  SET_PREG (1, 0); /* Interp loadmap addr.  */
+  SET_PREG (2, pt_dynamic); /* PT_DYNAMIC map addr.  */
+
+  auxvt = 1;
+  SET_SPREG (sp);
+ skip_fdpic_init:
+  free (phdrs);
 
   /* Figure out how much storage the argv/env strings need.  */
   argc = count_argc (argv);
@@ -552,19 +631,45 @@ bfin_user_init (SIM_DESC sd, SIM_CPU *cpu, char * const *argv, char * const *env
   for (i = 0; i < envc; ++i)
     env_flat += strlen (env[i]);
 
-  /* Figure out how much stack space we need w/argc/argv/env.  */
-  sp = SPREG - ((1 + argc + 1 + envc + 1) * 4) - argv_flat - env_flat;
-  /* Align the SP.  */
-  sp &= ~(4 - 1);
-  SPREG = sp;
+  /* Push the Auxiliary Vector Table between argv/env and actual strings.  */
+  sp_flat = sp = ALIGN (SPREG - argv_flat - env_flat - 4, 4);
+  if (auxvt)
+    {
+# define AT_PUSH(at, val) \
+  auxvt_size += 8; \
+  sp -= 4; \
+  auxvt = (val); \
+  sim_write (sd, sp, (void *)&auxvt, 4); \
+  sp -= 4; \
+  auxvt = (at); \
+  sim_write (sd, sp, (void *)&auxvt, 4)
+  auxvt_size = 0;
+      AT_PUSH (AT_NULL, 0);
+      AT_PUSH (AT_PAGESZ, 4096);
+      AT_PUSH (AT_UID, getuid ());
+      AT_PUSH (AT_GID, getgid ());
+      AT_PUSH (AT_EUID, geteuid ());
+      AT_PUSH (AT_EGID, getegid ());
+      AT_PUSH (AT_HWCAP, 0);
+      AT_PUSH (AT_FLAGS, 0);
+      AT_PUSH (AT_PHDR, 0 /* addr where PT's are mapped */);
+      AT_PUSH (AT_PHNUM, 0 /*phdrc*/);
+      /*AT_PUSH (AT_ENTRY, ehdr.e_entry);*/
+      AT_PUSH (AT_BASE, 0 /* addr wheer Ehdr is mapped */);
+      AT_PUSH (AT_CLKTCK, 100); /* XXX: This ever not 100 ?  */
+#undef AT_PUSH
+    }
+  SET_SPREG (sp);
+
+  /* Push the argc/argv/env after the auxvt.  */
+  sp -= ((1 + argc + 1 + envc + 1) * 4);
+  SET_SPREG (sp);
 
   /* First push the argc value.  */
-  /* XXX: Missing host -> target endian ...  */
   sim_write (sd, sp, (void *)&argc, 4);
   sp += 4;
 
   /* Then the actual argv strings so we know where to point argv[].  */
-  sp_flat = sp + ((argc + 1 + envc + 1) * 4);
   for (i = 0; i < argc; ++i)
     {
       unsigned len = strlen (argv[i]) + 1;
@@ -620,7 +725,7 @@ sim_create_inferior (SIM_DESC sd, struct bfd *abfd,
   switch (STATE_ENVIRONMENT (sd))
     {
     case USER_ENVIRONMENT:
-      bfin_user_init (sd, cpu, argv, env);
+      bfin_user_init (sd, cpu, abfd, argv, env);
       break;
     }
 
