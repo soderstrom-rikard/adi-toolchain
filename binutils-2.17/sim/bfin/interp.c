@@ -319,6 +319,8 @@ step_once (SIM_CPU *cpu)
   if (!BFIN_CPU_STATE.did_jump && !BFIN_CPU_STATE.flow_change)
     SET_PCREG (hwloop_get_next_pc (cpu, oldpc, insn_len));
 
+  ++ PROFILE_TOTAL_INSN_COUNT (CPU_PROFILE_DATA (cpu));
+
   return oldpc;
 }
 
@@ -401,6 +403,7 @@ bfin_initialize_cpu (SIM_DESC sd, SIM_CPU *cpu)
 
   memset (&cpu->state, 0, sizeof (cpu->state));
 
+  PROFILE_TOTAL_INSN_COUNT (CPU_PROFILE_DATA (cpu)) = 0;
   mdata = CPU_MODEL_DATA (cpu);
 
   /* These memory maps are supposed to be cpu-specific, but the common sim
