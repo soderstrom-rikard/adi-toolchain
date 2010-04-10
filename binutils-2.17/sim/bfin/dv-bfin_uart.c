@@ -83,7 +83,7 @@ bfin_uart_io_write_buffer (struct hw *me, const void *source,
   /* XXX: All MMRs are "8bit" ... what happens to high 8bits ?  */
 
   mmr_off = addr - uart->base;
-  valuep = (void *)uart + mmr_base() + mmr_off;
+  valuep = (void *)((unsigned long)uart + mmr_base() + mmr_off);
 
   switch (mmr_off)
     {
@@ -193,7 +193,7 @@ bfin_uart_io_read_buffer (struct hw *me, void *dest,
   dv_bfin_require_16 (me, addr, nr_bytes);
 
   mmr_off = addr - uart->base;
-  valuep = (void *)uart + mmr_base() + mmr_off;
+  valuep = (void *)((unsigned long)uart + mmr_base() + mmr_off);
 
   switch (mmr_off)
     {

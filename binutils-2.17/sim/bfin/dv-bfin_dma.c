@@ -95,7 +95,7 @@ bfin_dma_process_desc (struct hw *me, struct bfin_dma *dma)
       break;
     }
 
-  if (dma->ele_size != dma->x_modify)
+  if (dma->ele_size != (unsigned)dma->x_modify)
     hw_abort (me, "DMA config (striding) %#x not supported", dma->config);
 
   dma->curr_addr = dma->start_addr;
@@ -174,7 +174,7 @@ bfin_dma_io_write_buffer (struct hw *me, const void *source,
 	     (int) nr_bytes, value));
 
   mmr_off = addr - dma->base;
-  valuep = (void *)dma + mmr_base() + mmr_off;
+  valuep = (void *)((unsigned long)dma + mmr_base() + mmr_off);
   value16p = valuep;
   value32p = valuep;
 
@@ -252,7 +252,7 @@ bfin_dma_io_read_buffer (struct hw *me, void *dest,
   HW_TRACE ((me, "read 0x%08lx length %d", (long) addr, (int) nr_bytes));
 
   mmr_off = addr - dma->base;
-  valuep = (void *)dma + mmr_base() + mmr_off;
+  valuep = (void *)((unsigned long)dma + mmr_base() + mmr_off);
   value16p = valuep;
   value32p = valuep;
 

@@ -73,7 +73,7 @@ bfin_ctimer_io_write_buffer (struct hw *me, const void *source,
 	     (int) nr_bytes, value));
 
   mmr_off = addr - ctimer->base;
-  valuep = (void *)ctimer + mmr_base() + mmr_off;
+  valuep = (void *)((unsigned long)ctimer + mmr_base() + mmr_off);
 
   switch (mmr_off)
     {
@@ -126,7 +126,7 @@ bfin_ctimer_io_read_buffer (struct hw *me, void *dest,
   HW_TRACE ((me, "read 0x%08lx length %d", (long) addr, (int) nr_bytes));
 
   mmr_off = addr - ctimer->base;
-  valuep = (void *)ctimer + mmr_base() + mmr_off;
+  valuep = (void *)((unsigned long)ctimer + mmr_base() + mmr_off);
 
   dv_store_4 (dest, *valuep);
 

@@ -55,7 +55,7 @@ bfin_ebiu_sdc_io_write_buffer (struct hw *me, const void *source,
 	     (int) nr_bytes, value));
 
   mmr_off = addr - sdc->base;
-  valuep = (void *)sdc + mmr_base() + mmr_off;
+  valuep = (void *)((unsigned long)sdc + mmr_base() + mmr_off);
   value16p = valuep;
   value32p = valuep;
 
@@ -96,7 +96,7 @@ bfin_ebiu_sdc_io_read_buffer (struct hw *me, void *dest,
   HW_TRACE ((me, "read 0x%08lx length %d", (long) addr, (int) nr_bytes));
 
   mmr_off = addr - sdc->base;
-  valuep = (void *)sdc + mmr_base() + mmr_off;
+  valuep = (void *)((unsigned long)sdc + mmr_base() + mmr_off);
   value16p = valuep;
   value32p = valuep;
 

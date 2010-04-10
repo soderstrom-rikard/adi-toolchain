@@ -122,7 +122,7 @@ bfin_ebiu_amc_io_read_buffer (struct hw *me, void *dest,
   HW_TRACE ((me, "read 0x%08lx length %d", (long) addr, (int) nr_bytes));
 
   mmr_off = addr - amc->base;
-  valuep = (void *)amc + mmr_base() + mmr_off;
+  valuep = (void *)((unsigned long)amc + mmr_base() + mmr_off);
   value16 = valuep;
   value32 = valuep;
 

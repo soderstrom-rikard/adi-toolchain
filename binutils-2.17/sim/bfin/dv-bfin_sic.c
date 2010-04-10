@@ -48,7 +48,7 @@ bfin_sic_io_write_buffer (struct hw *me, const void *source,
 	     (int) nr_bytes, value));
 
   mmr_off = addr - sic->base;
-  valuep = (void *)sic + mmr_base() + mmr_off;
+  valuep = (void *)((unsigned long)sic + mmr_base() + mmr_off);
 
   /* XXX: Discard all SIC writes for now.  */
 
@@ -66,7 +66,7 @@ bfin_sic_io_read_buffer (struct hw *me, void *dest,
   HW_TRACE ((me, "read 0x%08lx length %d", (long) addr, (int) nr_bytes));
 
   mmr_off = addr - sic->base;
-  valuep = (void *)sic + mmr_base() + mmr_off;
+  valuep = (void *)((unsigned long)sic + mmr_base() + mmr_off);
 
   switch (mmr_off)
     {
