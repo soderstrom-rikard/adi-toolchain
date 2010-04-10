@@ -816,6 +816,24 @@ add16 (SIM_CPU *cpu, bu32 a, bu32 b, int *carry, int *overfl, int sat, int scale
   bu32 v = a + b;
   int flgn = (v >> 15) & 1;
   int overflow = (flgs ^ flgn) & (flgo ^ flgn);
+
+  switch (scale)
+    {
+    case 0:
+      break;
+    case 2:
+      /* (ASR) */
+      v = (a >> 1) + (a & 0x8000) + (b >> 1) + (b & 0x8000) + (((a & 1) + (b & 1)) >> 1);
+      flgn = (v >> 15) & 1;
+      overflow = (flgs ^ flgn) & (flgo ^ flgn);
+      break;
+    case 3:
+      /* (ASL) */
+      break;
+    default:
+      illegal_instruction (cpu);
+    }
+
   if (sat && overflow)
     {
       v = 1 << 15;
@@ -848,6 +866,27 @@ sub16 (SIM_CPU *cpu, bu32 a, bu32 b, int *carry, int *overfl, int sat, int scale
   bu32 v = a - b;
   int flgn = (v >> 15) & 1;
   int overflow = (flgs ^ flgo) & (flgn ^ flgs);
+
+  switch (scale)
+    {
+    case 0:
+      break;
+    case 2:
+      /* (ASR) */
+      if (sat)
+	v = ((a >> 1) + (a & 0x8000)) - ( (b >> 1) + (b & 0x8000));
+      else
+	v >>= 1;
+      flgn = (v >> 15) & 1;
+      overflow = (flgs ^ flgo) & (flgn ^ flgs);
+      break;
+    case 3:
+      /* (ASL) */
+      break;
+    default:
+      illegal_instruction (cpu);
+    }
+
   if (sat && overflow)
     {
       v = 1 << 15;
@@ -4024,32 +4063,24 @@ decode_dsp32alu_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1)
     }
   else if (aopcde == 1)
     {
+      bu32 d0, d1;
+
       TRACE_INSN (cpu, "R%i = R%i %s R%i, R%i = R%i %s R%i %s;",
 		  dst1, src0, HL ? "+|-" : "+|+", src1, dst0, src0, HL ? "-|+" : "-|-", src1,
 		  amod0amod2_names[aop * 4 + x * 2 + s]);
-      if (aop == 0)
-	{
-	  /* dregs = dregs +|+ dregs, dregs = dregs -|- dregs (amod0) */
-	  bu32 d0, d1;
 
-	  if (HL == 0)
-	    {
-	      d1 = addadd16 (cpu, DREG (src0), DREG (src1), s, aop, 0);
-	      d0 = subsub16 (cpu, DREG (src0), DREG (src1), s, aop, x);
-	    }
-	  else
-	    {
-	      d1 = addsub16 (cpu, DREG (src0), DREG (src1), s, aop, 0);
-	      d0 = subadd16 (cpu, DREG (src0), DREG (src1), s, aop, x);
-	    }
-	  STORE (DREG (dst0), d0);
-	  STORE (DREG (dst1), d1);
+      if (HL == 0)
+	{
+	  d1 = addadd16 (cpu, DREG (src0), DREG (src1), s, aop, 0);
+	  d0 = subsub16 (cpu, DREG (src0), DREG (src1), s, aop, x);
 	}
       else
-        {
-	  bu32 d0, d1;
-	  unhandled_instruction (cpu, "Add / Subtract (Quad Vector)");
-        }
+	{
+	  d1 = addsub16 (cpu, DREG (src0), DREG (src1), s, aop, 0);
+	  d0 = subadd16 (cpu, DREG (src0), DREG (src1), s, aop, x);
+	}
+      STORE (DREG (dst0), d0);
+      STORE (DREG (dst1), d1);
     }
   else if ((aop == 0 || aop == 1 || aop == 2) && aopcde == 11)
     {
