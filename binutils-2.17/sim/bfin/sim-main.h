@@ -97,16 +97,6 @@ struct sim_state {
     if (STATE_ENVIRONMENT (CPU_STATE (cpu)) == OPERATING_ENVIRONMENT) \
       bfin_trace_queue (cpu, oldpc, newpc, hwloop); \
   } while (0)
-#define PROFILE_BRANCH_TAKEN(cpu) \
-  do { \
-    if (PROFILE_MODEL_P (cpu)) \
-      ++ PROFILE_MODEL_TAKEN_COUNT (CPU_PROFILE_DATA (cpu)); \
-  } while (0)
-#define PROFILE_BRANCH_UNTAKEN(cpu) \
-  do { \
-    if (PROFILE_MODEL_P (cpu)) \
-      ++ PROFILE_MODEL_UNTAKEN_COUNT (CPU_PROFILE_DATA (cpu)); \
-  } while (0)
 
 extern void trace_register PARAMS ((SIM_DESC sd,
 				    sim_cpu *cpu,
