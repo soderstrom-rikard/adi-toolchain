@@ -1,7 +1,6 @@
 //Original:/testcases/core/c_cc_regmvlogi_mvbrsft_s1/c_cc_regmvlogi_mvbrsft_s1.dsp
 // Spec Reference: cc: set (regmv & logi2op) used (ccmv & brcc & dsp32sft)
 # mach: bfin
-# xfail: "need to implement +|-/-|+ in sim" bfin-*
 
 .include "testutils.inc"
 	start
