@@ -76,45 +76,45 @@ static const OPTION memory_options[] =
 {
   { {"memory-delete", required_argument, NULL, OPTION_MEMORY_DELETE },
       '\0', "ADDRESS|all", "Delete memory at ADDRESS (all addresses)",
-      memory_option_handler },
+      memory_option_handler, NULL },
   { {"delete-memory", required_argument, NULL, OPTION_MEMORY_DELETE },
       '\0', "ADDRESS", NULL,
-      memory_option_handler },
+      memory_option_handler, NULL },
 
   { {"memory-region", required_argument, NULL, OPTION_MEMORY_REGION },
       '\0', "ADDRESS,SIZE[,MODULO]", "Add a memory region",
-      memory_option_handler },
+      memory_option_handler, NULL },
 
   { {"memory-alias", required_argument, NULL, OPTION_MEMORY_ALIAS },
       '\0', "ADDRESS,SIZE{,ADDRESS}", "Add memory shadow",
-      memory_option_handler },
+      memory_option_handler, NULL },
 
   { {"memory-size", required_argument, NULL, OPTION_MEMORY_SIZE },
       '\0', "SIZE", "Add memory at address zero",
-      memory_option_handler },
+      memory_option_handler, NULL },
 
   { {"memory-fill", required_argument, NULL, OPTION_MEMORY_FILL },
       '\0', "VALUE", "Fill subsequently added memory regions",
-      memory_option_handler },
+      memory_option_handler, NULL },
 
   { {"memory-clear", no_argument, NULL, OPTION_MEMORY_CLEAR },
       '\0', NULL, "Clear subsequently added memory regions",
-      memory_option_handler },
+      memory_option_handler, NULL },
 
 #if defined(HAVE_MMAP) && defined(HAVE_MUNMAP)
   { {"memory-mapfile", required_argument, NULL, OPTION_MEMORY_MAPFILE },
       '\0', "FILE", "Memory-map next memory region from file",
-      memory_option_handler },
+      memory_option_handler, NULL },
 #endif
 
   { {"memory-info", no_argument, NULL, OPTION_MEMORY_INFO },
       '\0', NULL, "List configurable memory regions",
-      memory_option_handler },
+      memory_option_handler, NULL },
   { {"info-memory", no_argument, NULL, OPTION_MEMORY_INFO },
       '\0', NULL, NULL,
-      memory_option_handler },
+      memory_option_handler, NULL },
 
-  { {NULL, no_argument, NULL, 0}, '\0', NULL, NULL, NULL }
+  { {NULL, no_argument, NULL, 0}, '\0', NULL, NULL, NULL, NULL }
 };
 
 

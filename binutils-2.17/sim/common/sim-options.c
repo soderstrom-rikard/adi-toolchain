@@ -120,11 +120,11 @@ static const OPTION standard_options[] =
 {
   { {"verbose", no_argument, NULL, OPTION_VERBOSE},
       'v', NULL, "Verbose output",
-      standard_option_handler },
+      standard_option_handler, NULL },
 
   { {"endian", required_argument, NULL, OPTION_ENDIAN},
       'E', "big|little", "Set endianness",
-      standard_option_handler },
+      standard_option_handler, NULL },
 
 #ifdef SIM_HAVE_ENVIRONMENT
   /* This option isn't supported unless all choices are supported in keeping
@@ -132,62 +132,62 @@ static const OPTION standard_options[] =
      do [as opposed to things that just haven't been configured in].  */
   { {"environment", required_argument, NULL, OPTION_ENVIRONMENT},
       '\0', "user|virtual|operating", "Set running environment",
-      standard_option_handler },
+      standard_option_handler, NULL },
 #endif
 
   { {"alignment", required_argument, NULL, OPTION_ALIGNMENT},
       '\0', "strict|nonstrict|forced", "Set memory access alignment",
-      standard_option_handler },
+      standard_option_handler, NULL },
 
   { {"debug", no_argument, NULL, OPTION_DEBUG},
       'D', NULL, "Print debugging messages",
-      standard_option_handler },
+      standard_option_handler, NULL },
   { {"debug-insn", no_argument, NULL, OPTION_DEBUG_INSN},
       '\0', NULL, "Print instruction debugging messages",
-      standard_option_handler },
+      standard_option_handler, NULL },
   { {"debug-file", required_argument, NULL, OPTION_DEBUG_FILE},
       '\0', "FILE NAME", "Specify debugging output file",
-      standard_option_handler },
+      standard_option_handler, NULL },
 
 #ifdef SIM_H8300 /* FIXME: Should be movable to h8300 dir.  */
   { {"h8300h", no_argument, NULL, OPTION_H8300H},
       'h', NULL, "Indicate the CPU is H8/300H",
-      standard_option_handler },
+      standard_option_handler, NULL },
   { {"h8300s", no_argument, NULL, OPTION_H8300S},
       'S', NULL, "Indicate the CPU is H8S",
-      standard_option_handler },
+      standard_option_handler, NULL },
   { {"h8300sx", no_argument, NULL, OPTION_H8300SX},
       'x', NULL, "Indicate the CPU is H8SX",
-      standard_option_handler },
+      standard_option_handler, NULL },
 #endif
 
 #ifdef SIM_HAVE_FLATMEM
   { {"mem-size", required_argument, NULL, OPTION_MEM_SIZE},
       'm', "MEMORY SIZE", "Specify memory size",
-      standard_option_handler },
+      standard_option_handler, NULL },
 #endif
 
   { {"do-command", required_argument, NULL, OPTION_DO_COMMAND},
       '\0', "COMMAND", ""/*undocumented*/,
-      standard_option_handler },
+      standard_option_handler, NULL },
 
   { {"help", no_argument, NULL, OPTION_HELP},
       'H', NULL, "Print help information",
-      standard_option_handler },
+      standard_option_handler, NULL },
 
   { {"architecture", required_argument, NULL, OPTION_ARCHITECTURE},
       '\0', "MACHINE", "Specify the architecture to use",
-      standard_option_handler },
+      standard_option_handler, NULL },
   { {"architecture-info", no_argument, NULL, OPTION_ARCHITECTURE_INFO},
       '\0', NULL, "List supported architectures",
-      standard_option_handler },
+      standard_option_handler, NULL },
   { {"info-architecture", no_argument, NULL, OPTION_ARCHITECTURE_INFO},
       '\0', NULL, NULL,
-      standard_option_handler },
+      standard_option_handler, NULL },
 
   { {"target", required_argument, NULL, OPTION_TARGET},
       '\0', "BFDNAME", "Specify the object-code format for the object files",
-      standard_option_handler },
+      standard_option_handler, NULL },
 
 #ifdef SIM_HANDLES_LMA
   { {"load-lma", no_argument, NULL, OPTION_LOAD_LMA},
@@ -205,9 +205,9 @@ static const OPTION standard_options[] =
   { {"sysroot", required_argument, NULL, OPTION_SYSROOT},
       '\0', "SYSROOT",
     "Root for system calls with absolute file-names and cwd at start",
-      standard_option_handler },
+      standard_option_handler, NULL },
 
-  { {NULL, no_argument, NULL, 0}, '\0', NULL, NULL, NULL }
+  { {NULL, no_argument, NULL, 0}, '\0', NULL, NULL, NULL, NULL }
 };
 
 static SIM_RC
