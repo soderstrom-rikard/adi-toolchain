@@ -47,7 +47,7 @@ INCLUDE = bfin-sim.h
 
 ## COMMON_POST_CONFIG_FRAG
 
-interp.o: interp.c targ-vals.h devices.h $(INCLUDE)
+interp.o: interp.c targ-vals.h targ-linux.h devices.h $(INCLUDE)
 bfin-sim.o: bfin-sim.c $(INCLUDE)
 machs.o: machs.c $(INCLUDE)
 dv-bfin_cec.o: dv-bfin_cec.c devices.h $(INCLUDE)

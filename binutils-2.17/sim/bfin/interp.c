@@ -27,6 +27,7 @@
 #include <string.h>
 #include <signal.h>
 #include <errno.h>
+#include <fcntl.h>
 #include <unistd.h>	/* dup2 */
 
 #include "gdb/callback.h"
@@ -257,8 +258,9 @@ bfin_syscall (SIM_CPU *cpu)
     {
       if (sc.result == -1)
 	{
-	  sim_io_eprintf (sd, "bfin-sim: unimplemented syscall %i\n", sc.func);
-	  SET_DREG (0, -cb_host_to_target_errno (cb, ENOSYS));
+	  if (sc.errcode == cb_host_to_target_errno (cb, ENOSYS))
+	    sim_io_eprintf (sd, "bfin-sim: unimplemented syscall %i\n", sc.func);
+	  SET_DREG (0, -sc.errcode);
 	}
       else
 	SET_DREG (0, sc.result);

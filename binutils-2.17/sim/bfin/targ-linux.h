@@ -14,7 +14,7 @@ sed -r -n \
     -e '$i\ \ { 0, 0 }\n};' \
     -e '/#define E.* [0-9]/{s:^.* (E.*) (.*):#ifdef \1\n# define TARGET_LINUX_\1 \2\n  { \1, TARGET_LINUX_\1 },\n#endif:;p;}'
 
-echo '#include <sys/syscall.h>' | \
+echo '#include <fcntl.h>' | \
 bfin-uclinux-gcc -E -dD -P - | \
 sed -r -n \
     -e '1istatic CB_TARGET_DEFS_MAP cb_linux_open_map[] = {' \
@@ -1763,6 +1763,54 @@ static CB_TARGET_DEFS_MAP cb_linux_errno_map[] = {
 };
 
 static CB_TARGET_DEFS_MAP cb_linux_open_map[] = {
+#ifdef O_ACCMODE
+# define TARGET_LINUX_O_ACCMODE 0003
+  { O_ACCMODE, TARGET_LINUX_O_ACCMODE },
+#endif
+#ifdef O_RDONLY
+# define TARGET_LINUX_O_RDONLY 00
+  { O_RDONLY, TARGET_LINUX_O_RDONLY },
+#endif
+#ifdef O_WRONLY
+# define TARGET_LINUX_O_WRONLY 01
+  { O_WRONLY, TARGET_LINUX_O_WRONLY },
+#endif
+#ifdef O_RDWR
+# define TARGET_LINUX_O_RDWR 02
+  { O_RDWR, TARGET_LINUX_O_RDWR },
+#endif
+#ifdef O_CREAT
+# define TARGET_LINUX_O_CREAT 0100
+  { O_CREAT, TARGET_LINUX_O_CREAT },
+#endif
+#ifdef O_EXCL
+# define TARGET_LINUX_O_EXCL 0200
+  { O_EXCL, TARGET_LINUX_O_EXCL },
+#endif
+#ifdef O_NOCTTY
+# define TARGET_LINUX_O_NOCTTY 0400
+  { O_NOCTTY, TARGET_LINUX_O_NOCTTY },
+#endif
+#ifdef O_TRUNC
+# define TARGET_LINUX_O_TRUNC 01000
+  { O_TRUNC, TARGET_LINUX_O_TRUNC },
+#endif
+#ifdef O_APPEND
+# define TARGET_LINUX_O_APPEND 02000
+  { O_APPEND, TARGET_LINUX_O_APPEND },
+#endif
+#ifdef O_NONBLOCK
+# define TARGET_LINUX_O_NONBLOCK 04000
+  { O_NONBLOCK, TARGET_LINUX_O_NONBLOCK },
+#endif
+#ifdef O_SYNC
+# define TARGET_LINUX_O_SYNC 010000
+  { O_SYNC, TARGET_LINUX_O_SYNC },
+#endif
+#ifdef O_ASYNC
+# define TARGET_LINUX_O_ASYNC 020000
+  { O_ASYNC, TARGET_LINUX_O_ASYNC },
+#endif
   { -1, -1 }
 };
 
