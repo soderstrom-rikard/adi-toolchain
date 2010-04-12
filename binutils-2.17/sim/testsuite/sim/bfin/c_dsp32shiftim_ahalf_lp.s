@@ -5,9 +5,6 @@
 .include "testutils.inc"
 	start
 
-
-//include(nochecker.inc)
-
 // Ashift : positive data, count (+)=left (half reg)
 // d_lo = ashift (d_lo BY d_lo)
 // RLx by RLx

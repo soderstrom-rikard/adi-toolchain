@@ -5,11 +5,6 @@
 .include "testutils.inc"
 	start
 
-
-
-
-//clude(nochecker.inc)
-
 R0 = 0;
 ASTAT = R0;
 

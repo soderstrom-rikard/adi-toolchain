@@ -5,9 +5,6 @@
 .include "testutils.inc"
 	start
 
-
-//include(nochecker.inc)
-
 R0 = 0;
 R1 = 58;
 A0 = R1;

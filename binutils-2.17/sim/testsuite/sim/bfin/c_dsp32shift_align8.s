@@ -5,10 +5,6 @@
 .include "testutils.inc"
 	start
 
-
-//include(nochecker.inc)
-
-
 imm32 r0, 0x00000001;
 imm32 r1, 0x01000801;
 imm32 r2, 0x08200802;

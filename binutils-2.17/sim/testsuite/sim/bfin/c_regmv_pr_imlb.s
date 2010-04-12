@@ -5,11 +5,6 @@
 .include "testutils.inc"
 	start
 
-
-
-
-//clude(nochecker.inc)
-
 // check R-reg to imlb-reg move
 
 imm32 r0, 0x00000001;

@@ -5,10 +5,6 @@
 .include "testutils.inc"
 	start
 
-
-//include(nochecker.inc)
-
-
 // Ashift (Arithmetic ) retain the sign bit (0-->0, 1-->1)
 
 imm32 r4, 0x00000000;

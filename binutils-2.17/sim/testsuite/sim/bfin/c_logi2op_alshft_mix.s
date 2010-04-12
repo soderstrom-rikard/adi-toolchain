@@ -5,10 +5,6 @@
 .include "testutils.inc"
 	start
 
-
-
-//include(nochecker.inc)
-
 // Arithmetic >>>= : positive data
 imm32 r0, 0x40000000;
 imm32 r1, 0x01111111;
