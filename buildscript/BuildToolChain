@@ -1050,13 +1050,17 @@ export PKG_CONFIG_PATH="${DIR_ELF_OUTPUT}/lib/pkgconfig${PKG_CONFIG_PATH:+:${PKG
 
 build_ldr_utils()
 {
+	local x t d sf df
 	build_autotooled_pkg "${DIR_LDR_UTILS_SOURCE}"
 
 	# backwards compat support
 	for x in elf:${DIR_ELF_OUTPUT} uclinux:${DIR_uC_OUTPUT} linux-uclibc:${DIR_LINUX_OUTPUT} ; do
 		t=${x%%:*}
 		d=${x##*:}
-		run_cmd ln -f "${d}/bin/bfin-ldr$EXEEXT" "${d}/bin/bfin-${t}-ldr$EXEEXT"
+		sf="${d}/bin/bfin-ldr$EXEEXT"
+		df="${d}/bin/bfin-${t}-ldr$EXEEXT"
+		[ -e "${sf}" ] || continue
+		run_cmd ln -f "${sf}" "${df}"
 	done
 }
 [ $SKIP_LDR ] || build_ldr_utils
