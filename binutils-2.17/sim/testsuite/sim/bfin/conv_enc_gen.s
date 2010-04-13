@@ -9,30 +9,6 @@
 // the BDT benchmark, see file conv_enc.c. The solution presented
 // here is slower than conv_enc.c, but more generic.
 //
-// Performance.
-// The execution time for this code is approximately 2.5 cycles
-// per output bit. The time for the alternate solution for BDT's
-// benchmark is 1.3 cycles/out bit. Clearly, this can be seen in the
-// inner loops of these codes: former solution requires 2 cycles
-// to produce one bit, and latter 1. (The additional 0.5 and 0.3
-// are outer-loop and init overheads.)
-// This code shows a rate 1/2-system, but has been exercised with
-// rate 1/4, giving similar results.
-// The advantage of the BXOR solution is that it is more general
-// than the alternative, and has nearly 1/3 the amount of code:
-// BXOR requires 30 bytes, while BDT requires 100 bytes.
-//                                Speed               Code size
-//                             cycles/bit   cycles*      bytes
-// BXOR:                            2.5      631           30
-// A field XOR and interleave:      1.3                   100
-// * cycles to process 128 input bits -> 256 output bits
-//
-// Note that it is possible to achieve 1 cycle/bit + overhead for
-// the BXOR solution in the case where the inefficient data
-// structure of 1 bit per output word can be used (as in the
-// original function Convolutional_Encode()). This can be done
-// by storing the output word from BXOR rather than rotating CC.
-//
 // Forward Shift Register
 // -----------------------
 // This solution implements the XOR function by shifting the state

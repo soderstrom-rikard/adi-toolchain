@@ -77,62 +77,6 @@
 // The functions biquadf() and biquadR() have been tested with up to 3
 // stages using this technique, with inputs having small signal amplitude
 // (less than 0.001) and under 300 samples.
-// PERFORMANCE
-// -----------
-// Table shows total cycle counts, and cycle counts per element per
-// biquad for varying number of biquads, with input size of 100 samples.
-// Number of
-// biquads:       1    2    3    4    5     10
-// ----------------------------------------------
-// Total
-// cycles:	    1407 1807 2207 2607 3007   5007
-// Cycles
-// per sample
-// per biquad:   14   9   7.3  6.5  6.1   5.007
-// The inner loop is 4 cycles. As the table shows, the additional
-// overhead required to set up pointers and for the loop prolog takes up
-// a significant portion of time. The net result is that a 4 cycle inner
-// loop in reality translates to a net 5 to 14 cycles per sample,
-// depending on the filter size.
-// */
-// #include "model.h"
-// #define a1 0.5*1.4      /* scale by 0.5 all coeffs */
-// #define a2 0.5*-0.5
-// #define b1 0.5*2
-// #define b2 0.5*1
-// #define L 20  /* signal length */
-// #define N_BIQUADS 2   /* number of cascaded biquads */
-// #define EPS  0.02    /* epsilon used for test bound */
-// Function biquadR() computes N cascaded biquads on 16 data. This
-// function is unscheduled, but all the transformations needed to
-// parallelize and schedule have been applied. It is essentially a
-// one-to-one translation of the float function biquadf().
-// Coefficients and state is loaded as:
-//    +-----+-----+
-// R0 |  x        | input sample in RH0
-//    +-----+-----+
-//    +-----+-----+
-// R1 |  a1   b1  | coeffs in R1 and R2
-//    +-----+-----+
-//    +-----+-----+
-// R2 |  a2   b2  |
-//    +-----+-----+
-//    +-----+-----+
-// R3 | s[1] s[0] | state in R3
-//    +-----+-----+
-// Accumulator A0 holds feedback partial results, and accum A1 holds
-// feedforward partial res. In the code, s[i] and D[i] are used
-// interchangeably.
-// There are two ways that one can advance and update the state:
-// (a) manage the state as a FIFO using pointers, and (b) arrange the
-// state in pairs directly in the code. Solution (a) is expensive
-// since it requires that state be loaded as 16 bit elements. Solution
-// (b) allows state to be loaded as pairs of two 16 bit values
-// (s[1] s[0]), and hence is more memory efficient.
-// There are two instructions needed by this function:
-// - MAC with accumulator extraction and scale by 2.0
-// - PACK two 16 bit values into a 32 bit register
-// */
 //
 // In order to pipeline, need to maintain two pointers into the state
 // array: one to load (I0) and one to store (I2). This is required since
