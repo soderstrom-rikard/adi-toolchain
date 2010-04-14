@@ -1275,6 +1275,7 @@ decode_multfunc (SIM_CPU *cpu, int h0, int h1, int src0, int src1, int mmod,
       case M_IS:
       case M_ISS2:
       case M_IH:
+      case M_W32:
 	s0 |= sgn0;
 	s1 |= sgn1;
 	break;
@@ -1289,7 +1290,7 @@ decode_multfunc (SIM_CPU *cpu, int h0, int h1, int src0, int src1, int mmod,
   val = s0 * s1;
   /* Perform shift correction if appropriate for the mode.  */
   *psat = 0;
-  if (!MM && (mmod == 0 || mmod == M_T || mmod == M_S2RND))
+  if (!MM && (mmod == 0 || mmod == M_T || mmod == M_S2RND || mmod == M_W32))
     {
       if (val == 0x40000000)
 	val = 0x7fffffff, *psat = 1;
@@ -1436,6 +1437,7 @@ extract_mult (SIM_CPU *cpu, bu64 res, int mmod, int MM, int fullword)
     switch (mmod)
       {
       case 0:
+      case M_W32:
 	return saturate_s16 (rnd16 (res));
       case M_IH:
 	return saturate_s32((rnd16 (res))) & 0xFFFF;
@@ -1470,23 +1472,26 @@ decode_macfunc (SIM_CPU *cpu, int which, int op, int h0, int h1, int src0,
   int sat = 0;
 
   /* Sign extend accumulator if necessary, otherwise unsigned */
-  if (mmod == 0 || mmod == M_T || mmod == M_IS || mmod == M_ISS2 || mmod == M_S2RND || mmod == M_IH)
+  if (mmod == 0 || mmod == M_T || mmod == M_IS || mmod == M_ISS2 || mmod == M_S2RND || mmod == M_IH || mmod == M_W32)
     acc = get_extended_acc (cpu, which);
   else
     acc = get_unextended_acc (cpu, which);
 
-  if (MM && (mmod == M_T || mmod == M_IS || mmod == M_ISS2 || mmod == M_S2RND || mmod == M_IH))
+  if (MM && (mmod == M_T || mmod == M_IS || mmod == M_ISS2 || mmod == M_S2RND || mmod == M_IH || mmod == M_W32))
     acc |= -(acc & 0x80000000);
 
   if (op != 3)
     {
+      int sgn0 = (acc >> 31) & 1;
       bu64 res = decode_multfunc (cpu, h0, h1, src0, src1, mmod,
 				  MM, &sat);
+
       /* Perform accumulation.  */
       switch (op)
 	{
 	case 0:
 	  acc = res;
+	  sgn0 = (acc >> 31) & 1;
 	  break;
 	case 1:
 	  acc = acc + res;
@@ -1530,8 +1535,15 @@ decode_macfunc (SIM_CPU *cpu, int which, int op, int h0, int h1, int src0,
 	  else if ((bs64)acc >= 0x7fffffffll)
 	    acc = 0x7fffffffull, sat = 1;
 	  break;
+	case M_W32:
+	  if (sgn0 && (sgn0 != ((acc >> 31) & 1)) && (((acc >> 32) & 0xFF) == 0xff))
+	    acc = 0x80000000;
+	  acc &= 0xffffffff;
+	  if (acc & 0x80000000)
+	    acc |= 0xffffffff00000000ull;
+	  break;
 	default:
-	  unhandled_instruction (cpu, "macfunc");
+	  illegal_instruction (cpu);
 	}
     }
 
@@ -3360,8 +3372,11 @@ decode_dsp32mac_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1)
   if (op1 == 3 && MM)
     illegal_instruction (cpu);
 
-  if (((1 << mmod) & (P ? 0x313 : 0x1b57)) == 0)
-    unhandled_instruction (cpu, "dsp32mac");
+  if ((w1 || w0) && mmod == M_W32)
+    illegal_instruction (cpu);
+
+  if (((1 << mmod) & (P ? 0x131b : 0x1b5f)) == 0)
+    illegal_instruction (cpu);
 
   /* XXX: Missing TRACE_INSN - this is as good as it gets for now  */
   if (w0 && w1 && P)
@@ -3370,11 +3385,16 @@ decode_dsp32mac_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1)
     TRACE_INSN (cpu, "R%i = macfunc", dst);
   else if (w1 && P)
     TRACE_INSN (cpu, "R%i = macfunc", dst+1);
-
-  if (w0 && !P)
+  else if (w0 && !P)
     TRACE_INSN (cpu, "R%i.L = macfunc", dst);
   else if (w1 && !P)
     TRACE_INSN (cpu, "R%i.H = macfunc", dst);
+  else if (!w0 && !w1 && (op1 != 3 && op0 != 3))
+    TRACE_INSN (cpu, "A0 = macfunc, A1 = macfunc");
+  else if (!w0 && w1 && (op1 != 3 && op0 != 3))
+    TRACE_INSN (cpu, "A1 = macfunc");
+  else if (w0 && !w1 && (op1 != 3 && op0 != 3))
+    TRACE_INSN (cpu, "A0 = macfunc");
 
   if (w1 == 1 || op1 != 3)
     res1 = decode_macfunc (cpu, 1, op1, h01, h11, src0, src1, mmod, MM, P);
