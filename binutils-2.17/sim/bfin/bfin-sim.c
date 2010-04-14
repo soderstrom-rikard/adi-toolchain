@@ -338,6 +338,16 @@ const char * const amod0amod2_names[] =
   "(ASL)",  "(S, ASL)", "(CO, ASL)", "(SCO, ASL)",
 };
 
+static char *
+amod1 (int s0, int x0)
+{
+  if (s0 == 0 && x0 == 0)
+    return " (NS)";
+  else if (s0 == 1 && x0 == 0)
+    return " (S)";
+ return "";
+}
+
 static bu32 *
 get_allreg (SIM_CPU *cpu, int grp, int reg)
 {
@@ -4137,10 +4147,31 @@ decode_dsp32alu_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1)
     }
   else if (aop == 2 && aopcde == 4)
     unhandled_instruction (cpu, "dregs = dregs + dregs , dregs = dregs - dregs amod1");
-  else if (aop == 0 && aopcde == 17)
-    unhandled_instruction (cpu, "dregs = A1 + A0, dregs = A1 - A0 amod1");
-  else if (aop == 1 && aopcde == 17)
-    unhandled_instruction (cpu, "dregs = A0 + A1, dregs = A0 - A1 amod1");
+  else if (aopcde == 17)
+    {
+      bs40 acc0 = get_extended_acc (cpu, 0);
+      bs40 acc1 = get_extended_acc (cpu, 1);
+      bs40 val0, val1;
+
+      val1 = acc0 + acc1;
+      if (aop)
+	{
+	  TRACE_INSN (cpu, "R%i = A0 + A1, R%i = A0 - A1%s", dst1, dst0, amod1 (s, x));
+	  val0 = acc0 - acc1;
+	}
+      else
+	{
+	  TRACE_INSN (cpu, "R%i = A1 + A0, R%i = A1 - A0%s", dst1, dst0, amod1 (s, x));
+	  val0 = acc1 - acc0;
+	}
+      if (s)
+	{
+	  val0 = saturate_s32 (val0);
+	  val1 = saturate_s32 (val1);
+	}
+      STORE (DREG (dst0), val0 & 0xFFFFFFFF);
+      STORE (DREG (dst1), val1 & 0xFFFFFFFF);
+    }
   else if (aop == 0 && aopcde == 18)
     {
       TRACE_INSN (cpu, "SAA (R%i:%i, R%i:%i)%s", src0 + 1, src0, src1 + 1, src1,
