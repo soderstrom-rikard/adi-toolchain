@@ -777,8 +777,7 @@ add32 (SIM_CPU *cpu, bu32 a, bu32 b, int carry, int sat)
       v = (bu32)1 << 31;
       if (flgn)
 	v -= 1;
-      /* Saturating insns are documented as not setting overflow.  */
-      overflow = 0;
+      flgn = (v >> 31) & 1;
     }
   SET_ASTATREG (an, flgn);
   if (overflow)
@@ -792,7 +791,7 @@ add32 (SIM_CPU *cpu, bu32 a, bu32 b, int carry, int sat)
 }
 
 static bu32
-sub32 (SIM_CPU *cpu, bu32 a, bu32 b, int carry, int sat)
+sub32 (SIM_CPU *cpu, bu32 a, bu32 b, int carry, int sat, int parallel)
 {
   int flgs = (a >> 31) & 1;
   int flgo = (b >> 31) & 1;
@@ -807,13 +806,22 @@ sub32 (SIM_CPU *cpu, bu32 a, bu32 b, int carry, int sat)
       /* Saturating insns are documented as not setting overflow.  */
       overflow = 0;
     }
+  if (!parallel || flgn)
   SET_ASTATREG (an, flgn);
+
   if (overflow)
     SET_ASTATREG (vs, 1);
-  SET_ASTATREG (v, overflow);
-  ASTATREG (v_internal) |= overflow;
-  SET_ASTATREG (az, v == 0);
-  if (carry)
+
+  if (!parallel || overflow)
+    SET_ASTATREG (v, overflow);
+
+  if (!parallel || overflow)
+    ASTATREG (v_internal) |= overflow;
+
+  if (!parallel || v == 0)
+    SET_ASTATREG (az, v == 0);
+
+  if (carry && (!parallel || b <= a))
     SET_ASTATREG (ac0, b <= a);
   return v;
 }
@@ -2430,7 +2438,7 @@ decode_COMP3op_0 (SIM_CPU *cpu, bu16 iw0)
   else if (opc == 1)
     {
       TRACE_INSN (cpu, "R%i = R%i - R%i;", dst, src0, src1);
-      SET_DREG (dst, sub32 (cpu, DREG (src0), DREG (src1), 1, 0));
+      SET_DREG (dst, sub32 (cpu, DREG (src0), DREG (src1), 1, 0, 0));
     }
   else if (opc == 2)
     {
@@ -4143,10 +4151,14 @@ decode_dsp32alu_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1)
   else if (aop == 1 && aopcde == 4)
     {
       TRACE_INSN (cpu, "R%i = R%i - R%i;", dst0, src0, src1);
-      SET_DREG (dst0, sub32 (cpu, DREG (src0), DREG (src1), 1, s));
+      SET_DREG (dst0, sub32 (cpu, DREG (src0), DREG (src1), 1, s, 0));
     }
   else if (aop == 2 && aopcde == 4)
-    unhandled_instruction (cpu, "dregs = dregs + dregs , dregs = dregs - dregs amod1");
+    {
+      TRACE_INSN (cpu, "R%i = R%i + R%i, R%i = R%i - R%i;", dst1, src0, src1, dst0, src0, src1, amod1 (s, x));
+      STORE (DREG (dst1), add32 (cpu, DREG (src0), DREG (src1), 1, s));
+      STORE (DREG (dst0), sub32 (cpu, DREG (src0), DREG (src1), 1, s, 1));
+    }
   else if (aopcde == 17)
     {
       bs40 acc0 = get_extended_acc (cpu, 0);
