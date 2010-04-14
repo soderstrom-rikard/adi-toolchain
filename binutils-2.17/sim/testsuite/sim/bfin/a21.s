@@ -1,6 +1,5 @@
 //  Test ALU   RND RND12 RND20
 # mach: bfin
-# xfail: "need to implement dregs = A1 + A0, dregs = A1 - A0 amod1 in sim" bfin-*
 
 .include "testutils.inc"
 	start
