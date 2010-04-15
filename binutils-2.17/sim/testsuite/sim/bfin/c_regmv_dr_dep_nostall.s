@@ -232,9 +232,6 @@
 	R4 = R1;
 	RETS = R4;
 	R7 = RETS;
-//r5=r2;
-//        syscfg  = r5;	// the syscfg no longer exists
-//        r0      = syscfg;
 
 	CHECKREG r0, 0x00000030;
 	CHECKREG r1, 0x00000031;
