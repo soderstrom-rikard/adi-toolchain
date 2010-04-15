@@ -3845,12 +3845,18 @@ decode_dsp32alu_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1)
     {
       TRACE_INSN (cpu, "A%i = A%i (S);", aop, aop);
       SET_AXREG (aop, -(AWREG (aop) >> 31));
+
+      SET_ASTATREG (az, AWREG (aop) == 0);
+      SET_ASTATREG (an, (AWREG (aop) >> 31) & 1);
     }
   else if (aop == 2 && s == 1 && aopcde == 8)
     {
-      TRACE_INSN (cpu, "A1 = A1 (S) , A0 = A0 (S);");
+      TRACE_INSN (cpu, "A1 = A1 (S), A0 = A0 (S);");
       SET_AXREG (0, -(AWREG (0) >> 31));
       SET_AXREG (1, -(AWREG (1) >> 31));
+
+      SET_ASTATREG (az, ((AWREG (0) == 0) || (AWREG (1) == 0)));
+      SET_ASTATREG (an, ((AWREG (0) >> 31) & 1) || ((AWREG (1) >> 31) & 1));
     }
   else if (aop == 3 && (s == 0 || s == 1) && aopcde == 8)
     {
