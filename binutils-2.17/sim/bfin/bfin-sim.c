@@ -668,32 +668,33 @@ lshift (SIM_CPU *cpu, bu64 val, int cnt, int size, bool saturate)
    * Conversely, if an operation would otherwise cause a negative value
    * to overflow and become positive, saturation limits the result to the
    * maximum negative value for the register size.
+   *
+   * However, its a little more complex than looking at sign bits, we need
+   * to see if we are shifting the sign information away...
    */
-  tmp = (new_val & mask);
-  tmp >>= mask_cnt;
+  tmp = val & ((~mask << 1) | 1);
 
-  j = !(tmp & 0x1);
-  for (i = 0; i <= real_cnt; i++)
+  j = 0;
+  for (i = 1; i <= real_cnt && saturate; i++)
     {
-      if (tmp & 0x1 && !(tmp & 0x2))
+      if ((tmp & ((bu64)1 << (size - 1))) != (((val >> mask_cnt) & 0x1 ) << mask_cnt ))
 	j++;
-      tmp >>= 1;
+      tmp <<= 1;
     }
-  saturate &= (j > 1) ||
-	(!sgn && (new_val & (1 << mask_cnt))) ||
-	(sgn && !(new_val & (1 << mask_cnt)));
+  saturate &= (!sgn && (new_val & (1 << mask_cnt))) ||
+	      (sgn && !(new_val & (1 << mask_cnt)));
 
   switch (size)
     {
     case 16:
-      if (saturate && (new_val & mask))
+      if (j || (saturate && (new_val & mask)))
 	new_val = sgn == 0 ? 0x7fff : 0x8000;
       new_val &= 0xFFFF;
       break;
     case 32:
       new_val &= 0xFFFFFFFF;
       masked &= 0xFFFFFFFF;
-      if (saturate && ((sgn != masked) || (!sgn && new_val == 0)))
+      if (j || (saturate && ((sgn != masked) || (!sgn && new_val == 0))))
 	new_val = sgn == 0 ? 0x7fffffff : 0x80000000;
       break;
     case 40:
