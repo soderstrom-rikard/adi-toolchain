@@ -920,6 +920,7 @@ sub16 (SIM_CPU *cpu, bu32 a, bu32 b, int *carry, int *overfl, int sat, int scale
       v = 1 << 15;
       if (flgn)
 	v -= 1;
+      flgn = (v >> 15) & 1;
     }
   SET_ASTATREG (an, flgn);
   if (!overfl)
@@ -932,10 +933,7 @@ sub16 (SIM_CPU *cpu, bu32 a, bu32 b, int *carry, int *overfl, int sat, int scale
   ASTATREG (v_internal) |= overflow;
   SET_ASTATREG (az, v == 0);
   if (carry)
-    {
-      *carry = (bu16)b <= (bu16)a;
-      SET_ASTATREG (ac0, *carry);
-    }
+    *carry = (bu16)b <= (bu16)a;
   return v;
 }
 
@@ -4077,18 +4075,19 @@ decode_dsp32alu_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1)
       bu32 s1l = s1 & 0xFFFF;
       bu32 t0, t1;
       bu32 astat;
+      int v0 = 1;
       TRACE_INSN (cpu, "R%i = R%i %c|%c R%i%s;", dst0, src0,
 		  (aop & 2) ? '-' : '+', (aop & 1) ? '-' : '+', src1,
 		  amods[s + (x << 1)]);
       if (aop & 2)
-	t0 = sub16 (cpu, s0h, s1h, &ASTATREG (ac1), 0, s, 0);
+	t0 = sub16 (cpu, s0h, s1h, &ASTATREG (ac1), &v0, s, 0);
       else
-	t0 = add16 (cpu, s0h, s1h, &ASTATREG (ac1), 0, s, 0);
+	t0 = add16 (cpu, s0h, s1h, &ASTATREG (ac1), &v0, s, 0);
       astat = ASTAT;
       if (aop & 1)
-	t1 = sub16 (cpu, s0l, s1l, &ASTATREG (ac0), 0, s, 0);
+	t1 = sub16 (cpu, s0l, s1l, &ASTATREG (ac0), &v0, s, 0);
       else
-	t1 = add16 (cpu, s0l, s1l, &ASTATREG (ac0), 0, s, 0);
+	t1 = add16 (cpu, s0l, s1l, &ASTATREG (ac0), &v0, s, 0);
       SET_ASTAT (astat | ASTAT);
       t0 &= 0xFFFF;
       t1 &= 0xFFFF;
