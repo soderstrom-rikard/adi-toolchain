@@ -2095,14 +2095,18 @@ decode_CC2stat_0 (SIM_CPU *cpu, bu16 iw0)
   int cbit = ((iw0 >> 0) & 0x1f);
   int D = ((iw0 >> 7) & 0x1);
   int op = ((iw0 >> 5) & 0x3);
-  int *pval;
+  bu32 pval;
 
   const char * const op_names[] = { "", "|", "&", "^" } ;
   const char *astat_name;
-  const char * const astat_names[] = {
+  const char * const astat_names[32] = {
     [ 0] = "AZ",
     [ 1] = "AN",
+    [ 2] = "AC0_COPY",
+    [ 3] = "V_COPY",
+    [ 5] = "CC",
     [ 6] = "AQ",
+    [ 8] = "RND_MOD",
     [12] = "AC0",
     [13] = "AC1",
     [16] = "AV0",
@@ -2112,48 +2116,47 @@ decode_CC2stat_0 (SIM_CPU *cpu, bu16 iw0)
     [24] = "V",
     [25] = "VS",
   };
-  astat_name = cbit < (int)ARRAY_SIZE (astat_names) ? astat_names[cbit] : NULL;
+  astat_name = astat_names[cbit];
   if (!astat_name)
-    astat_name = "INVALID";
+    {
+      static char astat_bit[12];
+      sprintf (astat_bit, "ASTAT[%i]", cbit);
+      astat_name = astat_bit;
+    }
 
   TRACE_EXTRACT (cpu, "%s: D:%i op:%i cbit:%i", __func__, D, op, cbit);
 
   TRACE_INSN (cpu, "%s %s= %s;", D ? astat_name : "CC",
 	      op_names[op], D ? "CC" : astat_name);
 
-  switch (cbit)
-    {
-    case  0: pval = &ASTATREG (az); break;
-    case  1: pval = &ASTATREG (an); break;
-    case  6: pval = &ASTATREG (aq); break;
-    case 12: pval = &ASTATREG (ac0); break;
-    case 13: pval = &ASTATREG (ac1); break;
-    case 16: pval = &ASTATREG (av0); break;
-    case 17: pval = &ASTATREG (av0s); break;
-    case 18: pval = &ASTATREG (av1); break;
-    case 19: pval = &ASTATREG (av1s); break;
-    case 24: pval = &ASTATREG (v); break;
-    case 25: pval = &ASTATREG (vs); break;
-    default:
-      illegal_instruction (cpu);
-    }
+  /* CC = CC; is invalid.  */
+  if (cbit == 5)
+    illegal_instruction (cpu);
 
+  pval = !!(ASTAT & (1 << cbit));
   if (D == 0)
     switch (op)
       {
-      case 0: SET_CCREG (*pval); break;
-      case 1: SET_CCREG (CCREG | *pval); break;
-      case 2: SET_CCREG (CCREG & *pval); break;
-      case 3: SET_CCREG (CCREG ^ *pval); break;
+      case 0: SET_CCREG (pval); break;
+      case 1: SET_CCREG (CCREG | pval); break;
+      case 2: SET_CCREG (CCREG & pval); break;
+      case 3: SET_CCREG (CCREG ^ pval); break;
       }
   else
-    switch (op)
-      {
-      case 0: *pval  = CCREG; break;
-      case 1: *pval |= CCREG; break;
-      case 2: *pval &= CCREG; break;
-      case 3: *pval ^= CCREG; break;
-      }
+    {
+      switch (op)
+	{
+	case 0: pval  = CCREG; break;
+	case 1: pval |= CCREG; break;
+	case 2: pval &= CCREG; break;
+	case 3: pval ^= CCREG; break;
+	}
+      if (astat_names[cbit])
+	TRACE_REGISTER (cpu, "wrote ASTAT[%s] = %i", astat_name, pval);
+      else
+	TRACE_REGISTER (cpu, "wrote %s = %i", astat_name, pval);
+      SET_ASTAT ((ASTAT & ~(1 << cbit)) | (pval << cbit));
+    }
 }
 
 static void
