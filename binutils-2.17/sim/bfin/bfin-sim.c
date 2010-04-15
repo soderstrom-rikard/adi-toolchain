@@ -847,6 +847,9 @@ add16 (SIM_CPU *cpu, bu32 a, bu32 b, int *carry, int *overfl, int sat, int scale
       break;
     case 3:
       /* (ASL) */
+      v = (v << 1);
+      flgn = (v >> 15) & 1;
+      overflow = (flgs ^ flgn) & (flgo ^ flgn);
       break;
     default:
       illegal_instruction (cpu);
@@ -894,12 +897,20 @@ sub16 (SIM_CPU *cpu, bu32 a, bu32 b, int *carry, int *overfl, int sat, int scale
       if (sat)
 	v = ((a >> 1) + (a & 0x8000)) - ( (b >> 1) + (b & 0x8000));
       else
-	v >>= 1;
+	{
+	  v = ((v & 0xFFFF) >> 1);
+	  if ((!flgs & !flgo & flgn) ||
+	      (flgs & !flgo & !flgn) ||
+	      (flgs & flgo & flgn) ||
+	      (flgs & !flgo & flgn))
+	    v |= 0x8000;
+	}
       flgn = (v >> 15) & 1;
       overflow = (flgs ^ flgo) & (flgn ^ flgs);
       break;
     case 3:
       /* (ASL) */
+      v <<= 1;
       break;
     default:
       illegal_instruction (cpu);
