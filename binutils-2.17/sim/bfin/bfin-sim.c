@@ -2235,8 +2235,13 @@ decode_ALU2op_0 (SIM_CPU *cpu, bu16 iw0)
     }
   else if (opc == 1)
     {
+      bu32 val;
       TRACE_INSN (cpu, "R%i >>= R%i;", dst, src);
-      SET_DREG (dst, lshiftrt (cpu, DREG (dst), DREG (src), 32));
+      if (DREG (src) <= 0x1F)
+	val = lshiftrt (cpu, DREG (dst), DREG (src), 32);
+      else
+	val = 0;
+      SET_DREG (dst, val);
     }
   else if (opc == 2)
     {
