@@ -803,8 +803,7 @@ sub32 (SIM_CPU *cpu, bu32 a, bu32 b, int carry, int sat, int parallel)
       v = (bu32)1 << 31;
       if (flgn)
 	v -= 1;
-      /* Saturating insns are documented as not setting overflow.  */
-      overflow = 0;
+      flgn = (v >> 31) & 1;
     }
   if (!parallel || flgn)
   SET_ASTATREG (an, flgn);
