@@ -65,6 +65,7 @@ struct bfin_cpu_state
   bu32 az, cc, v, v_copy, vs;
   bu32 rnd_mod;
   bu32 v_internal;
+  bu32 astat_reserved;
 
   /* Set by an instruction emulation function if we performed a jump.  */
   bool did_jump;
@@ -208,61 +209,66 @@ struct bfin_cpu_state
 #define AV1S_BIT	19
 #define V_BIT		24
 #define VS_BIT		25
+#define ASTAT_DEFINED_BITS \
+  ((1 << AZ_BIT) | (1 << AN_BIT) | (1 << AC0_COPY_BIT) | (1 << V_COPY_BIT) \
+  |(1 << CC_BIT) | (1 << AQ_BIT) \
+  |(1 << RND_MOD_BIT) \
+  |(1 << AC0_BIT) | (1 << AC1_BIT) \
+  |(1 << AV0_BIT) | (1 << AV0S_BIT) | (1 << AV1_BIT) | (1 << AV1S_BIT) \
+  |(1 << V_BIT) | (1 << VS_BIT))
 
 #define ASTATREG(field) (BFIN_CPU_STATE.field)
 #define ASTAT_DEPOSIT(field, bit) (ASTATREG(field) << (bit))
 #define ASTAT \
-	(ASTAT_DEPOSIT(az,       AZ_BIT)       \
-	|ASTAT_DEPOSIT(an,       AN_BIT)       \
-	|ASTAT_DEPOSIT(ac0_copy, AC0_COPY_BIT) \
-	|ASTAT_DEPOSIT(v_copy,   V_COPY_BIT)   \
-	|ASTAT_DEPOSIT(cc,       CC_BIT)       \
-	|ASTAT_DEPOSIT(aq,       AQ_BIT)       \
-	|ASTAT_DEPOSIT(rnd_mod,  RND_MOD_BIT)  \
-	|ASTAT_DEPOSIT(ac0,      AC0_BIT)      \
-	|ASTAT_DEPOSIT(ac1,      AC1_BIT)      \
-	|ASTAT_DEPOSIT(av0,      AV0_BIT)      \
-	|ASTAT_DEPOSIT(av0s,     AV0S_BIT)     \
-	|ASTAT_DEPOSIT(av1,      AV1_BIT)      \
-	|ASTAT_DEPOSIT(av1s,     AV1S_BIT)     \
-	|ASTAT_DEPOSIT(v,        V_BIT)        \
-	|ASTAT_DEPOSIT(vs,       VS_BIT))
+  (ASTAT_DEPOSIT(az,       AZ_BIT)       \
+  |ASTAT_DEPOSIT(an,       AN_BIT)       \
+  |ASTAT_DEPOSIT(ac0_copy, AC0_COPY_BIT) \
+  |ASTAT_DEPOSIT(v_copy,   V_COPY_BIT)   \
+  |ASTAT_DEPOSIT(cc,       CC_BIT)       \
+  |ASTAT_DEPOSIT(aq,       AQ_BIT)       \
+  |ASTAT_DEPOSIT(rnd_mod,  RND_MOD_BIT)  \
+  |ASTAT_DEPOSIT(ac0,      AC0_BIT)      \
+  |ASTAT_DEPOSIT(ac1,      AC1_BIT)      \
+  |ASTAT_DEPOSIT(av0,      AV0_BIT)      \
+  |ASTAT_DEPOSIT(av0s,     AV0S_BIT)     \
+  |ASTAT_DEPOSIT(av1,      AV1_BIT)      \
+  |ASTAT_DEPOSIT(av1s,     AV1S_BIT)     \
+  |ASTAT_DEPOSIT(v,        V_BIT)        \
+  |ASTAT_DEPOSIT(vs,       VS_BIT)       \
+  |ASTATREG(astat_reserved))
 
 #define ASTAT_EXTRACT(a, bit)     (((a) >> bit) & 1)
 #define _SET_ASTAT(a, field, bit) (ASTATREG(field) = ASTAT_EXTRACT(a, bit))
 #define SET_ASTAT(a) \
-  do \
-    { \
-      TRACE_REGISTER (cpu, "wrote ASTAT = %#x", a); \
-      _SET_ASTAT(a, az,       AZ_BIT); \
-      _SET_ASTAT(a, an,       AN_BIT); \
-      _SET_ASTAT(a, ac0_copy, AC0_COPY_BIT); \
-      _SET_ASTAT(a, v_copy,   V_COPY_BIT); \
-      _SET_ASTAT(a, cc,       CC_BIT); \
-      _SET_ASTAT(a, aq,       AQ_BIT); \
-      _SET_ASTAT(a, rnd_mod,  RND_MOD_BIT); \
-      _SET_ASTAT(a, ac0,      AC0_BIT); \
-      _SET_ASTAT(a, ac1,      AC1_BIT); \
-      _SET_ASTAT(a, av0,      AV0_BIT); \
-      _SET_ASTAT(a, av0s,     AV0S_BIT); \
-      _SET_ASTAT(a, av1,      AV1_BIT); \
-      _SET_ASTAT(a, av1s,     AV1S_BIT); \
-      _SET_ASTAT(a, v,        V_BIT); \
-      _SET_ASTAT(a, vs,       VS_BIT); \
-    } \
-  while (0)
+  do { \
+    TRACE_REGISTER (cpu, "wrote ASTAT = %#x", a); \
+    _SET_ASTAT(a, az,       AZ_BIT); \
+    _SET_ASTAT(a, an,       AN_BIT); \
+    _SET_ASTAT(a, ac0_copy, AC0_COPY_BIT); \
+    _SET_ASTAT(a, v_copy,   V_COPY_BIT); \
+    _SET_ASTAT(a, cc,       CC_BIT); \
+    _SET_ASTAT(a, aq,       AQ_BIT); \
+    _SET_ASTAT(a, rnd_mod,  RND_MOD_BIT); \
+    _SET_ASTAT(a, ac0,      AC0_BIT); \
+    _SET_ASTAT(a, ac1,      AC1_BIT); \
+    _SET_ASTAT(a, av0,      AV0_BIT); \
+    _SET_ASTAT(a, av0s,     AV0S_BIT); \
+    _SET_ASTAT(a, av1,      AV1_BIT); \
+    _SET_ASTAT(a, av1s,     AV1S_BIT); \
+    _SET_ASTAT(a, v,        V_BIT); \
+    _SET_ASTAT(a, vs,       VS_BIT); \
+    ASTATREG(astat_reserved) = (a) & ~ASTAT_DEFINED_BITS; \
+  } while (0)
 #define SET_ASTATREG(field, val) \
-  do \
-    { \
-      int __v = !!(val); \
-      TRACE_REGISTER (cpu, "wrote ASTAT["#field"] = %i", __v); \
-      ASTATREG (field) = __v; \
-      if (&ASTATREG (field) == &ASTATREG (ac0)) \
-	ASTATREG (ac0_copy) = __v; \
-      else if (&ASTATREG (field) == &ASTATREG (v)) \
-	ASTATREG (v_copy) = __v; \
-    } \
-  while (0)
+  do { \
+    int __v = !!(val); \
+    TRACE_REGISTER (cpu, "wrote ASTAT["#field"] = %i", __v); \
+    ASTATREG (field) = __v; \
+    if (&ASTATREG (field) == &ASTATREG (ac0)) \
+      ASTATREG (ac0_copy) = __v; \
+    else if (&ASTATREG (field) == &ASTATREG (v)) \
+      ASTATREG (v_copy) = __v; \
+  } while (0)
 #define SET_CCREG(val) SET_ASTATREG (cc, val)
 
 #define SYSCFG_SSSTEP	(1 << 0)
