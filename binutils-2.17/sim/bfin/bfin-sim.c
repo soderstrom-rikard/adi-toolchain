@@ -338,7 +338,7 @@ const char * const amod0amod2_names[] =
   "(ASL)",  "(S, ASL)", "(CO, ASL)", "(SCO, ASL)",
 };
 
-static char *
+static const char *
 amod1 (int s0, int x0)
 {
   if (s0 == 0 && x0 == 0)
@@ -1482,7 +1482,7 @@ decode_macfunc (SIM_CPU *cpu, int which, int op, int h0, int h1, int src0,
 
   if (op != 3)
     {
-      int sgn0 = (acc >> 31) & 1;
+      bu8 sgn0 = (acc >> 31) & 1;
       bu64 res = decode_multfunc (cpu, h0, h1, src0, src1, mmod,
 				  MM, &sat);
 
@@ -4180,7 +4180,8 @@ decode_dsp32alu_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1)
     }
   else if (aop == 2 && aopcde == 4)
     {
-      TRACE_INSN (cpu, "R%i = R%i + R%i, R%i = R%i - R%i;", dst1, src0, src1, dst0, src0, src1, amod1 (s, x));
+      TRACE_INSN (cpu, "R%i = R%i + R%i, R%i = R%i - R%i%s;",
+		  dst1, src0, src1, dst0, src0, src1, amod1 (s, x));
       STORE (DREG (dst1), add32 (cpu, DREG (src0), DREG (src1), 1, s));
       STORE (DREG (dst0), sub32 (cpu, DREG (src0), DREG (src1), 1, s, 1));
     }
@@ -4214,7 +4215,7 @@ decode_dsp32alu_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1)
       TRACE_INSN (cpu, "SAA (R%i:%i, R%i:%i)%s", src0 + 1, src0, src1 + 1, src1,
 	s ? " (R)" :"");
 
-    unhandled_instruction (cpu, "SAA (dregs_pair, dregs_pair) aligndir");
+      unhandled_instruction (cpu, "SAA (dregs_pair, dregs_pair) aligndir");
     }
   else if (aop == 3 && aopcde == 18)
     {
