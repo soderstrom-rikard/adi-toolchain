@@ -3443,7 +3443,7 @@ decode_dsp32mac_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1)
       else
 	{
 	  if (res0 & 0xffff0000)
-	    unhandled_instruction (cpu, "dsp32mac0");
+	    illegal_instruction (cpu);
 	  res = REG_H_L (res, res0);
 	}
     }
@@ -3455,7 +3455,7 @@ decode_dsp32mac_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1)
       else
 	{
 	  if (res1 & 0xffff0000)
-	    unhandled_instruction (cpu, "dsp32mac1");
+	    illegal_instruction (cpu);
 	  res = REG_H_L (res1 << 16, res);
 	}
     }
@@ -5087,7 +5087,7 @@ decode_dsp32shiftimm_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1)
 	/* dregs_hi/lo = dregs_hi/lo << imm4 */
 	result = lshift (cpu, in, immag, 16, 0);
       else
-	unhandled_instruction (cpu, "dsp32shiftimm_0");
+	illegal_instruction (cpu);
       v = DREG (dst0);
       if (HLs & 2)
 	STORE (DREG (dst0), (v & 0xFFFF) | (result << 16));
