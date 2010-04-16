@@ -149,7 +149,7 @@ bfin_uart_get_next_byte (struct hw *me, struct bfin_uart *uart)
       else
 	{
 	  char byte;
-	  int ret = sim_io_read_stdin (sd, &byte, 1);
+	  int ret = sim_io_poll_read (sd, 0/*STDIN*/, &byte, 1);
 	  if (ret > 0)
 	    uart->rbr = byte;
 	}
