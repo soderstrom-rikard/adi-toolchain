@@ -67,6 +67,7 @@
 #include "dv-bfin_evt.h"
 #include "dv-bfin_mmu.h"
 #include "dv-bfin_pll.h"
+#include "dv-bfin_rtc.h"
 #include "dv-bfin_sic.h"
 #include "dv-bfin_trace.h"
 #include "dv-bfin_uart.h"
@@ -385,6 +386,7 @@ bfin_hw_tree_init (SIM_DESC sd)
   dv_bfin_hw_parse (sd, ebiu_sdc, EBIU_SDC);
   dv_bfin_hw_parse (sd, pll, PLL);
   dv_bfin_hw_parse (sd, sic, SIC);
+  dv_bfin_hw_parse (sd, rtc, RTC);
 
   dv_bfin_hw_parse (sd, wdog, WDOG);
   sim_hw_parse (sd, "/core/bfin_wdog > reset rst      /core/bfin_cec");

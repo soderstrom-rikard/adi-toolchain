@@ -23,6 +23,7 @@ SIM_AC_OPTION_HARDWARE(yes,,\
 	bfin_evt \
 	bfin_mmu \
 	bfin_pll \
+	bfin_rtc \
 	bfin_sic \
 	bfin_trace \
 	bfin_uart \
