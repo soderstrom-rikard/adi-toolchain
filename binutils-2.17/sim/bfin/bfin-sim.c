@@ -1310,7 +1310,7 @@ decode_multfunc (SIM_CPU *cpu, int h0, int h1, int src0, int src1, int mmod,
   val1 = val;
 
   if (mmod == 0 || mmod == M_IS || mmod == M_T || mmod == M_S2RND
-      || mmod == M_ISS2 || mmod == M_IH)
+      || mmod == M_ISS2 || mmod == M_IH || (MM && mmod == M_FU))
     val1 |= -(val1 & 0x80000000);
 
   return val1;
@@ -1435,6 +1435,8 @@ extract_mult (SIM_CPU *cpu, bu64 res, int mmod, int MM, int fullword)
       case M_IS:
 	return saturate_s32 (res);
       case M_FU:
+	if (MM)
+	  return saturate_s32 (res);
 	return saturate_u32 (res);
       case M_S2RND:
       case M_ISS2:
@@ -1453,6 +1455,8 @@ extract_mult (SIM_CPU *cpu, bu64 res, int mmod, int MM, int fullword)
       case M_IS:
 	return saturate_s16 (res);
       case M_FU:
+	if (MM)
+	  return saturate_s16 (rnd16 (res));
 	return saturate_u16 (rnd16 (res));
       case M_IU:
 	if (MM)
@@ -1540,12 +1544,16 @@ decode_macfunc (SIM_CPU *cpu, int which, int op, int h0, int h1, int src0,
 	    acc |= 0xffffffff00000000ull;
 	  break;
 	case M_FU:
-	  if (acc & 0x8000000000000000ull)
+	  if (!MM && (bs64)acc < 0)
 	    acc = 0x0, sat = 1;
-	  if (acc > 0xFFFFFFFFFFull)
+	  if (MM && (bs64)acc < -((bs64)1 << 39))
+	    acc = -((bu64)1 << 39), sat = 1;
+	  if (!MM && (bs64)acc > (bs64)0xFFFFFFFFFFll)
 	    acc = 0xFFFFFFFFFFull, sat = 1;
-	  if (MM && acc > 0xFFFFFFFF)
-	    acc &= 0xFFFFFFFF;
+	  if (MM && acc > 0xFFFFFFFFFFull)
+	    acc &= 0xFFFFFFFFFFull;
+	  if (MM && acc & 0x80000000)
+            acc |= 0xffffffff00000000ull;
 	  break;
 	case M_IH:
 	  if ((bs64)acc < -0x80000000ll)
