@@ -70,6 +70,7 @@
 #include "dv-bfin_sic.h"
 #include "dv-bfin_trace.h"
 #include "dv-bfin_uart.h"
+#include "dv-bfin_wdog.h"
 
 /* Count the number of arguments in an argv.  */
 static int
@@ -384,6 +385,11 @@ bfin_hw_tree_init (SIM_DESC sd)
   dv_bfin_hw_parse (sd, ebiu_sdc, EBIU_SDC);
   dv_bfin_hw_parse (sd, pll, PLL);
   dv_bfin_hw_parse (sd, sic, SIC);
+
+  dv_bfin_hw_parse (sd, wdog, WDOG);
+  sim_hw_parse (sd, "/core/bfin_wdog > reset rst      /core/bfin_cec");
+  sim_hw_parse (sd, "/core/bfin_wdog > nmi   nmi      /core/bfin_cec");
+  sim_hw_parse (sd, "/core/bfin_wdog > gpi   watchdog /core/bfin_sic");
 
   /* XXX: Should be pushed to the model code.  */
   sim_hw_parse (sd, "/core/bfin_uart@0/reg %#x %i", 0xFFC00400, 0x30);

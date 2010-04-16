@@ -5670,6 +5670,7 @@ else
 	bfin_sic \
 	bfin_trace \
 	bfin_uart \
+	bfin_wdog \
 "
 fi
 sim_hw_cflags="-DWITH_HW=1"

@@ -26,6 +26,7 @@ SIM_AC_OPTION_HARDWARE(yes,,\
 	bfin_sic \
 	bfin_trace \
 	bfin_uart \
+	bfin_wdog \
 )
 
 SIM_AC_OUTPUT
