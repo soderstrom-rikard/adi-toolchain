@@ -23,8 +23,7 @@
 
 #include "sim-main.h"
 
-#define BFIN_COREMMR_DMA_BASE	0xFFE02100
-#define BFIN_COREMMR_DMA_SIZE	(4 * 16)
+#define BFIN_MMR_DMA_SIZE	(4 * 16)
 
 /* DMA_CONFIG Masks */
 #define DMAEN		0x0001	/* DMA Channel Enable */

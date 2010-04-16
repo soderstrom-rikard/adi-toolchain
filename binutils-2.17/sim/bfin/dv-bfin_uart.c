@@ -1,4 +1,4 @@
-/* Blackfin UART model.
+/* Blackfin Universal Asynchronous Receiver/Transmitter (UART) model.
 
    Copyright (C) 2010 Free Software Foundation, Inc.
    Contributed by Analog Devices, Inc.
@@ -48,7 +48,7 @@ struct bfin_uart
   bu32 _pad0;
   bu16 BFIN_MMR_16(gctl);
 
-  /* XXX: This is for newer UARTs (BF54x)
+  /* XXX: This is for newer UARTs (BF54x/BF50x)
   bu16 BFIN_MMR_16(gctl);
   bu16 BFIN_MMR_16(lcr);
   bu16 BFIN_MMR_16(mcr);
@@ -253,8 +253,8 @@ attach_bfin_uart_regs (struct hw *me, struct bfin_uart *uart)
 				     &attach_space, &attach_address, me);
   hw_unit_size_to_attach_size (hw_parent (me), &reg.size, &attach_size, me);
 
-  if (attach_size != BFIN_COREMMR_UART_SIZE)
-    hw_abort (me, "\"reg\" size must be %#x", BFIN_COREMMR_UART_SIZE);
+  if (attach_size != BFIN_MMR_UART_SIZE)
+    hw_abort (me, "\"reg\" size must be %#x", BFIN_MMR_UART_SIZE);
 
   hw_attach_address (hw_parent (me),
 		     0, attach_space, attach_address, attach_size, me);

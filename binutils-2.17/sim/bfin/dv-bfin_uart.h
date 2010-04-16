@@ -1,4 +1,4 @@
-/* Blackfin UART model.
+/* Blackfin Universal Asynchronous Receiver/Transmitter (UART) model.
 
    Copyright (C) 2010 Free Software Foundation, Inc.
    Contributed by Analog Devices, Inc.
@@ -22,8 +22,7 @@
 #define DV_BFIN_UART_H
 
 /* XXX: This should be pushed into the model data.  */
-#define BFIN_COREMMR_UART_BASE	0xFFC00400
-#define BFIN_COREMMR_UART_SIZE	0x30
+#define BFIN_MMR_UART_SIZE	0x30
 
 /* UART_LCR */
 #define DLAB (1 << 7)

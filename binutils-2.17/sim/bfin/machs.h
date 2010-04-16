@@ -24,7 +24,9 @@
 #define _BFIN_MACHS_H_
 
 typedef enum model_type {
-  MODEL_BF537,
+#define P(n) MODEL_BF##n,
+#include "_proc_list.h"
+#undef P
   MODEL_MAX
 } MODEL_TYPE;
 
@@ -34,16 +36,6 @@ typedef enum mach_attr {
   MACH_MAX
 } MACH_ATTR;
 
-struct bfin_memory_layout {
-  address_word addr, len;
-  unsigned mask;	/* see mapmask in sim_core_attach() */
-};
-struct bfin_model_data {
-  address_word async_bank_size;
-  const struct bfin_memory_layout *mem;
-  size_t mem_count;
-};
-
-#define DEFAULT_MODEL "bf537"
+void bfin_model_cpu_init (SIM_DESC, SIM_CPU *);
 
 #endif

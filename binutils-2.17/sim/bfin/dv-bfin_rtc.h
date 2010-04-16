@@ -21,8 +21,7 @@
 #ifndef DV_BFIN_RTC_H
 #define DV_BFIN_RTC_H
 
-/* XXX: This should be pushed into the model data.  */
-#define BFIN_COREMMR_RTC_BASE	0xFFC00300
-#define BFIN_COREMMR_RTC_SIZE	(4 * 6)
+#define BFIN_MMR_RTC_BASE	0xFFC00300
+#define BFIN_MMR_RTC_SIZE	(4 * 6)
 
 #endif

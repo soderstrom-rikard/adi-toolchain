@@ -21,9 +21,8 @@
 #ifndef DV_BFIN_WDOG_H
 #define DV_BFIN_WDOG_H
 
-/* XXX: This should be pushed into the model data.  */
-#define BFIN_COREMMR_WDOG_BASE	0xFFC00200
-#define BFIN_COREMMR_WDOG_SIZE	(4 * 3)
+#define BFIN_MMR_WDOG_BASE	0xFFC00200
+#define BFIN_MMR_WDOG_SIZE	(4 * 3)
 
 /* WDOG_CTL */
 #define WDEV            0x0006  /* event generated on roll over */

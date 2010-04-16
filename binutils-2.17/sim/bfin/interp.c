@@ -59,19 +59,8 @@
 #include "elf/internal.h"
 #include "elf/bfin.h"
 
-#include "devices.h"
 #include "dv-bfin_cec.h"
-#include "dv-bfin_ctimer.h"
-#include "dv-bfin_ebiu_amc.h"
-#include "dv-bfin_ebiu_sdc.h"
-#include "dv-bfin_evt.h"
 #include "dv-bfin_mmu.h"
-#include "dv-bfin_pll.h"
-#include "dv-bfin_rtc.h"
-#include "dv-bfin_sic.h"
-#include "dv-bfin_trace.h"
-#include "dv-bfin_uart.h"
-#include "dv-bfin_wdog.h"
 
 /* Count the number of arguments in an argv.  */
 static int
@@ -361,70 +350,13 @@ free_state (SIM_DESC sd)
 /* Create an instance of the simulator.  */
 
 static void
-bfin_map_layout (SIM_DESC sd, SIM_CPU *cpu, size_t count,
-                 const struct bfin_memory_layout *mem)
-{
-  size_t idx;
-  for (idx = 0; idx < count; ++idx)
-    sim_core_attach (sd, NULL, 0, mem[idx].mask, 0, mem[idx].addr,
-                     mem[idx].len, 0, NULL, NULL);
-}
-
-static void
-bfin_hw_tree_init (SIM_DESC sd)
-{
-  int i;
-
-  dv_bfin_hw_parse (sd, cec, CEC);
-  dv_bfin_hw_parse (sd, ctimer, CTIMER);
-  sim_hw_parse (sd, "/core/bfin_ctimer > ivtmr ivtmr /core/bfin_cec");
-  dv_bfin_hw_parse (sd, evt, EVT);
-  dv_bfin_hw_parse (sd, mmu, MMU);
-  dv_bfin_hw_parse (sd, trace, TRACE);
-
-  dv_bfin_hw_parse (sd, ebiu_amc, EBIU_AMC);
-  dv_bfin_hw_parse (sd, ebiu_sdc, EBIU_SDC);
-  dv_bfin_hw_parse (sd, pll, PLL);
-  dv_bfin_hw_parse (sd, sic, SIC);
-  dv_bfin_hw_parse (sd, rtc, RTC);
-
-  dv_bfin_hw_parse (sd, wdog, WDOG);
-  sim_hw_parse (sd, "/core/bfin_wdog > reset rst      /core/bfin_cec");
-  sim_hw_parse (sd, "/core/bfin_wdog > nmi   nmi      /core/bfin_cec");
-  sim_hw_parse (sd, "/core/bfin_wdog > gpi   watchdog /core/bfin_sic");
-
-  /* XXX: Should be pushed to the model code.  */
-  sim_hw_parse (sd, "/core/bfin_uart@0/reg %#x %i", 0xFFC00400, 0x30);
-  sim_hw_parse (sd, "/core/bfin_uart@1/reg %#x %i", 0xFFC02000, 0x30);
-
-  for (i = 0; i < 16; ++i)
-    sim_hw_parse (sd, "/core/bfin_dma@%i/reg %#x %i", i, 0xFFC00C00 + i * 0x40, 0x40);
-  sim_hw_parse (sd, "/core/bfin_dma@12/peer /core/bfin_dma@13"); /* MDMA0 D->S */
-  sim_hw_parse (sd, "/core/bfin_dma@13/peer /core/bfin_dma@12"); /* MDMA0 S->D */
-  sim_hw_parse (sd, "/core/bfin_dma@14/peer /core/bfin_dma@15"); /* MDMA1 D->S */
-  sim_hw_parse (sd, "/core/bfin_dma@15/peer /core/bfin_dma@14"); /* MDMA1 S->D */
-
-  for (i = 7; i < 16; ++i)
-    sim_hw_parse (sd, "/core/bfin_sic > ivg%i ivg%i /core/bfin_cec", i, i);
-}
-
-static void
 bfin_initialize_cpu (SIM_DESC sd, SIM_CPU *cpu)
 {
-  struct bfin_model_data *mdata;
-
   memset (&cpu->state, 0, sizeof (cpu->state));
 
   PROFILE_TOTAL_INSN_COUNT (CPU_PROFILE_DATA (cpu)) = 0;
-  mdata = CPU_MODEL_DATA (cpu);
 
-  /* These memory maps are supposed to be cpu-specific, but the common sim
-     code does not yet allow that (2nd arg is "cpu" rather than "NULL".  */
-  sim_core_attach (sd, NULL, 0, access_read_write, 0, BFIN_L1_SRAM_SCRATCH,
-		   BFIN_L1_SRAM_SCRATCH_SIZE, 0, NULL, NULL);
-
-  /* Map in the on-chip memory (bootrom/sram/etc...).  */
-  bfin_map_layout (sd, cpu, mdata->mem_count, mdata->mem);
+  bfin_model_cpu_init (sd, cpu);
 
   /* Set default stack to top of scratch pad.  */
   SET_SPREG (BFIN_DEFAULT_MEM_SIZE);
@@ -476,13 +408,10 @@ sim_open (SIM_OPEN_KIND kind, host_callback *callback,
       return 0;
     }
 
-  /* Need to set up the tree now before the sim_post_argv_init().  */
-  bfin_hw_tree_init (sd);
-
   /* Allocate external memory if none specified by user.
      Use address 4 here in case the user wanted address 0 unmapped.  */
   if (sim_core_read_buffer (sd, NULL, read_map, &c, 4, 1) == 0)
-    sim_do_commandf (sd, "memory region 0,0x%lx", BFIN_DEFAULT_MEM_SIZE);
+    sim_do_commandf (sd, "memory-size 0x%lx", BFIN_DEFAULT_MEM_SIZE);
 
   /* Check for/establish the a reference program image.  */
   if (sim_analyze_program (sd,
@@ -725,16 +654,19 @@ bfin_os_init (SIM_DESC sd, SIM_CPU *cpu, char * const *argv)
   bu32 cmdline = BFIN_L1_SRAM_SCRATCH;
 
   SET_DREG (0, cmdline);
-  i = 1;
-  byte = ' ';
-  while (argv[i])
+  if (argv[0])
     {
-      bu32 len = strlen (argv[i]);
-      sim_write (sd, cmdline, argv[i], len);
-      cmdline += len;
-      sim_write (sd, cmdline, &byte, 1);
-      ++cmdline;
-      ++i;
+      i = 1;
+      byte = ' ';
+      while (argv[i])
+	{
+	  bu32 len = strlen (argv[i]);
+	  sim_write (sd, cmdline, argv[i], len);
+	  cmdline += len;
+	  sim_write (sd, cmdline, &byte, 1);
+	  ++cmdline;
+	  ++i;
+	}
     }
   byte = 0;
   sim_write (sd, cmdline, &byte, 1);

@@ -139,8 +139,8 @@ attach_bfin_ebiu_sdc_regs (struct hw *me, struct bfin_ebiu_sdc *sdc)
 				     &attach_space, &attach_address, me);
   hw_unit_size_to_attach_size (hw_parent (me), &reg.size, &attach_size, me);
 
-  if (attach_size != BFIN_COREMMR_EBIU_SDC_SIZE)
-    hw_abort (me, "\"reg\" size must be %#x", BFIN_COREMMR_EBIU_SDC_SIZE);
+  if (attach_size != BFIN_MMR_EBIU_SDC_SIZE)
+    hw_abort (me, "\"reg\" size must be %#x", BFIN_MMR_EBIU_SDC_SIZE);
 
   hw_attach_address (hw_parent (me),
 		     0, attach_space, attach_address, attach_size, me);

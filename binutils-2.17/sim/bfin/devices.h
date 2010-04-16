@@ -93,13 +93,6 @@ dv_get_state (SIM_CPU *cpu, const char *device_name)
   return hw_data (dv_get_device (cpu, device_name));
 }
 
-#define dv_bfin_hw_parse(sd, dv, DV) \
-  do { \
-    bu32 base = BFIN_COREMMR_##DV##_BASE; \
-    bu32 size = BFIN_COREMMR_##DV##_SIZE; \
-    sim_hw_parse (sd, "/core/bfin_"#dv"/reg %#x %i", base, size); \
-  } while (0)
-
 #define dv_bfin_invalid_mmr(hw, addr, size) \
   hw_abort (hw, "invalid MMR access %i bytes @%#x", size, addr)
 

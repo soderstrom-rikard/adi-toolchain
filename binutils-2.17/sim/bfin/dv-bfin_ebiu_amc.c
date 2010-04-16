@@ -167,10 +167,10 @@ attach_bfin_ebiu_amc_regs (struct hw *me, struct bfin_ebiu_amc *amc)
 				     &attach_space, &attach_address, me);
   hw_unit_size_to_attach_size (hw_parent (me), &reg.size, &attach_size, me);
 
-  if (attach_size != BFIN_COREMMR_EBIU_AMC_SIZE &&
-      attach_size != BF54X_COREMMR_EBIU_AMC_SIZE)
+  if (attach_size != BFIN_MMR_EBIU_AMC_SIZE &&
+      attach_size != BF54X_MMR_EBIU_AMC_SIZE)
     hw_abort (me, "\"reg\" size must be %#x or %#x",
-	      BFIN_COREMMR_EBIU_AMC_SIZE, BF54X_COREMMR_EBIU_AMC_SIZE);
+	      BFIN_MMR_EBIU_AMC_SIZE, BF54X_MMR_EBIU_AMC_SIZE);
 
   hw_attach_address (hw_parent (me),
 		     0, attach_space, attach_address, attach_size, me);
@@ -197,7 +197,7 @@ bfin_ebiu_amc_finish (struct hw *me)
   /* Initialize the AMC.  */
   bfin_ebiu_amc_write_amgctl (me, amc, 0x00f2);
   amc->ambctl0 = amc->ambctl1 = 0xffc2ffc2;
-  if (amc->reg_size == BF54X_COREMMR_EBIU_AMC_SIZE)
+  if (amc->reg_size == BF54X_MMR_EBIU_AMC_SIZE)
     {
       /* XXX: init these ...  */
     }

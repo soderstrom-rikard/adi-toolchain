@@ -23,7 +23,37 @@
 #include "sim-main.h"
 #include "gdb/sim-bfin.h"
 #include "bfd.h"
+
+#include "sim-hw.h"
+#include "devices.h"
 #include "dv-bfin_cec.h"
+#include "dv-bfin_ctimer.h"
+#include "dv-bfin_dma.h"
+#include "dv-bfin_ebiu_amc.h"
+#include "dv-bfin_ebiu_sdc.h"
+#include "dv-bfin_evt.h"
+#include "dv-bfin_mmu.h"
+#include "dv-bfin_pll.h"
+#include "dv-bfin_rtc.h"
+#include "dv-bfin_sic.h"
+#include "dv-bfin_trace.h"
+#include "dv-bfin_uart.h"
+#include "dv-bfin_wdog.h"
+
+struct bfin_memory_layout {
+  address_word addr, len;
+  unsigned mask;	/* see mapmask in sim_core_attach() */
+};
+struct bfin_dev_layout {
+  address_word base, len;
+  const char *dev;
+};
+struct bfin_model_data {
+  const struct bfin_memory_layout *mem;
+  size_t mem_count;
+  const struct bfin_dev_layout *dev;
+  size_t dev_count;
+};
 
 static const MACH bfin_mach;
 
@@ -34,24 +64,313 @@ const MACH *sim_machs[] =
 };
 
 #define LAYOUT(_addr, _len, _mask) { .addr = _addr, .len = _len, .mask = access_##_mask, }
-static const struct bfin_memory_layout bf537_mem[] = {
-	LAYOUT (0xEF000000, 0x800,  read_exec),
-	LAYOUT (0xFF800000, 0x8000, read_write),
-	LAYOUT (0xFF900000, 0x8000, read_write),
-	/* Common sim code can't model exec-only memory.
-	   http://sourceware.org/ml/gdb/2010-02/msg00047.html */
-	LAYOUT (0xFFA00000, 0xC000, read_write_exec),
-	LAYOUT (0xFFA10000, 0x4000, read_write_exec),
+#define DEVICE(_base, _len, _dev) { .base = _base, .len = _len, .dev = _dev, }
+
+/* [1] Common sim code can't model exec-only memory.
+   http://sourceware.org/ml/gdb/2010-02/msg00047.html */
+
+static const struct bfin_memory_layout bfin_mem[] = {};
+static const struct bfin_dev_layout bfin_dev[] = {};
+
+static const struct bfin_memory_layout bf50x_mem[] = {
+  LAYOUT (0xFF800000, 0x4000, read_write),	/* Data A */
+  LAYOUT (0xFF804000, 0x8000, read_write),	/* Data A Cache */
+  LAYOUT (0xFFA00000, 0x4000, read_write_exec),	/* Inst A [1] */
+  LAYOUT (0xFFA04000, 0x4000, read_write_exec),	/* Inst Cache [1] */
 };
+#define bf504_mem bf50x_mem
+#define bf506_mem bf50x_mem
+static const struct bfin_dev_layout bf50x_dev[] = {
+  DEVICE (0xFFC00400, BFIN_MMR_UART_SIZE, "bfin_uart"),
+};
+#define bf504_dev bf50x_dev
+#define bf506_dev bf50x_dev
+
+static const struct bfin_memory_layout bf51x_mem[] = {
+  LAYOUT (0xFF800000, 0x4000, read_write),	/* Data A */
+  LAYOUT (0xFF804000, 0x4000, read_write),	/* Data A Cache */
+  LAYOUT (0xFF900000, 0x4000, read_write),	/* Data B */
+  LAYOUT (0xFF904000, 0x4000, read_write),	/* Data B Cache */
+  LAYOUT (0xFFA00000, 0x8000, read_write_exec),	/* Inst A [1] */
+  LAYOUT (0xFFA10000, 0x4000, read_write_exec),	/* Inst Cache [1] */
+};
+#define bf512_mem bf51x_mem
+#define bf514_mem bf51x_mem
+#define bf516_mem bf51x_mem
+#define bf518_mem bf51x_mem
+static const struct bfin_dev_layout bf51x_dev[] = {
+  DEVICE (0xFFC00400, BFIN_MMR_UART_SIZE, "bfin_uart@0"),
+  DEVICE (0xFFC02000, BFIN_MMR_UART_SIZE, "bfin_uart@1"),
+};
+#define bf512_dev bf51x_dev
+#define bf514_dev bf51x_dev
+#define bf516_dev bf51x_dev
+#define bf518_dev bf51x_dev
+
+static const struct bfin_memory_layout bf52x_mem[] = {
+  LAYOUT (0xFF800000, 0x4000, read_write),	/* Data A */
+  LAYOUT (0xFF804000, 0x4000, read_write),	/* Data A Cache */
+  LAYOUT (0xFF900000, 0x4000, read_write),	/* Data B */
+  LAYOUT (0xFF904000, 0x4000, read_write),	/* Data B Cache */
+  LAYOUT (0xFFA00000, 0x8000, read_write_exec),	/* Inst A [1] */
+  LAYOUT (0xFFA08000, 0x4000, read_write_exec),	/* Inst B [1] */
+  LAYOUT (0xFFA10000, 0x4000, read_write_exec),	/* Inst Cache [1] */
+};
+#define bf522_mem bf52x_mem
+#define bf523_mem bf52x_mem
+#define bf524_mem bf52x_mem
+#define bf525_mem bf52x_mem
+#define bf526_mem bf52x_mem
+#define bf527_mem bf52x_mem
+static const struct bfin_dev_layout bf52x_dev[] = {
+  DEVICE (0xFFC00400, BFIN_MMR_UART_SIZE, "bfin_uart@0"),
+  DEVICE (0xFFC02000, BFIN_MMR_UART_SIZE, "bfin_uart@1"),
+};
+#define bf522_dev bf52x_dev
+#define bf523_dev bf52x_dev
+#define bf524_dev bf52x_dev
+#define bf525_dev bf52x_dev
+#define bf526_dev bf52x_dev
+#define bf527_dev bf52x_dev
+
+static const struct bfin_memory_layout bf531_mem[] = {
+  LAYOUT (0xFF804000, 0x4000, read_write),	/* Data A Cache */
+  LAYOUT (0xFFA08000, 0x4000, read_write_exec),	/* Inst B [1] */
+  LAYOUT (0xFFA10000, 0x4000, read_write_exec),	/* Inst Cache [1] */
+};
+static const struct bfin_memory_layout bf532_mem[] = {
+  LAYOUT (0xFF804000, 0x4000, read_write),	/* Data A Cache */
+  LAYOUT (0xFF904000, 0x4000, read_write),	/* Data B Cache */
+  LAYOUT (0xFFA08000, 0x4000, read_write_exec),	/* Inst B [1] */
+  LAYOUT (0xFFA0C000, 0x4000, read_write_exec),	/* Inst C [1] */
+  LAYOUT (0xFFA10000, 0x4000, read_write_exec),	/* Inst Cache [1] */
+};
+static const struct bfin_memory_layout bf533_mem[] = {
+  LAYOUT (0xFF800000, 0x4000, read_write),	/* Data A */
+  LAYOUT (0xFF804000, 0x4000, read_write),	/* Data A Cache */
+  LAYOUT (0xFF900000, 0x4000, read_write),	/* Data B */
+  LAYOUT (0xFF904000, 0x4000, read_write),	/* Data B Cache */
+  LAYOUT (0xFFA00000, 0x8000, read_write_exec),	/* Inst A [1] */
+  LAYOUT (0xFFA08000, 0x4000, read_write_exec),	/* Inst B [1] */
+  LAYOUT (0xFFA0C000, 0x4000, read_write_exec),	/* Inst C [1] */
+  LAYOUT (0xFFA10000, 0x4000, read_write_exec),	/* Inst Cache [1] */
+};
+static const struct bfin_dev_layout bf533_dev[] = {
+  DEVICE (0xFFC00400, BFIN_MMR_UART_SIZE, "bfin_uart"),
+};
+#define bf531_dev bf533_dev
+#define bf532_dev bf533_dev
+
+static const struct bfin_memory_layout bf534_mem[] = {
+  LAYOUT (0xFF800000, 0x4000, read_write),	/* Data A */
+  LAYOUT (0xFF804000, 0x4000, read_write),	/* Data A Cache */
+  LAYOUT (0xFF900000, 0x4000, read_write),	/* Data B */
+  LAYOUT (0xFF904000, 0x4000, read_write),	/* Data B Cache */
+  LAYOUT (0xFFA00000, 0x8000, read_write_exec),	/* Inst A [1] */
+  LAYOUT (0xFFA08000, 0x4000, read_write_exec),	/* Inst B [1] */
+  LAYOUT (0xFFA10000, 0x4000, read_write_exec),	/* Inst Cache [1] */
+};
+static const struct bfin_memory_layout bf536_mem[] = {
+  LAYOUT (0xFF804000, 0x4000, read_write),	/* Data A Cache */
+  LAYOUT (0xFF904000, 0x4000, read_write),	/* Data B Cache */
+  LAYOUT (0xFFA00000, 0x8000, read_write_exec),	/* Inst A [1] */
+  LAYOUT (0xFFA08000, 0x4000, read_write_exec),	/* Inst B [1] */
+  LAYOUT (0xFFA10000, 0x4000, read_write_exec),	/* Inst Cache [1] */
+};
+static const struct bfin_memory_layout bf537_mem[] = {
+  LAYOUT (0xFF800000, 0x4000, read_write),	/* Data A */
+  LAYOUT (0xFF804000, 0x4000, read_write),	/* Data A Cache */
+  LAYOUT (0xFF900000, 0x4000, read_write),	/* Data B */
+  LAYOUT (0xFF904000, 0x4000, read_write),	/* Data B Cache */
+  LAYOUT (0xFFA00000, 0x8000, read_write_exec),	/* Inst A [1] */
+  LAYOUT (0xFFA08000, 0x4000, read_write_exec),	/* Inst B [1] */
+  LAYOUT (0xFFA10000, 0x4000, read_write_exec),	/* Inst Cache [1] */
+};
+static const struct bfin_dev_layout bf537_dev[] = {
+  DEVICE (0xFFC00400, BFIN_MMR_UART_SIZE, "bfin_uart@0"),
+  DEVICE (0xFFC02000, BFIN_MMR_UART_SIZE, "bfin_uart@1"),
+};
+#define bf534_dev bf537_dev
+#define bf536_dev bf537_dev
+
+static const struct bfin_memory_layout bf538_mem[] = {
+  LAYOUT (0xFF800000, 0x4000, read_write),	/* Data A */
+  LAYOUT (0xFF804000, 0x4000, read_write),	/* Data A Cache */
+  LAYOUT (0xFF900000, 0x4000, read_write),	/* Data B */
+  LAYOUT (0xFF904000, 0x4000, read_write),	/* Data B Cache */
+  LAYOUT (0xFFA00000, 0x8000, read_write_exec),	/* Inst A [1] */
+  LAYOUT (0xFFA08000, 0x4000, read_write_exec),	/* Inst B [1] */
+  LAYOUT (0xFFA0C000, 0x4000, read_write_exec),	/* Inst C [1] */
+  LAYOUT (0xFFA10000, 0x4000, read_write_exec),	/* Inst Cache [1] */
+};
+#define bf539_mem bf538_mem
+static const struct bfin_dev_layout bf538_dev[] = {
+  DEVICE (0xFFC00400, BFIN_MMR_UART_SIZE, "bfin_uart@0"),
+  DEVICE (0xFFC02000, BFIN_MMR_UART_SIZE, "bfin_uart@1"),
+  DEVICE (0xFFC02100, BFIN_MMR_UART_SIZE, "bfin_uart@2"),
+};
+#define bf539_dev bf538_dev
+
+static const struct bfin_memory_layout bf54x_mem[] = {
+  LAYOUT (0xFEB00000, 0x20000, read_write_exec),	/* L2 */
+  LAYOUT (0xFF800000, 0x4000, read_write),	/* Data A */
+  LAYOUT (0xFF804000, 0x4000, read_write),	/* Data A Cache */
+  LAYOUT (0xFF900000, 0x4000, read_write),	/* Data B */
+  LAYOUT (0xFF904000, 0x4000, read_write),	/* Data B Cache */
+  LAYOUT (0xFFA00000, 0x8000, read_write_exec),	/* Inst A [1] */
+  LAYOUT (0xFFA08000, 0x4000, read_write_exec),	/* Inst B [1] */
+  LAYOUT (0xFFA10000, 0x4000, read_write_exec),	/* Inst Cache [1] */
+};
+#define bf542_mem bf54x_mem
+#define bf544_mem bf54x_mem
+#define bf547_mem bf54x_mem
+#define bf548_mem bf54x_mem
+#define bf549_mem bf54x_mem
+static const struct bfin_dev_layout bf54x_dev[] = {
+  DEVICE (0xFFC00400, BFIN_MMR_UART_SIZE, "bfin_uart@0"),
+  DEVICE (0xFFC02000, BFIN_MMR_UART_SIZE, "bfin_uart@1"),
+  DEVICE (0xFFC02100, BFIN_MMR_UART_SIZE, "bfin_uart@2"),
+  DEVICE (0xFFC03100, BFIN_MMR_UART_SIZE, "bfin_uart@3"),
+};
+#define bf542_dev bf54x_dev
+#define bf544_dev bf54x_dev
+#define bf547_dev bf54x_dev
+#define bf548_dev bf54x_dev
+#define bf549_dev bf54x_dev
+
+/* This is only Core A of course ...  */
+static const struct bfin_memory_layout bf561_mem[] = {
+  LAYOUT (0xFEB00000, 0x20000, read_write_exec),	/* L2 */
+  LAYOUT (0xFF800000, 0x4000, read_write),	/* Data A */
+  LAYOUT (0xFF804000, 0x4000, read_write),	/* Data A Cache */
+  LAYOUT (0xFF900000, 0x4000, read_write),	/* Data B */
+  LAYOUT (0xFF904000, 0x4000, read_write),	/* Data B Cache */
+  LAYOUT (0xFFA00000, 0x4000, read_write_exec),	/* Inst A [1] */
+  LAYOUT (0xFFA10000, 0x4000, read_write_exec),	/* Inst Cache [1] */
+};
+static const struct bfin_dev_layout bf561_dev[] = {
+  DEVICE (0xFFC00400, BFIN_MMR_UART_SIZE, "bfin_uart"),
+};
+
+#define ASYNC_1_MEG (1 * 1024 * 1024)
+#define ASYNC_4_MEG (4 * 1024 * 1024)
 
 static const struct bfin_model_data bfin_model_data[] =
 {
-  [MODEL_BF537] = {
-	.mem             = bf537_mem,
-	.mem_count       = ARRAY_SIZE (bf537_mem),
-	.async_bank_size = 1 * 1024 * 1024,
+#define P(n) \
+  [MODEL_BF##n] = { \
+    bf##n##_mem, ARRAY_SIZE (bf##n##_mem), \
+    bf##n##_dev, ARRAY_SIZE (bf##n##_dev), \
   },
+#include "_proc_list.h"
+#undef P
 };
+
+#define CORE_DEVICE(dev, DEV) \
+  DEVICE (BFIN_COREMMR_##DEV##_BASE, BFIN_COREMMR_##DEV##_SIZE, "bfin_"#dev)
+static const struct bfin_dev_layout bfin_core_dev[] = {
+  CORE_DEVICE (cec, CEC),
+  CORE_DEVICE (ctimer, CTIMER),
+  CORE_DEVICE (evt, EVT),
+  CORE_DEVICE (mmu, MMU),
+  CORE_DEVICE (trace, TRACE),
+};
+
+#define dv_bfin_hw_parse(sd, dv, DV) \
+  do { \
+    bu32 base = BFIN_MMR_##DV##_BASE; \
+    bu32 size = BFIN_MMR_##DV##_SIZE; \
+    sim_hw_parse (sd, "/core/bfin_"#dv"/reg %#x %i", base, size); \
+  } while (0)
+
+static void
+bfin_model_hw_tree_init (SIM_DESC sd, SIM_CPU *cpu)
+{
+  const MODEL *model = CPU_MODEL (cpu);
+  const struct bfin_model_data *mdata = CPU_MODEL_DATA (cpu);
+  int mnum = MODEL_NUM (model);
+  unsigned i;
+
+  /* Map the core devices.  */
+  for (i = 0; i < ARRAY_SIZE (bfin_core_dev); ++i)
+    {
+      const struct bfin_dev_layout *dev = &bfin_core_dev[i];
+      sim_hw_parse (sd, "/core/%s/reg %#x %i", dev->dev, dev->base, dev->len);
+    }
+  sim_hw_parse (sd, "/core/bfin_ctimer > ivtmr ivtmr /core/bfin_cec");
+
+  /* Map the common system devices.  */
+  dv_bfin_hw_parse (sd, ebiu_amc, EBIU_AMC);
+  dv_bfin_hw_parse (sd, ebiu_sdc, EBIU_SDC);
+  dv_bfin_hw_parse (sd, pll, PLL);
+
+  dv_bfin_hw_parse (sd, sic, SIC);
+  for (i = 7; i < 16; ++i)
+    sim_hw_parse (sd, "/core/bfin_sic > ivg%i ivg%i /core/bfin_cec", i, i);
+  sim_hw_parse (sd, "/core/bfin_sic/model %s", MODEL_NAME (model));
+
+  dv_bfin_hw_parse (sd, wdog, WDOG);
+  sim_hw_parse (sd, "/core/bfin_wdog > reset rst      /core/bfin_cec");
+  sim_hw_parse (sd, "/core/bfin_wdog > nmi   nmi      /core/bfin_cec");
+  sim_hw_parse (sd, "/core/bfin_wdog > gpi   watchdog /core/bfin_sic");
+
+  if (mnum != MODEL_BF561)
+    dv_bfin_hw_parse (sd, rtc, RTC);
+
+#if 0
+  /* XXX: How to handle datafiles with sim ?  */
+  sim_do_commandf (sd, "memory-mapfile %s", MODEL_NAME (model));
+  sim_do_commandf (sd, "memory region 0xEF000000,0x100000,0x800");
+#endif
+
+  for (i = 0; i < mdata->dev_count; ++i)
+    {
+      const struct bfin_dev_layout *dev = &mdata->dev[i];
+      sim_hw_parse (sd, "/core/%s/reg %#x %i", dev->dev, dev->base, dev->len);
+    }
+
+  /* XXX: Should be pushed to per-model structs.  */
+  for (i = 0; i < 16; ++i)
+    sim_hw_parse (sd, "/core/bfin_dma@%i/reg %#x %i", i,
+		  0xFFC00C00 + i * BFIN_MMR_DMA_SIZE, BFIN_MMR_DMA_SIZE);
+  sim_hw_parse (sd, "/core/bfin_dma@12/peer /core/bfin_dma@13"); /* MDMA0 D->S */
+  sim_hw_parse (sd, "/core/bfin_dma@13/peer /core/bfin_dma@12"); /* MDMA0 S->D */
+  sim_hw_parse (sd, "/core/bfin_dma@14/peer /core/bfin_dma@15"); /* MDMA1 D->S */
+  sim_hw_parse (sd, "/core/bfin_dma@15/peer /core/bfin_dma@14"); /* MDMA1 S->D */
+
+  /* Trigger all the new devices' finish func.  */
+  hw_tree_finish (dv_get_device (cpu, "/"));
+}
+
+void
+bfin_model_cpu_init (SIM_DESC sd, SIM_CPU *cpu)
+{
+  const MODEL *model = CPU_MODEL (cpu);
+  const struct bfin_model_data *mdata = CPU_MODEL_DATA (cpu);
+  int mnum = MODEL_NUM (model);
+  size_t idx;
+
+  if (mnum == MODEL_BFin)
+    return;
+
+  mdata = &bfin_model_data[MODEL_NUM (model)];
+
+  /* These memory maps are supposed to be cpu-specific, but the common sim
+     code does not yet allow that (2nd arg is "cpu" rather than "NULL".  */
+  sim_core_attach (sd, NULL, 0, access_read_write, 0, BFIN_L1_SRAM_SCRATCH,
+		   BFIN_L1_SRAM_SCRATCH_SIZE, 0, NULL, NULL);
+
+  /* Map in the on-chip memory (bootrom/sram/etc...).  */
+  for (idx = 0; idx < mdata->mem_count; ++idx)
+    {
+      const struct bfin_memory_layout *mem = &mdata->mem[idx];
+      sim_core_attach (sd, NULL, 0, mem->mask, 0, mem->addr,
+		       mem->len, 0, NULL, NULL);
+    }
+
+  /* Finally, build up the tree for this cpu model.  */
+  bfin_model_hw_tree_init (sd, cpu);
+}
 
 static void
 bfin_model_init (SIM_CPU *cpu)
@@ -232,7 +551,9 @@ bfin_prepare_run (SIM_CPU *cpu)
 
 static const MODEL bfin_models[] =
 {
-  { "bf537", & bfin_mach, MODEL_BF537, NULL, bfin_model_init },
+#define P(n) { "bf"#n, & bfin_mach, MODEL_BF##n, NULL, bfin_model_init },
+#include "_proc_list.h"
+#undef P
   { 0, NULL, 0, NULL, NULL, }
 };
 

@@ -151,8 +151,8 @@ attach_bfin_rtc_regs (struct hw *me, struct bfin_rtc *rtc)
 				     &attach_space, &attach_address, me);
   hw_unit_size_to_attach_size (hw_parent (me), &reg.size, &attach_size, me);
 
-  if (attach_size != BFIN_COREMMR_RTC_SIZE)
-    hw_abort (me, "\"reg\" size must be %#x", BFIN_COREMMR_RTC_SIZE);
+  if (attach_size != BFIN_MMR_RTC_SIZE)
+    hw_abort (me, "\"reg\" size must be %#x", BFIN_MMR_RTC_SIZE);
 
   hw_attach_address (hw_parent (me),
 		     0, attach_space, attach_address, attach_size, me);
