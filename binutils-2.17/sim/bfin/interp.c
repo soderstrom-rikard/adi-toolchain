@@ -714,6 +714,30 @@ bfin_user_init (SIM_DESC sd, SIM_CPU *cpu, struct bfd *abfd,
   cb->stat_map = stat_map;
 }
 
+static void
+bfin_os_init (SIM_DESC sd, SIM_CPU *cpu, char * const *argv)
+{
+  /* Pass the command line via a string in R0 like Linux expects.  */
+  int i;
+  bu8 byte;
+  bu32 cmdline = BFIN_L1_SRAM_SCRATCH;
+
+  SET_DREG (0, cmdline);
+  i = 1;
+  byte = ' ';
+  while (argv[i])
+    {
+      bu32 len = strlen (argv[i]);
+      sim_write (sd, cmdline, argv[i], len);
+      cmdline += len;
+      sim_write (sd, cmdline, &byte, 1);
+      ++cmdline;
+      ++i;
+    }
+  byte = 0;
+  sim_write (sd, cmdline, &byte, 1);
+}
+
 SIM_RC
 sim_create_inferior (SIM_DESC sd, struct bfd *abfd,
 		     char **argv, char **env)
@@ -741,6 +765,9 @@ sim_create_inferior (SIM_DESC sd, struct bfd *abfd,
     {
     case USER_ENVIRONMENT:
       bfin_user_init (sd, cpu, abfd, argv, env);
+      break;
+    case OPERATING_ENVIRONMENT:
+      bfin_os_init (sd, cpu, argv);
       break;
     }
 
