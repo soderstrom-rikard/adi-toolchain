@@ -37,5 +37,7 @@ typedef enum mach_attr {
 } MACH_ATTR;
 
 void bfin_model_cpu_init (SIM_DESC, SIM_CPU *);
+bu32 bfin_model_get_chipid (SIM_DESC);
+bu32 bfin_model_get_dspid (SIM_DESC);
 
 #endif

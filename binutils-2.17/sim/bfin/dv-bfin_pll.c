@@ -19,6 +19,7 @@
    along with this program.  If not, see <http://www.gnu.org/licenses/>.  */
 
 #include "sim-main.h"
+#include "machs.h"
 #include "devices.h"
 #include "dv-bfin_pll.h"
 
@@ -158,6 +159,7 @@ bfin_pll_finish (struct hw *me)
   pll->vr_ctl = 0x40DB;
   pll->pll_stat = 0x00A2;
   pll->pll_lockcnt = 0x0200;
+  pll->chipid = bfin_model_get_chipid (hw_system (me));
 
   /* XXX: slow it down!  */
   pll->pll_ctl = 0xa800;
@@ -165,7 +167,6 @@ bfin_pll_finish (struct hw *me)
   pll->vr_ctl = 0x40fb;
   pll->pll_stat = 0xa2;
   pll->pll_lockcnt = 0x300;
-  pll->chipid = 0x327c80cb;
 }
 
 const struct hw_descriptor dv_bfin_pll_descriptor[] = {

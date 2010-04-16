@@ -33,11 +33,11 @@ typedef unsigned32 sim_cia;
 
 typedef struct _sim_cpu SIM_CPU;
 
+#include "bfin-sim.h"
+
 #include "machs.h"
 
 #include "sim-base.h"
-
-#include "bfin-sim.h"
 
 struct _sim_cpu {
    /* ... simulator specific members ... */

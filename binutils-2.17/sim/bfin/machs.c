@@ -49,6 +49,7 @@ struct bfin_dev_layout {
   const char *dev;
 };
 struct bfin_model_data {
+  bu32 chipid;
   const struct bfin_memory_layout *mem;
   size_t mem_count;
   const struct bfin_dev_layout *dev;
@@ -69,9 +70,13 @@ const MACH *sim_machs[] =
 /* [1] Common sim code can't model exec-only memory.
    http://sourceware.org/ml/gdb/2010-02/msg00047.html */
 
+#define bfin_chipid 0
 static const struct bfin_memory_layout bfin_mem[] = {};
 static const struct bfin_dev_layout bfin_dev[] = {};
 
+#define bf50x_chipid 0x2800
+#define bf504_chipid bf50x_chipid
+#define bf506_chipid bf50x_chipid
 static const struct bfin_memory_layout bf50x_mem[] = {
   LAYOUT (0xFF800000, 0x4000, read_write),	/* Data A */
   LAYOUT (0xFF804000, 0x8000, read_write),	/* Data A Cache */
@@ -86,6 +91,11 @@ static const struct bfin_dev_layout bf50x_dev[] = {
 #define bf504_dev bf50x_dev
 #define bf506_dev bf50x_dev
 
+#define bf51x_chipid 0x27e8
+#define bf512_chipid bf51x_chipid
+#define bf514_chipid bf51x_chipid
+#define bf516_chipid bf51x_chipid
+#define bf518_chipid bf51x_chipid
 static const struct bfin_memory_layout bf51x_mem[] = {
   LAYOUT (0xFF800000, 0x4000, read_write),	/* Data A */
   LAYOUT (0xFF804000, 0x4000, read_write),	/* Data A Cache */
@@ -107,6 +117,12 @@ static const struct bfin_dev_layout bf51x_dev[] = {
 #define bf516_dev bf51x_dev
 #define bf518_dev bf51x_dev
 
+#define bf522_chipid 0x27e4
+#define bf523_chipid 0x27e0
+#define bf524_chipid bf522_chipid
+#define bf525_chipid bf523_chipid
+#define bf526_chipid bf522_chipid
+#define bf527_chipid bf523_chipid
 static const struct bfin_memory_layout bf52x_mem[] = {
   LAYOUT (0xFF800000, 0x4000, read_write),	/* Data A */
   LAYOUT (0xFF804000, 0x4000, read_write),	/* Data A Cache */
@@ -133,6 +149,9 @@ static const struct bfin_dev_layout bf52x_dev[] = {
 #define bf526_dev bf52x_dev
 #define bf527_dev bf52x_dev
 
+#define bf531_chipid 0x27a5
+#define bf532_chipid bf531_chipid
+#define bf533_chipid bf531_chipid
 static const struct bfin_memory_layout bf531_mem[] = {
   LAYOUT (0xFF804000, 0x4000, read_write),	/* Data A Cache */
   LAYOUT (0xFFA08000, 0x4000, read_write_exec),	/* Inst B [1] */
@@ -161,6 +180,9 @@ static const struct bfin_dev_layout bf533_dev[] = {
 #define bf531_dev bf533_dev
 #define bf532_dev bf533_dev
 
+#define bf534_chipid 0x27c6
+#define bf536_chipid 0x27c8
+#define bf537_chipid bf536_chipid
 static const struct bfin_memory_layout bf534_mem[] = {
   LAYOUT (0xFF800000, 0x4000, read_write),	/* Data A */
   LAYOUT (0xFF804000, 0x4000, read_write),	/* Data A Cache */
@@ -193,6 +215,8 @@ static const struct bfin_dev_layout bf537_dev[] = {
 #define bf534_dev bf537_dev
 #define bf536_dev bf537_dev
 
+#define bf538_chipid 0x27c4
+#define bf539_chipid bf538_chipid
 static const struct bfin_memory_layout bf538_mem[] = {
   LAYOUT (0xFF800000, 0x4000, read_write),	/* Data A */
   LAYOUT (0xFF804000, 0x4000, read_write),	/* Data A Cache */
@@ -211,6 +235,12 @@ static const struct bfin_dev_layout bf538_dev[] = {
 };
 #define bf539_dev bf538_dev
 
+#define bf54x_chipid 0x27de
+#define bf542_chipid bf54x_chipid
+#define bf544_chipid bf54x_chipid
+#define bf547_chipid bf54x_chipid
+#define bf548_chipid bf54x_chipid
+#define bf549_chipid bf54x_chipid
 static const struct bfin_memory_layout bf54x_mem[] = {
   LAYOUT (0xFEB00000, 0x20000, read_write_exec),	/* L2 */
   LAYOUT (0xFF800000, 0x4000, read_write),	/* Data A */
@@ -239,6 +269,7 @@ static const struct bfin_dev_layout bf54x_dev[] = {
 #define bf549_dev bf54x_dev
 
 /* This is only Core A of course ...  */
+#define bf561_chipid 0x27bb
 static const struct bfin_memory_layout bf561_mem[] = {
   LAYOUT (0xFEB00000, 0x20000, read_write_exec),	/* L2 */
   LAYOUT (0xFF800000, 0x4000, read_write),	/* Data A */
@@ -259,6 +290,7 @@ static const struct bfin_model_data bfin_model_data[] =
 {
 #define P(n) \
   [MODEL_BF##n] = { \
+    bf##n##_chipid, \
     bf##n##_mem, ARRAY_SIZE (bf##n##_mem), \
     bf##n##_dev, ARRAY_SIZE (bf##n##_dev), \
   },
@@ -370,6 +402,28 @@ bfin_model_cpu_init (SIM_DESC sd, SIM_CPU *cpu)
 
   /* Finally, build up the tree for this cpu model.  */
   bfin_model_hw_tree_init (sd, cpu);
+}
+
+bu32
+bfin_model_get_chipid (SIM_DESC sd)
+{
+  SIM_CPU *cpu = STATE_CPU (sd, 0);
+  const struct bfin_model_data *mdata = CPU_MODEL_DATA (cpu);
+  return
+	 (0x3 << 28) /* XXX: silicon rev */ |
+	 (mdata->chipid << 12) |
+	 (((0xE5 << 1) | 1) & 0xFF);
+}
+
+bu32
+bfin_model_get_dspid (SIM_DESC sd)
+{
+  SIM_CPU *cpu = STATE_CPU (sd, 0);
+  const struct bfin_model_data *mdata = CPU_MODEL_DATA (cpu);
+  return
+	 (0xE5 << 24) |
+	 (0x04 << 16) |
+	 (0x3) /* XXX: silicon rev */;
 }
 
 static void
