@@ -690,6 +690,31 @@ define _show_dma
 	printf ")\n"
 end
 
+define show_ctimer
+	set $$CTIMER  = 0xFFE03000
+	set $$TCNTL   = *(unsigned long *) ($$CTIMER + 0x0)
+	set $$TPERIOD = *(unsigned long *) ($$CTIMER + 0x4)
+	set $$TSCALE  = *(unsigned long *) ($$CTIMER + 0x8)
+	set $$TCOUNT  = *(unsigned long *) ($$CTIMER + 0xC)
+	printf "TCNTL:   %#x (", $$TCNTL
+	if ($$TCNTL & (1 << 0))
+		printf "power "
+	end
+	if ($$TCNTL & (1 << 1))
+		printf "enable "
+	end
+	if ($$TCNTL & (1 << 2))
+		printf "autoreload "
+	end
+	if ($$TCNTL & (1 << 3))
+		printf "int-enabled "
+	end
+	printf ")\n"
+	printf "TPERIOD: %#x\n", $$TPERIOD
+	printf "TSCALE:  %#x\n", $$TSCALE
+	printf "TCOUNT:  %#x\n", $$TCOUNT
+end
+
 define show_spi
 	set $$SPI_BASE = $arg0
 	set $$SPI_BAUD = *(unsigned short *) ($$SPI_BASE + 0x14)
