@@ -66,7 +66,7 @@ struct bfin_uart
 
 static unsigned
 bfin_uart_io_write_buffer (struct hw *me, const void *source,
-			  int space, address_word addr, unsigned nr_bytes)
+			   int space, address_word addr, unsigned nr_bytes)
 {
   struct bfin_uart *uart = hw_data (me);
   bu32 mmr_off;
@@ -182,7 +182,7 @@ bfin_uart_get_status (struct hw *me, struct bfin_uart *uart)
 
 static unsigned
 bfin_uart_io_read_buffer (struct hw *me, void *dest,
-			 int space, address_word addr, unsigned nr_bytes)
+			  int space, address_word addr, unsigned nr_bytes)
 {
   struct bfin_uart *uart = hw_data (me);
   bu32 mmr_off;

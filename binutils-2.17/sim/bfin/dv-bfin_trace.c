@@ -66,7 +66,7 @@ struct bfin_trace
 
 static unsigned
 bfin_trace_io_write_buffer (struct hw *me, const void *source,
-			  int space, address_word addr, unsigned nr_bytes)
+			    int space, address_word addr, unsigned nr_bytes)
 {
   struct bfin_trace *trace = hw_data (me);
   bu32 value;
@@ -95,7 +95,7 @@ bfin_trace_io_write_buffer (struct hw *me, const void *source,
 
 static unsigned
 bfin_trace_io_read_buffer (struct hw *me, void *dest,
-			 int space, address_word addr, unsigned nr_bytes)
+			   int space, address_word addr, unsigned nr_bytes)
 {
   struct bfin_trace *trace = hw_data (me);
   bu32 value;

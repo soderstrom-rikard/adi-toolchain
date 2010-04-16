@@ -44,7 +44,7 @@ bfin_wdog_enabled (struct bfin_wdog *wdog)
 
 static unsigned
 bfin_wdog_io_write_buffer (struct hw *me, const void *source,
-			  int space, address_word addr, unsigned nr_bytes)
+			   int space, address_word addr, unsigned nr_bytes)
 {
   struct bfin_wdog *wdog = hw_data (me);
   bu32 mmr_off;
@@ -96,7 +96,7 @@ bfin_wdog_io_write_buffer (struct hw *me, const void *source,
 
 static unsigned
 bfin_wdog_io_read_buffer (struct hw *me, void *dest,
-			 int space, address_word addr, unsigned nr_bytes)
+			  int space, address_word addr, unsigned nr_bytes)
 {
   struct bfin_wdog *wdog = hw_data (me);
   bu32 mmr_off;
@@ -135,7 +135,7 @@ static const struct hw_port_descriptor bfin_wdog_ports[] = {
 
 static void
 bfin_wdog_port_event (struct hw *me, int my_port, struct hw *source,
-			 int source_port, int level)
+		      int source_port, int level)
 {
   struct bfin_wdog *wdog = hw_data (me);
   bu16 wdev;

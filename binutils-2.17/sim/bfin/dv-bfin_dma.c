@@ -269,8 +269,8 @@ bfin_dma_io_read_buffer (struct hw *me, void *dest,
 }
 
 static unsigned
-bfin_dma_hw_dma_read_buffer_method(struct hw *bus, void *dest, int space,
-				   unsigned_word addr, unsigned nr_bytes)
+bfin_dma_hw_dma_read_buffer_method (struct hw *bus, void *dest, int space,
+				    unsigned_word addr, unsigned nr_bytes)
 {
   struct bfin_dma *dma = hw_data (bus);
   unsigned ret, ele_count;
@@ -298,10 +298,10 @@ bfin_dma_hw_dma_read_buffer_method(struct hw *bus, void *dest, int space,
 }
 
 static unsigned
-bfin_dma_hw_dma_write_buffer_method(struct hw *bus, const void *source,
-				    int space, unsigned_word addr,
-				    unsigned nr_bytes,
-				    int violate_read_only_section)
+bfin_dma_hw_dma_write_buffer_method (struct hw *bus, const void *source,
+				     int space, unsigned_word addr,
+				     unsigned nr_bytes,
+				     int violate_read_only_section)
 {
   struct bfin_dma *dma = hw_data (bus);
   unsigned ret, ele_count;
