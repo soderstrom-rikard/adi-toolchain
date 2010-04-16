@@ -5168,11 +5168,6 @@ decode_dsp32shiftimm_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1)
 
       STORE (DREG (dst0), (val0 << 16) | val1);
     }
-  else if (sop == 1 && sopcde == 1 && bit8 == 1)
-    {
-      /* dregs = dregs >>> uimm5 (V,S) */
-      unhandled_instruction (cpu, "dregs = dregs >>> uimm5 (V,S)");
-    }
   else if (sop == 2 && sopcde == 1 && bit8 == 1)
     {
       int count = imm5 (newimmag);
@@ -5203,14 +5198,15 @@ decode_dsp32shiftimm_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1)
 
       STORE (DREG (dst0), val0 | (val1 << 16));
     }
-  else if (sop == 0 && sopcde == 1)
+  else if (sopcde == 1 && (sop == 0  || (sop == 1 && bit8 == 1)))
     {
       int count = uimm5 (newimmag);
       bu16 val0 = DREG (src1) & 0xFFFF;
       bu16 val1 = DREG (src1) >> 16;
       bu32 astat;
 
-      TRACE_INSN (cpu, "R%i = R%i >>> %i (V);", dst0, src1, count);
+      TRACE_INSN (cpu, "R%i = R%i >>> %i %s;", dst0, src1, count, 
+		sop == 0 ? "(V)" : "(V,S)");
 
       val0 = ashiftrt (cpu, val0, count, 16);
       astat = ASTAT;
