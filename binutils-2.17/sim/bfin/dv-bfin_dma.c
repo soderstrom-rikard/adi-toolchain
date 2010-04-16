@@ -57,6 +57,9 @@ bfin_dma_enabled (struct bfin_dma *dma)
 static struct hw *
 bfin_dma_get_peer (struct hw *me, struct bfin_dma *dma)
 {
+  /* Delay the stub check until when people try to use it.  */
+  if (dma->peer == NULL)
+    hw_abort (me, "Stub DMA -- missing \"peer\" property");
   return hw_tree_find_device (me, dma->peer);
 }
 
@@ -339,12 +342,17 @@ attach_bfin_dma_regs (struct hw *me, struct bfin_dma *dma)
   if (!hw_find_reg_array_property (me, "reg", 0, &reg))
     hw_abort (me, "\"reg\" property must contain three addr/size entries");
 
-  if (hw_find_property (me, "peer") == NULL)
-    hw_abort (me, "Missing \"peer\" property");
-
-  dma->peer = hw_find_string_property (me, "peer");
-  if (dma->peer == NULL)
-    hw_abort (me, "\"peer\" property must name a device");
+  if (hw_find_property (me, "peer"))
+    {
+      dma->peer = hw_find_string_property (me, "peer");
+      if (dma->peer == NULL)
+        hw_abort (me, "\"peer\" property must name a device");
+    }
+  else
+    {
+      /* Ignore for now -- let's people stub things out.  */
+      /* hw_abort (me, "Missing \"peer\" property"); */
+    }
 
   hw_unit_address_to_attach_address (hw_parent (me),
 				     &reg.address,

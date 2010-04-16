@@ -371,6 +371,8 @@ bfin_map_layout (SIM_DESC sd, SIM_CPU *cpu, size_t count,
 static void
 bfin_hw_tree_init (SIM_DESC sd)
 {
+  int i;
+
   dv_bfin_hw_parse (sd, cec, CEC);
   dv_bfin_hw_parse (sd, ctimer, CTIMER);
   sim_hw_parse (sd, "/core/bfin_ctimer > ivtmr ivtmr /core/bfin_cec");
@@ -382,18 +384,20 @@ bfin_hw_tree_init (SIM_DESC sd)
   dv_bfin_hw_parse (sd, ebiu_sdc, EBIU_SDC);
   dv_bfin_hw_parse (sd, pll, PLL);
   dv_bfin_hw_parse (sd, sic, SIC);
-  dv_bfin_hw_parse (sd, uart, UART);
 
   /* XXX: Should be pushed to the model code.  */
-  sim_hw_parse (sd, "/core/bfin_dma@0/reg %#x %i", 0xFFC00F00, 0x40); /* MDMA D0 */
-  sim_hw_parse (sd, "/core/bfin_dma@0/peer /core/bfin_dma@1");
-  sim_hw_parse (sd, "/core/bfin_dma@1/reg %#x %i", 0xFFC00F40, 0x40); /* MDMA S0 */
-  sim_hw_parse (sd, "/core/bfin_dma@1/peer /core/bfin_dma@0");
+  sim_hw_parse (sd, "/core/bfin_uart@0/reg %#x %i", 0xFFC00400, 0x30);
+  sim_hw_parse (sd, "/core/bfin_uart@1/reg %#x %i", 0xFFC02000, 0x30);
 
-  sim_hw_parse (sd, "/core/bfin_dma@2/reg %#x %i", 0xFFC00F80, 0x40); /* MDMA D1 */
-  sim_hw_parse (sd, "/core/bfin_dma@2/peer /core/bfin_dma@3");
-  sim_hw_parse (sd, "/core/bfin_dma@3/reg %#x %i", 0xFFC00FC0, 0x40); /* MDMA S1 */
-  sim_hw_parse (sd, "/core/bfin_dma@3/peer /core/bfin_dma@2");
+  for (i = 0; i < 16; ++i)
+    sim_hw_parse (sd, "/core/bfin_dma@%i/reg %#x %i", i, 0xFFC00C00 + i * 0x40, 0x40);
+  sim_hw_parse (sd, "/core/bfin_dma@12/peer /core/bfin_dma@13"); /* MDMA0 D->S */
+  sim_hw_parse (sd, "/core/bfin_dma@13/peer /core/bfin_dma@12"); /* MDMA0 S->D */
+  sim_hw_parse (sd, "/core/bfin_dma@14/peer /core/bfin_dma@15"); /* MDMA1 D->S */
+  sim_hw_parse (sd, "/core/bfin_dma@15/peer /core/bfin_dma@14"); /* MDMA1 S->D */
+
+  for (i = 7; i < 16; ++i)
+    sim_hw_parse (sd, "/core/bfin_sic > ivg%i ivg%i /core/bfin_cec", i, i);
 }
 
 static void
