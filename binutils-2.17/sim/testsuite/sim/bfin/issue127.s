@@ -1,5 +1,4 @@
 # mach: bfin
-# xfail: "need to implement SAA (dregs_pair, dregs_pair) in sim" bfin-*
 
 .include "testutils.inc"
 	start
