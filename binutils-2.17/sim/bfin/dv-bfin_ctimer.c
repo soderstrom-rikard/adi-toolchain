@@ -40,13 +40,24 @@ bfin_ctimer_enabled (struct bfin_ctimer *ctimer)
   return (ctimer->tcntl & TMPWR) && (ctimer->tcntl & TMREN);
 }
 
+static bu32
+bfin_ctimer_scale (struct bfin_ctimer *ctimer)
+{
+  /* Only low 8 bits are actually checked.  */
+  return (ctimer->tscale & 0xff) + 1;
+}
+
 static void
 bfin_ctimer_tick (struct hw *me, void *data)
 {
   struct bfin_ctimer *ctimer = data;
+  bu32 scale = bfin_ctimer_scale (ctimer);
 
-  if (--ctimer->tcount)
-    goto reschedule;
+  if (ctimer->tcount > scale)
+    {
+      ctimer->tcount -= scale;
+      goto reschedule;
+    }
 
   ctimer->tcntl |= TINT;
   if (ctimer->tcntl & TAUTORLD)
@@ -55,7 +66,7 @@ bfin_ctimer_tick (struct hw *me, void *data)
   hw_port_event (me, IVG_IVTMR, 1);
 
  reschedule:
-  hw_event_queue_schedule (me, ctimer->tscale + 1, bfin_ctimer_tick, ctimer);
+  hw_event_queue_schedule (me, scale, bfin_ctimer_tick, ctimer);
 }
 
 static unsigned
@@ -83,7 +94,8 @@ bfin_ctimer_io_write_buffer (struct hw *me, const void *source,
 
       if (bfin_ctimer_enabled (ctimer) && !ctimer->handler)
 	{
-	  ctimer->handler = hw_event_queue_schedule (me, ctimer->tscale + 1,
+	  ctimer->handler = hw_event_queue_schedule (me,
+						     bfin_ctimer_scale (ctimer),
 						     bfin_ctimer_tick, ctimer);
 	}
       else if (!bfin_ctimer_enabled (ctimer) && ctimer->handler)
