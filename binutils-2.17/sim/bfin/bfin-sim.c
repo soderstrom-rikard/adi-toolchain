@@ -4125,8 +4125,8 @@ decode_dsp32alu_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1)
     }
   else if (aop == 1 && aopcde == 12)
     {
-      bu32 val0 = ((AWREG (0) & 0xFFFF0000) >> 16) + (AWREG (0) & 0xFFFF);
-      bu32 val1 = ((AWREG (1) & 0xFFFF0000) >> 16) + (AWREG (1) & 0xFFFF);
+      bu32 val0 = (((AWREG (0) & 0xFFFF0000) >> 16) + (AWREG (0) & 0xFFFF)) & 0xFFFF;
+      bu32 val1 = (((AWREG (1) & 0xFFFF0000) >> 16) + (AWREG (1) & 0xFFFF)) & 0xFFFF;
 
       TRACE_INSN (cpu, "R%i = A1.L + A1.H, R%i = A0.L + A0.H;", dst1, dst0);
 
@@ -4246,10 +4246,61 @@ decode_dsp32alu_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1)
     }
   else if (aop == 0 && aopcde == 18)
     {
+      bu40 acc0 = get_extended_acc (cpu, 0);
+      bu40 acc1 = get_extended_acc (cpu, 1);
+      bu32 s0L = DREG(src0);
+      bu32 s0H = DREG(src0+1);
+      bu32 s1L = DREG(src1);
+      bu32 s1H = DREG(src1+1);
+      bu32 s0, s1;
+      bs16 tmp0, tmp1, tmp2, tmp3;
+
+      /* This instruction is only defined for register pairs R1:0 and R3:2 */
+      if (!((src0 == 0 || src0 == 2) && (src1 == 0) || (src1 == 2)))
+	illegal_instruction (cpu);
+
       TRACE_INSN (cpu, "SAA (R%i:%i, R%i:%i)%s", src0 + 1, src0, src1 + 1, src1,
 	s ? " (R)" :"");
 
-      unhandled_instruction (cpu, "SAA (dregs_pair, dregs_pair) aligndir");
+      /* Bit s determines the order of the two registers from a pair:
+       * if s=0 the low-order bytes come from the low reg in the pair,
+       * and if s=1 the low-order bytes come from the high reg.
+       */
+
+      if (s)
+	{
+	  s0 = algn(s0H, s0L, IREG (0) & 3);
+	  s1 = algn(s1H, s1L, IREG (1) & 3);
+	}
+      else
+	{
+	  s0 = algn(s0L, s0H, IREG (0) & 3);
+	  s1 = algn(s1L, s1H, IREG (1) & 3);
+	}
+
+      /* find the absolute difference between pairs, 
+       * make it absolute, then add it to the existing accumulator half
+       */
+      /* Byte 0 */
+      tmp0  = ((s0 << 24) >> 24) - ((s1 << 24) >> 24);
+      tmp1  = ((s0 << 16) >> 24) - ((s1 << 16) >> 24);
+      tmp2  = ((s0 <<  8) >> 24) - ((s1 <<  8) >> 24);
+      tmp3  =  (s0        >> 24) -  (s1        >> 24);
+
+      tmp0  = (tmp0 < 0) ? -tmp0 : tmp0;
+      tmp1  = (tmp1 < 0) ? -tmp1 : tmp1;
+      tmp2  = (tmp2 < 0) ? -tmp2 : tmp2;
+      tmp3  = (tmp3 < 0) ? -tmp3 : tmp3;
+
+      s0L = saturate_u16((bu32)tmp0 + ( acc0        & 0xffff));
+      s0H = saturate_u16((bu32)tmp1 + ((acc0 >> 16) & 0xffff));
+      s1L = saturate_u16((bu32)tmp2 + ( acc1        & 0xffff));
+      s1H = saturate_u16((bu32)tmp3 + ((acc1 >> 16) & 0xffff));
+
+      STORE (AWREG (0), (s0H << 16) | (s0L & 0xFFFF));
+      STORE (AXREG (0), 0);
+      STORE (AWREG (1), (s1H << 16) | (s1L & 0xFFFF));
+      STORE (AXREG (1), 0);
     }
   else if (aop == 3 && aopcde == 18)
     {
