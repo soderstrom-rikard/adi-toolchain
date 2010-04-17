@@ -36,6 +36,11 @@ struct bfin_cec
 #define mmr_base()      offsetof(struct bfin_cec, evt_override)
 #define mmr_offset(mmr) (offsetof(struct bfin_cec, mmr) - mmr_base())
 
+static const char * const mmr_names[] = {
+  "EVT_OVERRIDE", "IMASK", "IPEND", "ILAT", "IPRIO",
+};
+#define mmr_name(off) mmr_names[(off) / 4]
+
 static void _cec_raise (SIM_CPU *, struct bfin_cec *, int);
 
 static void
@@ -70,14 +75,15 @@ bfin_cec_io_write_buffer (struct hw *me, const void *source,
 			  int space, address_word addr, unsigned nr_bytes)
 {
   struct bfin_cec *cec = hw_data (me);
+  bu32 mmr_off;
   bu32 value;
 
-  value = dv_load_4(source);
+  value = dv_load_4 (source);
+  mmr_off = addr - cec->base;
 
-  HW_TRACE ((me, "write to 0x%08lx length %d with 0x%x", (long) addr,
-	     (int) nr_bytes, value));
+  HW_TRACE_WRITE ();
 
-  switch (addr - cec->base)
+  switch (mmr_off)
     {
     case mmr_offset(evt_override):
       cec->evt_override = value;
@@ -103,12 +109,15 @@ bfin_cec_io_read_buffer (struct hw *me, void *dest,
 			 int space, address_word addr, unsigned nr_bytes)
 {
   struct bfin_cec *cec = hw_data (me);
-  bu32 *value;
+  bu32 mmr_off;
+  bu32 *valuep;
 
-  HW_TRACE ((me, "read 0x%08lx length %d", (long) addr, (int) nr_bytes));
+  mmr_off = addr - cec->base;
+  valuep = (void *)((unsigned long)cec + mmr_base() + mmr_off);
 
-  value = &cec->evt_override + (addr - cec->base) / 4;
-  dv_store_4 (dest, *value);
+  HW_TRACE_READ ();
+
+  dv_store_4 (dest, *valuep);
 
   return nr_bytes;
 }

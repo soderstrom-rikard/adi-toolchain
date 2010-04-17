@@ -64,6 +64,18 @@ struct bfin_uart
 #define mmr_base()      offsetof(struct bfin_uart, dll)
 #define mmr_offset(mmr) (offsetof(struct bfin_uart, mmr) - mmr_base())
 
+static const char * const mmr_names[] = {
+  "RBR/THR", "IER", "IIR", "LCR", "MCR", "LSR", "MSR", "SCR", "<INV>", "GCTL",
+};
+static const char *mmr_name (struct bfin_uart *uart, bu32 idx)
+{
+  if (uart->lcr & DLAB)
+    if (idx < 2)
+      return idx == 0 ? "DLL" : "DLH";
+  return mmr_names[idx];
+}
+#define mmr_name(off) mmr_name (uart, (off) / 4)
+
 static unsigned
 bfin_uart_io_write_buffer (struct hw *me, const void *source,
 			   int space, address_word addr, unsigned nr_bytes)
@@ -74,16 +86,14 @@ bfin_uart_io_write_buffer (struct hw *me, const void *source,
   bu16 *valuep;
 
   value = dv_load_2 (source);
+  mmr_off = addr - uart->base;
+  valuep = (void *)((unsigned long)uart + mmr_base() + mmr_off);
 
-  HW_TRACE ((me, "write to 0x%08lx length %d with 0x%x", (long) addr,
-	     (int) nr_bytes, value));
+  HW_TRACE_WRITE ();
 
   dv_bfin_require_16 (me, addr, nr_bytes);
 
   /* XXX: All MMRs are "8bit" ... what happens to high 8bits ?  */
-
-  mmr_off = addr - uart->base;
-  valuep = (void *)((unsigned long)uart + mmr_base() + mmr_off);
 
   switch (mmr_off)
     {
@@ -188,12 +198,12 @@ bfin_uart_io_read_buffer (struct hw *me, void *dest,
   bu32 mmr_off;
   bu16 *valuep;
 
-  HW_TRACE ((me, "read 0x%08lx length %d", (long) addr, (int) nr_bytes));
-
-  dv_bfin_require_16 (me, addr, nr_bytes);
-
   mmr_off = addr - uart->base;
   valuep = (void *)((unsigned long)uart + mmr_base() + mmr_off);
+
+  HW_TRACE_READ ();
+
+  dv_bfin_require_16 (me, addr, nr_bytes);
 
   switch (mmr_off)
     {

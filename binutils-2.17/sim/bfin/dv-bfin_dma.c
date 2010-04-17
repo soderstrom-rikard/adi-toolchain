@@ -48,6 +48,13 @@ struct bfin_dma
 #define mmr_base()      offsetof(struct bfin_dma, next_desc_ptr)
 #define mmr_offset(mmr) (offsetof(struct bfin_dma, mmr) - mmr_base())
 
+static const char * const mmr_names[] = {
+  "NEXT_DESC_PTR", "START_ADDR", "CONFIG", "<INV>", "X_COUNT", "X_MODIFY",
+  "Y_COUNT", "Y_MODIFY", "CURR_DESC_PTR", "CURR_ADDR", "IRQ_STATUS",
+  "PERIPHERAL_MAP", "CURR_X_COUNT", "<INV>", "CURR_Y_COUNT", "<INV>",
+};
+#define mmr_name(off) mmr_names[(off) / 4]
+
 static bool
 bfin_dma_enabled (struct bfin_dma *dma)
 {
@@ -173,13 +180,12 @@ bfin_dma_io_write_buffer (struct hw *me, const void *source,
   else
     value = dv_load_2 (source);
 
-  HW_TRACE ((me, "write to 0x%08lx length %d with 0x%x", (long) addr,
-	     (int) nr_bytes, value));
-
   mmr_off = addr - dma->base;
   valuep = (void *)((unsigned long)dma + mmr_base() + mmr_off);
   value16p = valuep;
   value32p = valuep;
+
+  HW_TRACE_WRITE ();
 
   /* XXX: All registers are RO when DMA is enabled (except IRQ_STATUS).
           But does the HW discard writes or send up IVGHW ?  The sim
@@ -252,12 +258,12 @@ bfin_dma_io_read_buffer (struct hw *me, void *dest,
   bu32 *value32p;
   void *valuep;
 
-  HW_TRACE ((me, "read 0x%08lx length %d", (long) addr, (int) nr_bytes));
-
   mmr_off = addr - dma->base;
   valuep = (void *)((unsigned long)dma + mmr_base() + mmr_off);
   value16p = valuep;
   value32p = valuep;
+
+  HW_TRACE_READ ();
 
   /* Hardware lets you read all MMRs as 16 or 32 bits, even reserved.  */
   if (nr_bytes == 4)

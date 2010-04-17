@@ -26,22 +26,33 @@
 struct bfin_evt
 {
   bu32 base;
+
+  /* Order after here is important -- matches hardware MMR layout.  */
   bu32 evt[16];
 };
+#define mmr_base()      offsetof(struct bfin_evt, evt[0])
+#define mmr_offset(mmr) (offsetof(struct bfin_evt, mmr) - mmr_base())
+
+static const char * const mmr_names[] = {
+  "EVT0", "EVT1", "EVT2", "EVT3", "EVT4", "EVT5", "EVT6", "EVT7", "EVT8",
+  "EVT9", "EVT10", "EVT11", "EVT12", "EVT13", "EVT14", "EVT15",
+};
+#define mmr_name(off) mmr_names[(off) / 4]
 
 static unsigned
 bfin_evt_io_write_buffer (struct hw *me, const void *source,
 			  int space, address_word addr, unsigned nr_bytes)
 {
   struct bfin_evt *evt = hw_data (me);
+  bu32 mmr_off;
   bu32 value;
 
   value = dv_load_4 (source);
+  mmr_off = addr - evt->base;
 
-  HW_TRACE ((me, "write to 0x%08lx length %d with 0x%x", (long) addr,
-	     (int) nr_bytes, value));
+  HW_TRACE_WRITE ();
 
-  evt->evt[(addr - evt->base) / 4] = value;
+  evt->evt[mmr_off / 4] = value;
 
   return nr_bytes;
 }
@@ -51,11 +62,14 @@ bfin_evt_io_read_buffer (struct hw *me, void *dest,
 			 int space, address_word addr, unsigned nr_bytes)
 {
   struct bfin_evt *evt = hw_data (me);
+  bu32 mmr_off;
   bu32 value;
 
-  HW_TRACE ((me, "read 0x%08lx length %d", (long) addr, (int) nr_bytes));
+  mmr_off = addr - evt->base;
 
-  value = evt->evt[(addr - evt->base) / 4];
+  HW_TRACE_READ ();
+
+  value = evt->evt[mmr_off / 4];
 
   dv_store_4 (dest, value);
 

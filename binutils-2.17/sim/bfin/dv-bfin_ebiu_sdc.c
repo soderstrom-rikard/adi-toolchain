@@ -35,6 +35,11 @@ struct bfin_ebiu_sdc
 #define mmr_base()      offsetof(struct bfin_ebiu_sdc, sdgctl)
 #define mmr_offset(mmr) (offsetof(struct bfin_ebiu_sdc, mmr) - mmr_base())
 
+static const char * const mmr_names[] = {
+  "SDGCTL", "SDBCTL", "SDRRC", "SDSTAT",
+};
+#define mmr_name(off) mmr_names[(off) / 4]
+
 static unsigned
 bfin_ebiu_sdc_io_write_buffer (struct hw *me, const void *source,
 			       int space, address_word addr, unsigned nr_bytes)
@@ -51,13 +56,12 @@ bfin_ebiu_sdc_io_write_buffer (struct hw *me, const void *source,
   else
     value = dv_load_2 (source);
 
-  HW_TRACE ((me, "write to 0x%08lx length %d with 0x%x", (long) addr,
-	     (int) nr_bytes, value));
-
   mmr_off = addr - sdc->base;
   valuep = (void *)((unsigned long)sdc + mmr_base() + mmr_off);
   value16p = valuep;
   value32p = valuep;
+
+  HW_TRACE_WRITE ();
 
   switch (mmr_off)
     {
@@ -93,12 +97,12 @@ bfin_ebiu_sdc_io_read_buffer (struct hw *me, void *dest,
   bu16 *value16p;
   void *valuep;
 
-  HW_TRACE ((me, "read 0x%08lx length %d", (long) addr, (int) nr_bytes));
-
   mmr_off = addr - sdc->base;
   valuep = (void *)((unsigned long)sdc + mmr_base() + mmr_off);
   value16p = valuep;
   value32p = valuep;
+
+  HW_TRACE_READ ();
 
   switch (mmr_off)
     {

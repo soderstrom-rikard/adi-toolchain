@@ -40,6 +40,11 @@ struct bfin_pll
 #define mmr_base()      offsetof(struct bfin_pll, pll_ctl)
 #define mmr_offset(mmr) (offsetof(struct bfin_pll, mmr) - mmr_base())
 
+static const char * const mmr_names[] = {
+  "PLL_CTL", "PLL_DIV", "VR_CTL", "PLL_STAT", "PLL_LOCKCNT", "CHIPID",
+};
+#define mmr_name(off) mmr_names[(off) / 4]
+
 static unsigned
 bfin_pll_io_write_buffer (struct hw *me, const void *source,
 			  int space, address_word addr, unsigned nr_bytes)
@@ -56,13 +61,12 @@ bfin_pll_io_write_buffer (struct hw *me, const void *source,
   else
     value = dv_load_2 (source);
 
-  HW_TRACE ((me, "write to 0x%08lx length %d with 0x%x", (long) addr,
-	     (int) nr_bytes, value));
-
   mmr_off = addr - pll->base;
   valuep = (void *)((unsigned long)pll + mmr_base() + mmr_off);
   value16p = valuep;
   value32p = valuep;
+
+  HW_TRACE_WRITE ();
 
   switch (mmr_off)
     {
@@ -90,12 +94,12 @@ bfin_pll_io_read_buffer (struct hw *me, void *dest,
   bu16 *value16p;
   void *valuep;
 
-  HW_TRACE ((me, "read 0x%08lx length %d", (long) addr, (int) nr_bytes));
-
   mmr_off = addr - pll->base;
   valuep = (void *)((unsigned long)pll + mmr_base() + mmr_off);
   value16p = valuep;
   value32p = valuep;
+
+  HW_TRACE_READ ();
 
   switch (mmr_off)
     {

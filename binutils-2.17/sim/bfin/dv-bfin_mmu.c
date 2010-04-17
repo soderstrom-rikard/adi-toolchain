@@ -24,6 +24,7 @@
 #include "dv-bfin_cec.h"
 
 /* XXX: This is a stub implementation for the most part.  */
+/* XXX: Should this really be two blocks of registers ?  */
 
 struct bfin_mmu
 {
@@ -57,6 +58,33 @@ struct bfin_mmu
 };
 #define mmr_base()      offsetof(struct bfin_mmu, sram_base_address)
 #define mmr_offset(mmr) (offsetof(struct bfin_mmu, mmr) - mmr_base())
+#define mmr_idx(mmr)    (mmr_offset (mmr) / 4)
+
+static const char * const mmr_names[] = {
+  "SRAM_BASE_ADDRESS", "DMEM_CONTROL", "DCPLB_FAULT_STATUS", "DCPLB_FAULT_ADDR",
+  [mmr_idx (dcplb_addr[0])] = "DCPLB_ADDR0",
+  "DCPLB_ADDR1", "DCPLB_ADDR2", "DCPLB_ADDR3", "DCPLB_ADDR4", "DCPLB_ADDR5",
+  "DCPLB_ADDR6", "DCPLB_ADDR7", "DCPLB_ADDR8", "DCPLB_ADDR9", "DCPLB_ADDR10",
+  "DCPLB_ADDR11", "DCPLB_ADDR12", "DCPLB_ADDR13", "DCPLB_ADDR14", "DCPLB_ADDR15",
+  [mmr_idx (dcplb_data[0])] = "DCPLB_DATA0",
+  "DCPLB_DATA1", "DCPLB_DATA2", "DCPLB_DATA3", "DCPLB_DATA4", "DCPLB_DATA5",
+  "DCPLB_DATA6", "DCPLB_DATA7", "DCPLB_DATA8", "DCPLB_DATA9", "DCPLB_DATA10",
+  "DCPLB_DATA11", "DCPLB_DATA12", "DCPLB_DATA13", "DCPLB_DATA14", "DCPLB_DATA15",
+  [mmr_idx (dtest_command)] = "DTEST_COMMAND",
+  [mmr_idx (dtest_data[0])] = "DTEST_DATA0", "DTEST_DATA1",
+  [mmr_idx (imem_control)] = "IMEM_CONTROL", "ICPLB_FAULT_STATUS", "ICPLB_FAULT_ADDR",
+  [mmr_idx (icplb_addr[0])] = "ICPLB_ADDR0",
+  "ICPLB_ADDR1", "ICPLB_ADDR2", "ICPLB_ADDR3", "ICPLB_ADDR4", "ICPLB_ADDR5",
+  "ICPLB_ADDR6", "ICPLB_ADDR7", "ICPLB_ADDR8", "ICPLB_ADDR9", "ICPLB_ADDR10",
+  "ICPLB_ADDR11", "ICPLB_ADDR12", "ICPLB_ADDR13", "ICPLB_ADDR14", "ICPLB_ADDR15",
+  [mmr_idx (icplb_data[0])] = "ICPLB_DATA0",
+  "ICPLB_DATA1", "ICPLB_DATA2", "ICPLB_DATA3", "ICPLB_DATA4", "ICPLB_DATA5",
+  "ICPLB_DATA6", "ICPLB_DATA7", "ICPLB_DATA8", "ICPLB_DATA9", "ICPLB_DATA10",
+  "ICPLB_DATA11", "ICPLB_DATA12", "ICPLB_DATA13", "ICPLB_DATA14", "ICPLB_DATA15",
+  [mmr_idx (itest_command)] = "ITEST_COMMAND",
+  [mmr_idx (itest_data[0])] = "ITEST_DATA0", "ITEST_DATA1",
+};
+#define mmr_name(off) (mmr_names[(off) / 4] ? : "<INV>")
 
 static unsigned
 bfin_mmu_io_write_buffer (struct hw *me, const void *source,
@@ -69,11 +97,10 @@ bfin_mmu_io_write_buffer (struct hw *me, const void *source,
 
   value = dv_load_4 (source);
 
-  HW_TRACE ((me, "write to 0x%08lx length %d with 0x%x", (long) addr,
-	     (int) nr_bytes, value));
-
   mmr_off = addr - mmu->base;
   valuep = (void *)((unsigned long)mmu + mmr_base() + mmr_off);
+
+  HW_TRACE_WRITE ();
 
   switch (mmr_off)
     {
@@ -116,10 +143,10 @@ bfin_mmu_io_read_buffer (struct hw *me, void *dest,
   bu32 mmr_off;
   bu32 *valuep;
 
-  HW_TRACE ((me, "read 0x%08lx length %d", (long) addr, (int) nr_bytes));
-
   mmr_off = addr - mmu->base;
   valuep = (void *)((unsigned long)mmu + mmr_base() + mmr_off);
+
+  HW_TRACE_READ ();
 
   switch (mmr_off)
     {

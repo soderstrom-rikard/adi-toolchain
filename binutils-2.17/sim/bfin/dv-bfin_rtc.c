@@ -42,6 +42,11 @@ struct bfin_rtc
 #define mmr_base()      offsetof(struct bfin_rtc, rtc_stat)
 #define mmr_offset(mmr) (offsetof(struct bfin_rtc, mmr) - mmr_base())
 
+static const char * const mmr_names[] = {
+  "RTC_STAT", "RTC_ICTL", "RTC_ISTAT", "RTC_SWCNT", "RTC_ALARM", "RTC_PREN",
+};
+#define mmr_name(off) mmr_names[(off) / 4]
+
 static unsigned
 bfin_rtc_io_write_buffer (struct hw *me, const void *source,
 			  int space, address_word addr, unsigned nr_bytes)
@@ -58,13 +63,12 @@ bfin_rtc_io_write_buffer (struct hw *me, const void *source,
   else
     value = dv_load_2 (source);
 
-  HW_TRACE ((me, "write to 0x%08lx length %d with 0x%x", (long) addr,
-	     (int) nr_bytes, value));
-
   mmr_off = addr - rtc->base;
   valuep = (void *)((unsigned long)rtc + mmr_base() + mmr_off);
   value16p = valuep;
   value32p = valuep;
+
+  HW_TRACE_WRITE ();
 
   /* XXX: These probably need more work.  */
   switch (mmr_off)
@@ -97,12 +101,12 @@ bfin_rtc_io_read_buffer (struct hw *me, void *dest,
   bu32 *value32p;
   void *valuep;
 
-  HW_TRACE ((me, "read 0x%08lx length %d", (long) addr, (int) nr_bytes));
-
   mmr_off = addr - rtc->base;
   valuep = (void *)((unsigned long)rtc + mmr_base() + mmr_off);
   value16p = valuep;
   value32p = valuep;
+
+  HW_TRACE_READ ();
 
   switch (mmr_off)
     {

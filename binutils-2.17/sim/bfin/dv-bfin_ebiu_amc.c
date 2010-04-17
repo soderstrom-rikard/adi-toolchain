@@ -38,6 +38,11 @@ struct bfin_ebiu_amc
 #define mmr_base()      offsetof(struct bfin_ebiu_amc, amgctl)
 #define mmr_offset(mmr) (offsetof(struct bfin_ebiu_amc, mmr) - mmr_base())
 
+static const char * const mmr_names[] = {
+  "AMGCTL", "AMBCTL0", "AMBCTL1", "MSBCTL", "ARBSTAT", "MODE", "FCTL",
+};
+#define mmr_name(off) mmr_names[(off) / 4]
+
 static void
 bfin_ebiu_amc_write_amgctl (struct hw *me, struct bfin_ebiu_amc *amc,
 			    bu16 amgctl)
@@ -68,14 +73,15 @@ bfin_ebiu_amc_io_write_buffer (struct hw *me, const void *source,
 			       int space, address_word addr, unsigned nr_bytes)
 {
   struct bfin_ebiu_amc *amc = hw_data (me);
+  bu32 mmr_off;
   bu32 value;
 
-  value = dv_load_4(source);
+  value = dv_load_4 (source);
+  mmr_off = addr - amc->base;
 
-  HW_TRACE ((me, "write to 0x%08lx length %d with 0x%x", (long) addr,
-	     (int) nr_bytes, value));
+  HW_TRACE_WRITE ();
 
-  switch (addr - amc->base)
+  switch (mmr_off)
     {
     case mmr_offset(amgctl):
       dv_bfin_require_16 (me, addr, nr_bytes);
@@ -119,12 +125,12 @@ bfin_ebiu_amc_io_read_buffer (struct hw *me, void *dest,
   bu16 *value16;
   void *valuep;
 
-  HW_TRACE ((me, "read 0x%08lx length %d", (long) addr, (int) nr_bytes));
-
   mmr_off = addr - amc->base;
   valuep = (void *)((unsigned long)amc + mmr_base() + mmr_off);
   value16 = valuep;
   value32 = valuep;
+
+  HW_TRACE_READ ();
 
   switch (mmr_off)
     {

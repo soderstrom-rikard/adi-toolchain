@@ -42,6 +42,12 @@ struct bfin_sic
 #define mmr_base()      offsetof(struct bfin_sic, swrst)
 #define mmr_offset(mmr) (offsetof(struct bfin_sic, mmr) - mmr_base())
 
+static const char * const mmr_names[] = {
+  "SWRST", "SYSCR", "SIC_RVECT", "SIC_IMASK", "SIC_IAR0", "SIC_IAR1",
+  "SIC_IAR2", "SIC_IAR3", "SIC_ISR", "SIC_IWR",
+};
+#define mmr_name(off) mmr_names[(off) / 4]
+
 static unsigned
 bfin_sic_io_write_buffer (struct hw *me, const void *source,
 			  int space, address_word addr, unsigned nr_bytes)
@@ -58,13 +64,12 @@ bfin_sic_io_write_buffer (struct hw *me, const void *source,
   else
     value = dv_load_2 (source);
 
-  HW_TRACE ((me, "write to 0x%08lx length %d with 0x%x", (long) addr,
-	     (int) nr_bytes, value));
-
   mmr_off = addr - sic->base;
   valuep = (void *)((unsigned long)sic + mmr_base() + mmr_off);
   value16p = valuep;
   value32p = valuep;
+
+  HW_TRACE_WRITE ();
 
   /* XXX: Discard all SIC writes for now.  */
   switch (mmr_off)
@@ -103,10 +108,10 @@ bfin_sic_io_read_buffer (struct hw *me, void *dest,
   bu32 mmr_off;
   bu32 *valuep;
 
-  HW_TRACE ((me, "read 0x%08lx length %d", (long) addr, (int) nr_bytes));
-
   mmr_off = addr - sic->base;
   valuep = (void *)((unsigned long)sic + mmr_base() + mmr_off);
+
+  HW_TRACE_READ ();
 
   switch (mmr_off)
     {

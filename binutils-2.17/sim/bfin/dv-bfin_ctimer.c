@@ -34,6 +34,11 @@ struct bfin_ctimer
 #define mmr_base()      offsetof(struct bfin_ctimer, tcntl)
 #define mmr_offset(mmr) (offsetof(struct bfin_ctimer, mmr) - mmr_base())
 
+static const char * const mmr_names[] = {
+  "TCNTL", "TPERIOD", "TSCALE", "TCOUNT",
+};
+#define mmr_name(off) mmr_names[(off) / 4]
+
 static bool
 bfin_ctimer_enabled (struct bfin_ctimer *ctimer)
 {
@@ -79,12 +84,10 @@ bfin_ctimer_io_write_buffer (struct hw *me, const void *source,
   bu32 *valuep;
 
   value = dv_load_4 (source);
-
-  HW_TRACE ((me, "write to 0x%08lx length %d with 0x%x", (long) addr,
-	     (int) nr_bytes, value));
-
   mmr_off = addr - ctimer->base;
   valuep = (void *)((unsigned long)ctimer + mmr_base() + mmr_off);
+
+  HW_TRACE_WRITE ();
 
   switch (mmr_off)
     {
@@ -135,10 +138,10 @@ bfin_ctimer_io_read_buffer (struct hw *me, void *dest,
   bu32 mmr_off;
   bu32 *valuep;
 
-  HW_TRACE ((me, "read 0x%08lx length %d", (long) addr, (int) nr_bytes));
-
   mmr_off = addr - ctimer->base;
   valuep = (void *)((unsigned long)ctimer + mmr_base() + mmr_off);
+
+  HW_TRACE_READ ();
 
   dv_store_4 (dest, *valuep);
 

@@ -54,6 +54,11 @@ struct bfin_trace
 #define mmr_base()      offsetof(struct bfin_trace, tbufctl)
 #define mmr_offset(mmr) (offsetof(struct bfin_trace, mmr) - mmr_base())
 
+static const char * const mmr_names[] = {
+  "TBUFCTL", "TBUFSTAT", [mmr_offset (tbuf) / 4] = "TBUF",
+};
+#define mmr_name(off) (mmr_names[(off) / 4] ? : "<INV>")
+
 /* Ugh, circular buffers.  */
 #define TBUF_LEN(t) ((t)->top - (t)->bottom)
 #define TBUF_IDX(i) ((i) & SIM_BFIN_TRACE_LEN_MASK)
@@ -69,14 +74,15 @@ bfin_trace_io_write_buffer (struct hw *me, const void *source,
 			    int space, address_word addr, unsigned nr_bytes)
 {
   struct bfin_trace *trace = hw_data (me);
+  bu32 mmr_off;
   bu32 value;
 
   value = dv_load_4 (source);
+  mmr_off = addr - trace->base;
 
-  HW_TRACE ((me, "write to 0x%08lx length %d with 0x%x", (long) addr,
-	     (int) nr_bytes, value));
+  HW_TRACE_WRITE ();
 
-  switch (addr - trace->base)
+  switch (mmr_off)
     {
     case mmr_offset(tbufctl):
       trace->tbufctl = value;
@@ -98,11 +104,14 @@ bfin_trace_io_read_buffer (struct hw *me, void *dest,
 			   int space, address_word addr, unsigned nr_bytes)
 {
   struct bfin_trace *trace = hw_data (me);
+  bu32 mmr_off;
   bu32 value;
 
-  HW_TRACE ((me, "read 0x%08lx length %d", (long) addr, (int) nr_bytes));
+  mmr_off = addr - trace->base;
 
-  switch (addr - trace->base)
+  HW_TRACE_READ ();
+
+  switch (mmr_off)
     {
     case mmr_offset(tbufctl):
       value = trace->tbufctl;
