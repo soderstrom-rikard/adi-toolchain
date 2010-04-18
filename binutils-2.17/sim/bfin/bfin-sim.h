@@ -272,8 +272,8 @@ struct bfin_cpu_state
 #define SET_CCREG(val) SET_ASTATREG (cc, val)
 
 #define SYSCFG_SSSTEP	(1 << 0)
-#define SYSCFG_CCEN	(2 << 0)
-#define SYSCFG_SNEN	(3 << 0)
+#define SYSCFG_CCEN	(1 << 1)
+#define SYSCFG_SNEN	(1 << 2)
 
 #define __PUT_MEM(taddr, v, size) \
 do { \
