@@ -329,14 +329,33 @@ get_allreg_name (int grp, int reg)
   return greg_names[(grp << 3) | reg];
 }
 
-/* aop * 4 + x * 2 + s */
-const char * const amod0amod2_names[] =
+static const char *
+amod0amod2 (int s0, int x0, int aop0)
 {
-  "",       "(S)",      "(CO)",      "(SCO)",
-  "(ill1)", "(ill2)",    "(ill3)",    "(ill4)",
-  "(ASR)",  "(S, ASR)", "(CO, ASR)", "(SCO, ASR)"
-  "(ASL)",  "(S, ASL)", "(CO, ASL)", "(SCO, ASL)",
-};
+  if (s0 == 1 && x0 == 0 && aop0 == 0)
+    return " (S)";
+  else if (s0 == 0 && x0 == 1 && aop0 == 0)
+    return " (CO)";
+  else if (s0 == 1 && x0 == 1 && aop0 == 0)
+    return " (SCO)";
+  else if (s0 == 0 && x0 == 0 && aop0 == 2)
+    return " (ASR)";
+  else if (s0 == 1 && x0 == 0 && aop0 == 2)
+    return " (S, ASR)";
+  else if (s0 == 0 && x0 == 1 && aop0 == 2)
+    return  " (CO, ASR)";
+  else if (s0 == 1 && x0 == 1 && aop0 == 2)
+    return " (SCO, ASR)";
+  else if (s0 == 0 && x0 == 0 && aop0 == 3)
+    return " (ASL)";
+  else if (s0 == 1 && x0 == 0 && aop0 == 3)
+    return " (S, ASL)";
+  else if (s0 == 0 && x0 == 1 && aop0 == 3)
+    return " (CO, ASL)";
+  else if (s0 == 1 && x0 == 1 && aop0 == 3)
+    return " (SCO, ASL)";
+  return "";
+}
 
 static const char *
 amod1 (int s0, int x0)
@@ -346,6 +365,18 @@ amod1 (int s0, int x0)
   else if (s0 == 1 && x0 == 0)
     return " (S)";
  return "";
+}
+
+static const char *
+amod0 (int s0, int x0)
+{
+  if (s0 == 1 && x0 == 0)
+    return " (S)";
+  else if (s0 == 0 && x0 == 1)
+    return " (CO)";
+  else if (s0 == 1 && x0 == 1)
+    return " (SCO)";
+  return "";
 }
 
 static bu32 *
@@ -3718,11 +3749,12 @@ decode_dsp32alu_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1)
     {
       bu32 s1, s2, val;
 
-      TRACE_INSN (cpu, "R%i.%c = R%i.%c %c R%i.%c;",
+      TRACE_INSN (cpu, "R%i.%c = R%i.%c %c R%i.%c%s;",
 		  dst0, HL ? 'H' : 'L',
 		  src0, aop & 2 ? 'L' : 'H',
 		  aopcde == 2 ? '+' : '-',
-		  src1, aop & 1 ? 'L' : 'H');
+		  src1, aop & 1 ? 'L' : 'H',
+		  amod1 (s, x));
 
       s1 = DREG (src0);
       s2 = DREG (src1);
@@ -4093,7 +4125,6 @@ decode_dsp32alu_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1)
     }
   else if (aopcde == 0)
     {
-      const char * const amods[] = { "", " (S)", " (CO)", " (SCO)" };
       bu32 s0 = DREG (src0);
       bu32 s1 = DREG (src1);
       bu32 s0h = s0 >> 16;
@@ -4105,7 +4136,7 @@ decode_dsp32alu_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1)
       int v0 = 1;
       TRACE_INSN (cpu, "R%i = R%i %c|%c R%i%s;", dst0, src0,
 		  (aop & 2) ? '-' : '+', (aop & 1) ? '-' : '+', src1,
-		  amods[s + (x << 1)]);
+		  amod0 (s, x));
       if (aop & 2)
 	t0 = sub16 (cpu, s0h, s1h, &ASTATREG (ac1), &v0, s, 0);
       else
@@ -4144,9 +4175,9 @@ decode_dsp32alu_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1)
     {
       bu32 d0, d1;
 
-      TRACE_INSN (cpu, "R%i = R%i %s R%i, R%i = R%i %s R%i %s;",
+      TRACE_INSN (cpu, "R%i = R%i %s R%i, R%i = R%i %s R%i%s;",
 		  dst1, src0, HL ? "+|-" : "+|+", src1, dst0, src0, HL ? "-|+" : "-|-", src1,
-		  amod0amod2_names[aop * 4 + x * 2 + s]);
+		  amod0amod2(s, x, aop));
 
       if (HL == 0)
 	{
@@ -4206,12 +4237,12 @@ decode_dsp32alu_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1)
     }
   else if (aop == 0 && aopcde == 4)
     {
-      TRACE_INSN (cpu, "R%i = R%i + R%i;", dst0, src0, src1);
+      TRACE_INSN (cpu, "R%i = R%i + R%i%s;", dst0, src0, src1, amod1 (s, x));
       SET_DREG (dst0, add32 (cpu, DREG (src0), DREG (src1), 1, s));
     }
   else if (aop == 1 && aopcde == 4)
     {
-      TRACE_INSN (cpu, "R%i = R%i - R%i;", dst0, src0, src1);
+      TRACE_INSN (cpu, "R%i = R%i - R%i%s;", dst0, src0, src1, amod1 (s, x));
       SET_DREG (dst0, sub32 (cpu, DREG (src0), DREG (src1), 1, s, 0));
     }
   else if (aop == 2 && aopcde == 4)
