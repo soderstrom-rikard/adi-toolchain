@@ -14,16 +14,16 @@
 	R3 = [ P0 ++ ];
 	R4 = [ P0 ++ ];
 
-	dbg r0;
-	dbg r1;
-	dbg r2;
-	dbg r3;
-	dbg r4;
+	_dbg r0;
+	_dbg r1;
+	_dbg r2;
+	_dbg r3;
+	_dbg r4;
 
 	R7 = 0;
 	ASTAT = R7;
 	r5 = r1 << 0x4 (s);
-	DBG ASTAT;
+	_DBG ASTAT;
 	r7=astat;
 	dbga (r5.h, 0x7fff);
 	dbga (r5.l, 0xffff);
@@ -33,7 +33,7 @@
 	R7 = 0;
 	ASTAT = R7;
 	r5.h = r1.h << 0x4 (s);
-	DBG ASTAT;
+	_DBG ASTAT;
 	r7=astat;
 	dbga (r5.h, 0x7fff);
 	dbga (r7.h, 0x0300);	// V=1, VS=1
@@ -43,13 +43,13 @@
 	A0.w = r1;
 	A0.x = r0.l;
 	r6 = 0x3;
-	dbg r6;
-	dbg A0;
+	_dbg r6;
+	_dbg A0;
 	R7 = 0;
 	ASTAT = R7;
 	A0 = ASHIFT A0 BY R6.L;
-	DBG ASTAT;
-	DBG A0;
+	_DBG ASTAT;
+	_DBG A0;
 	r7 = astat;
 	dbga (r7.h, 0x0);	// AV0=0, AV0S=0
 	dbga (r7.l, 0x2);	// AN = 1
@@ -58,12 +58,12 @@
 	A1 = r1;
 	A1.x = r0.l;
 	r6 = 0x3;
-	dbg A1;
+	_dbg A1;
 	R7 = 0;
 	ASTAT = R7;
 	A1 = ASHIFT A1 BY R6.L;
-	DBG ASTAT;
-	DBG A1;
+	_DBG ASTAT;
+	_DBG A1;
 	r7 = astat;
 	dbga (r7.h, 0x0);	// AV1=0, AV1S=0
 	dbga (r7.l, 0x2);	// AN = 1

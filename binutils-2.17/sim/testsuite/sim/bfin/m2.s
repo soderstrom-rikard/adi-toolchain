@@ -26,10 +26,10 @@
 	A1 = A0 = 0;
 	A1 += R0.L * R1.L, A0 += R0.L * R1.L;
 	R6 = A1.w;
-	DBG ASTAT;
-	DBG A0;
+	_DBG ASTAT;
+	_DBG A0;
 	R7.L = A1.x;
-	DBG ASTAT;
+	_DBG ASTAT;
 	DBGA ( R6.L , 0x0002 );
 	DBGA ( R6.H , 0x7ffe );
 	DBGA ( R7.L , 0x0000 );
@@ -49,7 +49,7 @@
 	DBGA ( R6.L , 0x0000 );
 	DBGA ( R6.H , 0x8001 );
 	DBGA ( R7.L , 0xffff );
-	DBG ASTAT;
+	_DBG ASTAT;
 	R7 = ASTAT;
 	DBGA (R7.H, 0x0);
 	DBGA (R7.L, 0x0);
@@ -100,9 +100,9 @@
 	A0.x = R4.L;
 	A1 += R0.L * R1.H, A0 += R0.L * R1.H;
 	R6 = A1.w;
-	DBG ASTAT;
+	_DBG ASTAT;
 	R7.L = A1.x;
-	DBG ASTAT;
+	_DBG ASTAT;
 	DBGA ( R6.L , 0x0000 );
 	DBGA ( R6.H , 0x0000 );
 	DBGA ( R7.L , 0xff80 );
@@ -142,9 +142,9 @@
 	A0.x = R4.L;
 	A1 -= R0.L * R1.L, A0 -= R0.L * R1.L;
 	R6 = A1.w;
-	DBG ASTAT;
+	_DBG ASTAT;
 	R7.L = A1.x;
-	DBG ASTAT;
+	_DBG ASTAT;
 	DBGA ( R6.L , 0x0000 );
 	DBGA ( R6.H , 0x0000 );
 	DBGA ( R7.L , 0xff80 );
@@ -160,9 +160,9 @@
 	A1 = A0 = 0;
 	A1 -= R0.H * R1.H, A0 -= R0.H * R1.H;
 	R6 = A1.w;
-	DBG ASTAT;
+	_DBG ASTAT;
 	R7.L = A1.x;
-	DBG ASTAT;
+	_DBG ASTAT;
 
 	DBGA ( R6.L , 0x0000 );
 	DBGA ( R6.H , 0x8000 );
@@ -216,7 +216,7 @@
 	ASTAT = R7;
 	A1 = A0 = 0;
 	A1 += R0.H * R1.H;
-	DBG A1;
+	_DBG A1;
 	R6 = A1.w;
 	R7.L = A1.x;
 	DBGA ( R6.L , 0x0000 );
@@ -224,24 +224,24 @@
 	DBGA ( R7.L , 0x0000 );
 
 	R6 = A0.w;
-	DBG ASTAT;
+	_DBG ASTAT;
 	R7.L = A0.x;
-	DBG ASTAT;
+	_DBG ASTAT;
 	DBGA ( R6.L , 0x0000 );
 	DBGA ( R6.H , 0x0000 );
 	DBGA ( R7.L , 0x0000 );
-	R7 = ASTAT;	dbg astat;
+	R7 = ASTAT;	_dbg astat;
 //AV1 AV1S should be 0.
 	DBGA ( R7.H , 0x0000 );
 	DBGA ( R7.L , 0x0000 );
 
-	DBG ASTAT;
+	_DBG ASTAT;
 	A1 = A0 = 0;
-	DBG A1;
-	DBG R0;	DBG R1;
+	_DBG A1;
+	_DBG R0;	_DBG R1;
 	A1 += R0.L * R1.L;	// make sure overflow flag is not set to zero
-	DBG A1;
-	DBG ASTAT;
+	_DBG A1;
+	_DBG ASTAT;
 	R7 = ASTAT;
 //AV1S should be 0.
 	DBGA ( R7.H, 0x0000 );

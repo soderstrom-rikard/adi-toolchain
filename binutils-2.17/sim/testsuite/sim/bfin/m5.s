@@ -28,7 +28,7 @@
 	R5.H = (A1 += R0.L * R1.L), R5.L = (A0 += R0.L * R1.L);
 	DBGA ( R5.L , 0x7ffe );
 	DBGA ( R5.H , 0x7ffe );
-	DBG ASTAT;
+	_DBG ASTAT;
 	R7 = ASTAT;
 	DBGA (R7.H, 0x0);
 	DBGA (R7.L, 0x0);
@@ -43,13 +43,13 @@
 	A0.x = R3.L;
 	A0.w = R2;
 	R5.H = (A1 += R0.L * R2.L), R5.L = (A0 += R0.L * R2.L);
-	DBG A1;
-	DBG A0;
+	_DBG A1;
+	_DBG A0;
 	DBGA ( R5.L , 0x7fff );
 	DBGA ( R5.H , 0x7fff );
-	DBG ASTAT;
+	_DBG ASTAT;
 	R7 = ASTAT;
-	DBG R7;
+	_DBG R7;
 	DBGA (R7.H, 0x300);
 	DBGA (R7.L, 0x8);
 
@@ -65,7 +65,7 @@
 	R5.H = (A1 += R0.L * R1.L), R5.L = (A0 += R0.L * R1.L);
 	DBGA ( R5.L , 0x7fff );
 	DBGA ( R5.H , 0x7fff );
-	DBG ASTAT;
+	_DBG ASTAT;
 	R7 = ASTAT;
 	DBGA (R7.H, 0x30f);
 	DBGA (R7.L, 0x8);
@@ -82,11 +82,11 @@
 	R5.H = (A1 += R0.L * R2.L), R5.L = (A0 += R0.L * R2.L);
 	DBGA ( R5.L , 0x8000 );
 	DBGA ( R5.H , 0x8000 );
-	DBG A1;
-	DBG A0;
-	DBG ASTAT;
+	_DBG A1;
+	_DBG A0;
+	_DBG ASTAT;
 	R7=ASTAT;
-	DBG R7;
+	_DBG R7;
 	DBGA (R7.H, 0x300);
 	DBGA (R7.L, 0x0008);
 
@@ -103,7 +103,7 @@
 	DBGA ( R5.L , 0x8000 );
 	DBGA ( R5.H , 0x8000 );
 	R7=ASTAT;
-	DBG ASTAT;
+	_DBG ASTAT;
 	DBGA (R7.H, 0x300);
 	DBGA (R7.L, 0x0008);
 
@@ -114,13 +114,13 @@
 	A1 = A0 = 0;
 	A0.w = R2;
 	A0.x = R4.L;
-	DBG ASTAT;
+	_DBG ASTAT;
 	R5.H = A1, R5.L = (A0 += R0.H * R1.L);
-	DBG A0;
+	_DBG A0;
 	DBGA ( R5.L , 0x8000 );
 	DBGA ( R5.H , 0x0000 );
 	R7=ASTAT;
-	DBG ASTAT;
+	_DBG ASTAT;
 	DBGA (R7.H, 0x300);
 	DBGA (R7.L, 0x0009);
 

@@ -12,12 +12,12 @@
 	A0.x = R0;
 	R1 = 1;
 
-	DBG A0;
-	DBG A1;
+	_DBG A0;
+	_DBG A1;
 
 	A0 -= A1;
-	dbg A0;
-	dbg ASTAT;
+	_dbg A0;
+	_dbg ASTAT;
 	r7=astat;
 	dbga (r7.h, 0x0);
 	dbga (r7.l, 0x1006);
@@ -30,12 +30,12 @@
 	A0.x = R0;
 	R1 = 1;
 
-	DBG A0;
-	DBG A1;
+	_DBG A0;
+	_DBG A1;
 
 	A0 -= A1;
-	dbg A0;
-	dbg ASTAT;
+	_dbg A0;
+	_dbg ASTAT;
 	r7=astat;
 	dbga (r7.h, 0x0);
 	dbga (r7.l, 0x1006);
@@ -49,12 +49,12 @@
 	R1 = 1;
 	A1 = R1;
 
-	DBG A0;
-	DBG A1;
+	_DBG A0;
+	_DBG A1;
 
 	A0 -= A1;
-	dbg A0;
-	dbg ASTAT;
+	_dbg A0;
+	_dbg ASTAT;
 	r7=astat;
 	dbga (r7.h, 0x3);
 	dbga (r7.l, 0x1006);
@@ -68,12 +68,12 @@
 	R1 = 2 (z);
 	A1 = R1;
 
-	DBG A0;
-	DBG A1;
+	_DBG A0;
+	_DBG A1;
 
 	A0 -= A1;
-	dbg A0;
-	dbg ASTAT;
+	_dbg A0;
+	_dbg ASTAT;
 	r7=astat;
 	dbga (r7.h, 0x3);
 	dbga (r7.l, 0x1006);
@@ -91,12 +91,12 @@
 	A1.x = R1;
 	A1.w = R0;
 
-	DBG A0;
-	DBG A1;
+	_DBG A0;
+	_DBG A1;
 
 	A0 += A1;
-	dbg A0;
-	dbg ASTAT;
+	_dbg A0;
+	_dbg ASTAT;
 	r7=astat;
 	dbga (r7.h, 0x3);
 	dbga (r7.l, 0x0);
@@ -110,12 +110,12 @@
 	A1.x = R1;
 	A1.w = R0;
 
-	DBG A0;
-	DBG A1;
+	_DBG A0;
+	_DBG A1;
 
 	A0 += A1;
-	dbg A0;
-	dbg ASTAT;
+	_dbg A0;
+	_dbg ASTAT;
 	r7=astat;
 	dbga (r7.h, 0x3);
 	dbga (r7.l, 0x1006);

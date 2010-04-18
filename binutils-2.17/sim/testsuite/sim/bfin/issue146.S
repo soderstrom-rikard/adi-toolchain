@@ -18,14 +18,14 @@
 	A0 = R0;
 	A1 = R1;
 
-	DBG A0;
-	DBG A1;
+	_DBG A0;
+	_DBG A1;
 
 	R3 = A1 + A0, R7 = A1 - A0 (S);
-	DBG R3;
-	DBG R7;
+	_DBG R3;
+	_DBG R7;
 
-	DBG ASTAT;
+	_DBG ASTAT;
 	R0 = ASTAT;
 	CHECKREG R0, (_VS|_V|_V_COPY|_AN);
 

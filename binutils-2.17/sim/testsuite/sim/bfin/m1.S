@@ -23,20 +23,20 @@
 
 LOOP1:
 	A1 -= R0.L * R1.L, A0 += R0.L * R1.L;
-//DBG a1;
-//DBG a0;
+//_DBG a1;
+//_DBG a0;
 	R4 += -1;
 	CC = R4 == R5;
 	IF !CC JUMP LOOP1;
 
-	DBG A1;
-	DBG A0;
+	_DBG A1;
+	_DBG A0;
 
 	R6 = A1.w;
-	DBG ASTAT;
+	_DBG ASTAT;
 	R7.L = A1.x;
 	R3 = ASTAT;
-	DBG r3;
+	_DBG r3;
 	CHECKREG R3, (_AV1S|_AV1|_AV0S|_AV0|_AC0|_AC0_COPY|_CC|_AZ);
 
 	CHECKREG R6, 0;

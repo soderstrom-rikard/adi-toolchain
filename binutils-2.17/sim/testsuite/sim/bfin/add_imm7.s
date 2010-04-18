@@ -8,8 +8,8 @@
 
 	r2=-7;
 	r2+=-63;
-	dbg r2;
-	dbg astat;
+	_dbg r2;
+	_dbg astat;
 	r7=astat;
 	dbga ( r7.h, 0x0);
 	dbga ( r7.l, 0x1006);
@@ -18,8 +18,8 @@
 	astat=r7;
 	r2=64;
 	r2+=-64;
-	dbg r2;
-	dbg astat;
+	_dbg r2;
+	_dbg astat;
 	r7=astat;
 	dbga ( r7.h, 0x0);
 	dbga ( r7.l, 0x1005);
@@ -29,8 +29,8 @@
 	r2=0;
 	r2.h=0x8000;
 	r2+=-63;
-	dbg astat;
-	dbg r2;
+	_dbg astat;
+	_dbg r2;
 	r7=astat;
 	dbga ( r7.h, 0x0300);
 	dbga ( r7.l, 0x100c);
