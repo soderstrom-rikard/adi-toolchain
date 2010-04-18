@@ -321,19 +321,19 @@ sim_engine_run (SIM_DESC sd,
 		int nr_cpus, /* ignore */
 		int siggnal) /* ignore */
 {
-  int i;
+  SIM_CPU *cpu;
 
   SIM_ASSERT (STATE_MAGIC (sd) == SIM_MAGIC_NUMBER);
 
+  cpu = STATE_CPU (sd, 0);
+
   while (1)
-    for (i = 0; i < MAX_NR_PROCESSORS; ++i)
-      {
-	SIM_CPU *cpu = STATE_CPU (sd, i);
-	step_once (cpu);
-	/* process any events */
-	if (sim_events_tick (sd))
-	  sim_events_process (sd);
-      }
+    {
+      step_once (cpu);
+      /* process any events */
+      if (sim_events_tick (sd))
+	sim_events_process (sd);
+    }
 }
 
 /* Cover function of sim_state_free to free the cpu buffers as well.  */

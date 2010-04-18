@@ -63,10 +63,11 @@
 
 #define SIGNEXTEND(v, n) (((bs32)(v) << (HOST_LONG_WORD_SIZE - (n))) >> (HOST_LONG_WORD_SIZE - (n)))
 
-static void
+static __attribute__ ((noreturn)) void
 illegal_instruction (SIM_CPU *cpu)
 {
-  cec_exception (cpu, VEC_UNDEF_I);
+  while (1)
+    cec_exception (cpu, VEC_UNDEF_I);
 }
 
 static __attribute__ ((noreturn)) void
@@ -90,8 +91,7 @@ unhandled_instruction (SIM_CPU *cpu, const char *insn)
 
   sim_io_eprintf (sd, ") ... aborting\n");
 
-  while (1)
-    illegal_instruction (cpu);
+  illegal_instruction (cpu);
 }
 
 typedef enum

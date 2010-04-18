@@ -339,7 +339,9 @@ cec_exception (SIM_CPU *cpu, int excp)
       if (STATE_ENVIRONMENT (sd) == OPERATING_ENVIRONMENT)
 	{
 	  _cec_raise (cpu, CEC_STATE (cpu), IVG_EVX);
-	  return;
+	  /* We need to restart the engine so that we don't return
+	     and continue processing this bad insn.  */
+	  sim_engine_restart (sd, cpu, NULL, PCREG);
 	}
     }
 
