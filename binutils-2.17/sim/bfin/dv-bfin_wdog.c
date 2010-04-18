@@ -118,7 +118,7 @@ bfin_wdog_io_read_buffer (struct hw *me, void *dest,
   switch (mmr_off)
     {
     case mmr_offset(wdog_ctl):
-      dv_bfin_require_16 (me, addr, nr_bytes);
+      dv_bfin_mmr_require_16 (me, addr, nr_bytes);
       dv_store_2 (dest, *value16p);
       break;
 

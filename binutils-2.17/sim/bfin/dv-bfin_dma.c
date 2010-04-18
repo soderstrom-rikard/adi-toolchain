@@ -240,7 +240,7 @@ bfin_dma_io_write_buffer (struct hw *me, const void *source,
     default:
       /* XXX: The HW lets the pad regions be read/written ...  */
       /* XXX: This should send up Hardware Error, not Exception ... */
-      dv_bfin_invalid_mmr (me, addr, nr_bytes);
+      dv_bfin_mmr_invalid (me, addr, nr_bytes);
       break;
     }
 

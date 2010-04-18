@@ -93,14 +93,9 @@ dv_get_state (SIM_CPU *cpu, const char *device_name)
   return hw_data (dv_get_device (cpu, device_name));
 }
 
-#define dv_bfin_invalid_mmr(hw, addr, size) \
-  hw_abort (hw, "invalid MMR access %i bytes @%#x", size, addr)
-
-#define dv_bfin_require_16(hw, addr, size) \
-  do { \
-    if ((size) != 2) \
-      dv_bfin_invalid_mmr (hw, addr, size); \
-  } while (0)
+void dv_bfin_mmr_invalid (struct hw *, address_word, unsigned nr_bytes);
+void dv_bfin_mmr_require_16 (struct hw *, address_word, unsigned nr_bytes);
+bool dv_bfin_mmr_check (struct hw *, address_word, unsigned nr_bytes);
 
 #define HW_TRACE_WRITE() \
   HW_TRACE ((me, "write 0x%08lx (%s) length %d with 0x%x", (long) addr, \

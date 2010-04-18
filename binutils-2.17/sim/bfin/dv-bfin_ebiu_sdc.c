@@ -71,15 +71,15 @@ bfin_ebiu_sdc_io_write_buffer (struct hw *me, const void *source,
       break;
     case mmr_offset(sdbctl):
       /* XXX: BF561 has a 32bit reg.  */
-      dv_bfin_require_16 (me, addr, nr_bytes);
+      dv_bfin_mmr_require_16 (me, addr, nr_bytes);
       *value16p = value;
       break;
     case mmr_offset(sdrrc):
-      dv_bfin_require_16 (me, addr, nr_bytes);
+      dv_bfin_mmr_require_16 (me, addr, nr_bytes);
       *value16p = value;
       break;
     case mmr_offset(sdstat):
-      dv_bfin_require_16 (me, addr, nr_bytes);
+      dv_bfin_mmr_require_16 (me, addr, nr_bytes);
       /* XXX: Some bits are W1C ...  */
       break;
     }
@@ -111,12 +111,12 @@ bfin_ebiu_sdc_io_read_buffer (struct hw *me, void *dest,
       break;
     case mmr_offset(sdbctl):
       /* XXX: BF561 has a 32bit reg.  */
-      dv_bfin_require_16 (me, addr, nr_bytes);
+      dv_bfin_mmr_require_16 (me, addr, nr_bytes);
       dv_store_2 (dest, *value16p);
       break;
     case mmr_offset(sdrrc):
     case mmr_offset(sdstat):
-      dv_bfin_require_16 (me, addr, nr_bytes);
+      dv_bfin_mmr_require_16 (me, addr, nr_bytes);
       dv_store_2 (dest, *value16p);
       break;
     }

@@ -23,35 +23,72 @@
 #include "hw-device.h"
 #include "dv-bfin_cec.h"
 
+static void
+bfin_mmr_invalid (struct hw *me, SIM_CPU *cpu, address_word addr,
+		  unsigned nr_bytes)
+{
+  if (!cpu)
+    cpu = hw_system_cpu (me);
+
+  /* Only throw a fit if the cpu is doing the access.  DMA/GDB simply
+     go unnoticed.  Not exactly hardware behavior, but close enough.  */
+  if (!cpu)
+    {
+      sim_io_eprintf (hw_system (me), "%s: invalid MMR access @ %#x\n",
+		      hw_path (me), addr);
+      return;
+    }
+
+  /* XXX: is this what hardware does ?  */
+  if (addr >= BFIN_CORE_MMR_BASE)
+    /* XXX: This should be setting up CPLB fault addrs ?  */
+    cec_exception (cpu, VEC_ILL_RES);
+  else
+    /* XXX: Newer parts set up an interrupt from EBIU and program
+            EBIU_ERRADDR with the address.  */
+    cec_latch (cpu, IVG_IVHW);
+}
+
+void
+dv_bfin_mmr_invalid (struct hw *me, address_word addr, unsigned nr_bytes)
+{
+  bfin_mmr_invalid (me, NULL, addr, nr_bytes);
+}
+
+void
+dv_bfin_mmr_require_16 (struct hw *me, address_word addr, unsigned nr_bytes)
+{
+  if (nr_bytes != 2)
+    dv_bfin_mmr_invalid (me, addr, nr_bytes);
+}
+
 static bool
-bfin_mmr_check (SIM_CPU *cpu, struct hw *me, address_word addr, unsigned nr_bytes)
+bfin_mmr_check (struct hw *me, SIM_CPU *cpu, address_word addr,
+		unsigned nr_bytes)
 {
   if (addr >= BFIN_CORE_MMR_BASE)
     {
       /* All Core MMRs are aligned 32bits.  */
       if ((addr & 3) == 0 && nr_bytes == 4)
 	return true;
-
-      /* XXX: is this what hardware does ?  */
-      if (cpu)
-	cec_exception (cpu, VEC_ILL_RES);
-      else
-	hw_abort (me, "invalid MMR access and cpu is NULL");
     }
   else if (addr >= BFIN_SYSTEM_MMR_BASE)
     {
       /* All System MMRs are 32bit aligned, but can be 16bits or 32bits.  */
       if ((addr & 0x3) == 0 && (nr_bytes == 2 || nr_bytes == 4))
 	return true;
-
-      /* XXX: is this what hardware does ? */
-      if (cpu)
-	cec_exception (cpu, VEC_ILL_RES);
-      else
-	hw_abort (me, "invalid MMR access and cpu is NULL");
     }
 
+  /* Still here ?  Must be crap.  */
+  bfin_mmr_invalid (me, cpu, addr, nr_bytes);
+
   return false;
+}
+
+bool
+dv_bfin_mmr_check (struct hw *me, address_word addr, unsigned nr_bytes)
+{
+  return bfin_mmr_check (me, NULL, addr, nr_bytes);
 }
 
 int
@@ -64,7 +101,7 @@ device_io_read_buffer (device *me, void *source, int space,
   if (STATE_ENVIRONMENT (sd) != OPERATING_ENVIRONMENT)
     return nr_bytes;
 
-  if (bfin_mmr_check (cpu, dv_me, addr, nr_bytes))
+  if (bfin_mmr_check (dv_me, cpu, addr, nr_bytes))
     if (cpu)
       {
 	sim_cpu_hw_io_read_buffer (cpu, cia, dv_me, source, space,
@@ -87,7 +124,7 @@ device_io_write_buffer (device *me, const void *source, int space,
   if (STATE_ENVIRONMENT (sd) != OPERATING_ENVIRONMENT)
     return nr_bytes;
 
-  if (bfin_mmr_check (cpu, dv_me, addr, nr_bytes))
+  if (bfin_mmr_check (dv_me, cpu, addr, nr_bytes))
     if (cpu)
       {
 	sim_cpu_hw_io_write_buffer (cpu, cia, dv_me, source, space,
@@ -102,5 +139,10 @@ device_io_write_buffer (device *me, const void *source, int space,
 
 void device_error (device *me, const char *message, ...)
 {
-  /* ... */
+  /* Just do what hw_abort() does.  */
+  struct hw *dv_me = (struct hw *) me;
+  va_list ap;
+  va_start (ap, message);
+  hw_vabort (dv_me, message, ap);
+  va_end (ap);
 }

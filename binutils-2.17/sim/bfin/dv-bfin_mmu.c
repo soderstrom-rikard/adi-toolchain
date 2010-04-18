@@ -128,7 +128,7 @@ bfin_mmu_io_write_buffer (struct hw *me, const void *source,
       /* Discard writes to these.  */
       break;
     default:
-      dv_bfin_invalid_mmr (me, addr, nr_bytes);
+      dv_bfin_mmr_invalid (me, addr, nr_bytes);
       break;
     }
 
@@ -172,7 +172,7 @@ bfin_mmu_io_read_buffer (struct hw *me, void *dest,
       dv_store_4 (dest, *valuep);
       break;
     default:
-      dv_bfin_invalid_mmr (me, addr, nr_bytes);
+      dv_bfin_mmr_invalid (me, addr, nr_bytes);
       break;
     }
 
