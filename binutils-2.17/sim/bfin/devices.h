@@ -102,4 +102,11 @@ dv_get_state (SIM_CPU *cpu, const char *device_name)
       dv_bfin_invalid_mmr (hw, addr, size); \
   } while (0)
 
+#define HW_TRACE_WRITE() \
+  HW_TRACE ((me, "write 0x%08lx (%s) length %d with 0x%x", (long) addr, \
+	     mmr_name (mmr_off), (int) nr_bytes, value))
+#define HW_TRACE_READ() \
+  HW_TRACE ((me, "read 0x%08lx (%s) length %d", (long) addr, \
+	     mmr_name (mmr_off), (int) nr_bytes))
+
 #endif
