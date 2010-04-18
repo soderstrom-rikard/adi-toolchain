@@ -27,6 +27,7 @@ struct bfin_ctimer
 {
   bu32 base;
   struct hw_event *handler;
+  signed64 timeout;
 
   /* Order after here is important -- matches hardware MMR layout.  */
   bu32 tcntl, tperiod, tscale, tcount;
@@ -53,16 +54,12 @@ bfin_ctimer_scale (struct bfin_ctimer *ctimer)
 }
 
 static void
-bfin_ctimer_tick (struct hw *me, void *data)
+bfin_ctimer_schedule (struct hw *me, struct bfin_ctimer *ctimer);
+
+static void
+bfin_ctimer_expire (struct hw *me, void *data)
 {
   struct bfin_ctimer *ctimer = data;
-  bu32 scale = bfin_ctimer_scale (ctimer);
-
-  if (ctimer->tcount > scale)
-    {
-      ctimer->tcount -= scale;
-      goto reschedule;
-    }
 
   ctimer->tcntl |= TINT;
   if (ctimer->tcntl & TAUTORLD)
@@ -70,8 +67,37 @@ bfin_ctimer_tick (struct hw *me, void *data)
 
   hw_port_event (me, IVG_IVTMR, 1);
 
- reschedule:
-  hw_event_queue_schedule (me, scale, bfin_ctimer_tick, ctimer);
+  bfin_ctimer_schedule (me, ctimer);
+}
+
+static void
+bfin_ctimer_update_count (struct hw *me, struct bfin_ctimer *ctimer)
+{
+  bu32 scale = bfin_ctimer_scale (ctimer);
+  signed64 timeout = hw_event_remain_time (me, ctimer->handler);
+  bu32 ticks = ctimer->timeout - timeout;
+  ctimer->tcount -= (scale * ticks);
+  ctimer->timeout = timeout;
+}
+
+static void
+bfin_ctimer_deschedule (struct hw *me, struct bfin_ctimer *ctimer)
+{
+  if (ctimer->handler)
+    {
+      hw_event_queue_deschedule (me, ctimer->handler);
+      ctimer->handler = NULL;
+    }
+}
+
+static void
+bfin_ctimer_schedule (struct hw *me, struct bfin_ctimer *ctimer)
+{
+  bu32 scale = bfin_ctimer_scale (ctimer);
+  ctimer->timeout = (ctimer->tcount / scale) + !!(ctimer->tcount % scale);
+  ctimer->handler = hw_event_queue_schedule (me, ctimer->timeout,
+					     bfin_ctimer_expire,
+					     ctimer);
 }
 
 static unsigned
@@ -79,6 +105,7 @@ bfin_ctimer_io_write_buffer (struct hw *me, const void *source,
 			     int space, address_word addr, unsigned nr_bytes)
 {
   struct bfin_ctimer *ctimer = hw_data (me);
+  bool curr_enabled;
   bu32 mmr_off;
   bu32 value;
   bu32 *valuep;
@@ -89,33 +116,36 @@ bfin_ctimer_io_write_buffer (struct hw *me, const void *source,
 
   HW_TRACE_WRITE ();
 
+  curr_enabled = bfin_ctimer_enabled (ctimer);
   switch (mmr_off)
     {
     case mmr_offset(tcntl):
       /* XXX: docs say TINT is sticky, but hardware doesnt seem to be ?  */
       dv_w1c_4_partial (valuep, value, TINT);
 
-      if (bfin_ctimer_enabled (ctimer) && !ctimer->handler)
+      if (bfin_ctimer_enabled (ctimer) == curr_enabled)
 	{
-	  ctimer->handler = hw_event_queue_schedule (me,
-						     bfin_ctimer_scale (ctimer),
-						     bfin_ctimer_tick, ctimer);
+	  /* Do nothing.  */
 	}
-      else if (!bfin_ctimer_enabled (ctimer) && ctimer->handler)
+      else if (curr_enabled)
 	{
-	  hw_event_queue_deschedule (me, ctimer->handler);
-	  ctimer->handler = NULL;
+	  bfin_ctimer_update_count (me, ctimer);
+	  bfin_ctimer_deschedule (me, ctimer);
 	}
+      else
+	bfin_ctimer_schedule (me, ctimer);
 
       break;
     case mmr_offset(tcount):
-      /* Writes are discarded when enabled.  */
-      if (!bfin_ctimer_enabled (ctimer))
+      /* HRM says writes are discarded when enabled.  */
+      /* XXX: But hardware seems to be writeable all the time ?  */
+      if (!curr_enabled)
 	*valuep = value;
       break;
     case mmr_offset(tperiod):
-      /* Writes are discarded when enabled.  */
-      if (!bfin_ctimer_enabled (ctimer))
+      /* HRM says writes are discarded when enabled.  */
+      /* XXX: But hardware seems to be writeable all the time ?  */
+      if (!curr_enabled)
 	{
 	  /* Writes are mirrored into TCOUNT.  */
 	  ctimer->tcount = value;
@@ -123,7 +153,14 @@ bfin_ctimer_io_write_buffer (struct hw *me, const void *source,
 	}
       break;
     case mmr_offset(tscale):
+      if (curr_enabled)
+	{
+	  bfin_ctimer_update_count (me, ctimer);
+	  bfin_ctimer_deschedule (me, ctimer);
+	}
       *valuep = value;
+      if (curr_enabled)
+	bfin_ctimer_schedule (me, ctimer);
       break;
     }
 
@@ -142,6 +179,15 @@ bfin_ctimer_io_read_buffer (struct hw *me, void *dest,
   valuep = (void *)((unsigned long)ctimer + mmr_base() + mmr_off);
 
   HW_TRACE_READ ();
+
+  switch (mmr_off)
+    {
+    case mmr_offset(tcount):
+      /* Since we're optimizing events here, we need to calculate
+         the new tcount value.  */
+      bfin_ctimer_update_count (me, ctimer);
+      break;
+    }
 
   dv_store_4 (dest, *valuep);
 
