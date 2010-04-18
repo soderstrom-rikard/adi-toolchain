@@ -4427,18 +4427,22 @@ decode_dsp32alu_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1)
     {
       bu32 val = DREG (src0);
 
-      TRACE_INSN (cpu, "R%i = - R%i (opt_sat);", dst0, src0);
+      TRACE_INSN (cpu, "R%i = - R%i %s;", dst0, src0, s ? "(S)" : "(NS)");
 
-      if (val == 0x80000000)
-	val = 0x7fffffff;
+      if (s && val == 0x80000000)
+	{
+	  val = 0x7fffffff;
+	  SET_ASTATREG (v, 1);
+	  SET_ASTATREG (vs, 1);
+	}
+      else if (val == 0x80000000)
+	val = 0x80000000;
       else
 	val = -val;
       SET_DREG (dst0, val);
 
-      SET_ASTATREG (v, val == 0x8000);
-      if (ASTATREG (v))
-	SET_ASTATREG (vs, 1);
-      setflags_logical (cpu, val);
+      SET_ASTATREG (az, val == 0);
+      SET_ASTATREG (an, val & 0x80000000);
     }
   else if (aop == 2 && aopcde == 6)
     {
