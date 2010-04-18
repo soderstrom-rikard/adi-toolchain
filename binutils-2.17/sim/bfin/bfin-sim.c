@@ -3514,9 +3514,11 @@ decode_dsp32mult_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1)
       dst, src0, h01 ? "L" : "H" , src1, h11 ? "L" : "H",
       dst, src0, h00 ? "L" : "H" , src1, h10 ? "L" : "H");
   else if (w0 && P)
-    TRACE_INSN (cpu, "R%i = dsp32mult", dst);
+    TRACE_INSN (cpu, "R%i = R%i.%s * R%i.%s",
+		dst, src0, h00 ? "L" : "H" , src1, h10 ? "L" : "H");
   else if (w1 && P)
-    TRACE_INSN (cpu, "R%i = dsp32mult", dst+1);
+    TRACE_INSN (cpu, "R%i = R%i.%s * R%i.%s",
+		dst+1, src0, h01 ? "L" : "H" , src1, h11 ? "L" : "H");
   else if (w0 && !P)
     TRACE_INSN (cpu, "R%i.L = R%i.%s * R%i.%s",
       dst, src0, h00 ? "L" : "H" , src1, h10 ? "L" : "H");
@@ -3528,34 +3530,11 @@ decode_dsp32mult_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1)
     {
       int sat;
       bu64 r = decode_multfunc (cpu, h01, h11, src0, src1, mmod, MM, &sat);
-      STORE (ASTATREG (av1), sat);
-      STORE (ASTATREG (av1s), ASTATREG (av1s) | sat);
+      STORE (ASTATREG (v), sat);
+      STORE (ASTATREG (v_copy), sat);
+      if (sat)
+	STORE (ASTATREG (vs), sat);
       res1 = extract_mult (cpu, r, mmod, MM, P);
-    }
-
-  if (w0)
-    {
-      int sat;
-      bu64 r = decode_multfunc (cpu, h00, h10, src0, src1, mmod, 0, &sat);
-      STORE (ASTATREG (av0), sat);
-      STORE (ASTATREG (av0s), ASTATREG (av0s) | sat);
-      res0 = extract_mult (cpu, r, mmod, 0, P);
-    }
-
-  if (w0)
-    {
-      if (P)
-	STORE (DREG (dst), res0);
-      else
-	{
-	  if (res0 & 0xFFFF0000)
-	    illegal_instruction (cpu);
-	  res = REG_H_L (res, res0);
-	}
-    }
-
-  if (w1)
-    {
       if (P)
 	STORE (DREG (dst + 1), res1);
       else
@@ -3563,6 +3542,25 @@ decode_dsp32mult_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1)
 	  if (res1 & 0xFFFF0000)
 	    illegal_instruction (cpu);
 	  res = REG_H_L (res1 << 16, res);
+	}
+    }
+
+  if (w0)
+    {
+      int sat;
+      bu64 r = decode_multfunc (cpu, h00, h10, src0, src1, mmod, 0, &sat);
+      STORE (ASTATREG (v), sat);
+      STORE (ASTATREG (v_copy), sat);
+      if (sat)
+	STORE (ASTATREG (vs), sat);
+      res0 = extract_mult (cpu, r, mmod, 0, P);
+      if (P)
+	STORE (DREG (dst), res0);
+      else
+	{
+	  if (res0 & 0xFFFF0000)
+	    illegal_instruction (cpu);
+	  res = REG_H_L (res, res0);
 	}
     }
 
