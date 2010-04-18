@@ -1,7 +1,6 @@
 //Original:/proj/frio/dv/testcases/core/c_dsp32alu_byteop2_m/c_dsp32alu_byteop2_m.dsp
 // Spec Reference: dsp32alu byteop2 - minus
 
-#include "test.h"
 .include "testutils.inc"
 	start
 
