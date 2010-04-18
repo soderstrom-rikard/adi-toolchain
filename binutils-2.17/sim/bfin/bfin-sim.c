@@ -1047,11 +1047,13 @@ add_and_shift (SIM_CPU *cpu, bu32 a, bu32 b, int shift)
   v = add32 (cpu, a, b, 0, 0);
   while (shift-- > 0)
     {
-      int x = v >> 30;
+      int x = (v >> 30) & 0x3;
       if (x == 1 || x == 2)
 	ASTATREG (v_internal) = 1;
       v <<= 1;
     }
+  SET_ASTATREG (az, v == 0);
+  SET_ASTATREG (an, v & 0x80000000);
   SET_ASTATREG (v, ASTATREG (v_internal));
   if (ASTATREG (v))
     SET_ASTATREG (vs, 1);
