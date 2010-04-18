@@ -862,7 +862,7 @@ add16 (SIM_CPU *cpu, bu32 a, bu32 b, int *carry, int *overfl, int sat, int scale
 	v -= 1;
     }
   SET_ASTATREG (an, flgn);
- 
+
   if (!overfl)
     overflow = 0;
 
@@ -3513,8 +3513,8 @@ decode_dsp32mult_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1)
     TRACE_INSN (cpu, "R%i:%i = dsp32mult", dst + 1, dst);
   else if (w0 && w1 && !P)
     TRACE_INSN (cpu, "R%i.L = R%i.%s * R%i.%s, R%i.H = R%i.%s * R%i.%s",
-      dst, src0, h01 ? "L" : "H" , src1, h11 ? "L" : "H",
-      dst, src0, h00 ? "L" : "H" , src1, h10 ? "L" : "H");
+		dst, src0, h01 ? "L" : "H" , src1, h11 ? "L" : "H",
+		dst, src0, h00 ? "L" : "H" , src1, h10 ? "L" : "H");
   else if (w0 && P)
     TRACE_INSN (cpu, "R%i = R%i.%s * R%i.%s",
 		dst, src0, h00 ? "L" : "H" , src1, h10 ? "L" : "H");
@@ -3523,10 +3523,10 @@ decode_dsp32mult_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1)
 		dst+1, src0, h01 ? "L" : "H" , src1, h11 ? "L" : "H");
   else if (w0 && !P)
     TRACE_INSN (cpu, "R%i.L = R%i.%s * R%i.%s",
-      dst, src0, h00 ? "L" : "H" , src1, h10 ? "L" : "H");
+		dst, src0, h00 ? "L" : "H" , src1, h10 ? "L" : "H");
   else if (w1 && !P)
     TRACE_INSN (cpu, "R%i.H = R%i.%s * R%i.%s",
-      dst, src0, h01 ? "L" : "H" , src1, h11 ? "L" : "H");
+		dst, src0, h01 ? "L" : "H" , src1, h11 ? "L" : "H");
 
   if (w1)
     {
@@ -4228,7 +4228,7 @@ decode_dsp32alu_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1)
       bs40 val0, val1;
 
       TRACE_INSN (cpu, "R%i = A%i + A%i, R%i = A%i - A%i%s",
-			dst1, !aop, aop, dst0, !aop, aop, amod1 (s, x));
+		  dst1, !aop, aop, dst0, !aop, aop, amod1 (s, x));
 
       val1 = acc0 + acc1;
       if (aop)
@@ -4256,11 +4256,11 @@ decode_dsp32alu_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1)
       bs16 tmp0, tmp1, tmp2, tmp3;
 
       /* This instruction is only defined for register pairs R1:0 and R3:2 */
-      if (!((src0 == 0 || src0 == 2) && (src1 == 0) || (src1 == 2)))
+      if (!((src0 == 0 || src0 == 2) && (src1 == 0 || src1 == 2)))
 	illegal_instruction (cpu);
 
-      TRACE_INSN (cpu, "SAA (R%i:%i, R%i:%i)%s", src0 + 1, src0, src1 + 1, src1,
-	s ? " (R)" :"");
+      TRACE_INSN (cpu, "SAA (R%i:%i, R%i:%i)%s", src0 + 1, src0,
+		  src1 + 1, src1, s ? " (R)" :"");
 
       /* Bit s determines the order of the two registers from a pair:
        * if s=0 the low-order bytes come from the low reg in the pair,
@@ -4278,14 +4278,14 @@ decode_dsp32alu_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1)
 	  s1 = algn(s1L, s1H, IREG (1) & 3);
 	}
 
-      /* find the absolute difference between pairs, 
+      /* find the absolute difference between pairs,
        * make it absolute, then add it to the existing accumulator half
        */
       /* Byte 0 */
       tmp0  = ((s0 << 24) >> 24) - ((s1 << 24) >> 24);
       tmp1  = ((s0 << 16) >> 24) - ((s1 << 16) >> 24);
       tmp2  = ((s0 <<  8) >> 24) - ((s1 <<  8) >> 24);
-      tmp3  =  (s0        >> 24) -  (s1        >> 24);
+      tmp3  = ((s0 <<  0) >> 24) - ((s1 <<  0) >> 24);
 
       tmp0  = (tmp0 < 0) ? -tmp0 : tmp0;
       tmp1  = (tmp1 < 0) ? -tmp1 : tmp1;
@@ -5260,8 +5260,8 @@ decode_dsp32shiftimm_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1)
       bu16 val1 = DREG (src1) >> 16;
       bu32 astat;
 
-      TRACE_INSN (cpu, "R%i = R%i >>> %i %s;", dst0, src1, count, 
-		sop == 0 ? "(V)" : "(V,S)");
+      TRACE_INSN (cpu, "R%i = R%i >>> %i %s;", dst0, src1, count,
+		  sop == 0 ? "(V)" : "(V,S)");
 
       val0 = ashiftrt (cpu, val0, count, 16);
       astat = ASTAT;
