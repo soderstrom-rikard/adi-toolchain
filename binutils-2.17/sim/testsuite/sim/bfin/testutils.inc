@@ -197,3 +197,7 @@ _main:
 	.macro _DBG reg:req
 	//DBG \reg;
 	.endm
+
+	.macro _DBGCMPLX reg:req
+	//
+	.endm
