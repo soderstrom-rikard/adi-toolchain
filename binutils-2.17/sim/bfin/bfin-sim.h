@@ -76,6 +76,9 @@ struct bfin_cpu_state
   /* Used by the CEC to figure out where to return to.  */
   bu32 insn_len;
 
+  /* How many cycles did this insn take to complete ?  */
+  bu32 cycle_delay;
+
   /* Needed for supporting the DISALGNEXCPT instruction */
   int dis_algn_expt;
 
@@ -115,6 +118,7 @@ struct bfin_cpu_state
 #define PCREG		(BFIN_CPU_STATE.pc)
 #define EMUDAT_INREG	(BFIN_CPU_STATE.emudat[0])
 #define EMUDAT_OUTREG	(BFIN_CPU_STATE.emudat[1])
+#define CYCLE_DELAY	(BFIN_CPU_STATE.cycle_delay)
 #define DIS_ALGN_EXPT	(BFIN_CPU_STATE.dis_algn_expt)
 
 #define EXCAUSE_MASK		0x3f

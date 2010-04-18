@@ -1666,42 +1666,56 @@ decode_ProgCtrl_0 (SIM_CPU *cpu, bu16 iw0, bu32 pc)
       TRACE_BRANCH (cpu, pc, newpc, -1, "RTS");
       SET_PCREG (newpc);
       BFIN_CPU_STATE.flow_change = true;
+      CYCLE_DELAY = 5;
     }
   else if (prgfunc == 1 && poprnd == 1)
     {
       TRACE_INSN (cpu, "RTI;");
       cec_return (cpu, -1);
+      CYCLE_DELAY = 5;
     }
   else if (prgfunc == 1 && poprnd == 2)
     {
       TRACE_INSN (cpu, "RTX;");
       cec_return (cpu, IVG_EVX);
+      CYCLE_DELAY = 5;
     }
   else if (prgfunc == 1 && poprnd == 3)
     {
       TRACE_INSN (cpu, "RTN;");
       cec_return (cpu, IVG_NMI);
+      CYCLE_DELAY = 5;
     }
   else if (prgfunc == 1 && poprnd == 4)
     {
       TRACE_INSN (cpu, "RTE;");
       cec_return (cpu, IVG_EMU);
+      CYCLE_DELAY = 5;
     }
   else if (prgfunc == 2 && poprnd == 0)
     {
+      SIM_DESC sd = CPU_STATE (cpu);
+      sim_events *events = STATE_EVENTS (sd);
+
       /* XXX: in supervisor mode, utilizes wake up sources
        * in user mode, it's a NOP ...  */
       TRACE_INSN (cpu, "IDLE;");
+
+      /* Timewarp !  */
+      CYCLE_DELAY = events->time_from_event;
     }
   else if (prgfunc == 2 && poprnd == 3)
     {
       /* just NOP it */
       TRACE_INSN (cpu, "CSYNC;");
+      CYCLE_DELAY = 10;
     }
   else if (prgfunc == 2 && poprnd == 4)
     {
       /* just NOP it */
       TRACE_INSN (cpu, "SSYNC;");
+      /* Really 10+, but no model info for this.  */
+      CYCLE_DELAY = 10;
     }
   else if (prgfunc == 2 && poprnd == 5)
     {
@@ -1717,6 +1731,7 @@ decode_ProgCtrl_0 (SIM_CPU *cpu, bu16 iw0, bu32 pc)
     {
       TRACE_INSN (cpu, "STI R%i;", poprnd);
       cec_sti (cpu, DREG (poprnd));
+      CYCLE_DELAY = 3;
     }
   else if (prgfunc == 5)
     {
@@ -1726,6 +1741,7 @@ decode_ProgCtrl_0 (SIM_CPU *cpu, bu16 iw0, bu32 pc)
       SET_PCREG (newpc);
       BFIN_CPU_STATE.did_jump = true;
       PROFILE_BRANCH_TAKEN (cpu);
+      CYCLE_DELAY = 5;
     }
   else if (prgfunc == 6)
     {
@@ -1738,6 +1754,7 @@ decode_ProgCtrl_0 (SIM_CPU *cpu, bu16 iw0, bu32 pc)
       SET_PCREG (newpc);
       BFIN_CPU_STATE.did_jump = true;
       PROFILE_BRANCH_TAKEN (cpu);
+      CYCLE_DELAY = 5;
     }
   else if (prgfunc == 7)
     {
@@ -1748,6 +1765,7 @@ decode_ProgCtrl_0 (SIM_CPU *cpu, bu16 iw0, bu32 pc)
       SET_PCREG (newpc);
       BFIN_CPU_STATE.did_jump = true;
       PROFILE_BRANCH_TAKEN (cpu);
+      CYCLE_DELAY = 5;
     }
   else if (prgfunc == 8)
     {
@@ -1757,12 +1775,14 @@ decode_ProgCtrl_0 (SIM_CPU *cpu, bu16 iw0, bu32 pc)
       SET_PCREG (newpc);
       BFIN_CPU_STATE.did_jump = true;
       PROFILE_BRANCH_TAKEN (cpu);
+      CYCLE_DELAY = 5;
     }
   else if (prgfunc == 9)
     {
       int raise = uimm4 (poprnd);
       TRACE_INSN (cpu, "RAISE %s;", uimm4_str (raise));
       cec_latch (cpu, raise);
+      CYCLE_DELAY = 3; /* XXX: Only if IVG is unmasked.  */
     }
   else if (prgfunc == 10)
     {
@@ -1770,6 +1790,7 @@ decode_ProgCtrl_0 (SIM_CPU *cpu, bu16 iw0, bu32 pc)
       TRACE_INSN (cpu, "EXCPT %s;", uimm4_str (excpt));
       /* XXX: see comments in cec_exception() */
       cec_exception (cpu, excpt);
+      CYCLE_DELAY = 3;
     }
   else if (prgfunc == 11)
     {
@@ -1779,6 +1800,8 @@ decode_ProgCtrl_0 (SIM_CPU *cpu, bu16 iw0, bu32 pc)
       byte = GET_WORD (addr);
       SET_CCREG (byte == 0);
       PUT_BYTE (addr, byte | 0x80);
+      /* Also includes memory stalls, but we don't model that.  */
+      CYCLE_DELAY = 2;
     }
   else
     illegal_instruction (cpu);
@@ -1931,6 +1954,8 @@ decode_PushPopMultiple_0 (SIM_CPU *cpu, bu16 iw0)
 	    sp -= 4;
 	    PUT_LONG (sp, PREG (i));
 	  }
+
+      CYCLE_DELAY = 14;
     }
   else
     {
@@ -1953,6 +1978,8 @@ decode_PushPopMultiple_0 (SIM_CPU *cpu, bu16 iw0)
 	    SET_DREG (i, GET_LONG (sp));
 	    sp += 4;
 	  }
+
+      CYCLE_DELAY = 11;
     }
 
   /* Note: SP update must be delayed until after all reads/writes so that
@@ -2213,8 +2240,6 @@ decode_BRCC_0 (SIM_CPU *cpu, bu16 iw0, bu32 pc)
   int cond = T ? CCREG : ! CCREG;
   int pcrel = pcrel10 (offset);
 
-  /* B is just the branch predictor hint - we can ignore it.  */
-
   TRACE_EXTRACT (cpu, "%s: T:%i B:%i offset:%#x", __func__, T, B, offset);
   TRACE_DECODE (cpu, "%s: pcrel10:%#x", __func__, pcrel);
 
@@ -2227,9 +2252,13 @@ decode_BRCC_0 (SIM_CPU *cpu, bu16 iw0, bu32 pc)
       SET_PCREG (newpc);
       BFIN_CPU_STATE.did_jump = true;
       PROFILE_BRANCH_TAKEN (cpu);
+      CYCLE_DELAY = B ? 5 : 9;
     }
   else
-    PROFILE_BRANCH_UNTAKEN (cpu);
+    {
+      PROFILE_BRANCH_UNTAKEN (cpu);
+      CYCLE_DELAY = B ? 9 : 1;
+    }
 }
 
 static void
@@ -2252,6 +2281,7 @@ decode_UJUMP_0 (SIM_CPU *cpu, bu16 iw0, bu32 pc)
   SET_PCREG (newpc);
   BFIN_CPU_STATE.did_jump = true;
   PROFILE_BRANCH_TAKEN (cpu);
+  CYCLE_DELAY = 5;
 }
 
 static void
@@ -2314,6 +2344,7 @@ decode_ALU2op_0 (SIM_CPU *cpu, bu16 iw0)
     {
       TRACE_INSN (cpu, "R%i *= R%i;", dst, src);
       SET_DREG (dst, DREG (dst) * DREG (src));
+      CYCLE_DELAY = 3;
     }
   else if (opc == 4)
     {
@@ -3271,6 +3302,7 @@ decode_CALLa_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1, bu32 pc)
   SET_PCREG (newpc);
   BFIN_CPU_STATE.did_jump = true;
   PROFILE_BRANCH_TAKEN (cpu);
+  CYCLE_DELAY = 5;
 }
 
 static void
@@ -3386,6 +3418,7 @@ decode_linkage_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1)
       PUT_LONG (sp, FPREG);
       SET_FPREG (sp);
       sp -= size;
+      CYCLE_DELAY = 3;
     }
   else
     {
@@ -3396,6 +3429,7 @@ decode_linkage_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1)
       sp += 4;
       SET_RETSREG (GET_LONG (sp));
       sp += 4;
+      CYCLE_DELAY = 2;
     }
   SET_SPREG (sp);
 }
@@ -5583,8 +5617,6 @@ _interp_insn_bfin (SIM_CPU *cpu, bu32 pc)
   else
     illegal_instruction (cpu);
 
-  cycles_inc (cpu, 1);
-
   return insn_len;
 }
 
@@ -5597,6 +5629,7 @@ interp_insn_bfin (SIM_CPU *cpu, bu32 pc)
   BFIN_CPU_STATE.n_stores = 0;
 
   DIS_ALGN_EXPT &= ~1;
+  CYCLE_DELAY = 1;
 
   insn_len = _interp_insn_bfin (cpu, pc);
 
@@ -5615,6 +5648,8 @@ interp_insn_bfin (SIM_CPU *cpu, bu32 pc)
       *addr = BFIN_CPU_STATE.stores[i].val;
       TRACE_REGISTER (cpu, "dequeuing write %s = %#x", get_store_name (cpu, addr), *addr);
     }
+
+  cycles_inc (cpu, CYCLE_DELAY);
 
   return insn_len;
 }

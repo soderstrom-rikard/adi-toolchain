@@ -321,6 +321,7 @@ sim_engine_run (SIM_DESC sd,
 		int nr_cpus, /* ignore */
 		int siggnal) /* ignore */
 {
+  bu32 ticks;
   SIM_CPU *cpu;
 
   SIM_ASSERT (STATE_MAGIC (sd) == SIM_MAGIC_NUMBER);
@@ -330,9 +331,11 @@ sim_engine_run (SIM_DESC sd,
   while (1)
     {
       step_once (cpu);
-      /* process any events */
-      if (sim_events_tick (sd))
-	sim_events_process (sd);
+      /* Process any events -- can't use tickn because it may
+         advance right over the next event.  */
+      for (ticks = 0; ticks < CYCLE_DELAY; ++ticks)
+	if (sim_events_tick (sd))
+	  sim_events_process (sd);
     }
 }
 
