@@ -36,7 +36,7 @@ struct bfin_ebiu_sdc
 #define mmr_offset(mmr) (offsetof(struct bfin_ebiu_sdc, mmr) - mmr_base())
 
 static const char * const mmr_names[] = {
-  "SDGCTL", "SDBCTL", "SDRRC", "SDSTAT",
+  "EBIU_SDGCTL", "EBIU_SDBCTL", "EBIU_SDRRC", "EBIU_SDSTAT",
 };
 #define mmr_name(off) mmr_names[(off) / 4]
 
