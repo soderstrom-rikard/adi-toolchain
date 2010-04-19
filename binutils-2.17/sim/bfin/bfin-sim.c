@@ -1702,7 +1702,10 @@ decode_ProgCtrl_0 (SIM_CPU *cpu, bu16 iw0, bu32 pc)
       TRACE_INSN (cpu, "IDLE;");
 
       /* Timewarp !  */
-      CYCLE_DELAY = events->time_from_event;
+      if (events->queue)
+	CYCLE_DELAY = events->time_from_event;
+      else
+	abort (); /* XXX: Should this ever happen ?  */
     }
   else if (prgfunc == 2 && poprnd == 3)
     {
