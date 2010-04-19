@@ -139,10 +139,8 @@ device_io_write_buffer (device *me, const void *source, int space,
 
 void device_error (device *me, const char *message, ...)
 {
-  /* Just do what hw_abort() does.  */
-  struct hw *dv_me = (struct hw *) me;
-  va_list ap;
-  va_start (ap, message);
-  hw_vabort (dv_me, message, ap);
-  va_end (ap);
+  /* Don't bother doing anything here -- any place in common code that
+     calls device_error() follows it with sim_hw_abort().  Since the
+     device isn't bound to the system yet, we can't call any common
+     hardware error funcs on it or we'll hit a NULL pointer.  */
 }
