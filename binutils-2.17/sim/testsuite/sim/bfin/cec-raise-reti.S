@@ -95,7 +95,10 @@ evt7:
 	RAISE 6;
 	[P0] = R7;
 	# ... but we should RETI here
-1:	JUMP fail_lvl;
+	# don't jump to fail_lvl as the pipeline might advance
+	# the PC to the fail_lvl point before the ivg actually
+	# gets a chance to fire
+1:	JUMP 1b;
 
 evt6:
 	R2 = RETI;
