@@ -56,9 +56,9 @@ dv_bfin_mmr_invalid (struct hw *me, address_word addr, unsigned nr_bytes)
 }
 
 void
-dv_bfin_mmr_require_16 (struct hw *me, address_word addr, unsigned nr_bytes)
+dv_bfin_mmr_require (struct hw *me, address_word addr, unsigned nr_bytes, unsigned size)
 {
-  if (nr_bytes != 2)
+  if (nr_bytes != size)
     dv_bfin_mmr_invalid (me, addr, nr_bytes);
 }
 

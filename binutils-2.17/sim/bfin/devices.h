@@ -94,8 +94,11 @@ dv_get_state (SIM_CPU *cpu, const char *device_name)
 }
 
 void dv_bfin_mmr_invalid (struct hw *, address_word, unsigned nr_bytes);
-void dv_bfin_mmr_require_16 (struct hw *, address_word, unsigned nr_bytes);
+void dv_bfin_mmr_require (struct hw *, address_word, unsigned nr_bytes, unsigned size);
 bool dv_bfin_mmr_check (struct hw *, address_word, unsigned nr_bytes);
+
+#define dv_bfin_mmr_require_16(hw, addr, nr_bytes) dv_bfin_mmr_require (hw, addr, nr_bytes, 2)
+#define dv_bfin_mmr_require_32(hw, addr, nr_bytes) dv_bfin_mmr_require (hw, addr, nr_bytes, 4)
 
 #define HW_TRACE_WRITE() \
   HW_TRACE ((me, "write 0x%08lx (%s) length %d with 0x%x", (long) addr, \

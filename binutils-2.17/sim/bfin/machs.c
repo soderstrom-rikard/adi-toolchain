@@ -341,7 +341,10 @@ bfin_model_hw_tree_init (SIM_DESC sd, SIM_CPU *cpu)
 		BFIN_MMR_EBIU_AMC_BASE, amc_size);
   sim_hw_parse (sd, "/core/bfin_ebiu_amc/type %i", mdata->model_num);
 
-  dv_bfin_hw_parse (sd, ebiu_sdc, EBIU_SDC);
+  if (mdata->model_num >= 540 && mdata->model_num <= 549)
+    dv_bfin_hw_parse (sd, ebiu_ddrc, EBIU_DDRC);
+  else
+    dv_bfin_hw_parse (sd, ebiu_sdc, EBIU_SDC);
 
   dv_bfin_hw_parse (sd, pll, PLL);
 
