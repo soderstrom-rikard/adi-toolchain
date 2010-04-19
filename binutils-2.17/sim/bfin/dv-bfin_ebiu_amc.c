@@ -23,9 +23,13 @@
 #include "devices.h"
 #include "dv-bfin_ebiu_amc.h"
 
+/* XXX: BF50x is like BF54x, not BF53x.  */
+
 struct bfin_ebiu_amc
 {
-  bu32 base, reg_size, bank_size;
+  bu32 base;
+  int type;
+  bu32 bank_size;
 
   /* Order after here is important -- matches hardware MMR layout.  */
   bu16 BFIN_MMR_16(amgctl);
@@ -39,7 +43,8 @@ struct bfin_ebiu_amc
 #define mmr_offset(mmr) (offsetof(struct bfin_ebiu_amc, mmr) - mmr_base())
 
 static const char * const mmr_names[] = {
-  "AMGCTL", "AMBCTL0", "AMBCTL1", "MSBCTL", "ARBSTAT", "MODE", "FCTL",
+  "EBIU_AMGCTL", "EBIU_AMBCTL0", "EBIU_AMBCTL1", "EBIU_MSBCTL",
+  "EBIU_ARBSTAT", "EBIU_MODE", "EBIU_FCTL",
 };
 #define mmr_name(off) mmr_names[(off) / 4]
 
@@ -47,25 +52,33 @@ static void
 bfin_ebiu_amc_write_amgctl (struct hw *me, struct bfin_ebiu_amc *amc,
 			    bu16 amgctl)
 {
-  int old_cnt, new_cnt;
-  bu32 old_size, new_size;
-
-  old_cnt = MIN ((amc->amgctl >> 1) & 0x7, 4);
-  new_cnt = MIN ((amgctl >> 1) & 0x7, 4);
-  old_size = old_cnt * amc->bank_size;
-  new_size = new_cnt * amc->bank_size;
+  bu32 amben, addr, i;
 
   amc->amgctl = amgctl;
+  amben = MIN ((amgctl >> 1) & 0x7, 4);
 
-#if 0
-  /* XXX: be nice if this was realloc() ...  */
-  if (old_cnt)
-    hw_detach_address (hw_parent (me), 0, 0, 
+  for (i = 0; i < 4; ++i)
+    {
+      char c;
+      unsigned read;
 
-    hw_attach_address (hw_parent (me), 0, 0, BFIN_ASYNC_BASE, new_size, me);
-		     0, attach_space, attach_address, attach_size, me);
-    hw_attach_address (me, BFIN_ASYNC_BASE
-#endif
+      addr = BFIN_EBIU_AMC_BASE + i * amc->bank_size;
+      read = sim_core_read_buffer (hw_system (me), NULL, read_map, &c, addr, 1);
+
+      if (i < amben)
+	{
+	  /* Enable the bank.  */
+	  if (read == 0)
+	    sim_core_attach (hw_system (me), NULL, 0, access_read_write_exec,
+			     0, addr, amc->bank_size, 0, NULL, NULL);
+	}
+      else
+	{
+	  /* Disable the bank.  */
+	  if (read == 1)
+	    sim_core_detach (hw_system (me), NULL, 0, 0, addr);
+	}
+    }
 }
 
 static unsigned
@@ -159,7 +172,7 @@ attach_bfin_ebiu_amc_regs (struct hw *me, struct bfin_ebiu_amc *amc)
 {
   address_word attach_address;
   int attach_space;
-  unsigned attach_size;
+  unsigned attach_size, reg_size;
   reg_property_spec reg;
 
   if (hw_find_property (me, "reg") == NULL)
@@ -168,23 +181,27 @@ attach_bfin_ebiu_amc_regs (struct hw *me, struct bfin_ebiu_amc *amc)
   if (!hw_find_reg_array_property (me, "reg", 0, &reg))
     hw_abort (me, "\"reg\" property must contain three addr/size entries");
 
+  if (hw_find_property (me, "type") == NULL)
+    hw_abort (me, "Missing \"type\" property");
+
+  amc->type = hw_find_integer_property (me, "type");
+  if (amc->type >= 540 && amc->type <= 549)
+    reg_size = BF54X_MMR_EBIU_AMC_SIZE;
+  else
+    reg_size = BFIN_MMR_EBIU_AMC_SIZE;
+
   hw_unit_address_to_attach_address (hw_parent (me),
 				     &reg.address,
 				     &attach_space, &attach_address, me);
   hw_unit_size_to_attach_size (hw_parent (me), &reg.size, &attach_size, me);
 
-  if (attach_size != BFIN_MMR_EBIU_AMC_SIZE &&
-      attach_size != BF54X_MMR_EBIU_AMC_SIZE)
-    hw_abort (me, "\"reg\" size must be %#x or %#x",
-	      BFIN_MMR_EBIU_AMC_SIZE, BF54X_MMR_EBIU_AMC_SIZE);
+  if (attach_size != reg_size)
+    hw_abort (me, "\"reg\" size must be %#x", reg_size);
 
   hw_attach_address (hw_parent (me),
 		     0, attach_space, attach_address, attach_size, me);
 
   amc->base = attach_address;
-  amc->reg_size = attach_size;
-  /* XXX: This is 16MB on some parts.  */
-  amc->bank_size = 1 * 1024 * 1024;
 }
 
 static void
@@ -201,12 +218,20 @@ bfin_ebiu_amc_finish (struct hw *me)
   attach_bfin_ebiu_amc_regs (me, amc);
 
   /* Initialize the AMC.  */
-  bfin_ebiu_amc_write_amgctl (me, amc, 0x00f2);
+  if ((amc->type >= 540 && amc->type <= 549) ||
+      amc->type == 561)
+    amc->bank_size = 64 * 1024 * 1024;
+  else
+    amc->bank_size = 1 * 1024 * 1024;
+  if (amc->type >= 500 && amc->type <= 509)
+    amc->amgctl = 0x00F3;
+  else if (amc->type >= 540 && amc->type <= 549)
+    amc->amgctl = 0x0002;
+  else
+    amc->amgctl = 0x00F2;
+  bfin_ebiu_amc_write_amgctl (me, amc, amc->amgctl);
   amc->ambctl0 = amc->ambctl1 = 0xffc2ffc2;
-  if (amc->reg_size == BF54X_MMR_EBIU_AMC_SIZE)
-    {
-      /* XXX: init these ...  */
-    }
+  amc->fctl = 0x6;
 }
 
 const struct hw_descriptor dv_bfin_ebiu_amc_descriptor[] = {

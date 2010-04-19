@@ -30,6 +30,7 @@
 #include "dv-bfin_ctimer.h"
 #include "dv-bfin_dma.h"
 #include "dv-bfin_ebiu_amc.h"
+#include "dv-bfin_ebiu_ddrc.h"
 #include "dv-bfin_ebiu_sdc.h"
 #include "dv-bfin_evt.h"
 #include "dv-bfin_mmu.h"
@@ -50,6 +51,7 @@ struct bfin_dev_layout {
 };
 struct bfin_model_data {
   bu32 chipid;
+  int model_num;
   const struct bfin_memory_layout *mem;
   size_t mem_count;
   const struct bfin_dev_layout *dev;
@@ -70,9 +72,9 @@ const MACH *sim_machs[] =
 /* [1] Common sim code can't model exec-only memory.
    http://sourceware.org/ml/gdb/2010-02/msg00047.html */
 
-#define bfin_chipid 0
-static const struct bfin_memory_layout bfin_mem[] = {};
-static const struct bfin_dev_layout bfin_dev[] = {};
+#define bf000_chipid 0
+static const struct bfin_memory_layout bf000_mem[] = {};
+static const struct bfin_dev_layout bf000_dev[] = {};
 
 #define bf50x_chipid 0x2800
 #define bf504_chipid bf50x_chipid
@@ -283,14 +285,11 @@ static const struct bfin_dev_layout bf561_dev[] = {
   DEVICE (0xFFC00400, BFIN_MMR_UART_SIZE, "bfin_uart"),
 };
 
-#define ASYNC_1_MEG (1 * 1024 * 1024)
-#define ASYNC_4_MEG (4 * 1024 * 1024)
-
 static const struct bfin_model_data bfin_model_data[] =
 {
 #define P(n) \
   [MODEL_BF##n] = { \
-    bf##n##_chipid, \
+    bf##n##_chipid, n, \
     bf##n##_mem, ARRAY_SIZE (bf##n##_mem), \
     bf##n##_dev, ARRAY_SIZE (bf##n##_dev), \
   },
@@ -313,6 +312,7 @@ static const struct bfin_dev_layout bfin_core_dev[] = {
     bu32 base = BFIN_MMR_##DV##_BASE; \
     bu32 size = BFIN_MMR_##DV##_SIZE; \
     sim_hw_parse (sd, "/core/bfin_"#dv"/reg %#x %i", base, size); \
+    sim_hw_parse (sd, "/core/bfin_"#dv"/type %i",  mdata->model_num); \
   } while (0)
 
 static void
@@ -322,6 +322,7 @@ bfin_model_hw_tree_init (SIM_DESC sd, SIM_CPU *cpu)
   const struct bfin_model_data *mdata = CPU_MODEL_DATA (cpu);
   int mnum = MODEL_NUM (model);
   unsigned i;
+  int amc_size;
 
   /* Map the core devices.  */
   for (i = 0; i < ARRAY_SIZE (bfin_core_dev); ++i)
@@ -331,9 +332,17 @@ bfin_model_hw_tree_init (SIM_DESC sd, SIM_CPU *cpu)
     }
   sim_hw_parse (sd, "/core/bfin_ctimer > ivtmr ivtmr /core/bfin_cec");
 
-  /* Map the common system devices.  */
-  dv_bfin_hw_parse (sd, ebiu_amc, EBIU_AMC);
+  /* Map the system devices.  */
+  if (mdata->model_num >= 540 && mdata->model_num <= 549)
+    amc_size = BF54X_MMR_EBIU_AMC_SIZE;
+  else
+    amc_size = BFIN_MMR_EBIU_AMC_SIZE;
+  sim_hw_parse (sd, "/core/bfin_ebiu_amc/reg %#x %i",
+		BFIN_MMR_EBIU_AMC_BASE, amc_size);
+  sim_hw_parse (sd, "/core/bfin_ebiu_amc/type %i", mdata->model_num);
+
   dv_bfin_hw_parse (sd, ebiu_sdc, EBIU_SDC);
+
   dv_bfin_hw_parse (sd, pll, PLL);
 
   dv_bfin_hw_parse (sd, sic, SIC);
@@ -382,7 +391,7 @@ bfin_model_cpu_init (SIM_DESC sd, SIM_CPU *cpu)
   int mnum = MODEL_NUM (model);
   size_t idx;
 
-  if (mnum == MODEL_BFin)
+  if (mnum == MODEL_BF000)
     return;
 
   mdata = &bfin_model_data[MODEL_NUM (model)];

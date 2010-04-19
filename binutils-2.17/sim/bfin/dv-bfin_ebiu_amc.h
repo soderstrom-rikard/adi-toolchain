@@ -27,4 +27,6 @@
 
 #define BF54X_MMR_EBIU_AMC_SIZE	(4 * 7)
 
+#define BFIN_EBIU_AMC_BASE	0x20000000
+
 #endif

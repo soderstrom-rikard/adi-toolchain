@@ -36,6 +36,8 @@ typedef enum mach_attr {
   MACH_MAX
 } MACH_ATTR;
 
+#define CPU_MODEL_NUM(cpu) MODEL_NUM (CPU_MODEL (cpu))
+
 void bfin_model_cpu_init (SIM_DESC, SIM_CPU *);
 bu32 bfin_model_get_chipid (SIM_DESC);
 bu32 bfin_model_get_dspid (SIM_DESC);
