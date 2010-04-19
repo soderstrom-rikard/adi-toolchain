@@ -752,6 +752,16 @@ algn (bu32 l, bu32 h, bu32 aln)
     return (l >> (8 * aln)) | (h << (32 - 8 * aln));
 }
 
+static bu32
+saturate_s16 (bu64 val)
+{
+  if ((bs64)val < -0x8000ll)
+    return 0x8000;
+  if ((bs64)val > 0x7fff)
+    return 0x7fff;
+  return val & 0xffff;
+}
+
 static bu40
 rot40 (bu40 val, int shift, bu32 *cc)
 {
@@ -858,11 +868,11 @@ sub32 (SIM_CPU *cpu, bu32 a, bu32 b, int carry, int sat, int parallel)
 }
 
 static bu32
-add16 (SIM_CPU *cpu, bu32 a, bu32 b, int *carry, int *overfl, int sat, int scale)
+add16 (SIM_CPU *cpu, bu16 a, bu16 b, int *carry, int *overfl, int *zero, int *neg, int sat, int scale)
 {
   int flgs = (a >> 15) & 1;
   int flgo = (b >> 15) & 1;
-  bu32 v = a + b;
+  bs64 v = (bs16)a + (bs16)b;
   int flgn = (v >> 15) & 1;
   int overflow = (flgs ^ flgn) & (flgo ^ flgn);
 
@@ -873,49 +883,43 @@ add16 (SIM_CPU *cpu, bu32 a, bu32 b, int *carry, int *overfl, int sat, int scale
     case 2:
       /* (ASR) */
       v = (a >> 1) + (a & 0x8000) + (b >> 1) + (b & 0x8000) + (((a & 1) + (b & 1)) >> 1);
-      flgn = (v >> 15) & 1;
-      overflow = (flgs ^ flgn) & (flgo ^ flgn);
+      v |= -(v & 0x8000);
       break;
     case 3:
       /* (ASL) */
       v = (v << 1);
-      flgn = (v >> 15) & 1;
-      overflow = (flgs ^ flgn) & (flgo ^ flgn);
       break;
     default:
       illegal_instruction (cpu);
     }
 
-  if (sat && overflow)
-    {
-      v = 1 << 15;
-      if (flgn)
-	v -= 1;
-    }
-  SET_ASTATREG (an, flgn);
+  flgn = (v >> 15) & 1;
+  overflow = (flgs ^ flgn) & (flgo ^ flgn);
 
-  if (!overfl)
-    overflow = 0;
+  if (v > (bs64)0xffff)
+    overflow = 1;
 
-  if (overflow)
-    SET_ASTATREG (vs, 1);
-  SET_ASTATREG (v, overflow);
-  ASTATREG (v_internal) |= overflow;
-  SET_ASTATREG (az, v == 0);
+  if (sat)
+    v = saturate_s16(v);
+
+  if (neg)
+    *neg |= (v >> 15) & 1;
+  if (overfl)
+    *overfl |= overflow;
+  if (zero)
+    *zero |= (v & 0xFFFF) == 0;
   if (carry)
-    {
-      *carry = (bu16)~a < (bu16)b;
-      SET_ASTATREG (ac0, *carry);
-    }
+      *carry |= ((bu16)~a < (bu16)b);
+
   return v & 0xffff;
 }
 
 static bu32
-sub16 (SIM_CPU *cpu, bu32 a, bu32 b, int *carry, int *overfl, int sat, int scale)
+sub16 (SIM_CPU *cpu, bu16 a, bu16 b, int *carry, int *overfl, int *zero, int *neg, int sat, int scale)
 {
   int flgs = (a >> 15) & 1;
   int flgo = (b >> 15) & 1;
-  bu32 v = a - b;
+  bs64 v = (bs16)a - (bs16)b;
   int flgn = (v >> 15) & 1;
   int overflow = (flgs ^ flgo) & (flgn ^ flgs);
 
@@ -926,7 +930,7 @@ sub16 (SIM_CPU *cpu, bu32 a, bu32 b, int *carry, int *overfl, int sat, int scale
     case 2:
       /* (ASR) */
       if (sat)
-	v = ((a >> 1) + (a & 0x8000)) - ( (b >> 1) + (b & 0x8000));
+	v = ((a >> 1) + (a & 0x8000)) - ( (b >> 1) + (b & 0x8000)) + (((a & 1)-(b & 1)));
       else
 	{
 	  v = ((v & 0xFFFF) >> 1);
@@ -936,91 +940,34 @@ sub16 (SIM_CPU *cpu, bu32 a, bu32 b, int *carry, int *overfl, int sat, int scale
 	      (flgs & !flgo & flgn))
 	    v |= 0x8000;
 	}
+      v |= -(v & 0x8000);
       flgn = (v >> 15) & 1;
       overflow = (flgs ^ flgo) & (flgn ^ flgs);
       break;
     case 3:
       /* (ASL) */
       v <<= 1;
+      if (v > (bs64)0x7fff || v < (bs64)-0xffff)
+        overflow = 1;
       break;
     default:
       illegal_instruction (cpu);
     }
 
-  if (sat && overflow)
+  if (sat)
     {
-      v = 1 << 15;
-      if (flgn)
-	v -= 1;
-      flgn = (v >> 15) & 1;
+      v = saturate_s16(v);
     }
-  SET_ASTATREG (an, flgn);
-  if (!overfl)
-    overflow = 0;
-
-  if  (overflow)
-    SET_ASTATREG (vs, 1);
-
-  SET_ASTATREG (v, overflow);
-  ASTATREG (v_internal) |= overflow;
-  SET_ASTATREG (az, v == 0);
+  if (neg)
+    *neg |= (v >> 15) & 1;
+  if (zero)
+    *zero |= (v & 0xFFFF) == 0;
+  if (overfl)
+    *overfl |= overflow;
   if (carry)
-    *carry = (bu16)b <= (bu16)a;
+    *carry |= (bu16)b <= (bu16)a;
   return v;
 }
-
-static bu32
-addadd16 (SIM_CPU *cpu, bu32 a, bu32 b, int sat, int scale, int x)
-{
-  int c0 = 0, c1 = 0;
-  bu32 x0, x1;
-  x0 = add16 (cpu, (a >> 16) & 0xffff, (b >> 16) & 0xffff, &c0, 0, sat, scale) & 0xffff;
-  x1 = add16 (cpu, a & 0xffff, b & 0xffff, &c1, 0, sat, scale) & 0xffff;
-  if (x == 0)
-    return (x0 << 16) | x1;
-  else
-    return (x1 << 16) | x0;
-}
-
-static bu32
-subsub16 (SIM_CPU *cpu, bu32 a, bu32 b, int sat, int scale, int x)
-{
-  int c0 = 0, c1 = 0;
-  bu32 x0, x1;
-  x0 = sub16 (cpu, (a >> 16) & 0xffff, (b >> 16) & 0xffff, &c0, 0, sat, scale) & 0xffff;
-  x1 = sub16 (cpu, a & 0xffff, b & 0xffff, &c1, 0, sat, scale) & 0xffff;
-  if (x == 0)
-    return (x0 << 16) | x1;
-  else
-    return (x1 << 16) | x0;
-}
-
-static bu32
-addsub16 (SIM_CPU *cpu, bu32 a, bu32 b, int sat, int scale, int x)
-{
-  int c0 = 0, c1 = 0;
-  bu32 x0, x1;
-  x0 = add16 (cpu, (a >> 16) & 0xffff, (b >> 16) & 0xffff, &c0, 0, sat, scale) & 0xffff;
-  x1 = sub16 (cpu, a & 0xffff, b & 0xffff, &c1, 0, sat, scale) & 0xffff;
-  if (x == 0)
-    return (x0 << 16) | x1;
-  else
-    return (x1 << 16) | x0;
-}
-
-static bu32
-subadd16 (SIM_CPU *cpu, bu32 a, bu32 b, int sat, int scale, int x)
-{
-  int c0 = 0, c1 = 0;
-  bu32 x0, x1;
-  x0 = sub16 (cpu, (a >> 16) & 0xffff, (b >> 16) & 0xffff, &c0, 0, sat, scale) & 0xffff;
-  x1 = add16 (cpu, a & 0xffff, b & 0xffff, &c1, 0, sat, scale) & 0xffff;
-  if (x == 0)
-    return (x0 << 16) | x1;
-  else
-    return (x1 << 16) | x0;
-}
-
 
 static bu32
 min32 (SIM_CPU *cpu, bu32 a, bu32 b)
@@ -1381,16 +1328,6 @@ saturate_s32 (bu64 val)
   if ((bs64)val > 0x7fffffff)
     return 0x7fffffff;
   return val;
-}
-
-static bu32
-saturate_s16 (bu64 val)
-{
-  if ((bs64)val < -0x8000ll)
-    return 0x8000;
-  if ((bs64)val > 0x7fff)
-    return 0x7fff;
-  return val & 0xffff;
 }
 
 static bu32
@@ -3784,7 +3721,7 @@ decode_dsp32alu_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1)
     }
   else if (aopcde == 2 || aopcde == 3)
     {
-      bu32 s1, s2, val;
+      bu32 s1, s2, val, ac0_i = 0, v_i = 0;
 
       TRACE_INSN (cpu, "R%i.%c = R%i.%c %c R%i.%c%s;",
 		  dst0, HL ? 'H' : 'L',
@@ -3801,10 +3738,12 @@ decode_dsp32alu_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1)
 	s1 >>= 16;
 
       if (aopcde == 2)
-	val = add16 (cpu, s1, s2, &ASTATREG (ac0), &ASTATREG (v), s, 0);
+	val = add16 (cpu, s1, s2, &ac0_i, &v_i, 0, 0, s, 0);
       else
-	val = sub16 (cpu, s1, s2, &ASTATREG (ac0), &ASTATREG (v), s, 0);
+	val = sub16 (cpu, s1, s2, &ac0_i, &v_i, 0, 0, s, 0);
 
+      SET_ASTATREG (ac0, ac0_i);
+      SET_ASTATREG (v, v_i);
       if (HL)
 	SET_DREG_H (dst0, val << 16);
       else
@@ -4169,21 +4108,29 @@ decode_dsp32alu_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1)
       bu32 s1h = s1 >> 16;
       bu32 s1l = s1 & 0xFFFF;
       bu32 t0, t1;
-      bu32 astat;
-      int v0 = 1;
+      bu32 astat, ac1_i = 0, ac0_i = 0, v_i = 0, z_i = 0, n_i = 0;
+
       TRACE_INSN (cpu, "R%i = R%i %c|%c R%i%s;", dst0, src0,
 		  (aop & 2) ? '-' : '+', (aop & 1) ? '-' : '+', src1,
 		  amod0 (s, x));
       if (aop & 2)
-	t0 = sub16 (cpu, s0h, s1h, &ASTATREG (ac1), &v0, s, 0);
+	t0 = sub16 (cpu, s0h, s1h, &ac1_i, &v_i, &z_i, &n_i, s, 0);
       else
-	t0 = add16 (cpu, s0h, s1h, &ASTATREG (ac1), &v0, s, 0);
-      astat = ASTAT;
+	t0 = add16 (cpu, s0h, s1h, &ac1_i, &v_i, &z_i, &n_i, s, 0);
+
       if (aop & 1)
-	t1 = sub16 (cpu, s0l, s1l, &ASTATREG (ac0), &v0, s, 0);
+	t1 = sub16 (cpu, s0l, s1l, &ac0_i, &v_i, &z_i, &n_i, s, 0);
       else
-	t1 = add16 (cpu, s0l, s1l, &ASTATREG (ac0), &v0, s, 0);
-      SET_ASTAT (astat | ASTAT);
+	t1 = add16 (cpu, s0l, s1l, &ac0_i, &v_i, &z_i, &n_i, s, 0);
+
+      SET_ASTATREG (ac1, ac1_i);
+      SET_ASTATREG (ac0, ac0_i);
+      SET_ASTATREG (az, z_i);
+      SET_ASTATREG (an, n_i);
+      SET_ASTATREG (v, v_i);
+      if (v_i)
+	SET_ASTATREG (vs, v_i);
+
       t0 &= 0xFFFF;
       t1 &= 0xFFFF;
       if (x)
@@ -4211,6 +4158,12 @@ decode_dsp32alu_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1)
   else if (aopcde == 1)
     {
       bu32 d0, d1;
+      bu32 x0, x1;
+      bu16 s0L =  (DREG(src0) & 0xFFFF);
+      bu16 s0H = ((DREG(src0) >> 16) & 0xFFFF);
+      bu16 s1L =  (DREG(src1) & 0xFFFF);
+      bu16 s1H = ((DREG(src1) >> 16) & 0xFFFF);
+      int v_i = 0, n_i = 0, z_i = 0;
 
       TRACE_INSN (cpu, "R%i = R%i %s R%i, R%i = R%i %s R%i%s;",
 		  dst1, src0, HL ? "+|-" : "+|+", src1, dst0, src0, HL ? "-|+" : "-|-", src1,
@@ -4218,14 +4171,36 @@ decode_dsp32alu_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1)
 
       if (HL == 0)
 	{
-	  d1 = addadd16 (cpu, DREG (src0), DREG (src1), s, aop, 0);
-	  d0 = subsub16 (cpu, DREG (src0), DREG (src1), s, aop, x);
+	  x0 = add16 (cpu, s0H, s1H, 0, &v_i, &z_i, &n_i, s, aop) & 0xffff;
+	  x1 = add16 (cpu, s0L, s1L, 0, &v_i, &z_i, &n_i, s, aop) & 0xffff;
+	  d1 = (x0 << 16) | x1;
+
+	  x0 = sub16 (cpu, s0H, s1H, 0, &v_i, &z_i, &n_i, s, aop) & 0xffff;
+	  x1 = sub16 (cpu, s0L, s1L, 0, &v_i, &z_i, &n_i, s, aop) & 0xffff;
+	  if (x == 0)
+	    d0 =(x0 << 16) | x1;
+	  else
+	    d0 = (x1 << 16) | x0;
 	}
       else
 	{
-	  d1 = addsub16 (cpu, DREG (src0), DREG (src1), s, aop, 0);
-	  d0 = subadd16 (cpu, DREG (src0), DREG (src1), s, aop, x);
+	  x0 = add16 (cpu, s0H, s1H, 0, &v_i, &z_i, &n_i, s, aop) & 0xffff;
+	  x1 = sub16 (cpu, s0L, s1L, 0, &v_i, &z_i, &n_i, s, aop) & 0xffff;
+	  d1 = (x0 << 16) | x1;
+
+	  x0 = sub16 (cpu, s0H, s1H, 0, &v_i, &z_i, &n_i, s, aop) & 0xffff;
+	  x1 = add16 (cpu, s0L, s1L, 0, &v_i, &z_i, &n_i, s, aop) & 0xffff;
+	  if (x == 0)
+	    d0 = (x0 << 16) | x1;
+	  else
+	    d0 = (x1 << 16) | x0;
 	}
+      SET_ASTATREG (az, z_i);
+      SET_ASTATREG (an, n_i);
+      SET_ASTATREG (v, v_i);
+      if (v_i)
+	SET_ASTATREG (vs, v_i);
+
       STORE (DREG (dst0), d0);
       STORE (DREG (dst1), d1);
     }
