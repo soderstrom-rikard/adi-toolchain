@@ -30,10 +30,10 @@ struct bfin_wdog
   bu32 base;
 
   /* Order after here is important -- matches hardware MMR layout.  */
-  bu16 BFIN_MMR_16(wdog_ctl);
-  bu32 wdog_cnt, wdog_stat;
+  bu16 BFIN_MMR_16(ctl);
+  bu32 cnt, stat;
 };
-#define mmr_base()      offsetof(struct bfin_wdog, wdog_ctl)
+#define mmr_base()      offsetof(struct bfin_wdog, ctl)
 #define mmr_offset(mmr) (offsetof(struct bfin_wdog, mmr) - mmr_base())
 
 static const char * const mmr_names[] = {
@@ -44,7 +44,7 @@ static const char * const mmr_names[] = {
 static bool
 bfin_wdog_enabled (struct bfin_wdog *wdog)
 {
-  return ((wdog->wdog_ctl & WDEN) != WDDIS);
+  return ((wdog->ctl & WDEN) != WDDIS);
 }
 
 static unsigned
@@ -72,25 +72,25 @@ bfin_wdog_io_write_buffer (struct hw *me, const void *source,
 
   switch (mmr_off)
     {
-    case mmr_offset(wdog_ctl):
+    case mmr_offset(ctl):
       dv_w1c_2_partial (value16p, value, WDRO);
       /* XXX: Should enable an event here to handle timeouts.  */
       break;
 
-    case mmr_offset(wdog_cnt):
+    case mmr_offset(cnt):
       /* Writes are discarded when enabeld.  */
       if (!bfin_wdog_enabled (wdog))
 	{
 	  *value32p = value;
 	  /* Writes to CNT preloads the STAT.  */
-	  wdog->wdog_stat = wdog->wdog_cnt;
+	  wdog->stat = wdog->cnt;
 	}
       break;
 
-    case mmr_offset(wdog_stat):
+    case mmr_offset(stat):
       /* When enabled, writes to STAT reload the counter.  */
       if (bfin_wdog_enabled (wdog))
-	wdog->wdog_stat = wdog->wdog_cnt;
+	wdog->stat = wdog->cnt;
       /* XXX: When disabled, are writes just ignored ?  */
       break;
     }
@@ -117,13 +117,13 @@ bfin_wdog_io_read_buffer (struct hw *me, void *dest,
 
   switch (mmr_off)
     {
-    case mmr_offset(wdog_ctl):
+    case mmr_offset(ctl):
       dv_bfin_mmr_require_16 (me, addr, nr_bytes);
       dv_store_2 (dest, *value16p);
       break;
 
-    case mmr_offset(wdog_cnt):
-    case mmr_offset(wdog_stat):
+    case mmr_offset(cnt):
+    case mmr_offset(stat):
       dv_store_4 (dest, *value32p);
       break;
     }
@@ -144,8 +144,8 @@ bfin_wdog_port_event (struct hw *me, int my_port, struct hw *source,
   struct bfin_wdog *wdog = hw_data (me);
   bu16 wdev;
 
-  wdog->wdog_ctl |= WDRO;
-  wdev = (wdog->wdog_ctl & WDEV);
+  wdog->ctl |= WDRO;
+  wdev = (wdog->ctl & WDEV);
   if (wdev != WDEV_NONE)
     hw_port_event (me, wdev, 1);
 }
@@ -194,7 +194,7 @@ bfin_wdog_finish (struct hw *me)
   attach_bfin_wdog_regs (me, wdog);
 
   /* Initialize the Watchdog.  */
-  wdog->wdog_ctl = WDDIS;
+  wdog->ctl = WDDIS;
 }
 
 const struct hw_descriptor dv_bfin_wdog_descriptor[] = {

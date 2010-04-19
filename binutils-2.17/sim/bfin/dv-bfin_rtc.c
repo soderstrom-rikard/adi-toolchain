@@ -32,14 +32,14 @@ struct bfin_rtc
   bu32 stat_shadow;
 
   /* Order after here is important -- matches hardware MMR layout.  */
-  bu32 rtc_stat;
-  bu16 BFIN_MMR_16(rtc_ictl);
-  bu16 BFIN_MMR_16(rtc_istat);
-  bu16 BFIN_MMR_16(rtc_swcnt);
-  bu32 rtc_alarm;
-  bu16 BFIN_MMR_16(rtc_pren);
+  bu32 stat;
+  bu16 BFIN_MMR_16(ictl);
+  bu16 BFIN_MMR_16(istat);
+  bu16 BFIN_MMR_16(swcnt);
+  bu32 alarm;
+  bu16 BFIN_MMR_16(pren);
 };
-#define mmr_base()      offsetof(struct bfin_rtc, rtc_stat)
+#define mmr_base()      offsetof(struct bfin_rtc, stat)
 #define mmr_offset(mmr) (offsetof(struct bfin_rtc, mmr) - mmr_base())
 
 static const char * const mmr_names[] = {
@@ -73,18 +73,18 @@ bfin_rtc_io_write_buffer (struct hw *me, const void *source,
   /* XXX: These probably need more work.  */
   switch (mmr_off)
     {
-    case mmr_offset(rtc_stat):
+    case mmr_offset(stat):
       /* XXX: Ignore these since we are wired to host.  */
       break;
-    case mmr_offset(rtc_istat):
+    case mmr_offset(istat):
       dv_w1c_2 (value16p, value, 1 << 14);
       break;
-    case mmr_offset(rtc_alarm):
+    case mmr_offset(alarm):
       break;
-    case mmr_offset(rtc_ictl):
+    case mmr_offset(ictl):
       /* XXX: This should schedule an event handler.  */
-    case mmr_offset(rtc_swcnt):
-    case mmr_offset(rtc_pren):
+    case mmr_offset(swcnt):
+    case mmr_offset(pren):
       break;
     }
 
@@ -110,7 +110,7 @@ bfin_rtc_io_read_buffer (struct hw *me, void *dest,
 
   switch (mmr_off)
     {
-    case mmr_offset(rtc_stat):
+    case mmr_offset(stat):
       {
 	time_t t = time (NULL);
 	struct tm *tm = localtime (&t);
@@ -122,13 +122,13 @@ bfin_rtc_io_read_buffer (struct hw *me, void *dest,
 	dv_store_4 (dest, value);
 	break;
       }
-    case mmr_offset(rtc_alarm):
+    case mmr_offset(alarm):
       dv_store_4 (dest, *value32p);
       break;
-    case mmr_offset(rtc_istat):
-    case mmr_offset(rtc_ictl):
-    case mmr_offset(rtc_swcnt):
-    case mmr_offset(rtc_pren):
+    case mmr_offset(istat):
+    case mmr_offset(ictl):
+    case mmr_offset(swcnt):
+    case mmr_offset(pren):
       dv_store_2 (dest, *value16p);
       break;
     }
