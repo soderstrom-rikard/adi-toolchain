@@ -33,6 +33,15 @@
 #define EVT4         (EVT0 + 4 * 4)
 #define EVT5         (EVT0 + 4 * 5)
 #define EVT6         (EVT0 + 4 * 6)
+#define EVT7         (EVT0 + 4 * 7)
+#define EVT8         (EVT0 + 4 * 8)
+#define EVT9         (EVT0 + 4 * 9)
+#define EVT10        (EVT0 + 4 * 10)
+#define EVT11        (EVT0 + 4 * 11)
+#define EVT12        (EVT0 + 4 * 12)
+#define EVT13        (EVT0 + 4 * 13)
+#define EVT14        (EVT0 + 4 * 14)
+#define EVT15        (EVT0 + 4 * 15)
 
 #define EVT_OVERRIDE 0xFFE02100
 #define IMASK        (EVT_OVERRIDE + 4 * 1)
