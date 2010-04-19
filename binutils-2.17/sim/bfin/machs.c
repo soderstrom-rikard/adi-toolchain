@@ -39,6 +39,7 @@
 #include "dv-bfin_sic.h"
 #include "dv-bfin_trace.h"
 #include "dv-bfin_uart.h"
+#include "dv-bfin_uart2.h"
 #include "dv-bfin_wdog.h"
 
 struct bfin_memory_layout {
@@ -88,7 +89,7 @@ static const struct bfin_memory_layout bf50x_mem[] = {
 #define bf504_mem bf50x_mem
 #define bf506_mem bf50x_mem
 static const struct bfin_dev_layout bf50x_dev[] = {
-  DEVICE (0xFFC00400, BFIN_MMR_UART_SIZE, "bfin_uart"),
+  DEVICE (0xFFC00400, BFIN_MMR_UART2_SIZE, "bfin_uart2"),
 };
 #define bf504_dev bf50x_dev
 #define bf506_dev bf50x_dev
@@ -259,10 +260,10 @@ static const struct bfin_memory_layout bf54x_mem[] = {
 #define bf548_mem bf54x_mem
 #define bf549_mem bf54x_mem
 static const struct bfin_dev_layout bf54x_dev[] = {
-  DEVICE (0xFFC00400, BFIN_MMR_UART_SIZE, "bfin_uart@0"),
-  DEVICE (0xFFC02000, BFIN_MMR_UART_SIZE, "bfin_uart@1"),
-  DEVICE (0xFFC02100, BFIN_MMR_UART_SIZE, "bfin_uart@2"),
-  DEVICE (0xFFC03100, BFIN_MMR_UART_SIZE, "bfin_uart@3"),
+  DEVICE (0xFFC00400, BFIN_MMR_UART2_SIZE, "bfin_uart2@0"),
+  DEVICE (0xFFC02000, BFIN_MMR_UART2_SIZE, "bfin_uart2@1"),
+  DEVICE (0xFFC02100, BFIN_MMR_UART2_SIZE, "bfin_uart2@2"),
+  DEVICE (0xFFC03100, BFIN_MMR_UART2_SIZE, "bfin_uart2@3"),
 };
 #define bf542_dev bf54x_dev
 #define bf544_dev bf54x_dev

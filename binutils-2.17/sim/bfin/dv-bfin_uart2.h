@@ -1,5 +1,5 @@
 /* Blackfin Universal Asynchronous Receiver/Transmitter (UART) model.
-   For "old style" UARTs on BF53x/etc... parts.
+   For "new style" UARTs on BF50x/BF54x parts.
 
    Copyright (C) 2010 Free Software Foundation, Inc.
    Contributed by Analog Devices, Inc.
@@ -19,23 +19,15 @@
    You should have received a copy of the GNU General Public License
    along with this program.  If not, see <http://www.gnu.org/licenses/>.  */
 
-#ifndef DV_BFIN_UART_H
-#define DV_BFIN_UART_H
+#ifndef DV_BFIN_UART2_H
+#define DV_BFIN_UART2_H
+
+#include "dv-bfin_uart.h"
 
 /* XXX: This should be pushed into the model data.  */
-#define BFIN_MMR_UART_SIZE	0x30
+#define BFIN_MMR_UART2_SIZE	0x30
 
-struct bfin_uart;
-bu16 bfin_uart_get_next_byte (struct hw *, struct bfin_uart *, bu16);
-bu16 bfin_uart_send_byte (struct hw *, bu16);
-bu16 bfin_uart_get_status (struct hw *, struct bfin_uart *, bu16);
-
-/* UART_LCR */
-#define DLAB (1 << 7)
-
-/* UART_LSR */
-#define TEMT (1 << 6)
-#define THRE (1 << 5)
-#define DR (1 << 0)
+/* UART_MSR */
+#define SCTS (1 << 0)
 
 #endif

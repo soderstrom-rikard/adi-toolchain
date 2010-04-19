@@ -1,5 +1,5 @@
 /* Blackfin Universal Asynchronous Receiver/Transmitter (UART) model.
-   For "old style" UARTs on BF53x/etc... parts.
+   For "new style" UARTs on BF50x/BF54x parts.
 
    Copyright (C) 2010 Free Software Foundation, Inc.
    Contributed by Analog Devices, Inc.
@@ -22,67 +22,43 @@
 #include "sim-main.h"
 #include "dv-sockser.h"
 #include "devices.h"
-#include "dv-bfin_uart.h"
+#include "dv-bfin_uart2.h"
 
 /* XXX: Should we bother emulating the TX/RX FIFOs ?  */
 
 struct bfin_uart
 {
-  /* Internal state needs to be the same as bfin_uart2.  */
+  /* Internal state needs to be the same as bfin_uart.  */
   bu32 base;
   char saved_byte;
   int saved_count;
 
-  /* These are aliased to DLL.  */
-  bu16 BFIN_MMR_16(thr), BFIN_MMR_16(rbr);
-  /* This is aliased to DLH.  */
-  bu16 BFIN_MMR_16(ier);
+  /* Accessed indirectly by ier_{set,clear}.  */
+  bu16 ier;
 
   /* Order after here is important -- matches hardware MMR layout.  */
   bu16 BFIN_MMR_16(dll);
   bu16 BFIN_MMR_16(dlh);
-  bu16 BFIN_MMR_16(iir);
+  bu16 BFIN_MMR_16(gctl);
   bu16 BFIN_MMR_16(lcr);
   bu16 BFIN_MMR_16(mcr);
   bu16 BFIN_MMR_16(lsr);
   bu16 BFIN_MMR_16(msr);
   bu16 BFIN_MMR_16(scr);
-  bu32 _pad0;
-  bu16 BFIN_MMR_16(gctl);
+  bu16 BFIN_MMR_16(ier_set);
+  bu16 BFIN_MMR_16(ier_clear);
+  bu16 BFIN_MMR_16(thr);
+  bu16 BFIN_MMR_16(rbr);
 };
 #define mmr_base()      offsetof(struct bfin_uart, dll)
 #define mmr_offset(mmr) (offsetof(struct bfin_uart, mmr) - mmr_base())
 
 static const char * const mmr_names[] = {
-  "UART_RBR/UART_THR", "UART_IER", "UART_IIR", "UART_LCR", "UART_MCR",
-  "UART_LSR", "UART_MSR", "UART_SCR", "<INV>", "UART_GCTL",
+  "UART_DLL", "UART_DLH", "UART_GCTL", "UART_LCR", "UART_MCR", "UART_LSR",
+  "UART_MSR", "UART_SCR", "UART_IER_SET", "UART_IER_CLEAR", "UART_THR",
+  "UART_RBR",
 };
-static const char *mmr_name (struct bfin_uart *uart, bu32 idx)
-{
-  if (uart->lcr & DLAB)
-    if (idx < 2)
-      return idx == 0 ? "UART_DLL" : "UART_DLH";
-  return mmr_names[idx];
-}
-#define mmr_name(off) mmr_name (uart, (off) / 4)
-
-bu16
-bfin_uart_send_byte (struct hw *me, bu16 thr)
-{
-  SIM_DESC sd = hw_system (me);
-  int status = dv_sockser_status (sd);
-
-  if (status & DV_SOCKSER_DISCONNECTED)
-    {
-      char ch = thr;
-      sim_io_write_stdout (sd, &ch, 1);
-      sim_io_flush_stdout (sd);
-    }
-  else
-    dv_sockser_write (sd, thr);
-
-  return thr;
-}
+#define mmr_name(off) mmr_names[(off) / 4]
 
 static unsigned
 bfin_uart_io_write_buffer (struct hw *me, const void *source,
@@ -105,26 +81,30 @@ bfin_uart_io_write_buffer (struct hw *me, const void *source,
 
   switch (mmr_off)
     {
-    case mmr_offset(dll):
-      if (uart->lcr & DLAB)
-	uart->dll = value;
-      else
-	uart->thr = bfin_uart_send_byte (me, value);
+    case mmr_offset(thr):
+      uart->thr = bfin_uart_send_byte (me, value);
       break;
-    case mmr_offset(dlh):
-      if (uart->lcr & DLAB)
-	uart->dlh = value;
-      else
-	uart->ier = value;
+    case mmr_offset(ier_set):
+      uart->ier |= value;
       break;
-    case mmr_offset(iir):
+    case mmr_offset(ier_clear):
+      dv_w1c_2 (&uart->ier, value, 0);
+      break;
     case mmr_offset(lsr):
+      dv_w1c_2 (valuep, value, TEMT | THRE | DR);
+      break;
+    case mmr_offset(rbr):
       /* XXX: Writes are ignored ?  */
       break;
+    case mmr_offset(msr):
+      dv_w1c_2 (valuep, value, SCTS);
+      break;
+    case mmr_offset(dll):
+    case mmr_offset(dlh):
+    case mmr_offset(gctl):
     case mmr_offset(lcr):
     case mmr_offset(mcr):
     case mmr_offset(scr):
-    case mmr_offset(gctl):
       *valuep = value;
       break;
     default:
@@ -133,54 +113,6 @@ bfin_uart_io_write_buffer (struct hw *me, const void *source,
     }
 
   return nr_bytes;
-}
-
-/* Switch between socket and stdin on the fly.  */
-bu16
-bfin_uart_get_next_byte (struct hw *me, struct bfin_uart *uart, bu16 rbr)
-{
-  SIM_DESC sd = hw_system (me);
-  int status = dv_sockser_status (sd);
-
-  if (status & DV_SOCKSER_DISCONNECTED)
-    {
-      if (uart->saved_count > 0)
-	{
-	  rbr = uart->saved_byte;
-	  --uart->saved_count;
-	}
-      else
-	{
-	  char byte;
-	  int ret = sim_io_poll_read (sd, 0/*STDIN*/, &byte, 1);
-	  if (ret > 0)
-	    rbr = byte;
-	}
-    }
-  else
-    rbr = dv_sockser_read (sd);
-
-  return rbr;
-}
-
-bu16
-bfin_uart_get_status (struct hw *me, struct bfin_uart *uart, bu16 lsr)
-{
-  SIM_DESC sd = hw_system (me);
-  int status = dv_sockser_status (sd);
-
-  if (status & DV_SOCKSER_DISCONNECTED)
-    {
-      if (uart->saved_count <= 0)
-	uart->saved_count = sim_io_poll_read (sd, 0/*STDIN*/,
-					      &uart->saved_byte, 1);
-      lsr |= TEMT | THRE | (uart->saved_count > 0 ? DR : 0);
-    }
-  else
-    lsr |= (status & DV_SOCKSER_INPUT_EMPTY ? 0 : DR) |
-		 (status & DV_SOCKSER_OUTPUT_EMPTY ? TEMT | THRE : 0);
-
-  return lsr;
 }
 
 static unsigned
@@ -200,33 +132,24 @@ bfin_uart_io_read_buffer (struct hw *me, void *dest,
 
   switch (mmr_off)
     {
-    case mmr_offset(dll):
-      if (uart->lcr & DLAB)
-	dv_store_2 (dest, uart->dll);
-      else
-	{
-	  uart->rbr = bfin_uart_get_next_byte (me, uart, uart->rbr);
-	  dv_store_2 (dest, uart->rbr);
-	}
+    case mmr_offset(rbr):
+      uart->rbr = bfin_uart_get_next_byte (me, uart, uart->rbr);
+      dv_store_2 (dest, uart->rbr);
       break;
-    case mmr_offset(dlh):
-      if (uart->lcr & DLAB)
-	dv_store_2 (dest, uart->dlh);
-      else
-	dv_store_2 (dest, uart->ier);
+    case mmr_offset(ier_set):
+    case mmr_offset(ier_clear):
+      dv_store_2 (dest, uart->ier);
       break;
     case mmr_offset(lsr):
-      /* XXX: Reads are destructive on most parts, but not all ...  */
       uart->lsr |= bfin_uart_get_status (me, uart, uart->lsr);
-      dv_store_2 (dest, *valuep);
-      uart->lsr = 0;
-      break;
-    case mmr_offset(iir):
-      /* XXX: Reads are destructive ...  */
+    case mmr_offset(thr):
+    case mmr_offset(msr):
+    case mmr_offset(dll):
+    case mmr_offset(dlh):
+    case mmr_offset(gctl):
     case mmr_offset(lcr):
     case mmr_offset(mcr):
     case mmr_offset(scr):
-    case mmr_offset(gctl):
       dv_store_2 (dest, *valuep);
       break;
     default:
@@ -256,8 +179,8 @@ attach_bfin_uart_regs (struct hw *me, struct bfin_uart *uart)
 				     &attach_space, &attach_address, me);
   hw_unit_size_to_attach_size (hw_parent (me), &reg.size, &attach_size, me);
 
-  if (attach_size != BFIN_MMR_UART_SIZE)
-    hw_abort (me, "\"reg\" size must be %#x", BFIN_MMR_UART_SIZE);
+  if (attach_size != BFIN_MMR_UART2_SIZE)
+    hw_abort (me, "\"reg\" size must be %#x", BFIN_MMR_UART2_SIZE);
 
   hw_attach_address (hw_parent (me),
 		     0, attach_space, attach_address, attach_size, me);
@@ -280,11 +203,10 @@ bfin_uart_finish (struct hw *me)
 
   /* Initialize the UART.  */
   uart->dll = 0x0001;
-  uart->iir = 0x0001;
   uart->lsr = 0x0060;
 }
 
-const struct hw_descriptor dv_bfin_uart_descriptor[] = {
-  {"bfin_uart", bfin_uart_finish,},
+const struct hw_descriptor dv_bfin_uart2_descriptor[] = {
+  {"bfin_uart2", bfin_uart_finish,},
   {NULL, NULL},
 };
