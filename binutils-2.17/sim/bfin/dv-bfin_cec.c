@@ -544,8 +544,7 @@ _cec_raise (SIM_CPU *cpu, struct bfin_cec *cec, int ivg)
 	    SET_RETXREG (oldpc);
 	  else
 	    {
-	      bu32 nextpc = hwloop_get_next_pc (cpu, oldpc,
-						BFIN_CPU_STATE.insn_len);
+	      bu32 nextpc = hwloop_get_next_pc (cpu, oldpc, INSN_LEN);
 	      SET_RETXREG (nextpc);
 	    }
 

@@ -5514,7 +5514,10 @@ _interp_insn_bfin (SIM_CPU *cpu, bu32 pc)
       insn_len = 2;
       TRACE_EXTRACT (cpu, "%s: iw0:%#x", __func__, iw0);
     }
-  BFIN_CPU_STATE.insn_len = insn_len;
+
+  /* Only cache on first run through (in case of parallel insns).  */
+  if (INSN_LEN == 0)
+    INSN_LEN = insn_len;
 
   if ((iw0 & 0xf7ff) == 0xc003 && iw1 == 0x1800)
     TRACE_INSN (cpu, "MNOP;");
@@ -5605,13 +5608,11 @@ interp_insn_bfin (SIM_CPU *cpu, bu32 pc)
   bu32 insn_len;
 
   BFIN_CPU_STATE.n_stores = 0;
-
   DIS_ALGN_EXPT &= ~1;
   CYCLE_DELAY = 1;
+  INSN_LEN = 0;
 
   insn_len = _interp_insn_bfin (cpu, pc);
-
-  BFIN_CPU_STATE.insn_len = 0;
 
   /* Proper display of multiple issue instructions.  */
   if (insn_len == 8)
@@ -5628,6 +5629,10 @@ interp_insn_bfin (SIM_CPU *cpu, bu32 pc)
     }
 
   cycles_inc (cpu, CYCLE_DELAY);
+
+  /* Set back to zero in case a pending CEC event occurs
+     after this this insn.  */
+  INSN_LEN = 0;
 
   return insn_len;
 }
