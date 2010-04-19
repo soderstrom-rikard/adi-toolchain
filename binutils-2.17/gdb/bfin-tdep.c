@@ -1190,6 +1190,7 @@ bfin_gdbarch_init (struct gdbarch_info info, struct gdbarch_list *arches)
   set_gdbarch_num_pseudo_regs (gdbarch, 0);
   set_gdbarch_sp_regnum (gdbarch, BFIN_SP_REGNUM);
   set_gdbarch_pc_regnum (gdbarch, BFIN_PC_REGNUM);
+  set_gdbarch_ps_regnum (gdbarch, BFIN_ASTAT_REGNUM);
   set_gdbarch_dwarf2_reg_to_regnum (gdbarch, bfin_reg_to_regnum);
   set_gdbarch_register_name (gdbarch, bfin_register_name);
   set_gdbarch_register_type (gdbarch, bfin_register_type);
