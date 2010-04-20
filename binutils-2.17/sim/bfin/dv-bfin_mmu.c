@@ -235,17 +235,33 @@ const struct hw_descriptor dv_bfin_mmu_descriptor[] = {
 #define MMU_STATE(cpu) ((struct bfin_mmu *) dv_get_state (cpu, "/core/bfin_mmu"))
 
 void
-mmu_process_fault (SIM_CPU *cpu, bu32 addr, bool write, bool inst, bool unaligned)
+mmu_log_ifault (SIM_CPU *cpu)
+{
+  struct bfin_mmu *mmu = MMU_STATE (cpu);
+  mmu->icplb_fault_addr = PCREG;
+  mmu->icplb_fault_status = (cec_get_ivg (cpu) >= 0) << 17;
+}
+
+void
+mmu_process_fault (SIM_CPU *cpu, bu32 addr, bool write, bool inst,
+		   bool unaligned, bool miss)
 {
   struct bfin_mmu *mmu = MMU_STATE (cpu);
   bu32 *fault_status, *fault_addr;
 
   fault_status = inst ? &mmu->icplb_fault_status : &mmu->dcplb_fault_status;
   fault_addr = inst ? &mmu->icplb_fault_addr : &mmu->dcplb_fault_addr;
+  /* ICPLB regs always get updated.  */
+  if (!inst)
+    {
+      mmu->icplb_fault_addr = PCREG;
+      mmu->icplb_fault_status = (cec_get_ivg (cpu) >= 0) << 17;
+    }
 
   *fault_addr = addr;
   /* XXX: should handle FAULT_DAG.  */
   *fault_status =
+	(miss << 19) |
 	((cec_get_ivg (cpu) >= 0) << 17) |
 	(write << 16);
 
@@ -263,5 +279,5 @@ void
 mmu_check_addr (SIM_CPU *cpu, bu32 addr, bool write, bool inst, int size)
 {
   if (addr & (size - 1))
-    mmu_process_fault (cpu, addr, write, inst, true);
+    mmu_process_fault (cpu, addr, write, inst, true, false);
 }

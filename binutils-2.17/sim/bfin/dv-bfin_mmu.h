@@ -25,6 +25,7 @@
 #define BFIN_COREMMR_MMU_SIZE	0x2000
 
 void mmu_check_addr (SIM_CPU *, bu32 addr, bool write, bool inst, int size);
-void mmu_process_fault (SIM_CPU *, bu32 addr, bool write, bool inst, bool unaligned);
+void mmu_process_fault (SIM_CPU *, bu32 addr, bool write, bool inst, bool unaligned, bool miss);
+void mmu_log_ifault (SIM_CPU *);
 
 #endif

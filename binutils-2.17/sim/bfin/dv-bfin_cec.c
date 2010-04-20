@@ -22,6 +22,7 @@
 #include "devices.h"
 #include "dv-bfin_cec.h"
 #include "dv-bfin_evt.h"
+#include "dv-bfin_mmu.h"
 
 struct bfin_cec
 {
@@ -338,6 +339,9 @@ cec_exception (SIM_CPU *cpu, int excp)
       SET_EXCAUSE (excp);
       if (STATE_ENVIRONMENT (sd) == OPERATING_ENVIRONMENT)
 	{
+	  /* ICPLB regs always get updated.  */
+	  if (excp != VEC_MISALI_I && excp != VEC_CPLB_I_M)
+	    mmu_log_ifault (cpu);
 	  _cec_raise (cpu, CEC_STATE (cpu), IVG_EVX);
 	  /* We need to restart the engine so that we don't return
 	     and continue processing this bad insn.  */

@@ -289,7 +289,7 @@ do { \
   __cnt = sim_core_write_buffer (CPU_STATE(cpu), cpu, write_map, \
 				 (void *)&__v, __taddr, __bytes); \
   if (__cnt != __bytes) \
-    mmu_process_fault (cpu, __taddr, true, false, false); \
+    mmu_process_fault (cpu, __taddr, true, false, false, true); \
   TRACE_CORE (cpu, __taddr, __bytes, write_map, __v); \
 } while (0)
 #define PUT_BYTE(taddr, v) __PUT_MEM(taddr, v, 8)
@@ -305,7 +305,7 @@ do { \
   __cnt = sim_core_read_buffer (CPU_STATE(cpu), cpu, map, \
 				(void *)&__ret, __taddr, __bytes); \
   if (__cnt != __bytes) \
-    mmu_process_fault (cpu, __taddr, false, inst, false); \
+    mmu_process_fault (cpu, __taddr, false, inst, false, true); \
   TRACE_CORE (cpu, __taddr, __bytes, map, __ret); \
   __ret; \
 })
