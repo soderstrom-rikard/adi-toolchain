@@ -1331,9 +1331,17 @@ static bu32
 saturate_s32 (bu64 val, int *overflow)
 {
   if ((bs64)val < -0x80000000ll)
-    return 0x80000000;
+    {
+      if (overflow)
+	*overflow = 1;
+      return 0x80000000;
+    }
   if ((bs64)val > 0x7fffffff)
-    return 0x7fffffff;
+    {
+      if (overflow)
+	*overflow = 1;
+      return 0x7fffffff;
+    }
   return val;
 }
 
@@ -4291,6 +4299,7 @@ decode_dsp32alu_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1)
       bs40 acc0 = get_extended_acc (cpu, 0);
       bs40 acc1 = get_extended_acc (cpu, 1);
       bs40 val0, val1;
+      bu32 sat, sat_i;
 
       TRACE_INSN (cpu, "R%i = A%i + A%i, R%i = A%i - A%i%s",
 		  dst1, !aop, aop, dst0, !aop, aop, amod1 (s, x));
@@ -4303,11 +4312,18 @@ decode_dsp32alu_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1)
 
       if (s)
 	{
-	  val0 = saturate_s32 (val0, 0);
-	  val1 = saturate_s32 (val1, 0);
+	  val0 = saturate_s32 (val0, &sat);
+	  sat_i = sat;
+	  val1 = saturate_s32 (val1, &sat);
+	  sat_i |= sat;
+	  SET_ASTATREG (v, sat_i);
+	  if (sat_i)
+	    SET_ASTATREG (vs, sat_i);
 	}
       STORE (DREG (dst0), val0);
       STORE (DREG (dst1), val1);
+      SET_ASTATREG (an, val0 & 0x80000000 || val1 & 0x80000000);
+      SET_ASTATREG (az, val0 == 0 || val1 == 0);
     }
   else if (aop == 0 && aopcde == 18)
     {
