@@ -106,7 +106,7 @@ bfin_mmu_io_write_buffer (struct hw *me, const void *source,
     {
     case mmr_offset(dmem_control):
     case mmr_offset(imem_control):
-      /* XXX: resize on-chip memories.  */
+      /* XXX: IMC/DMC bit should add/remove L1 cache regions ...  */
     case mmr_offset(dtest_command):
     case mmr_offset(dtest_data[0]) ... mmr_offset(dtest_data[2]):
       /* XXX: should do something here.  */
@@ -152,7 +152,6 @@ bfin_mmu_io_read_buffer (struct hw *me, void *dest,
     {
     case mmr_offset(dmem_control):
     case mmr_offset(imem_control):
-
     case mmr_offset(dtest_command):
     case mmr_offset(dtest_data[0]) ... mmr_offset(dtest_data[2]):
       /* XXX: should do something here.  */
@@ -242,11 +241,11 @@ mmu_log_ifault (SIM_CPU *cpu)
   mmu->icplb_fault_status = (cec_get_ivg (cpu) >= 0) << 17;
 }
 
-void
-mmu_process_fault (SIM_CPU *cpu, bu32 addr, bool write, bool inst,
-		   bool unaligned, bool miss)
+static void
+_mmu_process_fault (SIM_CPU *cpu, struct bfin_mmu *mmu, bu32 addr, bool write,
+		    bool inst, bool unaligned, bool miss)
 {
-  struct bfin_mmu *mmu = MMU_STATE (cpu);
+  bool supv = cec_is_supervisor_mode (cpu);
   bu32 *fault_status, *fault_addr;
 
   fault_status = inst ? &mmu->icplb_fault_status : &mmu->dcplb_fault_status;
@@ -255,14 +254,14 @@ mmu_process_fault (SIM_CPU *cpu, bu32 addr, bool write, bool inst,
   if (!inst)
     {
       mmu->icplb_fault_addr = PCREG;
-      mmu->icplb_fault_status = (cec_get_ivg (cpu) >= 0) << 17;
+      mmu->icplb_fault_status = supv << 17;
     }
 
   *fault_addr = addr;
   /* XXX: should handle FAULT_DAG.  */
   *fault_status =
 	(miss << 19) |
-	((cec_get_ivg (cpu) >= 0) << 17) |
+	(supv << 17) |
 	(write << 16);
 
   /* XXX: correct precedence order ?  Multiple exceptions ?  */
@@ -274,10 +273,104 @@ mmu_process_fault (SIM_CPU *cpu, bu32 addr, bool write, bool inst,
     cec_exception (cpu, inst ? VEC_CPLB_I_M : VEC_CPLB_M);
 }
 
-/* XXX: Need to flesh this out more.  */
+void
+mmu_process_fault (SIM_CPU *cpu, bu32 addr, bool write, bool inst,
+		   bool unaligned, bool miss)
+{
+  struct bfin_mmu *mmu = MMU_STATE (cpu);
+  _mmu_process_fault (cpu, mmu, addr, write, inst, unaligned, miss);
+}
+
 void
 mmu_check_addr (SIM_CPU *cpu, bu32 addr, bool write, bool inst, int size)
 {
+  struct bfin_mmu *mmu = MMU_STATE (cpu);
+  bu32 *fault_status, *fault_addr, *mem_control, *cplb_addr, *cplb_data;
+  bu32 faults;
+  bool supv;
+  int i, hits;
+
   if (addr & (size - 1))
-    mmu_process_fault (cpu, addr, write, inst, true, false);
+    _mmu_process_fault (cpu, mmu, addr, write, inst, true, false);
+
+  fault_status = inst ? &mmu->icplb_fault_status : &mmu->dcplb_fault_status;
+  fault_addr = inst ? &mmu->icplb_fault_addr : &mmu->dcplb_fault_addr;
+  mem_control = inst ? &mmu->imem_control : &mmu->dmem_control;
+  cplb_addr = inst ? &mmu->icplb_addr[0] : &mmu->dcplb_addr[0];
+  cplb_data = inst ? &mmu->icplb_data[0] : &mmu->dcplb_data[0];
+
+  /* CPLBs disabled -> nothing to do.  */
+  if (!(*mem_control & ENCPLB))
+    return;
+
+  supv = cec_is_supervisor_mode (cpu);
+  faults = 0;
+  hits = 0;
+  for (i = 0; i < 16; ++i)
+    {
+      const bu32 pages[4] = { 0x400, 0x1000, 0x100000, 0x400000 };
+      bu32 addr_lo, addr_hi;
+
+      /* Skip invalid entries.  */
+      if (!(cplb_data[i] & CPLB_VALID))
+	continue;
+
+      /* See if this entry covers this address.  */
+      addr_lo = cplb_addr[i];
+      addr_hi = cplb_addr[i] + pages[(cplb_data[i] & PAGE_SIZE) >> 16];
+      if (addr < addr_lo || addr >= addr_hi)
+	continue;
+
+      ++hits;
+      if (write)
+	{
+	  if (!supv && !(cplb_data[i] & CPLB_USER_WR))
+	    faults |= (1 << i);
+	  if (supv && !(cplb_data[i] & CPLB_SUPV_WR))
+	    faults |= (1 << i);
+	}
+      else
+	{
+	  if (!supv && !(cplb_data[i] & CPLB_USER_RD))
+	    faults |= (1 << i);
+	}
+    }
+
+
+  /* MMRs have an implicit CPLB.  */
+  if (hits == 0 && addr >= BFIN_SYSTEM_MMR_BASE)
+    return;
+
+  /* XXX: Should handle implicit set of CPLBs on L1.  */
+
+  /* No faults and one match -> good to go.  */
+  if (faults == 0 && hits == 1)
+    return;
+
+  /* ICPLB regs always get updated.  */
+  if (!inst)
+    {
+      mmu->icplb_fault_addr = PCREG;
+      mmu->icplb_fault_status = supv << 17;
+    }
+
+  *fault_status =
+	(1 /*miss*/ << 19) |
+	(supv << 17) |
+	(write << 16) |
+	faults;
+  *fault_addr = addr;
+
+  switch (hits)
+    {
+    case 0:
+      cec_exception (cpu, inst ? VEC_CPLB_I_M : VEC_CPLB_M);
+      break;
+    case 1:
+      cec_exception (cpu, inst ? VEC_CPLB_I_VL : VEC_CPLB_VL);
+      break;
+    default:
+      cec_exception (cpu, inst ? VEC_CPLB_I_MHIT : VEC_CPLB_MHIT);
+      break;
+    }
 }

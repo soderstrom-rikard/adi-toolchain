@@ -28,4 +28,21 @@ void mmu_check_addr (SIM_CPU *, bu32 addr, bool write, bool inst, int size);
 void mmu_process_fault (SIM_CPU *, bu32 addr, bool write, bool inst, bool unaligned, bool miss);
 void mmu_log_ifault (SIM_CPU *);
 
+/* MEM_CONTROL */
+#define ENCPLB (1 << 1)
+#define MC     (1 << 2)
+
+/* CPLB_DATA */
+#define CPLB_VALID   (1 << 0)
+#define CPLB_USER_RD (1 << 2)
+#define CPLB_USER_WR (1 << 3)
+#define CPLB_SUPV_WR (1 << 4)
+#define CPLB_DIRTY   (1 << 7)
+#define CPLB_L1_CHBL (1 << 12)
+#define PAGE_SIZE    (3 << 16)
+#define PAGE_SIZE_1K (0 << 16)
+#define PAGE_SIZE_4K (1 << 16)
+#define PAGE_SIZE_1M (2 << 16)
+#define PAGE_SIZE_4M (3 << 16)
+
 #endif

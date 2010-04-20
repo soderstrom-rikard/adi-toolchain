@@ -340,7 +340,11 @@ cec_exception (SIM_CPU *cpu, int excp)
       if (STATE_ENVIRONMENT (sd) == OPERATING_ENVIRONMENT)
 	{
 	  /* ICPLB regs always get updated.  */
-	  if (excp != VEC_MISALI_I && excp != VEC_CPLB_I_M)
+      /* XXX: Should optimize this call path ...  */
+	  if (excp != VEC_MISALI_I && excp != VEC_MISALI_D &&
+	      excp != VEC_CPLB_I_M && excp != VEC_CPLB_M &&
+	      excp != VEC_CPLB_I_VL && excp != VEC_CPLB_VL &&
+	      excp != VEC_CPLB_I_MHIT && excp != VEC_CPLB_MHIT)
 	    mmu_log_ifault (cpu);
 	  _cec_raise (cpu, CEC_STATE (cpu), IVG_EVX);
 	  /* We need to restart the engine so that we don't return
