@@ -753,12 +753,20 @@ algn (bu32 l, bu32 h, bu32 aln)
 }
 
 static bu32
-saturate_s16 (bu64 val)
+saturate_s16 (bu64 val, int *overflow)
 {
   if ((bs64)val < -0x8000ll)
-    return 0x8000;
+    {
+      if (overflow)
+	*overflow = 1;
+      return 0x8000;
+    }
   if ((bs64)val > 0x7fff)
-    return 0x7fff;
+    {
+      if (overflow)
+	*overflow = 1;
+      return 0x7fff;
+    }
   return val & 0xffff;
 }
 
@@ -900,7 +908,7 @@ add16 (SIM_CPU *cpu, bu16 a, bu16 b, int *carry, int *overfl, int *zero, int *ne
     overflow = 1;
 
   if (sat)
-    v = saturate_s16(v);
+    v = saturate_s16 (v, 0);
 
   if (neg)
     *neg |= (v >> 15) & 1;
@@ -956,7 +964,7 @@ sub16 (SIM_CPU *cpu, bu16 a, bu16 b, int *carry, int *overfl, int *zero, int *ne
 
   if (sat)
     {
-      v = saturate_s16(v);
+      v = saturate_s16 (v, 0);
     }
   if (neg)
     *neg |= (v >> 15) & 1;
@@ -1286,7 +1294,6 @@ decode_multfunc (SIM_CPU *cpu, int h0, int h1, int src0, int src1, int mmod,
       else
 	val <<= 1;
     }
-
   val1 = val;
 
   if (mmod == 0 || mmod == M_IS || mmod == M_T || mmod == M_S2RND
@@ -1321,7 +1328,7 @@ saturate_s40 (bu64 val)
 }
 
 static bu32
-saturate_s32 (bu64 val)
+saturate_s32 (bu64 val, int *overflow)
 {
   if ((bs64)val < -0x80000000ll)
     return 0x80000000;
@@ -1331,7 +1338,7 @@ saturate_s32 (bu64 val)
 }
 
 static bu32
-saturate_u32 (bu64 val)
+saturate_u32 (bu64 val, int *overflow)
 {
   if (val > 0xffffffff)
     return 0xffffffff;
@@ -1339,7 +1346,7 @@ saturate_u32 (bu64 val)
 }
 
 static bu32
-saturate_u16 (bu64 val)
+saturate_u16 (bu64 val, int *overflow)
 {
   if (val > 0xffff)
     return 0xffff;
@@ -1396,21 +1403,21 @@ signbits (bu64 val, int size)
    we want to extract, either a 32 bit multiply or a 40 bit accumulator.  */
 
 static bu32
-extract_mult (SIM_CPU *cpu, bu64 res, int mmod, int MM, int fullword)
+extract_mult (SIM_CPU *cpu, bu64 res, int mmod, int MM, int fullword, int *overflow)
 {
   if (fullword)
     switch (mmod)
       {
       case 0:
       case M_IS:
-	return saturate_s32 (res);
+	return saturate_s32 (res, 0);
       case M_FU:
 	if (MM)
-	  return saturate_s32 (res);
-	return saturate_u32 (res);
+	  return saturate_s32 (res, 0);
+	return saturate_u32 (res, 0);
       case M_S2RND:
       case M_ISS2:
-	return saturate_s32 (res << 1);
+	return saturate_s32 (res << 1, 0);
       default:
 	illegal_instruction (cpu);
       }
@@ -1419,29 +1426,29 @@ extract_mult (SIM_CPU *cpu, bu64 res, int mmod, int MM, int fullword)
       {
       case 0:
       case M_W32:
-	return saturate_s16 (rnd16 (res));
+	return saturate_s16 (rnd16 (res), overflow);
       case M_IH:
-	return saturate_s32((rnd16 (res))) & 0xFFFF;
+	return saturate_s32((rnd16 (res)), 0) & 0xFFFF;
       case M_IS:
-	return saturate_s16 (res);
+	return saturate_s16 (res, 0);
       case M_FU:
 	if (MM)
-	  return saturate_s16 (rnd16 (res));
-	return saturate_u16 (rnd16 (res));
+	  return saturate_s16 (rnd16 (res), 0);
+	return saturate_u16 (rnd16 (res), 0);
       case M_IU:
 	if (MM)
-	  return saturate_s16 (res);
-	return saturate_u16 (res);
+	  return saturate_s16 (res, 0);
+	return saturate_u16 (res, 0);
 
       case M_T:
-	return saturate_s16 (trunc16 (res));
+	return saturate_s16 (trunc16 (res), 0);
       case M_TFU:
-	return saturate_u16 (trunc16 (res));
+	return saturate_u16 (trunc16 (res), 0);
 
       case M_S2RND:
-	return saturate_s16 (rnd16 (res << 1));
+	return saturate_s16 (rnd16 (res << 1), 0);
       case M_ISS2:
-	return saturate_s16 (res << 1);
+	return saturate_s16 (res << 1, 0);
       default:
 	illegal_instruction (cpu);
       }
@@ -1449,10 +1456,10 @@ extract_mult (SIM_CPU *cpu, bu64 res, int mmod, int MM, int fullword)
 
 static bu32
 decode_macfunc (SIM_CPU *cpu, int which, int op, int h0, int h1, int src0,
-		int src1, int mmod, int MM, int fullword)
+		int src1, int mmod, int MM, int fullword, int *overflow)
 {
   bu64 acc;
-  int sat = 0;
+  int sat = 0, tsat;
 
   /* Sign extend accumulator if necessary, otherwise unsigned */
   if (mmod == 0 || mmod == M_T || mmod == M_IS || mmod == M_ISS2 || mmod == M_S2RND || mmod == M_IH || mmod == M_W32)
@@ -1466,8 +1473,9 @@ decode_macfunc (SIM_CPU *cpu, int which, int op, int h0, int h1, int src0,
   if (op != 3)
     {
       bu8 sgn0 = (acc >> 31) & 1;
+      /* this can't saturate, so we don't keep track of the sat flag */
       bu64 res = decode_multfunc (cpu, h0, h1, src0, src1, mmod,
-				  MM, &sat);
+				  MM, &tsat);
 
       /* Perform accumulation.  */
       switch (op)
@@ -1548,17 +1556,19 @@ decode_macfunc (SIM_CPU *cpu, int which, int op, int h0, int h1, int src0,
       STORE (AXREG (1), (acc >> 32) & 0xff);
       STORE (AWREG (1), acc & 0xffffffff);
       STORE (ASTATREG (av1), sat);
-      STORE (ASTATREG (av1s), ASTATREG (av1s) | sat);
+      if (sat)
+	STORE (ASTATREG (av1s), sat);
     }
   else
     {
       STORE (AXREG (0), (acc >> 32) & 0xff);
       STORE (AWREG (0), acc & 0xffffffff);
       STORE (ASTATREG (av0), sat);
-      STORE (ASTATREG (av0s), ASTATREG (av0s) | sat);
+      if (sat)
+	STORE (ASTATREG (av0s), sat);
     }
 
-  return extract_mult (cpu, acc, mmod, MM, fullword);
+  return extract_mult (cpu, acc, mmod, MM, fullword, overflow);
 }
 
 bu32
@@ -3401,6 +3411,7 @@ decode_dsp32mac_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1)
 
   bu32 res0, res1;
   bu32 res = DREG (dst);
+  bu32 v_i = 0;
 
   TRACE_EXTRACT (cpu, "%s: M:%i mmod:%i MM:%i P:%i w1:%i op1:%i h01:%i h11:%i "
 		      "w0:%i op0:%i h00:%i h10:%i dst:%i src0:%i src1:%i",
@@ -3438,11 +3449,11 @@ decode_dsp32mac_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1)
     TRACE_INSN (cpu, "A0 = macfunc");
 
   if (w1 == 1 || op1 != 3)
-    res1 = decode_macfunc (cpu, 1, op1, h01, h11, src0, src1, mmod, MM, P);
+    res1 = decode_macfunc (cpu, 1, op1, h01, h11, src0, src1, mmod, MM, P, &v_i);
 
   if (w0 == 1 || op0 != 3)
-    res0 = decode_macfunc (cpu, 0, op0, h00, h10, src0, src1, mmod, 0, P);
-
+    res0 = decode_macfunc (cpu, 0, op0, h00, h10, src0, src1, mmod, 0, P, &v_i);
+printf("foo\n");
   if (w0)
     {
       if (P)
@@ -3468,7 +3479,18 @@ decode_dsp32mac_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1)
     }
 
    if (!P && (w0 || w1))
-    STORE (DREG (dst), res);
+    {
+      STORE (DREG (dst), res);
+      SET_ASTATREG (v, v_i);
+      if (v_i)
+	SET_ASTATREG (vs, v_i);
+    }
+  else if (P)
+    {
+      SET_ASTATREG (v, v_i);
+      if (v_i)
+        SET_ASTATREG (vs, v_i);
+    }
 }
 
 static void
@@ -3541,7 +3563,7 @@ decode_dsp32mult_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1)
       STORE (ASTATREG (v_copy), sat);
       if (sat)
 	STORE (ASTATREG (vs), sat);
-      res1 = extract_mult (cpu, r, mmod, MM, P);
+      res1 = extract_mult (cpu, r, mmod, MM, P, 0);
       if (P)
 	STORE (DREG (dst + 1), res1);
       else
@@ -3560,7 +3582,7 @@ decode_dsp32mult_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1)
       STORE (ASTATREG (v_copy), sat);
       if (sat)
 	STORE (ASTATREG (vs), sat);
-      res0 = extract_mult (cpu, r, mmod, 0, P);
+      res0 = extract_mult (cpu, r, mmod, 0, P, 0);
       if (P)
 	STORE (DREG (dst), res0);
       else
@@ -4233,14 +4255,14 @@ decode_dsp32alu_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1)
 	}
       else if (aop == 1)	/* Dregs_lo = A0 += A1 */
 	{
-	  bu32 val = saturate_s32 (rnd16 (acc0) << 16);
+	  bu32 val = saturate_s32 (rnd16 (acc0) << 16, 0);
 	  if (HL)
 	    STORE (DREG (dst0), REG_H_L (val, DREG (dst0)));
 	  else
 	    STORE (DREG (dst0), REG_H_L (DREG (dst0), val >> 16));
 	}
       else if (aop == 0)	/* Dregs = A0 += A1 */
-	STORE (DREG (dst0), saturate_s32 (acc0));
+	STORE (DREG (dst0), saturate_s32 (acc0, 0));
     }
   else if ((aop == 0 || aop == 1) && aopcde == 10)
     {
@@ -4281,8 +4303,8 @@ decode_dsp32alu_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1)
 
       if (s)
 	{
-	  val0 = saturate_s32 (val0);
-	  val1 = saturate_s32 (val1);
+	  val0 = saturate_s32 (val0, 0);
+	  val1 = saturate_s32 (val1, 0);
 	}
       STORE (DREG (dst0), val0);
       STORE (DREG (dst1), val1);
@@ -4335,10 +4357,10 @@ decode_dsp32alu_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1)
       tmp2  = (tmp2 < 0) ? -tmp2 : tmp2;
       tmp3  = (tmp3 < 0) ? -tmp3 : tmp3;
 
-      s0L = saturate_u16((bu32)tmp0 + ( acc0        & 0xffff));
-      s0H = saturate_u16((bu32)tmp1 + ((acc0 >> 16) & 0xffff));
-      s1L = saturate_u16((bu32)tmp2 + ( acc1        & 0xffff));
-      s1H = saturate_u16((bu32)tmp3 + ((acc1 >> 16) & 0xffff));
+      s0L = saturate_u16((bu32)tmp0 + ( acc0        & 0xffff), 0);
+      s0H = saturate_u16((bu32)tmp1 + ((acc0 >> 16) & 0xffff), 0);
+      s1L = saturate_u16((bu32)tmp2 + ( acc1        & 0xffff), 0);
+      s1H = saturate_u16((bu32)tmp3 + ((acc1 >> 16) & 0xffff), 0);
 
       STORE (AWREG (0), (s0H << 16) | (s0L & 0xFFFF));
       STORE (AXREG (0), 0);
