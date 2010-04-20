@@ -638,6 +638,7 @@ ac_includes_default="\
 ac_subst_vars='LTLIBOBJS
 LIBOBJS
 cgen_breaks
+BFIN_SIM_EXTRA_OBJS
 sim_profile
 sim_trace
 sim_stdio
@@ -5719,6 +5720,21 @@ if test x"$silent" != x"yes"; then
   echo "Setting hardware to $sim_hw_cflags, $sim_hw, $sim_hw_objs"
 fi
 fi
+
+
+dv_sockser=1
+case ${host} in
+  *mingw32*) dv_sockser=0 ;;
+esac
+
+cat >>confdefs.h <<_ACEOF
+#define HAVE_DV_SOCKSER ${dv_sockser}
+_ACEOF
+
+
+BFIN_SIM_EXTRA_OBJS=
+test "$dv_sockser" = 1 && BFIN_SIM_EXTRA_OBJS="${BFIN_SIM_EXTRA_OBJS} dv-sockser.o"
+BFIN_SIM_EXTRA_OBJS=${BFIN_SIM_EXTRA_OBJS}
 
 
 

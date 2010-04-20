@@ -14,8 +14,10 @@
 #include "sim-module.h"
 
 /* FIXME: Revisit.  */
+#ifdef HAVE_DV_SOCKSER
 MODULE_INSTALL_FN dv_sockser_install;
 #define MODULE_LIST dv_sockser_install,
+#endif
 
 /* ??? Temporary hack until model support unified.  */
 #define SIM_HAVE_MODEL

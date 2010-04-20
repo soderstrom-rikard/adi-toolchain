@@ -32,4 +32,15 @@ SIM_AC_OPTION_HARDWARE(yes,,\
 	bfin_wdog \
 )
 
+dnl make sure the dv-sockser code can be supported (i.e. windows)
+dv_sockser=1
+case ${host} in
+  *mingw32*) dv_sockser=0 ;;
+esac
+AC_DEFINE_UNQUOTED([HAVE_DV_SOCKSER], ${dv_sockser}, [Define if dv-sockser is usable.])
+
+BFIN_SIM_EXTRA_OBJS=
+test "$dv_sockser" = 1 && BFIN_SIM_EXTRA_OBJS="${BFIN_SIM_EXTRA_OBJS} dv-sockser.o"
+AC_SUBST([BFIN_SIM_EXTRA_OBJS], ${BFIN_SIM_EXTRA_OBJS})
+
 SIM_AC_OUTPUT

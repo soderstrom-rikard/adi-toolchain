@@ -20,7 +20,6 @@
    along with this program.  If not, see <http://www.gnu.org/licenses/>.  */
 
 #include "sim-main.h"
-#include "dv-sockser.h"
 #include "devices.h"
 #include "dv-bfin_uart2.h"
 
