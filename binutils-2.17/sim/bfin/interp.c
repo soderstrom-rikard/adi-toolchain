@@ -673,7 +673,7 @@ bfin_os_init (SIM_DESC sd, SIM_CPU *cpu, char * const *argv)
   bu32 cmdline = BFIN_L1_SRAM_SCRATCH;
 
   SET_DREG (0, cmdline);
-  if (argv[0])
+  if (argv && argv[0])
     {
       i = 1;
       byte = ' ';
