@@ -628,7 +628,7 @@ static bu40
 ashiftrt (SIM_CPU *cpu, bu40 val, int cnt, int size)
 {
   int real_cnt = cnt > size ? size : cnt;
-  bu32 sgn = ~((val >> (size - 1)) - 1);
+  bu40 sgn = ~(((val & 0xFFFFFFFFFFull) >> (size - 1)) - 1);
   int sgncnt = size - real_cnt;
   if (sgncnt > 16)
     sgn <<= 16, sgncnt -= 16;
@@ -4727,7 +4727,7 @@ decode_dsp32shift_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1)
       bu40 acc = get_unextended_acc (cpu, HLs);
 
       TRACE_INSN (cpu, "A%i = ROT A%i BY R%i.L;", HLs, HLs, src0);
-      TRACE_DECODE (cpu, "A%i:%#lx shift:%i CC:%i", HLs, acc, shift, cc);
+      TRACE_DECODE (cpu, "A%i:%#"PRIx64" shift:%i CC:%i", HLs, acc, shift, cc);
 
       acc = rot40 (acc, shift, &cc);
       SET_AREG (HLs, acc);
@@ -4737,11 +4737,11 @@ decode_dsp32shift_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1)
   else if (sop == 0 && sopcde == 3 && (HLs == 0 || HLs == 1))
     {
       bs32 shft = (bs8)(DREG (src0) << 2) >> 2;
-      bu64 val;
+      bu64 val = get_extended_acc (cpu, HLs);
 
       HLs = !!HLs;
       TRACE_INSN (cpu, "A%i = ASHIFT A%i BY R%i.L;", HLs, HLs, src0);
-      val = get_extended_acc (cpu, HLs);
+      TRACE_DECODE (cpu, "A%i:%#"PRIx64" shift:%i", HLs, val, shft);
 
       if (shft <= 0)
 	val = ashiftrt (cpu, val, -shft, 40);
