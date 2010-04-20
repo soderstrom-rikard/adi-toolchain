@@ -62,6 +62,25 @@
 #include "dv-bfin_cec.h"
 #include "dv-bfin_mmu.h"
 
+#ifndef HAVE_GETUID
+# define getuid() 0
+#endif
+#ifndef HAVE_GETGID
+# define getgid() 0
+#endif
+#ifndef HAVE_GETEUID
+# define geteuid() 0
+#endif
+#ifndef HAVE_GETEGID
+# define getegid() 0
+#endif
+#ifndef HAVE_SETUID
+# define setuid(uid) -1
+#endif
+#ifndef HAVE_SETGID
+# define setgid(gid) -1
+#endif
+
 /* Count the number of arguments in an argv.  */
 static int
 count_argc (char * const *argv)

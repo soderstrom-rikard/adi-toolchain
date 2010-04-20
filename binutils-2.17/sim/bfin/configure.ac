@@ -32,6 +32,8 @@ SIM_AC_OPTION_HARDWARE(yes,,\
 	bfin_wdog \
 )
 
+AC_CHECK_FUNCS([getuid getgid geteuid getegid setuid setgid])
+
 dnl make sure the dv-sockser code can be supported (i.e. windows)
 dv_sockser=1
 case ${host} in
