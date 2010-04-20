@@ -719,14 +719,14 @@ lshift (SIM_CPU *cpu, bu64 val, int cnt, int size, bool saturate)
     {
     case 16:
       if (j || (saturate && (new_val & mask)))
-	new_val = sgn == 0 ? 0x7fff : 0x8000;
+	new_val = sgn == 0 ? 0x7fff : 0x8000, saturate = 1;
       new_val &= 0xFFFF;
       break;
     case 32:
       new_val &= 0xFFFFFFFF;
       masked &= 0xFFFFFFFF;
       if (j || (saturate && ((sgn != masked) || (!sgn && new_val == 0))))
-	new_val = sgn == 0 ? 0x7fffffff : 0x80000000;
+	new_val = sgn == 0 ? 0x7fffffff : 0x80000000, saturate = 1;
       break;
     case 40:
       new_val &= 0xFFFFFFFFFFull;
@@ -739,7 +739,9 @@ lshift (SIM_CPU *cpu, bu64 val, int cnt, int size, bool saturate)
 
   SET_ASTATREG (an, new_val >> (size - 1));
   SET_ASTATREG (az, new_val == 0);
-  SET_ASTATREG (v, 0);
+  SET_ASTATREG (v, !!(saturate || j));
+  if (saturate || j)
+    SET_ASTATREG (vs, 1);
   return new_val;
 }
 
