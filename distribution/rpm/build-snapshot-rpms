@@ -30,6 +30,8 @@ if [ ! -d "${toolchain_dir}" ] || [ ! -e "${spec}" ] ; then
 	exit 1
 fi
 
+cd "${toolchain_dir}/pkgs"
+
 mkdir -p BUILD/opt
 rm -f BUILD/opt/uClinux-SVN
 ln -s "${toolchain_dir}" BUILD/opt/uClinux-SVN
