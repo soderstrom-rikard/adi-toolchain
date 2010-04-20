@@ -430,7 +430,11 @@ sim_open (SIM_OPEN_KIND kind, host_callback *callback,
   /* Allocate external memory if none specified by user.
      Use address 4 here in case the user wanted address 0 unmapped.  */
   if (sim_core_read_buffer (sd, NULL, read_map, &c, 4, 1) == 0)
-    sim_do_commandf (sd, "memory-size 0x%lx", BFIN_DEFAULT_MEM_SIZE);
+    {
+      bu16 emuexcpt = 0x25;
+      sim_do_commandf (sd, "memory-size 0x%lx", BFIN_DEFAULT_MEM_SIZE);
+      sim_write (sd, 0, (void *)&emuexcpt, 2);
+    }
 
   /* Check for/establish the a reference program image.  */
   if (sim_analyze_program (sd,
