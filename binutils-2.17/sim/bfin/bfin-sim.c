@@ -1311,7 +1311,13 @@ decode_multfunc (SIM_CPU *cpu, int h0, int h1, int src0, int src1, int mmod,
   if (!MM && (mmod == 0 || mmod == M_T || mmod == M_S2RND || mmod == M_W32))
     {
       if (val == 0x40000000)
-	val = 0x7fffffff, *psat = 1;
+	{
+	  if (mmod == M_W32)
+	    val = 0x7fffffff;
+	  else
+	    val = 0x80000000;
+	  *psat = 1;
+	}
       else
 	val <<= 1;
     }
@@ -1320,6 +1326,9 @@ decode_multfunc (SIM_CPU *cpu, int h0, int h1, int src0, int src1, int mmod,
   if (mmod == 0 || mmod == M_IS || mmod == M_T || mmod == M_S2RND
       || mmod == M_ISS2 || mmod == M_IH || (MM && mmod == M_FU))
     val1 |= -(val1 & 0x80000000);
+
+  if (*psat)
+    val1 &= 0xFFFFFFFFull;
 
   return val1;
 }
@@ -1539,7 +1548,7 @@ decode_macfunc (SIM_CPU *cpu, int which, int op, int h0, int h1, int src0,
 	case M_S2RND:
 	  if ((bs64)acc < -((bs64)1 << 39))
 	    acc = -((bu64)1 << 39), sat = 1;
-	  else if ((bs64)acc >= 0x7fffffffffll)
+	  else if ((bs64)acc > 0x7fffffffffll)
 	    acc = 0x7fffffffffull, sat = 1;
 	  break;
 	case M_TFU:
