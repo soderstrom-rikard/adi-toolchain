@@ -3763,7 +3763,8 @@ decode_dsp32alu_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1)
       SET_ASTATREG (az, res == 0);
       SET_ASTATREG (an, res & 0x8000);
       SET_ASTATREG (v, ovX);
-      SET_ASTATREG (vs, ovX);
+      if (ovX)
+	SET_ASTATREG (vs, ovX);
     }
   else if ((aop == 2 || aop == 3) && aopcde == 5)
     {
@@ -4064,6 +4065,7 @@ decode_dsp32alu_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1)
       bool sBit_a, sBit_b;
 
       TRACE_INSN (cpu, "R%i.%s = R%i (RND);", dst0, HL == 0 ? "L" : "H", src0);
+      TRACE_DECODE (cpu, "R%i.%s = R%i:%#x (RND);", dst0, HL == 0 ? "L" : "H", src0, res);
 
       sBit_b = !!(res & 0x80000000);
 
@@ -4071,10 +4073,10 @@ decode_dsp32alu_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1)
       sBit_a = !!(res & 0x80000000);
 
       /* Overflow if the sign bit changed when we rounded */
-      if (res && (sBit_b != sBit_a))
+      if ((res >> 16) && (sBit_b != sBit_a))
 	{
 	  ovX = 1;
-	  if (!sBit_a)
+	  if (!sBit_b)
 	    res = 0x7FFF;
 	  else
 	    res = 0x8000;
