@@ -269,7 +269,7 @@ bfin_syscall (SIM_CPU *cpu)
       if (sc.result == -1)
 	{
 	  if (sc.errcode == cb_host_to_target_errno (cb, ENOSYS))
-	    sim_io_eprintf (sd, "bfin-sim: unimplemented syscall %i\n", sc.func);
+	    sim_io_eprintf (sd, "bfin-sim: unimplemented syscall %i (@ PC %#x)\n", sc.func, PCREG);
 	  SET_DREG (0, -sc.errcode);
 	}
       else
