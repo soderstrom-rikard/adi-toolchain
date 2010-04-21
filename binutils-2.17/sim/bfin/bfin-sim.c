@@ -3448,7 +3448,7 @@ decode_dsp32mac_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1)
 
   bu32 res0, res1;
   bu32 res = DREG (dst);
-  bu32 v_i = 0;
+  bu32 v_i = 0, zero = 0;
 
   TRACE_EXTRACT (cpu, "%s: M:%i mmod:%i MM:%i P:%i w1:%i op1:%i h01:%i h11:%i "
 		      "w0:%i op0:%i h00:%i h10:%i dst:%i src0:%i src1:%i",
@@ -3486,10 +3486,17 @@ decode_dsp32mac_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1)
     TRACE_INSN (cpu, "A0 = macfunc");
 
   if (w1 == 1 || op1 != 3)
-    res1 = decode_macfunc (cpu, 1, op1, h01, h11, src0, src1, mmod, MM, P, &v_i);
-
+    {
+      res1 = decode_macfunc (cpu, 1, op1, h01, h11, src0, src1, mmod, MM, P, &v_i);
+      if (op1 == 3)
+	zero = !!(res1 == 0);
+    }
   if (w0 == 1 || op0 != 3)
-    res0 = decode_macfunc (cpu, 0, op0, h00, h10, src0, src1, mmod, 0, P, &v_i);
+    {
+      res0 = decode_macfunc (cpu, 0, op0, h00, h10, src0, src1, mmod, 0, P, &v_i);
+      if (op1 == 3)
+	zero |= !!(res0 == 0);
+    }
   if (w0)
     {
       if (P)
@@ -3527,6 +3534,8 @@ decode_dsp32mac_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1)
       if (v_i)
         SET_ASTATREG (vs, v_i);
     }
+    if (op0 == 3 || op1 == 3)
+      SET_ASTATREG(az, zero);
 }
 
 static void
