@@ -429,6 +429,120 @@ bfin_model_hw_tree_init (SIM_DESC sd, SIM_CPU *cpu)
   hw_tree_finish (dv_get_device (cpu, "/"));
 }
 
+#include "bfroms/all.h"
+
+struct bfrom {
+  bu32 addr, len, alias_len;
+  int sirev;
+  const char *buf;
+};
+
+#define BFROMA(addr, rom, sirev, alias_len) \
+  { addr, sizeof (bfrom_bf##rom##_0_##sirev), alias_len, \
+    sirev, bfrom_bf##rom##_0_##sirev, }
+#define BFROM(rom, sirev, alias_len) BFROMA (0xef000000, rom, sirev, alias_len)
+#define BFROM_STUB { 0, 0, 0, 0, NULL, }
+static const struct bfrom bf50x_roms[] = {
+  BFROM_STUB,
+};
+static const struct bfrom bf51x_roms[] = {
+  BFROM (51x, 1, 0x1000000),
+  BFROM (51x, 0, 0x1000000),
+  BFROM_STUB,
+};
+static const struct bfrom bf526_roms[] = {
+  BFROM (526, 1, 0x1000000),
+  BFROM (526, 0, 0x1000000),
+  BFROM_STUB,
+};
+static const struct bfrom bf527_roms[] = {
+  BFROM (527, 2, 0x1000000),
+  BFROM (527, 0, 0x1000000),
+};
+static const struct bfrom bf533_roms[] = {
+  BFROM (533, 6, 0x1000000),
+  BFROM (533, 5, 0x1000000),
+  BFROM (533, 4, 0x1000000),
+  BFROM (533, 3, 0x1000000),
+  BFROM (533, 2, 0x1000000),
+  BFROM (533, 1, 0x1000000),
+  BFROM_STUB,
+};
+static const struct bfrom bf537_roms[] = {
+  BFROM (537, 3, 0x100000),
+  BFROM (537, 2, 0x100000),
+  BFROM (537, 1, 0x100000),
+  BFROM (537, 0, 0x100000),
+  BFROM_STUB,
+};
+static const struct bfrom bf538_roms[] = {
+  BFROM (538, 5, 0x1000000),
+  BFROM (538, 4, 0x1000000),
+  BFROM (538, 3, 0x1000000),
+  BFROM (538, 2, 0x1000000),
+  BFROM (538, 1, 0x1000000),
+  BFROM (538, 0, 0x1000000),
+  BFROM_STUB,
+};
+static const struct bfrom bf54x_roms[] = {
+  BFROM (54x, 2, 0),
+  BFROM (54x, 1, 0),
+  BFROM (54x, 0, 0),
+  BFROMA (0xffa14000, 54x_l1, 2, 0),
+  BFROMA (0xffa14000, 54x_l1, 1, 0),
+  BFROMA (0xffa14000, 54x_l1, 0, 0),
+  BFROM_STUB,
+};
+static const struct bfrom bf561_roms[] = {
+  /* XXX: No idea what the actual wrap limit is here.  */
+  BFROM (561, 5, 0),
+  BFROM_STUB,
+};
+
+static void
+bfin_model_map_bfrom (SIM_DESC sd, SIM_CPU *cpu)
+{
+  const MODEL *model = CPU_MODEL (cpu);
+  const struct bfin_model_data *mdata = CPU_MODEL_DATA (cpu);
+  int mnum = mdata->model_num;
+  const struct bfrom *bfrom;
+  /* XXX: Add option for people to specify this.  */
+  int sirev = -1;
+
+  if (mnum >= 500 && mnum <= 509)
+    bfrom = bf50x_roms;
+  else if (mnum >= 510 && mnum <= 519)
+    bfrom = bf51x_roms;
+  else if (mnum >= 520 && mnum <= 529)
+    bfrom = (mnum & 1) ? bf527_roms : bf526_roms;
+  else if (mnum >= 531 && mnum <= 533)
+    bfrom = bf533_roms;
+  else if (mnum == 535)
+    /* Stub.  */;
+  else if (mnum >= 534 && mnum <= 537)
+    bfrom = bf537_roms;
+  else if (mnum >= 538 && mnum <= 539)
+    bfrom = bf538_roms;
+  else if (mnum >= 540 && mnum <= 549)
+    bfrom = bf54x_roms;
+  else if (mnum == 561)
+    bfrom = bf561_roms;
+  else
+    return;
+
+  if (sirev == -1)
+    sirev = bfrom->sirev;
+  while (bfrom->buf)
+    {
+      /* Map all the ranges for this model/sirev.  */
+      if (bfrom->sirev == sirev)
+        sim_core_attach (sd, NULL, 0, access_read_exec, 0, bfrom->addr,
+			 bfrom->alias_len ? : bfrom->len, bfrom->len, NULL,
+			 (char *)bfrom->buf);
+      ++bfrom;
+    }
+}
+
 void
 bfin_model_cpu_init (SIM_DESC sd, SIM_CPU *cpu)
 {
@@ -447,13 +561,16 @@ bfin_model_cpu_init (SIM_DESC sd, SIM_CPU *cpu)
   sim_core_attach (sd, NULL, 0, access_read_write, 0, BFIN_L1_SRAM_SCRATCH,
 		   BFIN_L1_SRAM_SCRATCH_SIZE, 0, NULL, NULL);
 
-  /* Map in the on-chip memory (bootrom/sram/etc...).  */
+  /* Map in the on-chip memories (SRAMs).  */
   for (idx = 0; idx < mdata->mem_count; ++idx)
     {
       const struct bfin_memory_layout *mem = &mdata->mem[idx];
       sim_core_attach (sd, NULL, 0, mem->mask, 0, mem->addr,
 		       mem->len, 0, NULL, NULL);
     }
+
+  /* Map the on-chip ROMs.  */
+  bfin_model_map_bfrom (sd, cpu);
 
   /* Finally, build up the tree for this cpu model.  */
   bfin_model_hw_tree_init (sd, cpu);
