@@ -476,8 +476,8 @@ get_store_name (SIM_CPU *cpu, bu32 *p)
     return "ASTAT[ac0_copy]";
   else
     {
-    /* XXX: Worry about this when we start to STORE() it.  */
-      fprintf(stderr, "Unknown register name in store\n");
+      /* Worry about this when we start to STORE() it.  */
+      sim_io_eprintf (CPU_STATE (cpu), stderr, "STORE(): unknown register\n");
       abort ();
     }
 }
@@ -665,7 +665,7 @@ ashiftrt (SIM_CPU *cpu, bu40 val, int cnt, int size)
   val |= sgn;
   SET_ASTATREG (an, val >> (size - 1));
   SET_ASTATREG (az, val == 0);
-  /* @@@ */
+  /* XXX: Need to check ASTAT[v] behavior here.  */
   SET_ASTATREG (v, 0);
   return val;
 }
@@ -1701,7 +1701,7 @@ decode_ProgCtrl_0 (SIM_CPU *cpu, bu16 iw0, bu32 pc)
       sim_events *events = STATE_EVENTS (sd);
 
       /* XXX: in supervisor mode, utilizes wake up sources
-       * in user mode, it's a NOP ...  */
+         in user mode, it's a NOP ...  */
       TRACE_INSN (cpu, "IDLE;");
 
       /* Timewarp !  */
@@ -1794,7 +1794,6 @@ decode_ProgCtrl_0 (SIM_CPU *cpu, bu16 iw0, bu32 pc)
     {
       int excpt = uimm4 (poprnd);
       TRACE_INSN (cpu, "EXCPT %s;", uimm4_str (excpt));
-      /* XXX: see comments in cec_exception() */
       cec_exception (cpu, excpt);
       CYCLE_DELAY = 3;
     }
@@ -2436,7 +2435,7 @@ decode_ALU2op_0 (SIM_CPU *cpu, bu16 iw0)
       if (ASTATREG (v))
 	SET_ASTATREG (vs, 1);
       SET_ASTATREG (ac0, val == 0x0);
-      /* @@@ Documentation isn't entirely clear about av0 and av1.  */
+      /* XXX: Documentation isn't entirely clear about av0 and av1.  */
     }
   else if (opc == 15)
     {
@@ -3290,8 +3289,6 @@ decode_LDIMMhalf_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1)
   else
     val = luimm16 (hword), val_str = luimm16_str (hword);
 
-  /* XXX: writing RET{I,X,N,E}, USP, SEQSTAT, SYSCFG requires supervisor mode. */
-
   if (H == 0 && S == 1 && Z == 0)
     {
       TRACE_INSN (cpu, "%s = %s (X);", reg_name, val_str);
@@ -3534,7 +3531,7 @@ decode_dsp32mac_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1)
   else if (w0 && P)
     TRACE_INSN (cpu, "R%i = macfunc", dst);
   else if (w1 && P)
-    TRACE_INSN (cpu, "R%i = macfunc", dst+1);
+    TRACE_INSN (cpu, "R%i = macfunc", dst + 1);
   else if (w0 && !P)
     TRACE_INSN (cpu, "R%i.L = macfunc", dst);
   else if (w1 && !P)
@@ -3595,7 +3592,7 @@ decode_dsp32mac_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1)
         SET_ASTATREG (vs, v_i);
     }
     if (op0 == 3 || op1 == 3)
-      SET_ASTATREG(az, zero);
+      SET_ASTATREG (az, zero);
 }
 
 static void
@@ -3636,29 +3633,28 @@ decode_dsp32mult_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1)
     illegal_instruction (cpu);
   if (((1 << mmod) & (P ? 0x313 : 0x1b57)) == 0)
     illegal_instruction (cpu);
-  if (P && ((dst & 1) || (op1 != 0) || (op0 != 0) || !is_macmod_pmove(mmod)))
+  if (P && ((dst & 1) || (op1 != 0) || (op0 != 0) || !is_macmod_pmove (mmod)))
     illegal_instruction (cpu);
-  if (!P && ((op1 != 0) || (op0 != 0) || !is_macmod_hmove(mmod)))
+  if (!P && ((op1 != 0) || (op0 != 0) || !is_macmod_hmove (mmod)))
     illegal_instruction (cpu);
-
 
   if (w0 && w1 && P)
     TRACE_INSN (cpu, "R%i:%i = dsp32mult", dst + 1, dst);
   else if (w0 && w1 && !P)
-    TRACE_INSN (cpu, "R%i.L = R%i.%s * R%i.%s, R%i.H = R%i.%s * R%i.%s",
+    TRACE_INSN (cpu, "R%i.L = R%i.%s * R%i.%s, R%i.H = R%i.%s * R%i.%s;",
 		dst, src0, h01 ? "L" : "H" , src1, h11 ? "L" : "H",
 		dst, src0, h00 ? "L" : "H" , src1, h10 ? "L" : "H");
   else if (w0 && P)
-    TRACE_INSN (cpu, "R%i = R%i.%s * R%i.%s",
+    TRACE_INSN (cpu, "R%i = R%i.%s * R%i.%s;",
 		dst, src0, h00 ? "L" : "H" , src1, h10 ? "L" : "H");
   else if (w1 && P)
-    TRACE_INSN (cpu, "R%i = R%i.%s * R%i.%s",
-		dst+1, src0, h01 ? "L" : "H" , src1, h11 ? "L" : "H");
+    TRACE_INSN (cpu, "R%i = R%i.%s * R%i.%s;",
+		dst + 1, src0, h01 ? "L" : "H" , src1, h11 ? "L" : "H");
   else if (w0 && !P)
-    TRACE_INSN (cpu, "R%i.L = R%i.%s * R%i.%s",
+    TRACE_INSN (cpu, "R%i.L = R%i.%s * R%i.%s;",
 		dst, src0, h00 ? "L" : "H" , src1, h10 ? "L" : "H");
   else if (w1 && !P)
-    TRACE_INSN (cpu, "R%i.H = R%i.%s * R%i.%s",
+    TRACE_INSN (cpu, "R%i.H = R%i.%s * R%i.%s;",
 		dst, src0, h01 ? "L" : "H" , src1, h11 ? "L" : "H");
 
   if (w1)
@@ -4200,7 +4196,6 @@ decode_dsp32alu_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1)
 
       SET_AREG (HL, saturate_s40 (-src_acc));
 
-      /* XXX: Are these ASTAT flags correct ?  */
       SET_ASTATREG (az, AWREG (HL) == 0 && AXREG (HL) == 0);
       SET_ASTATREG (an, AXREG (HL) >> 7);
       SET_ASTATREG (ac0, src_acc == 0);
@@ -4291,16 +4286,16 @@ decode_dsp32alu_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1)
 
       SET_DREG (dst0, val0);
       SET_DREG (dst1, val1);
-      /* ASTAT ? */
+      /* XXX: ASTAT ?  */
     }
   else if (aopcde == 1)
     {
       bu32 d0, d1;
       bu32 x0, x1;
-      bu16 s0L =  (DREG(src0) & 0xFFFF);
-      bu16 s0H = ((DREG(src0) >> 16) & 0xFFFF);
-      bu16 s1L =  (DREG(src1) & 0xFFFF);
-      bu16 s1H = ((DREG(src1) >> 16) & 0xFFFF);
+      bu16 s0L =  (DREG (src0) & 0xFFFF);
+      bu16 s0H = ((DREG (src0) >> 16) & 0xFFFF);
+      bu16 s1L =  (DREG (src1) & 0xFFFF);
+      bu16 s1H = ((DREG (src1) >> 16) & 0xFFFF);
       int v_i = 0, n_i = 0, z_i = 0;
 
       TRACE_INSN (cpu, "R%i = R%i %s R%i, R%i = R%i %s R%i%s;",
@@ -4478,10 +4473,10 @@ decode_dsp32alu_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1)
     {
       bu40 acc0 = get_extended_acc (cpu, 0);
       bu40 acc1 = get_extended_acc (cpu, 1);
-      bu32 s0L = DREG(src0);
-      bu32 s0H = DREG(src0+1);
-      bu32 s1L = DREG(src1);
-      bu32 s1H = DREG(src1+1);
+      bu32 s0L = DREG (src0);
+      bu32 s0H = DREG (src0 + 1);
+      bu32 s1L = DREG (src1);
+      bu32 s1H = DREG (src1 + 1);
       bu32 s0, s1;
       bs16 tmp0, tmp1, tmp2, tmp3;
 
@@ -4499,13 +4494,13 @@ decode_dsp32alu_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1)
 
       if (s)
 	{
-	  s0 = algn(s0H, s0L, IREG (0) & 3);
-	  s1 = algn(s1H, s1L, IREG (1) & 3);
+	  s0 = algn (s0H, s0L, IREG (0) & 3);
+	  s1 = algn (s1H, s1L, IREG (1) & 3);
 	}
       else
 	{
-	  s0 = algn(s0L, s0H, IREG (0) & 3);
-	  s1 = algn(s1L, s1H, IREG (1) & 3);
+	  s0 = algn (s0L, s0H, IREG (0) & 3);
+	  s1 = algn (s1L, s1H, IREG (1) & 3);
 	}
 
       /* find the absolute difference between pairs,
@@ -5437,8 +5432,8 @@ decode_dsp32shiftimm_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1)
 	acc >>= shiftdn;
 
       SET_AREG (HLs, acc);
-      SET_ASTATREG(an, !!(acc & 0x8000000000ull));
-      SET_ASTATREG(az, acc == 0);
+      SET_ASTATREG (an, !!(acc & 0x8000000000ull));
+      SET_ASTATREG (az, acc == 0);
     }
   else if (sop == 1 && sopcde == 1 && bit8 == 0)
     {
@@ -5816,7 +5811,6 @@ interp_insn_bfin (SIM_CPU *cpu, bu32 pc)
     }
   for (i = 0; i < BFIN_CPU_STATE.n_stores; i++)
     {
-      /* XXX: This is missing register tracing.  */
       bu32 *addr = BFIN_CPU_STATE.stores[i].addr;
       *addr = BFIN_CPU_STATE.stores[i].val;
       TRACE_REGISTER (cpu, "dequeuing write %s = %#x", get_store_name (cpu, addr), *addr);

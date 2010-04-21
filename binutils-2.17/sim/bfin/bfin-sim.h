@@ -40,7 +40,7 @@ typedef int64_t bs64;
 /* For dealing with parallel instructions, we must avoid changing our register
    file until all parallel insns have been simulated.  This queue of stores
    can be used to delay a modification.
-   @@@ Should go and convert all 32 bit insns to use this.  */
+   XXX: Should go and convert all 32 bit insns to use this.  */
 struct store {
   bu32 *addr;
   bu32 val;
