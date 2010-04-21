@@ -270,7 +270,8 @@ _mmu_process_fault (SIM_CPU *cpu, struct bfin_mmu *mmu, bu32 addr, bool write,
   else if (unaligned)
     cec_exception (cpu, inst ? VEC_MISALI_I : VEC_MISALI_D);
   else
-    cec_exception (cpu, inst ? VEC_CPLB_I_M : VEC_CPLB_M);
+    /* XXX: When exactly does hardware do exception vs IVHW ?  */
+    cec_latch (cpu, IVG_IVHW);
 }
 
 void
