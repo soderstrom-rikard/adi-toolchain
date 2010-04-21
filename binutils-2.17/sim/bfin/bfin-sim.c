@@ -3463,7 +3463,6 @@ decode_dsp32mac_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1)
 
   if (w0 == 1 || op0 != 3)
     res0 = decode_macfunc (cpu, 0, op0, h00, h10, src0, src1, mmod, 0, P, &v_i);
-printf("foo\n");
   if (w0)
     {
       if (P)
