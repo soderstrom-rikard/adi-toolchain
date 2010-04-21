@@ -457,6 +457,16 @@ get_store_name (SIM_CPU *cpu, bu32 *p)
     return "ASTAT[vs]";
   else if (p == &ASTATREG (v_copy))
     return "ASTAT[v_copy]";
+  else if (p == &ASTATREG (az))
+    return "ASTAT[az]";
+  else if (p == &ASTATREG (an))
+    return "ASTAT[an]";
+  else if (p == &ASTATREG (az))
+    return "ASTAT[az]";
+  else if (p == &ASTATREG (ac0))
+    return "ASTAT[ac0]";
+  else if (p == &ASTATREG (ac0_copy))
+    return "ASTAT[ac0_copy]";
   else
     {
     /* XXX: Worry about this when we start to STORE() it.  */
@@ -3823,24 +3833,34 @@ decode_dsp32alu_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1)
     {
       bu64 acc0 = get_extended_acc (cpu, 0);
       bu64 acc1 = get_extended_acc (cpu, 1);
+      bu32 carry = (bu40)acc1 < (bu40)acc0;
+      bu32 sat = 0;
 
       TRACE_INSN (cpu, "A0 -= A1%s;", s ? " (W32)" : "");
 
       acc0 -= acc1;
       if ((bs64)acc0 < -0x8000000000ll)
-	acc0 = -0x8000000000ull;
+	acc0 = -0x8000000000ull, sat = 1;
       else if ((bs64)acc0 >= 0x7fffffffffll)
-	acc0 = 0x7fffffffffull;
-      STORE (AXREG (0), (acc0 >> 32) & 0xff);
-      STORE (AWREG (0), acc0 & 0xffffffff);
+	acc0 = 0x7fffffffffull, sat = 1;
+
       if (s == 1)
 	{
 	  /* A0 -= A1 (W32) */
 	  if (acc0 & (bu64)0x8000000000ll)
-	    STORE (AXREG (0), 0x80);
+	    acc0 &= 0x80ffffffffll, sat = 1;
 	  else
-	    STORE (AXREG (0), 0x0);
+	    acc0 &= 0xffffffffll;
 	}
+      STORE (AXREG (0), (acc0 >> 32) & 0xff);
+      STORE (AWREG (0), acc0 & 0xffffffff);
+      STORE (ASTATREG (az), acc0 == 0);
+      STORE (ASTATREG (an), !!(acc0 & (bu64)0x8000000000ll));
+      STORE (ASTATREG (ac0), carry);
+      STORE (ASTATREG (ac0_copy), carry);
+      STORE (ASTATREG (av0), sat);
+      if (sat)
+      STORE (ASTATREG (av0s), sat);
     }
   else if ((aop == 2 || aop == 3) && aopcde == 22)
     {
@@ -4255,7 +4275,8 @@ decode_dsp32alu_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1)
     {
       bs40 acc0 = get_extended_acc (cpu, 0);
       bs40 acc1 = get_extended_acc (cpu, 1);
-      bu32 v;
+      bu32 v, dreg, sat = 0;
+      bu32 carry = !!((bu40)~acc1 < (bu40)acc0);
 
       if (aop == 0)
 	TRACE_INSN (cpu, "R%i = (A0 += A1);", dst0);
@@ -4266,28 +4287,50 @@ decode_dsp32alu_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1)
 
       acc0 += acc1;
       acc0 = saturate_s40_astat (acc0, &v);
+
+      if (aop == 2 && s == 1)   /* A0 += A1 (W32) */
+	{
+	  if (acc0 & (bs40)0x8000000000ll)
+	    acc0 &= 0x80ffffffffll;
+	  else
+	    acc0 &= 0xffffffffll;
+	}
+
       STORE (AXREG (0), acc0 >> 32);
       STORE (AWREG (0), acc0);
       SET_ASTATREG (av0, v && acc1);
       if (v)
 	SET_ASTATREG (av0s, v);
-      if (aop == 2 && s == 1)	/* A0 += A1 (W32) */
+
+      if (aop == 1)	/* Dregs_lo = A0 += A1 */
 	{
-	  if (acc0 & (bs40)0x8000000000ll)
-	    STORE (AXREG (0), 0x80);
-	  else
-	    STORE (AXREG (0), 0x0);
-	}
-      else if (aop == 1)	/* Dregs_lo = A0 += A1 */
-	{
-	  bu32 val = saturate_s32 (rnd16 (acc0) << 16, 0);
+	  dreg = saturate_s32 (rnd16 (acc0) << 16, &sat);
 	  if (HL)
-	    STORE (DREG (dst0), REG_H_L (val, DREG (dst0)));
+	    STORE (DREG (dst0), REG_H_L (dreg, DREG (dst0)));
 	  else
-	    STORE (DREG (dst0), REG_H_L (DREG (dst0), val >> 16));
+	    STORE (DREG (dst0), REG_H_L (DREG (dst0), dreg >> 16));
 	}
       else if (aop == 0)	/* Dregs = A0 += A1 */
-	STORE (DREG (dst0), saturate_s32 (acc0, 0));
+	{
+	  dreg = saturate_s32 (acc0, 0);
+	  STORE (DREG (dst0), dreg);
+	}
+      if (aop == 0 || aop == 1)
+	{
+	  STORE (ASTATREG (az), dreg == 0);
+	  STORE (ASTATREG (an), !!(acc0 & 0x8000000000ull));
+	  STORE (ASTATREG (ac0), carry);
+	  STORE (ASTATREG (v), sat);
+          if (sat)
+	    STORE (ASTATREG (vs), sat);
+	}
+      else
+	{
+	  STORE (ASTATREG (az), acc0 == 0);
+	  STORE (ASTATREG (an), !!(acc0 & 0x8000000000ull));
+	  STORE (ASTATREG (ac0), carry);
+	  STORE (ASTATREG (ac0_copy), carry);
+	}
     }
   else if ((aop == 0 || aop == 1) && aopcde == 10)
     {
