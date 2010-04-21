@@ -2101,6 +2101,7 @@ decode_CCflag_0 (SIM_CPU *cpu, bu16 iw0)
 
       switch (opc)
 	{
+	default: /* shutup useless gcc warnings */
 	case 0: /* signed */
 	  op = "==";
 	  cc = az;
@@ -3550,35 +3551,34 @@ decode_dsp32mac_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1)
       res1 = decode_macfunc (cpu, 1, op1, h01, h11, src0, src1, mmod, MM, P, &v_i);
       if (op1 == 3)
 	zero = !!(res1 == 0);
+      if (w1)
+	{
+	  if (P)
+	    STORE (DREG (dst + 1), res1);
+	  else
+	    {
+	      if (res1 & 0xffff0000)
+		illegal_instruction (cpu);
+	      res = REG_H_L (res1 << 16, res);
+	    }
+	}
     }
   if (w0 == 1 || op0 != 3)
     {
       res0 = decode_macfunc (cpu, 0, op0, h00, h10, src0, src1, mmod, 0, P, &v_i);
       if (op1 == 3)
 	zero |= !!(res0 == 0);
-    }
-  if (w0)
-    {
-      if (P)
-	STORE (DREG (dst), res0);
-      else
+      if (w0)
 	{
-	  if (res0 & 0xffff0000)
-	    illegal_instruction (cpu);
-	  res = REG_H_L (res, res0);
-	}
-    }
-
-  if (w1)
-    {
-      if (P)
-	STORE (DREG (dst + 1), res1);
-      else
-	{
-	  if (res1 & 0xffff0000)
-	    illegal_instruction (cpu);
-	  res = REG_H_L (res1 << 16, res);
-	}
+	  if (P)
+	    STORE (DREG (dst), res0);
+	  else
+	    {
+	      if (res0 & 0xffff0000)
+		illegal_instruction (cpu);
+	      res = REG_H_L (res, res0);
+	    }
+        }
     }
 
    if (!P && (w0 || w1))
@@ -4373,21 +4373,22 @@ decode_dsp32alu_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1)
       if (v)
 	SET_ASTATREG (av0s, v);
 
-      if (aop == 1)	/* Dregs_lo = A0 += A1 */
-	{
-	  dreg = saturate_s32 (rnd16 (acc0) << 16, &sat);
-	  if (HL)
-	    STORE (DREG (dst0), REG_H_L (dreg, DREG (dst0)));
-	  else
-	    STORE (DREG (dst0), REG_H_L (DREG (dst0), dreg >> 16));
-	}
-      else if (aop == 0)	/* Dregs = A0 += A1 */
-	{
-	  dreg = saturate_s32 (acc0, 0);
-	  STORE (DREG (dst0), dreg);
-	}
       if (aop == 0 || aop == 1)
 	{
+	  if (aop)	/* Dregs_lo = A0 += A1 */
+	    {
+	      dreg = saturate_s32 (rnd16 (acc0) << 16, &sat);
+	      if (HL)
+		STORE (DREG (dst0), REG_H_L (dreg, DREG (dst0)));
+	      else
+		STORE (DREG (dst0), REG_H_L (DREG (dst0), dreg >> 16));
+	    }
+	  else		/* Dregs = A0 += A1 */
+	    {
+	      dreg = saturate_s32 (acc0, 0);
+	      STORE (DREG (dst0), dreg);
+	    }
+
 	  STORE (ASTATREG (az), dreg == 0);
 	  STORE (ASTATREG (an), !!(acc0 & 0x8000000000ull));
 	  STORE (ASTATREG (ac0), carry);
@@ -5385,7 +5386,7 @@ decode_dsp32shiftimm_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1)
       bu40 acc = get_unextended_acc (cpu, HLs);
 
       TRACE_INSN (cpu, "A%i = ROT A%i BY %i;", HLs, HLs, shift);
-      TRACE_DECODE (cpu, "A%i:%#lx shift:%i CC:%i", HLs, acc, shift, cc);
+      TRACE_DECODE (cpu, "A%i:%#"PRIx64" shift:%i CC:%i", HLs, acc, shift, cc);
 
       acc = rot40 (acc, shift, &cc);
       SET_AREG (HLs, acc);
@@ -5682,26 +5683,79 @@ _interp_insn_bfin (SIM_CPU *cpu, bu32 pc)
   bu16 iw0, iw1;
 
   iw0 = IFETCH (pc);
-  if ((iw0 & 0xc000) == 0xc000)
+  if ((iw0 & 0xc000) != 0xc000)
     {
-      iw1 = IFETCH (pc + 2);
-      if ((iw0 & BIT_MULTI_INS) && (iw0 & 0xe800) != 0xe800 /* not linkage */)
-	{
-	  SIM_DESC sd = CPU_STATE (cpu);
-	  trace_prefix (sd, cpu, NULL_CIA, pc, TRACE_LINENUM_P (cpu),
-			NULL, 0, "|| %#lx", sim_events_time (sd));
-	  insn_len = 8;
-	}
-      else
-	insn_len = 4;
-      TRACE_EXTRACT (cpu, "%s: iw0:%#x iw1:%#x insn_len:%i", __func__,
-		     iw0, iw1, insn_len);
+      /* 16-bit opcode */
+      insn_len = 2;
+      if (INSN_LEN == 0)
+	INSN_LEN = insn_len;
+
+      TRACE_EXTRACT (cpu, "%s: iw0:%#x", __func__, iw0);
+      if ((iw0 & 0xFF00) == 0x0000)
+	decode_ProgCtrl_0 (cpu, iw0, pc);
+      else if ((iw0 & 0xFFC0) == 0x0240)
+	decode_CaCTRL_0 (cpu, iw0);
+      else if ((iw0 & 0xFF80) == 0x0100)
+	decode_PushPopReg_0 (cpu, iw0);
+      else if ((iw0 & 0xFE00) == 0x0400)
+	decode_PushPopMultiple_0 (cpu, iw0);
+      else if ((iw0 & 0xFE00) == 0x0600)
+	decode_ccMV_0 (cpu, iw0);
+      else if ((iw0 & 0xF800) == 0x0800)
+	decode_CCflag_0 (cpu, iw0);
+      else if ((iw0 & 0xFFE0) == 0x0200)
+	decode_CC2dreg_0 (cpu, iw0);
+      else if ((iw0 & 0xFF00) == 0x0300)
+	decode_CC2stat_0 (cpu, iw0);
+      else if ((iw0 & 0xF000) == 0x1000)
+	decode_BRCC_0 (cpu, iw0, pc);
+      else if ((iw0 & 0xF000) == 0x2000)
+	decode_UJUMP_0 (cpu, iw0, pc);
+      else if ((iw0 & 0xF000) == 0x3000)
+	decode_REGMV_0 (cpu, iw0);
+      else if ((iw0 & 0xFC00) == 0x4000)
+	decode_ALU2op_0 (cpu, iw0);
+      else if ((iw0 & 0xFE00) == 0x4400)
+	decode_PTR2op_0 (cpu, iw0);
+      else if ((iw0 & 0xF800) == 0x4800)
+	decode_LOGI2op_0 (cpu, iw0);
+      else if ((iw0 & 0xF000) == 0x5000)
+	decode_COMP3op_0 (cpu, iw0);
+      else if ((iw0 & 0xF800) == 0x6000)
+	decode_COMPI2opD_0 (cpu, iw0);
+      else if ((iw0 & 0xF800) == 0x6800)
+	decode_COMPI2opP_0 (cpu, iw0);
+      else if ((iw0 & 0xF000) == 0x8000)
+	decode_LDSTpmod_0 (cpu, iw0);
+      else if ((iw0 & 0xFF60) == 0x9E60)
+	decode_dagMODim_0 (cpu, iw0);
+      else if ((iw0 & 0xFFF0) == 0x9F60)
+	decode_dagMODik_0 (cpu, iw0);
+      else if ((iw0 & 0xFC00) == 0x9C00)
+	decode_dspLDST_0 (cpu, iw0);
+      else if ((iw0 & 0xF000) == 0x9000)
+	decode_LDST_0 (cpu, iw0);
+      else if ((iw0 & 0xFC00) == 0xB800)
+	decode_LDSTiiFP_0 (cpu, iw0);
+      else if ((iw0 & 0xE000) == 0xA000)
+	decode_LDSTii_0 (cpu, iw0);
+      return insn_len;
+    }
+
+  /* Grab the next 16 bits, to determine if its  a 32-bit or 64-bit opcode */
+  iw1 = IFETCH (pc + 2);
+  if ((iw0 & BIT_MULTI_INS) && (iw0 & 0xe800) != 0xe800 /* not linkage */)
+    {
+      SIM_DESC sd = CPU_STATE (cpu);
+      trace_prefix (sd, cpu, NULL_CIA, pc, TRACE_LINENUM_P (cpu),
+			NULL, 0, "|| %#"PRIx64, sim_events_time (sd));
+      insn_len = 8;
     }
   else
-    {
-      insn_len = 2;
-      TRACE_EXTRACT (cpu, "%s: iw0:%#x", __func__, iw0);
-    }
+     insn_len = 4;
+
+  TRACE_EXTRACT (cpu, "%s: iw0:%#x iw1:%#x insn_len:%i", __func__,
+		     iw0, iw1, insn_len);
 
   /* Only cache on first run through (in case of parallel insns).  */
   if (INSN_LEN == 0)
@@ -5709,54 +5763,6 @@ _interp_insn_bfin (SIM_CPU *cpu, bu32 pc)
 
   if ((iw0 & 0xf7ff) == 0xc003 && iw1 == 0x1800)
     TRACE_INSN (cpu, "MNOP;");
-  else if ((iw0 & 0xFF00) == 0x0000)
-    decode_ProgCtrl_0 (cpu, iw0, pc);
-  else if ((iw0 & 0xFFC0) == 0x0240)
-    decode_CaCTRL_0 (cpu, iw0);
-  else if ((iw0 & 0xFF80) == 0x0100)
-    decode_PushPopReg_0 (cpu, iw0);
-  else if ((iw0 & 0xFE00) == 0x0400)
-    decode_PushPopMultiple_0 (cpu, iw0);
-  else if ((iw0 & 0xFE00) == 0x0600)
-    decode_ccMV_0 (cpu, iw0);
-  else if ((iw0 & 0xF800) == 0x0800)
-    decode_CCflag_0 (cpu, iw0);
-  else if ((iw0 & 0xFFE0) == 0x0200)
-    decode_CC2dreg_0 (cpu, iw0);
-  else if ((iw0 & 0xFF00) == 0x0300)
-    decode_CC2stat_0 (cpu, iw0);
-  else if ((iw0 & 0xF000) == 0x1000)
-    decode_BRCC_0 (cpu, iw0, pc);
-  else if ((iw0 & 0xF000) == 0x2000)
-    decode_UJUMP_0 (cpu, iw0, pc);
-  else if ((iw0 & 0xF000) == 0x3000)
-    decode_REGMV_0 (cpu, iw0);
-  else if ((iw0 & 0xFC00) == 0x4000)
-    decode_ALU2op_0 (cpu, iw0);
-  else if ((iw0 & 0xFE00) == 0x4400)
-    decode_PTR2op_0 (cpu, iw0);
-  else if ((iw0 & 0xF800) == 0x4800)
-    decode_LOGI2op_0 (cpu, iw0);
-  else if ((iw0 & 0xF000) == 0x5000)
-    decode_COMP3op_0 (cpu, iw0);
-  else if ((iw0 & 0xF800) == 0x6000)
-    decode_COMPI2opD_0 (cpu, iw0);
-  else if ((iw0 & 0xF800) == 0x6800)
-    decode_COMPI2opP_0 (cpu, iw0);
-  else if ((iw0 & 0xF000) == 0x8000)
-    decode_LDSTpmod_0 (cpu, iw0);
-  else if ((iw0 & 0xFF60) == 0x9E60)
-    decode_dagMODim_0 (cpu, iw0);
-  else if ((iw0 & 0xFFF0) == 0x9F60)
-    decode_dagMODik_0 (cpu, iw0);
-  else if ((iw0 & 0xFC00) == 0x9C00)
-    decode_dspLDST_0 (cpu, iw0);
-  else if ((iw0 & 0xF000) == 0x9000)
-    decode_LDST_0 (cpu, iw0);
-  else if ((iw0 & 0xFC00) == 0xB800)
-    decode_LDSTiiFP_0 (cpu, iw0);
-  else if ((iw0 & 0xE000) == 0xA000)
-    decode_LDSTii_0 (cpu, iw0);
   else if (((iw0 & 0xFF80) == 0xE080) && ((iw1 & 0x0C00) == 0x0000))
     decode_LoopSetup_0 (cpu, iw0, iw1, pc);
   else if (((iw0 & 0xFF00) == 0xE100) && ((iw1 & 0x0000) == 0x0000))
