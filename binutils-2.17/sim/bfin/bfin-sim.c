@@ -4305,6 +4305,10 @@ decode_dsp32alu_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1)
 
       TRACE_INSN (cpu, "R%i = A%i + A%i, R%i = A%i - A%i%s",
 		  dst1, !aop, aop, dst0, !aop, aop, amod1 (s, x));
+      TRACE_DECODE (cpu, "R%i = A%i:%#"PRIx64" + A%i:%#"PRIx64", "
+			 "R%i = A%i:%#"PRIx64" - A%i:%#"PRIx64"%s",
+		dst1, !aop, aop ? acc0 : acc1, aop, aop ? acc1 : acc0,
+		dst0, !aop, aop ? acc0 : acc1, aop, aop ? acc1 : acc0, amod1 (s, x));
 
       val1 = acc0 + acc1;
       if (aop)
@@ -4318,14 +4322,27 @@ decode_dsp32alu_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1)
 	  sat_i = sat;
 	  val1 = saturate_s32 (val1, &sat);
 	  sat_i |= sat;
-	  SET_ASTATREG (v, sat_i);
-	  if (sat_i)
-	    SET_ASTATREG (vs, sat_i);
 	}
+      else
+	{
+	  if ((bu40)val0 > 0xFFFFFFFF)
+	    sat_i = 1;
+	  if ((bu40)val1 > 0xFFFFFFFF)
+	    sat_i = 1;
+	}
+
       STORE (DREG (dst0), val0);
       STORE (DREG (dst1), val1);
+      SET_ASTATREG (v, sat_i);
+      if (sat_i)
+	SET_ASTATREG (vs, sat_i);
       SET_ASTATREG (an, val0 & 0x80000000 || val1 & 0x80000000);
       SET_ASTATREG (az, val0 == 0 || val1 == 0);
+      SET_ASTATREG (ac1, (bu40)~acc0 < (bu40)acc1);
+      if (aop)
+	SET_ASTATREG (ac0, !!((bu40)acc1 <= (bu40)acc0));
+      else
+	SET_ASTATREG (ac0, !!((bu40)acc0 <= (bu40)acc1));
     }
   else if (aop == 0 && aopcde == 18)
     {
