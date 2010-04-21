@@ -71,6 +71,13 @@ illegal_instruction (SIM_CPU *cpu)
 }
 
 static __attribute__ ((noreturn)) void
+illegal_instruction_combination (SIM_CPU *cpu)
+{
+  while (1)
+    cec_exception (cpu, VEC_ILGAL_I);
+}
+
+static __attribute__ ((noreturn)) void
 unhandled_instruction (SIM_CPU *cpu, const char *insn)
 {
   SIM_DESC sd = CPU_STATE (cpu);
@@ -1652,6 +1659,9 @@ decode_ProgCtrl_0 (SIM_CPU *cpu, bu16 iw0, bu32 pc)
 
   if (prgfunc == 0 && poprnd == 0)
     TRACE_INSN (cpu, "NOP;");
+  else if (INSN_LEN == 8)
+    /* None of these can be part of a parrallel instruction */
+    illegal_instruction_combination(cpu);
   else if (prgfunc == 1 && poprnd == 0)
     {
       bu32 newpc = RETSREG;
@@ -1816,6 +1826,10 @@ decode_CaCTRL_0 (SIM_CPU *cpu, bu16 iw0)
   bu32 preg = PREG (reg);
 
   TRACE_EXTRACT (cpu, "%s: a:%i op:%i reg:%i", __func__, a, op, reg);
+
+if (INSN_LEN == 8)
+    /* None of these can be part of a parrallel instruction */
+    illegal_instruction_combination(cpu);
 
   /* No cache simulation, so these are (mostly) all NOPs.
      XXX: The hardware takes care of masking to cache lines, but need
@@ -2001,6 +2015,10 @@ decode_ccMV_0 (SIM_CPU *cpu, bu16 iw0)
   TRACE_EXTRACT (cpu, "%s: T:%i d:%i s:%i dst:%i src:%i",
 		 __func__, T, d, s, dst, src);
 
+  if (INSN_LEN == 8)
+    /* None of these can be part of a parrallel instruction */
+    illegal_instruction_combination(cpu);
+
   TRACE_INSN (cpu, "IF %sCC %s = %s;", T ? "" : "! ",
 	      get_allreg_name (d, dst),
 	      get_allreg_name (s, src));
@@ -2024,6 +2042,10 @@ decode_CCflag_0 (SIM_CPU *cpu, bu16 iw0)
 
   TRACE_EXTRACT (cpu, "%s: I:%i opc:%i G:%i y:%i x:%i",
 		 __func__, I, opc, G, y, x);
+
+  if (INSN_LEN == 8)
+    /* None of these can be part of a parrallel instruction */
+    illegal_instruction_combination(cpu);
 
   if (opc > 4)
     {
@@ -2130,6 +2152,10 @@ decode_CC2dreg_0 (SIM_CPU *cpu, bu16 iw0)
 
   TRACE_EXTRACT (cpu, "%s: op:%i reg:%i", __func__, op, reg);
 
+  if (INSN_LEN == 8)
+    /* None of these can be part of a parrallel instruction */
+    illegal_instruction_combination(cpu);
+
   if (op == 0)
     {
       TRACE_INSN (cpu, "R%i = CC;", reg);
@@ -2190,6 +2216,10 @@ decode_CC2stat_0 (SIM_CPU *cpu, bu16 iw0)
 
   TRACE_EXTRACT (cpu, "%s: D:%i op:%i cbit:%i", __func__, D, op, cbit);
 
+  if (INSN_LEN == 8)
+    /* None of these can be part of a parrallel instruction */
+    illegal_instruction_combination(cpu);
+
   TRACE_INSN (cpu, "%s %s= %s;", D ? astat_name : "CC",
 	      op_names[op], D ? "CC" : astat_name);
 
@@ -2239,8 +2269,13 @@ decode_BRCC_0 (SIM_CPU *cpu, bu16 iw0, bu32 pc)
   TRACE_EXTRACT (cpu, "%s: T:%i B:%i offset:%#x", __func__, T, B, offset);
   TRACE_DECODE (cpu, "%s: pcrel10:%#x", __func__, pcrel);
 
+ if (INSN_LEN == 8)
+    /* None of these can be part of a parrallel instruction */
+    illegal_instruction_combination(cpu);
+
   TRACE_INSN (cpu, "IF %sCC JUMP %#x%s;", T ? "" : "! ",
 	      pcrel, B ? " (bp)" : "");
+
   if (cond)
     {
       bu32 newpc = pc + pcrel;
@@ -2270,6 +2305,10 @@ decode_UJUMP_0 (SIM_CPU *cpu, bu16 iw0, bu32 pc)
 
   TRACE_EXTRACT (cpu, "%s: offset:%#x", __func__, offset);
   TRACE_DECODE (cpu, "%s: pcrel12:%#x", __func__, pcrel);
+
+ if (INSN_LEN == 8)
+    /* None of these can be part of a parrallel instruction */
+    illegal_instruction_combination(cpu);
 
   TRACE_INSN (cpu, "JUMP.S %#x;", pcrel);
   TRACE_BRANCH (cpu, pc, newpc, -1, "JUMP.S");
@@ -2478,11 +2517,19 @@ decode_LOGI2op_0 (SIM_CPU *cpu, bu16 iw0)
 
   if (opc == 0)
     {
+      if (INSN_LEN == 8)
+	/* None of these can be part of a parrallel instruction */
+	illegal_instruction_combination(cpu);
+
       TRACE_INSN (cpu, "CC = ! BITTST (R%i, %s);", dst, uimm_str);
       SET_CCREG ((~DREG (dst) >> uimm) & 1);
     }
   else if (opc == 1)
     {
+      if (INSN_LEN == 8)
+	/* None of these can be part of a parrallel instruction */
+	illegal_instruction_combination(cpu);
+
       TRACE_INSN (cpu, "CC = BITTST (R%i, %s);", dst, uimm_str);
       SET_CCREG ((DREG (dst) >> uimm) & 1);
     }
@@ -3284,6 +3331,10 @@ decode_CALLa_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1, bu32 pc)
 
   TRACE_EXTRACT (cpu, "%s: S:%i msw:%#x lsw:%#x", __func__, S, msw, lsw);
   TRACE_DECODE (cpu, "%s: pcrel24:%#x", __func__, pcrel);
+
+ if (INSN_LEN == 8)
+    /* None of these can be part of a parrallel instruction */
+    illegal_instruction_combination(cpu);
 
   TRACE_INSN (cpu, "%s %#x;", S ? "CALL" : "JUMP.L", pcrel);
 
