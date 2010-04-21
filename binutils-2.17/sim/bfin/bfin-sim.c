@@ -451,9 +451,18 @@ get_store_name (SIM_CPU *cpu, bu32 *p)
     return "ASTAT[av1]";
   else if (p == &ASTATREG (av1s))
     return "ASTAT[av1s]";
+  else if (p == &ASTATREG (v))
+    return "ASTAT[v]";
+  else if (p == &ASTATREG (vs))
+    return "ASTAT[vs]";
+  else if (p == &ASTATREG (v_copy))
+    return "ASTAT[v_copy]";
   else
+    {
     /* XXX: Worry about this when we start to STORE() it.  */
-    abort ();
+      fprintf(stderr, "Unknown register name in store\n");
+      abort ();
+    }
 }
 
 static void
@@ -1351,7 +1360,11 @@ static bu32
 saturate_u32 (bu64 val, int *overflow)
 {
   if (val > 0xffffffff)
-    return 0xffffffff;
+    {
+      if (overflow)
+	*overflow = 1;
+      return 0xffffffff;
+    }
   return val;
 }
 
@@ -1359,7 +1372,11 @@ static bu32
 saturate_u16 (bu64 val, int *overflow)
 {
   if (val > 0xffff)
-    return 0xffff;
+    {
+      if (overflow)
+	*overflow = 1;
+      return 0xffff;
+    }
   return val;
 }
 
@@ -1420,14 +1437,14 @@ extract_mult (SIM_CPU *cpu, bu64 res, int mmod, int MM, int fullword, int *overf
       {
       case 0:
       case M_IS:
-	return saturate_s32 (res, 0);
+	return saturate_s32 (res, overflow);
       case M_FU:
 	if (MM)
-	  return saturate_s32 (res, 0);
-	return saturate_u32 (res, 0);
+	  return saturate_s32 (res, overflow);
+	return saturate_u32 (res, overflow);
       case M_S2RND:
       case M_ISS2:
-	return saturate_s32 (res << 1, 0);
+	return saturate_s32 (res << 1, overflow);
       default:
 	illegal_instruction (cpu);
       }
@@ -1438,27 +1455,27 @@ extract_mult (SIM_CPU *cpu, bu64 res, int mmod, int MM, int fullword, int *overf
       case M_W32:
 	return saturate_s16 (rnd16 (res), overflow);
       case M_IH:
-	return saturate_s32((rnd16 (res)), 0) & 0xFFFF;
+	return saturate_s32((rnd16 (res)), overflow) & 0xFFFF;
       case M_IS:
-	return saturate_s16 (res, 0);
+	return saturate_s16 (res, overflow);
       case M_FU:
 	if (MM)
-	  return saturate_s16 (rnd16 (res), 0);
-	return saturate_u16 (rnd16 (res), 0);
+	  return saturate_s16 (rnd16 (res), overflow);
+	return saturate_u16 (rnd16 (res), overflow);
       case M_IU:
 	if (MM)
-	  return saturate_s16 (res, 0);
-	return saturate_u16 (res, 0);
+	  return saturate_s16 (res, overflow);
+	return saturate_u16 (res, overflow);
 
       case M_T:
-	return saturate_s16 (trunc16 (res), 0);
+	return saturate_s16 (trunc16 (res), overflow);
       case M_TFU:
-	return saturate_u16 (trunc16 (res), 0);
+	return saturate_u16 (trunc16 (res), overflow);
 
       case M_S2RND:
-	return saturate_s16 (rnd16 (res << 1), 0);
+	return saturate_s16 (rnd16 (res << 1), overflow);
       case M_ISS2:
-	return saturate_s16 (res << 1, 0);
+	return saturate_s16 (res << 1, overflow);
       default:
 	illegal_instruction (cpu);
       }
@@ -3529,6 +3546,7 @@ decode_dsp32mult_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1)
 
   bu32 res0, res1;
   bu32 res = DREG (dst);
+  bu32 sat0 = 0, sat1 = 0;
 
   TRACE_EXTRACT (cpu, "%s: M:%i mmod:%i MM:%i P:%i w1:%i op1:%i h01:%i h11:%i "
 		      "w0:%i op0:%i h00:%i h10:%i dst:%i src0:%i src1:%i",
@@ -3566,12 +3584,7 @@ decode_dsp32mult_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1)
 
   if (w1)
     {
-      int sat;
-      bu64 r = decode_multfunc (cpu, h01, h11, src0, src1, mmod, MM, &sat);
-      STORE (ASTATREG (v), sat);
-      STORE (ASTATREG (v_copy), sat);
-      if (sat)
-	STORE (ASTATREG (vs), sat);
+      bu64 r = decode_multfunc (cpu, h01, h11, src0, src1, mmod, MM, &sat1);
       res1 = extract_mult (cpu, r, mmod, MM, P, 0);
       if (P)
 	STORE (DREG (dst + 1), res1);
@@ -3585,12 +3598,7 @@ decode_dsp32mult_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1)
 
   if (w0)
     {
-      int sat;
-      bu64 r = decode_multfunc (cpu, h00, h10, src0, src1, mmod, 0, &sat);
-      STORE (ASTATREG (v), sat);
-      STORE (ASTATREG (v_copy), sat);
-      if (sat)
-	STORE (ASTATREG (vs), sat);
+      bu64 r = decode_multfunc (cpu, h00, h10, src0, src1, mmod, 0, &sat0);
       res0 = extract_mult (cpu, r, mmod, 0, P, 0);
       if (P)
 	STORE (DREG (dst), res0);
@@ -3604,6 +3612,14 @@ decode_dsp32mult_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1)
 
    if (!P && (w0 || w1))
     STORE (DREG (dst), res);
+
+  if (w0 || w1)
+    {
+      STORE (ASTATREG (v), sat0 | sat1);
+      STORE (ASTATREG (v_copy), sat0 | sat1);
+      if (sat0 | sat1)
+	STORE (ASTATREG (vs), 1);
+    }
 }
 
 static void
@@ -5306,6 +5322,8 @@ decode_dsp32shiftimm_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1)
 	acc >>= shiftdn;
 
       SET_AREG (HLs, acc);
+      SET_ASTATREG(an, !!(acc & 0x8000000000ull));
+      SET_ASTATREG(az, acc == 0);
     }
   else if (sop == 1 && sopcde == 1 && bit8 == 0)
     {
