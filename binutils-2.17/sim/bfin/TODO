@@ -1,12 +1,6 @@
 need to review ASTAT write behavior
 
-create on-chip maps and default SP to scratch pad
-
-implement all unhandled_instruction locations
-
 how to model RETE and IVG0 bit in IPEND ...
-
-hwloop behavior when the last insn causes code flow change (did_jump)
 
 model the loop buffer ?  this means no ifetches because they're cached.
 see page 4-26 in Blackfin PRM under hardware loops.
