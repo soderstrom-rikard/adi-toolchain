@@ -477,7 +477,7 @@ get_store_name (SIM_CPU *cpu, bu32 *p)
   else
     {
       /* Worry about this when we start to STORE() it.  */
-      sim_io_eprintf (CPU_STATE (cpu), stderr, "STORE(): unknown register\n");
+      sim_io_eprintf (CPU_STATE (cpu), "STORE(): unknown register\n");
       abort ();
     }
 }
