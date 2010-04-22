@@ -68,7 +68,7 @@ static const char *mmr_name (struct bfin_uart *uart, bu32 idx)
 
 #ifndef HAVE_DV_SOCKSER
 # define dv_sockser_status(sd) -1
-# define dv_sockser_write(sd, byte)
+# define dv_sockser_write(sd, byte) do { ; } while (0)
 # define dv_sockser_read(sd) 0xff
 #endif
 
