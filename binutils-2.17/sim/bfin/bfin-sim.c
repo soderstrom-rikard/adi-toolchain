@@ -4003,22 +4003,47 @@ decode_dsp32alu_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1)
       SET_AREG (0, 0);
       SET_AREG (1, 0);
     }
-  else if ((aop == 0 || aop == 1) && s == 1 && aopcde == 8)
+  else if ((aop == 0 || aop == 1 || aop == 2) && s == 1 && aopcde == 8)
     {
-      TRACE_INSN (cpu, "A%i = A%i (S);", aop, aop);
-      SET_AXREG (aop, -(AWREG (aop) >> 31));
+      bs40 acc0 = get_extended_acc (cpu, 0);
+      bs40 acc1 = get_extended_acc (cpu, 1);
+      int sat;
 
-      SET_ASTATREG (az, AWREG (aop) == 0);
-      SET_ASTATREG (an, (AWREG (aop) >> 31) & 1);
-    }
-  else if (aop == 2 && s == 1 && aopcde == 8)
-    {
-      TRACE_INSN (cpu, "A1 = A1 (S), A0 = A0 (S);");
-      SET_AXREG (0, -(AWREG (0) >> 31));
-      SET_AXREG (1, -(AWREG (1) >> 31));
+      if (aop == 0 || aop == 1)
+        TRACE_INSN (cpu, "A%i = A%i (S);", aop, aop);
+      else
+        TRACE_INSN (cpu, "A1 = A1 (S), A0 = A0 (S);");
 
-      SET_ASTATREG (az, ((AWREG (0) == 0) || (AWREG (1) == 0)));
-      SET_ASTATREG (an, ((AWREG (0) >> 31) & 1) || ((AWREG (1) >> 31) & 1));
+      if (aop == 0 || aop == 2)
+	{
+	  sat = 0;
+	  acc0 = saturate_s32 (acc0, &sat);
+	  acc0 |= -(acc0 & 0x80000000ull);
+	  SET_AXREG (0, (acc0 >> 31) & 0xFF);
+	  SET_AWREG (0, acc0 & 0xFFFFFFFF);
+	  SET_ASTATREG (av0, sat);
+	  if (sat)
+	    SET_ASTATREG (av0s, sat);
+	}
+      else
+	acc0 = 1;
+
+      if (aop == 1 || aop == 2)
+	{
+	  sat = 0;
+	  acc1 = saturate_s32 (acc1, &sat);
+	  acc1 |= -(acc1 & 0x80000000ull);
+	  SET_AXREG (1, (acc1 >> 31) & 0xFF);
+	  SET_AWREG (1, acc1 & 0xFFFFFFFF);
+	  SET_ASTATREG (av1, sat);
+	  if (sat)
+	    SET_ASTATREG (av1s, sat);
+	}
+      else
+	acc1 = 1;
+
+      SET_ASTATREG (az, (acc0 == 0) || (acc1 == 0));
+      SET_ASTATREG (an, ((acc0 >> 31) & 1) || ((acc1 >> 31) & 1) );
     }
   else if (aop == 3 && (s == 0 || s == 1) && aopcde == 8)
     {
