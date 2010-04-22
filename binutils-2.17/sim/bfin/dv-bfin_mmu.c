@@ -248,21 +248,24 @@ _mmu_process_fault (SIM_CPU *cpu, struct bfin_mmu *mmu, bu32 addr, bool write,
   bool supv = cec_is_supervisor_mode (cpu);
   bu32 *fault_status, *fault_addr;
 
-  fault_status = inst ? &mmu->icplb_fault_status : &mmu->dcplb_fault_status;
-  fault_addr = inst ? &mmu->icplb_fault_addr : &mmu->dcplb_fault_addr;
-  /* ICPLB regs always get updated.  */
-  if (!inst)
+  if (mmu)
     {
-      mmu->icplb_fault_addr = PCREG;
-      mmu->icplb_fault_status = supv << 17;
-    }
+      fault_status = inst ? &mmu->icplb_fault_status : &mmu->dcplb_fault_status;
+      fault_addr = inst ? &mmu->icplb_fault_addr : &mmu->dcplb_fault_addr;
+      /* ICPLB regs always get updated.  */
+      if (!inst)
+	{
+	  mmu->icplb_fault_addr = PCREG;
+	  mmu->icplb_fault_status = supv << 17;
+	}
 
-  *fault_addr = addr;
-  /* XXX: should handle FAULT_DAG.  */
-  *fault_status =
+      *fault_addr = addr;
+      /* XXX: should handle FAULT_DAG.  */
+      *fault_status =
 	(miss << 19) |
 	(supv << 17) |
 	(write << 16);
+    }
 
   /* XXX: correct precedence order ?  Multiple exceptions ?  */
   if (addr >= BFIN_SYSTEM_MMR_BASE)
@@ -270,22 +273,33 @@ _mmu_process_fault (SIM_CPU *cpu, struct bfin_mmu *mmu, bu32 addr, bool write,
   else if (unaligned)
     cec_exception (cpu, inst ? VEC_MISALI_I : VEC_MISALI_D);
   else
-    /* XXX: When exactly does hardware do exception vs IVHW ?  */
-    cec_latch (cpu, IVG_IVHW);
+    {
+      if (mmu)
+	/* XXX: When exactly does hardware do exception vs IVHW ?  */
+	cec_latch (cpu, IVG_IVHW);
+      else
+	cec_exception (cpu, inst ? VEC_CPLB_I_M : VEC_CPLB_M);
+    }
 }
 
 void
 mmu_process_fault (SIM_CPU *cpu, bu32 addr, bool write, bool inst,
 		   bool unaligned, bool miss)
 {
-  struct bfin_mmu *mmu = MMU_STATE (cpu);
+  struct bfin_mmu *mmu;
+
+  if (STATE_ENVIRONMENT (sd) != OPERATING_ENVIRONMENT)
+    mmu = NULL;
+  else
+    mmu = MMU_STATE (cpu);
+
   _mmu_process_fault (cpu, mmu, addr, write, inst, unaligned, miss);
 }
 
 void
 mmu_check_addr (SIM_CPU *cpu, bu32 addr, bool write, bool inst, int size)
 {
-  struct bfin_mmu *mmu = MMU_STATE (cpu);
+  struct bfin_mmu *mmu = NULL;
   bu32 *fault_status, *fault_addr, *mem_control, *cplb_addr, *cplb_data;
   bu32 faults;
   bool supv;
@@ -294,6 +308,10 @@ mmu_check_addr (SIM_CPU *cpu, bu32 addr, bool write, bool inst, int size)
   if (addr & (size - 1))
     _mmu_process_fault (cpu, mmu, addr, write, inst, true, false);
 
+  if (STATE_ENVIRONMENT (sd) != OPERATING_ENVIRONMENT)
+    return;
+
+  mmu = MMU_STATE (cpu);
   fault_status = inst ? &mmu->icplb_fault_status : &mmu->dcplb_fault_status;
   fault_addr = inst ? &mmu->icplb_fault_addr : &mmu->dcplb_fault_addr;
   mem_control = inst ? &mmu->imem_control : &mmu->dmem_control;
@@ -336,7 +354,6 @@ mmu_check_addr (SIM_CPU *cpu, bu32 addr, bool write, bool inst, int size)
 	    faults |= (1 << i);
 	}
     }
-
 
   /* MMRs have an implicit CPLB.  */
   if (hits == 0 && addr >= BFIN_SYSTEM_MMR_BASE)
