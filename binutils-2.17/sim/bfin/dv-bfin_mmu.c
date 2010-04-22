@@ -286,6 +286,7 @@ void
 mmu_process_fault (SIM_CPU *cpu, bu32 addr, bool write, bool inst,
 		   bool unaligned, bool miss)
 {
+  SIM_DESC sd = CPU_STATE (cpu);
   struct bfin_mmu *mmu;
 
   if (STATE_ENVIRONMENT (sd) != OPERATING_ENVIRONMENT)
@@ -299,6 +300,7 @@ mmu_process_fault (SIM_CPU *cpu, bu32 addr, bool write, bool inst,
 void
 mmu_check_addr (SIM_CPU *cpu, bu32 addr, bool write, bool inst, int size)
 {
+  SIM_DESC sd = CPU_STATE (cpu);
   struct bfin_mmu *mmu = NULL;
   bu32 *fault_status, *fault_addr, *mem_control, *cplb_addr, *cplb_data;
   bu32 faults;
