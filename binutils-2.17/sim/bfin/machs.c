@@ -100,11 +100,13 @@ static const struct bfin_dev_layout bf50x_dev[] = {
 #define bf516_chipid bf51x_chipid
 #define bf518_chipid bf51x_chipid
 static const struct bfin_memory_layout bf51x_mem[] = {
+  LAYOUT (0xFFC00500, 0x20, read_write),	/* SPI0 stub */
   LAYOUT (0xFFC00700, 0x50, read_write),	/* PORTF stub */
   LAYOUT (0xFFC01400, 0x90, read_write),	/* TWI stub */
   LAYOUT (0xFFC01500, 0x50, read_write),	/* PORTG stub */
   LAYOUT (0xFFC01700, 0x50, read_write),	/* PORTH stub */
   LAYOUT (0xFFC03200, 0x50, read_write),	/* PORT_MUX stub */
+  LAYOUT (0xFFC03400, 0x20, read_write),	/* SPI1 stub */
   LAYOUT (0xFF800000, 0x4000, read_write),	/* Data A */
   LAYOUT (0xFF804000, 0x4000, read_write),	/* Data A Cache */
   LAYOUT (0xFF900000, 0x4000, read_write),	/* Data B */
@@ -132,6 +134,7 @@ static const struct bfin_dev_layout bf51x_dev[] = {
 #define bf526_chipid bf522_chipid
 #define bf527_chipid bf523_chipid
 static const struct bfin_memory_layout bf52x_mem[] = {
+  LAYOUT (0xFFC00500, 0x20, read_write),	/* SPI stub */
   LAYOUT (0xFFC00700, 0x50, read_write),	/* PORTF stub */
   LAYOUT (0xFFC01400, 0x90, read_write),	/* TWI stub */
   LAYOUT (0xFFC01500, 0x50, read_write),	/* PORTG stub */
@@ -167,12 +170,14 @@ static const struct bfin_dev_layout bf52x_dev[] = {
 #define bf532_chipid bf531_chipid
 #define bf533_chipid bf531_chipid
 static const struct bfin_memory_layout bf531_mem[] = {
+  LAYOUT (0xFFC00500, 0x20, read_write),	/* SPI stub */
   LAYOUT (0xFFC00700, 0x50, read_write),	/* GPIO stub */
   LAYOUT (0xFF804000, 0x4000, read_write),	/* Data A Cache */
   LAYOUT (0xFFA08000, 0x4000, read_write_exec),	/* Inst B [1] */
   LAYOUT (0xFFA10000, 0x4000, read_write_exec),	/* Inst Cache [1] */
 };
 static const struct bfin_memory_layout bf532_mem[] = {
+  LAYOUT (0xFFC00500, 0x20, read_write),	/* SPI stub */
   LAYOUT (0xFFC00700, 0x50, read_write),	/* GPIO stub */
   LAYOUT (0xFF804000, 0x4000, read_write),	/* Data A Cache */
   LAYOUT (0xFF904000, 0x4000, read_write),	/* Data B Cache */
@@ -181,6 +186,7 @@ static const struct bfin_memory_layout bf532_mem[] = {
   LAYOUT (0xFFA10000, 0x4000, read_write_exec),	/* Inst Cache [1] */
 };
 static const struct bfin_memory_layout bf533_mem[] = {
+  LAYOUT (0xFFC00500, 0x20, read_write),	/* SPI stub */
   LAYOUT (0xFFC00700, 0x50, read_write),	/* GPIO stub */
   LAYOUT (0xFF800000, 0x4000, read_write),	/* Data A */
   LAYOUT (0xFF804000, 0x4000, read_write),	/* Data A Cache */
@@ -201,6 +207,7 @@ static const struct bfin_dev_layout bf533_dev[] = {
 #define bf536_chipid 0x27c8
 #define bf537_chipid bf536_chipid
 static const struct bfin_memory_layout bf534_mem[] = {
+  LAYOUT (0xFFC00500, 0x20, read_write),	/* SPI stub */
   LAYOUT (0xFFC00700, 0x50, read_write),	/* PORTF stub */
   LAYOUT (0xFFC01400, 0x90, read_write),	/* TWI stub */
   LAYOUT (0xFFC01500, 0x50, read_write),	/* PORTG stub */
@@ -216,6 +223,7 @@ static const struct bfin_memory_layout bf534_mem[] = {
   LAYOUT (0xFFA10000, 0x4000, read_write_exec),	/* Inst Cache [1] */
 };
 static const struct bfin_memory_layout bf536_mem[] = {
+  LAYOUT (0xFFC00500, 0x20, read_write),	/* SPI stub */
   LAYOUT (0xFFC00700, 0x50, read_write),	/* PORTF stub */
   LAYOUT (0xFFC01400, 0x90, read_write),	/* TWI stub */
   LAYOUT (0xFFC01500, 0x50, read_write),	/* PORTG stub */
@@ -229,6 +237,7 @@ static const struct bfin_memory_layout bf536_mem[] = {
   LAYOUT (0xFFA10000, 0x4000, read_write_exec),	/* Inst Cache [1] */
 };
 static const struct bfin_memory_layout bf537_mem[] = {
+  LAYOUT (0xFFC00500, 0x20, read_write),	/* SPI stub */
   LAYOUT (0xFFC00700, 0x50, read_write),	/* PORTF stub */
   LAYOUT (0xFFC01400, 0x90, read_write),	/* TWI stub */
   LAYOUT (0xFFC01500, 0x50, read_write),	/* PORTG stub */
@@ -253,10 +262,13 @@ static const struct bfin_dev_layout bf537_dev[] = {
 #define bf538_chipid 0x27c4
 #define bf539_chipid bf538_chipid
 static const struct bfin_memory_layout bf538_mem[] = {
+  LAYOUT (0xFFC00500, 0x20, read_write),	/* SPI0 stub */
   LAYOUT (0xFFC00700, 0x50, read_write),	/* PORTF stub */
   LAYOUT (0xFFC01400, 0x90, read_write),	/* TWI0 stub */
   LAYOUT (0xFFC01500, 0x70, read_write),	/* PORTC/D/E stub */
   LAYOUT (0xFFC02200, 0x90, read_write),	/* TWI1 stub */
+  LAYOUT (0xFFC02300, 0x20, read_write),	/* SPI1 stub */
+  LAYOUT (0xFFC02400, 0x20, read_write),	/* SPI2 stub */
   LAYOUT (0xFF800000, 0x4000, read_write),	/* Data A */
   LAYOUT (0xFF804000, 0x4000, read_write),	/* Data A Cache */
   LAYOUT (0xFF900000, 0x4000, read_write),	/* Data B */
@@ -281,9 +293,11 @@ static const struct bfin_dev_layout bf538_dev[] = {
 #define bf548_chipid bf54x_chipid
 #define bf549_chipid bf54x_chipid
 static const struct bfin_memory_layout bf54x_mem[] = {
+  LAYOUT (0xFFC00500, 0x20, read_write),	/* SPI0 stub */
   LAYOUT (0xFFC00700, 0x90, read_write),	/* TWI0 stub */
   LAYOUT (0xFFC01400, 0x200, read_write),	/* PORT/GPIO stub */
   LAYOUT (0xFFC02200, 0x90, read_write),	/* TWI1 stub */
+  LAYOUT (0xFFC02300, 0x20, read_write),	/* SPI1 stub */
   LAYOUT (0xFEB00000, 0x20000, read_write_exec),	/* L2 */
   LAYOUT (0xFF800000, 0x4000, read_write),	/* Data A */
   LAYOUT (0xFF804000, 0x4000, read_write),	/* Data A Cache */
@@ -313,6 +327,7 @@ static const struct bfin_dev_layout bf54x_dev[] = {
 /* This is only Core A of course ...  */
 #define bf561_chipid 0x27bb
 static const struct bfin_memory_layout bf561_mem[] = {
+  LAYOUT (0xFFC00500, 0x20, read_write),	/* SPI stub */
   LAYOUT (0xFFC00700, 0x50, read_write),	/* GPIO0 stub */
   LAYOUT (0xFFC01500, 0x50, read_write),	/* GPIO1 stub */
   LAYOUT (0xFFC01700, 0x50, read_write),	/* GPIO2 stub */
