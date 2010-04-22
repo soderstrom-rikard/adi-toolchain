@@ -4380,14 +4380,16 @@ decode_dsp32alu_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1)
 	    }
 	  else		/* Dregs = A0 += A1 */
 	    {
-	      dreg = saturate_s32 (acc0, 0);
+	      dreg = saturate_s32 (acc0, &sat);
 	      STORE (DREG (dst0), dreg);
 	    }
 
 	  STORE (ASTATREG (az), dreg == 0);
-	  STORE (ASTATREG (an), !!(acc0 & 0x8000000000ull));
+	  STORE (ASTATREG (an), !!(dreg & 0x80000000));
 	  STORE (ASTATREG (ac0), carry);
+	  STORE (ASTATREG (ac0_copy), carry);
 	  STORE (ASTATREG (v), sat);
+	  STORE (ASTATREG (v_copy), sat);
           if (sat)
 	    STORE (ASTATREG (vs), sat);
 	}
