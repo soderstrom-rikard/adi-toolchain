@@ -715,6 +715,8 @@ enable_sim_hostendian
 enable_sim_default_model
 enable_sim_environment
 enable_sim_inline
+enable_build_warnings
+enable_sim_build_warnings
 enable_sim_hardware
 '
       ac_precious_vars='build_alias
@@ -1357,6 +1359,8 @@ Optional Features:
   --enable-sim-default-model=model	Specify default model to simulate.
   --enable-sim-environment=environment	Specify mixed, user, virtual or operating environment.
   --enable-sim-inline=inlines		Specify which functions should be inlined.
+  --enable-build-warnings Enable build-time compiler warnings if gcc is used
+  --enable-gdb-build-warnings Enable SIM specific build-time compiler warnings if gcc is used
   --enable-sim-hardware=LIST		Specify the hardware to be included in the build.
 
 Some influential environment variables:
@@ -4649,6 +4653,96 @@ if test "x$cross_compiling" = "xno"; then
 else
   sim_inline="-DDEFAULT_INLINE=0"
 fi
+fi
+
+
+# NOTE: Don't add -Wall or -Wunused, they both include
+# -Wunused-parameter which reports bogus warnings.
+# NOTE: If you add to this list, remember to update
+# gdb/doc/gdbint.texinfo.
+build_warnings="-Wimplicit -Wreturn-type -Wcomment -Wtrigraphs \
+-Wformat -Wparentheses -Wpointer-arith"
+# GCC supports -Wuninitialized only with -O or -On, n != 0.
+if test x${CFLAGS+set} = xset; then
+  case "${CFLAGS}" in
+    *"-O0"* ) ;;
+    *"-O"* )
+      build_warnings="${build_warnings} -Wuninitialized"
+    ;;
+  esac
+else
+  build_warnings="${build_warnings} -Wuninitialized"
+fi
+# Up for debate: -Wswitch -Wcomment -trigraphs -Wtrigraphs
+# -Wunused-function -Wunused-label -Wunused-variable -Wunused-value
+# -Wchar-subscripts -Wtraditional -Wshadow -Wcast-qual
+# -Wcast-align -Wwrite-strings -Wconversion -Wstrict-prototypes
+# -Wmissing-prototypes -Wmissing-declarations -Wredundant-decls
+# -Woverloaded-virtual -Winline -Werror"
+# Check whether --enable-build-warnings was given.
+if test "${enable_build_warnings+set}" = set; then :
+  enableval=$enable_build_warnings; case "${enableval}" in
+  yes)	;;
+  no)	build_warnings="-w";;
+  ,*)   t=`echo "${enableval}" | sed -e "s/,/ /g"`
+        build_warnings="${build_warnings} ${t}";;
+  *,)   t=`echo "${enableval}" | sed -e "s/,/ /g"`
+        build_warnings="${t} ${build_warnings}";;
+  *)    build_warnings=`echo "${enableval}" | sed -e "s/,/ /g"`;;
+esac
+if test x"$silent" != x"yes" && test x"$build_warnings" != x""; then
+  echo "Setting compiler warning flags = $build_warnings" 6>&1
+fi
+fi
+# Check whether --enable-sim-build-warnings was given.
+if test "${enable_sim_build_warnings+set}" = set; then :
+  enableval=$enable_sim_build_warnings; case "${enableval}" in
+  yes)	;;
+  no)	build_warnings="-w";;
+  ,*)   t=`echo "${enableval}" | sed -e "s/,/ /g"`
+        build_warnings="${build_warnings} ${t}";;
+  *,)   t=`echo "${enableval}" | sed -e "s/,/ /g"`
+        build_warnings="${t} ${build_warnings}";;
+  *)    build_warnings=`echo "${enableval}" | sed -e "s/,/ /g"`;;
+esac
+if test x"$silent" != x"yes" && test x"$build_warnings" != x""; then
+  echo "Setting GDB specific compiler warning flags = $build_warnings" 6>&1
+fi
+fi
+WARN_CFLAGS=""
+WERROR_CFLAGS=""
+if test "x${build_warnings}" != x -a "x$GCC" = xyes
+then
+    { $as_echo "$as_me:${as_lineno-$LINENO}: checking compiler warning flags" >&5
+$as_echo_n "checking compiler warning flags... " >&6; }
+    # Separate out the -Werror flag as some files just cannot be
+    # compiled with it enabled.
+    for w in ${build_warnings}; do
+	case $w in
+	-Werr*) WERROR_CFLAGS=-Werror ;;
+	*) # Check that GCC accepts it
+	    saved_CFLAGS="$CFLAGS"
+	    CFLAGS="$CFLAGS $w"
+	    cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+int
+main ()
+{
+
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_c_try_compile "$LINENO"; then :
+  WARN_CFLAGS="${WARN_CFLAGS} $w"
+fi
+rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
+	    CFLAGS="$saved_CFLAGS"
+	esac
+    done
+    { $as_echo "$as_me:${as_lineno-$LINENO}: result: ${WARN_CFLAGS}${WERROR_CFLAGS}" >&5
+$as_echo "${WARN_CFLAGS}${WERROR_CFLAGS}" >&6; }
 fi
 
 
