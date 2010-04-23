@@ -308,7 +308,7 @@ step_once (SIM_CPU *cpu)
 
   if (TRACE_ANY_P (cpu))
     trace_prefix (CPU_STATE (cpu), cpu, NULL_CIA, oldpc, TRACE_LINENUM_P (cpu),
-		  NULL, 0, "");
+		  NULL, 0, " "); /* Use a space for gcc warnings.  */
 
 #if 0
   /* XXX: Is this what happens on the hardware ?  */
