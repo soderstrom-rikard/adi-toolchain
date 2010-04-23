@@ -36,6 +36,16 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #endif
 #include <ctype.h>
 
+#if !WITH_PROFILE_PC_P
+static unsigned int _profile_stub;
+# define PROFILE_PC_FREQ(p) _profile_stub
+# define PROFILE_PC_NR_BUCKETS(p) _profile_stub
+# define PROFILE_PC_SHIFT(p) _profile_stub
+# define PROFILE_PC_START(p) _profile_stub
+# define PROFILE_PC_END(p) _profile_stub
+# define PROFILE_INSN_COUNT(p) &_profile_stub
+#endif
+
 #define COMMAS(n) sim_add_commas (comma_buf, sizeof (comma_buf), (n))
 
 static MODULE_INIT_FN profile_init;
