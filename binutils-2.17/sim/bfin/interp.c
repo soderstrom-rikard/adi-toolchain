@@ -229,8 +229,18 @@ bfin_syscall (SIM_CPU *cpu)
       break;
 
     case CB_SYS_dup2:
-      sc.result = dup2 (sc.arg1, sc.arg2);
-      goto sys_finish;
+      if (cb->fdmap[sc.arg1] > MAX_CALLBACK_FDS ||
+	  cb->fdmap[sc.arg2] > MAX_CALLBACK_FDS)
+	{
+	  sc.result = -1;
+	  sc.errcode = TARGET_EINVAL;
+	}
+      else
+	{
+	  sc.result = dup2 (cb->fdmap[sc.arg1], cb->fdmap[sc.arg2]);
+	  goto sys_finish;
+	}
+      break;
 
     case CB_SYS_getuid:
     case CB_SYS_getuid32:
