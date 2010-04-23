@@ -145,7 +145,8 @@ bfin_trace_io_read_buffer (struct hw *me, void *dest,
 	break;
       }
     default:
-      dv_bfin_mmr_invalid (me, addr, nr_bytes);
+      while (1) /* Core MMRs -> exception -> doesn't return.  */
+	dv_bfin_mmr_invalid (me, addr, nr_bytes);
       break;
     }
 
