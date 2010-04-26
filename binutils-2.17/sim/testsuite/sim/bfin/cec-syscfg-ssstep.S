@@ -67,8 +67,6 @@ _evx:
 	RTX;
 
 pass_lvl:
-	emuexcpt;
 	dbg_pass;
 fail_lvl:
-	emuexcpt;
 	dbg_fail;
