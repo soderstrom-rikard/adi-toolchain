@@ -314,11 +314,23 @@ trace_register (SIM_DESC sd,
 static sim_cia
 step_once (SIM_CPU *cpu)
 {
+  SIM_DESC sd = CPU_STATE (cpu);
   bu32 insn_len, oldpc = PCREG;
+  bool ssstep;
 
   if (TRACE_ANY_P (cpu))
-    trace_prefix (CPU_STATE (cpu), cpu, NULL_CIA, oldpc, TRACE_LINENUM_P (cpu),
+    trace_prefix (sd, cpu, NULL_CIA, oldpc, TRACE_LINENUM_P (cpu),
 		  NULL, 0, " "); /* Use a space for gcc warnings.  */
+
+  /* Handle hardware single stepping when lower than EVT3.  */
+  ssstep = false;
+  if (STATE_ENVIRONMENT (sd) == OPERATING_ENVIRONMENT &&
+      (SYSCFGREG & SYSCFG_SSSTEP))
+    {
+      int ivg = cec_get_ivg (cpu);
+      if (ivg == -1 || ivg > 3)
+	ssstep = true;
+    }
 
 #if 0
   /* XXX: Is this what happens on the hardware ?  */
@@ -337,6 +349,12 @@ step_once (SIM_CPU *cpu)
     SET_PCREG (hwloop_get_next_pc (cpu, oldpc, insn_len));
 
   ++ PROFILE_TOTAL_INSN_COUNT (CPU_PROFILE_DATA (cpu));
+
+  if (ssstep)
+    {
+      INSN_LEN = 0;
+      cec_exception (cpu, VEC_STEP);
+    }
 
   return oldpc;
 }

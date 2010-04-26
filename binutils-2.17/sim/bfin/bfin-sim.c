@@ -1629,6 +1629,9 @@ hwloop_get_next_pc (SIM_CPU *cpu, bu32 pc, bu32 insn_len)
 {
   int i;
 
+  if (insn_len == 0)
+    return pc;
+
   /* If our PC has reached the bottom of a hardware loop,
      move back up to the top of the hardware loop.  */
   for (i = 1; i >= 0; --i)
