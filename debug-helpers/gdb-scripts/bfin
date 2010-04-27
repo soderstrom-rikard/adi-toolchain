@@ -240,6 +240,10 @@ define hwtrace_on
 	set $$TBUFCTL  = (unsigned long *)0xFFE06000
 	set *$$TBUFCTL = 0x3
 end
+define hwtrace_off
+	set $$TBUFCTL  = (unsigned long *)0xFFE06000
+	set *$$TBUFCTL = 0x1
+end
 define hwtrace
 	set $$TBUFSTAT = (unsigned long *)0xFFE06004
 	set $$TBUF = (unsigned long *)0xFFE06100
@@ -696,7 +700,7 @@ define show_ctimer
 	set $$TPERIOD = *(unsigned long *) ($$CTIMER + 0x4)
 	set $$TSCALE  = *(unsigned long *) ($$CTIMER + 0x8)
 	set $$TCOUNT  = *(unsigned long *) ($$CTIMER + 0xC)
-	printf "TCNTL:   %#x (", $$TCNTL
+	printf "TCNTL:   %#x ( ", $$TCNTL
 	if ($$TCNTL & (1 << 0))
 		printf "power "
 	end
@@ -793,4 +797,36 @@ define show_spi
 	printf ")\n"
 	printf "FLG:  %04x\n", $$SPI_FLG
 	printf "TDBR: %04x  RDBR: %04x\n", $$SPI_TDBR, $$SPI_SHAD
+end
+
+define show_uart
+	if $argc > 0
+		set $$UART_BASE = $arg0
+	else
+		set $$UART_BASE = 0xffc00400
+	end
+	set $$UART_DLL  = (unsigned short *) ($$UART_BASE + 0x00)
+	set $$UART_RBR  = (unsigned short *) ($$UART_BASE + 0x00)
+	set $$UART_DLH  = (unsigned short *) ($$UART_BASE + 0x04)
+	set $$UART_IER  = (unsigned short *) ($$UART_BASE + 0x04)
+	set $$UART_IIR  = (unsigned short *) ($$UART_BASE + 0x08)
+	set $$UART_LCR  = (unsigned short *) ($$UART_BASE + 0x0C)
+	set $$UART_MCR  = (unsigned short *) ($$UART_BASE + 0x10)
+	set $$UART_LSR  = (unsigned short *) ($$UART_BASE + 0x14)
+	set $$UART_MSR  = (unsigned short *) ($$UART_BASE + 0x18)
+	set $$UART_SCR  = (unsigned short *) ($$UART_BASE + 0x1C)
+	set $$UART_GCTL = (unsigned short *) ($$UART_BASE + 0x24)
+
+	set $$DLAB = (1 << 7)
+	set $$LCR = *$$UART_LCR
+	set *$$UART_LCR = ($$LCR | $$DLAB)
+	printf "DLL: 0x%02x   DLH: 0x%02x\n", *$$UART_DLL, *$$UART_DLH
+	set *$$UART_LCR = $$LCR & ~$$DLAB
+	printf "RBR: 0x%02x   IER: 0x%02x\n", *$$UART_RBR, *$$UART_IER
+	set *$$UART_LCR = $$LCR
+
+	printf "IIR: 0x%02x   LCR: 0x%02x\n", *$$UART_IIR, *$$UART_LCR
+	printf "MCR: 0x%02x   LSR: 0x%02x\n", *$$UART_MCR, *$$UART_LSR
+	printf "MSR: 0x%02x   SCR: 0x%02x\n", *$$UART_MSR, *$$UART_SCR
+	printf "GCTL: 0x%02x\n", *$$UART_GCTL
 end
