@@ -320,12 +320,17 @@ mmu_check_addr (SIM_CPU *cpu, bu32 addr, bool write, bool inst, int size)
   mem_control = inst ? &mmu->imem_control : &mmu->dmem_control;
   cplb_addr = inst ? &mmu->icplb_addr[0] : &mmu->dcplb_addr[0];
   cplb_data = inst ? &mmu->icplb_data[0] : &mmu->dcplb_data[0];
-
-  /* CPLBs disabled -> nothing to do.  */
-  if (!(*mem_control & ENCPLB))
-    return;
-
   supv = cec_is_supervisor_mode (cpu);
+
+  /* CPLBs disabled -> little to do.  */
+  if (!(*mem_control & ENCPLB))
+    {
+      /* MMRs have an implicit CPLB.  */
+      if (addr >= BFIN_SYSTEM_MMR_BASE && !supv)
+	cec_exception (cpu, VEC_ILL_RES);
+      return;
+    }
+
   faults = 0;
   hits = 0;
   for (i = 0; i < 16; ++i)
@@ -360,7 +365,11 @@ mmu_check_addr (SIM_CPU *cpu, bu32 addr, bool write, bool inst, int size)
 
   /* MMRs have an implicit CPLB.  */
   if (hits == 0 && addr >= BFIN_SYSTEM_MMR_BASE)
-    return;
+    {
+      if (!supv)
+	cec_exception (cpu, VEC_ILL_RES);
+      return;
+    }
 
   /* XXX: Should handle implicit set of CPLBs on L1.  */
 
