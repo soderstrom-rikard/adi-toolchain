@@ -277,7 +277,7 @@ _mmu_process_fault (SIM_CPU *cpu, struct bfin_mmu *mmu, bu32 addr, bool write,
     {
       if (mmu)
 	/* XXX: When exactly does hardware do exception vs IVHW ?  */
-	cec_latch (cpu, IVG_IVHW);
+	cec_hwerr (cpu, HWERR_EXTERN_ADDR);
       else
 	cec_exception (cpu, inst ? VEC_CPLB_I_M : VEC_CPLB_M);
     }

@@ -117,6 +117,11 @@
 #define VEC_SIM_DBGA	(VEC_SIM_BASE + 4)
 extern void cec_exception (SIM_CPU *, int vec_excp);
 
+#define HWERR_SYSTEM_MMR	0x02
+#define HWERR_EXTERN_ADDR	0x03
+#define HWERR_PERF_FLOW		0x12
+#define HWERR_RAISE_5		0x18
+extern void cec_hwerr (SIM_CPU *, int hwerr);
 extern void cec_latch (SIM_CPU *, int ivg);
 extern void cec_return (SIM_CPU *, int ivg);
 

@@ -636,6 +636,13 @@ cec_latch (SIM_CPU *cpu, int ivg)
 }
 
 void
+cec_hwerr (SIM_CPU *cpu, int hwerr)
+{
+  SET_HWERRCAUSE (hwerr);
+  cec_latch (cpu, IVG_IVHW);
+}
+
+void
 cec_return (SIM_CPU *cpu, int ivg)
 {
   SIM_DESC sd = CPU_STATE (cpu);

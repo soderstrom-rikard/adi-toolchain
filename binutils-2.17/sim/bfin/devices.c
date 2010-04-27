@@ -46,7 +46,7 @@ bfin_mmr_invalid (struct hw *me, SIM_CPU *cpu, address_word addr,
   else
     /* XXX: Newer parts set up an interrupt from EBIU and program
             EBIU_ERRADDR with the address.  */
-    cec_latch (cpu, IVG_IVHW);
+    cec_hwerr (cpu, HWERR_SYSTEM_MMR);
 }
 
 void
