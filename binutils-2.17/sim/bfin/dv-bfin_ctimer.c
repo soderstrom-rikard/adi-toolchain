@@ -185,7 +185,8 @@ bfin_ctimer_io_read_buffer (struct hw *me, void *dest,
     case mmr_offset(tcount):
       /* Since we're optimizing events here, we need to calculate
          the new tcount value.  */
-      bfin_ctimer_update_count (me, ctimer);
+      if (bfin_ctimer_enabled (ctimer))
+	bfin_ctimer_update_count (me, ctimer);
       break;
     }
 
