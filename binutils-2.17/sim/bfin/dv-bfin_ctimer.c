@@ -68,7 +68,10 @@ bfin_ctimer_expire (struct hw *me, void *data)
       bfin_ctimer_schedule (me, ctimer);
     }
   else
-    ctimer->tcount = 0;
+    {
+      ctimer->tcount = 0;
+      ctimer->handler = NULL;
+    }
 
   hw_port_event (me, IVG_IVTMR, 1);
 }
@@ -76,9 +79,17 @@ bfin_ctimer_expire (struct hw *me, void *data)
 static void
 bfin_ctimer_update_count (struct hw *me, struct bfin_ctimer *ctimer)
 {
-  bu32 scale = bfin_ctimer_scale (ctimer);
-  signed64 timeout = hw_event_remain_time (me, ctimer->handler);
-  bu32 ticks = ctimer->timeout - timeout;
+  bu32 scale, ticks;
+  signed64 timeout;
+
+  /* If the timer was enabled w/out autoreload and has expired, then
+     there's nothing to calculate here.  */
+  if (ctimer->handler == NULL)
+    return;
+
+  scale = bfin_ctimer_scale (ctimer);
+  timeout = hw_event_remain_time (me, ctimer->handler);
+  ticks = ctimer->timeout - timeout;
   ctimer->tcount -= (scale * ticks);
   ctimer->timeout = timeout;
 }
@@ -123,8 +134,8 @@ bfin_ctimer_io_write_buffer (struct hw *me, const void *source,
   switch (mmr_off)
     {
     case mmr_offset(tcntl):
-      /* XXX: docs say TINT is sticky, but hardware doesnt seem to be ?  */
-      dv_w1c_4_partial (valuep, value, TINT);
+      /* HRM describes TINT as sticky, but it isn't W1C.  */
+      *valuep = value;
 
       if (bfin_ctimer_enabled (ctimer) == curr_enabled)
 	{
@@ -142,13 +153,13 @@ bfin_ctimer_io_write_buffer (struct hw *me, const void *source,
     case mmr_offset(tcount):
       /* HRM says writes are discarded when enabled.  */
       /* XXX: But hardware seems to be writeable all the time ?  */
-      if (!curr_enabled)
+      /* if (!curr_enabled) */
 	*valuep = value;
       break;
     case mmr_offset(tperiod):
       /* HRM says writes are discarded when enabled.  */
       /* XXX: But hardware seems to be writeable all the time ?  */
-      if (!curr_enabled)
+      /* if (!curr_enabled) */
 	{
 	  /* Writes are mirrored into TCOUNT.  */
 	  ctimer->tcount = value;
