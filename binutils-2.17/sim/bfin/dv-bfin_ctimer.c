@@ -63,11 +63,14 @@ bfin_ctimer_expire (struct hw *me, void *data)
 
   ctimer->tcntl |= TINT;
   if (ctimer->tcntl & TAUTORLD)
-    ctimer->tcount = ctimer->tperiod;
+    {
+      ctimer->tcount = ctimer->tperiod;
+      bfin_ctimer_schedule (me, ctimer);
+    }
+  else
+    ctimer->tcount = 0;
 
   hw_port_event (me, IVG_IVTMR, 1);
-
-  bfin_ctimer_schedule (me, ctimer);
 }
 
 static void
