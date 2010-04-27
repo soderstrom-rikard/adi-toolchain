@@ -1790,6 +1790,7 @@ decode_ProgCtrl_0 (SIM_CPU *cpu, bu16 iw0, bu32 pc)
     {
       int raise = uimm4 (poprnd);
       TRACE_INSN (cpu, "RAISE %s;", uimm4_str (raise));
+      cec_require_supervisor (cpu);
       cec_latch (cpu, raise);
       CYCLE_DELAY = 3; /* XXX: Only if IVG is unmasked.  */
     }
