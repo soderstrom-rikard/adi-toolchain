@@ -5665,7 +5665,7 @@ decode_psedodbg_assert_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1, bu32 pc)
     {
       sim_io_printf (sd, "FAIL at %#x: %s (%s%s, 0x%04x), actual value %#x\n",
 		     pc, dbg_name, reg_name, dbg_appd, expected, actual);
-      cec_exception (cpu, VEC_SIM_ABORT);
+      cec_exception (cpu, VEC_SIM_DBGA);
       SET_DREG (0, 1);
     }
 }

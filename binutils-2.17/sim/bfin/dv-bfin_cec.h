@@ -114,6 +114,7 @@
 #define VEC_SIM_HLT	(VEC_SIM_BASE + 1)
 #define VEC_SIM_ABORT	(VEC_SIM_BASE + 2)
 #define VEC_SIM_TRAP	(VEC_SIM_BASE + 3)
+#define VEC_SIM_DBGA	(VEC_SIM_BASE + 4)
 extern void cec_exception (SIM_CPU *, int vec_excp);
 
 extern void cec_latch (SIM_CPU *, int ivg);

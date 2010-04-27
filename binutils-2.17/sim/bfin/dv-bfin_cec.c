@@ -332,6 +332,12 @@ cec_exception (SIM_CPU *cpu, int excp)
       if (STATE_OPEN_KIND (sd) == SIM_OPEN_DEBUG)
 	excp_to_sim_halt (sim_stopped, SIM_SIGTRAP);
       return;
+    case VEC_SIM_DBGA:
+      /* If running in gdb, simply trap.  */
+      if (STATE_OPEN_KIND (sd) == SIM_OPEN_DEBUG)
+	excp_to_sim_halt (sim_stopped, SIM_SIGTRAP);
+      else
+	excp_to_sim_halt (sim_exited, 2);
     }
 
   if (excp <= 0x3f)
