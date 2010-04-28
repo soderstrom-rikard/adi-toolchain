@@ -305,7 +305,7 @@ mmu_check_addr (SIM_CPU *cpu, bu32 addr, bool write, bool inst, int size)
   struct bfin_mmu *mmu = NULL;
   bu32 *fault_status, *fault_addr, *mem_control, *cplb_addr, *cplb_data;
   bu32 faults;
-  bool supv;
+  bool supv, do_excp;
   int i, hits;
 
   if (addr & (size - 1))
@@ -333,6 +333,7 @@ mmu_check_addr (SIM_CPU *cpu, bu32 addr, bool write, bool inst, int size)
 
   faults = 0;
   hits = 0;
+  do_excp = false;
   for (i = 0; i < 16; ++i)
     {
       const bu32 pages[4] = { 0x400, 0x1000, 0x100000, 0x400000 };
@@ -349,19 +350,20 @@ mmu_check_addr (SIM_CPU *cpu, bu32 addr, bool write, bool inst, int size)
 	continue;
 
       ++hits;
+      faults |= (1 << i);
       if (write)
 	{
 	  if (!supv && !(cplb_data[i] & CPLB_USER_WR))
-	    faults |= (1 << i);
+	    do_excp = true;
 	  if (supv && !(cplb_data[i] & CPLB_SUPV_WR))
-	    faults |= (1 << i);
+	    do_excp = true;
 	  if ((cplb_data[i] & (CPLB_WT | CPLB_L1_CHBL | CPLB_DIRTY)) == CPLB_L1_CHBL)
-	    faults |= (1 << i);
+	    do_excp = true;
 	}
       else
 	{
 	  if (!supv && !(cplb_data[i] & CPLB_USER_RD))
-	    faults |= (1 << i);
+	    do_excp = true;
 	}
     }
 
@@ -376,7 +378,7 @@ mmu_check_addr (SIM_CPU *cpu, bu32 addr, bool write, bool inst, int size)
   /* XXX: Should handle implicit set of CPLBs on L1.  */
 
   /* No faults and one match -> good to go.  */
-  if (faults == 0 && hits == 1)
+  if (!do_excp && hits == 1)
     return;
 
   /* ICPLB regs always get updated.  */
@@ -387,7 +389,7 @@ mmu_check_addr (SIM_CPU *cpu, bu32 addr, bool write, bool inst, int size)
     }
 
   *fault_status =
-	((!!hits) << 19) |
+	(!hits << 19) |
 	(supv << 17) |
 	(write << 16) |
 	faults;
