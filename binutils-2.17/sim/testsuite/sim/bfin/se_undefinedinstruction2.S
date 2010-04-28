@@ -1695,7 +1695,13 @@ BEGIN:
     .dw 0x3FBD ;
     .dw 0x3FBE ;
     .dw 0x3FBF ;
+.endif
+#if 1
+	// EMUDAT = USP; is valid
     .dw 0x3FF8 ;
+#endif
+.ifndef BFIN_HW
+	// XXX: hardware doesnt trigger illegal exception ?
     .dw 0x3FF9 ;
     .dw 0x3FFA ;
     .dw 0x3FFB ;
@@ -3006,9 +3012,9 @@ BEGIN:
 CHECK_INIT_DEF(p0);  //CHECK_INIT(p0, 0xFF7FFFFC);
                     // Xhandler counts all EXCAUSE = 0x21;
 .ifndef BFIN_HW
-CHECKREG(r5, 2651 - 370); // count of all 16 bit UI's.
+CHECKREG(r5, 2651 - 371); // count of all 16 bit UI's.
 .else
-CHECKREG(r5, 2651 - 523); // count of all 16 bit UI's.
+CHECKREG(r5, 2651 - 524); // count of all 16 bit UI's.
 .endif
 
 END:

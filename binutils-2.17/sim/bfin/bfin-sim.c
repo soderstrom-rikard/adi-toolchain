@@ -2366,8 +2366,9 @@ decode_REGMV_0 (SIM_CPU *cpu, bu16 iw0)
 
   TRACE_INSN (cpu, "%s = %s;", dstreg_name, srcreg_name);
 
-  /* Dregs/Pregs can be src/dst to any other reg.  */
-  if (gs >= 2 && gd >= 2)
+  /* Dregs/Pregs can be src/dst to any other reg.
+     USP can be src to any other reg.  */
+  if (gs >= 2 && gd >= 2 && !(gs == 7 && src == 0))
     {
       /* Dagregs/Accumulators can move between each other.  */
       if (!(((gs << 3) + src) <= ((4 << 3) + 4) &&
