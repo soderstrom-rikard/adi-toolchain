@@ -1004,7 +1004,6 @@ BEGIN:
 
 CHECK_INIT_DEF(p0); //CHECK_INIT(p0, 0xFF7FFFFC);
                     // Xhandler counts all EXCAUSE = 0x21;
-emuexcpt;
 CHECKREG(r5, 830); // count of all 16 bit UI's.
 
 END:

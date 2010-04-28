@@ -5916,7 +5916,6 @@ BEGIN:
 
 CHECK_INIT_DEF(p0);  //CHECK_INIT(p0, 0xFF7FFFFC);
                     // Xhandler counts all EXCAUSE = 0x21;
-emuexcpt;
 CHECKREG(r5, 2871); // count of all 16 bit UI's.
 
 END:
@@ -5951,7 +5950,6 @@ R6 = 0x22;
 CC = r7 == r6;
 IF CC JUMP UNDEFINEDINSTRUCTION;
 
-emuexcpt;
 dbg_fail;
 
 UNDEFINEDINSTRUCTION:

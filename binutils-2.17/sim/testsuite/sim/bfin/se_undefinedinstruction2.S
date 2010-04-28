@@ -173,9 +173,15 @@ BEGIN:
 // 16 bit special cases  COUNT = 830
     .dw 0x10E ;
     .dw 0x124 ;
-    .dw 0x125 ;	// XXX: hardware doesnt trigger illegal exception ?
+.ifndef BFIN_HW
+	// XXX: hardware doesnt trigger illegal exception ?
+    .dw 0x125 ;
+.endif
     .dw 0x164 ;
-    .dw 0x165 ;	// XXX: hardware doesnt trigger illegal exception ?
+.ifndef BFIN_HW
+	// XXX: hardware doesnt trigger illegal exception ?
+    .dw 0x165 ;
+.endif
     .dw 0x128 ;
     .dw 0x129 ;
     .dw 0x12A ;
