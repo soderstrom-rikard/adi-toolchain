@@ -342,7 +342,7 @@ RTI;
 // Data Segment
 //
 
-.section MEM_DATA_ADDR_1,"aw"
+.data
 DATA:
     .space (0x10);
 

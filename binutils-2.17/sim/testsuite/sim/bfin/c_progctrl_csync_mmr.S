@@ -270,7 +270,7 @@ NOP;NOP;NOP;NOP;NOP;NOP;NOP; // needed for icache bug
 // Data Segment
 //
 
-.section MEM_0xF0000000,"aw"
+.data
 DATA:
     .space (0x10);
 
@@ -281,41 +281,3 @@ KSTACK:
 
     .space (STACKSIZE);
 USTACK:
-
-.section MEM_0xFFE03000,"aw"
-.dd 0x00000000
-.dd 0x00000000
-.dd 0x00000000
-.dd 0x00000000
-.dd 0x00000000
-.dd 0x00000000
-.dd 0x00000000
-.dd 0x00000000
-.dd 0x00000000
-.dd 0x00000000
-.dd 0x00000000
-.dd 0x00000000
-.dd 0x00000000
-.dd 0x00000000
-.dd 0x00000000
-.dd 0x00000000
-.dd 0x00000000
-.dd 0x00000000
-.dd 0x00000000
-.dd 0x00000000
-.dd 0x00000000
-.dd 0x00000000
-.dd 0x00000000
-.dd 0x00000000
-.dd 0x00000000
-.dd 0x00000000
-.dd 0x00000000
-.dd 0x00000000
-.dd 0x00000000
-.dd 0x00000000
-.dd 0x00000000
-.dd 0x00000000
-
-
-
-

@@ -324,7 +324,7 @@ NOP;NOP;NOP;NOP;NOP;NOP;NOP; // needed for icache bug
 // Data Segment
 //
 
-.section MEM_DATA_ADDR_1,"aw"
+.data
 DATA:
     .space (0x10);
 

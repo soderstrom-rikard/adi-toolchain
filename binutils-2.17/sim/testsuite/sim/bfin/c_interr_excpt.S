@@ -280,7 +280,7 @@ NOP;NOP;NOP;NOP;NOP;NOP;NOP; // needed for icache bug
 //
 
 //.data 0xF0000000
-.section MEM_DATA_ADDR_1,"aw"
+.data
 DATA:
     .space (0x10);
 

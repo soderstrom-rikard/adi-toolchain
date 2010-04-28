@@ -337,7 +337,7 @@ I15HANDLE:          // IVG 15 Handler
 JUMP ( P0 );
 RTI;
 
-.section MEM_DATA_ADDR_1,"aw"
+.data
 
 .space (STACKSIZE);
 KSTACK:
