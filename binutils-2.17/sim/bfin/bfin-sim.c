@@ -433,7 +433,7 @@ get_allreg (SIM_CPU *cpu, int grp, int reg)
 	case 62: return &RETEREG;
 	case 63: return &EMUDAT_INREG;
 	}
-      abort ();
+      illegal_instruction (cpu);
     }
 }
 
@@ -1914,10 +1914,16 @@ decode_PushPopReg_0 (SIM_CPU *cpu, bu16 iw0)
   TRACE_EXTRACT (cpu, "%s: W:%i grp:%i reg:%i", __func__, W, grp, reg);
   TRACE_DECODE (cpu, "%s: reg:%s", __func__, reg_name);
 
+  /* Can't push/pop SP itself.  */
+  if (grp == 1 && reg == 6)
+    illegal_instruction (cpu);
+
   if (W == 0)
     {
       TRACE_INSN (cpu, "%s = [SP++];", reg_name);
 
+      /* XXX: The valid register check is in reg_write(), so we might
+              incorrectly do a GET_LONG() here ...  */
       value = GET_LONG (sp);
       reg_write (cpu, grp, reg, value);
       if (grp == 7 && reg == 3)
@@ -2359,6 +2365,15 @@ decode_REGMV_0 (SIM_CPU *cpu, bu16 iw0)
   TRACE_DECODE (cpu, "%s: dst:%s src:%s", __func__, dstreg_name, srcreg_name);
 
   TRACE_INSN (cpu, "%s = %s;", dstreg_name, srcreg_name);
+
+  /* Dregs/Pregs can be src/dst to any other reg.  */
+  if (gs >= 2 && gd >= 2)
+    {
+      /* Dagregs/Accumulators can move between each other.  */
+      if (!(((gs << 3) + src) <= ((4 << 3) + 4) &&
+	    ((gd << 3) + dst) <= ((4 << 3) + 4)))
+	illegal_instruction (cpu);
+    }
 
   reg_write (cpu, gd, dst, reg_read (cpu, gs, src));
 }
@@ -3271,15 +3286,26 @@ decode_LoopSetup_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1, bu32 pc)
   else if (rop == 1)
     {
       TRACE_INSN (cpu, "LSETUP (%#x, %#x) LC%i = P%i;", spcrel, epcrel, c, reg);
+
+      /* SP/FP not allowed as source reg.  */
+      if (reg > 7)
+	illegal_instruction (cpu);
+
       SET_LCREG (c, PREG (reg));
     }
   else if (rop == 3)
     {
       TRACE_INSN (cpu, "LSETUP (%#x, %#x) LC%i = P%i >> 1;", spcrel, epcrel, c, reg);
+
+      /* SP/FP not allowed as source reg.  */
+      if (reg > 7)
+	illegal_instruction (cpu);
+
       SET_LCREG (c, PREG (reg) >> 1);
     }
   else
     illegal_instruction (cpu);
+
   SET_LTREG (c, pc + spcrel);
   SET_LBREG (c, pc + epcrel);
 }
@@ -3959,6 +3985,9 @@ decode_dsp32alu_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1)
 		  src0 + 1, src0, src1 + 1, src1, opts[HL + (aop << 1)],
 		  s ? ", r" : "");
 
+      if (src0 == src1)
+	illegal_instruction_combination (cpu);
+
       s0L = DREG (src0);
       s0H = DREG (src0 + 1);
       s1L = DREG (src1);
@@ -4076,6 +4105,9 @@ decode_dsp32alu_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1)
       TRACE_INSN (cpu, "R%i = BYTEOP3P (R%i:%i, R%i:%i) (%s%s);", dst0,
 		  src0 + 1, src0, src1 + 1, src1, HL ? "HI" : "LO",
 		  s ? ", R" : "");
+
+      if (src0 == src1)
+	illegal_instruction_combination (cpu);
 
       s0L = DREG (src0);
       s0H = DREG (src0 + 1);
@@ -4292,6 +4324,9 @@ decode_dsp32alu_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1)
 
       TRACE_INSN (cpu, "R%i = A1.L + A1.H, R%i = A0.L + A0.H;", dst1, dst0);
 
+      if (dst0 == dst1)
+	illegal_instruction_combination (cpu);
+
       if (val0 & 0x8000)
 	val0 |= 0xFFFF0000;
 
@@ -4313,8 +4348,12 @@ decode_dsp32alu_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1)
       int v_i = 0, n_i = 0, z_i = 0;
 
       TRACE_INSN (cpu, "R%i = R%i %s R%i, R%i = R%i %s R%i%s;",
-		  dst1, src0, HL ? "+|-" : "+|+", src1, dst0, src0, HL ? "-|+" : "-|-", src1,
+		  dst1, src0, HL ? "+|-" : "+|+", src1,
+		  dst0, src0, HL ? "-|+" : "-|-", src1,
 		  amod0amod2(s, x, aop));
+
+      if (dst0 == dst1)
+	illegal_instruction_combination (cpu);
 
       if (HL == 0)
 	{
@@ -4434,6 +4473,10 @@ decode_dsp32alu_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1)
     {
       TRACE_INSN (cpu, "R%i = R%i + R%i, R%i = R%i - R%i%s;",
 		  dst1, src0, src1, dst0, src0, src1, amod1 (s, x));
+
+      if (dst0 == dst1)
+	illegal_instruction_combination (cpu);
+
       STORE (DREG (dst1), add32 (cpu, DREG (src0), DREG (src1), 1, s));
       STORE (DREG (dst0), sub32 (cpu, DREG (src0), DREG (src1), 1, s, 1));
     }
@@ -4450,6 +4493,9 @@ decode_dsp32alu_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1)
 			 "R%i = A%i:%#"PRIx64" - A%i:%#"PRIx64"%s",
 		dst1, !aop, aop ? acc0 : acc1, aop, aop ? acc1 : acc0,
 		dst0, !aop, aop ? acc0 : acc1, aop, aop ? acc1 : acc0, amod1 (s, x));
+
+      if (dst0 == dst1)
+	illegal_instruction_combination (cpu);
 
       val1 = acc0 + acc1;
       if (aop)
@@ -4556,6 +4602,9 @@ decode_dsp32alu_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1)
       TRACE_INSN (cpu, "R%i = BYTEOP1P (R%i:%i, R%i:%i)%s;", dst0,
 		  src0 + 1, src0, src1 + 1, src1, opts[s + (aop << 1)]);
 
+      if (src0 == src1)
+	illegal_instruction_combination (cpu);
+
       s0L = DREG (src0);
       s0H = DREG (src0 + 1);
       s1L = DREG (src1);
@@ -4583,6 +4632,9 @@ decode_dsp32alu_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1)
 
       TRACE_INSN (cpu, "(R%i, R%i) = BYTEOP16P (R%i:%i, R%i:%i)%s;", dst1, dst0,
 		  src0 + 1, src0, src1 + 1, src1, s ? " (R)" : "");
+
+      if (dst0 == dst1)
+	illegal_instruction_combination (cpu);
 
       s0L = DREG (src0);
       s0H = DREG (src0 + 1);
@@ -4612,6 +4664,9 @@ decode_dsp32alu_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1)
 
       TRACE_INSN (cpu, "(R%i, R%i) = BYTEOP16M (R%i:%i, R%i:%i)%s;", dst1, dst0,
 		  src0 + 1, src0, src1 + 1, src1, s ? " (R)" : "");
+
+      if (dst0 == dst1)
+	illegal_instruction_combination (cpu);
 
       s0L = DREG (src0);
       s0H = DREG (src0 + 1);
@@ -4740,6 +4795,9 @@ decode_dsp32alu_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1)
       TRACE_INSN (cpu, "(R%i, R%i) = BYTEUNPACK R%i:%i%s;",
 		  dst1, dst0, src0 + 1, src0, s ? " (R)" : "");
 
+      if (dst0 == dst1)
+	illegal_instruction_combination (cpu);
+
       order = IREG (0) & 0x3;
       if (s)
 	hi = src0, lo = src0 + 1;
@@ -4761,6 +4819,9 @@ decode_dsp32alu_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1)
 
       TRACE_INSN (cpu, "(R%i, R%i) = SEARCH R%i (%s);",
 		  dst1, dst0, src0, searchmodes[aop]);
+
+      if (dst0 == dst1)
+	illegal_instruction_combination (cpu);
 
       up_hi = up_lo = false;
       a0_lo = AWREG (0);
@@ -5141,6 +5202,9 @@ decode_dsp32shift_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1)
 
       TRACE_INSN (cpu, "BITMUX (R%i, R%i, A0) (ASR);", src0, src1);
 
+      if (src0 == src1)
+	illegal_instruction_combination (cpu);
+
       s0 = DREG (src0);
       s1 = DREG (src1);
       acc = (acc >> 2) |
@@ -5157,6 +5221,9 @@ decode_dsp32shift_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1)
       bu32 s0, s1;
 
       TRACE_INSN (cpu, "BITMUX (R%i, R%i, A0) (ASL);", src0, src1);
+
+      if (src0 == src1)
+	illegal_instruction_combination (cpu);
 
       s0 = DREG (src0);
       s1 = DREG (src1);
