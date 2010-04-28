@@ -3085,9 +3085,6 @@ decode_LDST_0 (SIM_CPU *cpu, bu16 iw0)
 
   if (W == 0)
     {
-      if (aop != 2 && sz == 0 && Z == 1 && ptr == reg)
-	illegal_instruction (cpu);
-
       if (sz == 0 && Z == 0)
 	{
 	  TRACE_INSN (cpu, "R%i = [P%i%s];", reg, ptr, post);
@@ -3096,6 +3093,8 @@ decode_LDST_0 (SIM_CPU *cpu, bu16 iw0)
       else if (sz == 0 && Z == 1)
 	{
 	  TRACE_INSN (cpu, "P%i = [P%i%s];", reg, ptr, post);
+	  if (aop < 2 && ptr == reg)
+	    illegal_instruction_combination (cpu);
 	  SET_PREG (reg, GET_LONG (PREG (ptr)));
 	}
       else if (sz == 1 && Z == 0)
@@ -3118,12 +3117,11 @@ decode_LDST_0 (SIM_CPU *cpu, bu16 iw0)
 	  TRACE_INSN (cpu, "R%i = B[P%i%s] (X);", reg, ptr, post);
 	  SET_DREG (reg, (bs32) (bs8) GET_BYTE (PREG (ptr)));
 	}
+      else
+	illegal_instruction (cpu);
     }
   else
     {
-      if (sz != 0 && Z == 1)
-	illegal_instruction (cpu);
-
       if (sz == 0 && Z == 0)
 	{
 	  TRACE_INSN (cpu, "[P%i%s] = R%i;", ptr, post, reg);
@@ -3144,6 +3142,8 @@ decode_LDST_0 (SIM_CPU *cpu, bu16 iw0)
 	  TRACE_INSN (cpu, "B[P%i%s] = R%i;", ptr, post, reg);
 	  PUT_BYTE (PREG (ptr), DREG (reg));
 	}
+      else
+	illegal_instruction (cpu);
     }
 
   if (aop == 0)

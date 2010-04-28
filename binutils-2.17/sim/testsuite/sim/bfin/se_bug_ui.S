@@ -221,7 +221,13 @@ XHANDLE:            // Exception Handler 3
     R7 >>= 26;      // only want EXCAUSE
     R6 = 0x21;      // EXCAUSE 0x21 means I-Fetch Undefined Instruction
 CC = r7 == r6;
-IF !CC JUMP OUT;   // If EXCAUSE != 0x21 then leave
+IF CC JUMP UNDEFINEDINSTRUCTION;   // If EXCAUSE != 0x21 then leave
+
+    R6 = 0x22;      // Also accept illegal insn combo
+CC = r7 == r6;
+IF CC JUMP UNDEFINEDINSTRUCTION;   // If EXCAUSE != 0x21 then leave
+
+dbg_fail;
 
 UNDEFINEDINSTRUCTION:
     R7 = RETX;      // Fix up return address
