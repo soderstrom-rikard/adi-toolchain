@@ -80,6 +80,7 @@ Y02:
 	CHECKREG(r6, (FAULT_READ|FAULT_DAG1|FAULT_SUPV));	// DCPLB_STATUS
 	CHECKREG_SYM(r7, X02, r0);					// RETX  X02:	(HARDCODED ADDR!!)
 
+#if 0
 	//-------------------------------------------------------
 	// DAG1 Scratch SRAM Write access
 
@@ -118,6 +119,7 @@ Y04:
 	CHECKREG(r5, (( 0xFF800000 + 0x300000) + 4));				// FAULT ADDRESS
 	CHECKREG(r6, (FAULT_READ|FAULT_DAG1|FAULT_SUPV));	// DCPLB_STATUS
 	CHECKREG_SYM(r7, X04, r0);					// RETX  X04:	(HARDCODED ADDR!!)
+#endif
 
 	//-------------------------------------------------------
 
@@ -207,6 +209,7 @@ Y14:
 	CHECKREG(r6, (FAULT_READ|FAULT_DAG1|FAULT_USER));	// DCPLB_STATUS
 	CHECKREG_SYM(r7, X14, r0);					// RETX  X14:	(HARDCODED ADDR!!)
 
+#if 0
 	//-------------------------------------------------------
 	// DAG1 Scratch SRAM Write access
 
@@ -245,6 +248,7 @@ Y16:
 	CHECKREG(r5, (( 0xFF800000 + 0x300000) + 4));				// FAULT ADDRESS
 	CHECKREG(r6, (FAULT_READ|FAULT_DAG1|FAULT_USER));	// DCPLB_STATUS
 	CHECKREG_SYM(r7, X16, r0);					// RETX  X16:	(HARDCODED ADDR!!)
+#endif
 
 	//-------------------------------------------------------
 	// DAG0 MMR Write access (single-issue)

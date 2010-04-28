@@ -331,11 +331,12 @@ mmu_check_addr (SIM_CPU *cpu, bu32 addr, bool write, bool inst, int size)
   hits = 0;
   do_excp = false;
 
-  /* DAG1 can never access MMRs/scratchpad.  */
+  /* DAG1 can never access MMRs.  */
   if (dag1)
     {
-      if (addr >= BFIN_SYSTEM_MMR_BASE ||
-	  (addr >= BFIN_L1_SRAM_SCRATCH && addr < BFIN_L1_SRAM_SCRATCH_END))
+      /* XXX: Some old tests say DAG1 can't hit scratchpad ...
+              Need to verify hardware behavior.  */
+      if (addr >= BFIN_SYSTEM_MMR_BASE)
 	{
 	  hits = 1;
 	  goto process_excp;
@@ -388,16 +389,22 @@ mmu_check_addr (SIM_CPU *cpu, bu32 addr, bool write, bool inst, int size)
 	}
     }
 
-  /* MMRs have an implicit CPLB.  */
-  if (hits == 0 && addr >= BFIN_SYSTEM_MMR_BASE)
+  /* Handle default/implicit CPLBs.  */
+  if (hits == 0)
     {
-      if (supv)
-	return;
-      hits = 1;
-      do_excp = true;
+      if (addr >= BFIN_SYSTEM_MMR_BASE)
+	{
+	  if (supv)
+	    return;
+	  hits = 1;
+	  do_excp = true;
+	}
+      else if (addr >= BFIN_L1_SRAM_SCRATCH && addr < BFIN_L1_SRAM_SCRATCH_END)
+	{
+	  if (!inst)
+	    return;
+	}
     }
-
-  /* XXX: Should handle implicit set of CPLBs on L1.  */
 
   /* No faults and one match -> good to go.  */
   if (!do_excp && hits == 1)
