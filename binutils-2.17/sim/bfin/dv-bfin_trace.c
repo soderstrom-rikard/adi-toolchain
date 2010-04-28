@@ -92,7 +92,7 @@ bfin_trace_io_write_buffer (struct hw *me, const void *source,
       /* Discard writes to these.  */
       break;
     default:
-      dv_bfin_mmr_invalid (me, addr, nr_bytes);
+      dv_bfin_mmr_invalid (me, addr, nr_bytes, true);
       break;
     }
 
@@ -146,7 +146,7 @@ bfin_trace_io_read_buffer (struct hw *me, void *dest,
       }
     default:
       while (1) /* Core MMRs -> exception -> doesn't return.  */
-	dv_bfin_mmr_invalid (me, addr, nr_bytes);
+	dv_bfin_mmr_invalid (me, addr, nr_bytes, false);
       break;
     }
 

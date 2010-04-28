@@ -71,12 +71,12 @@ bfin_pll_io_write_buffer (struct hw *me, const void *source,
   switch (mmr_off)
     {
     case mmr_offset(pll_stat):
-      dv_bfin_mmr_require_16 (me, addr, nr_bytes);
+      dv_bfin_mmr_require_16 (me, addr, nr_bytes, true);
     case mmr_offset(chipid):
       /* Discard writes.  */
       break;
     default:
-      dv_bfin_mmr_require_16 (me, addr, nr_bytes);
+      dv_bfin_mmr_require_16 (me, addr, nr_bytes, true);
       *value16p = value;
       break;
     }
@@ -107,7 +107,7 @@ bfin_pll_io_read_buffer (struct hw *me, void *dest,
       dv_store_4 (dest, *value32p);
       break;
     default:
-      dv_bfin_mmr_require_16 (me, addr, nr_bytes);
+      dv_bfin_mmr_require_16 (me, addr, nr_bytes, false);
       dv_store_2 (dest, *value16p);
       break;
     }

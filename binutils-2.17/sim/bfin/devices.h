@@ -93,12 +93,12 @@ dv_get_state (SIM_CPU *cpu, const char *device_name)
   return hw_data (dv_get_device (cpu, device_name));
 }
 
-void dv_bfin_mmr_invalid (struct hw *, address_word, unsigned nr_bytes);
-void dv_bfin_mmr_require (struct hw *, address_word, unsigned nr_bytes, unsigned size);
-bool dv_bfin_mmr_check (struct hw *, address_word, unsigned nr_bytes);
+void dv_bfin_mmr_invalid (struct hw *, address_word, unsigned nr_bytes, bool write);
+void dv_bfin_mmr_require (struct hw *, address_word, unsigned nr_bytes, unsigned size, bool write);
+bool dv_bfin_mmr_check (struct hw *, address_word, unsigned nr_bytes, bool write);
 
-#define dv_bfin_mmr_require_16(hw, addr, nr_bytes) dv_bfin_mmr_require (hw, addr, nr_bytes, 2)
-#define dv_bfin_mmr_require_32(hw, addr, nr_bytes) dv_bfin_mmr_require (hw, addr, nr_bytes, 4)
+#define dv_bfin_mmr_require_16(hw, addr, nr_bytes, write) dv_bfin_mmr_require (hw, addr, nr_bytes, 2, write)
+#define dv_bfin_mmr_require_32(hw, addr, nr_bytes, write) dv_bfin_mmr_require (hw, addr, nr_bytes, 4, write)
 
 #define HW_TRACE_WRITE() \
   HW_TRACE ((me, "write 0x%08lx (%s) length %d with 0x%x", (long) addr, \

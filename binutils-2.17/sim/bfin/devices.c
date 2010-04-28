@@ -22,10 +22,11 @@
 #include "sim-hw.h"
 #include "hw-device.h"
 #include "dv-bfin_cec.h"
+#include "dv-bfin_mmu.h"
 
 static void
 bfin_mmr_invalid (struct hw *me, SIM_CPU *cpu, address_word addr,
-		  unsigned nr_bytes)
+		  unsigned nr_bytes, bool write)
 {
   if (!cpu)
     cpu = hw_system_cpu (me);
@@ -42,7 +43,7 @@ bfin_mmr_invalid (struct hw *me, SIM_CPU *cpu, address_word addr,
   /* XXX: is this what hardware does ?  */
   if (addr >= BFIN_CORE_MMR_BASE)
     /* XXX: This should be setting up CPLB fault addrs ?  */
-    cec_exception (cpu, VEC_ILL_RES);
+    mmu_process_fault (cpu, addr, write, false, false, true);
   else
     /* XXX: Newer parts set up an interrupt from EBIU and program
             EBIU_ERRADDR with the address.  */
@@ -50,21 +51,23 @@ bfin_mmr_invalid (struct hw *me, SIM_CPU *cpu, address_word addr,
 }
 
 void
-dv_bfin_mmr_invalid (struct hw *me, address_word addr, unsigned nr_bytes)
+dv_bfin_mmr_invalid (struct hw *me, address_word addr, unsigned nr_bytes,
+		     bool write)
 {
-  bfin_mmr_invalid (me, NULL, addr, nr_bytes);
+  bfin_mmr_invalid (me, NULL, addr, nr_bytes, write);
 }
 
 void
-dv_bfin_mmr_require (struct hw *me, address_word addr, unsigned nr_bytes, unsigned size)
+dv_bfin_mmr_require (struct hw *me, address_word addr, unsigned nr_bytes,
+		     unsigned size, bool write)
 {
   if (nr_bytes != size)
-    dv_bfin_mmr_invalid (me, addr, nr_bytes);
+    dv_bfin_mmr_invalid (me, addr, nr_bytes, write);
 }
 
 static bool
 bfin_mmr_check (struct hw *me, SIM_CPU *cpu, address_word addr,
-		unsigned nr_bytes)
+		unsigned nr_bytes, bool write)
 {
   if (addr >= BFIN_CORE_MMR_BASE)
     {
@@ -80,15 +83,16 @@ bfin_mmr_check (struct hw *me, SIM_CPU *cpu, address_word addr,
     }
 
   /* Still here ?  Must be crap.  */
-  bfin_mmr_invalid (me, cpu, addr, nr_bytes);
+  bfin_mmr_invalid (me, cpu, addr, nr_bytes, write);
 
   return false;
 }
 
 bool
-dv_bfin_mmr_check (struct hw *me, address_word addr, unsigned nr_bytes)
+dv_bfin_mmr_check (struct hw *me, address_word addr, unsigned nr_bytes,
+		   bool write)
 {
-  return bfin_mmr_check (me, NULL, addr, nr_bytes);
+  return bfin_mmr_check (me, NULL, addr, nr_bytes, write);
 }
 
 int
@@ -101,7 +105,7 @@ device_io_read_buffer (device *me, void *source, int space,
   if (STATE_ENVIRONMENT (sd) != OPERATING_ENVIRONMENT)
     return nr_bytes;
 
-  if (bfin_mmr_check (dv_me, cpu, addr, nr_bytes))
+  if (bfin_mmr_check (dv_me, cpu, addr, nr_bytes, false))
     if (cpu)
       {
 	sim_cpu_hw_io_read_buffer (cpu, cia, dv_me, source, space,
@@ -124,7 +128,7 @@ device_io_write_buffer (device *me, const void *source, int space,
   if (STATE_ENVIRONMENT (sd) != OPERATING_ENVIRONMENT)
     return nr_bytes;
 
-  if (bfin_mmr_check (dv_me, cpu, addr, nr_bytes))
+  if (bfin_mmr_check (dv_me, cpu, addr, nr_bytes, true))
     if (cpu)
       {
 	sim_cpu_hw_io_write_buffer (cpu, cia, dv_me, source, space,

@@ -97,7 +97,7 @@ bfin_ebiu_amc_io_write_buffer (struct hw *me, const void *source,
   switch (mmr_off)
     {
     case mmr_offset(amgctl):
-      dv_bfin_mmr_require_16 (me, addr, nr_bytes);
+      dv_bfin_mmr_require_16 (me, addr, nr_bytes, true);
       bfin_ebiu_amc_write_amgctl (me, amc, value);
       break;
     case mmr_offset(ambctl0):
@@ -108,7 +108,7 @@ bfin_ebiu_amc_io_write_buffer (struct hw *me, const void *source,
       break;
     case mmr_offset(mbsctl):
       /* XXX: implement this.  */
-      dv_bfin_mmr_require_16 (me, addr, nr_bytes);
+      dv_bfin_mmr_require_16 (me, addr, nr_bytes, true);
       break;
     case mmr_offset(arbstat):
       /* XXX: implement this.  */
@@ -118,10 +118,10 @@ bfin_ebiu_amc_io_write_buffer (struct hw *me, const void *source,
       break;
     case mmr_offset(fctl):
       /* XXX: implement this.  */
-      dv_bfin_mmr_require_16 (me, addr, nr_bytes);
+      dv_bfin_mmr_require_16 (me, addr, nr_bytes, true);
       break;
     default:
-      dv_bfin_mmr_invalid (me, addr, nr_bytes);
+      dv_bfin_mmr_invalid (me, addr, nr_bytes, true);
       break;
     }
 
@@ -150,7 +150,7 @@ bfin_ebiu_amc_io_read_buffer (struct hw *me, void *dest,
     case mmr_offset(amgctl):
     case mmr_offset(mbsctl):
     case mmr_offset(fctl):
-      dv_bfin_mmr_require_16 (me, addr, nr_bytes);
+      dv_bfin_mmr_require_16 (me, addr, nr_bytes, false);
       dv_store_2 (dest, *value16);
       break;
     case mmr_offset(ambctl0):
@@ -160,7 +160,7 @@ bfin_ebiu_amc_io_read_buffer (struct hw *me, void *dest,
       dv_store_4 (dest, *value32);
       break;
     default:
-      dv_bfin_mmr_invalid (me, addr, nr_bytes);
+      dv_bfin_mmr_invalid (me, addr, nr_bytes, false);
       break;
     }
 

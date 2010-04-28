@@ -60,7 +60,7 @@ struct bfin_mmu
 #define mmr_offset(mmr) (offsetof(struct bfin_mmu, mmr) - mmr_base())
 #define mmr_idx(mmr)    (mmr_offset (mmr) / 4)
 
-static const char * const mmr_names[] = {
+static const char * const mmr_names[BFIN_COREMMR_MMU_SIZE / 4] = {
   "SRAM_BASE_ADDRESS", "DMEM_CONTROL", "DCPLB_FAULT_STATUS", "DCPLB_FAULT_ADDR",
   [mmr_idx (dcplb_addr[0])] = "DCPLB_ADDR0",
   "DCPLB_ADDR1", "DCPLB_ADDR2", "DCPLB_ADDR3", "DCPLB_ADDR4", "DCPLB_ADDR5",
@@ -108,10 +108,10 @@ bfin_mmu_io_write_buffer (struct hw *me, const void *source,
     case mmr_offset(imem_control):
       /* XXX: IMC/DMC bit should add/remove L1 cache regions ...  */
     case mmr_offset(dtest_command):
-    case mmr_offset(dtest_data[0]) ... mmr_offset(dtest_data[2]):
+    case mmr_offset(dtest_data[0]) ... mmr_offset(dtest_data[1]):
       /* XXX: should do something here.  */
     case mmr_offset(itest_command):
-    case mmr_offset(itest_data[0]) ... mmr_offset(itest_data[2]):
+    case mmr_offset(itest_data[0]) ... mmr_offset(itest_data[1]):
       /* XXX: should do something here.  */
     case mmr_offset(dcplb_addr[0]) ... mmr_offset(dcplb_addr[15]):
     case mmr_offset(dcplb_data[0]) ... mmr_offset(dcplb_data[15]):
@@ -128,7 +128,7 @@ bfin_mmu_io_write_buffer (struct hw *me, const void *source,
       /* Discard writes to these.  */
       break;
     default:
-      dv_bfin_mmr_invalid (me, addr, nr_bytes);
+      dv_bfin_mmr_invalid (me, addr, nr_bytes, true);
       break;
     }
 
@@ -172,7 +172,7 @@ bfin_mmu_io_read_buffer (struct hw *me, void *dest,
       break;
     default:
       while (1) /* Core MMRs -> exception -> doesn't return.  */
-	dv_bfin_mmr_invalid (me, addr, nr_bytes);
+	dv_bfin_mmr_invalid (me, addr, nr_bytes, false);
       break;
     }
 
@@ -302,38 +302,59 @@ void
 mmu_check_addr (SIM_CPU *cpu, bu32 addr, bool write, bool inst, int size)
 {
   SIM_DESC sd = CPU_STATE (cpu);
-  struct bfin_mmu *mmu = NULL;
+  struct bfin_mmu *mmu;
   bu32 *fault_status, *fault_addr, *mem_control, *cplb_addr, *cplb_data;
   bu32 faults;
-  bool supv, do_excp;
+  bool supv, do_excp, dag1;
   int i, hits;
+
+  if (STATE_ENVIRONMENT (sd) == OPERATING_ENVIRONMENT)
+    mmu = MMU_STATE (cpu);
+  else
+    mmu = NULL;
 
   if (addr & (size - 1))
     _mmu_process_fault (cpu, mmu, addr, write, inst, true, false);
 
-  if (STATE_ENVIRONMENT (sd) != OPERATING_ENVIRONMENT)
+  if (mmu == NULL)
     return;
 
-  mmu = MMU_STATE (cpu);
   fault_status = inst ? &mmu->icplb_fault_status : &mmu->dcplb_fault_status;
   fault_addr = inst ? &mmu->icplb_fault_addr : &mmu->dcplb_fault_addr;
   mem_control = inst ? &mmu->imem_control : &mmu->dmem_control;
   cplb_addr = inst ? &mmu->icplb_addr[0] : &mmu->dcplb_addr[0];
   cplb_data = inst ? &mmu->icplb_data[0] : &mmu->dcplb_data[0];
   supv = cec_is_supervisor_mode (cpu);
-
-  /* CPLBs disabled -> little to do.  */
-  if (!(*mem_control & ENCPLB))
-    {
-      /* MMRs have an implicit CPLB.  */
-      if (addr >= BFIN_SYSTEM_MMR_BASE && !supv)
-	cec_exception (cpu, VEC_ILL_RES);
-      return;
-    }
+  dag1 = (BFIN_CPU_STATE.multi_pc == PCREG + 6);
 
   faults = 0;
   hits = 0;
   do_excp = false;
+
+  /* DAG1 can never access MMRs/scratchpad.  */
+  if (dag1)
+    {
+      if (addr >= BFIN_SYSTEM_MMR_BASE ||
+	  (addr >= BFIN_L1_SRAM_SCRATCH && addr < BFIN_L1_SRAM_SCRATCH_END))
+	{
+	  hits = 1;
+	  goto process_excp;
+	}
+    }
+
+  /* CPLBs disabled -> little to do.  */
+  if (!(*mem_control & ENCPLB))
+    {
+      /* User mode cannot access MMRs.  */
+      if (addr >= BFIN_SYSTEM_MMR_BASE && !supv)
+	{
+	  hits = 1;
+	  goto process_excp;
+	}
+
+      return;
+    }
+
   for (i = 0; i < 16; ++i)
     {
       const bu32 pages[4] = { 0x400, 0x1000, 0x100000, 0x400000 };
@@ -370,9 +391,10 @@ mmu_check_addr (SIM_CPU *cpu, bu32 addr, bool write, bool inst, int size)
   /* MMRs have an implicit CPLB.  */
   if (hits == 0 && addr >= BFIN_SYSTEM_MMR_BASE)
     {
-      if (!supv)
-	cec_exception (cpu, VEC_ILL_RES);
-      return;
+      if (supv)
+	return;
+      hits = 1;
+      do_excp = true;
     }
 
   /* XXX: Should handle implicit set of CPLBs on L1.  */
@@ -381,6 +403,7 @@ mmu_check_addr (SIM_CPU *cpu, bu32 addr, bool write, bool inst, int size)
   if (!do_excp && hits == 1)
     return;
 
+ process_excp:
   /* ICPLB regs always get updated.  */
   if (!inst)
     {
@@ -390,7 +413,7 @@ mmu_check_addr (SIM_CPU *cpu, bu32 addr, bool write, bool inst, int size)
 
   *fault_status =
 	(!hits << 19) |
-	((BFIN_CPU_STATE.multi_pc == PCREG + 6) << 18) |
+	(dag1 << 18) |
 	(supv << 17) |
 	(write << 16) |
 	faults;

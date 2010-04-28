@@ -105,7 +105,7 @@ bfin_uart_io_write_buffer (struct hw *me, const void *source,
 
   HW_TRACE_WRITE ();
 
-  dv_bfin_mmr_require_16 (me, addr, nr_bytes);
+  dv_bfin_mmr_require_16 (me, addr, nr_bytes, true);
 
   /* XXX: All MMRs are "8bit" ... what happens to high 8bits ?  */
 
@@ -134,7 +134,7 @@ bfin_uart_io_write_buffer (struct hw *me, const void *source,
       *valuep = value;
       break;
     default:
-      dv_bfin_mmr_invalid (me, addr, nr_bytes);
+      dv_bfin_mmr_invalid (me, addr, nr_bytes, true);
       break;
     }
 
@@ -202,7 +202,7 @@ bfin_uart_io_read_buffer (struct hw *me, void *dest,
 
   HW_TRACE_READ ();
 
-  dv_bfin_mmr_require_16 (me, addr, nr_bytes);
+  dv_bfin_mmr_require_16 (me, addr, nr_bytes, false);
 
   switch (mmr_off)
     {
@@ -236,7 +236,7 @@ bfin_uart_io_read_buffer (struct hw *me, void *dest,
       dv_store_2 (dest, *valuep);
       break;
     default:
-      dv_bfin_mmr_invalid (me, addr, nr_bytes);
+      dv_bfin_mmr_invalid (me, addr, nr_bytes, false);
       break;
     }
 

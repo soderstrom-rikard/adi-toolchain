@@ -81,11 +81,11 @@ bfin_ebiu_ddrc_io_write_buffer (struct hw *me, const void *source,
     {
     case mmr_offset(errmst):
     case mmr_offset(rstctl):
-      dv_bfin_mmr_require_16 (me, addr, nr_bytes);
+      dv_bfin_mmr_require_16 (me, addr, nr_bytes, true);
       *value16p = value;
       break;
     default:
-      dv_bfin_mmr_require_32 (me, addr, nr_bytes);
+      dv_bfin_mmr_require_32 (me, addr, nr_bytes, true);
       *value32p = value;
       break;
     }
@@ -114,11 +114,11 @@ bfin_ebiu_ddrc_io_read_buffer (struct hw *me, void *dest,
     {
     case mmr_offset(errmst):
     case mmr_offset(rstctl):
-      dv_bfin_mmr_require_16 (me, addr, nr_bytes);
+      dv_bfin_mmr_require_16 (me, addr, nr_bytes, false);
       dv_store_2 (dest, *value16p);
       break;
     default:
-      dv_bfin_mmr_require_32 (me, addr, nr_bytes);
+      dv_bfin_mmr_require_32 (me, addr, nr_bytes, false);
       dv_store_4 (dest, *value32p);
       break;
     }
