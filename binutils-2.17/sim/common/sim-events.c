@@ -1183,11 +1183,11 @@ sim_events_process (SIM_DESC sd)
 	      (to_do->trace != NULL) ? ", " : "",
 	      (to_do->trace != NULL) ? to_do->trace : ""));
       sim_events_free (sd, to_do);
-      update_time_from_event (sd);
       handler (sd, data);
       /* Update time *after* the handler in case it inserted an event itself.
          Like in the case of the persistent sim poll event.  Otherwise, our
          32bit math assumption may be violated and overflow.  */
+      update_time_from_event (sd);
     }
   
   /* put things back where they belong ready for the next iteration */
