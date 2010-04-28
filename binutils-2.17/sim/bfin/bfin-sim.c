@@ -1733,11 +1733,15 @@ decode_ProgCtrl_0 (SIM_CPU *cpu, bu16 iw0, bu32 pc)
     }
   else if (prgfunc == 3)
     {
+      if (poprnd > 7)
+	illegal_instruction (cpu);
       TRACE_INSN (cpu, "CLI R%i;", poprnd);
       SET_DREG (poprnd, cec_cli (cpu));
     }
   else if (prgfunc == 4)
     {
+      if (poprnd > 7)
+	illegal_instruction (cpu);
       TRACE_INSN (cpu, "STI R%i;", poprnd);
       cec_sti (cpu, DREG (poprnd));
       CYCLE_DELAY = 3;
@@ -1745,6 +1749,8 @@ decode_ProgCtrl_0 (SIM_CPU *cpu, bu16 iw0, bu32 pc)
   else if (prgfunc == 5)
     {
       bu32 newpc = PREG (poprnd);
+      if (poprnd > 7)
+	illegal_instruction (cpu);
       TRACE_INSN (cpu, "JUMP (P%i);", poprnd);
       TRACE_BRANCH (cpu, pc, newpc, -1, "JUMP (Preg)");
       SET_PCREG (newpc);
@@ -1755,6 +1761,8 @@ decode_ProgCtrl_0 (SIM_CPU *cpu, bu16 iw0, bu32 pc)
   else if (prgfunc == 6)
     {
       bu32 newpc = PREG (poprnd);
+      if (poprnd > 7)
+	illegal_instruction (cpu);
       TRACE_INSN (cpu, "CALL (P%i);", poprnd);
       TRACE_BRANCH (cpu, pc, newpc, -1, "CALL (Preg)");
       /* If we're at the end of a hardware loop, RETS is going to be
@@ -1768,6 +1776,8 @@ decode_ProgCtrl_0 (SIM_CPU *cpu, bu16 iw0, bu32 pc)
   else if (prgfunc == 7)
     {
       bu32 newpc = pc + PREG (poprnd);
+      if (poprnd > 7)
+	illegal_instruction (cpu);
       TRACE_INSN (cpu, "CALL (PC + P%i);", poprnd);
       TRACE_BRANCH (cpu, pc, newpc, -1, "CALL (PC + Preg)");
       SET_RETSREG (hwloop_get_next_pc (cpu, pc, 2));
@@ -1779,6 +1789,8 @@ decode_ProgCtrl_0 (SIM_CPU *cpu, bu16 iw0, bu32 pc)
   else if (prgfunc == 8)
     {
       bu32 newpc = pc + PREG (poprnd);
+      if (poprnd > 7)
+	illegal_instruction (cpu);
       TRACE_INSN (cpu, "JUMP (PC + P%i);", poprnd);
       TRACE_BRANCH (cpu, pc, newpc, -1, "JUMP (PC + Preg)");
       SET_PCREG (newpc);
@@ -1808,6 +1820,8 @@ decode_ProgCtrl_0 (SIM_CPU *cpu, bu16 iw0, bu32 pc)
     {
       bu32 addr = PREG (poprnd);
       bu8 byte;
+      if (poprnd > 7)
+	illegal_instruction (cpu);
       TRACE_INSN (cpu, "TESTSET (P%i);", poprnd);
       byte = GET_WORD (addr);
       SET_CCREG (byte == 0);
@@ -5737,6 +5751,8 @@ _interp_insn_bfin (SIM_CPU *cpu, bu32 pc)
 	decode_LDSTiiFP_0 (cpu, iw0);
       else if ((iw0 & 0xE000) == 0xA000)
 	decode_LDSTii_0 (cpu, iw0);
+      else
+	illegal_instruction (cpu);
       return insn_len;
     }
 
