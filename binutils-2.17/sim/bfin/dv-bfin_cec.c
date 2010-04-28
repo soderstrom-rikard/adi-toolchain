@@ -668,10 +668,16 @@ cec_return (SIM_CPU *cpu, int ivg)
   cec->ipend &= ~IVG_EMU_B;
 
   curr_ivg = _cec_get_ivg (cec);
+  if (curr_ivg == -1)
+    curr_ivg = IVG_USER;
   if (ivg == -1)
     ivg = curr_ivg;
 
   TRACE_EVENTS (cpu, "returning from EVT%i (should be EVT%i)", curr_ivg, ivg);
+
+  /* Not allowed to return from usermode.  */
+  if (curr_ivg == IVG_USER)
+    cec_exception (cpu, VEC_ILL_RES);
 
   if (ivg > IVG15 || ivg < 0)
     sim_io_error (sd, "%s: ivg %i out of range !", __func__, ivg);
@@ -701,7 +707,8 @@ cec_return (SIM_CPU *cpu, int ivg)
     default:
       /* RTI -- not valid in emulation, nmi, exception, or user.  */
       /* XXX: What does the hardware do ?  */
-      if (curr_ivg < IVG_IVHW && curr_ivg != IVG_RST)
+      if (curr_ivg == IVG_EMU || curr_ivg == IVG_NMI ||
+	  curr_ivg == IVG_EVX || curr_ivg == IVG_USER)
 	cec_exception (cpu, VEC_ILL_RES);
       break;
     case IVG_IRPTEN:
