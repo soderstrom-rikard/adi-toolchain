@@ -346,7 +346,7 @@ cec_exception (SIM_CPU *cpu, int excp)
       if (STATE_ENVIRONMENT (sd) == OPERATING_ENVIRONMENT)
 	{
 	  /* ICPLB regs always get updated.  */
-      /* XXX: Should optimize this call path ...  */
+	  /* XXX: Should optimize this call path ...  */
 	  if (excp != VEC_MISALI_I && excp != VEC_MISALI_D &&
 	      excp != VEC_CPLB_I_M && excp != VEC_CPLB_M &&
 	      excp != VEC_CPLB_I_VL && excp != VEC_CPLB_VL &&
@@ -582,7 +582,8 @@ _cec_raise (SIM_CPU *cpu, struct bfin_cec *cec, int ivg)
       BFIN_CPU_STATE.flow_change = true;
 
       /* Enable the global interrupt mask upon interrupt entry.  */
-      cec_irpten_enable (cpu, cec);
+      if (ivg >= IVG_IVHW)
+	cec_irpten_enable (cpu, cec);
     }
 
   /* When moving between states, don't let internal states bleed through */
@@ -647,6 +648,7 @@ cec_return (SIM_CPU *cpu, int ivg)
 {
   SIM_DESC sd = CPU_STATE (cpu);
   struct bfin_cec *cec;
+  bool snen;
   int curr_ivg;
   bu32 oldpc, newpc;
 
@@ -710,17 +712,22 @@ cec_return (SIM_CPU *cpu, int ivg)
   newpc = cec_read_ret_reg (cpu, ivg);
 
   /* XXX: Does this nested trick work on EMU/NMI/EVX ?  */
-  if (newpc & 1)
-    /* XXX: Delayed clear shows bad PCREG register trace above ?  */
-    newpc &= ~1;
-  else
-    cec->ipend &= ~(1 << ivg);
-  SET_PCREG (newpc);
+  snen = (newpc & 1);
+  /* XXX: Delayed clear shows bad PCREG register trace above ?  */
+  SET_PCREG (newpc & ~1);
 
   TRACE_BRANCH (cpu, oldpc, PCREG, -1, "CEC changed PC (from EVT%i)", ivg);
 
-  /* Disable global interrupt mask to let any interrupt take over.  */
-  cec_irpten_disable (cpu, cec);
+  /* Update ipend after the TRACE_BRANCH so dv-bfin_trace
+     knows current CEC state wrt overflow.  */
+  if (!snen)
+    cec->ipend &= ~(1 << ivg);
+
+  /* Disable global interrupt mask to let any interrupt take over, but
+     only when we were already in a RTI level.  Only way we could have
+     raised at that point is if it was cleared in the first place.  */
+  if (ivg >= IVG_IVHW || ivg == IVG_RST)
+    cec_irpten_disable (cpu, cec);
 
   /* When going from super to user, we clear LSB in LB regs in case
      it was set on the transition up.

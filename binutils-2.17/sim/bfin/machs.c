@@ -390,6 +390,9 @@ bfin_model_hw_tree_init (SIM_DESC sd, SIM_CPU *cpu)
     }
   sim_hw_parse (sd, "/core/bfin_ctimer > ivtmr ivtmr /core/bfin_cec");
 
+  if (mnum == MODEL_BF000)
+    goto done;
+
   /* Map the system devices.  */
   if (mdata->model_num >= 540 && mdata->model_num <= 549)
     amc_size = BF54X_MMR_EBIU_AMC_SIZE;
@@ -440,6 +443,7 @@ bfin_model_hw_tree_init (SIM_DESC sd, SIM_CPU *cpu)
   sim_hw_parse (sd, "/core/bfin_dma@14/peer /core/bfin_dma@15"); /* MDMA1 D->S */
   sim_hw_parse (sd, "/core/bfin_dma@15/peer /core/bfin_dma@14"); /* MDMA1 S->D */
 
+ done:
   /* Trigger all the new devices' finish func.  */
   hw_tree_finish (dv_get_device (cpu, "/"));
 }
@@ -567,17 +571,16 @@ bfin_model_cpu_init (SIM_DESC sd, SIM_CPU *cpu)
   int mnum = MODEL_NUM (model);
   size_t idx;
 
-  if (mnum == MODEL_BF000)
-    return;
-
-  mdata = &bfin_model_data[MODEL_NUM (model)];
-
   /* These memory maps are supposed to be cpu-specific, but the common sim
      code does not yet allow that (2nd arg is "cpu" rather than "NULL".  */
   sim_core_attach (sd, NULL, 0, access_read_write, 0, BFIN_L1_SRAM_SCRATCH,
 		   BFIN_L1_SRAM_SCRATCH_SIZE, 0, NULL, NULL);
 
+  if (mnum == MODEL_BF000)
+    goto core_only;
+
   /* Map in the on-chip memories (SRAMs).  */
+  mdata = &bfin_model_data[MODEL_NUM (model)];
   for (idx = 0; idx < mdata->mem_count; ++idx)
     {
       const struct bfin_memory_layout *mem = &mdata->mem[idx];
@@ -588,6 +591,7 @@ bfin_model_cpu_init (SIM_DESC sd, SIM_CPU *cpu)
   /* Map the on-chip ROMs.  */
   bfin_model_map_bfrom (sd, cpu);
 
+ core_only:
   /* Finally, build up the tree for this cpu model.  */
   bfin_model_hw_tree_init (sd, cpu);
 }
