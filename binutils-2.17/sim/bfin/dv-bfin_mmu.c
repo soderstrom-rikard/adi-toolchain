@@ -261,9 +261,9 @@ _mmu_process_fault (SIM_CPU *cpu, struct bfin_mmu *mmu, bu32 addr, bool write,
 	}
 
       *fault_addr = addr;
-      /* XXX: should handle FAULT_DAG.  */
       *fault_status =
 	(miss << 19) |
+	((BFIN_CPU_STATE.multi_pc == PCREG + 6) << 18) |
 	(supv << 17) |
 	(write << 16);
     }
@@ -390,6 +390,7 @@ mmu_check_addr (SIM_CPU *cpu, bu32 addr, bool write, bool inst, int size)
 
   *fault_status =
 	(!hits << 19) |
+	((BFIN_CPU_STATE.multi_pc == PCREG + 6) << 18) |
 	(supv << 17) |
 	(write << 16) |
 	faults;

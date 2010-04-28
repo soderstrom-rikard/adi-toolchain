@@ -79,6 +79,9 @@ struct bfin_cpu_state
   /* How many cycles did this insn take to complete ?  */
   bu32 cycle_delay;
 
+  /* The pc currently being interpreted in parallel insns.  */
+  bu32 multi_pc;
+
   /* Needed for supporting the DISALGNEXCPT instruction */
   int dis_algn_expt;
 

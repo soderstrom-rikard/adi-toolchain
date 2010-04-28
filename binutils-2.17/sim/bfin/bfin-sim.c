@@ -5679,6 +5679,7 @@ _interp_insn_bfin (SIM_CPU *cpu, bu32 pc)
   bu32 insn_len;
   bu16 iw0, iw1;
 
+  BFIN_CPU_STATE.multi_pc = pc;
   iw0 = IFETCH (pc);
   if ((iw0 & 0xc000) != 0xc000)
     {
