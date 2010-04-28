@@ -355,6 +355,8 @@ mmu_check_addr (SIM_CPU *cpu, bu32 addr, bool write, bool inst, int size)
 	    faults |= (1 << i);
 	  if (supv && !(cplb_data[i] & CPLB_SUPV_WR))
 	    faults |= (1 << i);
+	  if ((cplb_data[i] & (CPLB_WT | CPLB_L1_CHBL | CPLB_DIRTY)) == CPLB_L1_CHBL)
+	    faults |= (1 << i);
 	}
       else
 	{
@@ -385,7 +387,7 @@ mmu_check_addr (SIM_CPU *cpu, bu32 addr, bool write, bool inst, int size)
     }
 
   *fault_status =
-	(1 /*miss*/ << 19) |
+	((!!hits) << 19) |
 	(supv << 17) |
 	(write << 16) |
 	faults;

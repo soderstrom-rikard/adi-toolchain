@@ -24,21 +24,34 @@
 #define BFIN_COREMMR_MMU_BASE	0xFFE00000
 #define BFIN_COREMMR_MMU_SIZE	0x2000
 
+#ifndef __ASSEMBLER__
 void mmu_check_addr (SIM_CPU *, bu32 addr, bool write, bool inst, int size);
 void mmu_process_fault (SIM_CPU *, bu32 addr, bool write, bool inst, bool unaligned, bool miss);
 void mmu_log_ifault (SIM_CPU *);
+#endif
 
 /* MEM_CONTROL */
+#define ENM    (1 << 0)
 #define ENCPLB (1 << 1)
 #define MC     (1 << 2)
+
+#define ENDM         ENM
+#define ENDCPLB      ENCPLB
+#define DMC_AB_SRAM      0x0
+#define DMC_AB_CACHE     0xc
+#define DMC_ACACHE_BSRAM 0x8
 
 /* CPLB_DATA */
 #define CPLB_VALID   (1 << 0)
 #define CPLB_USER_RD (1 << 2)
 #define CPLB_USER_WR (1 << 3)
+#define CPLB_USER_RW (CPLB_USER_RD | CPLB_USER_WR)
 #define CPLB_SUPV_WR (1 << 4)
+#define CPLB_L1SRAM  (1 << 5)
+#define CPLB_DA0ACC  (1 << 6)
 #define CPLB_DIRTY   (1 << 7)
 #define CPLB_L1_CHBL (1 << 12)
+#define CPLB_WT      (1 << 14)
 #define PAGE_SIZE    (3 << 16)
 #define PAGE_SIZE_1K (0 << 16)
 #define PAGE_SIZE_4K (1 << 16)
