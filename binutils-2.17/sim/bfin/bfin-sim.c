@@ -343,56 +343,6 @@ reg_is_reserved (int grp, int reg)
   return (grp == 4 && (reg == 4 || reg == 5)) || (grp == 5);
 }
 
-static const char *
-amod0amod2 (int s0, int x0, int aop0)
-{
-  if (s0 == 1 && x0 == 0 && aop0 == 0)
-    return " (S)";
-  else if (s0 == 0 && x0 == 1 && aop0 == 0)
-    return " (CO)";
-  else if (s0 == 1 && x0 == 1 && aop0 == 0)
-    return " (SCO)";
-  else if (s0 == 0 && x0 == 0 && aop0 == 2)
-    return " (ASR)";
-  else if (s0 == 1 && x0 == 0 && aop0 == 2)
-    return " (S, ASR)";
-  else if (s0 == 0 && x0 == 1 && aop0 == 2)
-    return  " (CO, ASR)";
-  else if (s0 == 1 && x0 == 1 && aop0 == 2)
-    return " (SCO, ASR)";
-  else if (s0 == 0 && x0 == 0 && aop0 == 3)
-    return " (ASL)";
-  else if (s0 == 1 && x0 == 0 && aop0 == 3)
-    return " (S, ASL)";
-  else if (s0 == 0 && x0 == 1 && aop0 == 3)
-    return " (CO, ASL)";
-  else if (s0 == 1 && x0 == 1 && aop0 == 3)
-    return " (SCO, ASL)";
-  return "";
-}
-
-static const char *
-amod1 (int s0, int x0)
-{
-  if (s0 == 0 && x0 == 0)
-    return " (NS)";
-  else if (s0 == 1 && x0 == 0)
-    return " (S)";
- return "";
-}
-
-static const char *
-amod0 (int s0, int x0)
-{
-  if (s0 == 1 && x0 == 0)
-    return " (S)";
-  else if (s0 == 0 && x0 == 1)
-    return " (CO)";
-  else if (s0 == 1 && x0 == 1)
-    return " (SCO)";
-  return "";
-}
-
 static bu32 *
 get_allreg (SIM_CPU *cpu, int grp, int reg)
 {
@@ -442,6 +392,56 @@ get_allreg (SIM_CPU *cpu, int grp, int reg)
 	}
       illegal_instruction (cpu);
     }
+}
+
+static const char *
+amod0amod2 (int s0, int x0, int aop0)
+{
+  if (s0 == 1 && x0 == 0 && aop0 == 0)
+    return " (S)";
+  else if (s0 == 0 && x0 == 1 && aop0 == 0)
+    return " (CO)";
+  else if (s0 == 1 && x0 == 1 && aop0 == 0)
+    return " (SCO)";
+  else if (s0 == 0 && x0 == 0 && aop0 == 2)
+    return " (ASR)";
+  else if (s0 == 1 && x0 == 0 && aop0 == 2)
+    return " (S, ASR)";
+  else if (s0 == 0 && x0 == 1 && aop0 == 2)
+    return  " (CO, ASR)";
+  else if (s0 == 1 && x0 == 1 && aop0 == 2)
+    return " (SCO, ASR)";
+  else if (s0 == 0 && x0 == 0 && aop0 == 3)
+    return " (ASL)";
+  else if (s0 == 1 && x0 == 0 && aop0 == 3)
+    return " (S, ASL)";
+  else if (s0 == 0 && x0 == 1 && aop0 == 3)
+    return " (CO, ASL)";
+  else if (s0 == 1 && x0 == 1 && aop0 == 3)
+    return " (SCO, ASL)";
+  return "";
+}
+
+static const char *
+amod1 (int s0, int x0)
+{
+  if (s0 == 0 && x0 == 0)
+    return " (NS)";
+  else if (s0 == 1 && x0 == 0)
+    return " (S)";
+  return "";
+}
+
+static const char *
+amod0 (int s0, int x0)
+{
+  if (s0 == 1 && x0 == 0)
+    return " (S)";
+  else if (s0 == 0 && x0 == 1)
+    return " (CO)";
+  else if (s0 == 1 && x0 == 1)
+    return " (SCO)";
+  return "";
 }
 
 static const char *
@@ -733,7 +733,7 @@ lshift (SIM_CPU *cpu, bu64 val, int cnt, int size, bool saturate)
    * to overflow and become positive, saturation limits the result to the
    * maximum negative value for the register size.
    *
-   * However, its a little more complex than looking at sign bits, we need
+   * However, it's a little more complex than looking at sign bits, we need
    * to see if we are shifting the sign information away...
    */
   tmp = val & ((~mask << 1) | 1);
@@ -991,7 +991,7 @@ sub16 (SIM_CPU *cpu, bu16 a, bu16 b, int *carry, int *overfl, int *zero, int *ne
       /* (ASL) */
       v <<= 1;
       if (v > (bs64)0x7fff || v < (bs64)-0xffff)
-        overflow = 1;
+	overflow = 1;
       break;
     default:
       illegal_instruction (cpu);
@@ -1572,12 +1572,12 @@ decode_macfunc (SIM_CPU *cpu, int which, int op, int h0, int h1, int src0,
 	    acc &= 0xFFFFFFFF;
 	  break;
 	case M_IU:
-          if (acc & 0x8000000000000000ull)
-            acc = 0x0, sat = 1;
-          if (acc > 0xFFFFFFFFFFull)
-            acc &= 0xFFFFFFFFFFull, sat = 1;
-          if (MM && acc > 0xFFFFFFFF)
-            acc &= 0xFFFFFFFF;
+	  if (acc & 0x8000000000000000ull)
+	    acc = 0x0, sat = 1;
+	  if (acc > 0xFFFFFFFFFFull)
+	    acc &= 0xFFFFFFFFFFull, sat = 1;
+	  if (MM && acc > 0xFFFFFFFF)
+	    acc &= 0xFFFFFFFF;
 	  if (acc & 0x80000000)
 	    acc |= 0xffffffff00000000ull;
 	  break;
@@ -1591,7 +1591,7 @@ decode_macfunc (SIM_CPU *cpu, int which, int op, int h0, int h1, int src0,
 	  if (MM && acc > 0xFFFFFFFFFFull)
 	    acc &= 0xFFFFFFFFFFull;
 	  if (MM && acc & 0x80000000)
-            acc |= 0xffffffff00000000ull;
+	    acc |= 0xffffffff00000000ull;
 	  break;
 	case M_IH:
 	  if ((bs64)acc < -0x80000000ll)
@@ -1670,8 +1670,8 @@ decode_ProgCtrl_0 (SIM_CPU *cpu, bu16 iw0, bu32 pc)
   if (prgfunc == 0 && poprnd == 0)
     TRACE_INSN (cpu, "NOP;");
   else if (INSN_LEN == 8)
-    /* None of these can be part of a parrallel instruction */
-    illegal_instruction_combination(cpu);
+    /* None of these can be part of a parallel instruction */
+    illegal_instruction_combination (cpu);
   else if (prgfunc == 1 && poprnd == 0)
     {
       bu32 newpc = RETSREG;
@@ -1855,8 +1855,8 @@ decode_CaCTRL_0 (SIM_CPU *cpu, bu16 iw0)
   TRACE_EXTRACT (cpu, "%s: a:%i op:%i reg:%i", __func__, a, op, reg);
 
 if (INSN_LEN == 8)
-    /* None of these can be part of a parrallel instruction */
-    illegal_instruction_combination(cpu);
+    /* None of these can be part of a parallel instruction */
+    illegal_instruction_combination (cpu);
 
   /* No cache simulation, so these are (mostly) all NOPs.
      XXX: The hardware takes care of masking to cache lines, but need
@@ -2050,8 +2050,8 @@ decode_ccMV_0 (SIM_CPU *cpu, bu16 iw0)
 		 __func__, T, d, s, dst, src);
 
   if (INSN_LEN == 8)
-    /* None of these can be part of a parrallel instruction */
-    illegal_instruction_combination(cpu);
+    /* None of these can be part of a parallel instruction */
+    illegal_instruction_combination (cpu);
 
   TRACE_INSN (cpu, "IF %sCC %s = %s;", T ? "" : "! ",
 	      get_allreg_name (d, dst),
@@ -2078,8 +2078,8 @@ decode_CCflag_0 (SIM_CPU *cpu, bu16 iw0)
 		 __func__, I, opc, G, y, x);
 
   if (INSN_LEN == 8)
-    /* None of these can be part of a parrallel instruction */
-    illegal_instruction_combination(cpu);
+    /* None of these can be part of a parallel instruction */
+    illegal_instruction_combination (cpu);
 
   if (opc > 4)
     {
@@ -2194,8 +2194,8 @@ decode_CC2dreg_0 (SIM_CPU *cpu, bu16 iw0)
   TRACE_EXTRACT (cpu, "%s: op:%i reg:%i", __func__, op, reg);
 
   if (INSN_LEN == 8)
-    /* None of these can be part of a parrallel instruction */
-    illegal_instruction_combination(cpu);
+    /* None of these can be part of a parallel instruction */
+    illegal_instruction_combination (cpu);
 
   if (op == 0)
     {
@@ -2258,8 +2258,8 @@ decode_CC2stat_0 (SIM_CPU *cpu, bu16 iw0)
   TRACE_EXTRACT (cpu, "%s: D:%i op:%i cbit:%i", __func__, D, op, cbit);
 
   if (INSN_LEN == 8)
-    /* None of these can be part of a parrallel instruction */
-    illegal_instruction_combination(cpu);
+    /* None of these can be part of a parallel instruction */
+    illegal_instruction_combination (cpu);
 
   TRACE_INSN (cpu, "%s %s= %s;", D ? astat_name : "CC",
 	      op_names[op], D ? "CC" : astat_name);
@@ -2310,9 +2310,9 @@ decode_BRCC_0 (SIM_CPU *cpu, bu16 iw0, bu32 pc)
   TRACE_EXTRACT (cpu, "%s: T:%i B:%i offset:%#x", __func__, T, B, offset);
   TRACE_DECODE (cpu, "%s: pcrel10:%#x", __func__, pcrel);
 
- if (INSN_LEN == 8)
-    /* None of these can be part of a parrallel instruction */
-    illegal_instruction_combination(cpu);
+  if (INSN_LEN == 8)
+    /* None of these can be part of a parallel instruction */
+    illegal_instruction_combination (cpu);
 
   TRACE_INSN (cpu, "IF %sCC JUMP %#x%s;", T ? "" : "! ",
 	      pcrel, B ? " (bp)" : "");
@@ -2347,9 +2347,9 @@ decode_UJUMP_0 (SIM_CPU *cpu, bu16 iw0, bu32 pc)
   TRACE_EXTRACT (cpu, "%s: offset:%#x", __func__, offset);
   TRACE_DECODE (cpu, "%s: pcrel12:%#x", __func__, pcrel);
 
- if (INSN_LEN == 8)
-    /* None of these can be part of a parrallel instruction */
-    illegal_instruction_combination(cpu);
+  if (INSN_LEN == 8)
+    /* None of these can be part of a parallel instruction */
+    illegal_instruction_combination (cpu);
 
   TRACE_INSN (cpu, "JUMP.S %#x;", pcrel);
   TRACE_BRANCH (cpu, pc, newpc, -1, "JUMP.S");
@@ -2585,8 +2585,8 @@ decode_LOGI2op_0 (SIM_CPU *cpu, bu16 iw0)
   if (opc == 0)
     {
       if (INSN_LEN == 8)
-	/* None of these can be part of a parrallel instruction */
-	illegal_instruction_combination(cpu);
+	/* None of these can be part of a parallel instruction */
+	illegal_instruction_combination (cpu);
 
       TRACE_INSN (cpu, "CC = ! BITTST (R%i, %s);", dst, uimm_str);
       SET_CCREG ((~DREG (dst) >> uimm) & 1);
@@ -2594,8 +2594,8 @@ decode_LOGI2op_0 (SIM_CPU *cpu, bu16 iw0)
   else if (opc == 1)
     {
       if (INSN_LEN == 8)
-	/* None of these can be part of a parrallel instruction */
-	illegal_instruction_combination(cpu);
+	/* None of these can be part of a parallel instruction */
+	illegal_instruction_combination (cpu);
 
       TRACE_INSN (cpu, "CC = BITTST (R%i, %s);", dst, uimm_str);
       SET_CCREG ((DREG (dst) >> uimm) & 1);
@@ -3199,7 +3199,7 @@ decode_LDSTiiFP_0 (SIM_CPU *cpu, bu16 iw0)
      | 1 | 0 | 1 | 1 | 1 | 0 |.W.|.offset............|.reg...........|
      +---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+  */
   /* This isn't exactly a grp:reg as this insn only supports Dregs & Pregs,
-     but for our usage, it's functionality the same thing.  */
+     but for our usage, its functionality the same thing.  */
   int reg = ((iw0 >> 0) & 0x7);
   int grp = ((iw0 >> 3) & 0x1);
   int offset = ((iw0 >> 4) & 0x1f);
@@ -3416,9 +3416,9 @@ decode_CALLa_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1, bu32 pc)
   TRACE_EXTRACT (cpu, "%s: S:%i msw:%#x lsw:%#x", __func__, S, msw, lsw);
   TRACE_DECODE (cpu, "%s: pcrel24:%#x", __func__, pcrel);
 
- if (INSN_LEN == 8)
-    /* None of these can be part of a parrallel instruction */
-    illegal_instruction_combination(cpu);
+  if (INSN_LEN == 8)
+    /* None of these can be part of a parallel instruction */
+    illegal_instruction_combination (cpu);
 
   TRACE_INSN (cpu, "%s %#x;", S ? "CALL" : "JUMP.L", pcrel);
 
@@ -3661,10 +3661,10 @@ decode_dsp32mac_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1)
 		illegal_instruction (cpu);
 	      res = REG_H_L (res, res0);
 	    }
-        }
+	}
     }
 
-   if (!P && (w0 || w1))
+  if (!P && (w0 || w1))
     {
       STORE (DREG (dst), res);
       SET_ASTATREG (v, v_i);
@@ -3675,10 +3675,10 @@ decode_dsp32mac_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1)
     {
       SET_ASTATREG (v, v_i);
       if (v_i)
-        SET_ASTATREG (vs, v_i);
+	SET_ASTATREG (vs, v_i);
     }
-    if (op0 == 3 || op1 == 3)
-      SET_ASTATREG (az, zero);
+  if (op0 == 3 || op1 == 3)
+    SET_ASTATREG (az, zero);
 }
 
 static void
@@ -3771,7 +3771,7 @@ decode_dsp32mult_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1)
 	}
     }
 
-   if (!P && (w0 || w1))
+  if (!P && (w0 || w1))
     STORE (DREG (dst), res);
 
   if (w0 || w1)
@@ -3910,7 +3910,7 @@ decode_dsp32alu_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1)
 
       /* If subtract, just invert and add one */
       if (aop & 0x1)
-        val1= ~val1 + 1;
+	val1= ~val1 + 1;
 
       res = (val0 >> 4) + (val1 >> 4) + (((val0 & 0xf) + (val1 & 0xf)) >> 4);
       res += 0x8000;
@@ -4067,9 +4067,9 @@ decode_dsp32alu_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1)
       int sat;
 
       if (aop == 0 || aop == 1)
-        TRACE_INSN (cpu, "A%i = A%i (S);", aop, aop);
+	TRACE_INSN (cpu, "A%i = A%i (S);", aop, aop);
       else
-        TRACE_INSN (cpu, "A1 = A1 (S), A0 = A0 (S);");
+	TRACE_INSN (cpu, "A1 = A1 (S), A0 = A0 (S);");
 
       if (aop == 0 || aop == 2)
 	{
@@ -4185,7 +4185,7 @@ decode_dsp32alu_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1)
 
       SET_ASTATREG (av[HL], av);
       if (av)
-   	SET_ASTATREG (avs[HL], av);
+	SET_ASTATREG (avs[HL], av);
       SET_ASTATREG (az, acc == 0);
       SET_ASTATREG (an, 0);
     }
@@ -4482,7 +4482,7 @@ decode_dsp32alu_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1)
 	  STORE (ASTATREG (ac0_copy), carry);
 	  STORE (ASTATREG (v), sat);
 	  STORE (ASTATREG (v_copy), sat);
-          if (sat)
+	  if (sat)
 	    STORE (ASTATREG (vs), sat);
 	}
       else
@@ -5862,7 +5862,7 @@ _interp_insn_bfin (SIM_CPU *cpu, bu32 pc)
       return insn_len;
     }
 
-  /* Grab the next 16 bits, to determine if its  a 32-bit or 64-bit opcode */
+  /* Grab the next 16 bits to determine if it's a 32-bit or 64-bit opcode.  */
   iw1 = IFETCH (pc + 2);
   if ((iw0 & BIT_MULTI_INS) && (iw0 & 0xe800) != 0xe800 /* not linkage */)
     {
@@ -5872,7 +5872,7 @@ _interp_insn_bfin (SIM_CPU *cpu, bu32 pc)
       insn_len = 8;
     }
   else
-     insn_len = 4;
+    insn_len = 4;
 
   TRACE_EXTRACT (cpu, "%s: iw0:%#x iw1:%#x insn_len:%i", __func__,
 		     iw0, iw1, insn_len);
