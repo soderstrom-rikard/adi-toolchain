@@ -128,20 +128,16 @@ struct bfin_cpu_state
 #define EXCAUSE_SHIFT		0
 #define EXCAUSE_MASK		(0x3f << EXCAUSE_SHIFT)
 #define EXCAUSE			((SEQSTATREG & EXCAUSE_MASK) >> EXCAUSE_SHIFT)
-#define SET_EXCAUSE(excp)	SET_SEQSTATREG ((SEQSTATREG & ~EXCAUSE_MASK) | ((excp) << EXCAUSE_SHIFT))
 #define HWERRCAUSE_SHIFT	14
 #define HWERRCAUSE_MASK		(0x1f << HWERRCAUSE_SHIFT)
 #define HWERRCAUSE		((SEQSTATREG & HWERRCAUSE_MASK) >> HWERRCAUSE_SHIFT)
-#define SET_HWERRCAUSE(hwerr)	SET_SEQSTATREG ((SEQSTATREG & ~HWERRCAUSE_MASK) | ((hwerr) << HWERRCAUSE_SHIFT))
 
 #define _SET_CORE32REG_IDX(reg, p, x, val) \
-  do \
-    { \
-      bu32 __v = (val); \
-      TRACE_REGISTER (cpu, "wrote "#p"%i = %#x", x, __v); \
-      reg = __v; \
-    } \
-  while (0)
+  do { \
+    bu32 __v = (val); \
+    TRACE_REGISTER (cpu, "wrote "#p"%i = %#x", x, __v); \
+    reg = __v; \
+  } while (0)
 #define SET_DREG(x, val) _SET_CORE32REG_IDX (DREG (x), R, x, val)
 #define SET_PREG(x, val) _SET_CORE32REG_IDX (PREG (x), P, x, val)
 #define SET_IREG(x, val) _SET_CORE32REG_IDX (IREG (x), I, x, val)
@@ -157,40 +153,32 @@ struct bfin_cpu_state
 #define SET_DREG_H(x, h) SET_DREG (x, REG_H_L (h, DREG (x)))
 
 #define _SET_CORE32REG_ALU(reg, p, x, val) \
-  do \
-    { \
-      bu32 __v = (val); \
-      TRACE_REGISTER (cpu, "wrote A%i"#p" = %#x", x, __v); \
-      reg = __v; \
-    } \
-  while (0)
+  do { \
+    bu32 __v = (val); \
+    TRACE_REGISTER (cpu, "wrote A%i"#p" = %#x", x, __v); \
+    reg = __v; \
+  } while (0)
 #define SET_AXREG(x, val) _SET_CORE32REG_ALU (AXREG (x), X, x, val)
 #define SET_AWREG(x, val) _SET_CORE32REG_ALU (AWREG (x), W, x, val)
 
 #define SET_AREG(x, val) \
-  do \
-    { \
-      bu40 __a = (val); \
-      SET_AXREG (x, (__a >> 32) & 0xff); \
-      SET_AWREG (x, __a); \
-    } \
-  while (0)
+  do { \
+    bu40 __a = (val); \
+    SET_AXREG (x, (__a >> 32) & 0xff); \
+    SET_AWREG (x, __a); \
+  } while (0)
 #define SET_AREG32(x, val) \
-  do \
-    { \
-      SET_AWREG (x, val); \
-      SET_AXREG (x, -(AWREG (x) >> 31)); \
-    } \
-  while (0)
+  do { \
+    SET_AWREG (x, val); \
+    SET_AXREG (x, -(AWREG (x) >> 31)); \
+  } while (0)
 
 #define _SET_CORE32REG(reg, val) \
-  do \
-    { \
-      bu32 __v = (val); \
-      TRACE_REGISTER (cpu, "wrote "#reg" = %#x", __v); \
-      reg##REG = __v; \
-    } \
-  while (0)
+  do { \
+    bu32 __v = (val); \
+    TRACE_REGISTER (cpu, "wrote "#reg" = %#x", __v); \
+    reg##REG = __v; \
+  } while (0)
 #define SET_FPREG(val) _SET_CORE32REG (FP, val)
 #define SET_SPREG(val) _SET_CORE32REG (SP, val)
 #define SET_CYCLESREG(val) _SET_CORE32REG (CYCLES, val)
@@ -198,7 +186,6 @@ struct bfin_cpu_state
 #define SET_CYCLES2SHDREG(val) _SET_CORE32REG (CYCLES2SHD, val)
 #define SET_KSPREG(val) _SET_CORE32REG (KSP, val)
 #define SET_USPREG(val) _SET_CORE32REG (USP, val)
-#define SET_SEQSTATREG(val) _SET_CORE32REG (SEQSTAT, val)
 #define SET_SYSCFGREG(val) _SET_CORE32REG (SYSCFG, val)
 #define SET_RETSREG(val) _SET_CORE32REG (RETS, val)
 #define SET_RETIREG(val) _SET_CORE32REG (RETI, val)
@@ -206,6 +193,17 @@ struct bfin_cpu_state
 #define SET_RETNREG(val) _SET_CORE32REG (RETN, val)
 #define SET_RETEREG(val) _SET_CORE32REG (RETE, val)
 #define SET_PCREG(val) _SET_CORE32REG (PC, val)
+
+#define _SET_CORE32REGFIELD(reg, field, val, mask, shift) \
+  do { \
+    bu32 __f = (val); \
+    bu32 __v = ((reg##REG) & ~(mask)) | (__f << (shift)); \
+    TRACE_REGISTER (cpu, "wrote "#field" = %#x ("#reg" = %#x)", __f, __v); \
+    reg##REG = __v; \
+  } while (0)
+#define SET_SEQSTATREG(val)   _SET_CORE32REG (SEQSTAT, val)
+#define SET_EXCAUSE(excp)     _SET_CORE32REGFIELD (SEQSTAT, EXCAUSE, excp, EXCAUSE_MASK, EXCAUSE_SHIFT)
+#define SET_HWERRCAUSE(hwerr) _SET_CORE32REGFIELD (SEQSTAT, HWERRCAUSE, hwerr, HWERRCAUSE_MASK, HWERRCAUSE_SHIFT)
 
 #define AZ_BIT		0
 #define AN_BIT		1
