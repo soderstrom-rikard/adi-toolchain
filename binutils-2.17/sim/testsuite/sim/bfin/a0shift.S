@@ -39,7 +39,18 @@
 	R2.H = 0x5c32;
 // end load regs and acc;
 	R0.H = (A1 = R5.L * R6.H), R0.L = (A0 += R5.L * R6.H) (FU);
+P0 = ASTAT;
+CHECKREG P0, (_VS|_V|_V_COPY);
+
 		CHECKREG R0, 0xffff;
+R0 = A1.w
+CHECKREG R0, 0;
+R0 = A1.x
+CHECKREG R0, 0;
+R0 = A0.w
+CHECKREG R0, 0xffeec062;
+R0 = A0.x
+CHECKREG R0, 0x2c;
 		P0 = ASTAT;
 		CHECKREG P0, (_VS|_V|_V_COPY);
 	R4 = R6 +|- R5 , R3 = R6 -|+ R5;
@@ -56,6 +67,14 @@
 		CHECKREG P0, (_VS|_AN);
 	R7.H = ( A1 -= R2.L * R5.H ), A0 = R2.L * R5.H;
 		CHECKREG R7, 0xafda0000;
+R0 = A1.w
+CHECKREG R0, 0xafda0000;
+R0 = A1.x
+CHECKREG R0, 0xffffffff;
+R0 = A0.w
+CHECKREG R0, 0x50260000;
+R0 = A0.x
+CHECKREG R0, 0x0;
 		P0 = ASTAT;
 		CHECKREG P0, (_VS|_AN);
 	R3 = R7.L * R6.H, R2 = R7.L * R6.H (IS);
@@ -66,6 +85,14 @@
 	R1.H = (A1 += R7.L * R4.H) (M), R1.L = (A0 = R7.H * R4.H) (FU);
 		CHECKREG R1, 0xafda57ed;
 		P0 = ASTAT;
+R0 = A1.w
+CHECKREG R0, 0xafda0000;
+R0 = A1.x
+CHECKREG R0, 0xffffffff;
+R0 = A0.w
+CHECKREG R0, 0x57ed0000;
+R0 = A0.x
+CHECKREG R0, 0x0;
 		CHECKREG P0, (_VS|_AN);
 	R3 = R6.H * R5.L (FU);
 		CHECKREG R3, 0;
@@ -73,6 +100,14 @@
 		CHECKREG P0, (_VS|_AN);
 	R5.H = ( A1 += R3.L * R1.L ) (M), A0 -= R3.H * R1.H (ISS2);
 		CHECKREG R5, 0x80000000;
+R0 = A1.w
+CHECKREG R0, 0xafda0000;
+R0 = A1.x
+CHECKREG R0, 0xffffffff;
+R0 = A0.w
+CHECKREG R0, 0x57ed0000;
+R0 = A0.x
+CHECKREG R0, 0x0;
 		P0 = ASTAT;
 		CHECKREG P0, (_VS|_V|_V_COPY|_AN);
 	R3 = R3 +|- R5 , R6 = R3 -|+ R5 (CO);
@@ -81,6 +116,14 @@
 		P0 = ASTAT;
 		CHECKREG P0, (_VS|_V|_V_COPY|_AN|_AZ);
 	R7 = ( A1 += R4.L * R1.L ) (M),  R6 = ( A0 += R4.L * R1.H );
+R0 = A1.w
+CHECKREG R0, 0x83e38000;
+R0 = A1.x
+CHECKREG R0, 0xffffffff;
+R0 = A0.w
+CHECKREG R0, 0xa8130000;
+R0 = A0.x
+CHECKREG R0, 0x0;
 		CHECKREG R6, 0x7fffffff
 		CHECKREG R7, 0x83e38000
 		P0 = ASTAT;
@@ -105,6 +148,14 @@
 	R5 = ( A1 = R7.L * R7.L ),  R4 = ( A0 -= R7.H * R7.H )  (ISS2);
 		CHECKREG R5, 0x78b74f88
 		CHECKREG R4, 0xc73635f8
+R0 = A1.w
+CHECKREG R0, 0x3c5ba7c4;
+R0 = A1.x
+CHECKREG R0, 0x0;
+R0 = A0.w
+CHECKREG R0, 0xe39b1afc;
+R0 = A0.x
+CHECKREG R0, 0xffffffff;
 		R0 = ASTAT;
 		CHECKREG r0, (_VS|_AV0S|_AZ|_AN);
 	A0 = A0 >> 2;

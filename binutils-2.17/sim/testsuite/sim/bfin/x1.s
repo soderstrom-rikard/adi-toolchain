@@ -5,75 +5,76 @@
 
 
 // 0.5
-	R0.L = 0x4000;
-	R0.H = 0x4000;
-	R1.L = 0x4000;
-	R1.H = 0x4000;
+	imm32 r0, 0x40004000;
+	imm32 r1, 0x40004000;
+	R2 = R0 +|+ R1, R3 = R0 -|- R1 (S , ASR);
+	checkreg r2, 0x40004000;
+	checkreg r3, 0;
+
+	imm32 r1, 0x10001000;
 
 	R2 = R0 +|+ R1, R3 = R0 -|- R1 (S , ASR);
-//	DBGCMPLX ( R2 );
-//	DBGCMPLX ( R3 );
-
-	DBGA ( R2.L , 0x4000 );
-	DBGA ( R2.H , 0x4000 );
-	DBGA ( R3.L , 0 );
-	DBGA ( R3.H , 0 );
-
-// 0.125
-	R1.L = 0x1000;
-	R1.H = 0x1000;
-
-	R2 = R0 +|+ R1, R3 = R0 -|- R1 (S , ASR);
-//	DBGCMPLX ( R2 );
-//	DBGCMPLX ( R3 );
-//DBGA ( R2.L , 0.3125 );
-//DBGA ( R2.H , 0.3125 );
-//DBGA ( R3.L , 0.1875 );
-//DBGA ( R3.H , 0.1875 );
-	DBGA ( R2.L , 0x2800 );
-	DBGA ( R2.H , 0x2800);
-	DBGA ( R3.L , 0x1800 );
-	DBGA ( R3.H , 0x1800);
+	checkreg r2, 0x28002800;
+	checkreg r3, 0x18001800;
 
 	R0 = R2 +|+ R3, R1 = R2 -|- R3 (S , ASR);
-//	DBGCMPLX ( R0 );
-//	DBGCMPLX ( R1 );
-	DBGA ( R0.L , 0x2000);
-	DBGA ( R0.H , 0x2000 );
-	DBGA ( R1.L , 0x0800 );
-	DBGA ( R1.H , 0x0800 );
+	checkreg r0, 0x20002000;
+	checkreg r1, 0x08000800;
 
 	R0 = 1;
 	R0 <<= 15;
 	R1 = R0 << 16;
 	R0 = R0 | R1;
 	R1 = R0;
+	checkreg r0, 0x80008000;
+	checkreg r1, 0x80008000;
 
 	R2 = R0 +|+ R1, R3 = R0 -|- R1 (S , ASR);
-
-//	DBGCMPLX ( R2 );
-//	DBGCMPLX ( R3 );
-	DBGA ( R0.L , 0x8000 );
-	DBGA ( R0.H , 0x8000 );
-	DBGA ( R1.L , 0x8000 );
-	DBGA ( R1.H , 0x8000 );
+	checkreg r2, 0x80008000;
+	checkreg r3, 0x0;
 
 	R4 = 0;
 	R2 = R2 +|+ R4, R3 = R2 -|- R4 (S , ASR);
-//	DBGCMPLX ( R2 );
-//	DBGCMPLX ( R3 );
+	checkreg r2, 0xc000c000;
+	checkreg r3, 0xc000c000;
 
 	R2 = R2 +|+ R3, R3 = R2 -|- R3 (S , ASR);
-//	DBGCMPLX ( R2 );
-//	DBGCMPLX ( R3 );
-	DBGA ( R2.L , 0xc000 );
-	DBGA ( R2.H , 0xc000 );
+	checkreg r2, 0xc000c000;
+	checkreg r3, 0x0;
+
+	R4 = R2 +|+ R2, R5 = R2 -|- R2 (ASL);
+	checkreg r4, 0x0
+	checkreg r5, 0x0
 
 	R2 = R2 +|+ R2, R3 = R2 -|- R2 (S , ASL);
-//	DBGCMPLX ( R2 );
-//	DBGCMPLX ( R3 );
-//DBGA ( R2.L , 0x7fff );
-//DBGA ( R2.H , 0x7fff );
-	DBGA ( R2.L , 0x8000 );
-	DBGA ( R2.H , 0x8000 );
+	checkreg r2, 0x80008000;
+	checkreg r3, 0x0;
+
+
+imm32 r0, 0x50004000;
+imm32 r1, 0x40005000;
+R2 = R0 +|+ R1, R3 = R0 -|- R1 (S, ASL);
+checkreg r2, 0x7fff7fff;
+checkreg r3, 0x2000e000;
+R4 = R0 +|+ R1, R5 = R0 -|- R1 (ASL);
+checkreg r4, 0x20002000
+checkreg r5, 0x2000e000
+
+imm32 r0, 0x30001000;
+imm32 r1, 0x10003000;
+R2 = R0 +|+ R1, R3 = R0 -|- R1 (S, ASL);
+checkreg r2, 0x7fff7fff;
+checkreg r3, 0x4000c000;
+R4 = R0 +|+ R1, R5 = R0 -|- R1 (ASL);
+checkreg r4, 0x80008000
+checkreg r5, 0x4000c000
+
+imm32 r0, 0x20001fff;
+imm32 r1, 0x1fff2000;
+R2 = R0 +|+ R1, R3 = R0 -|- R1 (S, ASL);
+checkreg r2, 0x7ffe7ffe;
+checkreg r3, 0x0002fffe;
+
+
 	pass
+

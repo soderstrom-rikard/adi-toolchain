@@ -5,16 +5,13 @@
 
 	R0 = 0;
 	ASTAT = R0;
-	R1.L = 32767;
-	R1.H = -32768;
-	_DBG R1;
-	R0.L = 1;
-	R0.H = 1;
+	imm32 R1, 0x80007fff;
+	imm32 R0, 0x00010001;
 	R0 = R1 +|+ R0, R2 = R1 -|- R0 (S , ASL);
 	_DBG R0;
-	DBGA ( R0.H , 0x8000 );	DBGA ( R0.L , 0x7fff );
 	_DBG R2;
-	DBGA ( R2.H , 0x8000 );	DBGA ( R2.L , 0x7fff );
+	CHECKREG R0, 0x80007fff;
+	CHECKREG R2, 0x80007fff;
 
 	R0 = ASTAT;
 	_dbg r0;

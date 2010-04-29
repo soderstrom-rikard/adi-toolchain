@@ -71,6 +71,7 @@
 	CHECKREG r4, 0x8000DDDE;
 	CHECKREG r5, 0xDDDEDDDE;
 	R2 = R0 +|+ R1, R3 = R0 -|- R1 (SCO);	/* 0x         */
+CHECKREG r2, 0x7FFF8000;
 	R4 = R0 +|- R1 , R5 = R0 -|+ R1 (CO);	/* 0x         */
 	R6 = R0 + R1, R7 = R0 - R1 (S);	/* 0x         */
 	CHECKREG r2, 0x7FFF8000;

@@ -29,6 +29,8 @@
 	A1 = r0;
 	_dbg astat;
 	r0 +=1;
+	r7 = astat;
+	checkreg r7, (_AC0|_AC0_COPY|_AZ);
 	_dbg astat;
 	A1 = A1 (S);
 	r7 = astat;
@@ -48,6 +50,8 @@
 	a1 = r1;
 	a1 = a1 << 8;
 	_dbg a1;
+	r7 = astat;
+	checkreg r7, (_AC0|_AC0_COPY|_AN)
 	a1 = a1(s);
 	_dbg astat;
 	_dbg a1;
