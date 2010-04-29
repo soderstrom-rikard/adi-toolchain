@@ -139,14 +139,20 @@ _main:
 	.endm
 
 .ifndef BFIN_HOST
-	.macro loadsym reg:req, sym:req
-	\reg\().L = \sym;
-	\reg\().H = \sym;
+	.macro loadsym reg:req, sym:req, offset=0
+	\reg\().L = (\sym\() + \offset\());
+	\reg\().H = (\sym\() + \offset\());
 	.endm
 .else
-	.macro loadsym reg:req, sym:req
+	.macro loadsym reg:req, sym:req, offset=0
 	[--SP] = R0;
 	R0 = [P3 + \sym\()@GOT17M4];
+	.if \offset
+	[--SP] = R1;
+	R1 = \offset\() (Z);
+	R0 = R0 + R1;
+	R1 = [SP++];
+	.endif
 	\reg = R0;
 	R0 = [SP++];
 	.endm
@@ -159,7 +165,8 @@ _main:
 
 	.macro __init_regs reg:req, max:req, x:req, val:req
 	.ifle (\x - \max)
-	\reg\()\x = \val;
+	\reg\()\x\().L = ((\val) & 0xffff);
+	\reg\()\x\().H = (((\val) >> 16) & 0xffff);
 	.endif
 	.endm
 	.macro _init_regs reg:req, max:req, val:req
