@@ -139,6 +139,32 @@ RETE = USP;
     R1 = RETE;
 CHECKREG(r1, 2973379672);
 
+// Sanity check
+USP = R0;
+USP = R1;
+USP = R2;
+USP = R3;
+USP = R4;
+USP = R5;
+USP = R6;
+USP = R7;
+USP = P0;
+USP = P1;
+USP = P2;
+USP = P3;
+USP = P4;
+USP = P5;
+USP = SP;
+USP = FP;
+USP = A0.X;
+USP = A0.W;
+USP = A1.X;
+USP = A1.W;
+A0.X = USP;
+A0.W = USP;
+A1.X = USP;
+A1.W = USP;
+
 END:
 dbg_pass;            // End the test
 
