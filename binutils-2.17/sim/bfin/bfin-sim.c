@@ -66,6 +66,7 @@
 static __attribute__ ((noreturn)) void
 illegal_instruction (SIM_CPU *cpu)
 {
+  TRACE_INSN (cpu, "ILLEGAL INSTRUCTION");
   while (1)
     cec_exception (cpu, VEC_UNDEF_I);
 }
@@ -1154,8 +1155,7 @@ ones (bu32 val)
 static void
 reg_check_sup (SIM_CPU *cpu, int grp, int reg)
 {
-  /* XXX: EMUDAT safe to RW from user ?  */
-  if (grp == 7 && reg != 7)
+  if (grp == 7)
     cec_require_supervisor (cpu);
 }
 
@@ -1820,7 +1820,7 @@ decode_ProgCtrl_0 (SIM_CPU *cpu, bu16 iw0, bu32 pc)
     {
       bu32 addr = PREG (poprnd);
       bu8 byte;
-      if (poprnd > 7)
+      if (poprnd > 5)
 	illegal_instruction (cpu);
       TRACE_INSN (cpu, "TESTSET (P%i);", poprnd);
       byte = GET_WORD (addr);
@@ -1966,7 +1966,8 @@ decode_PushPopMultiple_0 (SIM_CPU *cpu, bu16 iw0)
   TRACE_EXTRACT (cpu, "%s: d:%i p:%i W:%i dr:%i pr:%i",
 		 __func__, d, p, W, dr, pr);
 
-  if ((d == 0 && p == 0) || (p && imm5 (pr) > 5))
+  if ((d == 0 && p == 0) || (p && imm5 (pr) > 5) ||
+      (d && !p && pr) || (p && !d && dr))
     illegal_instruction (cpu);
 
   if (W == 1)
@@ -2079,6 +2080,9 @@ decode_CCflag_0 (SIM_CPU *cpu, bu16 iw0)
       bs64 acc1 = get_extended_acc (cpu, 1);
       bs64 diff = acc0 - acc1;
 
+      if (x != 0 || y != 0)
+	illegal_instruction (cpu);
+
       if (opc == 5 && I == 0 && G == 0)
 	{
 	  TRACE_INSN (cpu, "CC = A0 == A1;");
@@ -2154,7 +2158,10 @@ decode_CCflag_0 (SIM_CPU *cpu, bu16 iw0)
 	TRACE_INSN (cpu, "CC = %c%i %s %s%s;", s, x, op,
 		    issigned ? imm3_str (y) : uimm3_str (y), sign);
       else
-	TRACE_INSN (cpu, "CC = %c%i %s %c%i%s;", s, x, op, d, y, sign);
+	{
+	  TRACE_DECODE (cpu, "%s %c%i:%x %c%i:%x", __func__, s, x, srcop,  d, y, dstop);
+	  TRACE_INSN (cpu, "CC = %c%i %s %c%i%s;", s, x, op, d, y, sign);
+	}
 
       SET_CCREG (cc);
       /* Pointer compares only touch CC.  */
@@ -2193,7 +2200,7 @@ decode_CC2dreg_0 (SIM_CPU *cpu, bu16 iw0)
       TRACE_INSN (cpu, "CC = R%i;", reg);
       SET_CCREG (DREG (reg) != 0);
     }
-  else if (op == 3)
+  else if (op == 3 && reg == 0)
     {
       TRACE_INSN (cpu, "CC = !CC;");
       SET_CCREG (!CCREG);
