@@ -337,6 +337,12 @@ get_allreg_name (int grp, int reg)
   return greg_names[(grp << 3) | reg];
 }
 
+static bool
+reg_is_reserved (int grp, int reg)
+{
+  return (grp == 4 && (reg == 4 || reg == 5)) || (grp == 5);
+}
+
 static const char *
 amod0amod2 (int s0, int x0, int aop0)
 {
@@ -1916,7 +1922,7 @@ decode_PushPopReg_0 (SIM_CPU *cpu, bu16 iw0)
   TRACE_DECODE (cpu, "%s: reg:%s", __func__, reg_name);
 
   /* Can't push/pop SP itself.  */
-  if (grp == 1 && reg == 6)
+  if ((grp == 1 && reg == 6) || reg_is_reserved (grp, reg))
     illegal_instruction (cpu);
 
   if (W == 0)
@@ -2374,8 +2380,9 @@ decode_REGMV_0 (SIM_CPU *cpu, bu16 iw0)
 
   TRACE_INSN (cpu, "%s = %s;", dstreg_name, srcreg_name);
 
-  /* Any reserved slot cannot be a src/dst, but those checks
-     are handled in the reg_read()/reg_write() funcs.  */
+  /* Reserved slots cannot be a src/dst.  */
+  if (reg_is_reserved (gs, src) || reg_is_reserved (gd, dst))
+    goto invalid_move;
 
   /* Dregs/Pregs can be src/dst to any other reg group.  */
   if (gs < 2 || gd < 2)
@@ -2395,6 +2402,7 @@ decode_REGMV_0 (SIM_CPU *cpu, bu16 iw0)
     goto valid_move;
 
   /* Still here ?  Invalid reg pair.  */
+ invalid_move:
   illegal_instruction (cpu);
 
  valid_move:
