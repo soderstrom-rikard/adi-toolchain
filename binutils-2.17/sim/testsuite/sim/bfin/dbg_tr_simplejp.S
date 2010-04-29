@@ -18,7 +18,7 @@ include(symtable.inc)
 #endif
 
 // This test embeds .text offsets, so pad our test so it lines up.
-.space 0x58
+.space 4
 
 // Boot code
 
