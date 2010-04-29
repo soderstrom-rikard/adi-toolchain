@@ -2790,7 +2790,8 @@ decode_LDSTpmod_0 (SIM_CPU *cpu, bu16 iw0)
       addr = PREG (ptr);
       val = GET_LONG (addr);
       STORE (DREG (reg), val);
-      STORE (PREG (ptr), addr + PREG (idx));
+      if (ptr != idx)
+	STORE (PREG (ptr), addr + PREG (idx));
     }
   else if (aop == 1 && W == 0)
     {
@@ -2798,7 +2799,8 @@ decode_LDSTpmod_0 (SIM_CPU *cpu, bu16 iw0)
       addr = PREG (ptr);
       val = GET_WORD (addr);
       STORE (DREG (reg), (DREG (reg) & 0xFFFF0000) | val);
-      STORE (PREG (ptr), addr + PREG (idx));
+      if (ptr != idx)
+	STORE (PREG (ptr), addr + PREG (idx));
     }
   else if (aop == 2 && W == 0)
     {
@@ -2806,7 +2808,8 @@ decode_LDSTpmod_0 (SIM_CPU *cpu, bu16 iw0)
       addr = PREG (ptr);
       val = GET_WORD (addr);
       STORE (DREG (reg), (DREG (reg) & 0xFFFF) | (val << 16));
-      STORE (PREG (ptr), addr + PREG (idx));
+      if (ptr != idx)
+	STORE (PREG (ptr), addr + PREG (idx));
     }
   else if (aop == 3 && W == 0)
     {
@@ -2814,7 +2817,8 @@ decode_LDSTpmod_0 (SIM_CPU *cpu, bu16 iw0)
       addr = PREG (ptr);
       val = GET_WORD (addr);
       STORE (DREG (reg), val);
-      STORE (PREG (ptr), addr + PREG (idx));
+      if (ptr != idx)
+	STORE (PREG (ptr), addr + PREG (idx));
     }
   else if (aop == 3 && W == 1)
     {
@@ -2822,28 +2826,32 @@ decode_LDSTpmod_0 (SIM_CPU *cpu, bu16 iw0)
       addr = PREG (ptr);
       val = GET_WORD (addr);
       STORE (DREG (reg), (bs32) (bs16) val);
-      STORE (PREG (ptr), addr + PREG (idx));
+      if (ptr != idx)
+	STORE (PREG (ptr), addr + PREG (idx));
     }
   else if (aop == 0 && W == 1)
     {
       TRACE_INSN (cpu, "[P%i ++ P%i] = R%i;", ptr, idx, reg);
       addr = PREG (ptr);
       PUT_LONG (addr, DREG (reg));
-      STORE (PREG (ptr), addr + PREG (idx));
+      if (ptr != idx)
+	STORE (PREG (ptr), addr + PREG (idx));
     }
   else if (aop == 1 && W == 1)
     {
       TRACE_INSN (cpu, "W[P%i ++ P%i] = R%i.L;", ptr, idx, reg);
       addr = PREG (ptr);
       PUT_WORD (addr, DREG (reg));
-      STORE (PREG (ptr), addr + PREG (idx));
+      if (ptr != idx)
+	STORE (PREG (ptr), addr + PREG (idx));
     }
   else if (aop == 2 && W == 1)
     {
       TRACE_INSN (cpu, "W[P%i ++ P%i] = R%i.H;", ptr, idx, reg);
       addr = PREG (ptr);
       PUT_WORD (addr, DREG (reg) >> 16);
-      STORE (PREG (ptr), addr + PREG (idx));
+      if (ptr != idx)
+	STORE (PREG (ptr), addr + PREG (idx));
     }
   else
     illegal_instruction (cpu);
