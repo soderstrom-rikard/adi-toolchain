@@ -2373,16 +2373,27 @@ decode_REGMV_0 (SIM_CPU *cpu, bu16 iw0)
 
   TRACE_INSN (cpu, "%s = %s;", dstreg_name, srcreg_name);
 
-  /* Dregs/Pregs can be src/dst to any other reg.
-     USP can be src to any other reg.  */
-  if (gs >= 2 && gd >= 2 && !(gs == 7 && src == 0))
-    {
-      /* Dagregs/Accumulators can move between each other.  */
-      if (!(((gs << 3) + src) <= ((4 << 3) + 4) &&
-	    ((gd << 3) + dst) <= ((4 << 3) + 4)))
-	illegal_instruction (cpu);
-    }
+  /* Dregs/Pregs can be src/dst to any other reg group.  */
+  if (gs < 2 || gd < 2)
+    goto valid_move;
 
+  /* Dagregs/Accumulators can move between each other.  */
+  if (((gs << 3) + src) <= ((4 << 3) + 4) &&
+      ((gd << 3) + dst) <= ((4 << 3) + 4))
+    goto valid_move;
+
+  /* USP can be src to sysregs, but not dagregs.  */
+  if ((gs == 7 && src == 0) && (gd >= 4))
+    goto valid_move;
+  /* USP can move between genregs (only check Accumulators).  */
+  if (((gs == 7 && src == 0) && (gd == 4 && dst < 4)) ||
+      ((gd == 7 && dst == 0) && (gs == 4 && src < 4)))
+    goto valid_move;
+
+  /* Still here ?  Invalid reg pair.  */
+  illegal_instruction (cpu);
+
+ valid_move:
   reg_write (cpu, gd, dst, reg_read (cpu, gs, src));
 }
 
