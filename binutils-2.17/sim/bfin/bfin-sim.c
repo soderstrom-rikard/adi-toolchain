@@ -1164,8 +1164,6 @@ reg_write (SIM_CPU *cpu, int grp, int reg, bu32 value)
 {
   bu32 *whichreg;
 
-  reg_check_sup (cpu, grp, reg);
-
   /* ASTAT is special!  */
   if (grp == 4 && reg == 6)
     {
@@ -1173,7 +1171,9 @@ reg_write (SIM_CPU *cpu, int grp, int reg, bu32 value)
       return;
     }
 
+  /* Check supervisor after get_allreg() so exception order is correct.  */
   whichreg = get_allreg (cpu, grp, reg);
+  reg_check_sup (cpu, grp, reg);
 
   if (whichreg == &CYCLES2REG)
     /* Writes to CYCLES2 goes to the shadow.  */
@@ -1201,13 +1201,14 @@ reg_read (SIM_CPU *cpu, int grp, int reg)
   bu32 *whichreg;
   bu32 value;
 
-  reg_check_sup (cpu, grp, reg);
-
   /* ASTAT is special!  */
   if (grp == 4 && reg == 6)
     return ASTAT;
 
+  /* Check supervisor after get_allreg() so exception order is correct.  */
   whichreg = get_allreg (cpu, grp, reg);
+  reg_check_sup (cpu, grp, reg);
+
   value = *whichreg;
 
   if (whichreg == &CYCLESREG)
@@ -2372,6 +2373,9 @@ decode_REGMV_0 (SIM_CPU *cpu, bu16 iw0)
   TRACE_DECODE (cpu, "%s: dst:%s src:%s", __func__, dstreg_name, srcreg_name);
 
   TRACE_INSN (cpu, "%s = %s;", dstreg_name, srcreg_name);
+
+  /* Any reserved slot cannot be a src/dst, but those checks
+     are handled in the reg_read()/reg_write() funcs.  */
 
   /* Dregs/Pregs can be src/dst to any other reg group.  */
   if (gs < 2 || gd < 2)
