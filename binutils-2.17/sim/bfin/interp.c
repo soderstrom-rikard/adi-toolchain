@@ -500,7 +500,7 @@ sim_open (SIM_OPEN_KIND kind, host_callback *callback,
 void
 sim_close (SIM_DESC sd, int quitting)
 {
-  /* Nothing to do.  */
+  sim_module_uninstall (sd);
 }
 
 static const char stat_map[] =
