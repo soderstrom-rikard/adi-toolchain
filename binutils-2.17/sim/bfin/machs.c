@@ -410,9 +410,9 @@ bfin_model_hw_tree_init (SIM_DESC sd, SIM_CPU *cpu)
   dv_bfin_hw_parse (sd, pll, PLL);
 
   dv_bfin_hw_parse (sd, sic, SIC);
+  sim_hw_parse (sd, "/core/bfin_sic/model %s", MODEL_NAME (model));
   for (i = 7; i < 16; ++i)
     sim_hw_parse (sd, "/core/bfin_sic > ivg%i ivg%i /core/bfin_cec", i, i);
-  sim_hw_parse (sd, "/core/bfin_sic/model %s", MODEL_NAME (model));
 
   dv_bfin_hw_parse (sd, wdog, WDOG);
   sim_hw_parse (sd, "/core/bfin_wdog > reset rst      /core/bfin_cec");
@@ -436,12 +436,20 @@ bfin_model_hw_tree_init (SIM_DESC sd, SIM_CPU *cpu)
 
   /* XXX: Should be pushed to per-model structs.  */
   for (i = 0; i < 16; ++i)
-    sim_hw_parse (sd, "/core/bfin_dma@%i/reg %#x %i", i,
-		  0xFFC00C00 + i * BFIN_MMR_DMA_SIZE, BFIN_MMR_DMA_SIZE);
-  sim_hw_parse (sd, "/core/bfin_dma@12/peer /core/bfin_dma@13"); /* MDMA0 D->S */
-  sim_hw_parse (sd, "/core/bfin_dma@13/peer /core/bfin_dma@12"); /* MDMA0 S->D */
-  sim_hw_parse (sd, "/core/bfin_dma@14/peer /core/bfin_dma@15"); /* MDMA1 D->S */
-  sim_hw_parse (sd, "/core/bfin_dma@15/peer /core/bfin_dma@14"); /* MDMA1 S->D */
+    {
+      sim_hw_parse (sd, "/core/bfin_dma@%i/reg %#x %i", i,
+		    0xFFC00C00 + i * BFIN_MMR_DMA_SIZE, BFIN_MMR_DMA_SIZE);
+      if (i < 12)
+	sim_hw_parse (sd, "/core/bfin_dma@%i > di dma%i /core/bfin_sic", i, i);
+    }
+  sim_hw_parse (sd, "/core/bfin_dma@12/peer dma@13"); /* MDMA0 D->S */
+  sim_hw_parse (sd, "/core/bfin_dma@12 > di mdma0 /core/bfin_sic");
+  sim_hw_parse (sd, "/core/bfin_dma@13/peer dma@12"); /* MDMA0 S->D */
+  sim_hw_parse (sd, "/core/bfin_dma@13 > di mdma0 /core/bfin_sic");
+  sim_hw_parse (sd, "/core/bfin_dma@14/peer dma@15"); /* MDMA1 D->S */
+  sim_hw_parse (sd, "/core/bfin_dma@14 > di mdma1 /core/bfin_sic");
+  sim_hw_parse (sd, "/core/bfin_dma@15/peer dma@14"); /* MDMA1 S->D */
+  sim_hw_parse (sd, "/core/bfin_dma@15 > di mdma1 /core/bfin_sic");
 
  done:
   /* Trigger all the new devices' finish func.  */
