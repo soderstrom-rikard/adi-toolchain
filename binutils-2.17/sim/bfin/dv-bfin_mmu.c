@@ -19,11 +19,11 @@
    along with this program.  If not, see <http://www.gnu.org/licenses/>.  */
 
 #include "sim-main.h"
+#include "sim-options.h"
 #include "devices.h"
 #include "dv-bfin_mmu.h"
 #include "dv-bfin_cec.h"
 
-/* XXX: This is a stub implementation for the most part.  */
 /* XXX: Should this really be two blocks of registers ?  */
 
 struct bfin_mmu
@@ -85,6 +85,8 @@ static const char * const mmr_names[BFIN_COREMMR_MMU_SIZE / 4] = {
   [mmr_idx (itest_data[0])] = "ITEST_DATA0", "ITEST_DATA1",
 };
 #define mmr_name(off) (mmr_names[(off) / 4] ? : "<INV>")
+
+static bool bfin_mmu_skip_cplbs = false; 
 
 static unsigned
 bfin_mmu_io_write_buffer (struct hw *me, const void *source,
@@ -231,7 +233,40 @@ const struct hw_descriptor dv_bfin_mmu_descriptor[] = {
   {"bfin_mmu", bfin_mmu_finish,},
   {NULL, NULL},
 };
+
+/* Device option parsing.  */
 
+static DECLARE_OPTION_HANDLER (bfin_mmu_option_handler);
+
+enum {
+  OPTION_MMU_SKIP_TABLES = OPTION_START,
+};
+
+const OPTION bfin_mmu_options[] =
+{
+  { {"mmu-skip-cplbs", no_argument, NULL, OPTION_MMU_SKIP_TABLES },
+      '\0', NULL, "Skip parsing of CPLB tables (big speed increase)",
+      bfin_mmu_option_handler, NULL },
+
+  { {NULL, no_argument, NULL, 0}, '\0', NULL, NULL, NULL, NULL }
+};
+
+static SIM_RC
+bfin_mmu_option_handler (SIM_DESC sd, sim_cpu *current_cpu, int opt,
+			 char *arg, int is_command)
+{
+  switch (opt)
+    {
+    case OPTION_MMU_SKIP_TABLES:
+      bfin_mmu_skip_cplbs = true;
+      return SIM_RC_OK;
+
+    default:
+      sim_io_eprintf (sd, "Unknown Blackfin MMU option %d\n", opt);
+      return SIM_RC_FAIL;
+    }
+}
+
 #define MMU_STATE(cpu) ((struct bfin_mmu *) dv_get_state (cpu, "/core/bfin_mmu"))
 
 void
@@ -316,7 +351,7 @@ mmu_check_addr (SIM_CPU *cpu, bu32 addr, bool write, bool inst, int size)
   if (addr & (size - 1))
     _mmu_process_fault (cpu, mmu, addr, write, inst, true, false);
 
-  if (mmu == NULL)
+  if (mmu == NULL || bfin_mmu_skip_cplbs)
     return;
 
   fault_status = inst ? &mmu->icplb_fault_status : &mmu->dcplb_fault_status;

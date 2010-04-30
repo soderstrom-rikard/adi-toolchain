@@ -446,6 +446,14 @@ sim_open (SIM_OPEN_KIND kind, host_callback *callback,
   if (STATE_ENVIRONMENT (sd) == ALL_ENVIRONMENT)
     STATE_ENVIRONMENT (sd) = VIRTUAL_ENVIRONMENT;
 
+  /* These options override any module options.
+     Obviously ambiguity should be avoided, however the caller may wish to
+     augment the meaning of an option.  */
+  {
+    extern const OPTION bfin_mmu_options[];
+    sim_add_option_table (sd, NULL, bfin_mmu_options);
+  }
+
   /* getopt will print the error message so we just have to exit if this fails.
      FIXME: Hmmm...  in the case of gdb we need getopt to call
      print_filtered.  */
