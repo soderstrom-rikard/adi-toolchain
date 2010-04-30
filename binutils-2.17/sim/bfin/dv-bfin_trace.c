@@ -202,7 +202,7 @@ const struct hw_descriptor dv_bfin_trace_descriptor[] = {
   {NULL, NULL},
 };
 
-#define TRACE_STATE(cpu) ((struct bfin_trace *) dv_get_state (cpu, "/core/bfin_trace"))
+#define TRACE_STATE(cpu) DV_STATE_CACHED (cpu, trace)
 
 /* This is not re-entrant, but neither is the cpu state, so this shouldn't
    be a big deal ...  */

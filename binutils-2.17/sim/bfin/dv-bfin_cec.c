@@ -240,7 +240,7 @@ static const char * const excp_decoded[] = {
   [VEC_ILL_RES    ] = "Illegal supervisor resource",
 };
 
-#define CEC_STATE(cpu) ((struct bfin_cec *) dv_get_state (cpu, "/core/bfin_cec"))
+#define CEC_STATE(cpu) DV_STATE_CACHED (cpu, cec)
 
 #define __cec_get_ivg(val) (ffs ((val) & ~IVG_IRPTEN_B) - 1)
 #define _cec_get_ivg(cec) __cec_get_ivg ((cec)->ipend & ~IVG_EMU_B)

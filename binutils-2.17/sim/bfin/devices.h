@@ -26,7 +26,7 @@
 #include "hw-tree.h"
 
 #define BFIN_MMR_16(mmr) mmr, __pad_##mmr
-
+
 static inline bu16 dv_load_2 (const void *ptr)
 {
   const unsigned char *c = ptr;
@@ -53,7 +53,7 @@ static inline void dv_store_4 (void *ptr, bu32 val)
   c[2] = val >> 16;
   dv_store_2 (ptr, val);
 }
-
+
 /* Helpers for MMRs where all bits are W1C except for the specified
    bits -- those ones are RO.  */
 #define dv_w1c(ptr, val, bits) (*(ptr) &= ~((val) & (bits)))
@@ -78,7 +78,9 @@ static inline void dv_w1c_4_partial (bu32 *ptr, bu32 val, bu32 bits)
 {
   dv_w1c_partial (ptr, val, bits);
 }
-
+
+/* XXX: Grubbing around in device internals is probably wrong, but
+        until someone shows me what's right ...  */
 static inline struct hw *
 dv_get_device (SIM_CPU *cpu, const char *device_name)
 {
@@ -93,13 +95,23 @@ dv_get_state (SIM_CPU *cpu, const char *device_name)
   return hw_data (dv_get_device (cpu, device_name));
 }
 
+#define DV_STATE(cpu, dv) dv_get_state (cpu, "/core/bfin_"#dv)
+
+#define DV_STATE_CACHED(cpu, dv) \
+  ({ \
+    struct bfin_##dv *__##dv = BFIN_CPU_STATE.dv##_cache; \
+    if (!__##dv) \
+      BFIN_CPU_STATE.dv##_cache = __##dv = dv_get_state (cpu, "/core/bfin_"#dv); \
+    __##dv; \
+  })
+
 void dv_bfin_mmr_invalid (struct hw *, address_word, unsigned nr_bytes, bool write);
 void dv_bfin_mmr_require (struct hw *, address_word, unsigned nr_bytes, unsigned size, bool write);
 bool dv_bfin_mmr_check (struct hw *, address_word, unsigned nr_bytes, bool write);
 
 #define dv_bfin_mmr_require_16(hw, addr, nr_bytes, write) dv_bfin_mmr_require (hw, addr, nr_bytes, 2, write)
 #define dv_bfin_mmr_require_32(hw, addr, nr_bytes, write) dv_bfin_mmr_require (hw, addr, nr_bytes, 4, write)
-
+
 #define HW_TRACE_WRITE() \
   HW_TRACE ((me, "write 0x%08lx (%s) length %d with 0x%x", (long) addr, \
 	     mmr_name (mmr_off), (int) nr_bytes, value))

@@ -86,7 +86,7 @@ static const char * const mmr_names[BFIN_COREMMR_MMU_SIZE / 4] = {
 };
 #define mmr_name(off) (mmr_names[(off) / 4] ? : "<INV>")
 
-static bool bfin_mmu_skip_cplbs = false; 
+static bool bfin_mmu_skip_cplbs = false;
 
 static unsigned
 bfin_mmu_io_write_buffer (struct hw *me, const void *source,
@@ -267,7 +267,7 @@ bfin_mmu_option_handler (SIM_DESC sd, sim_cpu *current_cpu, int opt,
     }
 }
 
-#define MMU_STATE(cpu) ((struct bfin_mmu *) dv_get_state (cpu, "/core/bfin_mmu"))
+#define MMU_STATE(cpu) DV_STATE_CACHED (cpu, mmu)
 
 void
 mmu_log_ifault (SIM_CPU *cpu)

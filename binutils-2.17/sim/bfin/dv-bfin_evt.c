@@ -123,7 +123,7 @@ const struct hw_descriptor dv_bfin_evt_descriptor[] = {
   {NULL, NULL},
 };
 
-#define EVT_STATE(cpu) ((struct bfin_evt *) dv_get_state (cpu, "/core/bfin_evt"))
+#define EVT_STATE(cpu) DV_STATE_CACHED (cpu, evt)
 
 void
 cec_set_evt (SIM_CPU *cpu, int ivg, bu32 handler_addr)

@@ -88,6 +88,14 @@ struct bfin_cpu_state
   /* See notes above for struct store.  */
   struct store stores[20];
   int n_stores;
+
+#if (WITH_HW)
+  /* Cache heavily used CPU-specific device pointers.  */
+  void *cec_cache;
+  void *evt_cache;
+  void *mmu_cache;
+  void *trace_cache;
+#endif
 };
 
 #define REG_H_L(h, l)	(((h) & 0xffff0000) | ((l) & 0x0000ffff))
