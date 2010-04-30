@@ -60,4 +60,7 @@
 #define DFETCH		0x0004	/* DMA Descriptor Fetch Indicator */
 #define DMA_RUN		0x0008	/* DMA Channel Running Indicator */
 
+/* DMA_PERIPHERAL_MAP Masks */
+#define CTYPE		(1 << 6)
+
 #endif

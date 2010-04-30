@@ -28,6 +28,7 @@ struct bfin_dma
   bu32 base;
   unsigned ele_size;
   const char *peer;
+  struct hw *hw_peer;
 
   /* Order after here is important -- matches hardware MMR layout.  */
   bu32 next_desc_ptr, start_addr;
@@ -61,13 +62,27 @@ bfin_dma_enabled (struct bfin_dma *dma)
   return (dma->config & DMAEN);
 }
 
+static const char *bfin_dma_537_pmap[16] = {
+  "ppi", "emac", "emac", "sport@0", "sport@0", "sport@1",
+  "sport@1", "spi", "uart@0", "uart@0", "uart@1", "uart@1",
+};
+
 static struct hw *
 bfin_dma_get_peer (struct hw *me, struct bfin_dma *dma)
 {
+  char peer[30];
+
+  if (dma->hw_peer)
+    return dma->hw_peer;
+
   /* Delay the stub check until when people try to use it.  */
   if (dma->peer == NULL)
-    hw_abort (me, "Stub DMA -- missing \"peer\" property");
-  return hw_tree_find_device (me, dma->peer);
+    dma->peer = bfin_dma_537_pmap[dma->peripheral_map >> 12];
+  if (dma->peer == NULL)
+    hw_abort (me, "Invalid DMA peripheral_map %#x", dma->peripheral_map);
+
+  sprintf (peer, "/core/bfin_%s", dma->peer);
+  return dma->hw_peer = hw_tree_find_device (me, peer);
 }
 
 static void
@@ -75,7 +90,7 @@ bfin_dma_process_desc (struct hw *me, struct bfin_dma *dma)
 {
   switch (dma->config & NDSIZE)
     {
-    case 0:
+    case NDSIZE_0:
       break;
     default:
       hw_abort (me, "DMA config (NDSIZE) %#x not supported", dma->config);
@@ -83,14 +98,15 @@ bfin_dma_process_desc (struct hw *me, struct bfin_dma *dma)
 
   switch (dma->config & DMAFLOW)
     {
-    case 0:
+    case DMAFLOW_STOP:
+      break;
+    case DMAFLOW_AUTO:
+      if ((dma->config & NDSIZE) != NDSIZE_0)
+	hw_abort (me, "DMA config error: DMAFLOW_AUTO requires NDSIZE_0");
       break;
     default:
       hw_abort (me, "DMA config (DMAFLOW) %#x not supported", dma->config);
     }
-
-  if (dma->config & DMA2D)
-    hw_abort (me, "DMA config (2D) %#x not supported", dma->config);
 
   switch (dma->config & WDSIZE)
     {
@@ -105,11 +121,47 @@ bfin_dma_process_desc (struct hw *me, struct bfin_dma *dma)
       break;
     }
 
+  /* Address has to be mutiple of transfer size.  */
+  if (dma->start_addr & (dma->ele_size - 1))
+    dma->irq_status |= DMA_ERR;
+
   if (dma->ele_size != (unsigned)dma->x_modify)
     hw_abort (me, "DMA config (striding) %#x not supported", dma->config);
 
   dma->curr_addr = dma->start_addr;
   dma->curr_x_count = dma->x_count;
+  dma->curr_y_count = dma->y_count;
+}
+
+static int
+bfin_dma_finish_x (struct hw *me, struct bfin_dma *dma)
+{
+  /* XXX: This would be the time to process the next descriptor.  */
+  /* XXX: Should this toggle Enable in dma->config ?  */
+
+  if (dma->config & DI_EN)
+    hw_port_event (me, 0, 1);
+
+  if ((dma->config & DMA2D) && dma->curr_y_count > 1)
+    {
+      dma->curr_y_count -= 1;
+      dma->curr_x_count = dma->x_count;
+
+      /* With 2D, last X transfer does not modify curr_addr.  */
+      dma->curr_addr = dma->curr_addr - dma->x_modify + dma->y_modify;
+
+      return 1;
+    }
+
+  switch (dma->config & DMAFLOW)
+    {
+    case DMAFLOW_AUTO:
+      bfin_dma_process_desc (me, dma);
+      return 1;
+    default:
+      dma->irq_status = (dma->irq_status & ~DMA_RUN) | DMA_DONE;
+      return 0;
+    }
 }
 
 /* Chew through the DMA over and over.  */
@@ -122,24 +174,30 @@ bfin_dma_hw_event_callback (struct hw *me, void *data)
   unsigned ret, nr_bytes, ele_count;
 
   peer = bfin_dma_get_peer (me, dma);
+  ret = 0;
   nr_bytes = MIN (sizeof (buf), dma->curr_x_count * dma->ele_size);
 
   /* Pumping a chunk!  */
   if (dma->config & WNR)
     {
       ret = hw_dma_read_buffer(peer, buf, 0, 0, nr_bytes);
-      /* XXX: How to handle partial DMA transfers ?  */
       /* Has the DMA stalled ?  abort for now.  */
-      if (ret != nr_bytes)
+      if (ret == 0)
+	goto reschedule;
+      /* XXX: How to handle partial DMA transfers ?  */
+      if (ret % dma->ele_size)
 	goto error;
-      ret = sim_write (hw_system (me), dma->curr_addr, buf, nr_bytes);
+      ret = sim_write (hw_system (me), dma->curr_addr, buf, ret);
     }
   else
     {
       ret = sim_read (hw_system (me), dma->curr_addr, buf, nr_bytes);
-      if (ret != nr_bytes)
+      if (ret == 0)
+	goto reschedule;
+      /* XXX: How to handle partial DMA transfers ?  */
+      if (ret % dma->ele_size)
 	goto error;
-      ret = hw_dma_write_buffer(peer, buf, 0, 0, nr_bytes, 0);
+      ret = hw_dma_write_buffer(peer, buf, 0, 0, ret, 0);
     }
 
   /* Ignore partial writes.  */
@@ -147,20 +205,16 @@ bfin_dma_hw_event_callback (struct hw *me, void *data)
   dma->curr_addr += ele_count * dma->x_modify;
   dma->curr_x_count -= ele_count;
 
-  if (!dma->curr_x_count)
-    {
-      /* XXX: This would be the time to process the next descriptor.  */
-      /* XXX: Should this toggle Enable in dma->config ?  */
-      dma->irq_status = (dma->irq_status & ~DMA_RUN) | DMA_DONE;
-    }
-  else
+  if (dma->curr_x_count || bfin_dma_finish_x (me, dma))
     /* Still got work to do, so schedule again.  */
-    hw_event_queue_schedule (me, 1, bfin_dma_hw_event_callback, dma);
+ reschedule:
+    hw_event_queue_schedule (me, ret ? 1 : 1000, bfin_dma_hw_event_callback, dma);
 
   return;
 
  error:
   /* Don't reschedule on errors ...  */
+sim_io_eprintf (hw_system (me), "%s: erroring %#x %#x\n", hw_path(me), nr_bytes, ret);
   dma->irq_status |= DMA_ERR;
 }
 
@@ -209,9 +263,20 @@ bfin_dma_io_write_buffer (struct hw *me, const void *source,
     case mmr_offset(x_modify):
     case mmr_offset(y_count):
     case mmr_offset(y_modify):
-    case mmr_offset(peripheral_map):
       if (!bfin_dma_enabled (dma))
 	*value16p = value;
+      break;
+    case mmr_offset(peripheral_map):
+      if (!bfin_dma_enabled (dma))
+	{
+	  *value16p = (*value16p & CTYPE) | (value & ~CTYPE);
+	  /* Clear peripheral peer so it gets looked up again.  */
+	  if (*value16p & CTYPE)
+	    {
+	      dma->peer = NULL;
+	      dma->hw_peer = NULL;
+	    }
+	}
       break;
     case mmr_offset(config):
       if (!bfin_dma_enabled (dma) || !(value & DMAEN))
@@ -295,9 +360,8 @@ bfin_dma_hw_dma_read_buffer_method (struct hw *bus, void *dest, int space,
   dma->curr_addr += ele_count * dma->x_modify;
   dma->curr_x_count -= ele_count;
 
-  /* XXX: Should this toggle Enable in dma->config ?  */
   if (dma->curr_x_count == 0)
-    dma->irq_status = (dma->irq_status & ~DMA_RUN) | DMA_DONE;
+    bfin_dma_finish_x (bus, dma);
 
   return ret;
 }
@@ -326,12 +390,15 @@ bfin_dma_hw_dma_write_buffer_method (struct hw *bus, const void *source,
   dma->curr_addr += ele_count * dma->x_modify;
   dma->curr_x_count -= ele_count;
 
-  /* XXX: Should this toggle Enable in dma->config ?  */
   if (dma->curr_x_count == 0)
-    dma->irq_status = (dma->irq_status & ~DMA_RUN) | DMA_DONE;
+    bfin_dma_finish_x (bus, dma);
 
   return ret;
 }
+
+static const struct hw_port_descriptor bfin_dma_ports[] = {
+  { "di", 0, 0, output_port, } /* DMA Interrupt */
+};
 
 static void
 attach_bfin_dma_regs (struct hw *me, struct bfin_dma *dma)
@@ -377,6 +444,7 @@ static void
 bfin_dma_finish (struct hw *me)
 {
   struct bfin_dma *dma;
+  const hw_unit *unit;
 
   dma = HW_ZALLOC (me, struct bfin_dma);
 
@@ -385,6 +453,7 @@ bfin_dma_finish (struct hw *me)
   set_hw_io_write_buffer (me, bfin_dma_io_write_buffer);
   set_hw_dma_read_buffer (me, bfin_dma_hw_dma_read_buffer_method);
   set_hw_dma_write_buffer (me, bfin_dma_hw_dma_write_buffer_method);
+  set_hw_ports (me, bfin_dma_ports);
 
   /* XXX: A better model might be:
       .../bfin_mdma/
@@ -392,6 +461,15 @@ bfin_dma_finish (struct hw *me)
                     dst_channel/
      But got to figure out how first ...  */
   attach_bfin_dma_regs (me, dma);
+
+  /* Initialize the DMA Controller.  */
+  unit = hw_unit_address (me);
+  if (dma->peer)
+    /* MDMA */
+    dma->peripheral_map = CTYPE;
+  else
+    /* DMA */
+    dma->peripheral_map = (unit->cells[unit->nr_cells - 1]) << 12;
 }
 
 const struct hw_descriptor dv_bfin_dma_descriptor[] = {
