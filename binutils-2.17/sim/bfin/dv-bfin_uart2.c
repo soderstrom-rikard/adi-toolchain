@@ -81,7 +81,7 @@ bfin_uart_io_write_buffer (struct hw *me, const void *source,
   switch (mmr_off)
     {
     case mmr_offset(thr):
-      uart->thr = bfin_uart_send_byte (me, value);
+      uart->thr = bfin_uart_write_byte (me, value);
       break;
     case mmr_offset(ier_set):
       uart->ier |= value;
@@ -132,7 +132,7 @@ bfin_uart_io_read_buffer (struct hw *me, void *dest,
   switch (mmr_off)
     {
     case mmr_offset(rbr):
-      uart->rbr = bfin_uart_get_next_byte (me, uart, uart->rbr, NULL);
+      uart->rbr = bfin_uart_get_next_byte (me, uart->rbr, NULL);
       dv_store_2 (dest, uart->rbr);
       break;
     case mmr_offset(ier_set):
@@ -140,7 +140,7 @@ bfin_uart_io_read_buffer (struct hw *me, void *dest,
       dv_store_2 (dest, uart->ier);
       break;
     case mmr_offset(lsr):
-      uart->lsr |= bfin_uart_get_status (me, uart, uart->lsr);
+      uart->lsr |= bfin_uart_get_status (me, uart->lsr);
     case mmr_offset(thr):
     case mmr_offset(msr):
     case mmr_offset(dll):
@@ -157,6 +157,22 @@ bfin_uart_io_read_buffer (struct hw *me, void *dest,
     }
 
   return nr_bytes;
+}
+
+static unsigned
+bfin_uart_hw_dma_read_buffer_method (struct hw *bus, void *dest, int space,
+				     unsigned_word addr, unsigned nr_bytes)
+{
+  return bfin_uart_read_buffer (bus, dest, nr_bytes);
+}
+
+static unsigned
+bfin_uart_hw_dma_write_buffer_method (struct hw *bus, const void *source,
+				      int space, unsigned_word addr,
+				      unsigned nr_bytes,
+				      int violate_read_only_section)
+{
+  return bfin_uart_write_buffer (bus, source, nr_bytes);
 }
 
 static void
@@ -197,6 +213,8 @@ bfin_uart_finish (struct hw *me)
   set_hw_data (me, uart);
   set_hw_io_read_buffer (me, bfin_uart_io_read_buffer);
   set_hw_io_write_buffer (me, bfin_uart_io_write_buffer);
+  set_hw_dma_read_buffer (me, bfin_uart_hw_dma_read_buffer_method);
+  set_hw_dma_write_buffer (me, bfin_uart_hw_dma_write_buffer_method);
 
   attach_bfin_uart_regs (me, uart);
 
