@@ -42,4 +42,11 @@ void bfin_model_cpu_init (SIM_DESC, SIM_CPU *);
 bu32 bfin_model_get_chipid (SIM_DESC);
 bu32 bfin_model_get_dspid (SIM_DESC);
 
+enum {
+#define I(insn) BFIN_INSN_##insn,
+#include "_insn_list.h"
+#undef I
+  BFIN_INSN_MAX
+};
+
 #endif

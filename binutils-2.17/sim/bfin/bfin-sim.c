@@ -1665,6 +1665,7 @@ decode_ProgCtrl_0 (SIM_CPU *cpu, bu16 iw0, bu32 pc)
   int poprnd = ((iw0 >> 0) & 0xf);
   int prgfunc = ((iw0 >> 4) & 0xf);
 
+  PROFILE_COUNT_INSN (cpu, pc, BFIN_INSN_ProgCtrl);
   TRACE_EXTRACT (cpu, "%s: poprnd:%i prgfunc:%i", __func__, poprnd, prgfunc);
 
   if (prgfunc == 0 && poprnd == 0)
@@ -1852,9 +1853,10 @@ decode_CaCTRL_0 (SIM_CPU *cpu, bu16 iw0)
   int op = ((iw0 >> 3) & 0x3);
   bu32 preg = PREG (reg);
 
+  PROFILE_COUNT_INSN (cpu, pc, BFIN_INSN_CaCTRL);
   TRACE_EXTRACT (cpu, "%s: a:%i op:%i reg:%i", __func__, a, op, reg);
 
-if (INSN_LEN == 8)
+  if (INSN_LEN == 8)
     /* None of these can be part of a parallel instruction */
     illegal_instruction_combination (cpu);
 
@@ -1918,6 +1920,7 @@ decode_PushPopReg_0 (SIM_CPU *cpu, bu16 iw0)
   bu32 value;
   bu32 sp = SPREG;
 
+  PROFILE_COUNT_INSN (cpu, pc, BFIN_INSN_PushPopReg);
   TRACE_EXTRACT (cpu, "%s: W:%i grp:%i reg:%i", __func__, W, grp, reg);
   TRACE_DECODE (cpu, "%s: reg:%s", __func__, reg_name);
 
@@ -1970,6 +1973,7 @@ decode_PushPopMultiple_0 (SIM_CPU *cpu, bu16 iw0)
   int i;
   bu32 sp = SPREG;
 
+  PROFILE_COUNT_INSN (cpu, pc, BFIN_INSN_PushPopMultiple);
   TRACE_EXTRACT (cpu, "%s: d:%i p:%i W:%i dr:%i pr:%i",
 		 __func__, d, p, W, dr, pr);
 
@@ -2046,6 +2050,7 @@ decode_ccMV_0 (SIM_CPU *cpu, bu16 iw0)
   int T = ((iw0 >> 8) & 0x1);
   int cond = T ? CCREG : ! CCREG;
 
+  PROFILE_COUNT_INSN (cpu, pc, BFIN_INSN_ccMV);
   TRACE_EXTRACT (cpu, "%s: T:%i d:%i s:%i dst:%i src:%i",
 		 __func__, T, d, s, dst, src);
 
@@ -2074,6 +2079,7 @@ decode_CCflag_0 (SIM_CPU *cpu, bu16 iw0)
   int opc = ((iw0 >> 7) & 0x7);
   int G = ((iw0 >> 6) & 0x1);
 
+  PROFILE_COUNT_INSN (cpu, pc, BFIN_INSN_CCflag);
   TRACE_EXTRACT (cpu, "%s: I:%i opc:%i G:%i y:%i x:%i",
 		 __func__, I, opc, G, y, x);
 
@@ -2191,6 +2197,7 @@ decode_CC2dreg_0 (SIM_CPU *cpu, bu16 iw0)
   int reg = ((iw0 >> 0) & 0x7);
   int op = ((iw0 >> 3) & 0x3);
 
+  PROFILE_COUNT_INSN (cpu, pc, BFIN_INSN_CC2dreg);
   TRACE_EXTRACT (cpu, "%s: op:%i reg:%i", __func__, op, reg);
 
   if (INSN_LEN == 8)
@@ -2255,6 +2262,7 @@ decode_CC2stat_0 (SIM_CPU *cpu, bu16 iw0)
       astat_name = astat_bit;
     }
 
+  PROFILE_COUNT_INSN (cpu, pc, BFIN_INSN_CC2stat);
   TRACE_EXTRACT (cpu, "%s: D:%i op:%i cbit:%i", __func__, D, op, cbit);
 
   if (INSN_LEN == 8)
@@ -2307,6 +2315,7 @@ decode_BRCC_0 (SIM_CPU *cpu, bu16 iw0, bu32 pc)
   int cond = T ? CCREG : ! CCREG;
   int pcrel = pcrel10 (offset);
 
+  PROFILE_COUNT_INSN (cpu, pc, BFIN_INSN_BRCC);
   TRACE_EXTRACT (cpu, "%s: T:%i B:%i offset:%#x", __func__, T, B, offset);
   TRACE_DECODE (cpu, "%s: pcrel10:%#x", __func__, pcrel);
 
@@ -2344,6 +2353,7 @@ decode_UJUMP_0 (SIM_CPU *cpu, bu16 iw0, bu32 pc)
   int pcrel = pcrel12 (offset);
   bu32 newpc = pc + pcrel;
 
+  PROFILE_COUNT_INSN (cpu, pc, BFIN_INSN_UJUMP);
   TRACE_EXTRACT (cpu, "%s: offset:%#x", __func__, offset);
   TRACE_DECODE (cpu, "%s: pcrel12:%#x", __func__, pcrel);
 
@@ -2374,6 +2384,7 @@ decode_REGMV_0 (SIM_CPU *cpu, bu16 iw0)
   const char *srcreg_name = get_allreg_name (gs, src);
   const char *dstreg_name = get_allreg_name (gd, dst);
 
+  PROFILE_COUNT_INSN (cpu, pc, BFIN_INSN_REGMV);
   TRACE_EXTRACT (cpu, "%s: gd:%i gs:%i dst:%i src:%i",
 		 __func__, gd, gs, dst, src);
   TRACE_DECODE (cpu, "%s: dst:%s src:%s", __func__, dstreg_name, srcreg_name);
@@ -2420,6 +2431,7 @@ decode_ALU2op_0 (SIM_CPU *cpu, bu16 iw0)
   int opc = ((iw0 >> 6) & 0xf);
   int dst = ((iw0 >> 0) & 0x7);
 
+  PROFILE_COUNT_INSN (cpu, pc, BFIN_INSN_ALU2op);
   TRACE_EXTRACT (cpu, "%s: opc:%i src:%i dst:%i", __func__, opc, src, dst);
 
   if (opc == 0)
@@ -2525,6 +2537,7 @@ decode_PTR2op_0 (SIM_CPU *cpu, bu16 iw0)
   int opc = ((iw0 >> 6) & 0x7);
   int dst = ((iw0 >> 0) & 0x7);
 
+  PROFILE_COUNT_INSN (cpu, pc, BFIN_INSN_PTR2op);
   TRACE_EXTRACT (cpu, "%s: opc:%i src:%i dst:%i", __func__, opc, src, dst);
 
   if (opc == 0)
@@ -2579,6 +2592,7 @@ decode_LOGI2op_0 (SIM_CPU *cpu, bu16 iw0)
   int uimm = uimm5 (src);
   const char *uimm_str = uimm5_str (uimm);
 
+  PROFILE_COUNT_INSN (cpu, pc, BFIN_INSN_LOGI2op);
   TRACE_EXTRACT (cpu, "%s: opc:%i src:%i dst:%i", __func__, opc, src, dst);
   TRACE_DECODE (cpu, "%s: uimm5:%#x", __func__, uimm);
 
@@ -2647,6 +2661,7 @@ decode_COMP3op_0 (SIM_CPU *cpu, bu16 iw0)
   int opc = ((iw0 >> 9) & 0x7);
   int dst = ((iw0 >> 6) & 0x7);
 
+  PROFILE_COUNT_INSN (cpu, pc, BFIN_INSN_COMP3op);
   TRACE_EXTRACT (cpu, "%s: opc:%i dst:%i src1:%i src0:%i",
 		 __func__, opc, dst, src1, src0);
 
@@ -2710,6 +2725,7 @@ decode_COMPI2opD_0 (SIM_CPU *cpu, bu16 iw0)
   int op = ((iw0 >> 10) & 0x1);
   int imm = imm7 (isrc);
 
+  PROFILE_COUNT_INSN (cpu, pc, BFIN_INSN_COMPI2opD);
   TRACE_EXTRACT (cpu, "%s: op:%i isrc:%i dst:%i", __func__, op, isrc, dst);
   TRACE_DECODE (cpu, "%s: imm7:%#x", __func__, imm);
 
@@ -2737,6 +2753,7 @@ decode_COMPI2opP_0 (SIM_CPU *cpu, bu16 iw0)
   int op = ((iw0 >> 10) & 0x1);
   int imm = imm7 (src);
 
+  PROFILE_COUNT_INSN (cpu, pc, BFIN_INSN_COMPI2opP);
   TRACE_EXTRACT (cpu, "%s: op:%i src:%i dst:%i", __func__, op, src, dst);
   TRACE_DECODE (cpu, "%s: imm:%#x", __func__, imm);
 
@@ -2766,6 +2783,7 @@ decode_LDSTpmod_0 (SIM_CPU *cpu, bu16 iw0)
   int W = ((iw0 >> 11) & 0x1);
   bu32 addr, val;
 
+  PROFILE_COUNT_INSN (cpu, pc, BFIN_INSN_LDSTpmod);
   TRACE_EXTRACT (cpu, "%s: W:%i aop:%i reg:%i idx:%i ptr:%i",
 		 __func__, W, aop, reg, idx, ptr);
 
@@ -2881,6 +2899,7 @@ decode_dagMODim_0 (SIM_CPU *cpu, bu16 iw0)
   int m = ((iw0 >> 2) & 0x3);
   int op = ((iw0 >> 4) & 0x1);
 
+  PROFILE_COUNT_INSN (cpu, pc, BFIN_INSN_dagMODim);
   TRACE_EXTRACT (cpu, "%s: br:%i op:%i m:%i i:%i", __func__, br, op, m, i);
 
   if (op == 0 && br == 1)
@@ -2912,6 +2931,7 @@ decode_dagMODik_0 (SIM_CPU *cpu, bu16 iw0)
   int i = ((iw0 >> 0) & 0x3);
   int op = ((iw0 >> 2) & 0x3);
 
+  PROFILE_COUNT_INSN (cpu, pc, BFIN_INSN_dagMODik);
   TRACE_EXTRACT (cpu, "%s: op:%i i:%i", __func__, op, i);
 
   if (op == 0)
@@ -2952,6 +2972,7 @@ decode_dspLDST_0 (SIM_CPU *cpu, bu16 iw0)
   int W = ((iw0 >> 9) & 0x1);
   bu32 addr;
 
+  PROFILE_COUNT_INSN (cpu, pc, BFIN_INSN_dspLDST);
   TRACE_EXTRACT (cpu, "%s: aop:%i m:%i i:%i reg:%i", __func__, aop, m, i, reg);
 
   if (aop == 0 && W == 0 && m == 0)
@@ -3116,6 +3137,7 @@ decode_LDST_0 (SIM_CPU *cpu, bu16 iw0)
   const char * const posts[] = { "++", "--", "" };
   const char *post = posts[aop];
 
+  PROFILE_COUNT_INSN (cpu, pc, BFIN_INSN_LDST);
   TRACE_EXTRACT (cpu, "%s: sz:%i W:%i aop:%i Z:%i ptr:%i reg:%i",
 		 __func__, sz, W, aop, Z, ptr, reg);
 
@@ -3209,6 +3231,7 @@ decode_LDSTiiFP_0 (SIM_CPU *cpu, bu16 iw0)
   const char *imm_str = negimm5s4_str (offset);
   const char *reg_name = get_allreg_name (grp, reg);
 
+  PROFILE_COUNT_INSN (cpu, pc, BFIN_INSN_LDSTiiFP);
   TRACE_EXTRACT (cpu, "%s: W:%i offset:%#x grp:%i reg:%i", __func__,
 		 W, offset, grp, reg);
   TRACE_DECODE (cpu, "%s: negimm5s4:%#x", __func__, imm);
@@ -3240,6 +3263,7 @@ decode_LDSTii_0 (SIM_CPU *cpu, bu16 iw0)
   bu32 imm, ea;
   const char *imm_str;
 
+  PROFILE_COUNT_INSN (cpu, pc, BFIN_INSN_LDSTii);
   TRACE_EXTRACT (cpu, "%s: W:%i op:%i offset:%#x ptr:%i reg:%i",
 		 __func__, W, op, offset, ptr, reg);
 
@@ -3313,6 +3337,7 @@ decode_LoopSetup_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1, bu32 pc)
   int spcrel = pcrel4 (soffset);
   int epcrel = lppcrel10 (eoffset);
 
+  PROFILE_COUNT_INSN (cpu, pc, BFIN_INSN_LoopSetup);
   TRACE_EXTRACT (cpu, "%s: rop:%i c:%i soffset:%i reg:%i eoffset:%i",
 		 __func__, rop, c, soffset, reg, eoffset);
   TRACE_DECODE (cpu, "%s: s_pcrel4:%#x e_lppcrel10:%#x",
@@ -3367,6 +3392,7 @@ decode_LDIMMhalf_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1)
   const char *val_str;
   const char *reg_name = get_allreg_name (grp, reg);
 
+  PROFILE_COUNT_INSN (cpu, pc, BFIN_INSN_LDIMMhalf);
   TRACE_EXTRACT (cpu, "%s: Z:%i H:%i S:%i grp:%i reg:%i hword:%#x",
 		 __func__, Z, H, S, grp, reg, hword);
 
@@ -3413,6 +3439,7 @@ decode_CALLa_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1, bu32 pc)
   int pcrel = pcrel24 (((msw) << 16) | (lsw));
   bu32 newpc = pc + pcrel;
 
+  PROFILE_COUNT_INSN (cpu, pc, BFIN_INSN_CALLa);
   TRACE_EXTRACT (cpu, "%s: S:%i msw:%#x lsw:%#x", __func__, S, msw, lsw);
   TRACE_DECODE (cpu, "%s: pcrel24:%#x", __func__, pcrel);
 
@@ -3457,6 +3484,7 @@ decode_LDSTidxI_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1)
   const char *imm_16s2_str = imm16s2_str (offset);
   const char *imm_16_str = imm16_str (offset);
 
+  PROFILE_COUNT_INSN (cpu, pc, BFIN_INSN_LDSTidxI);
   TRACE_EXTRACT (cpu, "%s: W:%i Z:%i sz:%i ptr:%i reg:%i offset:%#x",
 		 __func__, W, Z, sz, ptr, reg, offset);
 
@@ -3536,6 +3564,7 @@ decode_linkage_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1)
   int framesize = ((iw1 >> 0) & 0xffff);
   bu32 sp;
 
+  PROFILE_COUNT_INSN (cpu, pc, BFIN_INSN_linkage);
   TRACE_EXTRACT (cpu, "%s: R:%i framesize:%#x", __func__, R, framesize);
 
   if (R == 0)
@@ -3594,6 +3623,7 @@ decode_dsp32mac_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1)
   bu32 res = DREG (dst);
   bu32 v_i = 0, zero = 0;
 
+  PROFILE_COUNT_INSN (cpu, pc, BFIN_INSN_dsp32mac);
   TRACE_EXTRACT (cpu, "%s: M:%i mmod:%i MM:%i P:%i w1:%i op1:%i h01:%i h11:%i "
 		      "w0:%i op0:%i h00:%i h10:%i dst:%i src0:%i src1:%i",
 		 __func__, M, mmod, MM, P, w1, op1, h01, h11, w0, op0, h00, h10,
@@ -3710,6 +3740,7 @@ decode_dsp32mult_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1)
   bu32 res = DREG (dst);
   bu32 sat0 = 0, sat1 = 0;
 
+  PROFILE_COUNT_INSN (cpu, pc, BFIN_INSN_dsp32mult);
   TRACE_EXTRACT (cpu, "%s: M:%i mmod:%i MM:%i P:%i w1:%i op1:%i h01:%i h11:%i "
 		      "w0:%i op0:%i h00:%i h10:%i dst:%i src0:%i src1:%i",
 		 __func__, M, mmod, MM, P, w1, op1, h01, h11, w0, op0, h00, h10,
@@ -3802,6 +3833,7 @@ decode_dsp32alu_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1)
   int dst1 = ((iw1 >> 6) & 0x7);
   int M = ((iw0 >> 11) & 0x1);
 
+  PROFILE_COUNT_INSN (cpu, pc, BFIN_INSN_dsp32alu);
   TRACE_EXTRACT (cpu, "%s: M:%i HL:%i aopcde:%i aop:%i s:%i x:%i dst0:%i "
 		      "dst1:%i src0:%i src1:%i",
 		 __func__, M, HL, aopcde, aop, s, x, dst0, dst1, src0, src1);
@@ -4919,6 +4951,7 @@ decode_dsp32shift_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1)
   int sopcde = ((iw0 >> 0) & 0x1f);
   int HLs = ((iw1 >> 12) & 0x3);
 
+  PROFILE_COUNT_INSN (cpu, pc, BFIN_INSN_dsp32shift);
   TRACE_EXTRACT (cpu, "%s: M:%i sopcde:%i sop:%i HLs:%i dst0:%i src0:%i src1:%i",
 		 __func__, M, sopcde, sop, HLs, dst0, src0, src1);
 
@@ -5464,6 +5497,7 @@ decode_dsp32shiftimm_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1)
   int HLs = ((iw1 >> 12) & 0x3);
   int bit8 = immag >> 5;
 
+  PROFILE_COUNT_INSN (cpu, pc, BFIN_INSN_dsp32shiftimm);
   TRACE_EXTRACT (cpu, "%s: M:%i sopcde:%i sop:%i HLs:%i dst0:%i immag:%#x src1:%i",
 		 __func__, M, sopcde, sop, HLs, dst0, immag, src1);
 
@@ -5688,6 +5722,7 @@ decode_psedoDEBUG_0 (SIM_CPU *cpu, bu16 iw0)
   int fn = ((iw0 >> 6) & 0x3);
   int reg = ((iw0 >> 0) & 0x7);
 
+  PROFILE_COUNT_INSN (cpu, pc, BFIN_INSN_psedoDEBUG);
   TRACE_EXTRACT (cpu, "%s: fn:%i grp:%i reg:%i", __func__, fn, grp, reg);
 
   if ((reg == 0 || reg == 1) && fn == 3)
@@ -5741,6 +5776,7 @@ decode_psedoOChar_0 (SIM_CPU *cpu, bu16 iw0)
      +---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+  */
   int ch = ((iw0 >> 0) & 0xff);
 
+  PROFILE_COUNT_INSN (cpu, pc, BFIN_INSN_psedoOChar);
   TRACE_EXTRACT (cpu, "%s: ch:%#x", __func__, ch);
   TRACE_INSN (cpu, "OUTC %#x;", ch);
 
@@ -5765,6 +5801,7 @@ decode_psedodbg_assert_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1, bu32 pc)
   const char *reg_name = get_allreg_name (grp, regtest);
   const char *dbg_name, *dbg_appd;
 
+  PROFILE_COUNT_INSN (cpu, pc, BFIN_INSN_psedodbg_assert);
   TRACE_EXTRACT (cpu, "%s: dbgop:%i grp:%i regtest:%i expected:%#x",
 		 __func__, dbgop, grp, regtest, expected);
 
@@ -5882,7 +5919,10 @@ _interp_insn_bfin (SIM_CPU *cpu, bu32 pc)
     INSN_LEN = insn_len;
 
   if ((iw0 & 0xf7ff) == 0xc003 && iw1 == 0x1800)
-    TRACE_INSN (cpu, "MNOP;");
+    {
+      PROFILE_COUNT_INSN (cpu, pc, BFIN_INSN_dsp32mac);
+      TRACE_INSN (cpu, "MNOP;");
+    }
   else if (((iw0 & 0xFF80) == 0xE080) && ((iw1 & 0x0C00) == 0x0000))
     decode_LoopSetup_0 (cpu, iw0, iw1, pc);
   else if (((iw0 & 0xFF00) == 0xE100) && ((iw1 & 0x0000) == 0x0000))

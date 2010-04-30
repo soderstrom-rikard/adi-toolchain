@@ -788,6 +788,16 @@ bfin_pc_set (SIM_CPU *cpu, sim_cia newpc)
   SET_PCREG (newpc);
 }
 
+static const char *
+bfin_insn_name (SIM_CPU *cpu, int i)
+{
+  static const char * const insn_name[] = {
+#define I(insn) #insn,
+#include "_insn_list.h"
+#undef I
+  };
+  return insn_name[i];
+}
 
 static void
 bfin_init_cpu (SIM_CPU *cpu)
@@ -796,6 +806,8 @@ bfin_init_cpu (SIM_CPU *cpu)
   CPU_REG_STORE (cpu) = bfin_reg_store;
   CPU_PC_FETCH (cpu) = bfin_pc_get;
   CPU_PC_STORE (cpu) = bfin_pc_set;
+  CPU_MAX_INSNS (cpu) = BFIN_INSN_MAX;
+  CPU_INSN_NAME (cpu) = bfin_insn_name;
 }
 
 static void
