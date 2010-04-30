@@ -143,15 +143,22 @@ bfin_uart_io_write_buffer (struct hw *me, const void *source,
 
 /* Switch between socket and stdin on the fly.  */
 bu16
-bfin_uart_get_next_byte (struct hw *me, struct bfin_uart *uart, bu16 rbr)
+bfin_uart_get_next_byte (struct hw *me, struct bfin_uart *uart, bu16 rbr,
+			 bool *fresh)
 {
   SIM_DESC sd = hw_system (me);
   int status = dv_sockser_status (sd);
+  bool _fresh;
 
+  if (!fresh)
+    fresh = &_fresh;
+
+  *fresh = false;
   if (status & DV_SOCKSER_DISCONNECTED)
     {
       if (uart->saved_count > 0)
 	{
+	  *fresh = true;
 	  rbr = uart->saved_byte;
 	  --uart->saved_count;
 	}
@@ -160,7 +167,10 @@ bfin_uart_get_next_byte (struct hw *me, struct bfin_uart *uart, bu16 rbr)
 	  char byte;
 	  int ret = sim_io_poll_read (sd, 0/*STDIN*/, &byte, 1);
 	  if (ret > 0)
-	    rbr = byte;
+	    {
+	      *fresh = true;
+	      rbr = byte;
+	    }
 	}
     }
   else
@@ -211,7 +221,7 @@ bfin_uart_io_read_buffer (struct hw *me, void *dest,
 	dv_store_2 (dest, uart->dll);
       else
 	{
-	  uart->rbr = bfin_uart_get_next_byte (me, uart, uart->rbr);
+	  uart->rbr = bfin_uart_get_next_byte (me, uart, uart->rbr, NULL);
 	  dv_store_2 (dest, uart->rbr);
 	}
       break;
@@ -239,6 +249,39 @@ bfin_uart_io_read_buffer (struct hw *me, void *dest,
       dv_bfin_mmr_invalid (me, addr, nr_bytes, false);
       break;
     }
+
+  return nr_bytes;
+}
+
+static unsigned
+bfin_uart_hw_dma_read_buffer_method (struct hw *bus, void *dest, int space,
+				     unsigned_word addr, unsigned nr_bytes)
+{
+  struct bfin_uart *uart = hw_data (bus);
+  bool fresh;
+  bu8 byte;
+
+  /* XXX: Grabbing one byte at a time sucks.  */
+  byte = bfin_uart_get_next_byte (bus, uart, uart->rbr, &fresh);
+  if (!fresh)
+    return 0;
+
+  memcpy (dest, &byte, 1);
+  return 1;
+}
+
+static unsigned
+bfin_uart_hw_dma_write_buffer_method (struct hw *bus, const void *source,
+				      int space, unsigned_word addr,
+				      unsigned nr_bytes,
+				      int violate_read_only_section)
+{
+  SIM_DESC sd = hw_system (bus);
+  struct bfin_uart *uart = hw_data (bus);
+
+  /* XXX: Should integrate the sockser logic here.  */
+  sim_io_write_stdout (sd, source, nr_bytes);
+  sim_io_flush_stdout (sd);
 
   return nr_bytes;
 }
@@ -281,6 +324,8 @@ bfin_uart_finish (struct hw *me)
   set_hw_data (me, uart);
   set_hw_io_read_buffer (me, bfin_uart_io_read_buffer);
   set_hw_io_write_buffer (me, bfin_uart_io_write_buffer);
+  set_hw_dma_read_buffer (me, bfin_uart_hw_dma_read_buffer_method);
+  set_hw_dma_write_buffer (me, bfin_uart_hw_dma_write_buffer_method);
 
   attach_bfin_uart_regs (me, uart);
 

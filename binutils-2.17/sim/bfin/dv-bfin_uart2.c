@@ -132,7 +132,7 @@ bfin_uart_io_read_buffer (struct hw *me, void *dest,
   switch (mmr_off)
     {
     case mmr_offset(rbr):
-      uart->rbr = bfin_uart_get_next_byte (me, uart, uart->rbr);
+      uart->rbr = bfin_uart_get_next_byte (me, uart, uart->rbr, NULL);
       dv_store_2 (dest, uart->rbr);
       break;
     case mmr_offset(ier_set):

@@ -26,7 +26,7 @@
 #define BFIN_MMR_UART_SIZE	0x30
 
 struct bfin_uart;
-bu16 bfin_uart_get_next_byte (struct hw *, struct bfin_uart *, bu16);
+bu16 bfin_uart_get_next_byte (struct hw *, struct bfin_uart *, bu16, bool *fresh);
 bu16 bfin_uart_send_byte (struct hw *, bu16);
 bu16 bfin_uart_get_status (struct hw *, struct bfin_uart *, bu16);
 
