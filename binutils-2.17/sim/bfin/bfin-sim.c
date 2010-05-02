@@ -74,6 +74,7 @@ illegal_instruction (SIM_CPU *cpu)
 static __attribute__ ((noreturn)) void
 illegal_instruction_combination (SIM_CPU *cpu)
 {
+  TRACE_INSN (cpu, "ILLEGAL INSTRUCTION COMBINATION");
   while (1)
     cec_exception (cpu, VEC_ILGAL_I);
 }
@@ -1670,13 +1671,12 @@ decode_ProgCtrl_0 (SIM_CPU *cpu, bu16 iw0, bu32 pc)
 
   if (prgfunc == 0 && poprnd == 0)
     TRACE_INSN (cpu, "NOP;");
-  else if (INSN_LEN == 8)
-    /* None of these can be part of a parallel instruction */
-    illegal_instruction_combination (cpu);
   else if (prgfunc == 1 && poprnd == 0)
     {
       bu32 newpc = RETSREG;
       TRACE_INSN (cpu, "RTS;");
+      if (INSN_LEN == 8)
+	illegal_instruction_combination (cpu);
       TRACE_BRANCH (cpu, pc, newpc, -1, "RTS");
       SET_PCREG (newpc);
       BFIN_CPU_STATE.flow_change = true;
@@ -1685,24 +1685,32 @@ decode_ProgCtrl_0 (SIM_CPU *cpu, bu16 iw0, bu32 pc)
   else if (prgfunc == 1 && poprnd == 1)
     {
       TRACE_INSN (cpu, "RTI;");
+      if (INSN_LEN == 8)
+	illegal_instruction_combination (cpu);
       cec_return (cpu, -1);
       CYCLE_DELAY = 5;
     }
   else if (prgfunc == 1 && poprnd == 2)
     {
       TRACE_INSN (cpu, "RTX;");
+      if (INSN_LEN == 8)
+	illegal_instruction_combination (cpu);
       cec_return (cpu, IVG_EVX);
       CYCLE_DELAY = 5;
     }
   else if (prgfunc == 1 && poprnd == 3)
     {
       TRACE_INSN (cpu, "RTN;");
+      if (INSN_LEN == 8)
+	illegal_instruction_combination (cpu);
       cec_return (cpu, IVG_NMI);
       CYCLE_DELAY = 5;
     }
   else if (prgfunc == 1 && poprnd == 4)
     {
       TRACE_INSN (cpu, "RTE;");
+      if (INSN_LEN == 8)
+	illegal_instruction_combination (cpu);
       cec_return (cpu, IVG_EMU);
       CYCLE_DELAY = 5;
     }
@@ -1715,6 +1723,9 @@ decode_ProgCtrl_0 (SIM_CPU *cpu, bu16 iw0, bu32 pc)
          in user mode, it's a NOP ...  */
       TRACE_INSN (cpu, "IDLE;");
 
+      if (INSN_LEN == 8)
+	illegal_instruction_combination (cpu);
+
       /* Timewarp !  */
       if (events->queue)
 	CYCLE_DELAY = events->time_from_event;
@@ -1725,53 +1736,60 @@ decode_ProgCtrl_0 (SIM_CPU *cpu, bu16 iw0, bu32 pc)
     {
       /* just NOP it */
       TRACE_INSN (cpu, "CSYNC;");
+      if (INSN_LEN == 8)
+	illegal_instruction_combination (cpu);
       CYCLE_DELAY = 10;
     }
   else if (prgfunc == 2 && poprnd == 4)
     {
       /* just NOP it */
       TRACE_INSN (cpu, "SSYNC;");
+      if (INSN_LEN == 8)
+	illegal_instruction_combination (cpu);
+
       /* Really 10+, but no model info for this.  */
       CYCLE_DELAY = 10;
     }
   else if (prgfunc == 2 && poprnd == 5)
     {
       TRACE_INSN (cpu, "EMUEXCPT;");
+      if (INSN_LEN == 8)
+	illegal_instruction_combination (cpu);
       cec_exception (cpu, VEC_SIM_TRAP);
     }
-  else if (prgfunc == 3)
+  else if (prgfunc == 3 && poprnd < 8)
     {
-      if (poprnd > 7)
-	illegal_instruction (cpu);
       TRACE_INSN (cpu, "CLI R%i;", poprnd);
+      if (INSN_LEN == 8)
+	illegal_instruction_combination (cpu);
       SET_DREG (poprnd, cec_cli (cpu));
     }
-  else if (prgfunc == 4)
+  else if (prgfunc == 4 && poprnd < 8)
     {
-      if (poprnd > 7)
-	illegal_instruction (cpu);
       TRACE_INSN (cpu, "STI R%i;", poprnd);
+      if (INSN_LEN == 8)
+	illegal_instruction_combination (cpu);
       cec_sti (cpu, DREG (poprnd));
       CYCLE_DELAY = 3;
     }
-  else if (prgfunc == 5)
+  else if (prgfunc == 5 && poprnd < 8)
     {
       bu32 newpc = PREG (poprnd);
-      if (poprnd > 7)
-	illegal_instruction (cpu);
       TRACE_INSN (cpu, "JUMP (P%i);", poprnd);
+      if (INSN_LEN == 8)
+	illegal_instruction_combination (cpu);
       TRACE_BRANCH (cpu, pc, newpc, -1, "JUMP (Preg)");
       SET_PCREG (newpc);
       BFIN_CPU_STATE.did_jump = true;
       PROFILE_BRANCH_TAKEN (cpu);
       CYCLE_DELAY = 5;
     }
-  else if (prgfunc == 6)
+  else if (prgfunc == 6 && poprnd < 8)
     {
       bu32 newpc = PREG (poprnd);
-      if (poprnd > 7)
-	illegal_instruction (cpu);
       TRACE_INSN (cpu, "CALL (P%i);", poprnd);
+      if (INSN_LEN == 8)
+	illegal_instruction_combination (cpu);
       TRACE_BRANCH (cpu, pc, newpc, -1, "CALL (Preg)");
       /* If we're at the end of a hardware loop, RETS is going to be
          the top of the loop rather than the next instruction.  */
@@ -1781,12 +1799,12 @@ decode_ProgCtrl_0 (SIM_CPU *cpu, bu16 iw0, bu32 pc)
       PROFILE_BRANCH_TAKEN (cpu);
       CYCLE_DELAY = 5;
     }
-  else if (prgfunc == 7)
+  else if (prgfunc == 7 && poprnd < 8)
     {
       bu32 newpc = pc + PREG (poprnd);
-      if (poprnd > 7)
-	illegal_instruction (cpu);
       TRACE_INSN (cpu, "CALL (PC + P%i);", poprnd);
+      if (INSN_LEN == 8)
+	illegal_instruction_combination (cpu);
       TRACE_BRANCH (cpu, pc, newpc, -1, "CALL (PC + Preg)");
       SET_RETSREG (hwloop_get_next_pc (cpu, pc, 2));
       SET_PCREG (newpc);
@@ -1794,12 +1812,12 @@ decode_ProgCtrl_0 (SIM_CPU *cpu, bu16 iw0, bu32 pc)
       PROFILE_BRANCH_TAKEN (cpu);
       CYCLE_DELAY = 5;
     }
-  else if (prgfunc == 8)
+  else if (prgfunc == 8 && poprnd < 8)
     {
       bu32 newpc = pc + PREG (poprnd);
-      if (poprnd > 7)
-	illegal_instruction (cpu);
       TRACE_INSN (cpu, "JUMP (PC + P%i);", poprnd);
+      if (INSN_LEN == 8)
+	illegal_instruction_combination (cpu);
       TRACE_BRANCH (cpu, pc, newpc, -1, "JUMP (PC + Preg)");
       SET_PCREG (newpc);
       BFIN_CPU_STATE.did_jump = true;
@@ -1810,6 +1828,8 @@ decode_ProgCtrl_0 (SIM_CPU *cpu, bu16 iw0, bu32 pc)
     {
       int raise = uimm4 (poprnd);
       TRACE_INSN (cpu, "RAISE %s;", uimm4_str (raise));
+      if (INSN_LEN == 8)
+	illegal_instruction_combination (cpu);
       cec_require_supervisor (cpu);
       if (raise == IVG_IVHW)
 	cec_hwerr (cpu, HWERR_RAISE_5);
@@ -1821,16 +1841,18 @@ decode_ProgCtrl_0 (SIM_CPU *cpu, bu16 iw0, bu32 pc)
     {
       int excpt = uimm4 (poprnd);
       TRACE_INSN (cpu, "EXCPT %s;", uimm4_str (excpt));
+      if (INSN_LEN == 8)
+	illegal_instruction_combination (cpu);
       cec_exception (cpu, excpt);
       CYCLE_DELAY = 3;
     }
-  else if (prgfunc == 11)
+  else if (prgfunc == 11 && poprnd < 6)
     {
       bu32 addr = PREG (poprnd);
       bu8 byte;
-      if (poprnd > 5)
-	illegal_instruction (cpu);
       TRACE_INSN (cpu, "TESTSET (P%i);", poprnd);
+      if (INSN_LEN == 8)
+	illegal_instruction_combination (cpu);
       byte = GET_WORD (addr);
       SET_CCREG (byte == 0);
       PUT_BYTE (addr, byte | 0x80);
@@ -1868,36 +1890,52 @@ decode_CaCTRL_0 (SIM_CPU *cpu, bu16 iw0)
   if (a == 0 && op == 0)
     {
       TRACE_INSN (cpu, "PREFETCH [P%i];", reg);
+      if (INSN_LEN == 8)
+	illegal_instruction_combination (cpu);
       /* implicit read which may trigger CPLB miss.  */
       GET_BYTE (preg);
     }
   else if (a == 0 && op == 1)
     {
       TRACE_INSN (cpu, "FLUSHINV [P%i];", reg);
+      if (INSN_LEN == 8)
+	illegal_instruction_combination (cpu);
     }
   else if (a == 0 && op == 2)
     {
       TRACE_INSN (cpu, "FLUSH [P%i];", reg);
+      if (INSN_LEN == 8)
+	illegal_instruction_combination (cpu);
     }
   else if (a == 0 && op == 3)
     {
       TRACE_INSN (cpu, "IFLUSH [P%i];", reg);
+      if (INSN_LEN == 8)
+	illegal_instruction_combination (cpu);
     }
   else if (a == 1 && op == 0)
     {
       TRACE_INSN (cpu, "PREFETCH [P%i++];", reg);
+      if (INSN_LEN == 8)
+	illegal_instruction_combination (cpu);
     }
   else if (a == 1 && op == 1)
     {
       TRACE_INSN (cpu, "FLUSHINV [P%i++];", reg);
+      if (INSN_LEN == 8)
+	illegal_instruction_combination (cpu);
     }
   else if (a == 1 && op == 2)
     {
       TRACE_INSN (cpu, "FLUSH [P%i++];", reg);
+      if (INSN_LEN == 8)
+	illegal_instruction_combination (cpu);
     }
   else if (a == 1 && op == 3)
     {
       TRACE_INSN (cpu, "IFLUSH [P%i++];", reg);
+      if (INSN_LEN == 8)
+	illegal_instruction_combination (cpu);
     }
   else
     illegal_instruction (cpu);
@@ -1931,7 +1969,8 @@ decode_PushPopReg_0 (SIM_CPU *cpu, bu16 iw0)
   if (W == 0)
     {
       TRACE_INSN (cpu, "%s = [SP++];", reg_name);
-
+      if (INSN_LEN == 8)
+	illegal_instruction_combination (cpu);
       /* XXX: The valid register check is in reg_write(), so we might
               incorrectly do a GET_LONG() here ...  */
       value = GET_LONG (sp);
@@ -1944,6 +1983,8 @@ decode_PushPopReg_0 (SIM_CPU *cpu, bu16 iw0)
   else
     {
       TRACE_INSN (cpu, "[--SP] = %s;", reg_name);
+      if (INSN_LEN == 8)
+	illegal_instruction_combination (cpu);
 
       sp -= 4;
       value = reg_read (cpu, grp, reg);
@@ -2054,13 +2095,11 @@ decode_ccMV_0 (SIM_CPU *cpu, bu16 iw0)
   TRACE_EXTRACT (cpu, "%s: T:%i d:%i s:%i dst:%i src:%i",
 		 __func__, T, d, s, dst, src);
 
-  if (INSN_LEN == 8)
-    /* None of these can be part of a parallel instruction */
-    illegal_instruction_combination (cpu);
-
   TRACE_INSN (cpu, "IF %sCC %s = %s;", T ? "" : "! ",
 	      get_allreg_name (d, dst),
 	      get_allreg_name (s, src));
+  if (INSN_LEN == 8)
+    illegal_instruction_combination (cpu);
 
   if (cond)
     reg_write (cpu, d, dst, reg_read (cpu, s, src));
@@ -2083,10 +2122,6 @@ decode_CCflag_0 (SIM_CPU *cpu, bu16 iw0)
   TRACE_EXTRACT (cpu, "%s: I:%i opc:%i G:%i y:%i x:%i",
 		 __func__, I, opc, G, y, x);
 
-  if (INSN_LEN == 8)
-    /* None of these can be part of a parallel instruction */
-    illegal_instruction_combination (cpu);
-
   if (opc > 4)
     {
       bs64 acc0 = get_extended_acc (cpu, 0);
@@ -2099,16 +2134,22 @@ decode_CCflag_0 (SIM_CPU *cpu, bu16 iw0)
       if (opc == 5 && I == 0 && G == 0)
 	{
 	  TRACE_INSN (cpu, "CC = A0 == A1;");
+	  if (INSN_LEN == 8)
+	    illegal_instruction_combination (cpu);
 	  SET_CCREG (acc0 == acc1);
 	}
       else if (opc == 6 && I == 0 && G == 0)
 	{
 	  TRACE_INSN (cpu, "CC = A0 < A1");
+	  if (INSN_LEN == 8)
+	    illegal_instruction_combination (cpu);
 	  SET_CCREG (acc0 < acc1);
 	}
       else if (opc == 7 && I == 0 && G == 0)
 	{
 	  TRACE_INSN (cpu, "CC = A0 <= A1");
+	  if (INSN_LEN == 8)
+	    illegal_instruction_combination (cpu);
 	  SET_CCREG (acc0 <= acc1);
 	}
       else
@@ -2200,23 +2241,25 @@ decode_CC2dreg_0 (SIM_CPU *cpu, bu16 iw0)
   PROFILE_COUNT_INSN (cpu, pc, BFIN_INSN_CC2dreg);
   TRACE_EXTRACT (cpu, "%s: op:%i reg:%i", __func__, op, reg);
 
-  if (INSN_LEN == 8)
-    /* None of these can be part of a parallel instruction */
-    illegal_instruction_combination (cpu);
-
   if (op == 0)
     {
       TRACE_INSN (cpu, "R%i = CC;", reg);
+      if (INSN_LEN == 8)
+	illegal_instruction_combination (cpu);
       SET_DREG (reg, CCREG);
     }
   else if (op == 1)
     {
       TRACE_INSN (cpu, "CC = R%i;", reg);
+      if (INSN_LEN == 8)
+	illegal_instruction_combination (cpu);
       SET_CCREG (DREG (reg) != 0);
     }
   else if (op == 3 && reg == 0)
     {
       TRACE_INSN (cpu, "CC = !CC;");
+      if (INSN_LEN == 8)
+	illegal_instruction_combination (cpu);
       SET_CCREG (!CCREG);
     }
   else
@@ -2265,16 +2308,15 @@ decode_CC2stat_0 (SIM_CPU *cpu, bu16 iw0)
   PROFILE_COUNT_INSN (cpu, pc, BFIN_INSN_CC2stat);
   TRACE_EXTRACT (cpu, "%s: D:%i op:%i cbit:%i", __func__, D, op, cbit);
 
-  if (INSN_LEN == 8)
-    /* None of these can be part of a parallel instruction */
-    illegal_instruction_combination (cpu);
-
   TRACE_INSN (cpu, "%s %s= %s;", D ? astat_name : "CC",
 	      op_names[op], D ? "CC" : astat_name);
 
   /* CC = CC; is invalid.  */
   if (cbit == 5)
     illegal_instruction (cpu);
+
+  if (INSN_LEN == 8)
+    illegal_instruction_combination (cpu);
 
   pval = !!(ASTAT & (1 << cbit));
   if (D == 0)
@@ -2319,12 +2361,11 @@ decode_BRCC_0 (SIM_CPU *cpu, bu16 iw0, bu32 pc)
   TRACE_EXTRACT (cpu, "%s: T:%i B:%i offset:%#x", __func__, T, B, offset);
   TRACE_DECODE (cpu, "%s: pcrel10:%#x", __func__, pcrel);
 
-  if (INSN_LEN == 8)
-    /* None of these can be part of a parallel instruction */
-    illegal_instruction_combination (cpu);
-
   TRACE_INSN (cpu, "IF %sCC JUMP %#x%s;", T ? "" : "! ",
 	      pcrel, B ? " (bp)" : "");
+
+  if (INSN_LEN == 8)
+    illegal_instruction_combination (cpu);
 
   if (cond)
     {
@@ -2357,11 +2398,11 @@ decode_UJUMP_0 (SIM_CPU *cpu, bu16 iw0, bu32 pc)
   TRACE_EXTRACT (cpu, "%s: offset:%#x", __func__, offset);
   TRACE_DECODE (cpu, "%s: pcrel12:%#x", __func__, pcrel);
 
+  TRACE_INSN (cpu, "JUMP.S %#x;", pcrel);
+
   if (INSN_LEN == 8)
-    /* None of these can be part of a parallel instruction */
     illegal_instruction_combination (cpu);
 
-  TRACE_INSN (cpu, "JUMP.S %#x;", pcrel);
   TRACE_BRANCH (cpu, pc, newpc, -1, "JUMP.S");
 
   SET_PCREG (newpc);
@@ -2598,53 +2639,61 @@ decode_LOGI2op_0 (SIM_CPU *cpu, bu16 iw0)
 
   if (opc == 0)
     {
-      if (INSN_LEN == 8)
-	/* None of these can be part of a parallel instruction */
-	illegal_instruction_combination (cpu);
-
       TRACE_INSN (cpu, "CC = ! BITTST (R%i, %s);", dst, uimm_str);
+      if (INSN_LEN == 8)
+	illegal_instruction_combination (cpu);
       SET_CCREG ((~DREG (dst) >> uimm) & 1);
     }
   else if (opc == 1)
     {
-      if (INSN_LEN == 8)
-	/* None of these can be part of a parallel instruction */
-	illegal_instruction_combination (cpu);
-
       TRACE_INSN (cpu, "CC = BITTST (R%i, %s);", dst, uimm_str);
+      if (INSN_LEN == 8)
+	illegal_instruction_combination (cpu);
       SET_CCREG ((DREG (dst) >> uimm) & 1);
     }
   else if (opc == 2)
     {
       TRACE_INSN (cpu, "BITSET (R%i, %s);", dst, uimm_str);
+      if (INSN_LEN == 8)
+	illegal_instruction_combination (cpu);
       SET_DREG (dst, DREG (dst) | (1 << uimm));
       setflags_logical (cpu, DREG (dst));
     }
   else if (opc == 3)
     {
       TRACE_INSN (cpu, "BITTGL (R%i, %s);", dst, uimm_str);
+      if (INSN_LEN == 8)
+	illegal_instruction_combination (cpu);
       SET_DREG (dst, DREG (dst) ^ (1 << uimm));
       setflags_logical (cpu, DREG (dst));
     }
   else if (opc == 4)
     {
       TRACE_INSN (cpu, "BITCLR (R%i, %s);", dst, uimm_str);
+      if (INSN_LEN == 8)
+	illegal_instruction_combination (cpu);
       SET_DREG (dst, DREG (dst) & ~(1 << uimm));
       setflags_logical (cpu, DREG (dst));
     }
   else if (opc == 5)
     {
       TRACE_INSN (cpu, "R%i >>>= %s;", dst, uimm_str);
+      if (INSN_LEN == 8)
+	illegal_instruction_combination (cpu);
       SET_DREG (dst, ashiftrt (cpu, DREG (dst), uimm, 32));
     }
   else if (opc == 6)
     {
       TRACE_INSN (cpu, "R%i >>= %s;", dst, uimm_str);
+      if (INSN_LEN == 8)
+	illegal_instruction_combination (cpu);
       SET_DREG (dst, lshiftrt (cpu, DREG (dst), uimm, 32));
     }
   else if (opc == 7)
     {
       TRACE_INSN (cpu, "R%i <<= %s;", dst, uimm_str);
+      if (INSN_LEN == 8)
+	illegal_instruction_combination (cpu);
       SET_DREG (dst, lshift (cpu, DREG (dst), uimm, 32, 0));
     }
 }
@@ -3347,24 +3396,14 @@ decode_LoopSetup_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1, bu32 pc)
     {
       TRACE_INSN (cpu, "LSETUP (%#x, %#x) LC%i;", spcrel, epcrel, c);
     }
-  else if (rop == 1)
+  else if (rop == 1 && reg <= 7)
     {
       TRACE_INSN (cpu, "LSETUP (%#x, %#x) LC%i = P%i;", spcrel, epcrel, c, reg);
-
-      /* SP/FP not allowed as source reg.  */
-      if (reg > 7)
-	illegal_instruction (cpu);
-
       SET_LCREG (c, PREG (reg));
     }
-  else if (rop == 3)
+  else if (rop == 3 && reg <= 7)
     {
       TRACE_INSN (cpu, "LSETUP (%#x, %#x) LC%i = P%i >> 1;", spcrel, epcrel, c, reg);
-
-      /* SP/FP not allowed as source reg.  */
-      if (reg > 7)
-	illegal_instruction (cpu);
-
       SET_LCREG (c, PREG (reg) >> 1);
     }
   else
@@ -3443,11 +3482,10 @@ decode_CALLa_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1, bu32 pc)
   TRACE_EXTRACT (cpu, "%s: S:%i msw:%#x lsw:%#x", __func__, S, msw, lsw);
   TRACE_DECODE (cpu, "%s: pcrel24:%#x", __func__, pcrel);
 
-  if (INSN_LEN == 8)
-    /* None of these can be part of a parallel instruction */
-    illegal_instruction_combination (cpu);
-
   TRACE_INSN (cpu, "%s %#x;", S ? "CALL" : "JUMP.L", pcrel);
+
+  if (INSN_LEN == 8)
+    illegal_instruction_combination (cpu);
 
   if (S == 1)
     {
@@ -3572,6 +3610,8 @@ decode_linkage_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1)
       int size = uimm16s4 (framesize);
       sp = SPREG;
       TRACE_INSN (cpu, "LINK %s;", uimm16s4_str (framesize));
+      if (INSN_LEN == 8)
+	illegal_instruction_combination (cpu);
       sp -= 4;
       PUT_LONG (sp, RETSREG);
       sp -= 4;
@@ -3580,17 +3620,22 @@ decode_linkage_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1)
       sp -= size;
       CYCLE_DELAY = 3;
     }
-  else
+  else if (framesize == 0)
     {
       /* Restore SP from FP.  */
       sp = FPREG;
       TRACE_INSN (cpu, "UNLINK;");
+      if (INSN_LEN == 8)
+	illegal_instruction_combination (cpu);
       SET_FPREG (GET_LONG (sp));
       sp += 4;
       SET_RETSREG (GET_LONG (sp));
       sp += 4;
       CYCLE_DELAY = 2;
     }
+  else
+    illegal_instruction (cpu);
+
   SET_SPREG (sp);
 }
 
@@ -3643,7 +3688,7 @@ decode_dsp32mac_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1)
 
   /* XXX: Missing TRACE_INSN - this is as good as it gets for now  */
   if (w0 && w1 && P)
-    TRACE_INSN (cpu, "R%i:%i = macfunc", dst + 1, dst);
+    TRACE_INSN (cpu, "R%i = macfunc, R%i = macfunc", dst + 1, dst);
   else if (w0 && P)
     TRACE_INSN (cpu, "R%i = macfunc", dst);
   else if (w1 && P)
@@ -5895,7 +5940,10 @@ _interp_insn_bfin (SIM_CPU *cpu, bu32 pc)
       else if ((iw0 & 0xE000) == 0xA000)
 	decode_LDSTii_0 (cpu, iw0);
       else
-	illegal_instruction (cpu);
+	{
+	  TRACE_EXTRACT (cpu, "%s: no matching 16-bit pattern", __func__);
+	  illegal_instruction (cpu);
+	}
       return insn_len;
     }
 
@@ -5950,7 +5998,10 @@ _interp_insn_bfin (SIM_CPU *cpu, bu32 pc)
   else if (((iw0 & 0xFF00) == 0xF000) && ((iw1 & 0x0000) == 0x0000))
     decode_psedodbg_assert_0 (cpu, iw0, iw1, pc);
   else
-    illegal_instruction (cpu);
+    {
+      TRACE_EXTRACT (cpu, "%s: no matching 32-bit pattern", __func__);
+      illegal_instruction (cpu);
+    }
 
   return insn_len;
 }
