@@ -94,8 +94,10 @@ bfin_cec_io_write_buffer (struct hw *me, const void *source,
       bfin_cec_check_pending (me, cec);
       break;
     case mmr_offset(ipend):
+      /* Read-only register.  */
+      break;
     case mmr_offset(ilat):
-      /* read-only registers */
+      dv_w1c_4 (&cec->ilat, value, 0);
       break;
     case mmr_offset(iprio):
       cec->iprio = (value & IVG_UNMASKABLE_B);
