@@ -18,7 +18,11 @@
    You should have received a copy of the GNU General Public License
    along with this program.  If not, see <http://www.gnu.org/licenses/>.  */
 
+/* Workaround old/broken linux headers.  */
+#define __ASSEMBLY__
+#define __u16 unsigned short
 #include <linux/mii.h>
+#undef __ASSEMBLY__
 
 #include "sim-main.h"
 #include "devices.h"
