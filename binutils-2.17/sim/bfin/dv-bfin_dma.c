@@ -23,6 +23,11 @@
 #include "hw-device.h"
 #include "dv-bfin_dma.h"
 
+/* Note: This DMA implementation requires the producer to be the master.
+         The source is always a slave.  This way we don't have the two
+         devices thrashing each other with one trying to write and the
+         other trying to read.  */
+
 struct bfin_dma
 {
   /* This top portion matches common dv_bfin struct.  */
@@ -122,8 +127,9 @@ bfin_dma_process_desc (struct hw *me, struct bfin_dma *dma)
   if (dma->start_addr & (dma->ele_size - 1))
     dma->irq_status |= DMA_ERR;
 
-  if (dma->ele_size != (unsigned)dma->x_modify)
-    hw_abort (me, "DMA config (striding) %#x not supported", dma->config);
+  if (dma->ele_size != (unsigned) abs (dma->x_modify))
+    hw_abort (me, "DMA config (striding) %#x not supported (x_modify: %d)",
+	      dma->config, dma->x_modify);
 
   switch (dma->config & DMAFLOW)
     {
@@ -249,7 +255,11 @@ bfin_dma_hw_event_callback (struct hw *me, void *data)
   peer = bfin_dma_get_peer (me, dma);
   bfin_peer = hw_data (peer);
   ret = 0;
-  nr_bytes = MIN (sizeof (buf), dma->curr_x_count * dma->ele_size);
+  if (dma->x_modify < 0)
+    /* XXX: This sucks performance wise.  */
+    nr_bytes = dma->ele_size;
+  else
+    nr_bytes = MIN (sizeof (buf), dma->curr_x_count * dma->ele_size);
 
   /* Pumping a chunk!  */
   bfin_peer->dma_master = me;
@@ -372,7 +382,9 @@ bfin_dma_io_write_buffer (struct hw *me, const void *source,
 	{
 	  dma->irq_status |= DMA_RUN;
 	  bfin_dma_process_desc (me, dma);
-	  bfin_dma_reschedule (me, 1);
+	  /* The writer is the master.  */
+	  if (dma->config & WNR)
+	    bfin_dma_reschedule (me, 1);
 	}
       else
 	{
