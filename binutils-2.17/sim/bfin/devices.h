@@ -21,9 +21,17 @@
 #ifndef DEVICES_H
 #define DEVICES_H
 
+#include "hw-base.h"
 #include "hw-main.h"
 #include "hw-device.h"
 #include "hw-tree.h"
+
+/* We keep the same inital structure layout with DMA enabled devices.  */
+struct dv_bfin {
+  bu32 base;
+  struct hw *dma_master;
+  bool acked;
+};
 
 #define BFIN_MMR_16(mmr) mmr, __pad_##mmr
 
@@ -113,10 +121,17 @@ bool dv_bfin_mmr_check (struct hw *, address_word, unsigned nr_bytes, bool write
 #define dv_bfin_mmr_require_32(hw, addr, nr_bytes, write) dv_bfin_mmr_require (hw, addr, nr_bytes, 4, write)
 
 #define HW_TRACE_WRITE() \
-  HW_TRACE ((me, "write 0x%08lx (%s) length %d with 0x%x", (long) addr, \
-	     mmr_name (mmr_off), (int) nr_bytes, value))
+  HW_TRACE ((me, "write 0x%08lx (%s) length %u with 0x%x", \
+	     (unsigned long) addr, mmr_name (mmr_off), nr_bytes, value))
 #define HW_TRACE_READ() \
-  HW_TRACE ((me, "read 0x%08lx (%s) length %d", (long) addr, \
-	     mmr_name (mmr_off), (int) nr_bytes))
+  HW_TRACE ((me, "read 0x%08lx (%s) length %u", \
+	     (unsigned long) addr, mmr_name (mmr_off), nr_bytes))
+
+#define HW_TRACE_DMA_WRITE() \
+  HW_TRACE ((me, "dma write 0x%08lx length %u", \
+	     (unsigned long) addr, nr_bytes))
+#define HW_TRACE_DMA_READ() \
+  HW_TRACE ((me, "dma read 0x%08lx length %u", \
+	     (unsigned long) addr, nr_bytes))
 
 #endif

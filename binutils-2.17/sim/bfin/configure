@@ -4761,6 +4761,7 @@ else
 	bfin_ebiu_amc \
 	bfin_ebiu_ddrc \
 	bfin_ebiu_sdc \
+	bfin_emac \
 	bfin_evt \
 	bfin_mmu \
 	bfin_pll \
@@ -4770,6 +4771,7 @@ else
 	bfin_uart \
 	bfin_uart2 \
 	bfin_wdog \
+	eth_phy \
 "
 fi
 sim_hw_cflags="-DWITH_HW=1"

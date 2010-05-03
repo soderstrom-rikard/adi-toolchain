@@ -47,6 +47,7 @@
 #define NDSIZE_8	0x0800	/* Next Descriptor Size = 8 */
 #define NDSIZE_9	0x0900	/* Next Descriptor Size = 9 */
 #define NDSIZE		0x0f00	/* Next Descriptor Size */
+#define NDSIZE_SHIFT	8
 #define DMAFLOW		0x7000	/* Flow Control */
 #define DMAFLOW_STOP	0x0000	/* Stop Mode */
 #define DMAFLOW_AUTO	0x1000	/* Autobuffer Mode */

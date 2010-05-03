@@ -25,13 +25,25 @@
 
 struct bfin_dma
 {
+  /* This top portion matches common dv_bfin struct.  */
   bu32 base;
+  struct hw *dma_master;
+  bool acked;
+
+  struct hw_event *handler;
   unsigned ele_size;
   const char *peer;
   struct hw *hw_peer;
 
   /* Order after here is important -- matches hardware MMR layout.  */
-  bu32 next_desc_ptr, start_addr;
+  union {
+    struct { bu16 ndpl, ndph; };
+    bu32 next_desc_ptr;
+  };
+  union {
+    struct { bu16 sal, sah; };
+    bu32 start_addr;
+  };
   bu16 BFIN_MMR_16 (config);
   bu32 _pad0;
   bu16 BFIN_MMR_16 (x_count);
@@ -88,25 +100,10 @@ bfin_dma_get_peer (struct hw *me, struct bfin_dma *dma)
 static void
 bfin_dma_process_desc (struct hw *me, struct bfin_dma *dma)
 {
-  switch (dma->config & NDSIZE)
-    {
-    case NDSIZE_0:
-      break;
-    default:
-      hw_abort (me, "DMA config (NDSIZE) %#x not supported", dma->config);
-    }
+  bu8 skip, ndsize = (dma->config & NDSIZE) >> NDSIZE_SHIFT;
+  bu16 _flows[9], *flows = _flows;
 
-  switch (dma->config & DMAFLOW)
-    {
-    case DMAFLOW_STOP:
-      break;
-    case DMAFLOW_AUTO:
-      if ((dma->config & NDSIZE) != NDSIZE_0)
-	hw_abort (me, "DMA config error: DMAFLOW_AUTO requires NDSIZE_0");
-      break;
-    default:
-      hw_abort (me, "DMA config (DMAFLOW) %#x not supported", dma->config);
-    }
+  HW_TRACE ((me, "dma starting up %#x", dma->config));
 
   switch (dma->config & WDSIZE)
     {
@@ -128,9 +125,66 @@ bfin_dma_process_desc (struct hw *me, struct bfin_dma *dma)
   if (dma->ele_size != (unsigned)dma->x_modify)
     hw_abort (me, "DMA config (striding) %#x not supported", dma->config);
 
+  switch (dma->config & DMAFLOW)
+    {
+    case DMAFLOW_AUTO:
+    case DMAFLOW_STOP:
+      if (ndsize)
+	hw_abort (me, "DMA config error: DMAFLOW_{AUTO,STOP} requires NDSIZE_0");
+      break;
+    case DMAFLOW_ARRAY:
+      if (ndsize == 0 || ndsize > 7)
+	hw_abort (me, "DMA config error: DMAFLOW_ARRAY requires NDSIZE 1...7");
+      sim_read (hw_system (me), dma->curr_desc_ptr, (void *)flows, ndsize * 2);
+      break;
+    case DMAFLOW_SMALL:
+      if (ndsize == 0 || ndsize > 8)
+	hw_abort (me, "DMA config error: DMAFLOW_SMALL requires NDSIZE 1...8");
+      sim_read (hw_system (me), dma->next_desc_ptr, (void *)flows, ndsize * 2);
+      break;
+    case DMAFLOW_LARGE:
+      if (ndsize == 0 || ndsize > 9)
+	hw_abort (me, "DMA config error: DMAFLOW_LARGE requires NDSIZE 1...9");
+      sim_read (hw_system (me), dma->next_desc_ptr, (void *)flows, ndsize * 2);
+      break;
+    default:
+      hw_abort (me, "DMA config error: invalid DMAFLOW %#x", dma->config);
+    }
+
+  if (ndsize)
+    {
+      bu8 idx;
+      bu16 *stores[] = {
+	&dma->sal,
+	&dma->sah,
+	&dma->config,
+	&dma->x_count,
+	&dma->x_modify,
+	&dma->y_count,
+	&dma->y_modify,
+      };
+
+      switch (dma->config & DMAFLOW)
+	{
+	case DMAFLOW_LARGE:
+	  dma->ndph = _flows[1];
+	  --ndsize;
+	  ++flows;
+	case DMAFLOW_SMALL:
+	  dma->ndpl = _flows[0];
+	  --ndsize;
+	  ++flows;
+	  break;
+	}
+
+      for (idx = 0; idx < ndsize; ++idx)
+	*stores[idx] = flows[idx];
+    }
+
+  dma->curr_desc_ptr = dma->next_desc_ptr;
   dma->curr_addr = dma->start_addr;
-  dma->curr_x_count = dma->x_count;
-  dma->curr_y_count = dma->y_count;
+  dma->curr_x_count = dma->x_count ? : 0xffff;
+  dma->curr_y_count = dma->y_count ? : 0xffff;
 }
 
 static int
@@ -155,13 +209,30 @@ bfin_dma_finish_x (struct hw *me, struct bfin_dma *dma)
 
   switch (dma->config & DMAFLOW)
     {
-    case DMAFLOW_AUTO:
-      bfin_dma_process_desc (me, dma);
-      return 1;
-    default:
+    case DMAFLOW_STOP:
       dma->irq_status = (dma->irq_status & ~DMA_RUN) | DMA_DONE;
       return 0;
+    default:
+      bfin_dma_process_desc (me, dma);
+      return 1;
     }
+}
+
+static void bfin_dma_hw_event_callback (struct hw *, void *);
+
+static void
+bfin_dma_reschedule (struct hw *me, unsigned delay)
+{
+  struct bfin_dma *dma = hw_data (me);
+  if (dma->handler)
+    {
+      hw_event_queue_deschedule (me, dma->handler);
+      dma->handler = NULL;
+    }
+  if (!delay)
+    return;
+  dma->handler = hw_event_queue_schedule (me, delay,
+					  bfin_dma_hw_event_callback, dma);
 }
 
 /* Chew through the DMA over and over.  */
@@ -170,17 +241,25 @@ bfin_dma_hw_event_callback (struct hw *me, void *data)
 {
   struct bfin_dma *dma = data;
   struct hw *peer;
-  bu8 buf[1024];
+  struct dv_bfin *bfin_peer;
+  bu8 buf[4096];
   unsigned ret, nr_bytes, ele_count;
 
+  dma->handler = NULL;
   peer = bfin_dma_get_peer (me, dma);
+  bfin_peer = hw_data (peer);
   ret = 0;
   nr_bytes = MIN (sizeof (buf), dma->curr_x_count * dma->ele_size);
 
   /* Pumping a chunk!  */
+  bfin_peer->dma_master = me;
+  bfin_peer->acked = false;
   if (dma->config & WNR)
     {
-      ret = hw_dma_read_buffer(peer, buf, 0, 0, nr_bytes);
+      HW_TRACE ((me, "dma read from %s to 0x%08lx length %u", dma->peer,
+		 (unsigned long) dma->curr_addr, nr_bytes));
+
+      ret = hw_dma_read_buffer (peer, buf, 0, dma->curr_addr, nr_bytes);
       /* Has the DMA stalled ?  abort for now.  */
       if (ret == 0)
 	goto reschedule;
@@ -191,13 +270,18 @@ bfin_dma_hw_event_callback (struct hw *me, void *data)
     }
   else
     {
+      HW_TRACE ((me, "dma write to %s from 0x%08lx length %u", dma->peer,
+		 (unsigned long) dma->curr_addr, nr_bytes));
+
       ret = sim_read (hw_system (me), dma->curr_addr, buf, nr_bytes);
       if (ret == 0)
 	goto reschedule;
       /* XXX: How to handle partial DMA transfers ?  */
       if (ret % dma->ele_size)
 	goto error;
-      ret = hw_dma_write_buffer(peer, buf, 0, 0, ret, 0);
+      ret = hw_dma_write_buffer (peer, buf, 0, dma->curr_addr, ret, 0);
+      if (ret == 0)
+	goto reschedule;
     }
 
   /* Ignore partial writes.  */
@@ -205,16 +289,15 @@ bfin_dma_hw_event_callback (struct hw *me, void *data)
   dma->curr_addr += ele_count * dma->x_modify;
   dma->curr_x_count -= ele_count;
 
-  if (dma->curr_x_count || bfin_dma_finish_x (me, dma))
+  if ((!dma->acked && dma->curr_x_count) || bfin_dma_finish_x (me, dma))
     /* Still got work to do, so schedule again.  */
  reschedule:
-    hw_event_queue_schedule (me, ret ? 1 : 1000, bfin_dma_hw_event_callback, dma);
+    bfin_dma_reschedule (me, ret ? 1 : 5000);
 
   return;
 
  error:
   /* Don't reschedule on errors ...  */
-sim_io_eprintf (hw_system (me), "%s: erroring %#x %#x\n", hw_path(me), nr_bytes, ret);
   dma->irq_status |= DMA_ERR;
 }
 
@@ -279,19 +362,22 @@ bfin_dma_io_write_buffer (struct hw *me, const void *source,
 	}
       break;
     case mmr_offset(config):
-      if (!bfin_dma_enabled (dma) || !(value & DMAEN))
-	{
-	  if (nr_bytes == 4)
-	    *value32p = value;
-	  else
-	    *value16p = value;
+      /* XXX: How to handle updating CONFIG of a running channel ?  */
+      if (nr_bytes == 4)
+	*value32p = value;
+      else
+	*value16p = value;
 
-	  if (bfin_dma_enabled (dma))
-	    {
-	      dma->irq_status |= DMA_RUN;
-	      bfin_dma_process_desc (me, dma);
-	      hw_event_queue_schedule (me, 1, bfin_dma_hw_event_callback, dma);
-	    }
+      if (bfin_dma_enabled (dma))
+	{
+	  dma->irq_status |= DMA_RUN;
+	  bfin_dma_process_desc (me, dma);
+	  bfin_dma_reschedule (me, 1);
+	}
+      else
+	{
+	  dma->irq_status &= ~DMA_RUN;
+	  bfin_dma_reschedule (me, 0);
 	}
       break;
     case mmr_offset(irq_status):
@@ -339,18 +425,20 @@ bfin_dma_io_read_buffer (struct hw *me, void *dest,
 }
 
 static unsigned
-bfin_dma_hw_dma_read_buffer_method (struct hw *bus, void *dest, int space,
-				    unsigned_word addr, unsigned nr_bytes)
+bfin_dma_dma_read_buffer_method (struct hw *me, void *dest, int space,
+				 unsigned_word addr, unsigned nr_bytes)
 {
-  struct bfin_dma *dma = hw_data (bus);
+  struct bfin_dma *dma = hw_data (me);
   unsigned ret, ele_count;
+
+  HW_TRACE_DMA_READ ();
 
   /* If someone is trying to read from me, I have to be enabled.  */
   if (!bfin_dma_enabled (dma))
     return 0;
 
   /* XXX: handle x_modify ...  */
-  ret = sim_read (hw_system (bus), dma->curr_addr, dest, nr_bytes);
+  ret = sim_read (hw_system (me), dma->curr_addr, dest, nr_bytes);
   /* Ignore partial writes.  */
   ele_count = ret / dma->ele_size;
   /* Has the DMA stalled ?  abort for now.  */
@@ -361,26 +449,28 @@ bfin_dma_hw_dma_read_buffer_method (struct hw *bus, void *dest, int space,
   dma->curr_x_count -= ele_count;
 
   if (dma->curr_x_count == 0)
-    bfin_dma_finish_x (bus, dma);
+    bfin_dma_finish_x (me, dma);
 
   return ret;
 }
 
 static unsigned
-bfin_dma_hw_dma_write_buffer_method (struct hw *bus, const void *source,
-				     int space, unsigned_word addr,
-				     unsigned nr_bytes,
-				     int violate_read_only_section)
+bfin_dma_dma_write_buffer_method (struct hw *me, const void *source,
+				  int space, unsigned_word addr,
+				  unsigned nr_bytes,
+				  int violate_read_only_section)
 {
-  struct bfin_dma *dma = hw_data (bus);
+  struct bfin_dma *dma = hw_data (me);
   unsigned ret, ele_count;
+
+  HW_TRACE_DMA_WRITE ();
 
   /* If someone is trying to write to me, I have to be enabled.  */
   if (!bfin_dma_enabled (dma))
     return 0;
 
   /* XXX: handle x_modify ...  */
-  ret = sim_write (hw_system (bus), dma->curr_addr, source, nr_bytes);
+  ret = sim_write (hw_system (me), dma->curr_addr, source, nr_bytes);
   /* Ignore partial writes.  */
   ele_count = ret / dma->ele_size;
   /* Has the DMA stalled ?  abort for now.  */
@@ -391,7 +481,7 @@ bfin_dma_hw_dma_write_buffer_method (struct hw *bus, const void *source,
   dma->curr_x_count -= ele_count;
 
   if (dma->curr_x_count == 0)
-    bfin_dma_finish_x (bus, dma);
+    bfin_dma_finish_x (me, dma);
 
   return ret;
 }
@@ -451,8 +541,8 @@ bfin_dma_finish (struct hw *me)
   set_hw_data (me, dma);
   set_hw_io_read_buffer (me, bfin_dma_io_read_buffer);
   set_hw_io_write_buffer (me, bfin_dma_io_write_buffer);
-  set_hw_dma_read_buffer (me, bfin_dma_hw_dma_read_buffer_method);
-  set_hw_dma_write_buffer (me, bfin_dma_hw_dma_write_buffer_method);
+  set_hw_dma_read_buffer (me, bfin_dma_dma_read_buffer_method);
+  set_hw_dma_write_buffer (me, bfin_dma_dma_write_buffer_method);
   set_hw_ports (me, bfin_dma_ports);
 
   /* XXX: A better model might be:

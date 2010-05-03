@@ -32,6 +32,7 @@
 #include "dv-bfin_ebiu_amc.h"
 #include "dv-bfin_ebiu_ddrc.h"
 #include "dv-bfin_ebiu_sdc.h"
+#include "dv-bfin_emac.h"
 #include "dv-bfin_evt.h"
 #include "dv-bfin_mmu.h"
 #include "dv-bfin_pll.h"
@@ -121,6 +122,8 @@ static const struct bfin_memory_layout bf51x_mem[] = {
 static const struct bfin_dev_layout bf51x_dev[] = {
   DEVICE (0xFFC00400, BFIN_MMR_UART_SIZE, "bfin_uart@0"),
   DEVICE (0xFFC02000, BFIN_MMR_UART_SIZE, "bfin_uart@1"),
+  DEVICE (0xFFC03000, BFIN_MMR_EMAC_SIZE, "bfin_emac"),
+  DEVICE (0, 0x20, "bfin_emac/eth_phy"),
 };
 #define bf512_dev bf51x_dev
 #define bf514_dev bf51x_dev
@@ -139,7 +142,6 @@ static const struct bfin_memory_layout bf52x_mem[] = {
   LAYOUT (0xFFC01400, 0x90, read_write),	/* TWI stub */
   LAYOUT (0xFFC01500, 0x50, read_write),	/* PORTG stub */
   LAYOUT (0xFFC01700, 0x50, read_write),	/* PORTH stub */
-  LAYOUT (0xFFC03000, 0x200, read_write),	/* EMAC stub */
   LAYOUT (0xFFC03200, 0x50, read_write),	/* PORT_MUX stub */
   LAYOUT (0xFF800000, 0x4000, read_write),	/* Data A */
   LAYOUT (0xFF804000, 0x4000, read_write),	/* Data A Cache */
@@ -158,6 +160,8 @@ static const struct bfin_memory_layout bf52x_mem[] = {
 static const struct bfin_dev_layout bf52x_dev[] = {
   DEVICE (0xFFC00400, BFIN_MMR_UART_SIZE, "bfin_uart@0"),
   DEVICE (0xFFC02000, BFIN_MMR_UART_SIZE, "bfin_uart@1"),
+  DEVICE (0xFFC03000, BFIN_MMR_EMAC_SIZE, "bfin_emac"),
+  DEVICE (0, 0x20, "bfin_emac/eth_phy"),
 };
 #define bf522_dev bf52x_dev
 #define bf523_dev bf52x_dev
@@ -212,7 +216,6 @@ static const struct bfin_memory_layout bf534_mem[] = {
   LAYOUT (0xFFC01400, 0x90, read_write),	/* TWI stub */
   LAYOUT (0xFFC01500, 0x50, read_write),	/* PORTG stub */
   LAYOUT (0xFFC01700, 0x50, read_write),	/* PORTH stub */
-  LAYOUT (0xFFC03000, 0x200, read_write),	/* EMAC stub */
   LAYOUT (0xFFC03200, 0x10, read_write),	/* PORT_MUX stub */
   LAYOUT (0xFF800000, 0x4000, read_write),	/* Data A */
   LAYOUT (0xFF804000, 0x4000, read_write),	/* Data A Cache */
@@ -228,7 +231,6 @@ static const struct bfin_memory_layout bf536_mem[] = {
   LAYOUT (0xFFC01400, 0x90, read_write),	/* TWI stub */
   LAYOUT (0xFFC01500, 0x50, read_write),	/* PORTG stub */
   LAYOUT (0xFFC01700, 0x50, read_write),	/* PORTG stub */
-  LAYOUT (0xFFC03000, 0x200, read_write),	/* EMAC stub */
   LAYOUT (0xFFC03200, 0x10, read_write),	/* PORT_MUX stub */
   LAYOUT (0xFF804000, 0x4000, read_write),	/* Data A Cache */
   LAYOUT (0xFF904000, 0x4000, read_write),	/* Data B Cache */
@@ -242,7 +244,6 @@ static const struct bfin_memory_layout bf537_mem[] = {
   LAYOUT (0xFFC01400, 0x90, read_write),	/* TWI stub */
   LAYOUT (0xFFC01500, 0x50, read_write),	/* PORTG stub */
   LAYOUT (0xFFC01700, 0x50, read_write),	/* PORTG stub */
-  LAYOUT (0xFFC03000, 0x200, read_write),	/* EMAC stub */
   LAYOUT (0xFFC03200, 0x10, read_write),	/* PORT_MUX stub */
   LAYOUT (0xFF800000, 0x4000, read_write),	/* Data A */
   LAYOUT (0xFF804000, 0x4000, read_write),	/* Data A Cache */
@@ -252,11 +253,16 @@ static const struct bfin_memory_layout bf537_mem[] = {
   LAYOUT (0xFFA08000, 0x4000, read_write_exec),	/* Inst B [1] */
   LAYOUT (0xFFA10000, 0x4000, read_write_exec),	/* Inst Cache [1] */
 };
-static const struct bfin_dev_layout bf537_dev[] = {
+static const struct bfin_dev_layout bf534_dev[] = {
   DEVICE (0xFFC00400, BFIN_MMR_UART_SIZE, "bfin_uart@0"),
   DEVICE (0xFFC02000, BFIN_MMR_UART_SIZE, "bfin_uart@1"),
 };
-#define bf534_dev bf537_dev
+static const struct bfin_dev_layout bf537_dev[] = {
+  DEVICE (0xFFC00400, BFIN_MMR_UART_SIZE, "bfin_uart@0"),
+  DEVICE (0xFFC02000, BFIN_MMR_UART_SIZE, "bfin_uart@1"),
+  DEVICE (0xFFC03000, BFIN_MMR_EMAC_SIZE, "bfin_emac"),
+  DEVICE (0, 0x20, "bfin_emac/eth_phy"),
+};
 #define bf536_dev bf537_dev
 
 #define bf538_chipid 0x27c4

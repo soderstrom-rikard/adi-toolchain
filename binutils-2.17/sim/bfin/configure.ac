@@ -23,6 +23,7 @@ SIM_AC_OPTION_HARDWARE(yes,,\
 	bfin_ebiu_amc \
 	bfin_ebiu_ddrc \
 	bfin_ebiu_sdc \
+	bfin_emac \
 	bfin_evt \
 	bfin_mmu \
 	bfin_pll \
@@ -32,6 +33,7 @@ SIM_AC_OPTION_HARDWARE(yes,,\
 	bfin_uart \
 	bfin_uart2 \
 	bfin_wdog \
+	eth_phy \
 )
 
 AC_CHECK_FUNCS([getuid getgid geteuid getegid setuid setgid])

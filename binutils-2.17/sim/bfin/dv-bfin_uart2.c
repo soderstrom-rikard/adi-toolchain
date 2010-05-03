@@ -25,10 +25,14 @@
 
 /* XXX: Should we bother emulating the TX/RX FIFOs ?  */
 
+/* Internal state needs to be the same as bfin_uart.  */
 struct bfin_uart
 {
-  /* Internal state needs to be the same as bfin_uart.  */
+  /* This top portion matches common dv_bfin struct.  */
   bu32 base;
+  struct hw *dma_master;
+  bool acked;
+
   char saved_byte;
   int saved_count;
 
@@ -160,19 +164,21 @@ bfin_uart_io_read_buffer (struct hw *me, void *dest,
 }
 
 static unsigned
-bfin_uart_hw_dma_read_buffer_method (struct hw *bus, void *dest, int space,
-				     unsigned_word addr, unsigned nr_bytes)
+bfin_uart_dma_read_buffer_method (struct hw *me, void *dest, int space,
+				  unsigned_word addr, unsigned nr_bytes)
 {
-  return bfin_uart_read_buffer (bus, dest, nr_bytes);
+  HW_TRACE_DMA_READ ();
+  return bfin_uart_read_buffer (me, dest, nr_bytes);
 }
 
 static unsigned
-bfin_uart_hw_dma_write_buffer_method (struct hw *bus, const void *source,
-				      int space, unsigned_word addr,
-				      unsigned nr_bytes,
-				      int violate_read_only_section)
+bfin_uart_dma_write_buffer_method (struct hw *me, const void *source,
+				   int space, unsigned_word addr,
+				   unsigned nr_bytes,
+				   int violate_read_only_section)
 {
-  return bfin_uart_write_buffer (bus, source, nr_bytes);
+  HW_TRACE_DMA_WRITE ();
+  return bfin_uart_write_buffer (me, source, nr_bytes);
 }
 
 static void
@@ -213,8 +219,8 @@ bfin_uart_finish (struct hw *me)
   set_hw_data (me, uart);
   set_hw_io_read_buffer (me, bfin_uart_io_read_buffer);
   set_hw_io_write_buffer (me, bfin_uart_io_write_buffer);
-  set_hw_dma_read_buffer (me, bfin_uart_hw_dma_read_buffer_method);
-  set_hw_dma_write_buffer (me, bfin_uart_hw_dma_write_buffer_method);
+  set_hw_dma_read_buffer (me, bfin_uart_dma_read_buffer_method);
+  set_hw_dma_write_buffer (me, bfin_uart_dma_write_buffer_method);
 
   attach_bfin_uart_regs (me, uart);
 
