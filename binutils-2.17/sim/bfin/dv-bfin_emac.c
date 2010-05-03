@@ -21,9 +21,8 @@
 #include <errno.h>
 #include <fcntl.h>
 #include <unistd.h>
-#include <zlib.h>
 #include <sys/ioctl.h>
-#include <linux/if.h>
+#include <net/if.h>
 #include <linux/if_tun.h>
 #include <linux/mii.h>
 
@@ -503,13 +502,17 @@ bfin_emac_tap_init (struct hw *me)
 
   memset (&emac->ifr, 0, sizeof (emac->ifr));
   emac->ifr.ifr_flags = IFF_TAP | IFF_NO_PI;
-//  sprintf (ifr.ifr_name, "tap%c", unit->cells[unit->nr_cells - 1]);
   strcpy (emac->ifr.ifr_name, "tap-gdb");
 
   flags = 1 * 1024 * 1024;
-  if (ioctl (emac->tap, TUNSETIFF, &emac->ifr) < 0 ||
-      ioctl (emac->tap, TUNSETNOCSUM) < 0 ||
-      ioctl (emac->tap, TUNSETSNDBUF, &flags) < 0)
+  if (ioctl (emac->tap, TUNSETIFF, &emac->ifr) < 0
+#ifdef TUNSETNOCSUM
+      || ioctl (emac->tap, TUNSETNOCSUM) < 0
+#endif
+#ifdef TUNSETSNDBUF
+      || ioctl (emac->tap, TUNSETSNDBUF, &flags) < 0
+#endif
+     )
     {
       sim_io_eprintf (sd, "emac tap: ioctl setup failed: %s\n",
 		      strerror (errno));
