@@ -4089,7 +4089,7 @@ decode_dsp32alu_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1)
       STORE (ASTATREG (ac0_copy), carry);
       STORE (ASTATREG (av0), sat);
       if (sat)
-      STORE (ASTATREG (av0s), sat);
+	STORE (ASTATREG (av0s), sat);
     }
   else if ((aop == 0 || aop == 1) && aopcde == 22)
     {
