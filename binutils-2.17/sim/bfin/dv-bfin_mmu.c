@@ -109,12 +109,8 @@ bfin_mmu_io_write_buffer (struct hw *me, const void *source,
     case mmr_offset(dmem_control):
     case mmr_offset(imem_control):
       /* XXX: IMC/DMC bit should add/remove L1 cache regions ...  */
-    case mmr_offset(dtest_command):
     case mmr_offset(dtest_data[0]) ... mmr_offset(dtest_data[1]):
-      /* XXX: should do something here.  */
-    case mmr_offset(itest_command):
     case mmr_offset(itest_data[0]) ... mmr_offset(itest_data[1]):
-      /* XXX: should do something here.  */
     case mmr_offset(dcplb_addr[0]) ... mmr_offset(dcplb_addr[15]):
     case mmr_offset(dcplb_data[0]) ... mmr_offset(dcplb_data[15]):
     case mmr_offset(icplb_addr[0]) ... mmr_offset(icplb_addr[15]):
@@ -128,6 +124,34 @@ bfin_mmu_io_write_buffer (struct hw *me, const void *source,
     case mmr_offset(icplb_fault_status):
     case mmr_offset(icplb_fault_addr):
       /* Discard writes to these.  */
+      break;
+    case mmr_offset(itest_command):
+      /* XXX: Not supported atm.  */
+      if (value)
+	hw_abort (me, "ITEST_COMMAND unimplemented");
+      break;
+    case mmr_offset(dtest_command):
+      /* Access L1 memory indirectly.  */
+      *valuep = value;
+      if (value)
+	{
+	  bu32 addr = mmu->sram_base_address   |
+	    ((value >> (26 - 11)) & (1 << 11)) | /* addr bit 11 (Way0/Way1)   */
+	    ((value >> (24 - 21)) & (1 << 21)) | /* addr bit 21 (Data/Inst)   */
+	    ((value >> (23 - 15)) & (1 << 15)) | /* addr bit 15 (Data Bank)   */
+	    ((value >> (16 - 12)) & (3 << 12)) | /* addr bits 13:12 (Subbank) */
+	    (value & 0x47F8);                    /* addr bits 14 & 10:3       */
+
+	  if (!(value & TEST_DATA_ARRAY))
+	    hw_abort (me, "DTEST_COMMAND tag array unimplemented");
+	  if (value & 0xfa7cb801)
+	    hw_abort (me, "DTEST_COMMAND bits undefined");
+
+	  if (value & TEST_WRITE)
+	    sim_write (hw_system (me), addr, (void *)mmu->dtest_data, 8);
+	  else
+	    sim_read (hw_system (me), addr, (void *)mmu->dtest_data, 8);
+	}
       break;
     default:
       dv_bfin_mmr_invalid (me, addr, nr_bytes, true);
@@ -156,7 +180,6 @@ bfin_mmu_io_read_buffer (struct hw *me, void *dest,
     case mmr_offset(imem_control):
     case mmr_offset(dtest_command):
     case mmr_offset(dtest_data[0]) ... mmr_offset(dtest_data[2]):
-      /* XXX: should do something here.  */
     case mmr_offset(itest_command):
     case mmr_offset(itest_data[0]) ... mmr_offset(itest_data[2]):
       /* XXX: should do something here.  */

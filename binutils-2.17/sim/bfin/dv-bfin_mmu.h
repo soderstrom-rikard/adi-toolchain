@@ -24,11 +24,9 @@
 #define BFIN_COREMMR_MMU_BASE	0xFFE00000
 #define BFIN_COREMMR_MMU_SIZE	0x2000
 
-#ifndef __ASSEMBLER__
 void mmu_check_addr (SIM_CPU *, bu32 addr, bool write, bool inst, int size);
 void mmu_process_fault (SIM_CPU *, bu32 addr, bool write, bool inst, bool unaligned, bool miss);
 void mmu_log_ifault (SIM_CPU *);
-#endif
 
 /* MEM_CONTROL */
 #define ENM    (1 << 0)
@@ -82,5 +80,14 @@ void mmu_log_ifault (SIM_CPU *);
 #define FAULT_DAG0    (0 << 18)
 #define FAULT_DAG1    (1 << 18)
 #define FAULT_ILLADDR (1 << 19)
+
+/* DTEST_COMMAND */
+#define TEST_READ       (0 << 1)
+#define TEST_WRITE      (1 << 1)
+#define TEST_TAG_ARRAY  (0 << 2)
+#define TEST_DATA_ARRAY (1 << 2)
+#define TEST_DBANK      (1 << 23)
+#define TEST_DATA_SRAM  (0 << 24)
+#define TEST_INST_SRAM  (1 << 24)
 
 #endif
