@@ -448,13 +448,13 @@ bfin_model_hw_tree_init (SIM_DESC sd, SIM_CPU *cpu)
       if (i < 12)
 	sim_hw_parse (sd, "/core/bfin_dma@%i > di dma%i /core/bfin_sic", i, i);
     }
-  sim_hw_parse (sd, "/core/bfin_dma@12/peer dma@13"); /* MDMA0 D->S */
+  sim_hw_parse (sd, "/core/bfin_dma@12/peer dma@0xd"); /* MDMA0 D->S */
   sim_hw_parse (sd, "/core/bfin_dma@12 > di mdma0 /core/bfin_sic");
-  sim_hw_parse (sd, "/core/bfin_dma@13/peer dma@12"); /* MDMA0 S->D */
+  sim_hw_parse (sd, "/core/bfin_dma@13/peer dma@0xc"); /* MDMA0 S->D */
   sim_hw_parse (sd, "/core/bfin_dma@13 > di mdma0 /core/bfin_sic");
-  sim_hw_parse (sd, "/core/bfin_dma@14/peer dma@15"); /* MDMA1 D->S */
+  sim_hw_parse (sd, "/core/bfin_dma@14/peer dma@0xf"); /* MDMA1 D->S */
   sim_hw_parse (sd, "/core/bfin_dma@14 > di mdma1 /core/bfin_sic");
-  sim_hw_parse (sd, "/core/bfin_dma@15/peer dma@14"); /* MDMA1 S->D */
+  sim_hw_parse (sd, "/core/bfin_dma@15/peer dma@0xe"); /* MDMA1 S->D */
   sim_hw_parse (sd, "/core/bfin_dma@15 > di mdma1 /core/bfin_sic");
 
  done:
