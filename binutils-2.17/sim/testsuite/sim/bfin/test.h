@@ -11,7 +11,9 @@ typedef char bs8;
 #else
 #define __ADSPBF537__ /* XXX: Hack for .S files.  */
 #endif
+#ifndef __FDPIC__
 #include <blackfin.h>
+#endif
 
 /* AZ AN AC0_COPY V_COPY CC AQ RND_MOD AC0 AC1 AV0 AV0S AV1 AV1S V VS */
 
