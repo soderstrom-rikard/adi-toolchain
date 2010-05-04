@@ -83,7 +83,7 @@
 
 /* Count the number of arguments in an argv.  */
 static int
-count_argc (char * const *argv)
+count_argc (const char * const *argv)
 {
   int i;
 
@@ -128,7 +128,7 @@ void
 bfin_syscall (SIM_CPU *cpu)
 {
   SIM_DESC sd = CPU_STATE (cpu);
-  char **argv = STATE_PROG_ARGV (sd);
+  const char * const *argv = (void *)STATE_PROG_ARGV (sd);
   host_callback *cb = STATE_CALLBACK (sd);
   bu32 args[6];
   CB_SYSCALL sc;
@@ -183,7 +183,7 @@ bfin_syscall (SIM_CPU *cpu)
       {
 	if (sc.arg1 < count_argc (argv))
 	  {
-	    char *argn = argv[sc.arg1];
+	    const char *argn = argv[sc.arg1];
 	    int len = strlen (argn);
 	    int written = sc.write_mem (cb, &sc, sc.arg2, argn, len + 1);
 	    if (written == len + 1)
@@ -523,11 +523,11 @@ static const char stat_map[] =
 "space,4"; */
 
 /* Some utils don't like having a NULL environ.  */
-static char * const simple_env[] = { "HOME=/", "PATH=/bin", NULL };
+static const char * const simple_env[] = { "HOME=/", "PATH=/bin", NULL };
 
 static void
 bfin_user_init (SIM_DESC sd, SIM_CPU *cpu, struct bfd *abfd,
-		char * const *argv, char * const *env)
+		const char * const *argv, const char * const *env)
 {
   /* XXX: Missing host -> target endian ...  */
   /* Linux starts the user app with the stack:
@@ -705,7 +705,7 @@ bfin_user_init (SIM_DESC sd, SIM_CPU *cpu, struct bfd *abfd,
 }
 
 static void
-bfin_os_init (SIM_DESC sd, SIM_CPU *cpu, char * const *argv)
+bfin_os_init (SIM_DESC sd, SIM_CPU *cpu, const char * const *argv)
 {
   /* Pass the command line via a string in R0 like Linux expects.  */
   int i;
@@ -757,10 +757,10 @@ sim_create_inferior (SIM_DESC sd, struct bfd *abfd,
   switch (STATE_ENVIRONMENT (sd))
     {
     case USER_ENVIRONMENT:
-      bfin_user_init (sd, cpu, abfd, argv, env);
+      bfin_user_init (sd, cpu, abfd, (void *)argv, (void *)env);
       break;
     case OPERATING_ENVIRONMENT:
-      bfin_os_init (sd, cpu, argv);
+      bfin_os_init (sd, cpu, (void *)argv);
       break;
     }
 
