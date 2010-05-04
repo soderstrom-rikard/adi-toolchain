@@ -19,6 +19,12 @@
 	IF !CC JUMP 3f;
 	CC = R0 == 1;
 	IF !CC JUMP fail;
+	R3 = LC0;
+	CC = R3 == 2;
+	IF !CC JUMP fail;
+	R3 = LC1;
+	CC = R3 == 1;
+	IF !CC JUMP fail;
 	pass
 
 3:	nop;

@@ -12,7 +12,7 @@
 	LSETUP (1f, 2f) LC0 = P0;
 	.endm
 
-	.macro test_check exp5:req, exp6:req, exp7:req
+	.macro test_check exp5:req, exp6:req, exp7:req, expLC
 	imm32 R4, \exp5;
 	CC = R4 == R5;
 	IF !CC JUMP 2f;
@@ -21,6 +21,10 @@
 	IF !CC JUMP 2f;
 	imm32 R4, \exp7;
 	CC = R4 == R7;
+	IF !CC JUMP 2f;
+	R3 = LC0;
+	imm32 R4, \expLC;
+	CC = R4 == R3;
 	IF !CC JUMP 2f;
 	JUMP 3f;
 2:	fail
@@ -38,7 +42,7 @@ test_jump_s:
 2:	R6 += 1;
 	fail
 3:	R7 += 1;
-	test_check 0, 0, 1
+	test_check 0, 0, 1, \lc
 	.endm
 	test_jump_s 0
 	test_jump_s 1
@@ -53,7 +57,7 @@ test_jump_m:
 2:	R6 += 1;
 	fail
 3:	R7 += 1;
-	test_check 1, 0, 1
+	test_check 1, 0, 1, \lc
 	.endm
 	test_jump_m 0
 	test_jump_m 1
@@ -61,19 +65,19 @@ test_jump_m:
 	test_jump_m 10
 
 test_jump_e:
-	.macro test_jump_e lc:req
+	.macro test_jump_e lc:req, lcend:req
 	test_prep \lc, 3f
 1:	R5 += 1;
 	R6 += 1;
 2:	JUMP (P1);
 	fail
 3:	R7 += 1;
-	test_check 1, 1, 1
+	test_check 1, 1, 1, \lcend
 	.endm
-	test_jump_e 0
-	test_jump_e 1
-	test_jump_e 2
-	test_jump_e 10
+	test_jump_e 0, 0
+	test_jump_e 1, 0
+	test_jump_e 2, 1
+	test_jump_e 10, 9
 
 test_call_s:
 	.macro test_call_s lc:req, exp5:req, exp6:req, exp7:req
@@ -82,7 +86,7 @@ test_call_s:
 	R5 += 1;
 2:	R6 += 1;
 3:	R7 += 1;
-	test_check \exp5, \exp6, \exp7
+	test_check \exp5, \exp6, \exp7, 0
 	.endm
 	test_call_s 0, 1, 1, 2
 	test_call_s 1, 1, 1, 2
@@ -96,7 +100,7 @@ test_call_m:
 	CALL (P1);
 2:	R6 += 1;
 3:	R7 += 1;
-	test_check \exp5, \exp6, \exp7
+	test_check \exp5, \exp6, \exp7, 0
 	.endm
 	test_call_m 0, 1, 1, 2
 	test_call_m 1, 1, 1, 2
@@ -110,7 +114,7 @@ test_call_e:
 	R6 += 1;
 2:	CALL (P1);
 3:	R7 += 1;
-	test_check \exp5, \exp6, \exp7
+	test_check \exp5, \exp6, \exp7, 0
 	.endm
 	test_call_e 0, 1, 1, 2
 	test_call_e 1, 1, 1, 2
