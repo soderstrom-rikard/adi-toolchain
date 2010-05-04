@@ -357,7 +357,9 @@ cec_exception (SIM_CPU *cpu, int excp)
 	  _cec_raise (cpu, CEC_STATE (cpu), IVG_EVX);
 	  /* We need to restart the engine so that we don't return
 	     and continue processing this bad insn.  */
-	  sim_engine_restart (sd, cpu, NULL, PCREG);
+	  if (EXCAUSE >= 0x20)
+	    sim_engine_restart (sd, cpu, NULL, PCREG);
+	  return;
 	}
     }
 
@@ -555,8 +557,8 @@ _cec_raise (SIM_CPU *cpu, struct bfin_cec *cec, int ivg)
 	  SET_RETNREG (oldpc);
 	  break;
 	case IVG_EVX:
-	  /* Exceptions point to the excepting instruction, not after.  */
-	  if ((SEQSTATREG & EXCAUSE_MASK) >= 0x20)
+	  /* Non-service exceptions point to the excepting instruction.  */
+	  if (EXCAUSE >= 0x20)
 	    SET_RETXREG (oldpc);
 	  else
 	    {
@@ -581,7 +583,7 @@ _cec_raise (SIM_CPU *cpu, struct bfin_cec *cec, int ivg)
 	SET_PCREG (cec_get_evt (cpu, ivg));
 
       TRACE_BRANCH (cpu, oldpc, PCREG, -1, "CEC changed PC (to EVT%i):", ivg);
-      BFIN_CPU_STATE.flow_change = true;
+      BFIN_CPU_STATE.did_jump = true;
 
       /* Enable the global interrupt mask upon interrupt entry.  */
       if (ivg >= IVG_IVHW)
@@ -656,7 +658,7 @@ cec_return (SIM_CPU *cpu, int ivg)
 
   oldpc = PCREG;
 
-  BFIN_CPU_STATE.flow_change = true;
+  BFIN_CPU_STATE.did_jump = true;
   if (STATE_ENVIRONMENT (sd) != OPERATING_ENVIRONMENT)
     {
       SET_PCREG (cec_read_ret_reg (cpu, ivg));

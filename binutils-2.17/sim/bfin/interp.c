@@ -316,13 +316,15 @@ step_once (SIM_CPU *cpu)
 {
   SIM_DESC sd = CPU_STATE (cpu);
   bu32 insn_len, oldpc = PCREG;
+  int i;
   bool ssstep;
 
   if (TRACE_ANY_P (cpu))
     trace_prefix (sd, cpu, NULL_CIA, oldpc, TRACE_LINENUM_P (cpu),
 		  NULL, 0, " "); /* Use a space for gcc warnings.  */
 
-  /* Handle hardware single stepping when lower than EVT3.  */
+  /* Handle hardware single stepping when lower than EVT3, and when SYSCFG
+     has already had the SSSTEP bit enabled.  */
   ssstep = false;
   if (STATE_ENVIRONMENT (sd) == OPERATING_ENVIRONMENT &&
       (SYSCFGREG & SYSCFG_SSSTEP))
@@ -339,21 +341,34 @@ step_once (SIM_CPU *cpu)
 #endif
 
   BFIN_CPU_STATE.did_jump = false;
-  BFIN_CPU_STATE.flow_change = false;
 
   insn_len = interp_insn_bfin (cpu, oldpc);
 
-  /* Only process the hwloop if we didn't arrive here out of order.
-     i.e. We jumped to this address, so we need to execute it.  */
-  if (!BFIN_CPU_STATE.did_jump && !BFIN_CPU_STATE.flow_change)
+  /* If we executed this insn successfully, then we always decrement
+     the loop counter.  We don't want to update the PC though if the
+     last insn happened to be a change in code flow (jump/etc...).  */
+  if (!BFIN_CPU_STATE.did_jump)
     SET_PCREG (hwloop_get_next_pc (cpu, oldpc, insn_len));
+  for (i = 1; i >= 0; --i)
+    if (LCREG (i) && oldpc == LBREG (i))
+      {
+	SET_LCREG (i, LCREG (i) - 1);
+	if (LCREG (i))
+	  break;
+      }
 
   ++ PROFILE_TOTAL_INSN_COUNT (CPU_PROFILE_DATA (cpu));
 
+  /* Handle hardware single stepping only if we're still lower than EVT3.
+     XXX: May not be entirely correct wrt EXCPT insns.  */
   if (ssstep)
     {
-      INSN_LEN = 0;
-      cec_exception (cpu, VEC_STEP);
+      int ivg = cec_get_ivg (cpu);
+      if (ivg == -1 || ivg > 3)
+	{
+	  INSN_LEN = 0;
+	  cec_exception (cpu, VEC_STEP);
+	}
     }
 
   return oldpc;

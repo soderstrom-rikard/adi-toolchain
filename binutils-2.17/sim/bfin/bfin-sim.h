@@ -67,11 +67,9 @@ struct bfin_cpu_state
   bu32 v_internal;
   bu32 astat_reserved;
 
-  /* Set by an instruction emulation function if we performed a jump.  */
+  /* Set by an instruction emulation function if we performed a jump.  We
+     cannot compare oldpc to newpc as this ignores the "jump 0;" case.  */
   bool did_jump;
-  /* Set by an instruction emulation function if we changed flow.  Not
-     the same as jumping (think RTS rather than JUMP).  */
-  bool flow_change;
 
   /* Used by the CEC to figure out where to return to.  */
   bu32 insn_len;

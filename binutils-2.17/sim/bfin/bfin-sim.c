@@ -1643,14 +1643,10 @@ hwloop_get_next_pc (SIM_CPU *cpu, bu32 pc, bu32 insn_len)
   /* If our PC has reached the bottom of a hardware loop,
      move back up to the top of the hardware loop.  */
   for (i = 1; i >= 0; --i)
-    if (LCREG (i) && pc == LBREG (i))
+    if (LCREG (i) > 1 && pc == LBREG (i))
       {
-	SET_LCREG (i, LCREG (i) - 1);
-	if (LCREG (i))
-	  {
 	    TRACE_BRANCH (cpu, pc, LTREG (i), i, "Hardware loop %i", i);
 	    return LTREG (i);
-	  }
       }
 
   return pc + insn_len;
@@ -1679,7 +1675,7 @@ decode_ProgCtrl_0 (SIM_CPU *cpu, bu16 iw0, bu32 pc)
 	illegal_instruction_combination (cpu);
       TRACE_BRANCH (cpu, pc, newpc, -1, "RTS");
       SET_PCREG (newpc);
-      BFIN_CPU_STATE.flow_change = true;
+      BFIN_CPU_STATE.did_jump = true;
       CYCLE_DELAY = 5;
     }
   else if (prgfunc == 1 && poprnd == 1)
