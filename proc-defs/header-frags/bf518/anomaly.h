@@ -11,7 +11,7 @@
  */
 
 /* This file should be up to date with:
- *  - Revision D, 12/16/2009; ADSP-BF512/BF514/BF516/BF518 Blackfin Processor Anomaly List
+ *  - Revision E, 01/26/2010; ADSP-BF512/BF514/BF516/BF518 Blackfin Processor Anomaly List
  */
 
 /* We plan on not supporting 0.0 silicon, but 0.1 isn't out yet - sorry */
@@ -103,6 +103,7 @@
 #define ANOMALY_05000198 (0)
 #define ANOMALY_05000202 (0)
 #define ANOMALY_05000215 (0)
+#define ANOMALY_05000219 (0)
 #define ANOMALY_05000220 (0)
 #define ANOMALY_05000227 (0)
 #define ANOMALY_05000230 (0)

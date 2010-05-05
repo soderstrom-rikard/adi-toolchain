@@ -11,8 +11,8 @@
  */
 
 /* This file should be up to date with:
- *  - Revision G, 09/18/2008; ADSP-BF538/BF538F Blackfin Processor Anomaly List
- *  - Revision L, 09/18/2008; ADSP-BF539/BF539F Blackfin Processor Anomaly List
+ *  - Revision H, 07/10/2009; ADSP-BF538/BF538F Blackfin Processor Anomaly List
+ *  - Revision M, 07/10/2009; ADSP-BF539/BF539F Blackfin Processor Anomaly List
  */
 
 #ifndef _MACH_ANOMALY_H_
@@ -132,6 +132,8 @@
 #define ANOMALY_05000443 (1)
 /* False Hardware Error when RETI Points to Invalid Memory */
 #define ANOMALY_05000461 (1)
+/* Synchronization Problem at Startup May Cause SPORT Transmit Channels to Misalign */
+#define ANOMALY_05000462 (1)
 /* Interrupted 32-Bit SPORT Data Register Access Results In Underflow */
 #define ANOMALY_05000473 (1)
 /* TESTSET Instruction Cannot Be Interrupted */
