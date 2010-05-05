@@ -212,6 +212,12 @@
 #define ANOMALY_05000474 (1)
 /* TESTSET Instruction Cannot Be Interrupted */
 #define ANOMALY_05000477 (1)
+/* Reads of ITEST_COMMAND and ITEST_DATA Registers Cause Cache Corruption */
+#define ANOMALY_05000481 (1)
+/* Possible USB Data Corruption When Multiple Endpoints Are Accessed by the Core */
+#define ANOMALY_05000483 (1)
+/* PLL_CTL Change Using bfrom_SysControl() Can Result in Processor Overclocking */
+#define ANOMALY_05000485 (__SILICON_REVISION__ >= 2)
 
 /* Anomalies that don't exist on this proc */
 #define ANOMALY_05000099 (0)
@@ -262,5 +268,6 @@
 #define ANOMALY_05000412 (0)
 #define ANOMALY_05000432 (0)
 #define ANOMALY_05000435 (0)
+#define ANOMALY_05000475 (0)
 
 #endif

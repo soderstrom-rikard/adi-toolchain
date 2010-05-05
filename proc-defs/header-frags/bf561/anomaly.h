@@ -290,8 +290,12 @@
 #define ANOMALY_05000461 (1)
 /* Interrupted 32-Bit SPORT Data Register Access Results In Underflow */
 #define ANOMALY_05000473 (1)
+/* Possible Lockup Condition whem Modifying PLL from External Memory */
+#define ANOMALY_05000475 (__SILICON_REVISION__ < 4)
 /* TESTSET Instruction Cannot Be Interrupted */
 #define ANOMALY_05000477 (1)
+/* Reads of ITEST_COMMAND and ITEST_DATA Registers Cause Cache Corruption */
+#define ANOMALY_05000481 (1)
 
 /* Anomalies that don't exist on this proc */
 #define ANOMALY_05000119 (0)
@@ -317,5 +321,6 @@
 #define ANOMALY_05000465 (0)
 #define ANOMALY_05000467 (0)
 #define ANOMALY_05000474 (0)
+#define ANOMALY_05000485 (0)
 
 #endif
