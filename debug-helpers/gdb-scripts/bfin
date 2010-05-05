@@ -720,7 +720,11 @@ define show_ctimer
 end
 
 define show_spi
-	set $$SPI_BASE = $arg0
+	if $argc > 0
+		set $$SPI_BASE = $arg0
+	else
+		set $$SPI_BASE = 0xFFC00500
+	end
 	set $$SPI_BAUD = *(unsigned short *) ($$SPI_BASE + 0x14)
 	set $$SPI_CTL  = *(unsigned short *) ($$SPI_BASE + 0x00)
 	set $$SPI_FLG  = *(unsigned short *) ($$SPI_BASE + 0x04)
@@ -745,9 +749,9 @@ define show_spi
 		printf "emiso "
 	end
 	if ($$SPI_CTL & (1 << 8))
-		printf "8bit "
-	else
 		printf "16bit "
+	else
+		printf "8bit "
 	end
 	if ($$SPI_CTL & (1 << 9))
 		printf "lsbf "
