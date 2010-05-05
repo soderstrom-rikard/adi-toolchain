@@ -28,7 +28,7 @@
 #define ANOMALY_05000119 (1)
 /* Rx.H Cannot Be Used to Access 16-bit System MMR Registers */
 #define ANOMALY_05000122 (1)
-/* Data Corruption with Cached External Memory and Non-Cached On-Chip L2 Memory */
+/* Data Corruption/Core Hang with L2/L3 Configured in Writeback Cache Mode */
 #define ANOMALY_05000220 (1)
 /* False Hardware Error from an Access in the Shadow of a Conditional Branch */
 #define ANOMALY_05000245 (1)
@@ -210,8 +210,6 @@
 #define ANOMALY_05000473 (1)
 /* Access to DDR-SDRAM causes system hang under certain PLL/VR settings */
 #define ANOMALY_05000474 (1)
-/* Core Hang With L2/L3 Configured in Writeback Cache Mode */
-#define ANOMALY_05000475 (1)
 /* TESTSET Instruction Cannot Be Interrupted */
 #define ANOMALY_05000477 (1)
 
