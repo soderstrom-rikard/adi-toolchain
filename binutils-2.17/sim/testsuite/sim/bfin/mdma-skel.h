@@ -2,25 +2,34 @@
 
 void _mdma_memcpy (bu32 dst, bu32 src, bu32 size, bs16 mod)
 {
+  bu32 count = size >> (abs (mod) / 2);
+  bu16 wdsize;
+  switch (abs (mod))
+    {
+    case 4: wdsize = WDSIZE_32; break;
+    case 2: wdsize = WDSIZE_16; break;
+    default: wdsize = WDSIZE_8; break;
+    }
+
   s->config = d->config = 0;
 
   d->irq_status = DMA_DONE | DMA_ERR;
 
   /* Destination */
   d->start_addr = dst;
-  d->x_count = size >> 2;
+  d->x_count = count;
   d->x_modify = mod;
   d->irq_status = DMA_DONE | DMA_ERR;
 
   /* Source */
   s->start_addr = src;
-  s->x_count = size >> 2;
+  s->x_count = count;
   s->x_modify = mod;
   s->irq_status = DMA_DONE | DMA_ERR;
 
   /* Enable */
-  s->config = DMAEN | WDSIZE_32;
-  d->config = WNR | DI_EN | DMAEN | WDSIZE_32;
+  s->config = DMAEN | wdsize;
+  d->config = WNR | DI_EN | DMAEN | wdsize;
 
   while (!(d->irq_status & DMA_DONE))
     continue;
