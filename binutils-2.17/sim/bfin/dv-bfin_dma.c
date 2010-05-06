@@ -79,6 +79,12 @@ bfin_dma_enabled (struct bfin_dma *dma)
   return (dma->config & DMAEN);
 }
 
+static bool
+bfin_dma_running (struct bfin_dma *dma)
+{
+  return (dma->irq_status & DMA_RUN);
+}
+
 static const char *bfin_dma_537_pmap[16] = {
   "ppi", "emac", "emac", "sport@0", "sport@0", "sport@1",
   "sport@1", "spi", "uart@0", "uart@0", "uart@1", "uart@1",
@@ -216,6 +222,7 @@ bfin_dma_finish_x (struct hw *me, struct bfin_dma *dma)
   switch (dma->config & DMAFLOW)
     {
     case DMAFLOW_STOP:
+      HW_TRACE ((me, "dma is complete"));
       dma->irq_status = (dma->irq_status & ~DMA_RUN) | DMA_DONE;
       return 0;
     default:
@@ -237,6 +244,7 @@ bfin_dma_reschedule (struct hw *me, unsigned delay)
     }
   if (!delay)
     return;
+  HW_TRACE ((me, "scheduling next process in %u", delay));
   dma->handler = hw_event_queue_schedule (me, delay,
 					  bfin_dma_hw_event_callback, dma);
 }
@@ -266,7 +274,7 @@ bfin_dma_hw_event_callback (struct hw *me, void *data)
   bfin_peer->acked = false;
   if (dma->config & WNR)
     {
-      HW_TRACE ((me, "dma read from %s to 0x%08lx length %u", dma->peer,
+      HW_TRACE ((me, "dma transfer from %s to 0x%08lx length %u", dma->peer,
 		 (unsigned long) dma->curr_addr, nr_bytes));
 
       ret = hw_dma_read_buffer (peer, buf, 0, dma->curr_addr, nr_bytes);
@@ -280,8 +288,8 @@ bfin_dma_hw_event_callback (struct hw *me, void *data)
     }
   else
     {
-      HW_TRACE ((me, "dma write to %s from 0x%08lx length %u", dma->peer,
-		 (unsigned long) dma->curr_addr, nr_bytes));
+      HW_TRACE ((me, "dma transfer from 0x%08lx length %u to %s",
+		 (unsigned long) dma->curr_addr, nr_bytes, dma->peer));
 
       ret = sim_read (hw_system (me), dma->curr_addr, buf, nr_bytes);
       if (ret == 0)
@@ -344,23 +352,25 @@ bfin_dma_io_write_buffer (struct hw *me, const void *source,
     case mmr_offset(curr_desc_ptr):
     case mmr_offset(curr_addr):
       /* Don't require 32bit access as all DMA MMRs can be used as 16bit.  */
-      if (!bfin_dma_enabled (dma))
+      if (!bfin_dma_running (dma))
 	{
 	  if (nr_bytes == 4)
 	    *value32p = value;
 	  else
 	   *value16p = value;
 	}
+      else
+	HW_TRACE ((me, "discarding write while dma running"));
       break;
     case mmr_offset(x_count):
     case mmr_offset(x_modify):
     case mmr_offset(y_count):
     case mmr_offset(y_modify):
-      if (!bfin_dma_enabled (dma))
+      if (!bfin_dma_running (dma))
 	*value16p = value;
       break;
     case mmr_offset(peripheral_map):
-      if (!bfin_dma_enabled (dma))
+      if (!bfin_dma_running (dma))
 	{
 	  *value16p = (*value16p & CTYPE) | (value & ~CTYPE);
 	  /* Clear peripheral peer so it gets looked up again.  */
@@ -370,6 +380,8 @@ bfin_dma_io_write_buffer (struct hw *me, const void *source,
 	      dma->hw_peer = NULL;
 	    }
 	}
+      else
+	HW_TRACE ((me, "discarding write while dma running"));
       break;
     case mmr_offset(config):
       /* XXX: How to handle updating CONFIG of a running channel ?  */
@@ -397,8 +409,10 @@ bfin_dma_io_write_buffer (struct hw *me, const void *source,
       break;
     case mmr_offset(curr_x_count):
     case mmr_offset(curr_y_count):
-      if (!bfin_dma_enabled (dma))
+      if (!bfin_dma_running (dma))
 	*value16p = value;
+      else
+	HW_TRACE ((me, "discarding write while dma running"));
       break;
     default:
       /* XXX: The HW lets the pad regions be read/written ...  */
@@ -446,7 +460,7 @@ bfin_dma_dma_read_buffer_method (struct hw *me, void *dest, int space,
   HW_TRACE_DMA_READ ();
 
   /* If someone is trying to read from me, I have to be enabled.  */
-  if (!bfin_dma_enabled (dma))
+  if (!bfin_dma_enabled (dma) && !bfin_dma_running (dma))
     return 0;
 
   /* XXX: handle x_modify ...  */
@@ -478,7 +492,7 @@ bfin_dma_dma_write_buffer_method (struct hw *me, const void *source,
   HW_TRACE_DMA_WRITE ();
 
   /* If someone is trying to write to me, I have to be enabled.  */
-  if (!bfin_dma_enabled (dma))
+  if (!bfin_dma_enabled (dma) && !bfin_dma_running (dma))
     return 0;
 
   /* XXX: handle x_modify ...  */
