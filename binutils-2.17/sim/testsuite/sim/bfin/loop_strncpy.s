@@ -1,3 +1,4 @@
+# Blackfin testcase for loop counter values when jumping out from the last insn
 # mach: bfin
 
 .include "testutils.inc"
