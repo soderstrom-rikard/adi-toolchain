@@ -119,16 +119,18 @@ static const struct bfin_memory_layout bf51x_mem[] = {
 #define bf514_mem bf51x_mem
 #define bf516_mem bf51x_mem
 #define bf518_mem bf51x_mem
-static const struct bfin_dev_layout bf51x_dev[] = {
+static const struct bfin_dev_layout bf512_dev[] = {
+  DEVICE (0xFFC00400, BFIN_MMR_UART_SIZE, "bfin_uart@0"),
+  DEVICE (0xFFC02000, BFIN_MMR_UART_SIZE, "bfin_uart@1"),
+};
+#define bf514_dev bf512_dev
+static const struct bfin_dev_layout bf516_dev[] = {
   DEVICE (0xFFC00400, BFIN_MMR_UART_SIZE, "bfin_uart@0"),
   DEVICE (0xFFC02000, BFIN_MMR_UART_SIZE, "bfin_uart@1"),
   DEVICE (0xFFC03000, BFIN_MMR_EMAC_SIZE, "bfin_emac"),
   DEVICE (0, 0x20, "bfin_emac/eth_phy"),
 };
-#define bf512_dev bf51x_dev
-#define bf514_dev bf51x_dev
-#define bf516_dev bf51x_dev
-#define bf518_dev bf51x_dev
+#define bf518_dev bf516_dev
 
 #define bf522_chipid 0x27e4
 #define bf523_chipid 0x27e0
@@ -157,18 +159,20 @@ static const struct bfin_memory_layout bf52x_mem[] = {
 #define bf525_mem bf52x_mem
 #define bf526_mem bf52x_mem
 #define bf527_mem bf52x_mem
-static const struct bfin_dev_layout bf52x_dev[] = {
+static const struct bfin_dev_layout bf522_dev[] = {
+  DEVICE (0xFFC00400, BFIN_MMR_UART_SIZE, "bfin_uart@0"),
+  DEVICE (0xFFC02000, BFIN_MMR_UART_SIZE, "bfin_uart@1"),
+};
+#define bf523_dev bf522_dev
+#define bf524_dev bf522_dev
+#define bf525_dev bf522_dev
+static const struct bfin_dev_layout bf526_dev[] = {
   DEVICE (0xFFC00400, BFIN_MMR_UART_SIZE, "bfin_uart@0"),
   DEVICE (0xFFC02000, BFIN_MMR_UART_SIZE, "bfin_uart@1"),
   DEVICE (0xFFC03000, BFIN_MMR_EMAC_SIZE, "bfin_emac"),
   DEVICE (0, 0x20, "bfin_emac/eth_phy"),
 };
-#define bf522_dev bf52x_dev
-#define bf523_dev bf52x_dev
-#define bf524_dev bf52x_dev
-#define bf525_dev bf52x_dev
-#define bf526_dev bf52x_dev
-#define bf527_dev bf52x_dev
+#define bf527_dev bf526_dev
 
 #define bf531_chipid 0x27a5
 #define bf532_chipid bf531_chipid
@@ -418,7 +422,7 @@ bfin_model_hw_tree_init (SIM_DESC sd, SIM_CPU *cpu)
     dv_bfin_hw_parse (sd, ebiu_sdc, EBIU_SDC);
 
   dv_bfin_hw_parse (sd, sic, SIC);
-  sim_hw_parse (sd, "/core/bfin_sic/model %s", MODEL_NAME (model));
+  sim_hw_parse (sd, "/core/bfin_sic/type %i", mdata->model_num);
   for (i = 7; i < 16; ++i)
     sim_hw_parse (sd, "/core/bfin_sic > ivg%i ivg%i /core/bfin_cec", i, i);
 
@@ -436,6 +440,24 @@ bfin_model_hw_tree_init (SIM_DESC sd, SIM_CPU *cpu)
       sim_hw_parse (sd, "/core/bfin_rtc > rtc rtc /core/bfin_sic");
     }
 
+  /* XXX: Should be pushed to per-model structs.  */
+  sim_hw_parse (sd, "/core/bfin_dmac@0/type %i", mdata->model_num);
+  for (i = 0; i < 16; ++i)
+    {
+      sim_hw_parse (sd, "/core/bfin_dmac@0/bfin_dma@%i/reg %#x %i", i,
+		    0xFFC00C00 + i * BFIN_MMR_DMA_SIZE, BFIN_MMR_DMA_SIZE);
+      if (i < 12)
+	{
+	  /* Could route these into the bfin_dmac and let that
+	     forward it to the SIC, but not much value.  */
+	  sim_hw_parse (sd, "/core/bfin_dmac@0/bfin_dma@%i > di dma%i /core/bfin_sic", i, i);
+	}
+    }
+  sim_hw_parse (sd, "/core/bfin_dmac@0/bfin_dma@12 > di mdma0 /core/bfin_sic");
+  sim_hw_parse (sd, "/core/bfin_dmac@0/bfin_dma@13 > di mdma0 /core/bfin_sic");
+  sim_hw_parse (sd, "/core/bfin_dmac@0/bfin_dma@14 > di mdma1 /core/bfin_sic");
+  sim_hw_parse (sd, "/core/bfin_dmac@0/bfin_dma@15 > di mdma1 /core/bfin_sic");
+
   for (i = 0; i < mdata->dev_count; ++i)
     {
       const struct bfin_dev_layout *dev = &mdata->dev[i];
@@ -452,24 +474,6 @@ bfin_model_hw_tree_init (SIM_DESC sd, SIM_CPU *cpu)
 	  sim_hw_parse (sd, "/core/%s > stat %s_stat /core/bfin_sic", dev->dev, sint);
 	}
     }
-
-  /* XXX: Should be pushed to per-model structs.  */
-  sim_hw_parse (sd, "/core/bfin_dmac@0");
-  for (i = 0; i < 16; ++i)
-    {
-      sim_hw_parse (sd, "/core/bfin_dmac@0/bfin_dma@%i/reg %#x %i", i,
-		    0xFFC00C00 + i * BFIN_MMR_DMA_SIZE, BFIN_MMR_DMA_SIZE);
-      if (i < 12)
-	{
-	  /* Could route these into the bfin_dmac and let that
-	     forward it to the SIC, but not much value.  */
-	  sim_hw_parse (sd, "/core/bfin_dmac@0/bfin_dma@%i > di dma%i /core/bfin_sic", i, i);
-	}
-    }
-  sim_hw_parse (sd, "/core/bfin_dmac@0/bfin_dma@12 > di mdma0 /core/bfin_sic");
-  sim_hw_parse (sd, "/core/bfin_dmac@0/bfin_dma@13 > di mdma0 /core/bfin_sic");
-  sim_hw_parse (sd, "/core/bfin_dmac@0/bfin_dma@14 > di mdma1 /core/bfin_sic");
-  sim_hw_parse (sd, "/core/bfin_dmac@0/bfin_dma@15 > di mdma1 /core/bfin_sic");
 
  done:
   /* Trigger all the new devices' finish func.  */

@@ -39,6 +39,8 @@ struct dv_bfin {
 #define DV_PORT_TX   0
 #define DV_PORT_RX   1
 #define DV_PORT_STAT 2
+
+unsigned int dv_get_bus_num (struct hw *);
 
 static inline bu16 dv_load_2 (const void *ptr)
 {

@@ -34,14 +34,9 @@ struct bfin_dmac
 
   const char **pmap;
   unsigned int pmap_count;
+  const unsigned int *mdma_map;
+  unsigned int mdma_count;
 };
-
-static unsigned int
-bfin_dmac_get_chan_num (struct hw *dma)
-{
-  const hw_unit *unit = hw_unit_address (dma);
-  return unit->cells[unit->nr_cells - 1];
-}
 
 struct hw *
 bfin_dmac_get_peer (struct hw *dma, bu16 pmap)
@@ -55,14 +50,11 @@ bfin_dmac_get_peer (struct hw *dma, bu16 pmap)
   if (pmap & CTYPE)
     {
       /* MDMA channel.  */
-      unsigned int chan_num = bfin_dmac_get_chan_num (dma);
-      switch (chan_num)
-	{
-	case 12: chan_num = 13; break;	/* MDMA0 */
-	case 13: chan_num = 12; break;
-	case 14: chan_num = 15; break;	/* MDMA1 */
-	case 15: chan_num = 14; break;
-	}
+      unsigned int chan_num = dv_get_bus_num (dma);
+      if (chan_num < dmac->mdma_count && dmac->mdma_map[chan_num])
+	chan_num = dmac->mdma_map[chan_num];
+      else
+	hw_abort (me, "No map for mdma channel %i", chan_num);
       sprintf (peer, "%s/bfin_dma@%u", hw_path (me), chan_num);
     }
   else
@@ -85,12 +77,21 @@ bfin_dmac_default_pmap (struct hw *dma)
 {
   struct hw *me = hw_parent (dma);
   struct bfin_dmac *dmac = hw_data (me);
-  unsigned int chan_num = bfin_dmac_get_chan_num (dma);
+  unsigned int chan_num = dv_get_bus_num (dma);
   if (chan_num < dmac->pmap_count)
     return chan_num << 12;
   else
     return CTYPE;	/* MDMA */
 }
+
+static const unsigned int bfin_dmac_537_mdma_map[] = {
+  /* MDMA0 */
+  [12] = 13,
+  [13] = 12,
+  /* MDMA1 */
+  [14] = 15,
+  [15] = 14,
+};
 
 static const char *bfin_dmac_537_pmap[] = {
   "ppi", "emac", "emac", "sport@0", "sport@0", "sport@1",
@@ -148,9 +149,23 @@ bfin_dmac_finish (struct hw *me)
   set_hw_port_event (me, bfin_dmac_port_event);
 
   /* Initialize the DMA Controller.  */
-  dmac->pmap = bfin_dmac_537_pmap;
-  dmac->pmap_count = ARRAY_SIZE (bfin_dmac_537_pmap);
-  set_hw_ports (me, bfin_dmac_537_ports);
+  if (hw_find_property (me, "type") == NULL)
+    hw_abort (me, "Missing \"type\" property");
+
+  switch (hw_find_integer_property (me, "type"))
+    {
+    case 534:
+    case 536:
+    case 537:
+      dmac->pmap = bfin_dmac_537_pmap;
+      dmac->pmap_count = ARRAY_SIZE (bfin_dmac_537_pmap);
+      dmac->mdma_map = bfin_dmac_537_mdma_map;
+      dmac->mdma_count = ARRAY_SIZE (bfin_dmac_537_mdma_map);
+      set_hw_ports (me, bfin_dmac_537_ports);
+      break;
+    default:
+      hw_abort (me, "no support for DMAC on this Blackfin model yet");
+    }
 }
 
 const struct hw_descriptor dv_bfin_dmac_descriptor[] = {

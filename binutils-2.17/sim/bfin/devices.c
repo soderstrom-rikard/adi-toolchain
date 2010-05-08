@@ -148,3 +148,9 @@ void device_error (device *me, const char *message, ...)
      device isn't bound to the system yet, we can't call any common
      hardware error funcs on it or we'll hit a NULL pointer.  */
 }
+
+unsigned int dv_get_bus_num (struct hw *me)
+{
+  const hw_unit *unit = hw_unit_address (me);
+  return unit->cells[unit->nr_cells - 1];
+}
