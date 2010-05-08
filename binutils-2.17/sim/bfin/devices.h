@@ -34,6 +34,11 @@ struct dv_bfin {
 };
 
 #define BFIN_MMR_16(mmr) mmr, __pad_##mmr
+
+/* Most peripherals have either one interrupt or these three.  */
+#define DV_PORT_TX   0
+#define DV_PORT_RX   1
+#define DV_PORT_STAT 2
 
 static inline bu16 dv_load_2 (const void *ptr)
 {

@@ -34,13 +34,14 @@ struct bfin_uart
   struct hw *dma_master;
   bool acked;
 
+  struct hw_event *handler;
   char saved_byte;
   int saved_count;
 
-  /* These are aliased to DLL.  */
-  bu16 BFIN_MMR_16(thr), BFIN_MMR_16(rbr);
   /* This is aliased to DLH.  */
-  bu16 BFIN_MMR_16(ier);
+  bu16 ier;
+  /* These are aliased to DLL.  */
+  bu16 thr, rbr;
 
   /* Order after here is important -- matches hardware MMR layout.  */
   bu16 BFIN_MMR_16(dll);
@@ -51,7 +52,7 @@ struct bfin_uart
   bu16 BFIN_MMR_16(lsr);
   bu16 BFIN_MMR_16(msr);
   bu16 BFIN_MMR_16(scr);
-  bu32 _pad0;
+  bu16 _pad0[2];
   bu16 BFIN_MMR_16(gctl);
 };
 #define mmr_base()      offsetof(struct bfin_uart, dll)
@@ -76,22 +77,47 @@ static const char *mmr_name (struct bfin_uart *uart, bu32 idx)
 # define dv_sockser_read(sd) 0xff
 #endif
 
+static void
+bfin_uart_poll (struct hw *me, void *data)
+{
+  struct bfin_uart *uart = data;
+  bu16 lsr;
+
+  uart->handler = NULL;
+
+  lsr = bfin_uart_get_status (me);
+  if (lsr & DR)
+    hw_port_event (me, DV_PORT_RX, 1);
+
+  bfin_uart_reschedule (me);
+}
+
+void
+bfin_uart_reschedule (struct hw *me)
+{
+  struct bfin_uart *uart = hw_data (me);
+
+  if (uart->ier & ERBFI)
+    {
+      if (!uart->handler)
+	uart->handler = hw_event_queue_schedule (me, 10000,
+						 bfin_uart_poll, uart);
+    }
+  else
+    {
+      if (uart->handler)
+	{
+	  hw_event_queue_deschedule (me, uart->handler);
+	  uart->handler = NULL;
+	}
+    }
+}
+
 bu16
 bfin_uart_write_byte (struct hw *me, bu16 thr)
 {
-  SIM_DESC sd = hw_system (me);
-  int status = dv_sockser_status (sd);
-
-  if (status & DV_SOCKSER_DISCONNECTED)
-    {
-      char ch = thr;
-      sim_io_write_stdout (sd, &ch, 1);
-      sim_io_flush_stdout (sd);
-    }
-  else
-    /* XXX: We should check DV_SOCKSER_OUTPUT_EMPTY.  */
-    dv_sockser_write (sd, thr);
-
+  char ch = thr;
+  bfin_uart_write_buffer (me, &ch, 1);
   return thr;
 }
 
@@ -113,20 +139,27 @@ bfin_uart_io_write_buffer (struct hw *me, const void *source,
   dv_bfin_mmr_require_16 (me, addr, nr_bytes, true);
 
   /* XXX: All MMRs are "8bit" ... what happens to high 8bits ?  */
-
   switch (mmr_off)
     {
     case mmr_offset(dll):
       if (uart->lcr & DLAB)
 	uart->dll = value;
       else
-	uart->thr = bfin_uart_write_byte (me, value);
+	{
+	  uart->thr = bfin_uart_write_byte (me, value);
+
+	  if (uart->ier & ETBEI)
+	    hw_port_event (me, DV_PORT_TX, 1);
+	}
       break;
     case mmr_offset(dlh):
       if (uart->lcr & DLAB)
 	uart->dlh = value;
       else
-	uart->ier = value;
+	{
+	  uart->ier = value;
+	  bfin_uart_reschedule (me);
+	}
       break;
     case mmr_offset(iir):
     case mmr_offset(lsr):
@@ -187,11 +220,12 @@ bfin_uart_get_next_byte (struct hw *me, bu16 rbr, bool *fresh)
 }
 
 bu16
-bfin_uart_get_status (struct hw *me, bu16 lsr)
+bfin_uart_get_status (struct hw *me)
 {
   SIM_DESC sd = hw_system (me);
   struct bfin_uart *uart = hw_data (me);
   int status = dv_sockser_status (sd);
+  bu16 lsr = 0;
 
   if (status & DV_SOCKSER_DISCONNECTED)
     {
@@ -241,7 +275,7 @@ bfin_uart_io_read_buffer (struct hw *me, void *dest,
       break;
     case mmr_offset(lsr):
       /* XXX: Reads are destructive on most parts, but not all ...  */
-      uart->lsr |= bfin_uart_get_status (me, uart->lsr);
+      uart->lsr |= bfin_uart_get_status (me);
       dv_store_2 (dest, *valuep);
       uart->lsr = 0;
       break;
@@ -290,8 +324,8 @@ bfin_uart_read_buffer (struct hw *me, unsigned char *buffer, unsigned nr_bytes)
 }
 
 static unsigned
-bfin_uart_dma_read_buffer_method (struct hw *me, void *dest, int space,
-				  unsigned_word addr, unsigned nr_bytes)
+bfin_uart_dma_read_buffer (struct hw *me, void *dest, int space,
+			   unsigned_word addr, unsigned nr_bytes)
 {
   HW_TRACE_DMA_READ ();
   return bfin_uart_read_buffer (me, dest, nr_bytes);
@@ -320,14 +354,29 @@ bfin_uart_write_buffer (struct hw *me, const unsigned char *buffer,
 }
 
 static unsigned
-bfin_uart_dma_write_buffer_method (struct hw *me, const void *source,
-				   int space, unsigned_word addr,
-				   unsigned nr_bytes,
-				   int violate_read_only_section)
+bfin_uart_dma_write_buffer (struct hw *me, const void *source,
+			    int space, unsigned_word addr,
+			    unsigned nr_bytes,
+			    int violate_read_only_section)
 {
+  struct bfin_uart *uart = hw_data (me);
+  unsigned ret;
+
   HW_TRACE_DMA_WRITE ();
-  return bfin_uart_write_buffer (me, source, nr_bytes);
+
+  ret = bfin_uart_write_buffer (me, source, nr_bytes);
+
+  if (ret == nr_bytes && (uart->ier & ETBEI))
+    hw_port_event (me, DV_PORT_TX, 1);
+
+  return ret;
 }
+
+static const struct hw_port_descriptor bfin_uart_ports[] = {
+  { "tx",   DV_PORT_TX,   0, output_port, },
+  { "rx",   DV_PORT_RX,   0, output_port, },
+  { "stat", DV_PORT_STAT, 0, output_port, },
+};
 
 static void
 attach_bfin_uart_regs (struct hw *me, struct bfin_uart *uart)
@@ -367,8 +416,9 @@ bfin_uart_finish (struct hw *me)
   set_hw_data (me, uart);
   set_hw_io_read_buffer (me, bfin_uart_io_read_buffer);
   set_hw_io_write_buffer (me, bfin_uart_io_write_buffer);
-  set_hw_dma_read_buffer (me, bfin_uart_dma_read_buffer_method);
-  set_hw_dma_write_buffer (me, bfin_uart_dma_write_buffer_method);
+  set_hw_dma_read_buffer (me, bfin_uart_dma_read_buffer);
+  set_hw_dma_write_buffer (me, bfin_uart_dma_write_buffer);
+  set_hw_ports (me, bfin_uart_ports);
 
   attach_bfin_uart_regs (me, uart);
 

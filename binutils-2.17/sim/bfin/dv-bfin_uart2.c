@@ -33,6 +33,7 @@ struct bfin_uart
   struct hw *dma_master;
   bool acked;
 
+  struct hw_event *handler;
   char saved_byte;
   int saved_count;
 
@@ -86,6 +87,8 @@ bfin_uart_io_write_buffer (struct hw *me, const void *source,
     {
     case mmr_offset(thr):
       uart->thr = bfin_uart_write_byte (me, value);
+      if (uart->ier & ETBEI)
+	hw_port_event (me, DV_PORT_TX, 1);
       break;
     case mmr_offset(ier_set):
       uart->ier |= value;
@@ -142,9 +145,10 @@ bfin_uart_io_read_buffer (struct hw *me, void *dest,
     case mmr_offset(ier_set):
     case mmr_offset(ier_clear):
       dv_store_2 (dest, uart->ier);
+      bfin_uart_reschedule (me);
       break;
     case mmr_offset(lsr):
-      uart->lsr |= bfin_uart_get_status (me, uart->lsr);
+      uart->lsr |= bfin_uart_get_status (me);
     case mmr_offset(thr):
     case mmr_offset(msr):
     case mmr_offset(dll):
@@ -164,22 +168,37 @@ bfin_uart_io_read_buffer (struct hw *me, void *dest,
 }
 
 static unsigned
-bfin_uart_dma_read_buffer_method (struct hw *me, void *dest, int space,
-				  unsigned_word addr, unsigned nr_bytes)
+bfin_uart_dma_read_buffer (struct hw *me, void *dest, int space,
+			   unsigned_word addr, unsigned nr_bytes)
 {
   HW_TRACE_DMA_READ ();
   return bfin_uart_read_buffer (me, dest, nr_bytes);
 }
 
 static unsigned
-bfin_uart_dma_write_buffer_method (struct hw *me, const void *source,
-				   int space, unsigned_word addr,
-				   unsigned nr_bytes,
-				   int violate_read_only_section)
+bfin_uart_dma_write_buffer (struct hw *me, const void *source,
+			    int space, unsigned_word addr,
+			    unsigned nr_bytes,
+			    int violate_read_only_section)
 {
+  struct bfin_uart *uart = hw_data (me);
+  unsigned ret;
+
   HW_TRACE_DMA_WRITE ();
-  return bfin_uart_write_buffer (me, source, nr_bytes);
+
+  ret = bfin_uart_write_buffer (me, source, nr_bytes);
+
+  if (ret == nr_bytes && (uart->ier & ETBEI))
+    hw_port_event (me, DV_PORT_TX, 1);
+
+  return ret;
 }
+
+static const struct hw_port_descriptor bfin_uart_ports[] = {
+  { "tx",   DV_PORT_TX,   0, output_port, },
+  { "rx",   DV_PORT_RX,   0, output_port, },
+  { "stat", DV_PORT_STAT, 0, output_port, },
+};
 
 static void
 attach_bfin_uart_regs (struct hw *me, struct bfin_uart *uart)
@@ -219,8 +238,9 @@ bfin_uart_finish (struct hw *me)
   set_hw_data (me, uart);
   set_hw_io_read_buffer (me, bfin_uart_io_read_buffer);
   set_hw_io_write_buffer (me, bfin_uart_io_write_buffer);
-  set_hw_dma_read_buffer (me, bfin_uart_dma_read_buffer_method);
-  set_hw_dma_write_buffer (me, bfin_uart_dma_write_buffer_method);
+  set_hw_dma_read_buffer (me, bfin_uart_dma_read_buffer);
+  set_hw_dma_write_buffer (me, bfin_uart_dma_write_buffer);
+  set_hw_ports (me, bfin_uart_ports);
 
   attach_bfin_uart_regs (me, uart);
 

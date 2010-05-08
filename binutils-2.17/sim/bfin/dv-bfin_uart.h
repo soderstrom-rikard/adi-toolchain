@@ -28,9 +28,10 @@
 struct bfin_uart;
 bu16 bfin_uart_get_next_byte (struct hw *, bu16, bool *fresh);
 bu16 bfin_uart_write_byte (struct hw *, bu16);
-bu16 bfin_uart_get_status (struct hw *, bu16);
+bu16 bfin_uart_get_status (struct hw *);
 unsigned bfin_uart_write_buffer (struct hw *, const unsigned char *, unsigned);
 unsigned bfin_uart_read_buffer (struct hw *, unsigned char *, unsigned);
+void bfin_uart_reschedule (struct hw *);
 
 /* UART_LCR */
 #define DLAB (1 << 7)
@@ -39,5 +40,10 @@ unsigned bfin_uart_read_buffer (struct hw *, unsigned char *, unsigned);
 #define TEMT (1 << 6)
 #define THRE (1 << 5)
 #define DR (1 << 0)
+
+/* UART_IER */
+#define ERBFI (1 << 0)
+#define ETBEI (1 << 1)
+#define ELSI  (1 << 2)
 
 #endif
