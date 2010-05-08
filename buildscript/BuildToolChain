@@ -112,6 +112,7 @@ do
                 jtag)  SKIP_JTAG=true ;;
                 ldr)   SKIP_LDR=true ;;
                 tlibs) SKIP_TARGET_LIBS=true ;;
+                u-boot|\
                 uboot) SKIP_UBOOT=true ;;
                 flat)  SKIP_FLAT=true ;;
                 fdpic) SKIP_FDPIC=true ;;
