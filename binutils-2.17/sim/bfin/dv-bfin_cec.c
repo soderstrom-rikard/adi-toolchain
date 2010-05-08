@@ -290,7 +290,10 @@ _cec_require_supervisor (SIM_CPU *cpu, struct bfin_cec *cec)
 void
 cec_require_supervisor (SIM_CPU *cpu)
 {
-  _cec_require_supervisor (cpu, CEC_STATE (cpu));
+  /* Do not call _cec_require_supervisor() to avoid CEC_STATE()
+     as that macro requires OS operating mode.  */
+  if (cec_is_user_mode (cpu))
+    cec_exception (cpu, VEC_ILL_RES);
 }
 
 #define excp_to_sim_halt(reason, sigrc) \
