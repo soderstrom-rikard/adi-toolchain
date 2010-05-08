@@ -255,6 +255,7 @@ bfin_dma_hw_event_callback (struct hw *me, void *data)
     nr_bytes = MIN (sizeof (buf), dma->curr_x_count * dma->ele_size);
 
   /* Pumping a chunk!  */
+  bfin_peer->dma_master = me;
   bfin_peer->acked = false;
   if (dma->config & WNR)
     {
