@@ -608,6 +608,9 @@ bfin_model_cpu_init (SIM_DESC sd, SIM_CPU *cpu)
   sim_core_attach (sd, NULL, 0, access_read_write, 0, BFIN_L1_SRAM_SCRATCH,
 		   BFIN_L1_SRAM_SCRATCH_SIZE, 0, NULL, NULL);
 
+  if (STATE_ENVIRONMENT (CPU_STATE (cpu)) != OPERATING_ENVIRONMENT)
+    return;
+
   if (mnum == MODEL_BF000)
     goto core_only;
 
