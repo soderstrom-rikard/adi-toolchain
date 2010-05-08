@@ -1,4 +1,4 @@
-/* Blackfin Direct Memory Access (DMA) Controller model.
+/* Blackfin Direct Memory Access (DMA) Channel model.
 
    Copyright (C) 2010 Free Software Foundation, Inc.
    Contributed by Analog Devices, Inc.
@@ -22,11 +22,12 @@
 #include "devices.h"
 #include "hw-device.h"
 #include "dv-bfin_dma.h"
+#include "dv-bfin_dmac.h"
 
-/* Note: This DMA implementation requires the producer to be the master.
-         The source is always a slave.  This way we don't have the two
-         devices thrashing each other with one trying to write and the
-         other trying to read.  */
+/* Note: This DMA implementation requires the producer to be the master when
+         the peer is MDMA.  The source is always a slave.  This way we don't
+         have the two DMA devices thrashing each other with one trying to
+         write and the other trying to read.  */
 
 struct bfin_dma
 {
@@ -37,7 +38,6 @@ struct bfin_dma
 
   struct hw_event *handler;
   unsigned ele_size;
-  const char *peer;
   struct hw *hw_peer;
 
   /* Order after here is important -- matches hardware MMR layout.  */
@@ -85,27 +85,12 @@ bfin_dma_running (struct bfin_dma *dma)
   return (dma->irq_status & DMA_RUN);
 }
 
-static const char *bfin_dma_537_pmap[16] = {
-  "ppi", "emac", "emac", "sport@0", "sport@0", "sport@1",
-  "sport@1", "spi", "uart@0", "uart@0", "uart@1", "uart@1",
-};
-
 static struct hw *
 bfin_dma_get_peer (struct hw *me, struct bfin_dma *dma)
 {
-  char peer[30];
-
   if (dma->hw_peer)
     return dma->hw_peer;
-
-  /* Delay the stub check until when people try to use it.  */
-  if (dma->peer == NULL)
-    dma->peer = bfin_dma_537_pmap[dma->peripheral_map >> 12];
-  if (dma->peer == NULL)
-    hw_abort (me, "Invalid DMA peripheral_map %#x", dma->peripheral_map);
-
-  sprintf (peer, "/core/bfin_%s", dma->peer);
-  return dma->hw_peer = hw_tree_find_device (me, peer);
+  return dma->hw_peer = bfin_dmac_get_peer (me, dma->peripheral_map);
 }
 
 static void
@@ -270,11 +255,10 @@ bfin_dma_hw_event_callback (struct hw *me, void *data)
     nr_bytes = MIN (sizeof (buf), dma->curr_x_count * dma->ele_size);
 
   /* Pumping a chunk!  */
-  bfin_peer->dma_master = me;
   bfin_peer->acked = false;
   if (dma->config & WNR)
     {
-      HW_TRACE ((me, "dma transfer from %s to 0x%08lx length %u", dma->peer,
+      HW_TRACE ((me, "dma transfer to 0x%08lx length %u",
 		 (unsigned long) dma->curr_addr, nr_bytes));
 
       ret = hw_dma_read_buffer (peer, buf, 0, dma->curr_addr, nr_bytes);
@@ -288,8 +272,8 @@ bfin_dma_hw_event_callback (struct hw *me, void *data)
     }
   else
     {
-      HW_TRACE ((me, "dma transfer from 0x%08lx length %u to %s",
-		 (unsigned long) dma->curr_addr, nr_bytes, dma->peer));
+      HW_TRACE ((me, "dma transfer from 0x%08lx length %u",
+		 (unsigned long) dma->curr_addr, nr_bytes));
 
       ret = sim_read (hw_system (me), dma->curr_addr, buf, nr_bytes);
       if (ret == 0)
@@ -320,8 +304,8 @@ bfin_dma_hw_event_callback (struct hw *me, void *data)
 }
 
 static unsigned
-bfin_dma_io_write_buffer (struct hw *me, const void *source,
-			  int space, address_word addr, unsigned nr_bytes)
+bfin_dma_io_write_buffer (struct hw *me, const void *source, int space,
+			  address_word addr, unsigned nr_bytes)
 {
   struct bfin_dma *dma = hw_data (me);
   bu32 mmr_off;
@@ -335,7 +319,7 @@ bfin_dma_io_write_buffer (struct hw *me, const void *source,
   else
     value = dv_load_2 (source);
 
-  mmr_off = addr - dma->base;
+  mmr_off = addr % dma->base;
   valuep = (void *)((unsigned long)dma + mmr_base() + mmr_off);
   value16p = valuep;
   value32p = valuep;
@@ -374,11 +358,7 @@ bfin_dma_io_write_buffer (struct hw *me, const void *source,
 	{
 	  *value16p = (*value16p & CTYPE) | (value & ~CTYPE);
 	  /* Clear peripheral peer so it gets looked up again.  */
-	  if (*value16p & CTYPE)
-	    {
-	      dma->peer = NULL;
-	      dma->hw_peer = NULL;
-	    }
+	  dma->hw_peer = NULL;
 	}
       else
 	HW_TRACE ((me, "discarding write while dma running"));
@@ -395,7 +375,7 @@ bfin_dma_io_write_buffer (struct hw *me, const void *source,
 	  dma->irq_status |= DMA_RUN;
 	  bfin_dma_process_desc (me, dma);
 	  /* The writer is the master.  */
-	  if (dma->config & WNR)
+	  if (!(dma->peripheral_map & CTYPE) || (dma->config & WNR))
 	    bfin_dma_reschedule (me, 1);
 	}
       else
@@ -424,8 +404,8 @@ bfin_dma_io_write_buffer (struct hw *me, const void *source,
 }
 
 static unsigned
-bfin_dma_io_read_buffer (struct hw *me, void *dest,
-			 int space, address_word addr, unsigned nr_bytes)
+bfin_dma_io_read_buffer (struct hw *me, void *dest, int space,
+			 address_word addr, unsigned nr_bytes)
 {
   struct bfin_dma *dma = hw_data (me);
   bu32 mmr_off;
@@ -434,7 +414,7 @@ bfin_dma_io_read_buffer (struct hw *me, void *dest,
   bu32 *value32p;
   void *valuep;
 
-  mmr_off = addr - dma->base;
+  mmr_off = addr % dma->base;
   valuep = (void *)((unsigned long)dma + mmr_base() + mmr_off);
   value16p = valuep;
   value32p = valuep;
@@ -451,8 +431,8 @@ bfin_dma_io_read_buffer (struct hw *me, void *dest,
 }
 
 static unsigned
-bfin_dma_dma_read_buffer_method (struct hw *me, void *dest, int space,
-				 unsigned_word addr, unsigned nr_bytes)
+bfin_dma_dma_read_buffer (struct hw *me, void *dest, int space,
+			  unsigned_word addr, unsigned nr_bytes)
 {
   struct bfin_dma *dma = hw_data (me);
   unsigned ret, ele_count;
@@ -481,10 +461,10 @@ bfin_dma_dma_read_buffer_method (struct hw *me, void *dest, int space,
 }
 
 static unsigned
-bfin_dma_dma_write_buffer_method (struct hw *me, const void *source,
-				  int space, unsigned_word addr,
-				  unsigned nr_bytes,
-				  int violate_read_only_section)
+bfin_dma_dma_write_buffer (struct hw *me, const void *source,
+			   int space, unsigned_word addr,
+			   unsigned nr_bytes,
+			   int violate_read_only_section)
 {
   struct bfin_dma *dma = hw_data (me);
   unsigned ret, ele_count;
@@ -513,7 +493,7 @@ bfin_dma_dma_write_buffer_method (struct hw *me, const void *source,
 }
 
 static const struct hw_port_descriptor bfin_dma_ports[] = {
-  { "di", 0, 0, output_port, } /* DMA Interrupt */
+  { "di", 0, 0, output_port, }, /* DMA Interrupt */
 };
 
 static void
@@ -529,18 +509,6 @@ attach_bfin_dma_regs (struct hw *me, struct bfin_dma *dma)
 
   if (!hw_find_reg_array_property (me, "reg", 0, &reg))
     hw_abort (me, "\"reg\" property must contain three addr/size entries");
-
-  if (hw_find_property (me, "peer"))
-    {
-      dma->peer = hw_find_string_property (me, "peer");
-      if (dma->peer == NULL)
-        hw_abort (me, "\"peer\" property must name a device");
-    }
-  else
-    {
-      /* Ignore for now -- let's people stub things out.  */
-      /* hw_abort (me, "Missing \"peer\" property"); */
-    }
 
   hw_unit_address_to_attach_address (hw_parent (me),
 				     &reg.address,
@@ -560,32 +528,20 @@ static void
 bfin_dma_finish (struct hw *me)
 {
   struct bfin_dma *dma;
-  const hw_unit *unit;
 
   dma = HW_ZALLOC (me, struct bfin_dma);
 
   set_hw_data (me, dma);
   set_hw_io_read_buffer (me, bfin_dma_io_read_buffer);
   set_hw_io_write_buffer (me, bfin_dma_io_write_buffer);
-  set_hw_dma_read_buffer (me, bfin_dma_dma_read_buffer_method);
-  set_hw_dma_write_buffer (me, bfin_dma_dma_write_buffer_method);
+  set_hw_dma_read_buffer (me, bfin_dma_dma_read_buffer);
+  set_hw_dma_write_buffer (me, bfin_dma_dma_write_buffer);
   set_hw_ports (me, bfin_dma_ports);
 
-  /* XXX: A better model might be:
-      .../bfin_mdma/
-                    src_channel/
-                    dst_channel/
-     But got to figure out how first ...  */
   attach_bfin_dma_regs (me, dma);
 
-  /* Initialize the DMA Controller.  */
-  unit = hw_unit_address (me);
-  if (dma->peer)
-    /* MDMA */
-    dma->peripheral_map = CTYPE;
-  else
-    /* DMA */
-    dma->peripheral_map = (unit->cells[unit->nr_cells - 1]) << 12;
+  /* Initialize the DMA Channel.  */
+  dma->peripheral_map = bfin_dmac_default_pmap (me);
 }
 
 const struct hw_descriptor dv_bfin_dma_descriptor[] = {

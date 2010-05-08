@@ -90,7 +90,7 @@ static const struct bfin_memory_layout bf50x_mem[] = {
 #define bf504_mem bf50x_mem
 #define bf506_mem bf50x_mem
 static const struct bfin_dev_layout bf50x_dev[] = {
-  DEVICE (0xFFC00400, BFIN_MMR_UART2_SIZE, "bfin_uart2"),
+  DEVICE (0xFFC00400, BFIN_MMR_UART2_SIZE, "bfin_uart2@0"),
 };
 #define bf504_dev bf50x_dev
 #define bf506_dev bf50x_dev
@@ -202,7 +202,7 @@ static const struct bfin_memory_layout bf533_mem[] = {
   LAYOUT (0xFFA10000, 0x4000, read_write_exec),	/* Inst Cache [1] */
 };
 static const struct bfin_dev_layout bf533_dev[] = {
-  DEVICE (0xFFC00400, BFIN_MMR_UART_SIZE, "bfin_uart"),
+  DEVICE (0xFFC00400, BFIN_MMR_UART_SIZE, "bfin_uart@0"),
 };
 #define bf531_dev bf533_dev
 #define bf532_dev bf533_dev
@@ -318,17 +318,21 @@ static const struct bfin_memory_layout bf54x_mem[] = {
 #define bf547_mem bf54x_mem
 #define bf548_mem bf54x_mem
 #define bf549_mem bf54x_mem
-static const struct bfin_dev_layout bf54x_dev[] = {
+static const struct bfin_dev_layout bf542_dev[] = {
   DEVICE (0xFFC00400, BFIN_MMR_UART2_SIZE, "bfin_uart2@0"),
   DEVICE (0xFFC02000, BFIN_MMR_UART2_SIZE, "bfin_uart2@1"),
   DEVICE (0xFFC02100, BFIN_MMR_UART2_SIZE, "bfin_uart2@2"),
   DEVICE (0xFFC03100, BFIN_MMR_UART2_SIZE, "bfin_uart2@3"),
 };
-#define bf542_dev bf54x_dev
-#define bf544_dev bf54x_dev
-#define bf547_dev bf54x_dev
-#define bf548_dev bf54x_dev
-#define bf549_dev bf54x_dev
+#define bf544_dev bf542_dev
+static const struct bfin_dev_layout bf547_dev[] = {
+  DEVICE (0xFFC00400, BFIN_MMR_UART2_SIZE, "bfin_uart2@0"),
+  DEVICE (0xFFC02000, BFIN_MMR_UART2_SIZE, "bfin_uart2@1"),
+  DEVICE (0xFFC02100, BFIN_MMR_UART2_SIZE, "bfin_uart2@2"),
+  DEVICE (0xFFC03100, BFIN_MMR_UART2_SIZE, "bfin_uart2@3"),
+};
+#define bf548_dev bf547_dev
+#define bf549_dev bf547_dev
 
 /* This is only Core A of course ...  */
 #define bf561_chipid 0x27bb
@@ -346,7 +350,7 @@ static const struct bfin_memory_layout bf561_mem[] = {
   LAYOUT (0xFFA10000, 0x4000, read_write_exec),	/* Inst Cache [1] */
 };
 static const struct bfin_dev_layout bf561_dev[] = {
-  DEVICE (0xFFC00400, BFIN_MMR_UART_SIZE, "bfin_uart"),
+  DEVICE (0xFFC00400, BFIN_MMR_UART_SIZE, "bfin_uart@0"),
 };
 
 static const struct bfin_model_data bfin_model_data[] =
@@ -413,12 +417,13 @@ bfin_model_hw_tree_init (SIM_DESC sd, SIM_CPU *cpu)
   else
     dv_bfin_hw_parse (sd, ebiu_sdc, EBIU_SDC);
 
-  dv_bfin_hw_parse (sd, pll, PLL);
-
   dv_bfin_hw_parse (sd, sic, SIC);
   sim_hw_parse (sd, "/core/bfin_sic/model %s", MODEL_NAME (model));
   for (i = 7; i < 16; ++i)
     sim_hw_parse (sd, "/core/bfin_sic > ivg%i ivg%i /core/bfin_cec", i, i);
+
+  dv_bfin_hw_parse (sd, pll, PLL);
+  sim_hw_parse (sd, "/core/bfin_pll > pll pll /core/bfin_sic");
 
   dv_bfin_hw_parse (sd, wdog, WDOG);
   sim_hw_parse (sd, "/core/bfin_wdog > reset rst      /core/bfin_cec");
@@ -426,36 +431,45 @@ bfin_model_hw_tree_init (SIM_DESC sd, SIM_CPU *cpu)
   sim_hw_parse (sd, "/core/bfin_wdog > gpi   watchdog /core/bfin_sic");
 
   if (mnum != MODEL_BF561)
-    dv_bfin_hw_parse (sd, rtc, RTC);
-
-#if 0
-  /* XXX: How to handle datafiles with sim ?  */
-  sim_do_commandf (sd, "memory-mapfile %s", MODEL_NAME (model));
-  sim_do_commandf (sd, "memory region 0xEF000000,0x100000,0x800");
-#endif
+    {
+      dv_bfin_hw_parse (sd, rtc, RTC);
+      sim_hw_parse (sd, "/core/bfin_rtc > rtc rtc /core/bfin_sic");
+    }
 
   for (i = 0; i < mdata->dev_count; ++i)
     {
       const struct bfin_dev_layout *dev = &mdata->dev[i];
       sim_hw_parse (sd, "/core/%s/reg %#x %i", dev->dev, dev->base, dev->len);
+      if (strchr (dev->dev, '/'))
+	continue;
+      if (!strncmp (dev->dev, "bfin_uart", 9) ||
+	  !strncmp (dev->dev, "bfin_emac", 9) ||
+	  !strncmp (dev->dev, "bfin_sport", 10))
+	{
+	  const char *sint = dev->dev + 5;
+	  sim_hw_parse (sd, "/core/%s > tx   %s_tx   /core/bfin_dmac@0", dev->dev, sint);
+	  sim_hw_parse (sd, "/core/%s > rx   %s_rx   /core/bfin_dmac@0", dev->dev, sint);
+	  sim_hw_parse (sd, "/core/%s > stat %s_stat /core/bfin_sic", dev->dev, sint);
+	}
     }
 
   /* XXX: Should be pushed to per-model structs.  */
+  sim_hw_parse (sd, "/core/bfin_dmac@0");
   for (i = 0; i < 16; ++i)
     {
-      sim_hw_parse (sd, "/core/bfin_dma@%i/reg %#x %i", i,
+      sim_hw_parse (sd, "/core/bfin_dmac@0/bfin_dma@%i/reg %#x %i", i,
 		    0xFFC00C00 + i * BFIN_MMR_DMA_SIZE, BFIN_MMR_DMA_SIZE);
       if (i < 12)
-	sim_hw_parse (sd, "/core/bfin_dma@%i > di dma%i /core/bfin_sic", i, i);
+	{
+	  /* Could route these into the bfin_dmac and let that
+	     forward it to the SIC, but not much value.  */
+	  sim_hw_parse (sd, "/core/bfin_dmac@0/bfin_dma@%i > di dma%i /core/bfin_sic", i, i);
+	}
     }
-  sim_hw_parse (sd, "/core/bfin_dma@12/peer dma@0xd"); /* MDMA0 D->S */
-  sim_hw_parse (sd, "/core/bfin_dma@12 > di mdma0 /core/bfin_sic");
-  sim_hw_parse (sd, "/core/bfin_dma@13/peer dma@0xc"); /* MDMA0 S->D */
-  sim_hw_parse (sd, "/core/bfin_dma@13 > di mdma0 /core/bfin_sic");
-  sim_hw_parse (sd, "/core/bfin_dma@14/peer dma@0xf"); /* MDMA1 D->S */
-  sim_hw_parse (sd, "/core/bfin_dma@14 > di mdma1 /core/bfin_sic");
-  sim_hw_parse (sd, "/core/bfin_dma@15/peer dma@0xe"); /* MDMA1 S->D */
-  sim_hw_parse (sd, "/core/bfin_dma@15 > di mdma1 /core/bfin_sic");
+  sim_hw_parse (sd, "/core/bfin_dmac@0/bfin_dma@12 > di mdma0 /core/bfin_sic");
+  sim_hw_parse (sd, "/core/bfin_dmac@0/bfin_dma@13 > di mdma0 /core/bfin_sic");
+  sim_hw_parse (sd, "/core/bfin_dmac@0/bfin_dma@14 > di mdma1 /core/bfin_sic");
+  sim_hw_parse (sd, "/core/bfin_dmac@0/bfin_dma@15 > di mdma1 /core/bfin_sic");
 
  done:
   /* Trigger all the new devices' finish func.  */

@@ -1,4 +1,4 @@
-/* Blackfin Direct Memory Access (DMA) Controller model.
+/* Blackfin Direct Memory Access (DMA) Channel model.
 
    Copyright (C) 2010 Free Software Foundation, Inc.
    Contributed by Analog Devices, Inc.
@@ -20,8 +20,6 @@
 
 #ifndef DV_BFIN_DMA_H
 #define DV_BFIN_DMA_H
-
-#include "sim-main.h"
 
 #define BFIN_MMR_DMA_SIZE	(4 * 16)
 

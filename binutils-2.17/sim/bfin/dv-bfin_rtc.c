@@ -136,6 +136,10 @@ bfin_rtc_io_read_buffer (struct hw *me, void *dest,
   return nr_bytes;
 }
 
+static const struct hw_port_descriptor bfin_rtc_ports[] = {
+  { "rtc", 0, 0, output_port, },
+};
+
 static void
 attach_bfin_rtc_regs (struct hw *me, struct bfin_rtc *rtc)
 {
@@ -174,6 +178,7 @@ bfin_rtc_finish (struct hw *me)
   set_hw_data (me, rtc);
   set_hw_io_read_buffer (me, bfin_rtc_io_read_buffer);
   set_hw_io_write_buffer (me, bfin_rtc_io_write_buffer);
+  set_hw_ports (me, bfin_rtc_ports);
 
   attach_bfin_rtc_regs (me, rtc);
 

@@ -115,6 +115,10 @@ bfin_pll_io_read_buffer (struct hw *me, void *dest,
   return nr_bytes;
 }
 
+static const struct hw_port_descriptor bfin_pll_ports[] = {
+  { "pll", 0, 0, output_port, },
+};
+
 static void
 attach_bfin_pll_regs (struct hw *me, struct bfin_pll *pll)
 {
@@ -153,6 +157,7 @@ bfin_pll_finish (struct hw *me)
   set_hw_data (me, pll);
   set_hw_io_read_buffer (me, bfin_pll_io_read_buffer);
   set_hw_io_write_buffer (me, bfin_pll_io_write_buffer);
+  set_hw_ports (me, bfin_pll_ports);
 
   attach_bfin_pll_regs (me, pll);
 

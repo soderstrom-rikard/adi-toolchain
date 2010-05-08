@@ -326,8 +326,8 @@ attach_bfin_emac_regs (struct hw *me, struct bfin_emac *emac)
 static struct dv_bfin *dma_tx;
 
 static unsigned
-bfin_emac_dma_read_buffer_method (struct hw *me, void *dest, int space,
-				  unsigned_word addr, unsigned nr_bytes)
+bfin_emac_dma_read_buffer (struct hw *me, void *dest, int space,
+			   unsigned_word addr, unsigned nr_bytes)
 {
   struct bfin_emac *emac = hw_data (me);
   struct dv_bfin *dma = hw_data (emac->dma_master);
@@ -416,10 +416,10 @@ bfin_emac_dma_read_buffer_method (struct hw *me, void *dest, int space,
 }
 
 static unsigned
-bfin_emac_dma_write_buffer_method (struct hw *me, const void *source,
-				   int space, unsigned_word addr,
-				   unsigned nr_bytes,
-				   int violate_read_only_section)
+bfin_emac_dma_write_buffer (struct hw *me, const void *source,
+			    int space, unsigned_word addr,
+			    unsigned nr_bytes,
+			    int violate_read_only_section)
 {
   struct bfin_emac *emac = hw_data (me);
   struct dv_bfin *dma = hw_data (emac->dma_master);
@@ -449,6 +449,12 @@ bfin_emac_dma_write_buffer_method (struct hw *me, const void *source,
   dma->acked = true;
   return ret;
 }
+
+static const struct hw_port_descriptor bfin_emac_ports[] = {
+  { "tx",   DV_PORT_TX,   0, output_port, },
+  { "rx",   DV_PORT_RX,   0, output_port, },
+  { "stat", DV_PORT_STAT, 0, output_port, },
+};
 
 static void
 bfin_emac_attach_address_callback (struct hw *me,
@@ -534,8 +540,9 @@ bfin_emac_finish (struct hw *me)
   set_hw_data (me, emac);
   set_hw_io_read_buffer (me, bfin_emac_io_read_buffer);
   set_hw_io_write_buffer (me, bfin_emac_io_write_buffer);
-  set_hw_dma_read_buffer (me, bfin_emac_dma_read_buffer_method);
-  set_hw_dma_write_buffer (me, bfin_emac_dma_write_buffer_method);
+  set_hw_dma_read_buffer (me, bfin_emac_dma_read_buffer);
+  set_hw_dma_write_buffer (me, bfin_emac_dma_write_buffer);
+  set_hw_ports (me, bfin_emac_ports);
   set_hw_attach_address (me, bfin_emac_attach_address_callback);
   set_hw_delete (me, bfin_emac_delete);
 
