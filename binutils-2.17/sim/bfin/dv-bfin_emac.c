@@ -537,7 +537,7 @@ bfin_emac_tap_init (struct hw *me)
 #endif
      )
     {
-      if (errno != -EBUSY)
+      if (errno != EBUSY)
 	sim_io_eprintf (sd, "emac tap: ioctl setup failed: %s\n",
 		      strerror (errno));
       close (emac->tap);
