@@ -19,6 +19,8 @@
    You should have received a copy of the GNU General Public License
    along with this program.  If not, see <http://www.gnu.org/licenses/>.  */
 
+#include "config.h"
+
 #include "sim-main.h"
 #include "devices.h"
 #include "dv-bfin_ebiu_amc.h"
