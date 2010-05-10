@@ -401,6 +401,13 @@ mmu_check_addr (SIM_CPU *cpu, bu32 addr, bool write, bool inst, int size)
 	}
     }
 
+  /* Some things are never executable.  */
+  if (inst)
+    {
+      if (addr >= BFIN_SYSTEM_MMR_BASE)
+	goto process_excp;
+    }
+
   /* CPLBs disabled -> little to do.  */
   if (!(*mem_control & ENCPLB))
     {
