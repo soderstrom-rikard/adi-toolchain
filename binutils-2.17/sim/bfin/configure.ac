@@ -38,6 +38,7 @@ SIM_AC_OPTION_HARDWARE(yes,,\
 )
 
 AC_CHECK_FUNCS([getuid getgid geteuid getegid setuid setgid])
+AC_CHECK_HEADERS([sys/ioctl.h net/if.h linux/if_tun.h linux/mii.h])
 
 dnl make sure the dv-sockser code can be supported (i.e. windows)
 dv_sockser=1

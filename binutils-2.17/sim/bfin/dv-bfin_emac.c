@@ -21,10 +21,22 @@
 #include <errno.h>
 #include <fcntl.h>
 #include <unistd.h>
+
+#ifdef HAVE_SYS_IOCTL_H
 #include <sys/ioctl.h>
+#endif
+#ifdef HAVE_NET_IF_H
 #include <net/if.h>
+#endif
+#ifdef HAVE_LINUX_IF_TUN_H
 #include <linux/if_tun.h>
-#include <linux/mii.h>
+#endif
+
+#ifdef HAVE_LINUX_IF_TUN_H
+# define WITH_TUN 1
+#else
+# define WITH_TUN 0
+#endif
 
 #include "sim-main.h"
 #include "sim-hw.h"
@@ -41,7 +53,9 @@ struct bfin_emac
   bool acked;
 
   int tap;
+#if WITH_TUN
   struct ifreq ifr;
+#endif
   bu32 rx_crc;
 
   /* Order after here is important -- matches hardware MMR layout.  */
@@ -491,6 +505,7 @@ bfin_emac_delete (struct hw *me)
 static void
 bfin_emac_tap_init (struct hw *me)
 {
+#if WITH_TUN
   SIM_DESC sd = hw_system (me);
   struct bfin_emac *emac = hw_data (me);
   const hw_unit *unit;
@@ -520,7 +535,8 @@ bfin_emac_tap_init (struct hw *me)
 #endif
      )
     {
-      sim_io_eprintf (sd, "emac tap: ioctl setup failed: %s\n",
+      if (errno != -EBUSY)
+	sim_io_eprintf (sd, "emac tap: ioctl setup failed: %s\n",
 		      strerror (errno));
       close (emac->tap);
       return;
@@ -528,6 +544,7 @@ bfin_emac_tap_init (struct hw *me)
 
   flags = fcntl (emac->tap, F_GETFL);
   fcntl (emac->tap, F_SETFL, flags | O_NONBLOCK);
+#endif
 }
 
 static void

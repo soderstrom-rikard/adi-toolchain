@@ -21,6 +21,8 @@
 #include "sim-main.h"
 #include "devices.h"
 
+#ifdef HAVE_LINUX_MII_H
+
 /* Workaround old/broken linux headers.  */
 #define _LINUX_TYPES_H
 #define __u16 unsigned short
@@ -179,6 +181,16 @@ eth_phy_finish (struct hw *me)
   phy->regs[MII_PHYSID1] = 0;    /* Unassigned Vendor */
   phy->regs[MII_PHYSID2] = 0xAD; /* Product */
 }
+
+#else
+
+static void
+eth_phy_finish (struct hw *me)
+{
+  hw_abort (me, "No linux/mii.h support found");
+}
+
+#endif
 
 const struct hw_descriptor dv_eth_phy_descriptor[] = {
   {"eth_phy", eth_phy_finish,},
