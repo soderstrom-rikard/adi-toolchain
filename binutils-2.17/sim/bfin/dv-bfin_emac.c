@@ -518,8 +518,7 @@ bfin_emac_tap_init (struct hw *me)
   emac->tap = open ("/dev/net/tun", O_RDWR);
   if (emac->tap == -1)
     {
-      sim_io_eprintf (sd, "emac tap: unable to open /dev/net/tun: %s\n",
-		      strerror (errno));
+      HW_TRACE ((me, "unable to open /dev/net/tun: %s", strerror (errno)));
       return;
     }
 
@@ -537,9 +536,7 @@ bfin_emac_tap_init (struct hw *me)
 #endif
      )
     {
-      if (errno != EBUSY)
-	sim_io_eprintf (sd, "emac tap: ioctl setup failed: %s\n",
-		      strerror (errno));
+      HW_TRACE ((me, "tap ioctl setup failed: %s", strerror (errno)));
       close (emac->tap);
       return;
     }
