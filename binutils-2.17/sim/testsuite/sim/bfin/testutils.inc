@@ -16,7 +16,22 @@ __panic:
 __pass:
 	write 1, _passmsg, 5
 	exit 0
-
+.ifdef BFIN_JTAG
+__emu_out:
+	/* DBGSTAT */
+	P0.L = 0x5008;
+	P0.H = 0xFFE0;
+1:
+	R7 = [P0];
+	CC = BITTST (R7,0);
+	IF CC JUMP 1b;
+	EMUDAT = R0;
+2:
+	R7 = [P0];
+	CC = BITTST (R7,0);
+	IF CC JUMP 2b;
+	RTS;
+.endif
 	.global __fail
 __fail:
 .ifndef BFIN_HOST
@@ -118,11 +133,41 @@ _main:
 	.endif
 	.endm
 	.macro dbg_pass
+.ifdef BFIN_JTAG
+	R0 = 6;
+	CALL __emu_out;
+	R0.L = 0x6170;	/* 'p'=0x70  'a'=0x70 */
+	R0.H = 0x7373;	/* 's'=0x73 */
+	CALL __emu_out;
+
+	R0.L = 0x0A;	/* newline */
+	R0.H = 0x0000;
+	CALL __emu_out;  
+1:
+	EMUEXCPT;
+	JUMP 1b;
+.else
 	outc_str 'p', 'a', 's', 's', '\n'
 	HLT;
+.endif
 	.endm
 	.macro dbg_fail
+.ifdef BFIN_JTAG
+        R0 = 6;
+        CALL __emu_out;
+        R0.L = 0x6166;  /* 'f'=0x66  'a'=0x61 */
+        R0.H = 0x6c69;  /* 'i'=0x69  'l'=0x6c */
+        CALL __emu_out;
+
+        R0.L = 0x0A;    /* newline */
+        R0.H = 0x0000;
+        CALL __emu_out;
+1:
+        EMUEXCPT;
+        JUMP 1b;
+.else
 	outc_str 'f', 'a', 'i', 'l', '\n'
+.endif
 	ABORT;
 	.endm
 
