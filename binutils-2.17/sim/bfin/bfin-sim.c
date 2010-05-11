@@ -1966,6 +1966,9 @@ decode_PushPopReg_0 (SIM_CPU *cpu, bu16 iw0)
 
   if (W == 0)
     {
+      /* Dreg and Preg are not supported by this instruction */
+      if (grp == 0 || grp == 1)
+	illegal_instruction (cpu);
       TRACE_INSN (cpu, "%s = [SP++];", reg_name);
       if (INSN_LEN == 8)
 	illegal_instruction_combination (cpu);
