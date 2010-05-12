@@ -40,15 +40,17 @@ SIM_AC_OPTION_HARDWARE(yes,,\
 AC_CHECK_FUNCS([getuid getgid geteuid getegid setuid setgid])
 AC_CHECK_HEADERS([sys/ioctl.h net/if.h linux/if_tun.h linux/mii.h])
 
-dnl make sure the dv-sockser code can be supported (i.e. windows)
-dv_sockser=1
-case ${host} in
-  *mingw32*) dv_sockser=0 ;;
-esac
-AC_DEFINE_UNQUOTED([HAVE_DV_SOCKSER], ${dv_sockser}, [Define if dv-sockser is usable.])
-
 BFIN_SIM_EXTRA_OBJS=
-test "$dv_sockser" = 1 && BFIN_SIM_EXTRA_OBJS="${BFIN_SIM_EXTRA_OBJS} dv-sockser.o"
+
+dnl make sure the dv-sockser code can be supported (i.e. windows)
+case ${host} in
+  *mingw32*) ;;
+  *)
+    AC_DEFINE_UNQUOTED([HAVE_DV_SOCKSER], 1, [Define if dv-sockser is usable.])
+    BFIN_SIM_EXTRA_OBJS="${BFIN_SIM_EXTRA_OBJS} dv-sockser.o"
+    ;;
+esac
+
 AC_SUBST([BFIN_SIM_EXTRA_OBJS], ${BFIN_SIM_EXTRA_OBJS})
 
 SIM_AC_OUTPUT
