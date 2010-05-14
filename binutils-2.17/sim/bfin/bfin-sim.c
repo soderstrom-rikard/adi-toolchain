@@ -2962,7 +2962,7 @@ decode_dagMODim_0 (SIM_CPU *cpu, bu16 iw0)
       TRACE_INSN (cpu, "I%i += M%i;", i, m);
       dagadd (cpu, i, MREG (m));
     }
-  else if (op == 1)
+  else if (op == 1 && br == 0)
     {
       TRACE_INSN (cpu, "I%i -= M%i;", i, m);
       dagsub (cpu, i, MREG (m));
