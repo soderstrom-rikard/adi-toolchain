@@ -29,6 +29,7 @@ if [ $# -gt 0 ] ; then
  fi
 fi
 
+cp $TOOLCHAIN_BUILDSCRIPT/reset_board.exp $TOOLCHAIN_SCRIPTS
 rm $TOOLCHAIN_SCRIPTS/reset_board_log  >/dev/null  2>&1
 $TOOLCHAIN_SCRIPTS/reset_board.exp uImage.$TARGET_KERNEL_CONFIG  >/dev/null  2>&1
 
@@ -36,7 +37,7 @@ RUN=`rsh -l root $TARGET_IP /bin/ls / 2>/dev/null | wc -l`
 if [ $RUN -lt 5 ] ; then
   echo -e "************** The target board is not alive!**************\n"
   BOARD_CONFIG=NON_EXIST
-  TOOLCHAIN_VERSION=4.1
+  TOOLCHAIN_VERSION=4.3
 else       
   BOARD_CONFIG=`rsh -l root $TARGET_IP cat /proc/cpuinfo | grep 'board name' | awk  'BEGIN { FS="[ :-]" } {print $5"-"$6}'`
   TOOLCHAIN_VERSION=`rsh -l root $TARGET_IP version | grep 'toolchain' | awk 'BEGIN { FS="[ :.]" } {print $7"."$8}'`
@@ -267,7 +268,7 @@ sleep 20
   cd $TOOLCHAIN_BUILDSCRIPT
  
   ## compare the results on elf-sim uclinux linux-uclibc.
-  for toolchain_type in elf-sim uclinux linux-uclibc  
+  for toolchain_type in elf-sim uclinux linux-uclibc
   do
 
   ./compare_toolchain_results $TOOLCHAINBUILD/$BASELINE/tests/$toolchain_type $BUILD/tests/$toolchain_type > $BUILD/tests/diff/$toolchain_type.diff
