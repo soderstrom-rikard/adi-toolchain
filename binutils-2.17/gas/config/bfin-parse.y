@@ -391,8 +391,8 @@ is_store (INSTR_T x)
   if ((x->value & 0xf000) == 0x8000)
     {
       int aop = ((x->value >> 9) & 0x3);
-      int W = ((x->value >> 11) & 0x1);
-      if (!W || aop == 3)
+      int w = ((x->value >> 11) & 0x1);
+      if (!w || aop == 3)
 	return 0;
       return 1;
     }
@@ -404,8 +404,8 @@ is_store (INSTR_T x)
   /* decode_dspLDST_0 */
   if ((x->value & 0xFC00) == 0x9C00)
     {
-      int W = ((x->value >> 9) & 0x1);
-      if (W)
+      int w = ((x->value >> 9) & 0x1);
+      if (w)
 	return 1;
     }
   return 0;
