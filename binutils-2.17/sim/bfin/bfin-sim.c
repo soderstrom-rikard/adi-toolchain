@@ -1960,8 +1960,8 @@ decode_PushPopReg_0 (SIM_CPU *cpu, bu16 iw0)
   TRACE_EXTRACT (cpu, "%s: W:%i grp:%i reg:%i", __func__, W, grp, reg);
   TRACE_DECODE (cpu, "%s: reg:%s", __func__, reg_name);
 
-  /* Can't push/pop SP itself.  */
-  if ((grp == 1 && reg == 6) || reg_is_reserved (grp, reg))
+  /* Can't push/pop reserved registers  */
+  if (reg_is_reserved (grp, reg))
     illegal_instruction (cpu);
 
   if (W == 0)
@@ -1970,7 +1970,8 @@ decode_PushPopReg_0 (SIM_CPU *cpu, bu16 iw0)
       if (grp == 0 || grp == 1)
 	illegal_instruction (cpu);
       TRACE_INSN (cpu, "%s = [SP++];", reg_name);
-      if (INSN_LEN == 8)
+      /* Can't pop USP while in userspace */
+      if (INSN_LEN == 8 || (grp == 7 && reg == 0 && cec_is_user_mode(cpu)))
 	illegal_instruction_combination (cpu);
       /* XXX: The valid register check is in reg_write(), so we might
               incorrectly do a GET_LONG() here ...  */
@@ -1984,7 +1985,8 @@ decode_PushPopReg_0 (SIM_CPU *cpu, bu16 iw0)
   else
     {
       TRACE_INSN (cpu, "[--SP] = %s;", reg_name);
-      if (INSN_LEN == 8)
+      /* Can't push SP */
+      if (INSN_LEN == 8 || grp == 1 && reg == 6)
 	illegal_instruction_combination (cpu);
 
       sp -= 4;
@@ -2437,18 +2439,23 @@ decode_REGMV_0 (SIM_CPU *cpu, bu16 iw0)
   if (reg_is_reserved (gs, src) || reg_is_reserved (gd, dst))
     goto invalid_move;
 
-  /* Dregs/Pregs can be src/dst to any other reg group.  */
-  if (gs < 2 || gd < 2)
+  /* Standard register moves  */
+  if ((gs < 2) ||				/* Dregs/Pregs as source  */
+      (gd < 2) ||				/* Dregs/Pregs as dest    */
+      (gs == 4 && src < 4) ||			/* Accumulators as source */
+      (gd == 4 && dst < 4 && (gs < 4)) ||	/* Accumulators as dest   */
+      (gs == 7 && src == 7 && !(gd == 4 && dst < 4)) ||	/* EMUDAT as src  */
+      (gd == 7 && dst == 7)) 			/* EMUDAT as dest         */
     goto valid_move;
 
-  /* Dagregs/Accumulators can move between each other.  */
-  if (((gs << 3) + src) <= ((4 << 3) + 4) &&
-      ((gd << 3) + dst) <= ((4 << 3) + 4))
+  /* dareg = dareg (IMBL) */
+  if (gs < 4 && gd < 4)
     goto valid_move;
 
   /* USP can be src to sysregs, but not dagregs.  */
   if ((gs == 7 && src == 0) && (gd >= 4))
     goto valid_move;
+
   /* USP can move between genregs (only check Accumulators).  */
   if (((gs == 7 && src == 0) && (gd == 4 && dst < 4)) ||
       ((gd == 7 && dst == 0) && (gs == 4 && src < 4)))
