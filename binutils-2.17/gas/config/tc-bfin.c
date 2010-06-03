@@ -1357,12 +1357,10 @@ bfin_gen_loopsetup (Expr_Node * psoffset, REG_T c, int rop,
   ASSIGN (rop);
   ASSIGN_R (c);
   ASSIGN_R (reg);
-
   return
       conscode (gencode (HI (c_code.opcode)),
 		conctcode (Expr_Node_Gen_Reloc (psoffset, BFD_RELOC_BFIN_5_PCREL),
 			   conctcode (gencode (LO (c_code.opcode)), Expr_Node_Gen_Reloc (peoffset, BFD_RELOC_BFIN_11_PCREL))));
-
 }
 
 /*  Call, Link.  */
@@ -1927,6 +1925,7 @@ bfin_gen_loop (Expr_Node *expr, REG_T reg, int rop, REG_T preg)
   char *lbeginsym, *lendsym;
   Expr_Node_Value lbeginval, lendval;
   Expr_Node *lbegin, *lend;
+  symbolS *sym;
 
   loopsym = expr->value.s_value;
   lbeginsym = (char *) xmalloc (strlen (loopsym) + strlen ("__BEGIN") + 5);
@@ -1938,7 +1937,6 @@ bfin_gen_loop (Expr_Node *expr, REG_T reg, int rop, REG_T preg)
   strcat (lbeginsym, "L$L$");
   strcat (lbeginsym, loopsym);
   strcat (lbeginsym, "__BEGIN");
-
   strcat (lendsym, "L$L$");
   strcat (lendsym, loopsym);
   strcat (lendsym, "__END");
@@ -1949,10 +1947,20 @@ bfin_gen_loop (Expr_Node *expr, REG_T reg, int rop, REG_T preg)
   lbegin = Expr_Node_Create (Expr_Node_Reloc, lbeginval, NULL, NULL);
   lend   = Expr_Node_Create (Expr_Node_Reloc, lendval, NULL, NULL);
 
-  symbol_remove (symbol_find (loopsym), &symbol_rootP, &symbol_lastP);
+  sym = symbol_find(loopsym);
+  if (!symbol_used_p(sym))
+    symbol_remove (sym, &symbol_rootP, &symbol_lastP);
 
   return bfin_gen_loopsetup(lbegin, reg, rop, lend, preg);
 }
+
+void bfin_loop_attempt_create_label(Expr_Node *expr,int is_begin) {
+  char *name;
+  name = fb_label_name(expr->value.i_value,is_begin);
+  expr->value.s_value = strdup(name);
+  expr->type = Expr_Node_Reloc;
+}
+
 
 void
 bfin_loop_beginend (Expr_Node *expr, int begin)

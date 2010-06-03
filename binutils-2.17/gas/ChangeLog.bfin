@@ -1,3 +1,10 @@
+2010-06-03 David Gibson <david.gibson@analog.com>
+ * gas/config/bfin-parse.y 
+ * gas/config/tc-bfin.c: Allow declaration of temporary numeric labels when
+   declaring hardware loops. Also resolved a crashed when using .<Label> in
+   a hw loop - we were trying to remove the symbol, assuming it wasn't used 
+   in any other location. Fixes issue 5928.
+
 2010-02-03  Mike Frysinger  <michael.frysinger@analog.com>
 
 	* doc/c-bfin.texi (-mcpu): Add bf592.

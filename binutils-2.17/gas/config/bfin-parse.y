@@ -3572,16 +3572,37 @@ asm_1:
 	}
 
 /* LOOP_BEGIN.  */
+	| LOOP_BEGIN NUMBER
+	{
+	  Expr_Node_Value val;
+  	  val.i_value = $2;
+	  Expr_Node *tmp = Expr_Node_Create (Expr_Node_Constant, val, NULL, NULL);
+          bfin_loop_attempt_create_label(tmp,1);
+	  if (!IS_RELOC (tmp))
+	    return yyerror ("Invalid expression in LOOP_BEGIN statement");
+	  bfin_loop_beginend (tmp, 1);
+	  $$ = 0;
+	}
 	| LOOP_BEGIN expr
 	{
 	  if (!IS_RELOC ($2))
 	    return yyerror ("Invalid expression in LOOP_BEGIN statement");
-
 	  bfin_loop_beginend ($2, 1);
 	  $$ = 0;
 	}
 
 /* LOOP_END.  */
+	| LOOP_END NUMBER
+	{
+	  Expr_Node_Value val;
+  	  val.i_value = $2;
+	  Expr_Node *tmp = Expr_Node_Create (Expr_Node_Constant, val, NULL, NULL);
+          bfin_loop_attempt_create_label(tmp,1);
+	  if (!IS_RELOC (tmp))
+	    return yyerror ("Invalid expression in LOOP_END statement");
+	  bfin_loop_beginend (tmp, 0);
+	  $$ = 0;
+	}
 	| LOOP_END expr
 	{
 	  if (!IS_RELOC ($2))
