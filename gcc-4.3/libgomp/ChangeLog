@@ -1,3 +1,29 @@
+2010-05-22  Release Manager
+
+	* GCC 4.3.5 released.
+
+2010-05-06  Ralf Wildenhues  <Ralf.Wildenhues@gmx.de>
+
+	PR other/43620
+	* configure.ac (AM_INIT_AUTOMAKE): Add no-dist.
+	* configure: Regenerate.
+	* aclocal.m4: Regenerate.
+	* config.h.in: Regenerate.
+	* Makefile.in: Regenerate.
+	* testsuite/Makefile.in: Regenerate.
+
+2009-08-19  Tobias Burnus  <burnus@net-b.de>
+
+	PR fortran/41102
+	omp_lib.h.in: Fix -std=f95 errors.
+
+2009-08-14  Uros Bizjak  <ubizjak@gmail.com>
+
+	Backport from mainline:
+	2008-12-26  Uros Bizjak  <ubizjak@gmail.com>
+
+	* testsuite/libgomp.c/atomic-6.c: Add -mieee for alpha*-*-* targets.
+
 2009-08-04  Release Manager
 
 	* GCC 4.3.4 released.

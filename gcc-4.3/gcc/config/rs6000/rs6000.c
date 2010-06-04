@@ -13811,8 +13811,6 @@ rs6000_split_lock_test_and_set (rtx retval, rtx mem, rtx val, rtx scratch)
   enum machine_mode mode = GET_MODE (mem);
   rtx label, x, cond = gen_rtx_REG (CCmode, CR0_REGNO);
 
-  emit_insn (gen_memory_barrier ());
-
   label = gen_rtx_LABEL_REF (VOIDmode, gen_label_rtx ());
   emit_label (XEXP (label, 0));
 
@@ -16225,6 +16223,8 @@ rs6000_output_function_prologue (FILE *file,
 
   if (! HAVE_prologue)
     {
+      rtx prologue;
+
       start_sequence ();
 
       /* A NOTE_INSN_DELETED is supposed to be at the start and end of
@@ -16244,10 +16244,14 @@ rs6000_output_function_prologue (FILE *file,
 	  }
       }
 
-      if (TARGET_DEBUG_STACK)
-	debug_rtx_list (get_insns (), 100);
-      final (get_insns (), file, FALSE);
+      prologue = get_insns ();
       end_sequence ();
+
+      if (TARGET_DEBUG_STACK)
+	debug_rtx_list (prologue, 100);
+
+      emit_insn_before_noloc (prologue, BB_HEAD (ENTRY_BLOCK_PTR->next_bb),
+			      ENTRY_BLOCK_PTR);
     }
 
   rs6000_pic_labelno++;

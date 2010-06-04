@@ -1,3 +1,69 @@
+2010-05-22  Release Manager
+
+	* GCC 4.3.5 released.
+
+2010-05-19  Jason Merrill  <jason@redhat.com>
+
+	PR c++/44193
+	* pt.c (tsubst) [TYPENAME_TYPE]: Discard cv-quals on
+	function/reference type.
+
+2010-04-20  Richard Guenther  <rguenther@suse.de>
+
+	Backport from mainline
+	2009-01-09  Jakub Jelinek  <jakub@redhat.com>
+
+	PR c++/35335
+	* error.c (dump_expr): Handle EXPR_STMT like BIND_EXPR.
+
+2009-11-13  Jason Merrill  <jason@redhat.com>
+
+	PR c++/21008, DR 515
+	* semantics.c (finish_non_static_data_member): Don't check
+	derivation in a template.
+
+2009-11-12  Jason Merrill  <jason@redhat.com>
+
+	PR c++/37037
+	* decl.c (grokdeclarator): Don't generate a void PARM_DECL.
+
+2009-11-09  Jason Merrill  <jason@redhat.com>
+
+	PR c++/41972
+	* parser.c (cp_parser_template_argument): Accept SCOPE_REF around
+	VAR_DECL.
+
+2009-11-04  Jason Merrill  <jason@redhat.com>
+
+	PR c++/35067
+	* method.c (use_thunk): Check DECL_WEAK as well as
+	DECL_ONE_ONLY.
+
+2009-11-04  Dodji Seketeli  <dodji@redhat.com>
+
+	Revert fix for PR c++/37093
+	* pt.c (check_valid_ptrmem_cst_expr): Revert my previous change.
+	(convert_nontype_argument): Likewise.
+
+2009-11-03  Jason Merrill  <jason@redhat.com>
+
+	PR c++/41876
+	* parser.c (cp_parser_exception_declaration): Pass true to
+	is_condition parm of cp_parser_type_specifier_seq.
+
+2009-11-03  Dodji Seketeli  <dodji@redhat.com>
+
+	PR c++/37093
+	* pt.c (check_valid_ptrmem_cst_expr): New function.
+	(convert_nontype_argument): Use it to output an error for
+	illegal pointer to member expressions used as template arguments.
+
+2009-08-04  Dodji Seketeli  <dodji@redhat.com>
+
+	PR debug/39706
+	* error.c (lang_decl_name): Print qualified names for decls
+	in  namespace scope.
+
 2009-08-04  Release Manager
 
 	* GCC 4.3.4 released.
