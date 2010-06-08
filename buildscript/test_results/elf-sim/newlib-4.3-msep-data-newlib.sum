@@ -1,0 +1,45 @@
+Test Run By rgetz on Mon Jun  7 23:14:30 2010
+Target is bfin-unknown-elf
+Host   is x86_64-unknown-linux-gnu
+
+		=== newlib tests ===
+
+Schedule of variations:
+    bfin-sim
+
+Running target bfin-sim
+Running binutils-2.17/newlib/testsuite/newlib.elix/elix.exp ...
+Running binutils-2.17/newlib/testsuite/newlib.iconv/iconv.exp ...
+PASS: newlib.iconv/iconvnm.c compilation
+FAIL: newlib.iconv/iconvnm.c execution
+PASS: newlib.iconv/iconvru.c compilation
+FAIL: newlib.iconv/iconvru.c execution
+PASS: newlib.iconv/iconvjp.c compilation
+FAIL: newlib.iconv/iconvjp.c execution
+Running binutils-2.17/newlib/testsuite/newlib.locale/UTF-8.exp ...
+PASS: newlib.locale/UTF-8.c compilation
+FAIL: newlib.locale/UTF-8.c output
+Running binutils-2.17/newlib/testsuite/newlib.locale/locale.exp ...
+Running binutils-2.17/newlib/testsuite/newlib.search/hsearchtest.exp ...
+PASS: newlib.search/hsearchtest.c compilation
+FAIL: newlib.search/hsearchtest.c execution
+Running binutils-2.17/newlib/testsuite/newlib.stdlib/atexit.exp ...
+PASS: newlib.stdlib/atexit.c compilation
+FAIL: newlib.stdlib/atexit.c output
+Running binutils-2.17/newlib/testsuite/newlib.string/string.exp ...
+PASS: newlib.string/tstring.c compilation
+FAIL: newlib.string/tstring.c execution
+PASS: newlib.string/memmove1.c compilation
+FAIL: newlib.string/memmove1.c execution
+Running binutils-2.17/newlib/testsuite/newlib.wctype/wctype.exp ...
+PASS: newlib.wctype/tiswctype.c compilation
+FAIL: newlib.wctype/tiswctype.c execution
+PASS: newlib.wctype/twctrans.c compilation
+FAIL: newlib.wctype/twctrans.c execution
+PASS: newlib.wctype/twctype.c compilation
+FAIL: newlib.wctype/twctype.c execution
+
+		=== newlib Summary ===
+
+# of expected passes		11
+# of unexpected failures	11
