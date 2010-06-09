@@ -1,3 +1,12 @@
+2010-06-09  Steve Kilbane  <stephen.kilbane@analog.com>
+	Fix #5802 - gfortran case fails for undefined reference to `__gfortran_chmod_func' and '__gfortran_chmod_i4_sub' 
+	* configure
+	* config.h.in
+	* configure.ac
+		Check for vfork
+	* intrinsics/chmod.c
+		Use vfork if we don't have fork
+
 2009-01-22  Jie Zhang  <jie.zhang@analog.com>
 
 	* configure.ac: Add --enable-symvers.
