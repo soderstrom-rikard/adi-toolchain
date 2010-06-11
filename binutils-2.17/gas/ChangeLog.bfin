@@ -1,3 +1,7 @@
+2010-06-11 David Gibson <david.gibson@analog.com>
+  * config/tc_bfin.c: Last fix was not removing labels for unwanted locals.
+    [#6059]
+
 2010-06-03 David Gibson <david.gibson@analog.com>
  * gas/config/bfin-parse.y 
  * gas/config/tc-bfin.c: Allow declaration of temporary numeric labels when

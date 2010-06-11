@@ -21,6 +21,7 @@
 
 #include "as.h"
 #include "struc-symbol.h"
+#include "symbols.h"
 #include "obj-elf.h"
 #include "bfin-defs.h"
 #include "obstack.h"
@@ -1948,7 +1949,7 @@ bfin_gen_loop (Expr_Node *expr, REG_T reg, int rop, REG_T preg)
   lend   = Expr_Node_Create (Expr_Node_Reloc, lendval, NULL, NULL);
 
   sym = symbol_find(loopsym);
-  if (!symbol_used_p(sym))
+  if ( !S_IS_LOCAL(sym) || ( S_IS_LOCAL(sym) && !symbol_used_p(sym)))
     symbol_remove (sym, &symbol_rootP, &symbol_lastP);
 
   return bfin_gen_loopsetup(lbegin, reg, rop, lend, preg);
