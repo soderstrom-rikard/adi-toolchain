@@ -1,3 +1,8 @@
+2010-06-16  Steve Kilbane  <stephen.kilbane@anaog.com>
+
+	* intrinsics/chmod.c
+		If execl fails in the child, exit rather than returning to caller.
+
 2010-06-09  Steve Kilbane  <stephen.kilbane@analog.com>
 	Fix #5802 - gfortran case fails for undefined reference to `__gfortran_chmod_func' and '__gfortran_chmod_i4_sub' 
 	* configure
