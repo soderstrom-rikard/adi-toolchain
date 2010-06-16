@@ -1,3 +1,8 @@
+2010-06-16  Steve Kilbane  <stephen.kilbane@analog.com>
+
+	* config/lib1funcs.asm: Use a new implementation for
+	 ___divsi3 and ___udivsi3. Adjust ___umodsi3 to match.
+
 2010-06-01  Steve Kilbane  <stephen.kilbane@analog.com>
 
 Fix bug [#6018]:
