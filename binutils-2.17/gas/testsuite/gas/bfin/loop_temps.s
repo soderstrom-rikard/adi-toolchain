@@ -200,8 +200,6 @@ _filter_mem16:
 	R0 = [FP+-4];
 	cc =R0<R1;
 	if cc jump .L7;
-#APP
-// 681 "test.i" 1
 	R0 = [FP+48];
 	P0 = [FP+-20];
 	I0 = P0;
@@ -302,9 +300,6 @@ _filter_mem16:
 	A1 = A0 = 0 || [P4++] = R0;
 	LOOP_END mem_update256;
 	L0 = 0;
-	
-// 0 "" 2
-#NO_APP
 	SP = [FP+-24];
 	SP = [FP+-68];
 	UNLINK;
@@ -313,6 +308,5 @@ _filter_mem16:
 	R5 = [SP++];
 	R4 = [SP++];
 	( r7:7 ) = [sp++];
-
 	rts;
 	.size	_filter_mem16, .-_filter_mem16
