@@ -1,0 +1,224 @@
+#!/bin/sh 
+
+USER=/home/test/work/cruise
+CHECKOUT=$USER/checkouts
+TOOLCHAIN_BUILDSCRIPT=$CHECKOUT/toolchain/buildscript
+TOOLCHAIN_SCRIPTS=$USER/test_scripts/toolchain
+TOOLCHAINBUILD=$TOOLCHAIN_SCRIPTS/toolchain-build
+BASELINE=standard
+LASTRUN=lastrun
+THISRUN=thisrun
+FROM=grace.pan@analog.com
+NOTIFY=toolchain-test-notify@blackfin.uclinux.org
+COMPARE_LASTRUN_STATUS=0
+TEST_RESULTS=0
+MAIL_LIST=""
+
+#####  target board configs  #######
+
+TARGET_IP=10.100.4.50
+TARGET_KERNEL_CONFIG=normal
+TARGET_KERNEL_BUILD="shared_flat normal flat_lib fdpic_lib"
+if [ $# -gt 0 ] ; then
+ if [ $1 = "normal" ] || [ $1 = "shared_flat" ] || [ $1 = "kgdb" ] || [ $1 = "smp" ] || [ $1 = "flat_lib" ] || [ $1 = "fdpic_lib" ] ; then
+  TARGET_KERNEL_CONFIG=$1
+  if [ $1 = "kgdb" ] || [ $1 = "smp" ] ; then
+  TARGET_KERNEL_BUILD="$1 $TARGET_KERNEL_BUILD"
+  fi
+ fi
+fi
+
+BOARD_CONFIG=BF537-STAMP
+TOOLCHAIN_VERSION=4.3
+
+#####  host machine configs  #######
+HOST_IP=`/sbin/ifconfig | grep "10\.99" | awk 'BEGIN { FS="[ :]" } {print $13}'`
+HOST_CONFIG=SUSE
+
+
+#############  Do Not Edit Below This Line  ########## 
+
+if [ ! -d $CHECKOUT ] ; then
+  mkdir -p $CHECKOUT
+fi
+if [ ! -d $TOOLCHAINBUILD ] ; then
+  mkdir -p $TOOLCHAINBUILD
+fi
+
+## make the directory for this toolchain build and test.
+
+TIMESTAMP=`date +%Y_%b_%d_%H_%M`
+BUILD=$TOOLCHAINBUILD/toolchain-$TIMESTAMP
+mkdir -p $BUILD
+
+cd $TOOLCHAINBUILD
+rm -rf $THISRUN
+ln -s $BUILD $THISRUN
+
+######################################################
+## Copy log
+
+copy_log()
+{
+     cp $TOOLCHAIN_SCRIPTS/toolchain_test_log  $BUILD 
+}
+
+## Send out mails to notify.
+
+send_mail()
+{
+   echo -e "\n$*"
+   if [ -n "$*" ] ; then 
+   title=$1
+   shift  
+   cat "$@" | mail -s "$title"  -r $FROM  $NOTIFY       
+   fi
+}
+
+## Move this build folder to lastrun link file at the end of testing.
+
+move_to_lastrun ()
+{
+  cd $TOOLCHAINBUILD
+  rm -rf $LASTRUN
+  ln -s $BUILD $LASTRUN
+}
+
+move_build_folder ()
+{
+  mv $USER/temp/* $BUILD  
+  mkdir -p $BUILD/tests 
+  mv $BUILD/regtest_build$TOOLCHAIN_VERSION/tests/* $BUILD/tests 
+}
+
+log_test_results ()
+{
+  if [ $1 -eq 0 ] ; then
+            echo -e "Testing in toolchain-$TIMESTAMP is successful.\nexit=0.\n"  > $BUILD/test_results
+  else
+            echo -e "Testing in toolchain-$TIMESTAMP is failed. \nexit=$1.\n"   > $BUILD/test_results
+
+  fi
+
+}
+
+########################################################
+
+if [ -z $UBOOT_SUBDIR ] ; then
+  UBOOT_SUBDIR=`ls -ltr $CHECKOUT/u-boot | grep u-boot-\[0-9.\]* | head -1 | awk '{print $8}'`
+fi
+
+
+######## Do svn update and show svn info for each project.
+cd $CHECKOUT
+cat  <<EOF
+************** Testing is done on target with kernel config ($TARGET_KERNEL_CONFIG). *************
+************** Testing $TOOLCHAIN_VERSION toolchain on $BOARD_CONFIG. ************
+************** Host $HOST_CONFIG $HOST_IP. ***********
+
+************** Tested toolchain svn info ***************
+`cd toolchain ; svn up `
+`cd toolchain ; svn info`
+************** Tested U-Boot svn info ******************
+`cd u-boot ; svn up `
+`cd u-boot ; svn info`
+************* Tested uclinux-dist svn info *************
+`cd uclinux-dist ;svn up ` 
+`cd uclinux-dist ;svn info`
+************* Tested linux svn info ********************
+`cd uclinux-dist/linux-2.6.x ; svn up `
+`cd uclinux-dist/linux-2.6.x ; svn info`
+
+EOF
+
+######## Start building an up-to-date Toolchain here.
+  cd $TOOLCHAIN_BUILDSCRIPT 
+
+# For branch testing, use -K kbuild_output.
+# ./BuildToolChain  -j 1 -w -s $CHECKOUT/toolchain -b $USER/temp -K $CHECKOUT/toolchain/kbuild_output  -u $CHECKOUT/u-boot/$UBOOT_SUBDIR  -c $TOOLCHAIN_VERSION  -D
+
+# For trunk testing, use -k $CHECKOUT/uclinux-dist/linux-2.6.x.
+  ./BuildToolChain  -j 1 -w -s $CHECKOUT/toolchain -b $USER/temp -k $CHECKOUT/uclinux-dist/linux-2.6.x  -c $TOOLCHAIN_VERSION -D 
+
+  if [ $? != 0 ] ; then
+  echo -e "\nFailed to build the toolchain in toolchain-$TIMESTAMP . exit!\n"     
+  mv  $USER/temp/*  $BUILD
+  log_test_results 2
+  copy_log
+  $TOOLCHAIN_BUILDSCRIPT/compare_toolchain_results   > $BUILD/compare_results
+  if [ $? != 0 ] ; then
+     send_mail "Fail to build $TOOLCHAIN_VERSION toolchain on $BOARD_CONFIG ($HOST_IP)" $BUILD/test_results $BUILD/toolchain_test_log 
+  fi
+  move_to_lastrun
+  exit  
+  fi
+
+  TEST_TOOLCHAIN_DIR=$USER/temp
+# TEST_TOOLCHAIN_DIR=/opt/uClinux
+
+
+sleep 20
+
+######## Start testing here.
+
+  cd $TOOLCHAIN_SCRIPTS
+  rm $TOOLCHAIN_SCRIPTS/start_gdbproxy_log
+  $TOOLCHAIN_SCRIPTS/start_gdbproxy.exp $TEST_TOOLCHAIN_DIR/bfin-elf/bin  >/dev/null  2>&1  &
+#vivi???
+  cp $TOOLCHAIN_SCRIPTS/bfin-elf.exp.1  $CHECKOUT/toolchain/buildscript/boards/bfin-elf.exp.1
+  sleep 100
+  cd $CHECKOUT/toolchain/buildscript
+  ./toolchain-regtest -s $CHECKOUT/toolchain -o $TEST_TOOLCHAIN_DIR/bfin -b $USER/temp/regtest_build$TOOLCHAIN_VERSION -t elf-jtag -a -L
+  find $USER/temp/regtest_build$TOOLCHAIN_VERSION/.  -maxdepth 1 -type d -regex .*build\[-0-9.\]*  -exec mv {} {}-elf-jtag \;
+
+  pkill start_gdbproxy
+  cp $TOOLCHAIN_SCRIPTS/start_gdbproxy_log   $BUILD
+
+  move_build_folder
+
+######## Do comparision of the summary files and send out notify mail.
+
+  # if this is the first time to run the test - set this to the standard
+  if [ ! -d $TOOLCHAINBUILD/$BASELINE ] ; then
+    ln -s $BUILD $TOOLCHAINBUILD/$BASELINE
+  fi
+  
+  ## compare the tests with the default
+  COMPARE=$CHECKOUT/toolchain/gcc-$TOOLCHAIN_VERSION/contrib/compare_tests
+  chmod +x $COMPARE
+ 
+  mkdir -p $BUILD/tests/diff
+  cd $TOOLCHAIN_BUILDSCRIPT
+ 
+  ## compare the results on elf-sim uclinux linux-uclibc.
+  for toolchain_type in elf-jtag # simulator hardware-flat hardware-fdpic
+  do
+
+  ./compare_toolchain_results $TOOLCHAINBUILD/$BASELINE/tests/$toolchain_type $BUILD/tests/$toolchain_type > $BUILD/tests/diff/$toolchain_type.diff
+  if [ $? != 0 ] ; then
+        TEST_RESULTS=1 
+  fi
+
+  ./compare_toolchain_results $TOOLCHAINBUILD/$LASTRUN/tests/$toolchain_type $BUILD/tests/$toolchain_type > $BUILD/tests/diff/lastrun-$toolchain_type.diff 
+  if [ $? != 0 ] ; then
+        COMPARE_LASTRUN_STATUS=1
+        head -150 $BUILD/tests/diff/lastrun-$toolchain_type.diff > /tmp/lastrun-$toolchain_type.diff
+        echo -e "\n ...\n\nThe rest of the file is omitted. Detailed lastrun-$toolchain_type.diff can be found on test machine.\n\n"  >>   \
+        /tmp/lastrun-$toolchain_type.diff
+        MAIL_LIST="$MAIL_LIST  /tmp/lastrun-$toolchain_type.diff" 
+  fi
+
+  done    
+
+  log_test_results $TEST_RESULTS
+  copy_log
+
+  if [ $COMPARE_LASTRUN_STATUS -eq 1 ] ; then
+  send_mail "Fail in testing $TOOLCHAIN_VERSION toolchain on $BOARD_CONFIG ($HOST_IP)"  $BUILD/test_results  $MAIL_LIST 
+  else
+  send_mail "Better than lastrun in testing $TOOLCHAIN_VERSION toolchain on $BOARD_CONFIG ($HOST_IP)"  $BUILD/test_results 
+  fi
+
+  move_to_lastrun 
+  exit  
+

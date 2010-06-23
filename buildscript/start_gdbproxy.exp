@@ -1,0 +1,112 @@
+#!/usr/bin/expect
+log_file -noappend start_gdbproxy_log
+send_user "Starting start_gdbproxy.exp\n"
+
+set user /home/test/work/cruise
+set send_slow {1 0.1}
+set password "blackfin"
+set gdbproxy_path $user/temp/bfin-elf/bin/
+#set gdbproxy_path /opt/uClinux/bfin-elf/bin/
+set target bfin
+set step_sequence_number 1
+
+if { $argc >= 1} {
+    set gdbproxy_path [lindex $argv 0]
+}
+
+if { $argc >= 2} {
+    set target [lindex $argv 1]
+    send_log "\n#### target is $target\n"
+}
+
+proc step { message } {
+    global step_sequence_number
+
+    puts "\n*******************************************************************"
+    puts "STEP $step_sequence_number: $message\n\n"
+    send_log "\n************** STEP $step_sequence_number: $message\n\n"
+    incr step_sequence_number
+}
+
+
+step "Run start gdbproxy."
+cd $gdbproxy_path
+
+spawn su
+sleep .5
+while 1 {
+    expect {
+        "Password:" {
+            send -s "$password\r"
+            break
+        }
+        timeout {
+            send_user "Fail to su."
+            break
+        }
+    }
+}
+
+while 1 {
+    expect {
+        "#" {
+            send_user "su success.\n"
+            break
+        }
+        timeout {
+            puts " "
+            send_user "Fail to su as root."
+            break
+        }
+    }
+}
+
+set su_id $spawn_id
+
+send -s  "ps aux| grep bfin-gdbproxy | grep -v grep\r"
+while 1 {
+    expect {
+        -re "root +(\[0-9]+) .*#" {
+            set process_id $expect_out(1,string)
+            send_log "process_id $process_id \n"
+            break
+        }
+        timeout {
+            set process_id ""
+            break
+        }
+    }
+}
+
+if { $process_id != ""} {
+    set timeout 100
+    send -s  "kill -9 $process_id\r"
+    while 1 {
+        expect {
+            "#" {
+                break
+            }
+            timeout {
+                send_user "Fail to kill existing bfin gdbproxy."
+                break
+            }
+        }
+    }
+}
+
+send -s "./bfin-gdbproxy $target\r"
+#send -s "./bfin-gdbproxy $target --connect=\"cable gnice+\" --frequency=15000000 \r"
+while 1 {
+    expect {
+        -re "Connected to libftdi driver.*bfin-gdbproxy: waiting on TCP port" {
+            send_log "GDBproxy is already been started."
+        }
+        eof {# Actually it would never stopped and would be killed and started again in next round of testing.
+            send_log "Wait for gdbproxy to be ended."
+            break
+        }
+    }
+}
+
+send_user "Ending start_gdbproxy.exp\n"
+log_file

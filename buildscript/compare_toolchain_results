@@ -24,7 +24,7 @@ if [  $# -ge 3 ] ; then
 fi
 
 if [ ! $COMPARE ] ; then
-  COMPARE=~/work/cruise/checkouts/toolchain/gcc-4.1/contrib/compare_tests
+  COMPARE=~/work/cruise/checkouts/toolchain/gcc-4.3/contrib/compare_tests
 fi
 chmod 755 $COMPARE
 
