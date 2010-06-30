@@ -1,3 +1,8 @@
+2010-06-30  Steve Kilbane  <stephen.kilbane@anaog.com>
+	[#5802] chmod again - previous change wasn't right
+	* intrinsics/chmod.c
+		We should be invoking _exit() here, not exit().
+	
 2010-06-16  Steve Kilbane  <stephen.kilbane@anaog.com>
 
 	* intrinsics/chmod.c
