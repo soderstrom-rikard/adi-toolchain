@@ -341,11 +341,15 @@ if [ -n "${UCLIBC_CFLAGS}" ] ; then
 fi
 : ${UCLIBC_CFLAGS:=-g -O2}
 
-check_src_pkg ldr-utils
-check_src_pkg libusb
-check_src_pkg libftdi-1.0 LIBFTDI
-check_src_pkg urjtag
-check_src_pkg gdbproxy
+if [ -z "${SKIP_LDR}" ] ; then
+	check_src_pkg ldr-utils
+fi
+if [ -z "${SKIP_JTAG}" ] ; then
+	check_src_pkg libusb
+	check_src_pkg libftdi-1.0 LIBFTDI
+	check_src_pkg urjtag
+	check_src_pkg gdbproxy
+fi
 
 : ${DIR_uC_OUTPUT:=${DIR_BUILD}/bfin-uclinux}
 mk_output_dir "FLAT" $DIR_uC_OUTPUT $SKIP_FLAT
