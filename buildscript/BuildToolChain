@@ -875,10 +875,9 @@ build_uclibc()
 		local opt="$1"
 		shift
 		log_it "uClibc config update: $*"
-		sed -i.tmp \
+		ised .config \
 			-e "/^\# ${opt} is not set/d" \
-			-e "/^${opt}=.*/d" \
-			.config
+			-e "/^${opt}=.*/d"
 		echo "$*" >> .config
 	}
 	set_opt() {
@@ -967,7 +966,10 @@ build_uclibc()
     done
 
     # update the kernel header path just to make rebuilding easier later on
-    sed -i.tmp '/^KERNEL_HEADERS/s:=.*:="'"$DIR_uC_OUTPUT/bfin-uclinux/runtime/usr/include"'":' .config-used-for*
+    local f
+    for f in .config-used-for* ; do
+	ised "${f}" -e '/^KERNEL_HEADERS/s:=.*:="'"$DIR_uC_OUTPUT/bfin-uclinux/runtime/usr/include"'":'
+    done
     run_cmd rm -f .config*.tmp
 
     if ! resume_check uclibc.host-utils ; then

@@ -263,3 +263,11 @@ get_scm_ver()
 	[ -n "$SCM_REV" ] && SCM_REV="/${SCM_REV}"
 	echo "ADI${SCM_URL}${SCM_REV}"
 }
+
+# ised <file> <normal sed args>
+ised()
+{
+	# not everyone supports the -i option, or does so correctly, so fake it
+	sed "$@" > "$1".tmp
+	mv "$1".tmp "$1"
+}
