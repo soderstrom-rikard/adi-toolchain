@@ -990,6 +990,7 @@ build_uclibc()
     run_cmd mkdir -p $DIR_LINUX_OUTPUT/bfin-linux-uclibc/runtime
     run_cmd cp -r $DIR_KBUILD_OUTPUT/usr $DIR_uC_OUTPUT/bfin-uclinux/runtime
     run_cmd cp -r $DIR_KBUILD_OUTPUT/usr $DIR_LINUX_OUTPUT/bfin-linux-uclibc/runtime
+    run_cmd find $DIR_LINUX_OUTPUT/bfin-linux-uclibc/runtime -type f -name '*.so' -exec chmod a+rx {} \;
 
     echo_date "uClibc: cleaning"
     change_dir $DIR_UCLIBC_SOURCE
