@@ -1,0 +1,91 @@
+--- urjtag/src/tap/cable/wiggler.c	(revision 4682)
++++ urjtag/src/tap/cable/wiggler.c	(working copy)
+@@ -389,29 +389,27 @@
+ static void
+ wiggler_help (urj_log_level_t ll, const char *cablename)
+ {
+-    urj_log (ll,
+-             _("Usage: cable %s parallel PORTADDR [TDO,TRST,TDI,TCK,TMS,SRESET]\n"
+ #if ENABLE_LOWLEVEL_PPDEV
+-               "   or: cable %s ppdev PPDEV [TDO,TRST,TDI,TCK,TMS,SRESET]\n"
++# define PPDEV1 "   or: cable %1$s ppdev PPDEV [TDO,TRST,TDI,TCK,TMS,SRESET]\n"
++# define PPDEV2 "PPDEV      ppdev device (e.g. /dev/parport0)\n"
++#else
++# define PPDEV1 ""
++# define PPDEV2 ""
+ #endif
+ #if HAVE_DEV_PPBUS_PPI_H
+-               "   or: cable %s ppi PPIDEV [TDO,TRST,TDI,TCK,TMS,SRESET]\n"
++# define PPI1 "   or: cable %1$s ppi PPIDEV [TDO,TRST,TDI,TCK,TMS,SRESET]\n"
++# define PPI2 "PPIDEF     ppi device (e.g. /dev/ppi0)\n"
++#else
++# define PPI1 ""
++# define PPI2 ""
+ #endif
++    urj_log (ll,
++             _("Usage: cable %1$s parallel PORTADDR [TDO,TRST,TDI,TCK,TMS,SRESET]\n"
++               PPDEV1 PPI1
+                "\n" "PORTADDR   parallel port address (e.g. 0x378)\n"
+-#if ENABLE_LOWLEVEL_PPDEV
+-               "PPDEV      ppdev device (e.g. /dev/parport0)\n"
+-#endif
+-#if HAVE_DEV_PPBUS_PPI_H
+-               "PPIDEF     ppi device (e.g. /dev/ppi0)\n"
+-#endif
++               PPDEV2 PPI2
+                "TDO, ...   parallel port bit number, prepend '#' for inversion\n"
+-               "           default is '%s'\n" "\n"),
+-#if ENABLE_LOWLEVEL_PPDEV
+-             cablename,
+-#endif
+-#if HAVE_DEV_PPBUS_PPI_H
+-             cablename,
+-#endif
++               "           default is '%2$s'\n" "\n"),
+              cablename, std_wgl_map);
+ }
+ 
+--- urjtag/src/tap/cable/generic_parport.c	(revision 4682)
++++ urjtag/src/tap/cable/generic_parport.c	(working copy)
+@@ -116,27 +116,25 @@
+ void
+ urj_tap_cable_generic_parport_help (urj_log_level_t ll, const char *cablename)
+ {
+-    urj_log (ll,
+-             _("Usage: cable %s parallel PORTADDR\n"
+ #if ENABLE_LOWLEVEL_PPDEV
+-               "   or: cable %s ppdev PPDEV\n"
++# define PPDEV1 "   or: cable %1$s ppdev PPDEV\n"
++# define PPDEV2 "PPDEV      ppdev device (e.g. /dev/parport0)\n"
++#else
++# define PPDEV1 ""
++# define PPDEV2 ""
+ #endif
+ #if HAVE_DEV_PPBUS_PPI_H
+-               "   or: cable %s ppi PPIDEV\n"
++# define PPI1 "   or: cable %1$s ppi PPIDEV\n"
++# define PPI2 "PPIDEF     ppi device (e.g. /dev/ppi0)\n"
++#else
++# define PPI1 ""
++# define PPI2 ""
+ #endif
++    urj_log (ll,
++             _("Usage: cable %1$s parallel PORTADDR\n"
++               PPDEV1 PPI1
+                "\n" "PORTADDR   parallel port address (e.g. 0x378)\n"
+-#if ENABLE_LOWLEVEL_PPDEV
+-               "PPDEV      ppdev device (e.g. /dev/parport0)\n"
+-#endif
+-#if HAVE_DEV_PPBUS_PPI_H
+-               "PPIDEF     ppi device (e.g. /dev/ppi0)\n"
+-#endif
++               PPDEV2 PPI2
+                "\n"),
+-#if ENABLE_LOWLEVEL_PPDEV
+-             cablename,
+-#endif
+-#if HAVE_DEV_PPBUS_PPI_H
+-             cablename,
+-#endif
+              cablename);
+ }

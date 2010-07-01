@@ -33,16 +33,18 @@ Source8:      uClibc.tar.bz2
 Source9:      ldr-utils.tar.bz2
 Source10:     mpfr.tar.bz2
 Source11:     gmp.tar.bz2
-#Source12:     libftdi.tar.bz2
-#Source13:     libusb.tar.bz2
-#Source14:     urjtag.tar.bz2
-#Source15:     gdbproxy.tar.bz2
+Source12:     libftdi.tar.bz2
+Source13:     libusb.tar.bz2
+Source14:     urjtag.tar.bz2
+Source15:     gdbproxy.tar.bz2
+Patch:        jtag.diff
 prefix:       /opt/uClinux
 BuildRoot:    %{_tmppath}/%{name}-%{version}-build
 
 %description
 This contains the bfin-uclinux- (FLAT) and bfin-linux-uclibc- (FDPIC)
 toolchains for the Blackfin processor, based around gcc-%{gcc_main_fullver}.
+It also contains programs for working with JTAG.
 
 %if %{optional_gcc}
 %package gcc-%{gcc_addon_ver}-addon
@@ -109,7 +111,8 @@ gcc-%{gcc_addon_fullver} based toolchain.
 %if %{optional_gcc}
 %define extra_setup -b 1
 %endif
-%setup -q -c %{name}-%{version} %{extra_setup} -a 2 -a 3 -a 4 -a 5 -a 6 -a 7 -a 8 -a 9 -a 10 -a 11
+%setup -q -c %{name}-%{version} %{extra_setup} -a 2 -a 3 -a 4 -a 5 -a 6 -a 7 -a 8 -a 9 -a 10 -a 11 -a 12 -a 13 -a 14 -a 15
+%patch -p0
 
 %build
 %if %{optional_gcc}
@@ -123,7 +126,6 @@ echo Building in $RPM_BUILD_ROOT
 	-s `pwd` \
 	-K `pwd`/kbuild_output \
 	-u `pwd`/`echo u-boot-*` \
-	-S jtag \
 	%{gcc_build_opts} \
 	-o %{prefix}/bfin
 
