@@ -50,8 +50,10 @@ build_autotooled_pkg()
 
 	# mung the local .pc files so other packages in here can find them
 	run_cmd rm -f "${DIR_ELF_OUTPUT}"/lib/*.la
-	run_cmd_nodie sed -i "/^prefix=/s:=.*:=${DIR_ELF_OUTPUT}:" \
-		"${DIR_ELF_OUTPUT}"/lib/pkgconfig/*.pc
+	local f
+	for f in "${DIR_ELF_OUTPUT}"/lib/pkgconfig/*.pc ; do
+		ised "${f}" -e "/^prefix=/s:=.*:=${DIR_ELF_OUTPUT}:"
+	done
 
 	run_cmd rm -rf "${build}"
 

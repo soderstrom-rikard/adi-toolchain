@@ -268,6 +268,7 @@ get_scm_ver()
 ised()
 {
 	# not everyone supports the -i option, or does so correctly, so fake it
+	[ -e "$1" ] || return 0
 	sed "$@" > "$1".tmp
 	mv "$1".tmp "$1"
 }
