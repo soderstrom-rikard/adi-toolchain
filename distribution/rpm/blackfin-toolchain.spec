@@ -1,21 +1,28 @@
 #%define __os_install_post %{nil}
-%define optional_gcc 1
+%define optional_gcc 0
 %define bfin_host_strip strip
 %define bfin_targ_strip %{prefix}/bfin-elf/bin/bfin-elf-strip
 %define EXEEXT %{nil}
 %define x_support 1
 %define extra_buildtoolchain_opts %{nil}
 
+%define gcc_main_ver 4.3
+%define gcc_main_fullver %{gcc_main_ver}.5
+%define gcc_addon_ver 4.5
+%define gcc_addon_fullver %{gcc_addon_ver}.0
+
 Name:         blackfin-toolchain
 URL:          http://blackfin.uclinux.org
-Version:      09r1.1
-Release:      2
+Version:      10r1
+Release:      1
 Obsoletes:    bfin-gcc
-Summary:      The GNU toolchain for Blackfin
+Summary:      The GNU toolchain for the Blackfin processor
 License:      GPL
 Group:        Compilers
-Source:       bfin-gcc-4.1.tar.bz2
-Source1:      bfin-gcc-4.3.tar.bz2
+Source:       bfin-gcc-%{gcc_main_ver}.tar.bz2
+%if %{optional_gcc}
+Source1:      bfin-gcc-%{gcc_addon_ver}.tar.bz2
+%endif
 Source2:      binutils.tar.bz2
 Source3:      kbuild.tar.bz2
 Source4:      buildscript.tar.bz2
@@ -24,87 +31,101 @@ Source6:      uboot.tar.bz2
 Source7:      libdsp.tar.bz2
 Source8:      uClibc.tar.bz2
 Source9:      ldr-utils.tar.bz2
-#Patch:        mkuboot.diff
-prefix: /opt/uClinux
+Source10:     mpfr.tar.bz2
+Source11:     gmp.tar.bz2
+#Source12:     libftdi.tar.bz2
+#Source13:     libusb.tar.bz2
+#Source14:     urjtag.tar.bz2
+#Source15:     gdbproxy.tar.bz2
+prefix:       /opt/uClinux
 BuildRoot:    %{_tmppath}/%{name}-%{version}-build
 
 %description
-This contains the bfin-uclinux- and bfin-linux-uclibc- toolchains for
-the Blackfin, based around gcc-4.1.2.
+This contains the bfin-uclinux- (FLAT) and bfin-linux-uclibc- (FDPIC)
+toolchains for the Blackfin processor, based around gcc-%{gcc_main_fullver}.
 
 %if %{optional_gcc}
-%package gcc-4.3-addon
+%package gcc-%{gcc_addon_ver}-addon
 Requires: blackfin-toolchain
 Group:        Compilers
 License:      GPL
-Summary: gcc-4.3 add-on for the Blackfin toolchain
+Summary: gcc-%{gcc_addon_fullver} add-on for the Blackfin toolchain
 %endif
 
-%package elf-gcc-4.1
+%package elf-gcc-%{gcc_main_ver}
 #Requires:
 Group:        Compilers
 License:      GPL
-Summary: A bfin-elf toolchain based on gcc-4.1.2
+Summary: A bfin-elf toolchain based on gcc-%{gcc_main_fullver}.
 
 %if %{optional_gcc}
-%package elf-gcc-4.3-addon
-Requires: blackfin-toolchain blackfin-toolchain-elf-gcc-4.1
+%package elf-gcc-%{gcc_addon_ver}-addon
+Requires: blackfin-toolchain blackfin-toolchain-elf-gcc-%{gcc_main_ver}
 Group:        Compilers
 License:      GPL
-Summary: An add-on for the bfin-elf toolchain based on gcc-4.3.3.
+Summary: An add-on for the bfin-elf toolchain based on gcc-%{gcc_addon_fullver}.
 %endif
 
 %package uclibc-default
 Requires: blackfin-toolchain
 Group:        Compilers
 License:      GPL
-Summary: An add-on for the bfin-elf toolchain based on gcc-4.1.2.
+Summary: An add-on for the bfin-elf toolchain based on gcc-%{gcc_main_fullver}.
 
 %if %{optional_gcc}
-%package uclibc-default-gcc-4.3-addon
-Requires: blackfin-toolchain blackfin-toolchain-gcc-4.3-addon
+%package uclibc-default-gcc-%{gcc_addon_ver}-addon
+Requires: blackfin-toolchain blackfin-toolchain-gcc-%{gcc_addon_ver}-addon
 Group:        Compilers
 License:      GPL
-Summary: An add-on for the bfin-elf toolchain based on gcc-4.3.3.
+Summary: An add-on for the bfin-elf toolchain based on gcc-%{gcc_addon_fullver}.
 
-%description gcc-4.3-addon
-This contains an additional gcc-4.3.3 compiler for the Blackfin.
+%description gcc-%{gcc_addon_ver}-addon
+This contains an additional gcc-%{gcc_addon_fullver} compiler for the Blackfin
+processor.
 %endif
 
-%description elf-gcc-4.1
+%description elf-gcc-%{gcc_main_ver}
 This contains a bfin-elf toolchain which is sometimes useful for simulator
 testing and building standalone applications.  It is not necessary for
-uClinux development.  This package is based around gcc-4.1.
+Linux development.  This package is based around gcc-%{gcc_main_fullver}.
 
 %if %{optional_gcc}
-%description elf-gcc-4.3-addon
-This contains an additional gcc-4.3.3 compiler for the bfin-elf toolchain
-package.
+%description elf-gcc-%{gcc_addon_ver}-addon
+This contains an additional gcc-%{gcc_addon_fullver} compiler for the bfin-elf
+toolchain package.
 %endif
 
 %description uclibc-default
-This contains the default libraries for use with the Blackfin gcc-4.1 based
-toolchain.
+This contains the default libraries for use with the Blackfin gcc-%{gcc_main_ver}
+based toolchain.
 
 %if %{optional_gcc}
-%description uclibc-default-gcc-4.3-addon
-This contains additional default libraries for use with the Blackfin gcc-4.3
-based toolchain.
+%description uclibc-default-gcc-%{gcc_addon_ver}-addon
+This contains additional default libraries for use with the Blackfin
+gcc-%{gcc_addon_fullver} based toolchain.
 %endif
 
 %prep
-%setup -b 1 -b 2 -b 3 -b 4 -b 5 -b 6 -b 7 -b 8 -b 9
-#%patch -p1
-cd ..
-
 %if %{optional_gcc}
-%define gcc_build_opts -c 4.3 -c 4.1
-%else
-%define gcc_build_opts -c 4.1
+%define extra_setup -b 1
 %endif
+%setup -q -c %{name}-%{version} %{extra_setup} -a 2 -a 3 -a 4 -a 5 -a 6 -a 7 -a 8 -a 9 -a 10 -a 11
+
 %build
-echo $RPM_BUILD_ROOT
-./BuildToolChain %{extra_buildtoolchain_opts} -P ADI-%{version}-%{release} -s `pwd`/.. -K `pwd`/../kbuild_output -u `pwd`/../u-boot-2008.10  %{gcc_build_opts} -o %{prefix}/bfin
+%if %{optional_gcc}
+%define gcc_build_opts -c %{gcc_addon_ver} -c %{gcc_main_ver}
+%else
+%define gcc_build_opts -c %{gcc_main_ver}
+%endif
+echo Building in $RPM_BUILD_ROOT
+./buildscript/BuildToolChain %{extra_buildtoolchain_opts} \
+	-P ADI-%{version}-%{release} \
+	-s `pwd` \
+	-K `pwd`/kbuild_output \
+	-u `pwd`/`echo u-boot-*` \
+	-S jtag \
+	%{gcc_build_opts} \
+	-o %{prefix}/bfin
 
 %install
 echo Installing in $RPM_BUILD_ROOT
@@ -113,32 +134,34 @@ mkdir -p $RPM_BUILD_ROOT%{prefix}
 (%{bfin_host_strip} %{prefix}/bfin-elf/bin/* || true)
 (%{bfin_host_strip} %{prefix}/bfin-uclinux/bin/* || true)
 (%{bfin_host_strip} %{prefix}/bfin-linux-uclibc/bin/* || true)
-(%{bfin_host_strip} %{prefix}/bfin-elf/libexec/gcc/bfin-elf/4.3.3/cc1* || true)
-(%{bfin_host_strip} %{prefix}/bfin-uclinux/libexec/gcc/bfin-uclinux/4.3.3/cc1* || true)
-(%{bfin_host_strip} %{prefix}/bfin-linux-uclibc/libexec/gcc/bfin-linux-uclibc/4.3.3/cc1* || true)
-(%{bfin_host_strip} %{prefix}/bfin-elf/libexec/gcc/bfin-elf/4.1.2/cc1* || true)
-(%{bfin_host_strip} %{prefix}/bfin-uclinux/libexec/gcc/bfin-uclinux/4.1.2/cc1* || true)
-(%{bfin_host_strip} %{prefix}/bfin-linux-uclibc/libexec/gcc/bfin-linux-uclibc/4.1.2/cc1* || true)
-(%{bfin_host_strip} %{prefix}/bfin-elf/libexec/gcc/bfin-elf/4.1.2/f951* || true)
-(%{bfin_host_strip} %{prefix}/bfin-uclinux/libexec/gcc/bfin-uclinux/4.1.2/f951* || true)
-(%{bfin_host_strip} %{prefix}/bfin-linux-uclibc/libexec/gcc/bfin-linux-uclibc/4.1.2/f951* || true)
-(%{bfin_host_strip} %{prefix}/bfin-elf/libexec/gcc/bfin-elf/4.3.3/f951* || true)
-(%{bfin_host_strip} %{prefix}/bfin-uclinux/libexec/gcc/bfin-uclinux/4.3.3/f951* || true)
-(%{bfin_host_strip} %{prefix}/bfin-linux-uclibc/libexec/gcc/bfin-linux-uclibc/4.3.3/f951* || true)
+%if %{optional_gcc}
+(%{bfin_host_strip} %{prefix}/bfin-elf/libexec/gcc/bfin-elf/%{gcc_addon_fullver}/cc1* || true)
+(%{bfin_host_strip} %{prefix}/bfin-uclinux/libexec/gcc/bfin-uclinux/%{gcc_addon_fullver}/cc1* || true)
+(%{bfin_host_strip} %{prefix}/bfin-linux-uclibc/libexec/gcc/bfin-linux-uclibc/%{gcc_addon_fullver}/cc1* || true)
+(%{bfin_host_strip} %{prefix}/bfin-elf/libexec/gcc/bfin-elf/%{gcc_addon_fullver}/f951* || true)
+(%{bfin_host_strip} %{prefix}/bfin-uclinux/libexec/gcc/bfin-uclinux/%{gcc_addon_fullver}/f951* || true)
+(%{bfin_host_strip} %{prefix}/bfin-linux-uclibc/libexec/gcc/bfin-linux-uclibc/%{gcc_addon_fullver}/f951* || true)
+%endif
+(%{bfin_host_strip} %{prefix}/bfin-elf/libexec/gcc/bfin-elf/%{gcc_main_fullver}/cc1* || true)
+(%{bfin_host_strip} %{prefix}/bfin-uclinux/libexec/gcc/bfin-uclinux/%{gcc_main_fullver}/cc1* || true)
+(%{bfin_host_strip} %{prefix}/bfin-linux-uclibc/libexec/gcc/bfin-linux-uclibc/%{gcc_main_fullver}/cc1* || true)
+(%{bfin_host_strip} %{prefix}/bfin-elf/libexec/gcc/bfin-elf/%{gcc_main_fullver}/f951* || true)
+(%{bfin_host_strip} %{prefix}/bfin-uclinux/libexec/gcc/bfin-uclinux/%{gcc_main_fullver}/f951* || true)
+(%{bfin_host_strip} %{prefix}/bfin-linux-uclibc/libexec/gcc/bfin-linux-uclibc/%{gcc_main_fullver}/f951* || true)
 FILES=`find %{prefix}/ -name 'crt*.o'`
 (%{bfin_targ_strip} --strip-debug $FILES || true)
 
 find %{prefix}/ -name crt1.o | xargs %{bfin_targ_strip} --strip-debug
 cp -a %{prefix} $RPM_BUILD_ROOT/opt/
-./find-duplicates.sh  $RPM_BUILD_ROOT%{prefix}/bfin-elf/ $RPM_BUILD_ROOT%{prefix}/bfin-uclinux/ bfin-elf bfin-uclinux
-./find-duplicates.sh  $RPM_BUILD_ROOT%{prefix}/bfin-linux-uclibc/ $RPM_BUILD_ROOT%{prefix}/bfin-uclinux/ bfin-linux-uclibc bfin-uclinux
+./buildscript/find-duplicates.sh  $RPM_BUILD_ROOT%{prefix}/bfin-elf/ $RPM_BUILD_ROOT%{prefix}/bfin-uclinux/ bfin-elf bfin-uclinux
+./buildscript/find-duplicates.sh  $RPM_BUILD_ROOT%{prefix}/bfin-linux-uclibc/ $RPM_BUILD_ROOT%{prefix}/bfin-uclinux/ bfin-linux-uclibc bfin-uclinux
 
 #for x in bf532-none/ bf532-0.3/ bf561-none/ bf561-0.2/; do
-#  ./find-duplicates.sh \
+#  ./buildscript/find-duplicates.sh \
 #     $RPM_BUILD_ROOT%{prefix}/bfin-uclinux/bfin-uclinux/runtime/usr/lib/$x \
 #     $RPM_BUILD_ROOT%{prefix}/bfin-uclinux/bfin-uclinux/runtime/usr/lib/ \
 #     $x ""
-#  ./find-duplicates.sh \
+#  ./buildscript/find-duplicates.sh \
 #     $RPM_BUILD_ROOT%{prefix}/bfin-linux-uclibc/bfin-linux-uclibc/runtime/usr/lib/$x \
 #     $RPM_BUILD_ROOT%{prefix}/bfin-linux-uclibc/bfin-linux-uclibc/runtime/usr/lib/ \
 #     $x ""
@@ -166,7 +189,7 @@ rm -rf $RPM_BUILD_ROOT
 %{prefix}/bfin-uclinux/bin/bfin-uclinux-flthdr%{EXEEXT}
 %{prefix}/bfin-uclinux/bin/bfin-uclinux-g++%{EXEEXT}
 %{prefix}/bfin-uclinux/bin/bfin-uclinux-gcc%{EXEEXT}
-%{prefix}/bfin-uclinux/bin/bfin-uclinux-*-4.1.2%{EXEEXT}
+%{prefix}/bfin-uclinux/bin/bfin-uclinux-*-%{gcc_main_fullver}%{EXEEXT}
 %{prefix}/bfin-uclinux/bin/bfin-uclinux-gccbug
 %{prefix}/bfin-uclinux/bin/bfin-uclinux-gcov%{EXEEXT}
 %{prefix}/bfin-uclinux/bin/bfin-uclinux-gdb%{EXEEXT}
@@ -205,8 +228,8 @@ rm -rf $RPM_BUILD_ROOT
 %{prefix}/bfin-uclinux/bfin-uclinux/bin/ranlib%{EXEEXT}
 %{prefix}/bfin-uclinux/bfin-uclinux/bin/strip%{EXEEXT}
 
-%{prefix}/bfin-uclinux/lib/*.a
-%{prefix}/bfin-uclinux/libexec/gcc/bfin-uclinux/4.1.2/*
+#%{prefix}/bfin-uclinux/lib/*.a
+%{prefix}/bfin-uclinux/libexec/gcc/bfin-uclinux/%{gcc_main_fullver}/*
 %if %{x_support}
 %{prefix}/bfin-uclinux/lib/*.sh
 %{prefix}/bfin-uclinux/lib/insight1.0/*
@@ -223,7 +246,7 @@ rm -rf $RPM_BUILD_ROOT
 %{prefix}/bfin-linux-uclibc/bin/bfin-linux-uclibc-cpp%{EXEEXT}
 %{prefix}/bfin-linux-uclibc/bin/bfin-linux-uclibc-g++%{EXEEXT}
 %{prefix}/bfin-linux-uclibc/bin/bfin-linux-uclibc-gcc%{EXEEXT}
-%{prefix}/bfin-linux-uclibc/bin/bfin-linux-uclibc-*-4.1.2%{EXEEXT}
+%{prefix}/bfin-linux-uclibc/bin/bfin-linux-uclibc-*-%{gcc_main_fullver}%{EXEEXT}
 %{prefix}/bfin-linux-uclibc/bin/bfin-linux-uclibc-gccbug
 %{prefix}/bfin-linux-uclibc/bin/bfin-linux-uclibc-gcov%{EXEEXT}
 %{prefix}/bfin-linux-uclibc/bin/bfin-linux-uclibc-gdb%{EXEEXT}
@@ -260,8 +283,8 @@ rm -rf $RPM_BUILD_ROOT
 %{prefix}/bfin-linux-uclibc/bfin-linux-uclibc/bin/ranlib%{EXEEXT}
 %{prefix}/bfin-linux-uclibc/bfin-linux-uclibc/bin/strip%{EXEEXT}
 
-%{prefix}/bfin-linux-uclibc/lib/*.a
-%{prefix}/bfin-linux-uclibc/libexec/gcc/bfin-linux-uclibc/4.1.2/*
+#%{prefix}/bfin-linux-uclibc/lib/*.a
+%{prefix}/bfin-linux-uclibc/libexec/gcc/bfin-linux-uclibc/%{gcc_main_fullver}/*
 %if %{x_support}
 %{prefix}/bfin-linux-uclibc/lib/*.sh
 %{prefix}/bfin-linux-uclibc/lib/insight1.0/*
@@ -269,7 +292,7 @@ rm -rf $RPM_BUILD_ROOT
 %{prefix}/bfin-linux-uclibc/lib/itk3.2/*
 %endif
 
-%files elf-gcc-4.1
+%files elf-gcc-%{gcc_main_ver}
 %doc %{prefix}/bfin-elf/info/*
 %doc %{prefix}/bfin-elf/man/*
 %{prefix}/bfin-elf/share/*
@@ -283,7 +306,7 @@ rm -rf $RPM_BUILD_ROOT
 %{prefix}/bfin-elf/bin/bfin-elf-flthdr%{EXEEXT}
 %{prefix}/bfin-elf/bin/bfin-elf-g++%{EXEEXT}
 %{prefix}/bfin-elf/bin/bfin-elf-gcc%{EXEEXT}
-%{prefix}/bfin-elf/bin/bfin-elf-*-4.1.2%{EXEEXT}
+%{prefix}/bfin-elf/bin/bfin-elf-*-%{gcc_main_fullver}%{EXEEXT}
 %{prefix}/bfin-elf/bin/bfin-elf-gccbug
 %{prefix}/bfin-elf/bin/bfin-elf-gcov%{EXEEXT}
 %{prefix}/bfin-elf/bin/bfin-elf-gdb%{EXEEXT}
@@ -320,9 +343,9 @@ rm -rf $RPM_BUILD_ROOT
 %{prefix}/bfin-elf/bfin-elf/bin/ranlib%{EXEEXT}
 %{prefix}/bfin-elf/bfin-elf/bin/strip%{EXEEXT}
 
-%{prefix}/bfin-elf/lib/*.a
-%{prefix}/bfin-elf/lib/gcc/bfin-elf/4.1.2
-%{prefix}/bfin-elf/libexec/gcc/bfin-elf/4.1.2
+#%{prefix}/bfin-elf/lib/*.a
+%{prefix}/bfin-elf/lib/gcc/bfin-elf/%{gcc_main_fullver}
+%{prefix}/bfin-elf/libexec/gcc/bfin-elf/%{gcc_main_fullver}
 %if %{x_support}
 %{prefix}/bfin-elf/lib/*.sh
 %{prefix}/bfin-elf/lib/insight1.0/*
@@ -331,33 +354,33 @@ rm -rf $RPM_BUILD_ROOT
 %endif
 
 %if %{optional_gcc}
-%files gcc-4.3-addon
-%{prefix}/bfin-uclinux/bin/bfin-uclinux-*-4.3.3%{EXEEXT}
-%{prefix}/bfin-uclinux/libexec/gcc/bfin-uclinux/4.3.3/*
+%files gcc-%{gcc_addon_ver}-addon
+%{prefix}/bfin-uclinux/bin/bfin-uclinux-*-%{gcc_addon_fullver}%{EXEEXT}
+%{prefix}/bfin-uclinux/libexec/gcc/bfin-uclinux/%{gcc_addon_fullver}/*
 
-%{prefix}/bfin-linux-uclibc/bin/bfin-linux-uclibc-*-4.3.3%{EXEEXT}
-%{prefix}/bfin-linux-uclibc/libexec/gcc/bfin-linux-uclibc/4.3.3/*
+%{prefix}/bfin-linux-uclibc/bin/bfin-linux-uclibc-*-%{gcc_addon_fullver}%{EXEEXT}
+%{prefix}/bfin-linux-uclibc/libexec/gcc/bfin-linux-uclibc/%{gcc_addon_fullver}/*
 
-%files elf-gcc-4.3-addon
-%{prefix}/bfin-elf/bin/bfin-elf-*-4.3.3%{EXEEXT}
-%{prefix}/bfin-elf/lib/gcc/bfin-elf/4.3.3/*
-%{prefix}/bfin-elf/libexec/gcc/bfin-elf/4.3.3/*
+%files elf-gcc-%{gcc_addon_ver}-addon
+%{prefix}/bfin-elf/bin/bfin-elf-*-%{gcc_addon_fullver}%{EXEEXT}
+%{prefix}/bfin-elf/lib/gcc/bfin-elf/%{gcc_addon_fullver}/*
+%{prefix}/bfin-elf/libexec/gcc/bfin-elf/%{gcc_addon_fullver}/*
 %endif
 
 %files uclibc-default
 %{prefix}/bfin-linux-uclibc/bfin-linux-uclibc/include/*
 %{prefix}/bfin-linux-uclibc/bfin-linux-uclibc/lib/*
 %{prefix}/bfin-linux-uclibc/bfin-linux-uclibc/runtime/*
-%{prefix}/bfin-linux-uclibc/lib/gcc/bfin-linux-uclibc/4.1.2/*
+%{prefix}/bfin-linux-uclibc/lib/gcc/bfin-linux-uclibc/%{gcc_main_fullver}/*
 %{prefix}/bfin-uclinux/bfin-uclinux/include/*
 %{prefix}/bfin-uclinux/bfin-uclinux/lib/*
 %{prefix}/bfin-uclinux/bfin-uclinux/runtime/*
-%{prefix}/bfin-uclinux/lib/gcc/bfin-uclinux/4.1.2/*
+%{prefix}/bfin-uclinux/lib/gcc/bfin-uclinux/%{gcc_main_fullver}/*
 
 %if %{optional_gcc}
-%files uclibc-default-gcc-4.3-addon
-%{prefix}/bfin-linux-uclibc/lib/gcc/bfin-linux-uclibc/4.3.3/*
-%{prefix}/bfin-uclinux/lib/gcc/bfin-uclinux/4.3.3/*
+%files uclibc-default-gcc-%{gcc_addon_ver}-addon
+%{prefix}/bfin-linux-uclibc/lib/gcc/bfin-linux-uclibc/%{gcc_addon_fullver}/*
+%{prefix}/bfin-uclinux/lib/gcc/bfin-uclinux/%{gcc_addon_fullver}/*
 %endif
 
 
