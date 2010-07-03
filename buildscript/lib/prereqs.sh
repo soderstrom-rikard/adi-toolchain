@@ -8,10 +8,11 @@ check_header() {
 }
 
 check_lib() {
-	local lib=$1 temp_file
+	local lib=$1 prefix=$2 Lpaths temp_file
 	# Old Linux installations keep X in /usr/X11R6.
 	temp_file=$(mktemp || echo "${TMPDIR-/tmp}/conftest.o")
-	echo "int main(){}" | gcc -x c - -L/usr/X11R6/lib -L/sw/lib -l${lib} -o ${temp_file} >/dev/null
+	[ -z "${prefix}" ] && Lpaths="-L/usr/X11R6/lib -L/sw/lib" || prefix="${prefix}-"
+	echo "int main(){}" | ${prefix}gcc -x c - ${LDFLAGS} ${Lpaths} -l${lib} -o ${temp_file} >/dev/null
 	local ret=$?
 	rm -f "${temp_file}"
 	return ${ret}

@@ -288,6 +288,9 @@ fi
 mkdir -p "${DIR_BUILD}"
 check_abs_dir "" "${DIR_BUILD}"
 
+export STAGEDIR=${DIR_BUILD}/staging_build
+mk_output_dir "staging" "${STAGEDIR}"
+
 : ${DIR_ELF_OUTPUT:=${DIR_BUILD}/bfin-elf}
 mk_output_dir "ELF" "${DIR_ELF_OUTPUT}" $SKIP_ELF
 
@@ -400,6 +403,129 @@ fi
 ############## DONOT CHANGE ANYTHING BELOW THIS LINE ############
 #################################################################
 
+build_curses()
+{
+	# help out mingw targets; some packages (like gdb) need curses
+	if [ "${CBUILD}" = "${CHOST}" ] || check_lib curses ${CHOST} 2>/dev/null ; then
+		return 0
+	fi
+
+	PN="pdcurses"
+	S=$(echo $DIR_BINUTILS_SOURCE/../PDCurses-*)
+	WORKDIR=$DIR_BUILD/${PN}_build
+
+	[ -d "${S}" ] || return 0
+
+	PV=$(awk '{v=$NF} END{print v}' "${S}"/version.mif)
+
+	echo_date "${CHOST}: ${PN}: building (${PV})"
+	change_clean_dir "${WORKDIR}"
+	run_cmd $MAKE -f "${S}"/win32/gccwin32.mak PDCURSES_SRCDIR="${S}" \
+		CC=${CHOST}-gcc LIBEXE=${CHOST}-ar libs
+
+	echo_date "${CHOST}: ${PN}: installing"
+	run_cmd cp *curses.a "${STAGEDIR}"/usr/lib/libcurses.a
+	run_cmd cp "${S}"/curses.h "${STAGEDIR}"/usr/include/
+
+	change_dir "${DIR_BUILD}"
+	run_cmd rm -rf "${WORKDIR}"
+}
+
+build_expat()
+{
+	# help out mingw targets; some packages (like gdb) like expat
+	if [ "${CBUILD}" = "${CHOST}" ] || check_lib expat ${CHOST} 2>/dev/null ; then
+		return 0
+	fi
+
+	PN="expat"
+	S=$(echo $DIR_BINUTILS_SOURCE/../expat-*)
+	WORKDIR=$DIR_BUILD/${PN}_build
+
+	[ -d "${S}" ] || return 0
+
+	PV=$("${S}"/conftools/get-version.sh "${S}"/lib/expat.h)
+
+	echo_date "${CHOST}: ${PN}: configuring (${PV})"
+	change_clean_dir "${WORKDIR}"
+	run_cmd "${S}"/configure $BUILD_TARGET $HOST_TARGET \
+		--target=${target} --disable-shared --prefix=/usr
+
+	echo_date "${CHOST}: ${PN}: building"
+	run_cmd $MAKE buildlib
+
+	echo_date "${CHOST}: ${PN}: installing"
+	run_cmd $MAKE installlib DESTDIR="${STAGEDIR}"
+
+	change_dir "${DIR_BUILD}"
+	run_cmd rm -rf "${WORKDIR}"
+}
+
+build_pthreads()
+{
+	# help out mingw targets; some packages (like urjtag/ldr-utils) like pthreads
+	if [ "${CBUILD}" = "${CHOST}" ] || check_lib pthreads ${CHOST} 2>/dev/null ; then
+		return 0
+	fi
+
+	PN="pthreads"
+	S=$(echo $DIR_BINUTILS_SOURCE/../pthreads-*)
+	WORKDIR=$DIR_BUILD/${PN}_build
+
+	[ -d "${S}" ] || return 0
+
+	PV=$(awk '$2 == "PTW32_VERSION" {print $NF; exit}' "${S}"/pthread.h | sed 's:,:.:g')
+
+	echo_date "${CHOST}: ${PN}: building (${PV})"
+	change_dir "${S}"
+	run_cmd $MAKE realclean
+	run_cmd $MAKE GC CROSS=${CHOST}- # for win64: LFLAGS=-lw32_32
+
+	echo_date "${CHOST}: ${PN}: installing"
+	run_cmd cp libpthreadGC2.a "${STAGEDIR}"/usr/lib/libpthread.a
+	run_cmd cp pthread.h semaphore.h sched.h "${STAGEDIR}"/usr/include/
+
+	echo_date "${CHOST}: ${PN}: cleaning"
+	run_cmd $MAKE realclean
+
+	change_dir "${DIR_BUILD}"
+}
+
+build_zlib()
+{
+	# help out mingw targets; some packages (like elf2flt) need zlib
+	if [ "${CBUILD}" = "${CHOST}" ] || check_lib z ${CHOST} 2>/dev/null ; then
+		return 0
+	fi
+
+	PN="zlib"
+	local gcc_ver=`set -- ${GCC_VERSIONS}; echo $1`
+	_S=$DIR_SOURCE/gcc-${gcc_ver}
+	S="${_S}"/zlib
+	WORKDIR=$DIR_BUILD/${PN}_build
+
+	PV=$(echo ZLIB_VERSION | gcc -include "${S}"/zlib.h -E - | tail -n 1)
+	PV="`eval echo ${PV}` from gcc-${gcc_ver}"
+
+	echo_date "${CHOST}: ${PN}: configuring (${PV})"
+	change_clean_dir "${WORKDIR}"
+	run_cmd rm -f "${_S}"/gmp "${_S}"/mpfr
+	run_cmd ln -s ../gmp "${_S}"/gmp
+	run_cmd ln -s ../mpfr "${_S}"/mpfr
+	run_cmd "${_S}"/configure $BUILD_TARGET $HOST_TARGET
+
+	echo_date "${CHOST}: ${PN}: building"
+	run_cmd $MAKE all-zlib
+
+	echo_date "${CHOST}: ${PN}: installing"
+	run_cmd cp zlib/libz.a "${STAGEDIR}"/usr/lib/
+	run_cmd cp "${S}"/zlib.h "${S}"/zconf.h "${STAGEDIR}"/usr/include/
+
+	change_dir "${DIR_BUILD}"
+	run_cmd rm -f "${_S}"/gmp "${_S}"/mpfr
+	run_cmd rm -rf "${WORKDIR}"
+}
+
 build_gcc()
 {
 	local ver="$1"
@@ -420,7 +546,7 @@ build_gcc()
 		p=$DIR_GCC_BUILD/.bfin.path
 		mkdir $p
 		for t in gcc g++ c++ gfortran ; do
-			fullt=$(echo `which ${target}-$t`-${ver}.?)
+			fullt=$(echo `which ${target}-$t 2>/dev/null`-${ver}.?)
 			if [ ! -x "$fullt" ] ; then
 				if [ "$t" = "gcc" ] ; then
 					die_with_log "You need to have gcc ${ver} installed in order to build it"
@@ -588,6 +714,12 @@ build_binutils()
 	change_dir $DIR_BINUTILS_BUILD
 	echo_date "${target}: binutils/gdb: installing"
 	run_cmd $MAKE install-binutils install-gas install-ld install-sim install-gdb
+
+	if [ "${CBUILD}" != "${CHOST}" ] && ! check_lib readline ${CHOST} 2>/dev/null ; then
+		echo_date "${CHOST}: readline: installing"
+		# cache native readline for other packages (like urjtag)
+		run_cmd $MAKE -C readline install-static DESTDIR=${STAGEDIR} prefix=/usr
+	fi
 
 	# need to leave build dir behind for elf2flt
 	[ "${target}" = "bfin-linux-uclibc" ] && run_cmd rm -rf "$DIR_BINUTILS_BUILD"
@@ -1006,6 +1138,22 @@ build_uclibc()
 }
 
 #
+# Prep a few 3rd party libs if need be
+#
+if [ "${CBUILD}" != "${CHOST}" ] ; then
+	# need a local compiling wrapper for the staging dir
+	export PATH=${STAGEDIR}/bin:${PATH}
+	run_cmd mkdir -p "${STAGEDIR}"/bin "${STAGEDIR}"/usr/lib "${STAGEDIR}"/usr/include
+	for x in cpp g++ gcc ld ; do
+		run_cmd cp "${DIR_APP}"/staging-compiler "${STAGEDIR}"/bin/${CHOST}-${x}
+	done
+fi
+build_curses
+build_expat
+build_pthreads
+build_zlib
+
+#
 # First build up the ELF toolchain
 #
 if [ "x$SKIP_ELF" = "x" ]; then
@@ -1215,6 +1363,7 @@ if [ ! $SKIP_TARGET_LIBS ] ; then
 fi
 
 change_dir "${DIR_BUILD}"
+run_cmd rm -rf "${STAGEDIR}"
 
 resume_clear
 
