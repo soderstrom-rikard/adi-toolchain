@@ -1,11 +1,21 @@
-#%define __os_install_post %{nil}
-%define optional_gcc 0
+%define windows_build 0
+%if %{windows_build}
+%define mingw_prefix mingw32
+%define __os_install_post %{nil}
+%define bfin_host_strip %{mingw_prefix}/strip
+%define bfin_targ_strip bfin-elf-strip
+%define EXEEXT .exe
+%define x_support 0
+%define extra_buildtoolchain_opts -H %{mingw_prefix}
+%else
 %define bfin_host_strip strip
 %define bfin_targ_strip %{prefix}/bfin-elf/bin/bfin-elf-strip
 %define EXEEXT %{nil}
 %define x_support 1
 %define extra_buildtoolchain_opts %{nil}
+%endif
 
+%define optional_gcc 0
 %define gcc_main_ver 4.3
 %define gcc_main_fullver %{gcc_main_ver}.5
 %define gcc_addon_ver 4.5
@@ -37,6 +47,12 @@ Source12:     libftdi.tar.bz2
 Source13:     libusb.tar.bz2
 Source14:     urjtag.tar.bz2
 Source15:     gdbproxy.tar.bz2
+%if %{windows_build}
+Source16:     libusb-winusb.tar.bz2
+Source17:     expat-2.0.1.tar.gz
+Source18:     PDCurses-3.4.tar.gz
+Source19:     pthreads-windows.tar.bz2
+%endif
 Patch:        jtag.diff
 prefix:       /opt/uClinux
 BuildRoot:    %{_tmppath}/%{name}-%{version}-build
@@ -109,9 +125,12 @@ gcc-%{gcc_addon_fullver} based toolchain.
 
 %prep
 %if %{optional_gcc}
-%define extra_setup -b 1
+%define extra_setup -a 1
 %endif
-%setup -q -c %{name}-%{version} %{extra_setup} -a 2 -a 3 -a 4 -a 5 -a 6 -a 7 -a 8 -a 9 -a 10 -a 11 -a 12 -a 13 -a 14 -a 15
+%if %{windows_build}
+%define windows_setup -a 16 -a 17 -a 18 -a 19
+%endif
+%setup -q -c %{name}-%{version} %{extra_setup} -a 2 -a 3 -a 4 -a 5 -a 6 -a 7 -a 8 -a 9 -a 10 -a 11 -a 12 -a 13 -a 14 -a 15 %{windows_setup}
 %patch -p0
 
 %build
