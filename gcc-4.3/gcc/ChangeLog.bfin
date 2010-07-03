@@ -1,3 +1,8 @@
+2010-07-02  Mike Frysinger  <michael.frysinger@analog.com>
+
+	* config/bfin/bfin.h (bfin_cpu_t): Drop trailing comma in enum to
+	avoid warnings from gcc.
+
 2010-06-16  Steve Kilbane  <stephen.kilbane@analog.com>
 
 	* config/lib1funcs.asm: Use a new implementation for
