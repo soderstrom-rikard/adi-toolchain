@@ -1,3 +1,8 @@
+2010-07-07  Steve Kilbane   <stephen.kilbane@analog.com>
+
+	[#6092] Pattern for RETI would only match the pop, not the push.
+	* gcc.target/bfin/hdlr_intr-2.c: New test.
+
 2010-06-30  Steve Kilbane   <stephen.kilbane@analog.com>
 
 	* gcc.target/bfin/hdlr_except-1.c: New test.
