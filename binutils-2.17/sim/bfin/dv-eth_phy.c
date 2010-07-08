@@ -49,8 +49,12 @@ static const char * const reg_names[] = {
   [MII_ADVERTISE  ] = "MII_ADVERTISE",
   [MII_LPA        ] = "MII_LPA",
   [MII_EXPANSION  ] = "MII_EXPANSION",
+#ifdef MII_CTRL1000
   [MII_CTRL1000   ] = "MII_CTRL1000",
+#endif
+#ifdef MII_STAT1000
   [MII_STAT1000   ] = "MII_STAT1000",
+#endif
   [MII_ESTATUS    ] = "MII_ESTATUS",
   [MII_DCOUNTER   ] = "MII_DCOUNTER",
   [MII_FCSCOUNTER ] = "MII_FCSCOUNTER",
