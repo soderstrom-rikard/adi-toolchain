@@ -1,3 +1,11 @@
+2010-07-08  Steve Kilbane  <stephen.kilbane@analog.com>
+
+	[#5827] Failures in trampoline code due to icache/dcache incoherence
+	* config/bfin/bfin.c: abort if we attempt to create a trampoline,
+	as we don't have a workaround for this yet. At least we won't create
+	code that will fail randomly at run-time. Means an internal compiler
+	error will be thrown if you take the address of a nested function defn.
+
 2010-07-02  Mike Frysinger  <michael.frysinger@analog.com>
 
 	* config/bfin/bfin.h (bfin_cpu_t): Drop trailing comma in enum to

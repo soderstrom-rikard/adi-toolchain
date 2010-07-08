@@ -2147,6 +2147,12 @@ initialize_trampoline (rtx tramp, rtx fnaddr, rtx cxt)
   rtx addr;
   int i = 0;
 
+  /* We haven't yet decided how to handle trampolines, since the cache
+     needs to be cleared, but there's an anomaly that prevents us using
+     IFLUSH anywhere except L1. So barf for now, so that at least users
+     know that they've got a problem that needs a trampoline. */
+  abort ();
+#if 0
   if (TARGET_FDPIC)
     {
       rtx a = memory_address (Pmode, plus_constant (tramp, 8));
@@ -2166,6 +2172,7 @@ initialize_trampoline (rtx tramp, rtx fnaddr, rtx cxt)
   emit_insn (gen_ashrsi3 (t2, t2, GEN_INT (16)));
   addr = memory_address (Pmode, plus_constant (tramp, i + 14));
   emit_move_insn (gen_rtx_MEM (HImode, addr), gen_lowpart (HImode, t2));
+#endif
 }
 
 /* Emit insns to move operands[1] into operands[0].  */
