@@ -55,7 +55,9 @@ static const char * const reg_names[] = {
 #ifdef MII_STAT1000
   [MII_STAT1000   ] = "MII_STAT1000",
 #endif
+#ifdef MII_ESTATUS
   [MII_ESTATUS    ] = "MII_ESTATUS",
+#endif
   [MII_DCOUNTER   ] = "MII_DCOUNTER",
   [MII_FCSCOUNTER ] = "MII_FCSCOUNTER",
   [MII_NWAYTEST   ] = "MII_NWAYTEST",
