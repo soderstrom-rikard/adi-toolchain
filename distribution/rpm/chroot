@@ -1,0 +1,54 @@
+#!/bin/bash -e
+
+[[ -w / ]] || exec sudo "$0" "$@"
+[[ $# -eq 0 ]] && set -- /bin/bash -l
+mounts="proc sys dev dev/pts usr/local/src var/lib/gforge/filesystem"
+
+chroot=${0%/*}
+case ${chroot} in
+	.) chroot=$PWD;;
+	.*) chroot=$(cd ${chroot}; pwd);;
+esac
+cd "${chroot}"
+
+maybe_mount() {
+	local src=$1 dst=${2:-$1}
+	[ -e "${src}" ] || return 0
+	mkdir -p "${chroot}/${dst}"
+	grep -sq "${chroot}/${dst}" /proc/mounts || mount --bind "/${src}" "${chroot}/${dst}"
+}
+for m in ${mounts} ; do
+	maybe_mount ${m}
+done
+
+if [[ $(file bin/bash) == *x86-64* ]] ; then
+	setarch=
+#	maybe_mount /mnt/apt-cache-lenny-amd64 var/cache/apt/archives
+else
+	setarch="setarch i386"
+#	maybe_mount /mnt/apt-cache-lenny-i386 var/cache/apt/archives
+fi
+
+if [[ ! -L /etc/mtab ]] ; then
+	rm -f etc/mtab
+	ln -sf /proc/mounts etc/mtab
+fi
+etc="
+	hosts
+	locale.gen
+	localtime
+	resolv.conf
+"
+root="
+	.inputrc
+	.nanorc
+"
+for f in \
+	$(printf 'etc/%s ' ${etc}) \
+	$(printf 'root/%s ' ${root}) \
+; do
+	cp /${f} ${f}
+done
+
+unset LS_COLORS # format changes over time
+exec ${setarch} chroot "${chroot}" "$@"
