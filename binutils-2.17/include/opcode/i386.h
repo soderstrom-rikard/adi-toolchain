@@ -1377,6 +1377,7 @@ static const template i386_optab[] =
 
 /* Supplemental Streaming SIMD extensions 3 Instructions.  */
 
+#ifdef CpuSSSE3
 {"phaddw",    2,   0x0f3801,X, CpuSSSE3, NoSuf|IgnoreSize|Modrm,	{ RegMMX|LongMem, RegMMX, 0 } },
 {"phaddw",    2, 0x660f3801,X, CpuSSSE3, NoSuf|IgnoreSize|Modrm,	{ RegXMM|LLongMem, RegXMM, 0 } },
 {"phaddd",    2,   0x0f3802,X, CpuSSSE3, NoSuf|IgnoreSize|Modrm,	{ RegMMX|LongMem, RegMMX, 0 } },
@@ -1409,6 +1410,7 @@ static const template i386_optab[] =
 {"pabsw",    2,  0x660f381d,X, CpuSSSE3, NoSuf|IgnoreSize|Modrm,	{ RegXMM|LLongMem, RegXMM, 0 } },
 {"pabsd",    2,    0x0f381e,X, CpuSSSE3, NoSuf|IgnoreSize|Modrm,	{ RegMMX|LongMem, RegMMX, 0 } },
 {"pabsd",    2,  0x660f381e,X, CpuSSSE3, NoSuf|IgnoreSize|Modrm,	{ RegXMM|LLongMem, RegXMM, 0 } },
+#endif
 
 /* AMD 3DNow! instructions.  */
 
@@ -1464,16 +1466,20 @@ static const template i386_optab[] =
 
 
 /* SSE4a instructions */
+#ifdef CpuSSE4a
 {"movntsd",  2, 0xf20f2b,  X, CpuSSE4a, NoSuf|IgnoreSize|Modrm, { RegXMM, LongMem, 0 } },
 {"movntss",  2, 0xf30f2b,  X, CpuSSE4a, NoSuf|IgnoreSize|Modrm, { RegXMM, WordMem, 0 } },
 {"extrq",    3, 0x660f78,  0, CpuSSE4a, NoSuf|IgnoreSize|Modrm, { Imm8, Imm8, RegXMM } },
 {"extrq",    2, 0x660f79,  X, CpuSSE4a, NoSuf|IgnoreSize|Modrm, { RegXMM, RegXMM} },
 {"insertq",  2, 0xf20f79,  X, CpuSSE4a, NoSuf|IgnoreSize|Modrm, { RegXMM, RegXMM} },
 {"insertq",  4, 0xf20f78,  X, CpuSSE4a, NoSuf|IgnoreSize|Modrm, { Imm8, Imm8, RegXMM, RegXMM} },
+#endif
 
 /* ABM instructions */
+#ifdef CpuABM
 {"popcnt",   2, 0xf30fb8,  X, CpuABM, wlq_Suf|Modrm,          { WordReg|WordMem, WordReg, 0} },
 {"lzcnt",    2, 0xf30fbd,  X, CpuABM, wlq_Suf|Modrm,          { WordReg|WordMem, WordReg, 0} },
+#endif
 
 
 /* VIA PadLock extensions.  */

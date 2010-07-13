@@ -57,6 +57,10 @@
 #define BEFORE_SIZE (1)
 #define AFTER_SIZE  (1)
 
+#ifndef TC_EOL_IN_INSN
+#define TC_EOL_IN_INSN(P) 0
+#endif
+
 static char *buffer_start;	/*->1st char of full buffer area.  */
 static char *partial_where;	/*->after last full line in buffer.  */
 static int partial_size;	/* >=0. Number of chars in partial line in buffer.  */
