@@ -249,7 +249,9 @@ if [ -z "${KERNEL_SOURCE}" ] ; then
 		../linux-kernel \
 		../../linux-kernel/trunk \
 		../uclinux-dist/linux-2.6.x \
-		../../uclinux-dist/trunk/linux-2.6.x
+		../uClinux-dist/linux-2.6.x \
+		../../uclinux-dist/trunk/linux-2.6.x \
+		../../uClinux-dist/trunk/linux-2.6.x
 	do
 		d="${DIR_SOURCE}/${p}"
 		if [ -d "${d}/arch/blackfin" ] ; then
