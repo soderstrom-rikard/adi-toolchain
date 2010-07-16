@@ -13,7 +13,7 @@ cd "${chroot}"
 
 maybe_mount() {
 	local src=$1 dst=${2:-$1}
-	[ -e "${src}" ] || return 0
+	[ -e "/${src}" ] || return 0
 	mkdir -p "${chroot}/${dst}"
 	grep -sq "${chroot}/${dst}" /proc/mounts || mount --bind "/${src}" "${chroot}/${dst}"
 }
