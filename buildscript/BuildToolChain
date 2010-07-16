@@ -937,7 +937,7 @@ build_kernel_headers()
 		KBUILD_OUTPUT=$DIR_KBUILD_OUTPUT \
 		CROSS_COMPILE=bfin-elf- \
 		ARCH=blackfin
-	find "$DIR_KBUILD_OUTPUT/usr" -type f -name '.*' -exec rm {} +
+	find "$DIR_KBUILD_OUTPUT/usr" -type f -name '.*' -print0 | xargs -0 rm -f
 	change_dir ..
 
 	resume_save
