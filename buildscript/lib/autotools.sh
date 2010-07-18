@@ -41,6 +41,11 @@ build_autotooled_pkg()
 	echo_date "${pkg}: installing"
 	at_install() {
 		run_cmd $MAKE install DESTDIR="$1" program_transform_name=s,^,bfin-, $(at_make_args)
+		run_cmd rm -f "$1"/lib/*.la
+		run_cmd_nodie mv "$1"/include/* "${STAGEDIR}"/usr/include/
+		run_cmd_nodie mv "$1"/lib/*.a "${STAGEDIR}"/usr/lib/
+		run_cmd_nodie mv "$1"/lib/pkgconfig/* "${STAGEDIR}"/usr/lib/pkgconfig/
+		run_cmd_nodie rmdir "$1"/lib/pkgconfig "$1"/lib "$1"/include
 	}
 	at_install "${DIR_ELF_OUTPUT}"
 	if [ $KERNEL_SOURCE ] ; then
@@ -49,10 +54,9 @@ build_autotooled_pkg()
 	fi
 
 	# mung the local .pc files so other packages in here can find them
-	run_cmd rm -f "${DIR_ELF_OUTPUT}"/lib/*.la
 	local f
-	for f in "${DIR_ELF_OUTPUT}"/lib/pkgconfig/*.pc ; do
-		ised "${f}" -e "/^prefix=/s:=.*:=${DIR_ELF_OUTPUT}:"
+	for f in "${STAGEDIR}"/usr/lib/pkgconfig/*.pc ; do
+		ised "${f}" -e "/^prefix=/s:=.*:=${STAGEDIR}/usr:"
 	done
 
 	run_cmd rm -rf "${build}"

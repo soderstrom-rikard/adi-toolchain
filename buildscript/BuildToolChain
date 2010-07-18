@@ -487,6 +487,13 @@ build_pthreads()
 	run_cmd cp libpthreadGC2.a "${STAGEDIR}"/usr/lib/libpthread.a
 	run_cmd cp pthread.h semaphore.h sched.h "${STAGEDIR}"/usr/include/
 
+	# blah, need to include the shared dll
+	local d
+	for d in "${DIR_ELF_OUTPUT}" "${DIR_uC_OUTPUT}" "${DIR_LINUX_OUTPUT}" ; do
+		run_cmd mkdir -p "${d}"/bin
+		run_cmd cp pthreadGC2.dll "${d}"/bin/
+	done
+
 	echo_date "${CHOST}: ${PN}: cleaning"
 	run_cmd $MAKE realclean
 
@@ -1145,7 +1152,7 @@ build_uclibc()
 if [ "${CBUILD}" != "${CHOST}" ] ; then
 	# need a local compiling wrapper for the staging dir
 	export PATH=${STAGEDIR}/bin:${PATH}
-	run_cmd mkdir -p "${STAGEDIR}"/bin "${STAGEDIR}"/usr/lib "${STAGEDIR}"/usr/include
+	run_cmd mkdir -p "${STAGEDIR}"/bin "${STAGEDIR}"/usr/lib/pkgconfig "${STAGEDIR}"/usr/include
 	for x in cpp g++ gcc ld ; do
 		run_cmd cp "${DIR_APP}"/staging-compiler "${STAGEDIR}"/bin/${CHOST}-${x}
 	done
@@ -1202,7 +1209,7 @@ fi
 # Finally do u-boot if wanted
 [ $SKIP_UBOOT ] || build_uboot
 
-export PKG_CONFIG_PATH="${DIR_ELF_OUTPUT}/lib/pkgconfig${PKG_CONFIG_PATH:+:${PKG_CONFIG_PATH}}"
+export PKG_CONFIG_PATH="${STAGEDIR}/usr/lib/pkgconfig${PKG_CONFIG_PATH:+:${PKG_CONFIG_PATH}}"
 
 ######################## ldr-utils ###########################
 
