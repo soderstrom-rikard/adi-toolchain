@@ -6,10 +6,10 @@
 [Version]
 Signature   = "$Chicago$"
 Class       = %DeviceClassName%
-ClassGUID   = {89982A59-5EEA-45aa-AF97-52EC351018C2}
+ClassGUID   = %DeviceClassGUID%
 Provider    = %manufacturer%
 CatalogFile = gnICE.cat
-DriverVer   = 11/10/2009,2.0
+DriverVer   = 07/18/2010,3.0 ;mm/dd/yyyy[,x.y.v.z]
 
 ; Install into the same place as the ADI USB ICEs
 [ClassInstall]
@@ -30,79 +30,101 @@ HKR,,Icon,,"-5"
 ;
 
 ;[Devices]
-;%gnICE_JTAG%  = LIBUSB_DEV, USB\VID_0456&PID_f000&MI_00
-;%gnICE+_JTAG% = LIBUSB_DEV, USB\VID_0456&PID_f001&MI_00
+;%gnICE_JTAG%  = USB_Install, USB\VID_0456&PID_f000&MI_00
+;%gnICE+_JTAG% = USB_Install, USB\VID_0456&PID_f001&MI_00
 [Devices.NTX86]
-%gnICE_JTAG%  = LIBUSB_DEV, USB\VID_0456&PID_f000&MI_00
-%gnICE+_JTAG% = LIBUSB_DEV, USB\VID_0456&PID_f001&MI_00
+%gnICE_JTAG%  = USB_Install, USB\VID_0456&PID_f000&MI_00
+%gnICE+_JTAG% = USB_Install, USB\VID_0456&PID_f001&MI_00
 [Devices.NTAMD64]
-%gnICE_JTAG%  = LIBUSB_DEV, USB\VID_0456&PID_f000&MI_00
-%gnICE+_JTAG% = LIBUSB_DEV, USB\VID_0456&PID_f001&MI_00
+%gnICE_JTAG%  = USB_Install, USB\VID_0456&PID_f000&MI_00
+%gnICE+_JTAG% = USB_Install, USB\VID_0456&PID_f001&MI_00
+
+;
+; ==================== Installation ===================
+;
+
+; The Include and Needs directives in the USB_Install section are required for 
+; installing WinUSB on Windows Vista systems. Windows XP systems ignore these 
+; directives. These directives should not be modified.
+[USB_Install]
+Include=winusb.inf
+Needs=WINUSB.NT
+
+; The Include directive in the USB_Install.Services section includes the system-
+; supplied INF for WinUSB. This INF is installed by the WinUSB co-installer if 
+; it is not already on the target system. The AddService directive specifies 
+; WinUsb.sys as the device’s function driver. These directives should not be 
+; modified.
+[USB_Install.Services]
+Include=winusb.inf
+AddService=WinUSB,0x00000002,WinUSB_ServiceInstall
+
+; The WinUSB_ServiceInstall section contains the data for installing WinUsb.sys 
+; as a service. This section should not be modified.
+[WinUSB_ServiceInstall]
+DisplayName     = %WinUSB_SvcDesc%
+ServiceType     = 1
+StartType       = 3
+ErrorControl    = 1
+ServiceBinary   = %12%\WinUSB.sys
+
+; The KmdfService directive installs WinUsb.sys as a kernel-mode service. The 
+; referenced WinUSB_Install section specifies the KMDF library version. 
+; Usually, the version can be derived from the WdfCoInstallerxxyyy.dll with 
+; xx = major, yyy = minor
+[USB_Install.Wdf]
+KmdfService=WINUSB, WinUsb_Install
+
+[WinUSB_Install]
+KmdfLibraryVersion=1.9
+
+; USB_Install.HW is the key section in the INF. It specifies the device 
+; interface globally unique identifier (GUID) for your device. The AddReg 
+; directive puts the interface GUID in a standard registry value. When 
+; WinUsb.sys is loaded as the device’s function driver, it reads the registry
+; value and uses the specified GUID to represent the device interface. You 
+; should replace the GUID in this example with one that you create specifically
+; for your device. If the protocols for the device change, you should create a
+; new device interface GUID.
+[USB_Install.HW]
+AddReg=Dev_AddReg
+
+[Dev_AddReg]
+HKR,,DeviceInterfaceGUIDs,0x10000,%DeviceGUID%
+
+; The USB_Install.CoInstallers section, including the referenced AddReg and 
+; CopyFiles sections, contains data and instructions to install the WinUSB and 
+; KMDF co installers and associate them with the device. Most USB devices can 
+; use these sections and directives without modification.
+[USB_Install.CoInstallers]
+AddReg=CoInstallers_AddReg
+CopyFiles=CoInstallers_CopyFiles
+
+[CoInstallers_AddReg]
+HKR,,CoInstallers32,0x00010000,"WdfCoInstaller01009.dll,WdfCoInstaller","WinUSBCoInstaller2.dll"
+
+[CoInstallers_CopyFiles]
+WinUSBCoInstaller2.dll
+WdfCoInstaller01009.dll
+
+[DestinationDirs]
+CoInstallers_CopyFiles = 11
 
 ;
 ; Files
 ;
 
 [SourceDisksNames]
-1 = "gnICE (Libusb-Win32) Driver Installation Disk",,
+1 = %DiskName%,,,\i386
+2 = %DiskName%,,,\amd64
 
-[SourceDisksFiles]
-libusb0.sys = 1,i386
-libusb0.dll = 1,i386
-libusb0_x64.sys = 1,amd64
-libusb0_x64.dll = 1,amd64
+[SourceDisksFiles.x86]
+WinUSBCoInstaller2.dll  = 1
+WdfCoInstaller01009.dll = 1
 
-[DestinationDirs]
-libusb_files_sys = 10,system32\drivers
-libusb_files_sys_x64 = 10,system32\drivers
-libusb_files_dll = 10,system32
-libusb_files_dll_wow64 = 10,syswow64
-libusb_files_dll_x64 = 10,system32
-
-[libusb_files_sys]
-libusb0.sys
-
-[libusb_files_sys_x64]
-libusb0.sys,libusb0_x64.sys
-
-[libusb_files_dll]
-libusb0.dll
-
-[libusb_files_dll_wow64]
-libusb0.dll
-
-[libusb_files_dll_x64]
-libusb0.dll,libusb0_x64.dll
-
-;
-; Device Driver
-;
-
-[LIBUSB_DEV]
-
-[LIBUSB_DEV.NTX86]
-CopyFiles = libusb_files_sys, libusb_files_dll
-[LIBUSB_DEV.NTX86.HW]
-AddReg = libusb_add_reg_hw
-[LIBUSB_DEV.NTX86.Services]
-AddService = libusb0, 0x13a, libusb_add_service
-
-[LIBUSB_DEV.NTAMD64]
-CopyFiles = libusb_files_sys_x64, libusb_files_dll_wow64, libusb_files_dll_x64
-[LIBUSB_DEV.NTAMD64.HW]
-AddReg = libusb_add_reg_hw
-[LIBUSB_DEV.NTAMD64.Services]
-AddService = libusb0_x64, 0x13a, libusb_add_service
-
-[libusb_add_service]
-DisplayName    = "LibUsb-Win32 - Kernel Driver"
-ServiceType    = 1
-StartType      = 3
-ErrorControl   = 0
-ServiceBinary  = %12%\libusb0.sys
-
-[libusb_add_reg_hw]
-HKR,,SurpriseRemovalOK, 0x00010001, 1
+[SourceDisksFiles.amd64]
+WinUSBCoInstaller2.dll  = 2
+WdfCoInstaller01009.dll = 2
 
 ;
 ; Strings
@@ -113,3 +135,6 @@ manufacturer    = "Analog Devices, Inc."
 DeviceClassName = "ADI Development Tools"
 gnICE_JTAG      = "gnICE (JTAG)"
 gnICE+_JTAG     = "gnICE+ (JTAG)"
+DiskName        = "gnICE (libusb-winusb) Driver Installation Disk"
+DeviceGUID      = "{89982A59-5EEA-45aa-AF97-52EC351018C2}"
+DeviceClassGUID = "{78a1c341-4539-11d3-b88d-00c04fad5171}" ; Generic WinUSB device
