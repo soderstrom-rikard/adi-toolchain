@@ -1149,10 +1149,10 @@ build_uclibc()
 #
 # Prep a few 3rd party libs if need be
 #
+run_cmd mkdir -p "${STAGEDIR}"/bin "${STAGEDIR}"/usr/lib/pkgconfig "${STAGEDIR}"/usr/include
 if [ "${CBUILD}" != "${CHOST}" ] ; then
 	# need a local compiling wrapper for the staging dir
 	export PATH=${STAGEDIR}/bin:${PATH}
-	run_cmd mkdir -p "${STAGEDIR}"/bin "${STAGEDIR}"/usr/lib/pkgconfig "${STAGEDIR}"/usr/include
 	for x in cpp g++ gcc ld ; do
 		run_cmd cp "${DIR_APP}"/staging-compiler "${STAGEDIR}"/bin/${CHOST}-${x}
 	done
