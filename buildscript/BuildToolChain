@@ -547,6 +547,7 @@ build_gcc()
 
 	DIR_GCC_BUILD=$DIR_BUILD/gcc_build-${ver}
 	change_clean_dir $DIR_GCC_BUILD
+	touch_tree "${DIR_GCC_SOURCE}"
 
 	# When doing a canadian cross, we have to use the toolchain on the host.
 	# Since gcc is very picky about being compiled by another version, make
@@ -687,6 +688,7 @@ build_binutils()
 	resume_check ${target}.binutils && return 0
 
 	change_clean_dir $DIR_BINUTILS_BUILD
+	touch_tree "${DIR_BINUTILS_SOURCE}"
 
 	# Blackfin doesn't utilize xml memory maps so disable this for now
 	# to avoid the ABI differences between systems
@@ -747,7 +749,7 @@ build_elf2flt()
 
 	echo_date "${target}: elf2flt: configuring"
 	change_clean_dir $DIR_ELF2FLT_BUILD
-	touch -r . $DIR_ELF2FLT_SOURCE/* # fix autotool timestamps
+	touch_tree "${DIR_ELF2FLT_SOURCE}"
 
 	myconf=""
 	if [ -e $DIR_BINUTILS_BUILD/intl/libintl.a ] ; then

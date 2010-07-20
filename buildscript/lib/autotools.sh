@@ -7,6 +7,13 @@ reset_autotool_hooks()
 	at_make_args() { :; }
 }
 
+touch_tree()
+{
+	# fix autotool timestamps
+	log_it find "$@" -print0 ... xargs -0 touch -r "$1"
+	find "$@" -print0 | xargs -0 touch -r "$1"
+}
+
 build_autotooled_pkg()
 {
 	local ver
@@ -22,7 +29,7 @@ build_autotooled_pkg()
 	ver=$("${src}"/configure --version | awk '{print $NF;exit}')
 
 	echo_date "${pkg}: cleaning (${ver})"
-	find . -print0 | xargs -0 touch -r . # fix autotool timestamps
+	touch_tree .
 	at_clean
 	[ -e Makefile ] && run_cmd $MAKE distclean
 
