@@ -92,89 +92,89 @@ exit ${1:-0}
 
 while getopts b:B:c:C:dDfH:hj:k:K:l:m:o:O:pP:r:s:S:tT:u:U:vwX parameter
 do
-    case $parameter in
-        p)  CHECK_PRE=true ;;
-        m)  MAKE=$OPTARG ;;
-        w)  WARN=1 ;;
-        d)  DATE_STAMP=1 ;;
-        D)  SKIP_DEV_CHECKS=true ;;
-        v)  VERBOSE=1 ;;
-        f|t|T|r)
-            case ${parameter} in
-                t) OPTARG="elf-sim";;
-                T) OPTARG="${OPTARG} -t uclinux -t linux-uclibc";;
-            esac
-            TEST_OPTS="${TEST_OPTS} -${parameter} ${OPTARG}"
-            ;;
-        S)
-            case ${OPTARG} in
-                elf)   SKIP_ELF=true ;;
-                jtag)  SKIP_JTAG=true ;;
-                ldr)   SKIP_LDR=true ;;
-                tlibs) SKIP_TARGET_LIBS=true ;;
-                u-boot|\
-                uboot) SKIP_UBOOT=true ;;
-                flat)  SKIP_FLAT=true ;;
-                fdpic) SKIP_FDPIC=true ;;
-                *)     error "invalid skip target '${OPTARG}'" ;;
-            esac
-            ;;
-        s)  DIR_SOURCE=${OPTARG%/} ;;
-        l)
-            TMP=`echo $OPTARG | grep c`
-            if [ -n "$TMP" ] ; then
-                TMP=`echo $OPTARG | sed {s/\,/\ /}`
-                for RUN in $TMP
-                do
-                    if [ "$RUN" = "c" ] ; then
-                         BFIN_LANGS=" --enable-languages=$OPTARG"
-                    fi
-                done
-                if [ -z $BFIN_LANGS ] ; then
-                    error "Must Build C Compiler $OPTARG"
-                fi
-            else
-                error "Can't understand Language argument $OPTARG"
-            fi
-            ;;
-        B)  BINUTILS_VERSION=$OPTARG ;;
-        P)  PKGVERSION=$OPTARG ;;
-        c)  GCC_VERSIONS="$GCC_VERSIONS $OPTARG" ;;
-        H)  CHOST=$OPTARG ;;
-        k)  KERNEL_SOURCE=$OPTARG ;;
-        K)  KERNEL_SOURCE=$OPTARG
-            DIR_KBUILD_OUTPUT=$OPTARG
-            if [ ! -d $KERNEL_SOURCE/usr/include/linux ] ; then
-                error "Can't find kernel headers"
-            fi
-            ;;
-        u)
-            if [ -f $OPTARG/tools/mkimage.c ] ; then
-                DIR_UBOOT=$OPTARG
-            else
-                error "Invalid U-Boot Path"
-            fi
-            ;;
-        b)  DIR_BUILD=${OPTARG%/} ;;
-        C)  UCLIBC_CONFIG_FILE=$OPTARG ;;
-        o)
-            DIR_ELF_OUTPUT=$OPTARG-elf
-            DIR_uC_OUTPUT=$OPTARG-uclinux
-            DIR_LINUX_OUTPUT=$OPTARG-linux-uclibc
-            ;;
-        O)
-            DIR_ELF_OUTPUT=$OPTARG
-            DIR_uC_OUTPUT=$OPTARG
-            DIR_LINUX_OUTPUT=$OPTARG
-            ;;
-        j)  NUM_JOBS=$OPTARG ;;
-        X)  WITHOUT_X=true ;;
-        U)  UCLIBC_CFLAGS=$OPTARG ;;
-        h)  usage ;;
-        *)  error "unknown option $parameter\n" \
-                  "Try \`$APP_NAME -h' for more information."
-            ;;
-    esac
+	case $parameter in
+		p)  CHECK_PRE=true ;;
+		m)  MAKE=$OPTARG ;;
+		w)  WARN=1 ;;
+		d)  DATE_STAMP=1 ;;
+		D)  SKIP_DEV_CHECKS=true ;;
+		v)  VERBOSE=1 ;;
+		f|t|T|r)
+			case ${parameter} in
+				t) OPTARG="elf-sim";;
+				T) OPTARG="${OPTARG} -t uclinux -t linux-uclibc";;
+			esac
+			TEST_OPTS="${TEST_OPTS} -${parameter} ${OPTARG}"
+			;;
+		S)
+			case ${OPTARG} in
+				elf)   SKIP_ELF=true ;;
+				jtag)  SKIP_JTAG=true ;;
+				ldr)   SKIP_LDR=true ;;
+				tlibs) SKIP_TARGET_LIBS=true ;;
+				u-boot|\
+				uboot) SKIP_UBOOT=true ;;
+				flat)  SKIP_FLAT=true ;;
+				fdpic) SKIP_FDPIC=true ;;
+				*)     error "invalid skip target '${OPTARG}'" ;;
+			esac
+			;;
+		s)  DIR_SOURCE=${OPTARG%/} ;;
+		l)
+			TMP=`echo $OPTARG | grep c`
+			if [ -n "$TMP" ] ; then
+				TMP=`echo $OPTARG | sed {s/\,/\ /}`
+				for RUN in $TMP
+				do
+					if [ "$RUN" = "c" ] ; then
+						 BFIN_LANGS=" --enable-languages=$OPTARG"
+					fi
+				done
+				if [ -z $BFIN_LANGS ] ; then
+					error "Must Build C Compiler $OPTARG"
+				fi
+			else
+				error "Can't understand Language argument $OPTARG"
+			fi
+			;;
+		B)  BINUTILS_VERSION=$OPTARG ;;
+		P)  PKGVERSION=$OPTARG ;;
+		c)  GCC_VERSIONS="$GCC_VERSIONS $OPTARG" ;;
+		H)  CHOST=$OPTARG ;;
+		k)  KERNEL_SOURCE=$OPTARG ;;
+		K)  KERNEL_SOURCE=$OPTARG
+			DIR_KBUILD_OUTPUT=$OPTARG
+			if [ ! -d $KERNEL_SOURCE/usr/include/linux ] ; then
+				error "Can't find kernel headers"
+			fi
+			;;
+		u)
+			if [ -f $OPTARG/tools/mkimage.c ] ; then
+				DIR_UBOOT=$OPTARG
+			else
+				error "Invalid U-Boot Path"
+			fi
+			;;
+		b)  DIR_BUILD=${OPTARG%/} ;;
+		C)  UCLIBC_CONFIG_FILE=$OPTARG ;;
+		o)
+			DIR_ELF_OUTPUT=$OPTARG-elf
+			DIR_uC_OUTPUT=$OPTARG-uclinux
+			DIR_LINUX_OUTPUT=$OPTARG-linux-uclibc
+			;;
+		O)
+			DIR_ELF_OUTPUT=$OPTARG
+			DIR_uC_OUTPUT=$OPTARG
+			DIR_LINUX_OUTPUT=$OPTARG
+			;;
+		j)  NUM_JOBS=$OPTARG ;;
+		X)  WITHOUT_X=true ;;
+		U)  UCLIBC_CFLAGS=$OPTARG ;;
+		h)  usage ;;
+		*)  error "unknown option $parameter\n" \
+		          "Try \`$APP_NAME -h' for more information."
+			;;
+	esac
 done
 
 shift $((OPTIND - 1))
@@ -316,11 +316,11 @@ HOST_TARGET="--host=${CHOST}"
 # once we update to that, we should be able to re-enable NLS
 UCLIBC_HOSTUTILS="PASS"
 if [ "${WITHOUT_X}" = "true" ] ; then
-    BINUTILS_EXTRA_CONF="${BINUTILS_EXTRA_CONF} --disable-gdbtk"
+	BINUTILS_EXTRA_CONF="${BINUTILS_EXTRA_CONF} --disable-gdbtk"
 fi
 case ${CHOST} in
-    *mingw*)  BINUTILS_EXTRA_CONF="${BINUTILS_EXTRA_CONF} --disable-nls"; UCLIBC_HOSTUTILS="XFAIL";;
-    *darwin*) BINUTILS_EXTRA_CONF="${BINUTILS_EXTRA_CONF} --disable-nls"; UCLIBC_HOSTUTILS="XFAIL";;
+	*mingw*)  BINUTILS_EXTRA_CONF="${BINUTILS_EXTRA_CONF} --disable-nls"; UCLIBC_HOSTUTILS="XFAIL";;
+	*darwin*) BINUTILS_EXTRA_CONF="${BINUTILS_EXTRA_CONF} --disable-nls"; UCLIBC_HOSTUTILS="XFAIL";;
 esac
 # warnings with gcc-4.3 cause build failures
 BINUTILS_EXTRA_CONF="${BINUTILS_EXTRA_CONF} --disable-werror"
@@ -383,17 +383,17 @@ STDOUT_LOG="$DIR_LOG/log${DATE_STAMP+.${TIMESTAMP}}"
 STDERR_LOG="$DIR_LOG/warn${DATE_STAMP+.${TIMESTAMP}}"
 notice "Creating log file" "${STDOUT_LOG}"
 if [ $VERBOSE ]; then
-    LOGFILE="| tee -a ${STDOUT_LOG}"
-    ACTUAL_LOGFILE=${STDOUT_LOG}
+	LOGFILE="| tee -a ${STDOUT_LOG}"
+	ACTUAL_LOGFILE=${STDOUT_LOG}
 else
-    if [ $WARN ] ; then
-        echo "*** Warnings going to $DIR_LOG/warn"
-        LOGFILE=">> ${STDOUT_LOG} 2>> ${STDERR_LOG}"
-        ACTUAL_LOGFILE=${STDERR_LOG}
-    else
-        LOGFILE=">> ${STDOUT_LOG} 2>&1"
-        ACTUAL_LOGFILE=${STDOUT_LOG}
-    fi
+	if [ $WARN ] ; then
+		echo "*** Warnings going to $DIR_LOG/warn"
+		LOGFILE=">> ${STDOUT_LOG} 2>> ${STDERR_LOG}"
+		ACTUAL_LOGFILE=${STDERR_LOG}
+	else
+		LOGFILE=">> ${STDOUT_LOG} 2>&1"
+		ACTUAL_LOGFILE=${STDOUT_LOG}
+	fi
 fi
 
 # Add output dir so when building uclibc, it can find the toolchain
@@ -761,7 +761,7 @@ build_elf2flt()
 		--with-libiberty=$DIR_BINUTILS_BUILD/libiberty/libiberty.a \
 		--with-bfd-include-dir=$DIR_BINUTILS_BUILD/bfd \
 		--with-binutils-include-dir=$DIR_BINUTILS_SOURCE/include \
-                --with-binutils-ldscript-dir=${prefix}/${target}/lib \
+		--with-binutils-ldscript-dir=${prefix}/${target}/lib \
 		--prefix=${prefix} --program-suffix= ${myconf}
 
 	echo_date "${target}: elf2flt: building"
@@ -955,45 +955,45 @@ build_kernel_headers()
 
 build_uClibc_core()
 {
-    ARGS="V=1 CROSS=bfin-elf-"
+	ARGS="V=1 CROSS=bfin-elf-"
 
-    echo_date "uClibc: cleaning"
-    run_cmd $MAKE clean $ARGS
+	echo_date "uClibc: cleaning"
+	run_cmd $MAKE clean $ARGS
 
-    echo_date "uClibc: building"
-    if ! grep -qs UCLIBC_HAS_LOCALE=y .config ; then
-        # sometimes uClibc dies on parallel build, so lets build it with -j1
-        run_cmd $MAKE $ARGS -j 1
-    else
-        echo_date "uClibc: building locale"
-        run_cmd $MAKE headers $ARGS
+	echo_date "uClibc: building"
+	if ! grep -qs UCLIBC_HAS_LOCALE=y .config ; then
+		# sometimes uClibc dies on parallel build, so lets build it with -j1
+		run_cmd $MAKE $ARGS -j 1
+	else
+		echo_date "uClibc: building locale"
+		run_cmd $MAKE headers $ARGS
 
-        change_dir extra/locale
-        run_cmd $MAKE clean
+		change_dir extra/locale
+		run_cmd $MAKE clean
 
-        if [ ! -f ./codesets.txt ] ; then
-            echo "      Creating codesets.txt"
-            find ./charmaps -name "*.pairs" > ./codesets.txt
-        fi
-        if [ ! -f ./locales.txt ] ; then
-            echo "      Creating locales.txt"
-            cp ./LOCALES ./locales.txt
-        fi
+		if [ ! -f ./codesets.txt ] ; then
+			echo "      Creating codesets.txt"
+			find ./charmaps -name "*.pairs" > ./codesets.txt
+		fi
+		if [ ! -f ./locales.txt ] ; then
+			echo "      Creating locales.txt"
+			cp ./LOCALES ./locales.txt
+		fi
 
-        run_cmd $MAKE $ARGS
+		run_cmd $MAKE $ARGS
 
-        change_dir ../..
-        run_cmd $MAKE all $ARGS -j 1
-    fi
+		change_dir ../..
+		run_cmd $MAKE all $ARGS -j 1
+	fi
 
-    echo_date "uClibc: installing"
-    run_cmd $MAKE install DESTDIR=$1/runtime SUFFIX=$2 $ARGS
+	echo_date "uClibc: installing"
+	run_cmd $MAKE install DESTDIR=$1/runtime SUFFIX=$2 $ARGS
 
-    # Need a way to look at uClibc make system , and see what libs
-    # should be created
-    EXEEXT=""
-    check_installed_files uClibc "$1/runtime/$2/usr/lib/$3/" \
-        crt1.o libc.a libcrypt.a libm.a libnsl.a libresolv.a libutil.a
+	# Need a way to look at uClibc make system , and see what libs
+	# should be created
+	EXEEXT=""
+	check_installed_files uClibc "$1/runtime/$2/usr/lib/$3/" \
+		crt1.o libc.a libcrypt.a libm.a libnsl.a libresolv.a libutil.a
 }
 
 build_uclibc()
@@ -1031,122 +1031,122 @@ build_uclibc()
 	}
 	unset_opt() { do_opt ${opt} "# $1 is not set" ; }
 
-    change_dir $DIR_UCLIBC_SOURCE
+	change_dir $DIR_UCLIBC_SOURCE
 
-    MULTILIBS=`bfin-elf-gcc --print-multi-lib`
+	MULTILIBS=`bfin-elf-gcc --print-multi-lib`
 
-    for ml in $MULTILIBS; do
+	for ml in $MULTILIBS; do
 
-	dir=`echo ${ml} | sed -e 's/;.*$//'`
-	suffix=`echo ${dir} | sed -e 's/\//_/g'`
-	flags=`echo ${ml} | sed -e 's/^[^;]*;//' -e 's/@/ -/g'`
+		dir=`echo ${ml} | sed -e 's/;.*$//'`
+		suffix=`echo ${dir} | sed -e 's/\//_/g'`
+		flags=`echo ${ml} | sed -e 's/^[^;]*;//' -e 's/@/ -/g'`
 
-	if echo "${dir}" | grep -q bf561; then
-	    continue
+		if echo "${dir}" | grep -q bf561; then
+			continue
+		fi
+
+		resume_check uclibc.${dir} && continue
+
+		echo_date "uClibc: configuring for ${dir}"
+
+		case ${flags} in
+		*mfdpic*)
+			uclibc_sysroot="$DIR_LINUX_OUTPUT/bfin-linux-uclibc"
+			uclibc_dir1=`echo ${dir} | sed -e 's/mfdpic//' -e 's|/$||'`
+			uclibc_dir2=
+				;;
+		*)
+			uclibc_sysroot="$DIR_uC_OUTPUT/bfin-uclinux"
+			uclibc_dir1=
+			uclibc_dir2=${dir}
+			;;
+		esac
+
+		run_cmd cp ${UCLIBC_CONFIG_FILE:-extra/Configs/Config.bfin.default} .config
+		set_opt KERNEL_HEADERS \"$DIR_KBUILD_OUTPUT/usr/include\"
+		set_opt MULTILIB \"${uclibc_dir2}\"
+		set_opt UCLIBC_EXTRA_CFLAGS \"${flags} ${UCLIBC_CFLAGS} -Wa,--noexecstack\"
+		set_opt RUNTIME_PREFIX \"/\"
+		set_opt DEVEL_PREFIX \"/usr/\"
+
+		case ${flags} in
+		*mfdpic*)             uclibc_format="FDPIC_ELF" ;;
+		*msep-data*)          uclibc_format="FLAT_SEP_DATA" ;;
+		*mid-shared-library*) uclibc_format="SHARED_FLAT" ;;
+		*)                    uclibc_format="FLAT" ;;
+		esac
+		set_opt UCLIBC_FORMAT_${uclibc_format}
+		for format in FDPIC_ELF FLAT_SEP_DATA SHARED_FLAT FLAT ; do
+			[ "${format}" = "${uclibc_format}" ] && continue
+			unset_opt UCLIBC_FORMAT_${format}
+		done
+
+		unset_opt HAVE_NO_PIC
+		set_opt LDSO_BASE_FILENAME \"ld.so\"
+		set_opt SHARED_LIB_LOADER_PREFIX \"/lib\"
+		unset_opt LDSO_RUNPATH
+		for opt in \
+			BUILD_UCLIBC_LDSO \
+			DOPIC \
+			FORCE_SHAREABLE_TEXT_SEGMENTS \
+			HAVE_SHARED \
+			LDSO_CACHE_SUPPORT \
+			LDSO_LDD_SUPPORT \
+			UCLIBC_BUILD_NOEXECSTACK \
+			UCLIBC_BUILD_RELRO \
+			UCLIBC_STATIC_LDCONFIG
+		do
+			case ${flags} in
+			*mfdpic*) set_opt ${opt} ;;
+			*)      unset_opt ${opt} ;;
+			esac
+		done
+
+		run_cmd $MAKE oldconfig CROSS=bfin-elf- </dev/null
+		run_cmd cp .config .config-used-for_${suffix}
+		build_uClibc_core "${uclibc_sysroot}" "${uclibc_dir1}" "${uclibc_dir2}"
+
+		resume_save
+	done
+
+	# update the kernel header path just to make rebuilding easier later on
+	local f
+	for f in .config-used-for* ; do
+		ised "${f}" -e '/^KERNEL_HEADERS/s:=.*:="'"$DIR_uC_OUTPUT/bfin-uclinux/runtime/usr/include"'":'
+	done
+	run_cmd rm -f .config*.tmp
+
+	if ! resume_check uclibc.host-utils ; then
+
+		echo_date "uClibc: building host utils"
+		if run_cmd_nodie $MAKE -C utils hostutils $ARGS ; then
+			run_cmd mkdir -p $DIR_LINUX_OUTPUT/bin
+			for RUN in ldconfig ldd ; do
+				run_cmd cp utils/${RUN}.host $DIR_LINUX_OUTPUT/bin/bfin-linux-uclibc-${RUN}
+			done
+		elif [ "${UCLIBC_HOSTUTILS}" != "XFAIL" ] ; then
+			die_with_log
+		else
+			log_it 'Host utils were expected to fail; ignoring'
+		fi
+
+		resume_save
 	fi
 
-	resume_check uclibc.${dir} && continue
+	run_cmd mkdir -p $DIR_uC_OUTPUT/bfin-uclinux/runtime
+	run_cmd mkdir -p $DIR_LINUX_OUTPUT/bfin-linux-uclibc/runtime
+	run_cmd cp -r $DIR_KBUILD_OUTPUT/usr $DIR_uC_OUTPUT/bfin-uclinux/runtime
+	run_cmd cp -r $DIR_KBUILD_OUTPUT/usr $DIR_LINUX_OUTPUT/bfin-linux-uclibc/runtime
+	run_cmd find $DIR_LINUX_OUTPUT/bfin-linux-uclibc/runtime -type f -name '*.so' -exec chmod a+rx {} \;
 
-	echo_date "uClibc: configuring for ${dir}"
+	echo_date "uClibc: cleaning"
+	change_dir $DIR_UCLIBC_SOURCE
+	run_cmd $MAKE CROSS=bfin-elf- distclean
 
-	case ${flags} in
-	*mfdpic*)
-		uclibc_sysroot="$DIR_LINUX_OUTPUT/bfin-linux-uclibc"
-		uclibc_dir1=`echo ${dir} | sed -e 's/mfdpic//' -e 's|/$||'`
-		uclibc_dir2=
-		;;
-	*)
-		uclibc_sysroot="$DIR_uC_OUTPUT/bfin-uclinux"
-		uclibc_dir1=
-		uclibc_dir2=${dir}
-		;;
-	esac
-
-	run_cmd cp ${UCLIBC_CONFIG_FILE:-extra/Configs/Config.bfin.default} .config
-	set_opt KERNEL_HEADERS \"$DIR_KBUILD_OUTPUT/usr/include\"
-	set_opt MULTILIB \"${uclibc_dir2}\"
-	set_opt UCLIBC_EXTRA_CFLAGS \"${flags} ${UCLIBC_CFLAGS} -Wa,--noexecstack\"
-	set_opt RUNTIME_PREFIX \"/\"
-	set_opt DEVEL_PREFIX \"/usr/\"
-
-	case ${flags} in
-	*mfdpic*)             uclibc_format="FDPIC_ELF" ;;
-	*msep-data*)          uclibc_format="FLAT_SEP_DATA" ;;
-	*mid-shared-library*) uclibc_format="SHARED_FLAT" ;;
-	*)                    uclibc_format="FLAT" ;;
-	esac
-	set_opt UCLIBC_FORMAT_${uclibc_format}
-	for format in FDPIC_ELF FLAT_SEP_DATA SHARED_FLAT FLAT ; do
-		[ "${format}" = "${uclibc_format}" ] && continue
-		unset_opt UCLIBC_FORMAT_${format}
-	done
-
-	unset_opt HAVE_NO_PIC
-	set_opt LDSO_BASE_FILENAME \"ld.so\"
-	set_opt SHARED_LIB_LOADER_PREFIX \"/lib\"
-	unset_opt LDSO_RUNPATH
-	for opt in \
-		BUILD_UCLIBC_LDSO \
-		DOPIC \
-		FORCE_SHAREABLE_TEXT_SEGMENTS \
-		HAVE_SHARED \
-		LDSO_CACHE_SUPPORT \
-		LDSO_LDD_SUPPORT \
-		UCLIBC_BUILD_NOEXECSTACK \
-		UCLIBC_BUILD_RELRO \
-		UCLIBC_STATIC_LDCONFIG
-	do
-		case ${flags} in
-		*mfdpic*) set_opt ${opt} ;;
-		*)      unset_opt ${opt} ;;
-		esac
-	done
-
-	run_cmd $MAKE oldconfig CROSS=bfin-elf- </dev/null
-	run_cmd cp .config .config-used-for_${suffix}
-	build_uClibc_core "${uclibc_sysroot}" "${uclibc_dir1}" "${uclibc_dir2}"
-
-	resume_save
-    done
-
-    # update the kernel header path just to make rebuilding easier later on
-    local f
-    for f in .config-used-for* ; do
-	ised "${f}" -e '/^KERNEL_HEADERS/s:=.*:="'"$DIR_uC_OUTPUT/bfin-uclinux/runtime/usr/include"'":'
-    done
-    run_cmd rm -f .config*.tmp
-
-    if ! resume_check uclibc.host-utils ; then
-
-    echo_date "uClibc: building host utils"
-    if run_cmd_nodie $MAKE -C utils hostutils $ARGS ; then
-        run_cmd mkdir -p $DIR_LINUX_OUTPUT/bin
-        for RUN in ldconfig ldd ; do
-            run_cmd cp utils/${RUN}.host $DIR_LINUX_OUTPUT/bin/bfin-linux-uclibc-${RUN}
-        done
-    elif [ "${UCLIBC_HOSTUTILS}" != "XFAIL" ] ; then
-        die_with_log
-    else
-        log_it 'Host utils were expected to fail; ignoring'
-    fi
-
-    run_cmd mkdir -p $DIR_uC_OUTPUT/bfin-uclinux/runtime
-    run_cmd mkdir -p $DIR_LINUX_OUTPUT/bfin-linux-uclibc/runtime
-    run_cmd cp -r $DIR_KBUILD_OUTPUT/usr $DIR_uC_OUTPUT/bfin-uclinux/runtime
-    run_cmd cp -r $DIR_KBUILD_OUTPUT/usr $DIR_LINUX_OUTPUT/bfin-linux-uclibc/runtime
-    run_cmd find $DIR_LINUX_OUTPUT/bfin-linux-uclibc/runtime -type f -name '*.so' -exec chmod a+rx {} \;
-
-    echo_date "uClibc: cleaning"
-    change_dir $DIR_UCLIBC_SOURCE
-    run_cmd $MAKE CROSS=bfin-elf- distclean
-
-    if [ "$DIR_KBUILD_OUTPUT" != "$KERNEL_SOURCE" ]; then
-        echo_date "Cleaning kernel"
-        run_cmd rm -rf "$DIR_KBUILD_OUTPUT"
-    fi
-
-    resume_save
-    fi
+	if [ "$DIR_KBUILD_OUTPUT" != "$KERNEL_SOURCE" ] ; then
+		echo_date "Cleaning kernel"
+		run_cmd rm -rf "$DIR_KBUILD_OUTPUT"
+	fi
 }
 
 #
@@ -1298,52 +1298,52 @@ done
 
 if [ -z $SKIP_TARGET_LIBS ] && [ -e $DIR_SOURCE/libs/Makefile ] ; then
 
-    change_dir $DIR_SOURCE/libs
+	change_dir $DIR_SOURCE/libs
 
-    MULTILIBS=`bfin-elf-gcc --print-multi-lib`
+	MULTILIBS=`bfin-elf-gcc --print-multi-lib`
 
-    echo_date "Building libs"
+	echo_date "Building libs"
 
-    for ml in $MULTILIBS; do
+	for ml in $MULTILIBS; do
 
-	dir=`echo ${ml} | sed -e 's/;.*$//'`
-	flags=`echo ${ml} | sed -e 's/^[^;]*;//' -e 's/@/ -/g'`
+		dir=`echo ${ml} | sed -e 's/;.*$//'`
+		flags=`echo ${ml} | sed -e 's/^[^;]*;//' -e 's/@/ -/g'`
+
+		run_cmd $MAKE CROSS=bfin-elf- clean
+
+		run_cmd $MAKE CROSS=bfin-elf- MULTILIB_FLAGS="$flags"
+
+		EXEEXT=
+		check_installed_files libdsp "$DIR_SOURCE/libs/libdsp/" \
+			libbfdsp.a libbffastfp.a
+
+		if echo "${dir}" | grep -q -v bf561; then
+			if echo "${flags}" | grep -q mfdpic; then
+				[ $SKIP_FDPIC ] && continue
+				suffix=/`echo ${dir} | sed -e 's/mfdpic//' -e 's|/$||'`
+				mlib=
+				destdir="$DIR_LINUX_OUTPUT/bfin-linux-uclibc/runtime"
+			else
+				[ $SKIP_FLAT ] && continue
+				suffix=
+				mlib="/$dir"
+				destdir="$DIR_uC_OUTPUT/bfin-uclinux/runtime"
+			fi
+			run_cmd $MAKE CROSS=bfin-elf- install DESTDIR="${destdir}" USR=/usr SUFFIX="${suffix}" MULTILIB="${mlib}"
+		fi
+
+		# LIBC_HAS_NO_CMATH=1 will add several more files to libbfdsp.a.
+		# For file systems with low resolution timestamp, like ext2/3,
+		# sometimes, libbfdsp.a will not be updated correctly.
+		# Remove it instead of make clean can save much time.
+		run_cmd rm $DIR_SOURCE/libs/libdsp/libbfdsp.a
+
+		run_cmd $MAKE CROSS=bfin-elf- LIBC_HAS_NO_CMATH=1 MULTILIB_FLAGS="$flags"
+
+		run_cmd $MAKE CROSS=bfin-elf- LIBC_HAS_NO_CMATH=1 install DESTDIR=$DIR_ELF_OUTPUT/bfin-elf USR= SUFFIX= MULTILIB=/$dir
+	done
 
 	run_cmd $MAKE CROSS=bfin-elf- clean
-
-	run_cmd $MAKE CROSS=bfin-elf- MULTILIB_FLAGS="$flags"
-
-	EXEEXT=
-	check_installed_files libdsp "$DIR_SOURCE/libs/libdsp/" \
-		libbfdsp.a libbffastfp.a
-
-	if echo "${dir}" | grep -q -v bf561; then
-		if echo "${flags}" | grep -q mfdpic; then
-			[ $SKIP_FDPIC ] && continue
-			suffix=/`echo ${dir} | sed -e 's/mfdpic//' -e 's|/$||'`
-			mlib=
-			destdir="$DIR_LINUX_OUTPUT/bfin-linux-uclibc/runtime"
-		else
-			[ $SKIP_FLAT ] && continue
-			suffix=
-			mlib="/$dir"
-			destdir="$DIR_uC_OUTPUT/bfin-uclinux/runtime"
-		fi
-		run_cmd $MAKE CROSS=bfin-elf- install DESTDIR="${destdir}" USR=/usr SUFFIX="${suffix}" MULTILIB="${mlib}"
-	fi
-
-	# LIBC_HAS_NO_CMATH=1 will add several more files to libbfdsp.a.
-	# For file systems with low resolution timestamp, like ext2/3,
-	# sometimes, libbfdsp.a will not be updated correctly.
-	# Remove it instead of make clean can save much time.
-	run_cmd rm $DIR_SOURCE/libs/libdsp/libbfdsp.a
-
-	run_cmd $MAKE CROSS=bfin-elf- LIBC_HAS_NO_CMATH=1 MULTILIB_FLAGS="$flags"
-
-	run_cmd $MAKE CROSS=bfin-elf- LIBC_HAS_NO_CMATH=1 install DESTDIR=$DIR_ELF_OUTPUT/bfin-elf USR= SUFFIX= MULTILIB=/$dir
-    done
-
-    run_cmd $MAKE CROSS=bfin-elf- clean
 fi
 
 ########################### Target binutils ########################
