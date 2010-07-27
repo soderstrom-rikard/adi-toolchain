@@ -18,6 +18,18 @@
 #include <sys/syscall.h>
 #include <bits/kernel_types.h>
 
+/*
+ * NoMMU systems have small stacks, and opening even a modest sized dir
+ * on a NoMMU system can easily blow that stack, so use malloc() instead.
+ */
+#ifdef __ARCH_USE_MMU__
+# define alloc(x) alloca(x)
+# define alloc_free(x)
+#else
+# define alloc(x) malloc(x)
+# define alloc_free(x) free(x)
+#endif
+
 #if defined __UCLIBC_HAS_LFS__ && defined __NR_getdents64
 
 /* Experimentally off - libc_hidden_proto(memcpy) */
@@ -56,11 +68,13 @@ ssize_t __getdents64 (int fd, char *buf, size_t nbytes)
 	    nbytes - size_diff);
 
     dp = (struct dirent64 *) buf;
-    skdp = kdp = alloca (red_nbytes);
+    skdp = kdp = alloc(red_nbytes);
 
     retval = __syscall_getdents64(fd, (unsigned char *)kdp, red_nbytes);
-    if (retval == -1)
+    if (retval == -1) {
+	alloc_free(skdp);
 	return -1;
+    }
 
     while ((char *) kdp < (char *) skdp + retval) {
 	const size_t alignment = __alignof__ (struct dirent64);
@@ -77,6 +91,7 @@ ssize_t __getdents64 (int fd, char *buf, size_t nbytes)
 	    if ((char *) dp == buf) {
 		/* The buffer the user passed in is too small to hold even
 		   one entry.  */
+		alloc_free(skdp);
 		__set_errno (EINVAL);
 		return -1;
 	    }
@@ -93,6 +108,7 @@ ssize_t __getdents64 (int fd, char *buf, size_t nbytes)
 	dp = (struct dirent64 *) ((char *) dp + new_reclen);
 	kdp = (struct kernel_dirent64 *) (((char *) kdp) + kdp->d_reclen);
     }
+    alloc_free(skdp);
     return (char *) dp - buf;
 }
 
