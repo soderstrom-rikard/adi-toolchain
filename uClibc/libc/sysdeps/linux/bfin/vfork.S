@@ -18,3 +18,5 @@ ___vfork:
 .size ___vfork,.-___vfork
 weak_alias(__vfork,vfork)
 libc_hidden_weak(vfork)
+
+.section .note.GNU-stack,"",%progbits
