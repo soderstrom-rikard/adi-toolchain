@@ -1029,7 +1029,7 @@ build_uclibc()
 		shift
 		do_opt ${opt} "${opt}=${*:-y}"
 	}
-	unset_opt() { do_opt ${opt} "# $1 is not set" ; }
+	unset_opt() { do_opt $1 "# $1 is not set" ; }
 
 	change_dir $DIR_UCLIBC_SOURCE
 
