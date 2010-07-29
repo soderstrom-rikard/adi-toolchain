@@ -1739,8 +1739,8 @@
 	<register name="SPORT0_TCR2"    group="SPORT" description="" bit-size="16" read-address="0xFFC00804" write-address="0xFFC00804" type="IO" target="EMU"/>
 	<register name="SPORT0_TCLKDIV" group="SPORT" description="" bit-size="16" read-address="0xFFC00808" write-address="0xFFC00808" type="IO" target="EMU"/>
 	<register name="SPORT0_TFSDIV"  group="SPORT" description="" bit-size="16" read-address="0xFFC0080C" write-address="0xFFC0080C" type="IO" target="EMU"/>
-	<register name="SPORT0_TX"      group="SPORT" description="" bit-size="32" read-address="0xFFC00810" write-address="0xFFC00810" type="IO" target="EMU"/>
-	<register name="SPORT0_RX"      group="SPORT" description="" bit-size="32" read-address="" write-address="0xFFC00818" type="IO" target="EMU"/>
+	<register name="SPORT0_TX"      group="SPORT" description="" bit-size="32" read-address="" write-address="0xFFC00810" type="IO" target="EMU"/>
+	<register name="SPORT0_RX"      group="SPORT" description="" bit-size="32" read-address="0xFFC00818" write-address="0xFFC00818" type="IO" target="EMU"/>
 	<register name="SPORT0_RCR1"    group="SPORT" description="" bit-size="16" read-address="0xFFC00820" write-address="0xFFC00820" type="IO" target="EMU"/>
 	<register name="SPORT0_RCR2"    group="SPORT" description="" bit-size="16" read-address="0xFFC00824" write-address="0xFFC00824" type="IO" target="EMU"/>
 	<register name="SPORT0_RCLKDIV" group="SPORT" description="" bit-size="16" read-address="0xFFC00828" write-address="0xFFC00828" type="IO" target="EMU"/>
