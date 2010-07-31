@@ -1,3 +1,7 @@
+2010-07-30  Mike Frysinger  <michael.frysinger@analog.com>
+
+	* gcc.target/bfin/mcpu-bf592.c: Check SILICON_REVISION is 0x0001.
+
 2010-07-07  Steve Kilbane   <stephen.kilbane@analog.com>
 
 	[#6092] Pattern for RETI would only match the pop, not the push.

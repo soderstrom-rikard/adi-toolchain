@@ -1,3 +1,7 @@
+2010-07-30  Mike Frysinger  <michael.frysinger@analog.com>
+
+	* config/bfin/bfin.c (bfin_cpus[]): Add 0.1 for bf592.
+
 2010-07-08  Steve Kilbane  <stephen.kilbane@analog.com>
 
 	[#5827] Failures in trampoline code due to icache/dcache incoherence
