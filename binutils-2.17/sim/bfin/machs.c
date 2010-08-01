@@ -113,6 +113,8 @@ static const struct bfin_memory_layout bf51x_mem[] = {
   LAYOUT (0xFFC01700, 0x50, read_write),	/* PORTH stub */
   LAYOUT (0xFFC03200, 0x50, read_write),	/* PORT_MUX stub */
   LAYOUT (0xFFC03400, 0x20, read_write),	/* SPI1 stub */
+  LAYOUT (0xFFC03600, 0x10, read_write),	/* OTP stub */
+  LAYOUT (0xFFC03680, 0x10, read_write),	/* OTP Data stub */
   LAYOUT (0xFF800000, 0x4000, read_write),	/* Data A */
   LAYOUT (0xFF804000, 0x4000, read_write),	/* Data A Cache */
   LAYOUT (0xFF900000, 0x4000, read_write),	/* Data B */
@@ -169,6 +171,9 @@ static const struct bfin_memory_layout bf52x_mem[] = {
   LAYOUT (0xFFC01500, 0x50, read_write),	/* PORTG stub */
   LAYOUT (0xFFC01700, 0x50, read_write),	/* PORTH stub */
   LAYOUT (0xFFC03200, 0x50, read_write),	/* PORT_MUX stub */
+  LAYOUT (0xFFC03600, 0x10, read_write),	/* OTP stub */
+  LAYOUT (0xFFC03680, 0x10, read_write),	/* OTP Data stub */
+  LAYOUT (0xFFC03800, 0xd00, read_write),	/* MUSB stub */
   LAYOUT (0xFF800000, 0x4000, read_write),	/* Data A */
   LAYOUT (0xFF804000, 0x4000, read_write),	/* Data A Cache */
   LAYOUT (0xFF900000, 0x4000, read_write),	/* Data B */
@@ -387,6 +392,9 @@ static const struct bfin_memory_layout bf54x_mem[] = {
   LAYOUT (0xFFC01400, 0x200, read_write),	/* PORT/GPIO stub */
   LAYOUT (0xFFC02200, 0x90, read_write),	/* TWI1 stub */
   LAYOUT (0xFFC02300, 0x20, read_write),	/* SPI1 stub */
+  LAYOUT (0xFFC03C00, 0xd00, read_write),	/* MUSB stub */
+  LAYOUT (0xFFC04300, 0x10, read_write),	/* OTP stub */
+  LAYOUT (0xFFC04380, 0x10, read_write),	/* OTP Data stub */
   LAYOUT (0xFEB00000, 0x20000, read_write_exec),	/* L2 */
   LAYOUT (0xFF800000, 0x4000, read_write),	/* Data A */
   LAYOUT (0xFF804000, 0x4000, read_write),	/* Data A Cache */
