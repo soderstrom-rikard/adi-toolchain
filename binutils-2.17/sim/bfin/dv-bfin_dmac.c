@@ -70,7 +70,8 @@ bfin_dmac_get_peer (struct hw *dma, bu16 pmap)
 
   ret = hw_tree_find_device (me, peer);
   if (!ret)
-    hw_abort (me, "Unable to locate peer for %s (%#x)", hw_name (dma), pmap);
+    hw_abort (me, "Unable to locate peer for %s (pmap:%#x %s)",
+	      hw_name (dma), pmap, peer);
   return ret;
 }
 
@@ -85,6 +86,40 @@ bfin_dmac_default_pmap (struct hw *dma)
   else
     return CTYPE;	/* MDMA */
 }
+
+static const unsigned int bfin_dmac_52x_mdma_map[] = {
+  /* MDMA0 */
+  [12] = 13,
+  [13] = 12,
+  /* MDMA1 */
+  [14] = 15,
+  [15] = 14,
+};
+
+static const char *bfin_dmac_52x_pmap[] = {
+  "ppi", "emac", "emac", "sport@0", "sport@0", "sport@1",
+  "sport@1", "spi", "uart@0", "uart@0", "uart@1", "uart@1",
+};
+
+/* XXX: Need to figure out how to handle portmuxed DMA channels
+        like PPI/NFC here which share DMA0.  */
+static const struct hw_port_descriptor bfin_dmac_52x_ports[] = {
+  { "ppi",         0, 0, input_port, },
+/*{ "nfc",         0, 0, input_port, },*/
+  { "emac_rx",     1, 0, input_port, },
+/*{ "hostdp",      1, 0, input_port, },*/
+  { "emac_tx",     2, 0, input_port, },
+/*{ "nfc",         2, 0, input_port, },*/
+  { "sport@0_tx",  3, 0, input_port, },
+  { "sport@0_rx",  4, 0, input_port, },
+  { "sport@1_tx",  5, 0, input_port, },
+  { "sport@1_rx",  6, 0, input_port, },
+  { "spi",         7, 0, input_port, },
+  { "uart@0_tx",   8, 0, input_port, },
+  { "uart@0_rx",   9, 0, input_port, },
+  { "uart@1_tx",  10, 0, input_port, },
+  { "uart@1_rx",  11, 0, input_port, },
+};
 
 static const unsigned int bfin_dmac_537_mdma_map[] = {
   /* MDMA0 */
@@ -156,6 +191,13 @@ bfin_dmac_finish (struct hw *me)
 
   switch (hw_find_integer_property (me, "type"))
     {
+    case 522 ... 527:
+      dmac->pmap = bfin_dmac_52x_pmap;
+      dmac->pmap_count = ARRAY_SIZE (bfin_dmac_52x_pmap);
+      dmac->mdma_map = bfin_dmac_52x_mdma_map;
+      dmac->mdma_count = ARRAY_SIZE (bfin_dmac_52x_mdma_map);
+      set_hw_ports (me, bfin_dmac_52x_ports);
+      break;
     case 534:
     case 536:
     case 537:
