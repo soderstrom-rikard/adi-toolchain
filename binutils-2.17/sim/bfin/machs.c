@@ -36,7 +36,9 @@
 #include "dv-bfin_ebiu_sdc.h"
 #include "dv-bfin_emac.h"
 #include "dv-bfin_evt.h"
+#include "dv-bfin_gptimer.h"
 #include "dv-bfin_mmu.h"
+#include "dv-bfin_ppi.h"
 #include "dv-bfin_pll.h"
 #include "dv-bfin_rtc.h"
 #include "dv-bfin_sic.h"
@@ -104,6 +106,7 @@ static const struct bfin_dev_layout bf50x_dev[] = {
 #define bf518_chipid bf51x_chipid
 static const struct bfin_memory_layout bf51x_mem[] = {
   LAYOUT (0xFFC00500, 0x20, read_write),	/* SPI0 stub */
+  LAYOUT (0xFFC00680, 0xC, read_write),		/* TIMER stub */
   LAYOUT (0xFFC00700, 0x50, read_write),	/* PORTF stub */
   LAYOUT (0xFFC01400, 0x90, read_write),	/* TWI stub */
   LAYOUT (0xFFC01500, 0x50, read_write),	/* PORTG stub */
@@ -122,14 +125,32 @@ static const struct bfin_memory_layout bf51x_mem[] = {
 #define bf516_mem bf51x_mem
 #define bf518_mem bf51x_mem
 static const struct bfin_dev_layout bf512_dev[] = {
-  DEVICE (0xFFC00400, BFIN_MMR_UART_SIZE, "bfin_uart@0"),
-  DEVICE (0xFFC02000, BFIN_MMR_UART_SIZE, "bfin_uart@1"),
+  DEVICE (0xFFC00400, BFIN_MMR_UART_SIZE,    "bfin_uart@0"),
+  DEVICE (0xFFC00600, BFIN_MMR_GPTIMER_SIZE, "bfin_gptimer@0"),
+  DEVICE (0xFFC00610, BFIN_MMR_GPTIMER_SIZE, "bfin_gptimer@1"),
+  DEVICE (0xFFC00620, BFIN_MMR_GPTIMER_SIZE, "bfin_gptimer@2"),
+  DEVICE (0xFFC00630, BFIN_MMR_GPTIMER_SIZE, "bfin_gptimer@3"),
+  DEVICE (0xFFC00640, BFIN_MMR_GPTIMER_SIZE, "bfin_gptimer@4"),
+  DEVICE (0xFFC00650, BFIN_MMR_GPTIMER_SIZE, "bfin_gptimer@5"),
+  DEVICE (0xFFC00660, BFIN_MMR_GPTIMER_SIZE, "bfin_gptimer@6"),
+  DEVICE (0xFFC00670, BFIN_MMR_GPTIMER_SIZE, "bfin_gptimer@7"),
+  DEVICE (0xFFC01000, BFIN_MMR_PPI_SIZE,     "bfin_ppi"),
+  DEVICE (0xFFC02000, BFIN_MMR_UART_SIZE,    "bfin_uart@1"),
 };
 #define bf514_dev bf512_dev
 static const struct bfin_dev_layout bf516_dev[] = {
-  DEVICE (0xFFC00400, BFIN_MMR_UART_SIZE, "bfin_uart@0"),
-  DEVICE (0xFFC02000, BFIN_MMR_UART_SIZE, "bfin_uart@1"),
-  DEVICE (0xFFC03000, BFIN_MMR_EMAC_SIZE, "bfin_emac"),
+  DEVICE (0xFFC00400, BFIN_MMR_UART_SIZE,    "bfin_uart@0"),
+  DEVICE (0xFFC00600, BFIN_MMR_GPTIMER_SIZE, "bfin_gptimer@0"),
+  DEVICE (0xFFC00610, BFIN_MMR_GPTIMER_SIZE, "bfin_gptimer@1"),
+  DEVICE (0xFFC00620, BFIN_MMR_GPTIMER_SIZE, "bfin_gptimer@2"),
+  DEVICE (0xFFC00630, BFIN_MMR_GPTIMER_SIZE, "bfin_gptimer@3"),
+  DEVICE (0xFFC00640, BFIN_MMR_GPTIMER_SIZE, "bfin_gptimer@4"),
+  DEVICE (0xFFC00650, BFIN_MMR_GPTIMER_SIZE, "bfin_gptimer@5"),
+  DEVICE (0xFFC00660, BFIN_MMR_GPTIMER_SIZE, "bfin_gptimer@6"),
+  DEVICE (0xFFC00670, BFIN_MMR_GPTIMER_SIZE, "bfin_gptimer@7"),
+  DEVICE (0xFFC01000, BFIN_MMR_PPI_SIZE,     "bfin_ppi"),
+  DEVICE (0xFFC02000, BFIN_MMR_UART_SIZE,    "bfin_uart@1"),
+  DEVICE (0xFFC03000, BFIN_MMR_EMAC_SIZE,    "bfin_emac"),
   DEVICE (0, 0x20, "bfin_emac/eth_phy"),
 };
 #define bf518_dev bf516_dev
@@ -142,6 +163,7 @@ static const struct bfin_dev_layout bf516_dev[] = {
 #define bf527_chipid bf523_chipid
 static const struct bfin_memory_layout bf52x_mem[] = {
   LAYOUT (0xFFC00500, 0x20, read_write),	/* SPI stub */
+  LAYOUT (0xFFC00680, 0xC, read_write),		/* TIMER stub */
   LAYOUT (0xFFC00700, 0x50, read_write),	/* PORTF stub */
   LAYOUT (0xFFC01400, 0x90, read_write),	/* TWI stub */
   LAYOUT (0xFFC01500, 0x50, read_write),	/* PORTG stub */
@@ -162,16 +184,34 @@ static const struct bfin_memory_layout bf52x_mem[] = {
 #define bf526_mem bf52x_mem
 #define bf527_mem bf52x_mem
 static const struct bfin_dev_layout bf522_dev[] = {
-  DEVICE (0xFFC00400, BFIN_MMR_UART_SIZE, "bfin_uart@0"),
-  DEVICE (0xFFC02000, BFIN_MMR_UART_SIZE, "bfin_uart@1"),
+  DEVICE (0xFFC00400, BFIN_MMR_UART_SIZE,    "bfin_uart@0"),
+  DEVICE (0xFFC00600, BFIN_MMR_GPTIMER_SIZE, "bfin_gptimer@0"),
+  DEVICE (0xFFC00610, BFIN_MMR_GPTIMER_SIZE, "bfin_gptimer@1"),
+  DEVICE (0xFFC00620, BFIN_MMR_GPTIMER_SIZE, "bfin_gptimer@2"),
+  DEVICE (0xFFC00630, BFIN_MMR_GPTIMER_SIZE, "bfin_gptimer@3"),
+  DEVICE (0xFFC00640, BFIN_MMR_GPTIMER_SIZE, "bfin_gptimer@4"),
+  DEVICE (0xFFC00650, BFIN_MMR_GPTIMER_SIZE, "bfin_gptimer@5"),
+  DEVICE (0xFFC00660, BFIN_MMR_GPTIMER_SIZE, "bfin_gptimer@6"),
+  DEVICE (0xFFC00670, BFIN_MMR_GPTIMER_SIZE, "bfin_gptimer@7"),
+  DEVICE (0xFFC01000, BFIN_MMR_PPI_SIZE,     "bfin_ppi"),
+  DEVICE (0xFFC02000, BFIN_MMR_UART_SIZE,    "bfin_uart@1"),
 };
 #define bf523_dev bf522_dev
 #define bf524_dev bf522_dev
 #define bf525_dev bf522_dev
 static const struct bfin_dev_layout bf526_dev[] = {
-  DEVICE (0xFFC00400, BFIN_MMR_UART_SIZE, "bfin_uart@0"),
-  DEVICE (0xFFC02000, BFIN_MMR_UART_SIZE, "bfin_uart@1"),
-  DEVICE (0xFFC03000, BFIN_MMR_EMAC_SIZE, "bfin_emac"),
+  DEVICE (0xFFC00400, BFIN_MMR_UART_SIZE,    "bfin_uart@0"),
+  DEVICE (0xFFC00600, BFIN_MMR_GPTIMER_SIZE, "bfin_gptimer@0"),
+  DEVICE (0xFFC00610, BFIN_MMR_GPTIMER_SIZE, "bfin_gptimer@1"),
+  DEVICE (0xFFC00620, BFIN_MMR_GPTIMER_SIZE, "bfin_gptimer@2"),
+  DEVICE (0xFFC00630, BFIN_MMR_GPTIMER_SIZE, "bfin_gptimer@3"),
+  DEVICE (0xFFC00640, BFIN_MMR_GPTIMER_SIZE, "bfin_gptimer@4"),
+  DEVICE (0xFFC00650, BFIN_MMR_GPTIMER_SIZE, "bfin_gptimer@5"),
+  DEVICE (0xFFC00660, BFIN_MMR_GPTIMER_SIZE, "bfin_gptimer@6"),
+  DEVICE (0xFFC00670, BFIN_MMR_GPTIMER_SIZE, "bfin_gptimer@7"),
+  DEVICE (0xFFC01000, BFIN_MMR_PPI_SIZE,     "bfin_ppi"),
+  DEVICE (0xFFC02000, BFIN_MMR_UART_SIZE,    "bfin_uart@1"),
+  DEVICE (0xFFC03000, BFIN_MMR_EMAC_SIZE,    "bfin_emac"),
   DEVICE (0, 0x20, "bfin_emac/eth_phy"),
 };
 #define bf527_dev bf526_dev
@@ -181,6 +221,7 @@ static const struct bfin_dev_layout bf526_dev[] = {
 #define bf533_chipid bf531_chipid
 static const struct bfin_memory_layout bf531_mem[] = {
   LAYOUT (0xFFC00500, 0x20, read_write),	/* SPI stub */
+  LAYOUT (0xFFC00640, 0xC, read_write),		/* TIMER stub */
   LAYOUT (0xFFC00700, 0x50, read_write),	/* GPIO stub */
   LAYOUT (0xFF804000, 0x4000, read_write),	/* Data A Cache */
   LAYOUT (0xFFA08000, 0x4000, read_write_exec),	/* Inst B [1] */
@@ -188,6 +229,7 @@ static const struct bfin_memory_layout bf531_mem[] = {
 };
 static const struct bfin_memory_layout bf532_mem[] = {
   LAYOUT (0xFFC00500, 0x20, read_write),	/* SPI stub */
+  LAYOUT (0xFFC00640, 0xC, read_write),		/* TIMER stub */
   LAYOUT (0xFFC00700, 0x50, read_write),	/* GPIO stub */
   LAYOUT (0xFF804000, 0x4000, read_write),	/* Data A Cache */
   LAYOUT (0xFF904000, 0x4000, read_write),	/* Data B Cache */
@@ -197,6 +239,7 @@ static const struct bfin_memory_layout bf532_mem[] = {
 };
 static const struct bfin_memory_layout bf533_mem[] = {
   LAYOUT (0xFFC00500, 0x20, read_write),	/* SPI stub */
+  LAYOUT (0xFFC00640, 0xC, read_write),		/* TIMER stub */
   LAYOUT (0xFFC00700, 0x50, read_write),	/* GPIO stub */
   LAYOUT (0xFF800000, 0x4000, read_write),	/* Data A */
   LAYOUT (0xFF804000, 0x4000, read_write),	/* Data A Cache */
@@ -208,7 +251,11 @@ static const struct bfin_memory_layout bf533_mem[] = {
   LAYOUT (0xFFA10000, 0x4000, read_write_exec),	/* Inst Cache [1] */
 };
 static const struct bfin_dev_layout bf533_dev[] = {
-  DEVICE (0xFFC00400, BFIN_MMR_UART_SIZE, "bfin_uart@0"),
+  DEVICE (0xFFC00400, BFIN_MMR_UART_SIZE,    "bfin_uart@0"),
+  DEVICE (0xFFC00600, BFIN_MMR_GPTIMER_SIZE, "bfin_gptimer@0"),
+  DEVICE (0xFFC00610, BFIN_MMR_GPTIMER_SIZE, "bfin_gptimer@1"),
+  DEVICE (0xFFC00620, BFIN_MMR_GPTIMER_SIZE, "bfin_gptimer@2"),
+  DEVICE (0xFFC01000, BFIN_MMR_PPI_SIZE,     "bfin_ppi"),
 };
 #define bf531_dev bf533_dev
 #define bf532_dev bf533_dev
@@ -218,6 +265,7 @@ static const struct bfin_dev_layout bf533_dev[] = {
 #define bf537_chipid bf536_chipid
 static const struct bfin_memory_layout bf534_mem[] = {
   LAYOUT (0xFFC00500, 0x20, read_write),	/* SPI stub */
+  LAYOUT (0xFFC00680, 0xC, read_write),		/* TIMER stub */
   LAYOUT (0xFFC00700, 0x50, read_write),	/* PORTF stub */
   LAYOUT (0xFFC01400, 0x90, read_write),	/* TWI stub */
   LAYOUT (0xFFC01500, 0x50, read_write),	/* PORTG stub */
@@ -233,6 +281,7 @@ static const struct bfin_memory_layout bf534_mem[] = {
 };
 static const struct bfin_memory_layout bf536_mem[] = {
   LAYOUT (0xFFC00500, 0x20, read_write),	/* SPI stub */
+  LAYOUT (0xFFC00680, 0xC, read_write),		/* TIMER stub */
   LAYOUT (0xFFC00700, 0x50, read_write),	/* PORTF stub */
   LAYOUT (0xFFC01400, 0x90, read_write),	/* TWI stub */
   LAYOUT (0xFFC01500, 0x50, read_write),	/* PORTG stub */
@@ -246,6 +295,7 @@ static const struct bfin_memory_layout bf536_mem[] = {
 };
 static const struct bfin_memory_layout bf537_mem[] = {
   LAYOUT (0xFFC00500, 0x20, read_write),	/* SPI stub */
+  LAYOUT (0xFFC00680, 0xC, read_write),		/* TIMER stub */
   LAYOUT (0xFFC00700, 0x50, read_write),	/* PORTF stub */
   LAYOUT (0xFFC01400, 0x90, read_write),	/* TWI stub */
   LAYOUT (0xFFC01500, 0x50, read_write),	/* PORTG stub */
@@ -260,13 +310,31 @@ static const struct bfin_memory_layout bf537_mem[] = {
   LAYOUT (0xFFA10000, 0x4000, read_write_exec),	/* Inst Cache [1] */
 };
 static const struct bfin_dev_layout bf534_dev[] = {
-  DEVICE (0xFFC00400, BFIN_MMR_UART_SIZE, "bfin_uart@0"),
-  DEVICE (0xFFC02000, BFIN_MMR_UART_SIZE, "bfin_uart@1"),
+  DEVICE (0xFFC00400, BFIN_MMR_UART_SIZE,    "bfin_uart@0"),
+  DEVICE (0xFFC00600, BFIN_MMR_GPTIMER_SIZE, "bfin_gptimer@0"),
+  DEVICE (0xFFC00610, BFIN_MMR_GPTIMER_SIZE, "bfin_gptimer@1"),
+  DEVICE (0xFFC00620, BFIN_MMR_GPTIMER_SIZE, "bfin_gptimer@2"),
+  DEVICE (0xFFC00630, BFIN_MMR_GPTIMER_SIZE, "bfin_gptimer@3"),
+  DEVICE (0xFFC00640, BFIN_MMR_GPTIMER_SIZE, "bfin_gptimer@4"),
+  DEVICE (0xFFC00650, BFIN_MMR_GPTIMER_SIZE, "bfin_gptimer@5"),
+  DEVICE (0xFFC00660, BFIN_MMR_GPTIMER_SIZE, "bfin_gptimer@6"),
+  DEVICE (0xFFC00670, BFIN_MMR_GPTIMER_SIZE, "bfin_gptimer@7"),
+  DEVICE (0xFFC01000, BFIN_MMR_PPI_SIZE,     "bfin_ppi"),
+  DEVICE (0xFFC02000, BFIN_MMR_UART_SIZE,    "bfin_uart@1"),
 };
 static const struct bfin_dev_layout bf537_dev[] = {
-  DEVICE (0xFFC00400, BFIN_MMR_UART_SIZE, "bfin_uart@0"),
-  DEVICE (0xFFC02000, BFIN_MMR_UART_SIZE, "bfin_uart@1"),
-  DEVICE (0xFFC03000, BFIN_MMR_EMAC_SIZE, "bfin_emac"),
+  DEVICE (0xFFC00400, BFIN_MMR_UART_SIZE,    "bfin_uart@0"),
+  DEVICE (0xFFC00600, BFIN_MMR_GPTIMER_SIZE, "bfin_gptimer@0"),
+  DEVICE (0xFFC00610, BFIN_MMR_GPTIMER_SIZE, "bfin_gptimer@1"),
+  DEVICE (0xFFC00620, BFIN_MMR_GPTIMER_SIZE, "bfin_gptimer@2"),
+  DEVICE (0xFFC00630, BFIN_MMR_GPTIMER_SIZE, "bfin_gptimer@3"),
+  DEVICE (0xFFC00640, BFIN_MMR_GPTIMER_SIZE, "bfin_gptimer@4"),
+  DEVICE (0xFFC00650, BFIN_MMR_GPTIMER_SIZE, "bfin_gptimer@5"),
+  DEVICE (0xFFC00660, BFIN_MMR_GPTIMER_SIZE, "bfin_gptimer@6"),
+  DEVICE (0xFFC00670, BFIN_MMR_GPTIMER_SIZE, "bfin_gptimer@7"),
+  DEVICE (0xFFC01000, BFIN_MMR_PPI_SIZE,     "bfin_ppi"),
+  DEVICE (0xFFC02000, BFIN_MMR_UART_SIZE,    "bfin_uart@1"),
+  DEVICE (0xFFC03000, BFIN_MMR_EMAC_SIZE,    "bfin_emac"),
   DEVICE (0, 0x20, "bfin_emac/eth_phy"),
 };
 #define bf536_dev bf537_dev
@@ -292,9 +360,18 @@ static const struct bfin_memory_layout bf538_mem[] = {
 };
 #define bf539_mem bf538_mem
 static const struct bfin_dev_layout bf538_dev[] = {
-  DEVICE (0xFFC00400, BFIN_MMR_UART_SIZE, "bfin_uart@0"),
-  DEVICE (0xFFC02000, BFIN_MMR_UART_SIZE, "bfin_uart@1"),
-  DEVICE (0xFFC02100, BFIN_MMR_UART_SIZE, "bfin_uart@2"),
+  DEVICE (0xFFC00400, BFIN_MMR_UART_SIZE,    "bfin_uart@0"),
+  DEVICE (0xFFC00600, BFIN_MMR_GPTIMER_SIZE, "bfin_gptimer@0"),
+  DEVICE (0xFFC00610, BFIN_MMR_GPTIMER_SIZE, "bfin_gptimer@1"),
+  DEVICE (0xFFC00620, BFIN_MMR_GPTIMER_SIZE, "bfin_gptimer@2"),
+  DEVICE (0xFFC00630, BFIN_MMR_GPTIMER_SIZE, "bfin_gptimer@3"),
+  DEVICE (0xFFC00640, BFIN_MMR_GPTIMER_SIZE, "bfin_gptimer@4"),
+  DEVICE (0xFFC00650, BFIN_MMR_GPTIMER_SIZE, "bfin_gptimer@5"),
+  DEVICE (0xFFC00660, BFIN_MMR_GPTIMER_SIZE, "bfin_gptimer@6"),
+  DEVICE (0xFFC00670, BFIN_MMR_GPTIMER_SIZE, "bfin_gptimer@7"),
+  DEVICE (0xFFC01000, BFIN_MMR_PPI_SIZE,     "bfin_ppi"),
+  DEVICE (0xFFC02000, BFIN_MMR_UART_SIZE,    "bfin_uart@1"),
+  DEVICE (0xFFC02100, BFIN_MMR_UART_SIZE,    "bfin_uart@2"),
 };
 #define bf539_dev bf538_dev
 
@@ -357,6 +434,8 @@ static const struct bfin_memory_layout bf561_mem[] = {
 };
 static const struct bfin_dev_layout bf561_dev[] = {
   DEVICE (0xFFC00400, BFIN_MMR_UART_SIZE, "bfin_uart@0"),
+  DEVICE (0xFFC01000, BFIN_MMR_PPI_SIZE,  "bfin_ppi@0"),
+  DEVICE (0xFFC01300, BFIN_MMR_PPI_SIZE,  "bfin_ppi@1"),
 };
 
 static const struct bfin_model_data bfin_model_data[] =
@@ -474,6 +553,16 @@ bfin_model_hw_tree_init (SIM_DESC sd, SIM_CPU *cpu)
 	  sim_hw_parse (sd, "/core/%s > tx   %s_tx   /core/bfin_dmac@0", dev->dev, sint);
 	  sim_hw_parse (sd, "/core/%s > rx   %s_rx   /core/bfin_dmac@0", dev->dev, sint);
 	  sim_hw_parse (sd, "/core/%s > stat %s_stat /core/bfin_sic", dev->dev, sint);
+	}
+      else if (!strncmp (dev->dev, "bfin_gptimer", 12))
+	{
+	  const char *sint = dev->dev + 5;
+	  sim_hw_parse (sd, "/core/%s > stat %s /core/bfin_sic", dev->dev, sint);
+	}
+      else if (!strncmp (dev->dev, "bfin_ppi", 7))
+	{
+	  const char *sint = dev->dev + 5;
+	  sim_hw_parse (sd, "/core/%s > stat %s /core/bfin_sic", dev->dev, sint);
 	}
     }
 
