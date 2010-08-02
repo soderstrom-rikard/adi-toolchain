@@ -24,6 +24,7 @@
 #pragma file_attr("prefersMemNum =30")
 
 
+#include <math_bf.h>
 #include <fract.h>
 #include <fract_complex.h>
 
