@@ -111,6 +111,6 @@ extern void trace_register PARAMS ((SIM_DESC sd,
 #define TRACE_REG(cpu, reg, val) TRACE_REGISTER (cpu, "wrote "#reg" = %#x", val)
 
 /* Default memory size.  */
-#define BFIN_DEFAULT_MEM_SIZE (64 * 1024 * 1024)
+#define BFIN_DEFAULT_MEM_SIZE (128 * 1024 * 1024)
 
 #endif
