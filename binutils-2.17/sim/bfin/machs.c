@@ -53,6 +53,7 @@ struct bfin_memory_layout {
 };
 struct bfin_dev_layout {
   address_word base, len;
+  unsigned int dmac;
   const char *dev;
 };
 struct bfin_model_data {
@@ -73,7 +74,8 @@ const MACH *sim_machs[] =
 };
 
 #define LAYOUT(_addr, _len, _mask) { .addr = _addr, .len = _len, .mask = access_##_mask, }
-#define DEVICE(_base, _len, _dev) { .base = _base, .len = _len, .dev = _dev, }
+#define _DEVICE(_base, _len, _dev, _dmac) { .base = _base, .len = _len, .dev = _dev, .dmac = _dmac, }
+#define DEVICE(_base, _len, _dev) _DEVICE(_base, _len, _dev, 0)
 
 /* [1] Common sim code can't model exec-only memory.
    http://sourceware.org/ml/gdb/2010-02/msg00047.html */
@@ -392,10 +394,8 @@ static const struct bfin_dev_layout bf538_dev[] = {
   DEVICE (0xFFC00610, BFIN_MMR_GPTIMER_SIZE, "bfin_gptimer@1"),
   DEVICE (0xFFC00620, BFIN_MMR_GPTIMER_SIZE, "bfin_gptimer@2"),
   DEVICE (0xFFC01000, BFIN_MMR_PPI_SIZE,     "bfin_ppi"),
-/* XXX: DMAC1 not fully supported yet.
-  DEVICE (0xFFC02000, BFIN_MMR_UART_SIZE,    "bfin_uart@1"),
-  DEVICE (0xFFC02100, BFIN_MMR_UART_SIZE,    "bfin_uart@2"),
- */
+ _DEVICE (0xFFC02000, BFIN_MMR_UART_SIZE,    "bfin_uart@1", 1),
+ _DEVICE (0xFFC02100, BFIN_MMR_UART_SIZE,    "bfin_uart@2", 1),
 };
 #define bf539_dev bf538_dev
 
@@ -468,8 +468,8 @@ static const struct bfin_memory_layout bf561_mem[] = {
 };
 static const struct bfin_dev_layout bf561_dev[] = {
   DEVICE (0xFFC00400, BFIN_MMR_UART_SIZE, "bfin_uart@0"),
-  DEVICE (0xFFC01000, BFIN_MMR_PPI_SIZE,  "bfin_ppi@0"),
-  DEVICE (0xFFC01300, BFIN_MMR_PPI_SIZE,  "bfin_ppi@1"),
+ _DEVICE (0xFFC01000, BFIN_MMR_PPI_SIZE,  "bfin_ppi@0", 1),
+ _DEVICE (0xFFC01300, BFIN_MMR_PPI_SIZE,  "bfin_ppi@1", 1),
 };
 
 static const struct bfin_model_data bfin_model_data[] =
@@ -557,7 +557,7 @@ bfin_model_hw_tree_init (SIM_DESC sd, SIM_CPU *cpu)
 
   /* XXX: Should be pushed to per-model structs.  */
   dmac = 0;
-  sim_hw_parse (sd, "/core/bfin_dmac@%i/type %i", dmac, mdata->model_num);
+  sim_hw_parse (sd, "/core/bfin_dmac@%u/type %i", dmac, mdata->model_num);
   switch (mdata->model_num)
     {
     case 510 ... 519:
@@ -565,6 +565,7 @@ bfin_model_hw_tree_init (SIM_DESC sd, SIM_CPU *cpu)
     case 534:
     case 536:
     case 537:
+    case 561:
       num_dmas = 16;
       break;
     case 531 ... 533:
@@ -580,42 +581,43 @@ bfin_model_hw_tree_init (SIM_DESC sd, SIM_CPU *cpu)
     }
   for (i = 0; i < num_dmas; ++i)
     {
-      sim_hw_parse (sd, "/core/bfin_dmac@%i/bfin_dma@%i/reg %#x %i", dmac, i,
+      sim_hw_parse (sd, "/core/bfin_dmac@%u/bfin_dma@%i/reg %#x %i", dmac, i,
 		    0xFFC00C00 + i * BFIN_MMR_DMA_SIZE, BFIN_MMR_DMA_SIZE);
       if (i < num_dmas - 4)
 	{
 	  /* Could route these into the bfin_dmac and let that
 	     forward it to the SIC, but not much value.  */
-	  sim_hw_parse (sd, "/core/bfin_dmac@%i/bfin_dma@%i > di dma%i /core/bfin_sic", dmac, i, i);
+	  sim_hw_parse (sd, "/core/bfin_dmac@%u/bfin_dma@%i > di dma%i /core/bfin_sic", dmac, i, i);
 	}
     }
-  sim_hw_parse (sd, "/core/bfin_dmac@%i/bfin_dma@%i > di mdma0 /core/bfin_sic", dmac, num_dmas - 4);
-  sim_hw_parse (sd, "/core/bfin_dmac@%i/bfin_dma@%i > di mdma0 /core/bfin_sic", dmac, num_dmas - 3);
-  sim_hw_parse (sd, "/core/bfin_dmac@%i/bfin_dma@%i > di mdma1 /core/bfin_sic", dmac, num_dmas - 2);
-  sim_hw_parse (sd, "/core/bfin_dmac@%i/bfin_dma@%i > di mdma1 /core/bfin_sic", dmac, num_dmas - 1);
+  sim_hw_parse (sd, "/core/bfin_dmac@%u/bfin_dma@%i > di mdma0 /core/bfin_sic", dmac, num_dmas - 4);
+  sim_hw_parse (sd, "/core/bfin_dmac@%u/bfin_dma@%i > di mdma0 /core/bfin_sic", dmac, num_dmas - 3);
+  sim_hw_parse (sd, "/core/bfin_dmac@%u/bfin_dma@%i > di mdma1 /core/bfin_sic", dmac, num_dmas - 2);
+  sim_hw_parse (sd, "/core/bfin_dmac@%u/bfin_dma@%i > di mdma1 /core/bfin_sic", dmac, num_dmas - 1);
 
-  if (mdata->model_num == 538 || mdata->model_num == 539)
+  if (mdata->model_num == 538 || mdata->model_num == 539 || mdata->model_num == 561)
     {
+      unsigned int off = mdata->model_num == 561 ? 16 : 8;
       dmac = 1;
       num_dmas = 16;
 
-      sim_hw_parse (sd, "/core/bfin_dmac@%i/type %i", dmac, mdata->model_num);
+      sim_hw_parse (sd, "/core/bfin_dmac@%u/type %i", dmac, mdata->model_num);
 
       for (i = 0; i < num_dmas; ++i)
 	{
-	  sim_hw_parse (sd, "/core/bfin_dmac@%i/bfin_dma@%i/reg %#x %i", dmac, i + 8,
+	  sim_hw_parse (sd, "/core/bfin_dmac@%u/bfin_dma@%i/reg %#x %i", dmac, i + off,
 			0xFFC01C00 + i * BFIN_MMR_DMA_SIZE, BFIN_MMR_DMA_SIZE);
 	  if (i < num_dmas - 4)
 	    {
 	      /* Could route these into the bfin_dmac and let that
 	         forward it to the SIC, but not much value.  */
-	      sim_hw_parse (sd, "/core/bfin_dmac@%i/bfin_dma@%i > di dma%i /core/bfin_sic", dmac, i + 8, i + 8);
+	      sim_hw_parse (sd, "/core/bfin_dmac@%u/bfin_dma@%i > di dma%i /core/bfin_sic", dmac, i + off, i + off);
 	    }
 	}
-      sim_hw_parse (sd, "/core/bfin_dmac@%i/bfin_dma@%i > di mdma0 /core/bfin_sic", dmac, num_dmas - 4 + 8);
-      sim_hw_parse (sd, "/core/bfin_dmac@%i/bfin_dma@%i > di mdma0 /core/bfin_sic", dmac, num_dmas - 3 + 8);
-      sim_hw_parse (sd, "/core/bfin_dmac@%i/bfin_dma@%i > di mdma1 /core/bfin_sic", dmac, num_dmas - 2 + 8);
-      sim_hw_parse (sd, "/core/bfin_dmac@%i/bfin_dma@%i > di mdma1 /core/bfin_sic", dmac, num_dmas - 1 + 8);
+      sim_hw_parse (sd, "/core/bfin_dmac@%u/bfin_dma@%i > di mdma0 /core/bfin_sic", dmac, num_dmas - 4 + off);
+      sim_hw_parse (sd, "/core/bfin_dmac@%u/bfin_dma@%i > di mdma0 /core/bfin_sic", dmac, num_dmas - 3 + off);
+      sim_hw_parse (sd, "/core/bfin_dmac@%u/bfin_dma@%i > di mdma1 /core/bfin_sic", dmac, num_dmas - 2 + off);
+      sim_hw_parse (sd, "/core/bfin_dmac@%u/bfin_dma@%i > di mdma1 /core/bfin_sic", dmac, num_dmas - 1 + off);
     }
 
   for (i = 0; i < mdata->dev_count; ++i)
@@ -629,8 +631,8 @@ bfin_model_hw_tree_init (SIM_DESC sd, SIM_CPU *cpu)
 	  !strncmp (dev->dev, "bfin_sport", 10))
 	{
 	  const char *sint = dev->dev + 5;
-	  sim_hw_parse (sd, "/core/%s > tx   %s_tx   /core/bfin_dmac@0", dev->dev, sint);
-	  sim_hw_parse (sd, "/core/%s > rx   %s_rx   /core/bfin_dmac@0", dev->dev, sint);
+	  sim_hw_parse (sd, "/core/%s > tx   %s_tx   /core/bfin_dmac@%u", dev->dev, sint, dev->dmac);
+	  sim_hw_parse (sd, "/core/%s > rx   %s_rx   /core/bfin_dmac@%u", dev->dev, sint, dev->dmac);
 	  sim_hw_parse (sd, "/core/%s > stat %s_stat /core/bfin_sic", dev->dev, sint);
 	}
       else if (!strncmp (dev->dev, "bfin_gptimer", 12))

@@ -26,7 +26,9 @@
 
 struct bfin_ebiu_sdc
 {
-  bu32 base, reg_size, bank_size;
+  bu32 base;
+  int type;
+  bu32 reg_size, bank_size;
 
   /* Order after here is important -- matches hardware MMR layout.  */
   bu32 sdgctl;
@@ -72,9 +74,16 @@ bfin_ebiu_sdc_io_write_buffer (struct hw *me, const void *source,
       *value32p = value;
       break;
     case mmr_offset(sdbctl):
-      /* XXX: BF561 has a 32bit reg.  */
-      dv_bfin_mmr_require_16 (me, addr, nr_bytes, true);
-      *value16p = value;
+      if (sdc->type == 561)
+	{
+	  dv_bfin_mmr_require_32 (me, addr, nr_bytes, true);
+	  *value32p = value;
+	}
+      else
+	{
+	  dv_bfin_mmr_require_16 (me, addr, nr_bytes, true);
+	  *value16p = value;
+	}
       break;
     case mmr_offset(sdrrc):
       dv_bfin_mmr_require_16 (me, addr, nr_bytes, true);
@@ -112,9 +121,16 @@ bfin_ebiu_sdc_io_read_buffer (struct hw *me, void *dest,
       dv_store_4 (dest, *value32p);
       break;
     case mmr_offset(sdbctl):
-      /* XXX: BF561 has a 32bit reg.  */
-      dv_bfin_mmr_require_16 (me, addr, nr_bytes, false);
-      dv_store_2 (dest, *value16p);
+      if (sdc->type == 561)
+	{
+	  dv_bfin_mmr_require_32 (me, addr, nr_bytes, false);
+	  dv_store_4 (dest, *value32p);
+	}
+      else
+	{
+	  dv_bfin_mmr_require_16 (me, addr, nr_bytes, false);
+	  dv_store_2 (dest, *value16p);
+	}
       break;
     case mmr_offset(sdrrc):
     case mmr_offset(sdstat):
@@ -166,6 +182,8 @@ bfin_ebiu_sdc_finish (struct hw *me)
   set_hw_io_write_buffer (me, bfin_ebiu_sdc_io_write_buffer);
 
   attach_bfin_ebiu_sdc_regs (me, sdc);
+
+  sdc->type = hw_find_integer_property (me, "type");
 
   /* Initialize the SDC.  */
   sdc->sdgctl = 0xE0088849;
