@@ -87,6 +87,38 @@ bfin_dmac_default_pmap (struct hw *dma)
     return CTYPE;	/* MDMA */
 }
 
+static const unsigned int bfin_dmac_51x_mdma_map[] = {
+  /* MDMA0 */
+  [12] = 13,
+  [13] = 12,
+  /* MDMA1 */
+  [14] = 15,
+  [15] = 14,
+};
+
+static const char *bfin_dmac_51x_pmap[] = {
+  "ppi", "emac", "emac", "sport@0", "sport@0", "sport@1",
+  "sport@1", "spi@0", "uart@0", "uart@0", "uart@1", "uart@1",
+};
+
+/* XXX: Need to figure out how to handle portmuxed DMA channels.  */
+static const struct hw_port_descriptor bfin_dmac_51x_ports[] = {
+  { "ppi",         0, 0, input_port, },
+  { "emac_rx",     1, 0, input_port, },
+  { "emac_tx",     2, 0, input_port, },
+  { "sport@0_rx",  3, 0, input_port, },
+  { "sport@0_tx",  4, 0, input_port, },
+/*{ "rsi",         4, 0, input_port, },*/
+  { "sport@1_tx",  5, 0, input_port, },
+/*{ "spi@1",       5, 0, input_port, },*/
+  { "sport@1_rx",  6, 0, input_port, },
+  { "spi@0",       7, 0, input_port, },
+  { "uart@0_rx",   8, 0, input_port, },
+  { "uart@0_tx",   9, 0, input_port, },
+  { "uart@1_rx",  10, 0, input_port, },
+  { "uart@1_tx",  11, 0, input_port, },
+};
+
 static const unsigned int bfin_dmac_52x_mdma_map[] = {
   /* MDMA0 */
   [12] = 13,
@@ -216,6 +248,13 @@ bfin_dmac_finish (struct hw *me)
 
   switch (hw_find_integer_property (me, "type"))
     {
+    case 510 ... 519:
+      dmac->pmap = bfin_dmac_51x_pmap;
+      dmac->pmap_count = ARRAY_SIZE (bfin_dmac_51x_pmap);
+      dmac->mdma_map = bfin_dmac_51x_mdma_map;
+      dmac->mdma_count = ARRAY_SIZE (bfin_dmac_51x_mdma_map);
+      set_hw_ports (me, bfin_dmac_51x_ports);
+      break;
     case 522 ... 527:
       dmac->pmap = bfin_dmac_52x_pmap;
       dmac->pmap_count = ARRAY_SIZE (bfin_dmac_52x_pmap);

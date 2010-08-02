@@ -117,6 +117,8 @@ static const struct bfin_memory_layout bf51x_mem[] = {
   LAYOUT (0xFFC03400, 0x20, read_write),	/* SPI1 stub */
   LAYOUT (0xFFC03600, 0x10, read_write),	/* OTP stub */
   LAYOUT (0xFFC03680, 0x10, read_write),	/* OTP Data stub */
+  LAYOUT (0xFFC03800, 0xD0, read_write),	/* RSI stub */
+  LAYOUT (0xFFC03FE0, 0x20, read_write),	/* RSI peripheral stub */
   LAYOUT (0xFF800000, 0x4000, read_write),	/* Data A */
   LAYOUT (0xFF804000, 0x4000, read_write),	/* Data A Cache */
   LAYOUT (0xFF900000, 0x4000, read_write),	/* Data B */
@@ -419,6 +421,7 @@ static const struct bfin_memory_layout bf54x_mem[] = {
   LAYOUT (0xFFC03C00, 0xd00, read_write),	/* MUSB stub */
   LAYOUT (0xFFC04300, 0x10, read_write),	/* OTP stub */
   LAYOUT (0xFFC04380, 0x10, read_write),	/* OTP Data stub */
+  LAYOUT (0xFFC03900, 0x100, read_write),	/* RSI stub */
   LAYOUT (0xFEB00000, 0x20000, read_write_exec),	/* L2 */
   LAYOUT (0xFF800000, 0x4000, read_write),	/* Data A */
   LAYOUT (0xFF804000, 0x4000, read_write),	/* Data A Cache */
@@ -559,15 +562,16 @@ bfin_model_hw_tree_init (SIM_DESC sd, SIM_CPU *cpu)
   sim_hw_parse (sd, "/core/bfin_dmac@0/type %i", mdata->model_num);
   switch (mdata->model_num)
     {
+    case 510 ... 519:
     case 522 ... 527:
+    case 534:
+    case 536:
+    case 537:
       num_dmas = 16;
       break;
     case 531 ... 533:
       num_dmas = 12;
       break;
-    case 534:
-    case 536:
-    case 537:
     default:
       num_dmas = 16;
       break;
