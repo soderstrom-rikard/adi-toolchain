@@ -566,6 +566,63 @@ static const struct hw_port_descriptor bfin_sic_537_ports[] = {
   { "portf_irq_b",  311, 0, input_port, },
 };
 
+static const struct hw_port_descriptor bfin_sic_538_ports[] = {
+  BFIN_SIC_TO_CEC_PORTS
+  /* SIC0 */
+  { "pll",            0, 0, input_port, },
+  { "dmac@0_stat",    1, 0, input_port, },
+  { "ppi",            2, 0, input_port, },
+  { "sport@0_stat",   3, 0, input_port, },
+  { "sport@1_stat",   4, 0, input_port, },
+  { "spi@0_stat",     5, 0, input_port, },
+  { "uart@0_stat",    6, 0, input_port, },
+  { "rtc",            7, 0, input_port, },
+  { "dma0",           8, 0, input_port, },
+  { "dma1",           9, 0, input_port, },
+  { "dma2",          10, 0, input_port, },
+  { "dma3",          11, 0, input_port, },
+  { "dma4",          12, 0, input_port, },
+  { "dma5",          13, 0, input_port, },
+  { "dma6",          14, 0, input_port, },
+  { "dma7",          15, 0, input_port, },
+  { "gptimer@0",     16, 0, input_port, },
+  { "gptimer@1",     17, 0, input_port, },
+  { "gptimer@2",     18, 0, input_port, },
+  { "portf_irq_a",   19, 0, input_port, },
+  { "portf_irq_b",   20, 0, input_port, },
+  { "mdma0",         21, 0, input_port, },
+  { "mdma1",         22, 0, input_port, },
+  { "watchdog",      23, 0, input_port, },
+  { "dmac@1_stat",   24, 0, input_port, },
+  { "sport@2_stat",  25, 0, input_port, },
+  { "sport@3_stat",  26, 0, input_port, },
+/*{ "reserved",      27, 0, input_port, },*/
+  { "spi@1_stat",    28, 0, input_port, },
+  { "spi@2_stat",    29, 0, input_port, },
+  { "uart@1_stat",   30, 0, input_port, },
+  { "uart@2_stat",   31, 0, input_port, },
+  /* SIC1 */
+  { "can_stat",     100, 0, input_port, },
+  { "dma8",         101, 0, input_port, },
+  { "dma9",         102, 0, input_port, },
+  { "dma10",        103, 0, input_port, },
+  { "dma11",        104, 0, input_port, },
+  { "dma12",        105, 0, input_port, },
+  { "dma13",        106, 0, input_port, },
+  { "dma14",        107, 0, input_port, },
+  { "dma15",        108, 0, input_port, },
+  { "dma16",        109, 0, input_port, },
+  { "dma17",        110, 0, input_port, },
+  { "dma18",        111, 0, input_port, },
+  { "dma19",        112, 0, input_port, },
+  { "twi@0_stat",   113, 0, input_port, },
+  { "twi@1_stat",   114, 0, input_port, },
+  { "can_rx",       115, 0, input_port, },
+  { "can_tx",       116, 0, input_port, },
+  { "mdma1_0",      117, 0, input_port, },
+  { "mdma1_1",      118, 0, input_port, },
+};
+
 static void
 bfin_sic_537_port_event (struct hw *me, int my_port, struct hw *source,
 			 int source_port, int level)
@@ -697,6 +754,26 @@ bfin_sic_finish (struct hw *me)
       sic->bf537.iar1 = 0x43333332;
       sic->bf537.iar2 = 0x55555444;
       sic->bf537.iar3 = 0x66655555;
+      break;
+    case 538 ... 539:
+      set_hw_io_read_buffer (me, bfin_sic_52x_io_read_buffer);
+      set_hw_io_write_buffer (me, bfin_sic_52x_io_write_buffer);
+      set_hw_ports (me, bfin_sic_538_ports);
+      set_hw_port_event (me, bfin_sic_52x_port_event);
+      mmr_names = bf52x_mmr_names;
+
+      /* Initialize the SIC.  */
+      sic->bf52x.imask0 = sic->bf52x.imask1 = 0;
+      sic->bf52x.isr0 = sic->bf52x.isr1 = 0;
+      sic->bf52x.iwr0 = sic->bf52x.iwr1 = 0xFFFFFFFF;
+      sic->bf52x.iar0 = 0x10000000;
+      sic->bf52x.iar1 = 0x33322221;
+      sic->bf52x.iar2 = 0x66655444;
+      sic->bf52x.iar3 = 0x00000000;
+      sic->bf52x.iar4 = 0x32222220;
+      sic->bf52x.iar5 = 0x44433333;
+      sic->bf52x.iar6 = 0x00444664;
+      sic->bf52x.iar7 = 0x00000000;	/* XXX: Find and fix */
       break;
     default:
       hw_abort (me, "no support for SIC on this Blackfin model yet");

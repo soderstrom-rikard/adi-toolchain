@@ -178,6 +178,53 @@ static const struct hw_port_descriptor bfin_dmac_533_ports[] = {
   { "uart@0_rx",   7, 0, input_port, },
 };
 
+static const unsigned int bfin_dmac0_538_mdma_map[] = {
+  /* MDMA0 */
+  [20] = 21,
+  [21] = 20,
+  /* MDMA1 */
+  [22] = 23,
+  [23] = 22,
+};
+
+static const char *bfin_dmac0_538_pmap[] = {
+  "ppi", "sport@0", "sport@0", "sport@1", "sport@1", "spi@0",
+  "uart@0", "uart@0",
+};
+
+static const struct hw_port_descriptor bfin_dmac0_538_ports[] = {
+  { "ppi",         0, 0, input_port, },
+  { "sport@0_rx",  1, 0, input_port, },
+  { "sport@0_tx",  2, 0, input_port, },
+  { "sport@1_rx",  3, 0, input_port, },
+  { "sport@1_tx",  4, 0, input_port, },
+  { "spi@0",       5, 0, input_port, },
+  { "uart@0_rx",   6, 0, input_port, },
+  { "uart@0_tx",   7, 0, input_port, },
+};
+
+/* XXX: this is unhandled ... */
+static const unsigned int bfin_dmac1_538_mdma_map[] = {
+};
+
+static const char *bfin_dmac1_538_pmap[] = {
+  "sport@2", "sport@2", "sport@3", "sport@3", NULL, NULL,
+  "spi@1", "spi@2", "uart@1", "uart@1", "uart@2", "uart@2",
+};
+
+static const struct hw_port_descriptor bfin_dmac1_538_ports[] = {
+  { "sport@2_rx",  0, 0, input_port, },
+  { "sport@2_tx",  1, 0, input_port, },
+  { "sport@3_rx",  2, 0, input_port, },
+  { "sport@3_tx",  3, 0, input_port, },
+  { "spi@1",       6, 0, input_port, },
+  { "spi@2",       7, 0, input_port, },
+  { "uart@0_rx",   8, 0, input_port, },
+  { "uart@0_tx",   9, 0, input_port, },
+  { "uart@1_rx",  10, 0, input_port, },
+  { "uart@1_tx",  11, 0, input_port, },
+};
+
 static const unsigned int bfin_dmac_537_mdma_map[] = {
   /* MDMA0 */
   [12] = 13,
@@ -277,6 +324,13 @@ bfin_dmac_finish (struct hw *me)
       dmac->mdma_map = bfin_dmac_537_mdma_map;
       dmac->mdma_count = ARRAY_SIZE (bfin_dmac_537_mdma_map);
       set_hw_ports (me, bfin_dmac_537_ports);
+      break;
+    case 538 ... 539:
+      dmac->pmap = bfin_dmac0_538_pmap;
+      dmac->pmap_count = ARRAY_SIZE (bfin_dmac0_538_pmap);
+      dmac->mdma_map = bfin_dmac0_538_mdma_map;
+      dmac->mdma_count = ARRAY_SIZE (bfin_dmac0_538_mdma_map);
+      set_hw_ports (me, bfin_dmac0_538_ports);
       break;
     default:
       hw_abort (me, "no support for DMAC on this Blackfin model yet");

@@ -391,14 +391,11 @@ static const struct bfin_dev_layout bf538_dev[] = {
   DEVICE (0xFFC00600, BFIN_MMR_GPTIMER_SIZE, "bfin_gptimer@0"),
   DEVICE (0xFFC00610, BFIN_MMR_GPTIMER_SIZE, "bfin_gptimer@1"),
   DEVICE (0xFFC00620, BFIN_MMR_GPTIMER_SIZE, "bfin_gptimer@2"),
-  DEVICE (0xFFC00630, BFIN_MMR_GPTIMER_SIZE, "bfin_gptimer@3"),
-  DEVICE (0xFFC00640, BFIN_MMR_GPTIMER_SIZE, "bfin_gptimer@4"),
-  DEVICE (0xFFC00650, BFIN_MMR_GPTIMER_SIZE, "bfin_gptimer@5"),
-  DEVICE (0xFFC00660, BFIN_MMR_GPTIMER_SIZE, "bfin_gptimer@6"),
-  DEVICE (0xFFC00670, BFIN_MMR_GPTIMER_SIZE, "bfin_gptimer@7"),
   DEVICE (0xFFC01000, BFIN_MMR_PPI_SIZE,     "bfin_ppi"),
+/* XXX: DMAC1 not supported yet.
   DEVICE (0xFFC02000, BFIN_MMR_UART_SIZE,    "bfin_uart@1"),
   DEVICE (0xFFC02100, BFIN_MMR_UART_SIZE,    "bfin_uart@2"),
+ */
 };
 #define bf539_dev bf538_dev
 
@@ -570,6 +567,10 @@ bfin_model_hw_tree_init (SIM_DESC sd, SIM_CPU *cpu)
       num_dmas = 16;
       break;
     case 531 ... 533:
+      num_dmas = 12;
+      break;
+    case 538 ... 539:
+      /* XXX: This is just DMAC0.  */
       num_dmas = 12;
       break;
     default:
