@@ -508,7 +508,7 @@ bfin_model_hw_tree_init (SIM_DESC sd, SIM_CPU *cpu)
   const MODEL *model = CPU_MODEL (cpu);
   const struct bfin_model_data *mdata = CPU_MODEL_DATA (cpu);
   int mnum = MODEL_NUM (model);
-  unsigned i;
+  unsigned i, num_dmas;
   int amc_size;
 
   /* Map the core devices.  */
@@ -557,21 +557,36 @@ bfin_model_hw_tree_init (SIM_DESC sd, SIM_CPU *cpu)
 
   /* XXX: Should be pushed to per-model structs.  */
   sim_hw_parse (sd, "/core/bfin_dmac@0/type %i", mdata->model_num);
-  for (i = 0; i < 16; ++i)
+  switch (mdata->model_num)
+    {
+    case 522 ... 527:
+      num_dmas = 16;
+      break;
+    case 531 ... 533:
+      num_dmas = 12;
+      break;
+    case 534:
+    case 536:
+    case 537:
+    default:
+      num_dmas = 16;
+      break;
+    }
+  for (i = 0; i < num_dmas; ++i)
     {
       sim_hw_parse (sd, "/core/bfin_dmac@0/bfin_dma@%i/reg %#x %i", i,
 		    0xFFC00C00 + i * BFIN_MMR_DMA_SIZE, BFIN_MMR_DMA_SIZE);
-      if (i < 12)
+      if (i < num_dmas - 4)
 	{
 	  /* Could route these into the bfin_dmac and let that
 	     forward it to the SIC, but not much value.  */
 	  sim_hw_parse (sd, "/core/bfin_dmac@0/bfin_dma@%i > di dma%i /core/bfin_sic", i, i);
 	}
     }
-  sim_hw_parse (sd, "/core/bfin_dmac@0/bfin_dma@12 > di mdma0 /core/bfin_sic");
-  sim_hw_parse (sd, "/core/bfin_dmac@0/bfin_dma@13 > di mdma0 /core/bfin_sic");
-  sim_hw_parse (sd, "/core/bfin_dmac@0/bfin_dma@14 > di mdma1 /core/bfin_sic");
-  sim_hw_parse (sd, "/core/bfin_dmac@0/bfin_dma@15 > di mdma1 /core/bfin_sic");
+  sim_hw_parse (sd, "/core/bfin_dmac@0/bfin_dma@%i > di mdma0 /core/bfin_sic", num_dmas - 4);
+  sim_hw_parse (sd, "/core/bfin_dmac@0/bfin_dma@%i > di mdma0 /core/bfin_sic", num_dmas - 3);
+  sim_hw_parse (sd, "/core/bfin_dmac@0/bfin_dma@%i > di mdma1 /core/bfin_sic", num_dmas - 2);
+  sim_hw_parse (sd, "/core/bfin_dmac@0/bfin_dma@%i > di mdma1 /core/bfin_sic", num_dmas - 1);
 
   for (i = 0; i < mdata->dev_count; ++i)
     {

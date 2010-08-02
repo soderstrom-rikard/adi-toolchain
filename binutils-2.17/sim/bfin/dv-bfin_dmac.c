@@ -121,6 +121,31 @@ static const struct hw_port_descriptor bfin_dmac_52x_ports[] = {
   { "uart@1_rx",  11, 0, input_port, },
 };
 
+static const unsigned int bfin_dmac_533_mdma_map[] = {
+  /* MDMA0 */
+  [8] = 9,
+  [9] = 8,
+  /* MDMA1 */
+  [10] = 11,
+  [11] = 10,
+};
+
+static const char *bfin_dmac_533_pmap[] = {
+  "ppi", "sport@0", "sport@0", "sport@1", "sport@1", "spi",
+  "uart@0", "uart@0",
+};
+
+static const struct hw_port_descriptor bfin_dmac_533_ports[] = {
+  { "ppi",         0, 0, input_port, },
+  { "sport@0_tx",  1, 0, input_port, },
+  { "sport@0_rx",  2, 0, input_port, },
+  { "sport@1_tx",  3, 0, input_port, },
+  { "sport@1_rx",  4, 0, input_port, },
+  { "spi",         5, 0, input_port, },
+  { "uart@0_tx",   6, 0, input_port, },
+  { "uart@0_rx",   7, 0, input_port, },
+};
+
 static const unsigned int bfin_dmac_537_mdma_map[] = {
   /* MDMA0 */
   [12] = 13,
@@ -197,6 +222,13 @@ bfin_dmac_finish (struct hw *me)
       dmac->mdma_map = bfin_dmac_52x_mdma_map;
       dmac->mdma_count = ARRAY_SIZE (bfin_dmac_52x_mdma_map);
       set_hw_ports (me, bfin_dmac_52x_ports);
+      break;
+    case 531 ... 533:
+      dmac->pmap = bfin_dmac_533_pmap;
+      dmac->pmap_count = ARRAY_SIZE (bfin_dmac_533_pmap);
+      dmac->mdma_map = bfin_dmac_533_mdma_map;
+      dmac->mdma_count = ARRAY_SIZE (bfin_dmac_533_mdma_map);
+      set_hw_ports (me, bfin_dmac_533_ports);
       break;
     case 534:
     case 536:

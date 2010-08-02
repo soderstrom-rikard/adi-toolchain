@@ -405,6 +405,52 @@ bfin_sic_52x_port_event (struct hw *me, int my_port, struct hw *source,
   bfin_sic_52x_forward_interrupts (me, sic);
 }
 
+static const struct hw_port_descriptor bfin_sic_533_ports[] = {
+  BFIN_SIC_TO_CEC_PORTS
+  { "pll",            0, 0, input_port, },
+  { "dma_stat",       1, 0, input_port, },
+  { "ppi",            2, 0, input_port, },
+  { "sport@0_stat",   3, 0, input_port, },
+  { "sport@1_stat",   4, 0, input_port, },
+  { "spi",            5, 0, input_port, },
+  { "uart@0_stat",    6, 0, input_port, },
+  { "rtc",            7, 0, input_port, },
+  { "dma0",           8, 0, input_port, },
+  { "dma1",           9, 0, input_port, },
+  { "dma2",          10, 0, input_port, },
+  { "dma3",          11, 0, input_port, },
+  { "dma4",          12, 0, input_port, },
+  { "dma5",          13, 0, input_port, },
+  { "dma6",          14, 0, input_port, },
+  { "dma7",          15, 0, input_port, },
+  { "gptimer@0",     16, 0, input_port, },
+  { "gptimer@1",     17, 0, input_port, },
+  { "gptimer@2",     18, 0, input_port, },
+  { "portf_irq_a",   19, 0, input_port, },
+  { "portf_irq_b",   20, 0, input_port, },
+  { "mdma0",         21, 0, input_port, },
+  { "mdma1",         22, 0, input_port, },
+  { "watchdog",      23, 0, input_port, },
+};
+
+static void
+bfin_sic_533_port_event (struct hw *me, int my_port, struct hw *source,
+			 int source_port, int level)
+{
+  struct bfin_sic *sic = hw_data (me);
+  bu32 bit = (1 << my_port);
+
+  /* SIC only exists to forward interrupts from the system to the CEC.  */
+  sic->bf537.isr |= bit;
+
+  /* XXX: Handle SIC wakeup source ?
+  if (sic->bf537.iwr & bit)
+    What to do ?;
+   */
+
+  bfin_sic_537_forward_interrupts (me, sic);
+}
+
 static const struct hw_port_descriptor bfin_sic_537_ports[] = {
   BFIN_SIC_TO_CEC_PORTS
   { "pll",            0, 0, input_port, },
@@ -533,6 +579,22 @@ bfin_sic_finish (struct hw *me)
       sic->bf52x.iar5 = 0x06666655;
       sic->bf52x.iar6 = 0x33333000;
       sic->bf52x.iar7 = 0x00000000;
+      break;
+    case 531 ... 533:
+      set_hw_io_read_buffer (me, bfin_sic_537_io_read_buffer);
+      set_hw_io_write_buffer (me, bfin_sic_537_io_write_buffer);
+      set_hw_ports (me, bfin_sic_533_ports);
+      set_hw_port_event (me, bfin_sic_533_port_event);
+      mmr_names = bf537_mmr_names;
+
+      /* Initialize the SIC.  */
+      sic->bf537.imask = 0;
+      sic->bf537.isr = 0;
+      sic->bf537.iwr = 0xFFFFFFFF;
+      sic->bf537.iar0 = 0x10000000;
+      sic->bf537.iar1 = 0x33322221;
+      sic->bf537.iar2 = 0x66655444;
+      sic->bf537.iar3 = 0; /* XXX: fix this */
       break;
     case 534:
     case 536:
