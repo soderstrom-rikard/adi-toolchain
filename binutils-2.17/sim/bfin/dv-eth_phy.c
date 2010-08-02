@@ -195,7 +195,7 @@ eth_phy_finish (struct hw *me)
 static void
 eth_phy_finish (struct hw *me)
 {
-  hw_abort (me, "No linux/mii.h support found");
+  HW_TRACE ((me, "No linux/mii.h support found"));
 }
 
 #endif
