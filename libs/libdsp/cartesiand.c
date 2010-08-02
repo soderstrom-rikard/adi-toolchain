@@ -26,6 +26,7 @@
 
 /* Defined in */
 #include <complex_bf.h>
+#include <complex_fns.h>
 
 #include <math.h>
 
@@ -36,7 +37,7 @@ cartesiand
   long double*  phase             /*{ (o) - Phase                  }*/
 )
 {
-    *phase = argd(a);             /* compute phase     */
+    *phase = bf_argd(a);          /* compute phase     */
     return bf_cabsd(a);           /* compute magnitude */
 }
 

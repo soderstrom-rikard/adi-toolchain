@@ -22,6 +22,7 @@
 #pragma file_attr("prefersMemNum =30")
 
 #include <complex_bf.h>
+#include <complex_fns.h>
 
 complex_float _normf(complex_float a )
 {

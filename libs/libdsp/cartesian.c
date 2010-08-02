@@ -25,10 +25,11 @@
 #pragma file_attr("prefersMemNum =30")
 
 #include <complex_bf.h>
+#include <complex_fns.h>
 
 float _cartesianf( complex_float a, float* phase )
 {
-   *phase = argf(a);      /* compute phase     */
+   *phase = bf_argf(a);   /* compute phase     */
    return bf_cabsf(a);    /* compute magnitude */
 }
 

@@ -28,6 +28,7 @@
 
 /* Defined in */
 #include <complex_bf.h>
+#include <complex_fns.h>
 
 complex_long_double               /*{ ret - Normalized `a`         }*/
 normd
