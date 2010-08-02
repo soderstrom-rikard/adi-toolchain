@@ -213,6 +213,7 @@ bfin_ctimer_io_read_buffer (struct hw *me, void *dest,
 
 static const struct hw_port_descriptor bfin_ctimer_ports[] = {
   { "ivtmr", IVG_IVTMR, 0, output_port, },
+  { NULL, 0, 0, 0, },
 };
 
 static void

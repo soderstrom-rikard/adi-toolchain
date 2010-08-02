@@ -117,6 +117,7 @@ static const struct hw_port_descriptor bfin_dmac_51x_ports[] = {
   { "uart@0_tx",   9, 0, input_port, },
   { "uart@1_rx",  10, 0, input_port, },
   { "uart@1_tx",  11, 0, input_port, },
+  { NULL, 0, 0, 0, },
 };
 
 static const unsigned int bfin_dmac_52x_mdma_map[] = {
@@ -151,6 +152,7 @@ static const struct hw_port_descriptor bfin_dmac_52x_ports[] = {
   { "uart@0_rx",   9, 0, input_port, },
   { "uart@1_tx",  10, 0, input_port, },
   { "uart@1_rx",  11, 0, input_port, },
+  { NULL, 0, 0, 0, },
 };
 
 static const unsigned int bfin_dmac_533_mdma_map[] = {
@@ -176,6 +178,7 @@ static const struct hw_port_descriptor bfin_dmac_533_ports[] = {
   { "spi",         5, 0, input_port, },
   { "uart@0_tx",   6, 0, input_port, },
   { "uart@0_rx",   7, 0, input_port, },
+  { NULL, 0, 0, 0, },
 };
 
 static const unsigned int bfin_dmac0_538_mdma_map[] = {
@@ -201,6 +204,7 @@ static const struct hw_port_descriptor bfin_dmac0_538_ports[] = {
   { "spi@0",       5, 0, input_port, },
   { "uart@0_rx",   6, 0, input_port, },
   { "uart@0_tx",   7, 0, input_port, },
+  { NULL, 0, 0, 0, },
 };
 
 /* XXX: this is unhandled ... */
@@ -223,6 +227,7 @@ static const struct hw_port_descriptor bfin_dmac1_538_ports[] = {
   { "uart@0_tx",   9, 0, input_port, },
   { "uart@1_rx",  10, 0, input_port, },
   { "uart@1_tx",  11, 0, input_port, },
+  { NULL, 0, 0, 0, },
 };
 
 static const unsigned int bfin_dmac_537_mdma_map[] = {
@@ -252,6 +257,7 @@ static const struct hw_port_descriptor bfin_dmac_537_ports[] = {
   { "uart@0_rx",   9, 0, input_port, },
   { "uart@1_tx",  10, 0, input_port, },
   { "uart@1_rx",  11, 0, input_port, },
+  { NULL, 0, 0, 0, },
 };
 
 static void

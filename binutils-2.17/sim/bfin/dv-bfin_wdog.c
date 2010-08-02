@@ -137,6 +137,7 @@ static const struct hw_port_descriptor bfin_wdog_ports[] = {
   { "reset", WDEV_RESET, 0, output_port, },
   { "nmi",   WDEV_NMI,   0, output_port, },
   { "gpi",   WDEV_GPI,   0, output_port, },
+  { NULL, 0, 0, 0, },
 };
 
 static void

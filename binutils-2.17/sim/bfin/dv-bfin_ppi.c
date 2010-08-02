@@ -145,6 +145,7 @@ bfin_ppi_dma_write_buffer (struct hw *me, const void *source,
 
 static const struct hw_port_descriptor bfin_ppi_ports[] = {
   { "stat", 0, 0, output_port, },
+  { NULL, 0, 0, 0, },
 };
 
 static void

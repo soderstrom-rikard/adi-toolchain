@@ -382,6 +382,7 @@ static const struct hw_port_descriptor bfin_sic_51x_ports[] = {
   { "pwm_trip",     121, 0, input_port, },
   { "pwm_sync",     122, 0, input_port, },
   { "ptp_stat",     123, 0, input_port, },
+  { NULL, 0, 0, 0, },
 };
 
 static const struct hw_port_descriptor bfin_sic_52x_ports[] = {
@@ -442,6 +443,7 @@ static const struct hw_port_descriptor bfin_sic_52x_ports[] = {
   { "usb_int0",     120, 0, input_port, },
   { "usb_int1",     121, 0, input_port, },
   { "usb_int2",     122, 0, input_port, },
+  { NULL, 0, 0, 0, },
 };
 
 static void
@@ -495,6 +497,7 @@ static const struct hw_port_descriptor bfin_sic_533_ports[] = {
   { "mdma0",         21, 0, input_port, },
   { "mdma1",         22, 0, input_port, },
   { "watchdog",      23, 0, input_port, },
+  { NULL, 0, 0, 0, },
 };
 
 static void
@@ -564,6 +567,7 @@ static const struct hw_port_descriptor bfin_sic_537_ports[] = {
   { "mdma1",        300, 0, input_port, },
   { "watchdog",     310, 0, input_port, },
   { "portf_irq_b",  311, 0, input_port, },
+  { NULL, 0, 0, 0, },
 };
 
 static const struct hw_port_descriptor bfin_sic_538_ports[] = {
@@ -621,6 +625,7 @@ static const struct hw_port_descriptor bfin_sic_538_ports[] = {
   { "can_tx",       116, 0, input_port, },
   { "mdma1_0",      117, 0, input_port, },
   { "mdma1_1",      118, 0, input_port, },
+  { NULL, 0, 0, 0, },
 };
 
 static void

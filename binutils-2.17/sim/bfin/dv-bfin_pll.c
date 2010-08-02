@@ -119,6 +119,7 @@ bfin_pll_io_read_buffer (struct hw *me, void *dest,
 
 static const struct hw_port_descriptor bfin_pll_ports[] = {
   { "pll", 0, 0, output_port, },
+  { NULL, 0, 0, 0, },
 };
 
 static void

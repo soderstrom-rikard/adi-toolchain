@@ -491,6 +491,7 @@ static const struct hw_port_descriptor bfin_emac_ports[] = {
   { "tx",   DV_PORT_TX,   0, output_port, },
   { "rx",   DV_PORT_RX,   0, output_port, },
   { "stat", DV_PORT_STAT, 0, output_port, },
+  { NULL, 0, 0, 0, },
 };
 
 static void

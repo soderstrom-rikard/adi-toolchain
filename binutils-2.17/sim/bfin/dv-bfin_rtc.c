@@ -140,6 +140,7 @@ bfin_rtc_io_read_buffer (struct hw *me, void *dest,
 
 static const struct hw_port_descriptor bfin_rtc_ports[] = {
   { "rtc", 0, 0, output_port, },
+  { NULL, 0, 0, 0, },
 };
 
 static void

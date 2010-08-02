@@ -143,6 +143,7 @@ static const struct hw_port_descriptor bfin_cec_ports[] = {
   { "ivg13", IVG13,     0, input_port, },
   { "ivg14", IVG14,     0, input_port, },
   { "ivg15", IVG15,     0, input_port, },
+  { NULL, 0, 0, 0, },
 };
 
 static void

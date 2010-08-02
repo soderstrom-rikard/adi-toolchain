@@ -497,6 +497,7 @@ bfin_dma_dma_write_buffer (struct hw *me, const void *source,
 
 static const struct hw_port_descriptor bfin_dma_ports[] = {
   { "di", 0, 0, output_port, }, /* DMA Interrupt */
+  { NULL, 0, 0, 0, },
 };
 
 static void
