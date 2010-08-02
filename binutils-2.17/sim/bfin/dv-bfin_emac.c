@@ -68,12 +68,20 @@ struct bfin_emac
   bu32 _pad1[4];
   bu32 sysctl, systat, rx_stat, rx_stky, rx_irqe, tx_stat, tx_stky, tx_irqe;
   bu32 mmc_ctl, mmc_rirqs, mmc_rirqe, mmc_tirqs, mmc_tirqe;
-  bu32 _pad2[27];
+  bu32 _pad2[3];
+  bu16 BFIN_MMR_16(ptp_ctl);
+  bu16 BFIN_MMR_16(ptp_ie);
+  bu16 BFIN_MMR_16(ptp_istat);
+  bu32 ptp_foff, ptp_fv1, ptp_fv2, ptp_fv3, ptp_addend, ptp_accr, ptp_offset;
+  bu32 ptp_timelo, ptp_timehi, ptp_rxsnaplo, ptp_rxsnaphi, ptp_txsnaplo;
+  bu32 ptp_txsnaphi, ptp_alarmlo, ptp_alarmhi, ptp_id_off, ptp_id_snap;
+  bu32 ptp_pps_startlo, ptp_pps_starthi, ptp_pps_period;
+  bu32 _pad3[1];
   bu32 rxc_ok, rxc_fcs, rxc_lign, rxc_octet, rxc_dmaovf, rxc_unicst, rxc_multi;
   bu32 rxc_broad, rxc_lnerri, rxc_lnerro, rxc_long, rxc_macctl, rxc_opcode;
   bu32 rxc_pause, rxc_allfrm, rxc_alloct, rxc_typed, rxc_short, rxc_eq64;
   bu32 rxc_lt128, rxc_lt256, rxc_lt512, rxc_lt1024, rxc_ge1024;
-  bu32 _pad3[8];
+  bu32 _pad4[8];
   bu32 txc_ok, txc_1col, txc_gt1col, txc_octet, txc_defer, txc_latecl;
   bu32 txc_xs_col, txc_dmaund, txc_crserr, txc_unicst, txc_multi, txc_broad;
   bu32 txc_xs_dfr, txc_macctl, txc_allfrm, txc_alloct, txc_eq64, txc_lt128;
@@ -92,6 +100,13 @@ static const char * const mmr_names[BFIN_MMR_EMAC_SIZE / 4] = {
   "EMAC_RX_STAT", "EMAC_RX_STKY", "EMAC_RX_IRQE", "EMAC_TX_STAT",
   "EMAC_TX_STKY", "EMAC_TX_IRQE", "EMAC_MMC_CTL", "EMAC_MMC_RIRQS",
   "EMAC_MMC_RIRQE", "EMAC_MMC_TIRQS", "EMAC_MMC_TIRQE",
+  [mmr_idx (ptp_ctl)] = "EMAC_PTP_CTL", "EMAC_PTP_IE", "EMAC_PTP_ISTAT",
+  "EMAC_PTP_FOFF", "EMAC_PTP_FV1", "EMAC_PTP_FV2", "EMAC_PTP_FV3",
+  "EMAC_PTP_ADDEND", "EMAC_PTP_ACCR", "EMAC_PTP_OFFSET", "EMAC_PTP_TIMELO",
+  "EMAC_PTP_TIMEHI", "EMAC_PTP_RXSNAPLO", "EMAC_PTP_RXSNAPHI",
+  "EMAC_PTP_TXSNAPLO", "EMAC_PTP_TXSNAPHI", "EMAC_PTP_ALARMLO",
+  "EMAC_PTP_ALARMHI", "EMAC_PTP_ID_OFF", "EMAC_PTP_ID_SNAP",
+  "EMAC_PTP_PPS_STARTLO", "EMAC_PTP_PPS_STARTHI", "EMAC_PTP_PPS_PERIOD",
   [mmr_idx (rxc_ok)] = "EMAC_RXC_OK", "EMAC_RXC_FCS", "EMAC_RXC_LIGN",
   "EMAC_RXC_OCTET", "EMAC_RXC_DMAOVF", "EMAC_RXC_UNICST", "EMAC_RXC_MULTI",
   "EMAC_RXC_BROAD", "EMAC_RXC_LNERRI", "EMAC_RXC_LNERRO", "EMAC_RXC_LONG",
@@ -241,6 +256,9 @@ bfin_emac_io_write_buffer (struct hw *me, const void *source,
       /* XXX: Are these supposed to be read-only ?  */
       *valuep = value;
       break;
+    case mmr_offset(ptp_ctl) ... mmr_offset(ptp_pps_period):
+      /* XXX: Only on some models; ignore for now.  */
+      break;
     default:
       dv_bfin_mmr_invalid (me, addr, nr_bytes, true);
       break;
@@ -302,6 +320,9 @@ bfin_emac_io_read_buffer (struct hw *me, void *dest,
     case mmr_offset(rxc_ok) ... mmr_offset(rxc_ge1024):
     case mmr_offset(txc_ok) ... mmr_offset(txc_abort):
       dv_store_4 (dest, *valuep);
+      break;
+    case mmr_offset(ptp_ctl) ... mmr_offset(ptp_pps_period):
+      /* XXX: Only on some models; ignore for now.  */
       break;
     default:
       dv_bfin_mmr_invalid (me, addr, nr_bytes, false);
