@@ -267,11 +267,8 @@ if [ -z "${DIR_UBOOT}" ] ; then
 	for p in ../u-boot ../../u-boot/trunk ; do
 		d="${DIR_SOURCE}/${p}"
 		if [ -d "${d}" ] ; then
-			d=`ls -d "${d}"/u-boot-* | tail -1`
-			if [ -e "${d}/tools/mkimage.c" ] ; then
-				DIR_UBOOT=${d}
-				break
-			fi
+			DIR_UBOOT=${d}
+			break
 		fi
 	done
 fi
