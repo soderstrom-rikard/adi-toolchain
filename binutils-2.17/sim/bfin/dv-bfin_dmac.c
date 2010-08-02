@@ -183,11 +183,11 @@ static const struct hw_port_descriptor bfin_dmac_533_ports[] = {
 
 static const unsigned int bfin_dmac0_538_mdma_map[] = {
   /* MDMA0 */
-  [20] = 21,
-  [21] = 20,
+  [8] = 9,
+  [9] = 8,
   /* MDMA1 */
-  [22] = 23,
-  [23] = 22,
+  [10] = 11,
+  [11] = 10,
 };
 
 static const char *bfin_dmac0_538_pmap[] = {
@@ -207,8 +207,13 @@ static const struct hw_port_descriptor bfin_dmac0_538_ports[] = {
   { NULL, 0, 0, 0, },
 };
 
-/* XXX: this is unhandled ... */
 static const unsigned int bfin_dmac1_538_mdma_map[] = {
+  /* MDMA0 */
+  [12] = 13,
+  [13] = 12,
+  /* MDMA1 */
+  [14] = 15,
+  [15] = 14,
 };
 
 static const char *bfin_dmac1_538_pmap[] = {
@@ -289,6 +294,7 @@ static void
 bfin_dmac_finish (struct hw *me)
 {
   struct bfin_dmac *dmac;
+  unsigned int dmac_num = dv_get_bus_num (me);
 
   dmac = HW_ZALLOC (me, struct bfin_dmac);
 
@@ -302,6 +308,8 @@ bfin_dmac_finish (struct hw *me)
   switch (hw_find_integer_property (me, "type"))
     {
     case 510 ... 519:
+      if (dmac_num != 0)
+	hw_abort (me, "this Blackfin only has a DMAC0");
       dmac->pmap = bfin_dmac_51x_pmap;
       dmac->pmap_count = ARRAY_SIZE (bfin_dmac_51x_pmap);
       dmac->mdma_map = bfin_dmac_51x_mdma_map;
@@ -309,6 +317,8 @@ bfin_dmac_finish (struct hw *me)
       set_hw_ports (me, bfin_dmac_51x_ports);
       break;
     case 522 ... 527:
+      if (dmac_num != 0)
+	hw_abort (me, "this Blackfin only has a DMAC0");
       dmac->pmap = bfin_dmac_52x_pmap;
       dmac->pmap_count = ARRAY_SIZE (bfin_dmac_52x_pmap);
       dmac->mdma_map = bfin_dmac_52x_mdma_map;
@@ -316,6 +326,8 @@ bfin_dmac_finish (struct hw *me)
       set_hw_ports (me, bfin_dmac_52x_ports);
       break;
     case 531 ... 533:
+      if (dmac_num != 0)
+	hw_abort (me, "this Blackfin only has a DMAC0");
       dmac->pmap = bfin_dmac_533_pmap;
       dmac->pmap_count = ARRAY_SIZE (bfin_dmac_533_pmap);
       dmac->mdma_map = bfin_dmac_533_mdma_map;
@@ -325,6 +337,8 @@ bfin_dmac_finish (struct hw *me)
     case 534:
     case 536:
     case 537:
+      if (dmac_num != 0)
+	hw_abort (me, "this Blackfin only has a DMAC0");
       dmac->pmap = bfin_dmac_537_pmap;
       dmac->pmap_count = ARRAY_SIZE (bfin_dmac_537_pmap);
       dmac->mdma_map = bfin_dmac_537_mdma_map;
@@ -332,11 +346,25 @@ bfin_dmac_finish (struct hw *me)
       set_hw_ports (me, bfin_dmac_537_ports);
       break;
     case 538 ... 539:
-      dmac->pmap = bfin_dmac0_538_pmap;
-      dmac->pmap_count = ARRAY_SIZE (bfin_dmac0_538_pmap);
-      dmac->mdma_map = bfin_dmac0_538_mdma_map;
-      dmac->mdma_count = ARRAY_SIZE (bfin_dmac0_538_mdma_map);
-      set_hw_ports (me, bfin_dmac0_538_ports);
+      switch (dmac_num)
+	{
+	case 0:
+	  dmac->pmap = bfin_dmac0_538_pmap;
+	  dmac->pmap_count = ARRAY_SIZE (bfin_dmac0_538_pmap);
+	  dmac->mdma_map = bfin_dmac0_538_mdma_map;
+	  dmac->mdma_count = ARRAY_SIZE (bfin_dmac0_538_mdma_map);
+	  set_hw_ports (me, bfin_dmac0_538_ports);
+	  break;
+	case 1:
+	  dmac->pmap = bfin_dmac1_538_pmap;
+	  dmac->pmap_count = ARRAY_SIZE (bfin_dmac1_538_pmap);
+	  dmac->mdma_map = bfin_dmac1_538_mdma_map;
+	  dmac->mdma_count = ARRAY_SIZE (bfin_dmac1_538_mdma_map);
+	  set_hw_ports (me, bfin_dmac1_538_ports);
+	  break;
+	default:
+	  hw_abort (me, "this Blackfin only has a DMAC0 & DMAC1");
+	}
       break;
     default:
       hw_abort (me, "no support for DMAC on this Blackfin model yet");

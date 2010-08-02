@@ -392,7 +392,7 @@ static const struct bfin_dev_layout bf538_dev[] = {
   DEVICE (0xFFC00610, BFIN_MMR_GPTIMER_SIZE, "bfin_gptimer@1"),
   DEVICE (0xFFC00620, BFIN_MMR_GPTIMER_SIZE, "bfin_gptimer@2"),
   DEVICE (0xFFC01000, BFIN_MMR_PPI_SIZE,     "bfin_ppi"),
-/* XXX: DMAC1 not supported yet.
+/* XXX: DMAC1 not fully supported yet.
   DEVICE (0xFFC02000, BFIN_MMR_UART_SIZE,    "bfin_uart@1"),
   DEVICE (0xFFC02100, BFIN_MMR_UART_SIZE,    "bfin_uart@2"),
  */
@@ -508,7 +508,7 @@ bfin_model_hw_tree_init (SIM_DESC sd, SIM_CPU *cpu)
   const MODEL *model = CPU_MODEL (cpu);
   const struct bfin_model_data *mdata = CPU_MODEL_DATA (cpu);
   int mnum = MODEL_NUM (model);
-  unsigned i, num_dmas;
+  unsigned i, num_dmas, dmac;
   int amc_size;
 
   /* Map the core devices.  */
@@ -556,7 +556,8 @@ bfin_model_hw_tree_init (SIM_DESC sd, SIM_CPU *cpu)
     }
 
   /* XXX: Should be pushed to per-model structs.  */
-  sim_hw_parse (sd, "/core/bfin_dmac@0/type %i", mdata->model_num);
+  dmac = 0;
+  sim_hw_parse (sd, "/core/bfin_dmac@%i/type %i", dmac, mdata->model_num);
   switch (mdata->model_num)
     {
     case 510 ... 519:
@@ -579,19 +580,43 @@ bfin_model_hw_tree_init (SIM_DESC sd, SIM_CPU *cpu)
     }
   for (i = 0; i < num_dmas; ++i)
     {
-      sim_hw_parse (sd, "/core/bfin_dmac@0/bfin_dma@%i/reg %#x %i", i,
+      sim_hw_parse (sd, "/core/bfin_dmac@%i/bfin_dma@%i/reg %#x %i", dmac, i,
 		    0xFFC00C00 + i * BFIN_MMR_DMA_SIZE, BFIN_MMR_DMA_SIZE);
       if (i < num_dmas - 4)
 	{
 	  /* Could route these into the bfin_dmac and let that
 	     forward it to the SIC, but not much value.  */
-	  sim_hw_parse (sd, "/core/bfin_dmac@0/bfin_dma@%i > di dma%i /core/bfin_sic", i, i);
+	  sim_hw_parse (sd, "/core/bfin_dmac@%i/bfin_dma@%i > di dma%i /core/bfin_sic", dmac, i, i);
 	}
     }
-  sim_hw_parse (sd, "/core/bfin_dmac@0/bfin_dma@%i > di mdma0 /core/bfin_sic", num_dmas - 4);
-  sim_hw_parse (sd, "/core/bfin_dmac@0/bfin_dma@%i > di mdma0 /core/bfin_sic", num_dmas - 3);
-  sim_hw_parse (sd, "/core/bfin_dmac@0/bfin_dma@%i > di mdma1 /core/bfin_sic", num_dmas - 2);
-  sim_hw_parse (sd, "/core/bfin_dmac@0/bfin_dma@%i > di mdma1 /core/bfin_sic", num_dmas - 1);
+  sim_hw_parse (sd, "/core/bfin_dmac@%i/bfin_dma@%i > di mdma0 /core/bfin_sic", dmac, num_dmas - 4);
+  sim_hw_parse (sd, "/core/bfin_dmac@%i/bfin_dma@%i > di mdma0 /core/bfin_sic", dmac, num_dmas - 3);
+  sim_hw_parse (sd, "/core/bfin_dmac@%i/bfin_dma@%i > di mdma1 /core/bfin_sic", dmac, num_dmas - 2);
+  sim_hw_parse (sd, "/core/bfin_dmac@%i/bfin_dma@%i > di mdma1 /core/bfin_sic", dmac, num_dmas - 1);
+
+  if (mdata->model_num == 538 || mdata->model_num == 539)
+    {
+      dmac = 1;
+      num_dmas = 16;
+
+      sim_hw_parse (sd, "/core/bfin_dmac@%i/type %i", dmac, mdata->model_num);
+
+      for (i = 0; i < num_dmas; ++i)
+	{
+	  sim_hw_parse (sd, "/core/bfin_dmac@%i/bfin_dma@%i/reg %#x %i", dmac, i + 8,
+			0xFFC01C00 + i * BFIN_MMR_DMA_SIZE, BFIN_MMR_DMA_SIZE);
+	  if (i < num_dmas - 4)
+	    {
+	      /* Could route these into the bfin_dmac and let that
+	         forward it to the SIC, but not much value.  */
+	      sim_hw_parse (sd, "/core/bfin_dmac@%i/bfin_dma@%i > di dma%i /core/bfin_sic", dmac, i + 8, i + 8);
+	    }
+	}
+      sim_hw_parse (sd, "/core/bfin_dmac@%i/bfin_dma@%i > di mdma0 /core/bfin_sic", dmac, num_dmas - 4 + 8);
+      sim_hw_parse (sd, "/core/bfin_dmac@%i/bfin_dma@%i > di mdma0 /core/bfin_sic", dmac, num_dmas - 3 + 8);
+      sim_hw_parse (sd, "/core/bfin_dmac@%i/bfin_dma@%i > di mdma1 /core/bfin_sic", dmac, num_dmas - 2 + 8);
+      sim_hw_parse (sd, "/core/bfin_dmac@%i/bfin_dma@%i > di mdma1 /core/bfin_sic", dmac, num_dmas - 1 + 8);
+    }
 
   for (i = 0; i < mdata->dev_count; ++i)
     {
