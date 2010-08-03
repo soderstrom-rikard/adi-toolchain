@@ -30,6 +30,12 @@ has()
 }
 
 # make sure the specified directory is an absolute path
+is_abs_file()
+{
+	[ -n "$1" ] && [ -f "/..$1" ]
+}
+
+# make sure the specified directory is an absolute path
 is_abs_dir()
 {
 	[ -n "$1" ] && [ -d "/..$1" ]
