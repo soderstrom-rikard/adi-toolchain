@@ -156,7 +156,15 @@ do
 			fi
 			;;
 		b)  DIR_BUILD=${OPTARG%/} ;;
-		C)  UCLIBC_CONFIG_FILE=$OPTARG ;;
+		C)
+			UCLIBC_CONFIG_FILE=$OPTARG
+			if ! is_abs_file "${UCLIBC_CONFIG_FILE}" ; then
+				UCLIBC_CONFIG_FILE="${PWD}/${OPTARG}"
+				if ! is_abs_file "${UCLIBC_CONFIG_FILE}" ; then
+					error "-C (uClibc config) option takes a full path"
+				fi
+			fi
+			;;
 		o)
 			DIR_ELF_OUTPUT=$OPTARG-elf
 			DIR_uC_OUTPUT=$OPTARG-uclinux
@@ -952,44 +960,41 @@ build_kernel_headers()
 
 build_uClibc_core()
 {
+	local sysroot="$1" mlib1="$2" mlib2="$3" config="$4"
+
 	ARGS="V=1 CROSS=bfin-elf-"
 
 	echo_date "uClibc: cleaning"
-	run_cmd $MAKE clean $ARGS
+	run_cmd $MAKE distclean $ARGS
 
-	echo_date "uClibc: building"
-	if ! grep -qs UCLIBC_HAS_LOCALE=y .config ; then
-		# sometimes uClibc dies on parallel build, so lets build it with -j1
-		run_cmd $MAKE $ARGS -j 1
-	else
+	echo_date "uClibc: setup"
+	run_cmd cp "${config}" .config
+	run_cmd $MAKE headers $ARGS
+
+	if grep -qs UCLIBC_HAS_LOCALE=y .config ; then
 		echo_date "uClibc: building locale"
-		run_cmd $MAKE headers $ARGS
 
 		change_dir extra/locale
 		run_cmd $MAKE clean
 
-		if [ ! -f ./codesets.txt ] ; then
-			echo "      Creating codesets.txt"
-			find ./charmaps -name "*.pairs" > ./codesets.txt
-		fi
-		if [ ! -f ./locales.txt ] ; then
-			echo "      Creating locales.txt"
-			cp ./LOCALES ./locales.txt
-		fi
-
-		run_cmd $MAKE $ARGS
+		find ./charmaps -name "*.pairs" > ./codesets.txt
+		run_cmd cp ./LOCALES ./locales.txt
+		run_cmd $MAKE $ARGS -j 1
 
 		change_dir ../..
-		run_cmd $MAKE all $ARGS -j 1
 	fi
 
+	echo_date "uClibc: building"
+	# sometimes uClibc dies on parallel build, so lets build it with -j1
+	run_cmd $MAKE $ARGS -j 1
+
 	echo_date "uClibc: installing"
-	run_cmd $MAKE install DESTDIR=$1/runtime SUFFIX=$2 $ARGS
+	run_cmd $MAKE install DESTDIR="${sysroot}"/runtime SUFFIX=${mlib1} $ARGS
 
 	# Need a way to look at uClibc make system , and see what libs
 	# should be created
 	EXEEXT=""
-	check_installed_files uClibc "$1/runtime/$2/usr/lib/$3/" \
+	check_installed_files uClibc "${sysroot}/runtime/${mlib1}/usr/lib/${mlib2}/" \
 		crt1.o libc.a libcrypt.a libm.a libnsl.a libresolv.a libutil.a
 }
 
@@ -999,7 +1004,9 @@ build_uclibc()
 		printf "*** Checking uClibc CFLAGS:"
 		# We test (and fail) if any of the CFLAGS for uClibc don't work on the bfin-elf compiler
 		for opt in $UCLIBC_CFLAGS ; do
-			if ! check_cc_options $DIR_ELF_OUTPUT/bin/bfin-elf-gcc $opt ; then
+			local cc="$DIR_ELF_OUTPUT/bin/bfin-elf-gcc"
+			[ $SKIP_ELF ] && cc=${cc##*/}
+			if ! check_cc_options "${cc}" $opt ; then
 				error \
 					"\n" \
 					"I could not make option $opt work on the bfin-elf compiler,\n" \
@@ -1101,7 +1108,9 @@ build_uclibc()
 
 		run_cmd $MAKE oldconfig CROSS=bfin-elf- </dev/null
 		run_cmd cp .config .config-used-for_${suffix}
-		build_uClibc_core "${uclibc_sysroot}" "${uclibc_dir1}" "${uclibc_dir2}"
+		build_uClibc_core \
+			"${uclibc_sysroot}" "${uclibc_dir1}" "${uclibc_dir2}" \
+			.config-used-for_${suffix}
 
 		resume_save
 	done
