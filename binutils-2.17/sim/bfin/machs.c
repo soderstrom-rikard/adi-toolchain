@@ -180,6 +180,7 @@ static const struct bfin_memory_layout bf52x_mem[] = {
   LAYOUT (0xFFC01500, 0x50, read_write),	/* PORTG stub */
   LAYOUT (0xFFC01700, 0x50, read_write),	/* PORTH stub */
   LAYOUT (0xFFC03200, 0x50, read_write),	/* PORT_MUX stub */
+  LAYOUT (0xFFC03700, 0x50, read_write),	/* NAND stub */
   LAYOUT (0xFFC03800, 0xd00, read_write),	/* MUSB stub */
   LAYOUT (0xFF800000, 0x4000, read_write),	/* Data A */
   LAYOUT (0xFF804000, 0x4000, read_write),	/* Data A Cache */
@@ -416,6 +417,7 @@ static const struct bfin_memory_layout bf54x_mem[] = {
   LAYOUT (0xFFC02500, 0x60, read_write),	/* SPORT2 stub */
   LAYOUT (0xFFC02600, 0x60, read_write),	/* SPORT3 stub */
   LAYOUT (0xFFC03900, 0x100, read_write),	/* RSI stub */
+  LAYOUT (0xFFC03B00, 0x50, read_write),	/* NAND stub */
   LAYOUT (0xFFC03C00, 0xd00, read_write),	/* MUSB stub */
   LAYOUT (0xFEB00000, 0x20000, read_write_exec),	/* L2 */
   LAYOUT (0xFF800000, 0x4000, read_write),	/* Data A */
@@ -434,16 +436,16 @@ static const struct bfin_memory_layout bf54x_mem[] = {
 static const struct bfin_dev_layout bf542_dev[] = {
   DEVICE (0xFFC00400, BFIN_MMR_UART2_SIZE, "bfin_uart2@0"),
   DEVICE (0xFFC02000, BFIN_MMR_UART2_SIZE, "bfin_uart2@1"),
-  DEVICE (0xFFC02100, BFIN_MMR_UART2_SIZE, "bfin_uart2@2"),
-  DEVICE (0xFFC03100, BFIN_MMR_UART2_SIZE, "bfin_uart2@3"),
+ _DEVICE (0xFFC02100, BFIN_MMR_UART2_SIZE, "bfin_uart2@2", 1),
+ _DEVICE (0xFFC03100, BFIN_MMR_UART2_SIZE, "bfin_uart2@3", 1),
   DEVICE (0xFFC04300, BFIN_MMR_OTP_SIZE,   "bfin_otp"),
 };
 #define bf544_dev bf542_dev
 static const struct bfin_dev_layout bf547_dev[] = {
   DEVICE (0xFFC00400, BFIN_MMR_UART2_SIZE, "bfin_uart2@0"),
   DEVICE (0xFFC02000, BFIN_MMR_UART2_SIZE, "bfin_uart2@1"),
-  DEVICE (0xFFC02100, BFIN_MMR_UART2_SIZE, "bfin_uart2@2"),
-  DEVICE (0xFFC03100, BFIN_MMR_UART2_SIZE, "bfin_uart2@3"),
+ _DEVICE (0xFFC02100, BFIN_MMR_UART2_SIZE, "bfin_uart2@2", 1),
+ _DEVICE (0xFFC03100, BFIN_MMR_UART2_SIZE, "bfin_uart2@3", 1),
 };
 #define bf548_dev bf547_dev
 #define bf549_dev bf547_dev
@@ -564,6 +566,7 @@ bfin_model_hw_tree_init (SIM_DESC sd, SIM_CPU *cpu)
     case 534:
     case 536:
     case 537:
+    case 540 ... 549:
     case 561:
       num_dmas = 16;
       break;
@@ -571,7 +574,6 @@ bfin_model_hw_tree_init (SIM_DESC sd, SIM_CPU *cpu)
       num_dmas = 12;
       break;
     case 538 ... 539:
-      /* XXX: This is just DMAC0.  */
       num_dmas = 12;
       break;
     default:
@@ -594,9 +596,17 @@ bfin_model_hw_tree_init (SIM_DESC sd, SIM_CPU *cpu)
   sim_hw_parse (sd, "/core/bfin_dmac@%u/bfin_dma@%i > di mdma1 /core/bfin_sic", dmac, num_dmas - 2);
   sim_hw_parse (sd, "/core/bfin_dmac@%u/bfin_dma@%i > di mdma1 /core/bfin_sic", dmac, num_dmas - 1);
 
-  if (mdata->model_num == 538 || mdata->model_num == 539 || mdata->model_num == 561)
+  if (mdata->model_num == 538 || mdata->model_num == 539 || mdata->model_num == 561 ||
+      (mdata->model_num >= 540 && mdata->model_num <= 549))
     {
-      unsigned int off = mdata->model_num == 561 ? 16 : 8;
+      unsigned int off;
+
+      switch (mdata->model_num)
+	{
+	case 538: off = 8; break;
+	case 561: off = 16; break;
+	default: off = 12; break;
+	}
       dmac = 1;
       num_dmas = 16;
 

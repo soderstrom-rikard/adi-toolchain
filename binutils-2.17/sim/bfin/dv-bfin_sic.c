@@ -50,6 +50,14 @@ struct bfin_sic
       bu32 isr, iwr;
     } bf537;
     struct {
+      bu32 imask0, imask1, imask2;
+      bu32 isr0, isr1, isr2;
+      bu32 iwr0, iwr1, iwr2;
+      bu32 iar0, iar1, iar2, iar3;
+      bu32 iar4, iar5, iar6, iar7;
+      bu32 iar8, iar9, iar10, iar11;
+    } bf54x;
+    struct {
       bu32 imask0, imask1;
       bu32 iar0, iar1, iar2, iar3;
       bu32 iar4, iar5, iar6, iar7;
@@ -71,6 +79,13 @@ static const char * const bf52x_mmr_names[] = {
 static const char * const bf537_mmr_names[] = {
   "SWRST", "SYSCR", "SIC_RVECT", "SIC_IMASK", "SIC_IAR0", "SIC_IAR1",
   "SIC_IAR2", "SIC_IAR3", "SIC_ISR", "SIC_IWR",
+};
+static const char * const bf54x_mmr_names[] = {
+  "SWRST", "SYSCR", "SIC_RVECT", "SIC_IMASK0", "SIC_IMASK1", "SIC_IMASK2",
+  "SIC_ISR0", "SIC_ISR1", "SIC_ISR2", "SIC_IWR0", "SIC_IWR1", "SIC_IWR2",
+  "SIC_IAR0", "SIC_IAR1", "SIC_IAR2", "SIC_IAR3",
+  "SIC_IAR4", "SIC_IAR5", "SIC_IAR6", "SIC_IAR7",
+  "SIC_IAR8", "SIC_IAR9", "SIC_IAR10", "SIC_IAR11",
 };
 static const char * const bf561_mmr_names[] = {
   "SWRST", "SYSCR", "SIC_RVECT", "SIC_IMASK0", "SIC_IMASK1",
@@ -310,6 +325,106 @@ bfin_sic_537_io_read_buffer (struct hw *me, void *dest, int space,
     case mmr_offset(bf537.iar3):
     case mmr_offset(bf537.isr):
     case mmr_offset(bf537.iwr):
+      dv_store_4 (dest, *value32p);
+      break;
+    default:
+      if (nr_bytes == 2)
+	dv_store_2 (dest, 0);
+      else
+	dv_store_4 (dest, 0);
+      break;
+    }
+
+  return nr_bytes;
+}
+
+static void
+bfin_sic_54x_forward_interrupts (struct hw *me, struct bfin_sic *sic)
+{
+  bfin_sic_forward_interrupts (me, &sic->bf54x.isr0, &sic->bf54x.imask0, &sic->bf54x.iar0);
+  bfin_sic_forward_interrupts (me, &sic->bf54x.isr1, &sic->bf54x.imask1, &sic->bf54x.iar4);
+  bfin_sic_forward_interrupts (me, &sic->bf54x.isr2, &sic->bf54x.imask2, &sic->bf54x.iar8);
+}
+
+static unsigned
+bfin_sic_54x_io_write_buffer (struct hw *me, const void *source, int space,
+			      address_word addr, unsigned nr_bytes)
+{
+  struct bfin_sic *sic = hw_data (me);
+  bu32 mmr_off;
+  bu32 value;
+  bu16 *value16p;
+  bu32 *value32p;
+  void *valuep;
+
+  if (nr_bytes == 4)
+    value = dv_load_4 (source);
+  else
+    value = dv_load_2 (source);
+
+  mmr_off = addr - sic->base;
+  valuep = (void *)((unsigned long)sic + mmr_base() + mmr_off);
+  value16p = valuep;
+  value32p = valuep;
+
+  HW_TRACE_WRITE ();
+
+  /* XXX: Discard all SIC writes for now.  */
+  switch (mmr_off)
+    {
+    case mmr_offset(swrst):
+      /* XXX: This should trigger a software reset ...  */
+      break;
+    case mmr_offset(syscr):
+      /* XXX: what to do ...  */
+      break;
+    case mmr_offset(bf54x.imask0) ... mmr_offset(bf54x.imask2):
+      bfin_sic_54x_forward_interrupts (me, sic);
+      *value32p = value;
+      break;
+    case mmr_offset(bf54x.iar0) ... mmr_offset(bf54x.iar11):
+    case mmr_offset(bf54x.iwr0) ... mmr_offset(bf54x.iwr2):
+      *value32p = value;
+      break;
+    case mmr_offset(bf54x.isr0) ... mmr_offset(bf54x.isr2):
+      /* ISR is read-only.  */
+      break;
+    default:
+      /* XXX: Should discard other writes.  */
+      ;
+    }
+
+  return nr_bytes;
+}
+
+static unsigned
+bfin_sic_54x_io_read_buffer (struct hw *me, void *dest, int space,
+			     address_word addr, unsigned nr_bytes)
+{
+  struct bfin_sic *sic = hw_data (me);
+  bu32 mmr_off;
+  bu16 *value16p;
+  bu32 *value32p;
+  void *valuep;
+
+  mmr_off = addr - sic->base;
+  valuep = (void *)((unsigned long)sic + mmr_base() + mmr_off);
+  value16p = valuep;
+  value32p = valuep;
+
+  HW_TRACE_READ ();
+
+  switch (mmr_off)
+    {
+    case mmr_offset(swrst):
+    case mmr_offset(syscr):
+    case mmr_offset(rvect):
+      dv_store_2 (dest, *value16p);
+      break;
+    case mmr_offset(bf54x.imask0) ... mmr_offset(bf54x.imask2):
+    case mmr_offset(bf54x.iar0) ... mmr_offset(bf54x.iar11):
+    case mmr_offset(bf54x.iwr0) ... mmr_offset(bf54x.iwr2):
+    case mmr_offset(bf54x.isr0) ... mmr_offset(bf54x.isr2):
       dv_store_4 (dest, *value32p);
       break;
     default:
@@ -766,6 +881,138 @@ static const struct hw_port_descriptor bfin_sic_538_ports[] = {
   { NULL, 0, 0, 0, },
 };
 
+static const struct hw_port_descriptor bfin_sic_54x_ports[] = {
+  BFIN_SIC_TO_CEC_PORTS
+  /* SIC0 */
+  { "pll",            0, 0, input_port, },
+  { "dmac@0_stat",    1, 0, input_port, },
+  { "eppi@0",         2, 0, input_port, },
+  { "sport@0_stat",   3, 0, input_port, },
+  { "sport@1_stat",   4, 0, input_port, },
+  { "spi@0_stat",     5, 0, input_port, },
+  { "uart2@0_stat",   6, 0, input_port, },
+  { "rtc",            7, 0, input_port, },
+  { "dma12",          8, 0, input_port, },
+  { "dma0",           9, 0, input_port, },
+  { "dma1",          10, 0, input_port, },
+  { "dma2",          11, 0, input_port, },
+  { "dma3",          12, 0, input_port, },
+  { "dma4",          13, 0, input_port, },
+  { "dma6",          14, 0, input_port, },
+  { "dma7",          15, 0, input_port, },
+  { "gptimer@8",     16, 0, input_port, },
+  { "gptimer@9",     17, 0, input_port, },
+  { "gptimer@10",    18, 0, input_port, },
+  { "pint@0",        19, 0, input_port, },
+  { "pint@1",        20, 0, input_port, },
+  { "mdma0",         21, 0, input_port, },
+  { "mdma1",         22, 0, input_port, },
+  { "watchdog",      23, 0, input_port, },
+  { "dmac@1_stat",   24, 0, input_port, },
+  { "sport@2_stat",  25, 0, input_port, },
+  { "sport@3_stat",  26, 0, input_port, },
+  { "mxvr",          27, 0, input_port, },
+  { "spi@1_stat",    28, 0, input_port, },
+  { "spi@2_stat",    29, 0, input_port, },
+  { "uart2@1_stat",  30, 0, input_port, },
+  { "uart2@2_stat",  31, 0, input_port, },
+  /* SIC1 */
+  { "can@0_stat",    32, 0, input_port, },
+  { "dma18",         33, 0, input_port, },
+  { "dma19",         34, 0, input_port, },
+  { "dma20",         35, 0, input_port, },
+  { "dma21",         36, 0, input_port, },
+  { "dma13",         37, 0, input_port, },
+  { "dma14",         38, 0, input_port, },
+  { "dma5",          39, 0, input_port, },
+  { "dma23",         40, 0, input_port, },
+  { "dma8",          41, 0, input_port, },
+  { "dma9",          42, 0, input_port, },
+  { "dma10",         43, 0, input_port, },
+  { "dma11",         44, 0, input_port, },
+  { "twi@0",         45, 0, input_port, },
+  { "twi@1",         46, 0, input_port, },
+  { "can@0_rx",      47, 0, input_port, },
+  { "can@0_tx",      48, 0, input_port, },
+  { "mdma2",         49, 0, input_port, },
+  { "mdma3",         50, 0, input_port, },
+  { "mxvr_stat",     51, 0, input_port, },
+  { "mxvr_message",  52, 0, input_port, },
+  { "mxvr_packet",   53, 0, input_port, },
+  { "eppi@1",        54, 0, input_port, },
+  { "eppi@2",        55, 0, input_port, },
+  { "uart2@3_stat",  56, 0, input_port, },
+  { "hostdp",        57, 0, input_port, },
+/*{ "reserved",      58, 0, input_port, },*/
+  { "pixc_stat",     59, 0, input_port, },
+  { "nfc",           60, 0, input_port, },
+  { "atapi",         61, 0, input_port, },
+  { "can@1_stat",    62, 0, input_port, },
+  { "dmar",          63, 0, input_port, },
+  /* SIC2 */
+  { "dma15",         64, 0, input_port, },
+  { "dma16",         65, 0, input_port, },
+  { "dma17",         66, 0, input_port, },
+  { "dma22",         67, 0, input_port, },
+  { "counter",       68, 0, input_port, },
+  { "key",           69, 0, input_port, },
+  { "can@1_rx",      70, 0, input_port, },
+  { "can@1_tx",      71, 0, input_port, },
+  { "sdh_mask0",     72, 0, input_port, },
+  { "sdh_mask1",     73, 0, input_port, },
+/*{ "reserved",      74, 0, input_port, },*/
+  { "usb_int0",      75, 0, input_port, },
+  { "usb_int1",      76, 0, input_port, },
+  { "usb_int2",      77, 0, input_port, },
+  { "usb_dma",       78, 0, input_port, },
+  { "otpsec",        79, 0, input_port, },
+/*{ "reserved",      80, 0, input_port, },*/
+/*{ "reserved",      81, 0, input_port, },*/
+/*{ "reserved",      82, 0, input_port, },*/
+/*{ "reserved",      83, 0, input_port, },*/
+/*{ "reserved",      84, 0, input_port, },*/
+/*{ "reserved",      85, 0, input_port, },*/
+  { "gptimer@0",     86, 0, input_port, },
+  { "gptimer@1",     87, 0, input_port, },
+/*{ "gptimer@2",     88, 0, input_port, },*/
+  { "gptimer@3",     89, 0, input_port, },
+  { "gptimer@4",     90, 0, input_port, },
+  { "gptimer@5",     91, 0, input_port, },
+  { "gptimer@6",     92, 0, input_port, },
+  { "gptimer@7",     93, 0, input_port, },
+  { "pint2",         94, 0, input_port, },
+  { "pint3",         95, 0, input_port, },
+  { NULL, 0, 0, 0, },
+};
+
+static void
+bfin_sic_54x_port_event (struct hw *me, int my_port, struct hw *source,
+			 int source_port, int level)
+{
+  struct bfin_sic *sic = hw_data (me);
+  bu32 idx = my_port / 100;
+  bu32 bit = (1 << (my_port & 0x1f));
+
+  /* SIC only exists to forward interrupts from the system to the CEC.  */
+  switch (idx)
+    {
+    case 0: sic->bf54x.isr0 |= bit; break;
+    case 1: sic->bf54x.isr1 |= bit; break;
+    case 2: sic->bf54x.isr2 |= bit; break;
+    }
+
+  /* XXX: Handle SIC wakeup source ?
+  if (sic->bf54x.iwr0 & bit)
+    What to do ?;
+  if (sic->bf54x.iwr1 & bit)
+    What to do ?;
+  if (sic->bf54x.iwr2 & bit)
+    What to do ?;
+   */
+
+  bfin_sic_54x_forward_interrupts (me, sic);
+}
+
 static const struct hw_port_descriptor bfin_sic_561_ports[] = {
   BFIN_SIC_TO_CEC_PORTS
   /* SIC0 */
@@ -995,6 +1242,30 @@ bfin_sic_finish (struct hw *me)
       sic->bf52x.iar5 = 0x44433333;
       sic->bf52x.iar6 = 0x00444664;
       sic->bf52x.iar7 = 0x00000000;	/* XXX: Find and fix */
+      break;
+    case 540 ... 549:
+      set_hw_io_read_buffer (me, bfin_sic_54x_io_read_buffer);
+      set_hw_io_write_buffer (me, bfin_sic_54x_io_write_buffer);
+      set_hw_ports (me, bfin_sic_54x_ports);
+      set_hw_port_event (me, bfin_sic_54x_port_event);
+      mmr_names = bf54x_mmr_names;
+
+      /* Initialize the SIC.  */
+      sic->bf54x.imask0 = sic->bf54x.imask1 = sic->bf54x.imask2 = 0;
+      sic->bf54x.isr0 = sic->bf54x.isr1 = sic->bf54x.isr2 = 0;
+      sic->bf54x.iwr0 = sic->bf54x.iwr1 = sic->bf54x.iwr1 = 0xFFFFFFFF;
+      sic->bf54x.iar0 = 0x10000000;
+      sic->bf54x.iar1 = 0x33322221;
+      sic->bf54x.iar2 = 0x66655444;
+      sic->bf54x.iar3 = 0x00000000;
+      sic->bf54x.iar4 = 0x32222220;
+      sic->bf54x.iar5 = 0x44433333;
+      sic->bf54x.iar6 = 0x00444664;
+      sic->bf54x.iar7 = 0x00000000;
+      sic->bf54x.iar8 = 0x44111111;
+      sic->bf54x.iar9 = 0x44444444;
+      sic->bf54x.iar10 = 0x44444444;
+      sic->bf54x.iar11 = 0x55444444;
       break;
     case 561:
       set_hw_io_read_buffer (me, bfin_sic_561_io_read_buffer);

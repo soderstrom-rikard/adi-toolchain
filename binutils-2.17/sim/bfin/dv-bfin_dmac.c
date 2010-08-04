@@ -265,6 +265,72 @@ static const struct hw_port_descriptor bfin_dmac1_538_ports[] = {
   { NULL, 0, 0, 0, },
 };
 
+static const unsigned int bfin_dmac0_54x_mdma_map[] = {
+  /* MDMA0 */
+  [12] = 13,
+  [13] = 12,
+  /* MDMA1 */
+  [14] = 15,
+  [15] = 14,
+};
+
+static const char *bfin_dmac0_54x_pmap[] = {
+  "sport@0", "sport@0", "sport@1", "sport@1", "spi@0", "spi@1",
+  "uart2@0", "uart2@0", "uart2@1", "uart2@1", "atapi", "atapi",
+};
+
+static const struct hw_port_descriptor bfin_dmac0_54x_ports[] = {
+  { "sport@0_rx",  0, 0, input_port, },
+  { "sport@0_tx",  1, 0, input_port, },
+  { "sport@1_rx",  2, 0, input_port, },
+  { "sport@1_tx",  3, 0, input_port, },
+  { "spi@0",       4, 0, input_port, },
+  { "spi@1",       5, 0, input_port, },
+  { "uart2@0_rx",  6, 0, input_port, },
+  { "uart2@0_tx",  7, 0, input_port, },
+  { "uart2@1_rx",  8, 0, input_port, },
+  { "uart2@1_tx",  9, 0, input_port, },
+  { "atapi",      10, 0, input_port, },
+  { "atapi",      11, 0, input_port, },
+  { NULL, 0, 0, 0, },
+};
+
+static const unsigned int bfin_dmac1_54x_mdma_map[] = {
+  /* MDMA0 */
+  [12] = 13,
+  [13] = 12,
+  /* MDMA1 */
+  [14] = 15,
+  [15] = 14,
+};
+
+static const char *bfin_dmac1_54x_pmap[] = {
+  "eppi@0", "eppi@1", "eppi@2", "pixc", "pixc", "pixc",
+  "sport@2", "sport@2", "sport@3", "sport@3", "sdh",
+  "spi@2", "uart2@2", "uart2@2", "uart2@3", "uart2@3",
+};
+
+static const struct hw_port_descriptor bfin_dmac1_54x_ports[] = {
+  { "eppi@0",      0, 0, input_port, },
+  { "eppi@1",      1, 0, input_port, },
+  { "eppi@2",      2, 0, input_port, },
+  { "pixc",        3, 0, input_port, },
+  { "pixc",        4, 0, input_port, },
+  { "pixc",        5, 0, input_port, },
+  { "sport@2_rx",  6, 0, input_port, },
+  { "sport@2_tx",  7, 0, input_port, },
+  { "sport@3_rx",  8, 0, input_port, },
+  { "sport@3_tx",  9, 0, input_port, },
+  { "sdh",        10, 0, input_port, },
+/*{ "nfc",        10, 0, input_port, },*/
+  { "spi@2",      11, 0, input_port, },
+  { "uart2@2_rx", 12, 0, input_port, },
+  { "uart2@2_tx", 13, 0, input_port, },
+  { "uart2@3_rx", 14, 0, input_port, },
+  { "uart2@3_tx", 15, 0, input_port, },
+  { NULL, 0, 0, 0, },
+};
+
 static const unsigned int bfin_dmac0_561_mdma_map[] = {
   /* MDMA0 */
   [12] = 13,
@@ -404,6 +470,27 @@ bfin_dmac_finish (struct hw *me)
 	  dmac->mdma_map = bfin_dmac1_538_mdma_map;
 	  dmac->mdma_count = ARRAY_SIZE (bfin_dmac1_538_mdma_map);
 	  set_hw_ports (me, bfin_dmac1_538_ports);
+	  break;
+	default:
+	  hw_abort (me, "this Blackfin only has a DMAC0 & DMAC1");
+	}
+      break;
+    case 540 ... 549:
+      switch (dmac_num)
+	{
+	case 0:
+	  dmac->pmap = bfin_dmac0_54x_pmap;
+	  dmac->pmap_count = ARRAY_SIZE (bfin_dmac0_54x_pmap);
+	  dmac->mdma_map = bfin_dmac0_54x_mdma_map;
+	  dmac->mdma_count = ARRAY_SIZE (bfin_dmac0_54x_mdma_map);
+	  set_hw_ports (me, bfin_dmac0_54x_ports);
+	  break;
+	case 1:
+	  dmac->pmap = bfin_dmac1_54x_pmap;
+	  dmac->pmap_count = ARRAY_SIZE (bfin_dmac1_54x_pmap);
+	  dmac->mdma_map = bfin_dmac1_54x_mdma_map;
+	  dmac->mdma_count = ARRAY_SIZE (bfin_dmac1_54x_mdma_map);
+	  set_hw_ports (me, bfin_dmac1_54x_ports);
 	  break;
 	default:
 	  hw_abort (me, "this Blackfin only has a DMAC0 & DMAC1");
