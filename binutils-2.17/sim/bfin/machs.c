@@ -38,6 +38,7 @@
 #include "dv-bfin_evt.h"
 #include "dv-bfin_gptimer.h"
 #include "dv-bfin_mmu.h"
+#include "dv-bfin_otp.h"
 #include "dv-bfin_ppi.h"
 #include "dv-bfin_pll.h"
 #include "dv-bfin_rtc.h"
@@ -117,8 +118,6 @@ static const struct bfin_memory_layout bf51x_mem[] = {
   LAYOUT (0xFFC01700, 0x50, read_write),	/* PORTH stub */
   LAYOUT (0xFFC03200, 0x50, read_write),	/* PORT_MUX stub */
   LAYOUT (0xFFC03400, 0x20, read_write),	/* SPI1 stub */
-  LAYOUT (0xFFC03600, 0x10, read_write),	/* OTP stub */
-  LAYOUT (0xFFC03680, 0x10, read_write),	/* OTP Data stub */
   LAYOUT (0xFFC03800, 0xD0, read_write),	/* RSI stub */
   LAYOUT (0xFFC03FE0, 0x20, read_write),	/* RSI peripheral stub */
   LAYOUT (0xFF800000, 0x4000, read_write),	/* Data A */
@@ -142,6 +141,7 @@ static const struct bfin_dev_layout bf512_dev[] = {
   DEVICE (0xFFC00650, BFIN_MMR_GPTIMER_SIZE, "bfin_gptimer@5"),
   DEVICE (0xFFC00660, BFIN_MMR_GPTIMER_SIZE, "bfin_gptimer@6"),
   DEVICE (0xFFC00670, BFIN_MMR_GPTIMER_SIZE, "bfin_gptimer@7"),
+  DEVICE (0xFFC03600, BFIN_MMR_OTP_SIZE,     "bfin_otp"),
   DEVICE (0xFFC01000, BFIN_MMR_PPI_SIZE,     "bfin_ppi"),
   DEVICE (0xFFC02000, BFIN_MMR_UART_SIZE,    "bfin_uart@1"),
 };
@@ -156,6 +156,7 @@ static const struct bfin_dev_layout bf516_dev[] = {
   DEVICE (0xFFC00650, BFIN_MMR_GPTIMER_SIZE, "bfin_gptimer@5"),
   DEVICE (0xFFC00660, BFIN_MMR_GPTIMER_SIZE, "bfin_gptimer@6"),
   DEVICE (0xFFC00670, BFIN_MMR_GPTIMER_SIZE, "bfin_gptimer@7"),
+  DEVICE (0xFFC03600, BFIN_MMR_OTP_SIZE,     "bfin_otp"),
   DEVICE (0xFFC01000, BFIN_MMR_PPI_SIZE,     "bfin_ppi"),
   DEVICE (0xFFC02000, BFIN_MMR_UART_SIZE,    "bfin_uart@1"),
   DEVICE (0xFFC03000, BFIN_MMR_EMAC_SIZE,    "bfin_emac"),
@@ -179,8 +180,6 @@ static const struct bfin_memory_layout bf52x_mem[] = {
   LAYOUT (0xFFC01500, 0x50, read_write),	/* PORTG stub */
   LAYOUT (0xFFC01700, 0x50, read_write),	/* PORTH stub */
   LAYOUT (0xFFC03200, 0x50, read_write),	/* PORT_MUX stub */
-  LAYOUT (0xFFC03600, 0x10, read_write),	/* OTP stub */
-  LAYOUT (0xFFC03680, 0x10, read_write),	/* OTP Data stub */
   LAYOUT (0xFFC03800, 0xd00, read_write),	/* MUSB stub */
   LAYOUT (0xFF800000, 0x4000, read_write),	/* Data A */
   LAYOUT (0xFF804000, 0x4000, read_write),	/* Data A Cache */
@@ -206,6 +205,7 @@ static const struct bfin_dev_layout bf522_dev[] = {
   DEVICE (0xFFC00650, BFIN_MMR_GPTIMER_SIZE, "bfin_gptimer@5"),
   DEVICE (0xFFC00660, BFIN_MMR_GPTIMER_SIZE, "bfin_gptimer@6"),
   DEVICE (0xFFC00670, BFIN_MMR_GPTIMER_SIZE, "bfin_gptimer@7"),
+  DEVICE (0xFFC03600, BFIN_MMR_OTP_SIZE,     "bfin_otp"),
   DEVICE (0xFFC01000, BFIN_MMR_PPI_SIZE,     "bfin_ppi"),
   DEVICE (0xFFC02000, BFIN_MMR_UART_SIZE,    "bfin_uart@1"),
 };
@@ -415,10 +415,8 @@ static const struct bfin_memory_layout bf54x_mem[] = {
   LAYOUT (0xFFC02300, 0x20, read_write),	/* SPI1 stub */
   LAYOUT (0xFFC02500, 0x60, read_write),	/* SPORT2 stub */
   LAYOUT (0xFFC02600, 0x60, read_write),	/* SPORT3 stub */
-  LAYOUT (0xFFC03C00, 0xd00, read_write),	/* MUSB stub */
-  LAYOUT (0xFFC04300, 0x10, read_write),	/* OTP stub */
-  LAYOUT (0xFFC04380, 0x10, read_write),	/* OTP Data stub */
   LAYOUT (0xFFC03900, 0x100, read_write),	/* RSI stub */
+  LAYOUT (0xFFC03C00, 0xd00, read_write),	/* MUSB stub */
   LAYOUT (0xFEB00000, 0x20000, read_write_exec),	/* L2 */
   LAYOUT (0xFF800000, 0x4000, read_write),	/* Data A */
   LAYOUT (0xFF804000, 0x4000, read_write),	/* Data A Cache */
@@ -438,6 +436,7 @@ static const struct bfin_dev_layout bf542_dev[] = {
   DEVICE (0xFFC02000, BFIN_MMR_UART2_SIZE, "bfin_uart2@1"),
   DEVICE (0xFFC02100, BFIN_MMR_UART2_SIZE, "bfin_uart2@2"),
   DEVICE (0xFFC03100, BFIN_MMR_UART2_SIZE, "bfin_uart2@3"),
+  DEVICE (0xFFC04300, BFIN_MMR_OTP_SIZE,   "bfin_otp"),
 };
 #define bf544_dev bf542_dev
 static const struct bfin_dev_layout bf547_dev[] = {
@@ -624,6 +623,7 @@ bfin_model_hw_tree_init (SIM_DESC sd, SIM_CPU *cpu)
     {
       const struct bfin_dev_layout *dev = &mdata->dev[i];
       sim_hw_parse (sd, "/core/%s/reg %#x %i", dev->dev, dev->base, dev->len);
+      sim_hw_parse (sd, "/core/%s/type %i", dev->dev, mdata->model_num);
       if (strchr (dev->dev, '/'))
 	continue;
       if (!strncmp (dev->dev, "bfin_uart", 9) ||
