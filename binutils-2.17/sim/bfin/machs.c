@@ -35,6 +35,7 @@
 #include "dv-bfin_ebiu_ddrc.h"
 #include "dv-bfin_ebiu_sdc.h"
 #include "dv-bfin_emac.h"
+#include "dv-bfin_eppi.h"
 #include "dv-bfin_evt.h"
 #include "dv-bfin_gptimer.h"
 #include "dv-bfin_mmu.h"
@@ -435,16 +436,21 @@ static const struct bfin_memory_layout bf54x_mem[] = {
 #define bf549_mem bf54x_mem
 static const struct bfin_dev_layout bf542_dev[] = {
   DEVICE (0xFFC00400, BFIN_MMR_UART2_SIZE, "bfin_uart2@0"),
+ _DEVICE (0xFFC01300, BFIN_MMR_EPPI_SIZE,  "bfin_eppi@1", 1),
   DEVICE (0xFFC02000, BFIN_MMR_UART2_SIZE, "bfin_uart2@1"),
  _DEVICE (0xFFC02100, BFIN_MMR_UART2_SIZE, "bfin_uart2@2", 1),
+ _DEVICE (0xFFC02900, BFIN_MMR_EPPI_SIZE,  "bfin_eppi@2", 1),
  _DEVICE (0xFFC03100, BFIN_MMR_UART2_SIZE, "bfin_uart2@3", 1),
   DEVICE (0xFFC04300, BFIN_MMR_OTP_SIZE,   "bfin_otp"),
 };
 #define bf544_dev bf542_dev
 static const struct bfin_dev_layout bf547_dev[] = {
   DEVICE (0xFFC00400, BFIN_MMR_UART2_SIZE, "bfin_uart2@0"),
+ _DEVICE (0xFFC01000, BFIN_MMR_EPPI_SIZE,  "bfin_eppi@0", 1),
+ _DEVICE (0xFFC01300, BFIN_MMR_EPPI_SIZE,  "bfin_eppi@1", 1),
   DEVICE (0xFFC02000, BFIN_MMR_UART2_SIZE, "bfin_uart2@1"),
  _DEVICE (0xFFC02100, BFIN_MMR_UART2_SIZE, "bfin_uart2@2", 1),
+ _DEVICE (0xFFC02900, BFIN_MMR_EPPI_SIZE,  "bfin_eppi@2", 1),
  _DEVICE (0xFFC03100, BFIN_MMR_UART2_SIZE, "bfin_uart2@3", 1),
 };
 #define bf548_dev bf547_dev
