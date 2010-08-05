@@ -417,6 +417,7 @@ static const struct bfin_memory_layout bf54x_mem[] = {
   LAYOUT (0xFFC02300, 0x20, read_write),	/* SPI1 stub */
   LAYOUT (0xFFC02500, 0x60, read_write),	/* SPORT2 stub */
   LAYOUT (0xFFC02600, 0x60, read_write),	/* SPORT3 stub */
+  LAYOUT (0xFFC03800, 0x70, read_write),	/* ATAPI stub */
   LAYOUT (0xFFC03900, 0x100, read_write),	/* RSI stub */
   LAYOUT (0xFFC03B00, 0x50, read_write),	/* NAND stub */
   LAYOUT (0xFFC03C00, 0xd00, read_write),	/* MUSB stub */
