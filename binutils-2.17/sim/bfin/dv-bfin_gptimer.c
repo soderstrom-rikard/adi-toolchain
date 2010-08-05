@@ -112,13 +112,13 @@ bfin_gptimer_io_read_buffer (struct hw *me, void *dest, int space,
   switch (mmr_off)
     {
     case mmr_offset(config):
-      dv_bfin_mmr_require_16 (me, addr, nr_bytes, true);
+      dv_bfin_mmr_require_16 (me, addr, nr_bytes, false);
       dv_store_2 (dest, *value16p);
       break;
     case mmr_offset(counter):
     case mmr_offset(period):
     case mmr_offset(width):
-      dv_bfin_mmr_require_32 (me, addr, nr_bytes, true);
+      dv_bfin_mmr_require_32 (me, addr, nr_bytes, false);
       dv_store_4 (dest, *value32p);
       break;
     default:

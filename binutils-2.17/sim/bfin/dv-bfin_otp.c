@@ -121,7 +121,7 @@ bfin_otp_io_write_buffer (struct hw *me, const void *source, int space,
       {
 	int page;
 
-	dv_bfin_mmr_require_16 (me, addr, nr_bytes, false);
+	dv_bfin_mmr_require_16 (me, addr, nr_bytes, true);
 	/* XXX: Seems like these bits aren't writable.  */
 	*value16p = value & 0x39FF;
 
@@ -141,12 +141,12 @@ bfin_otp_io_write_buffer (struct hw *me, const void *source, int space,
 	break;
       }
     case mmr_offset(ben):
-      dv_bfin_mmr_require_16 (me, addr, nr_bytes, false);
+      dv_bfin_mmr_require_16 (me, addr, nr_bytes, true);
       /* XXX: All bits seem to be writable.  */
       *value16p = value;
       break;
     case mmr_offset(status):
-      dv_bfin_mmr_require_16 (me, addr, nr_bytes, false);
+      dv_bfin_mmr_require_16 (me, addr, nr_bytes, true);
       /* XXX: All bits seem to be W1C.  */
       dv_w1c_2 (value16p, value, 0);
       break;
@@ -155,7 +155,7 @@ bfin_otp_io_write_buffer (struct hw *me, const void *source, int space,
     case mmr_offset(data1):
     case mmr_offset(data2):
     case mmr_offset(data3):
-      dv_bfin_mmr_require_32 (me, addr, nr_bytes, false);
+      dv_bfin_mmr_require_32 (me, addr, nr_bytes, true);
       *value32p = value;
       break;
     default:
