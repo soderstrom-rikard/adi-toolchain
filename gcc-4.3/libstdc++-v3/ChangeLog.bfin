@@ -1,3 +1,9 @@
+2010-08-05  Steve Kilbane <stephen.kilbane@analog.com>
+
+	[#6101] Remove lax_strtofp xfail condition from test that actually
+	passes.
+	* testsuite/27_io/basic_istream/extractors_arithmetic/char/12.cc
+
 2009-04-03  Jie Zhang  <jie.zhang@analog.com>
 
 	* testsuite/lib/libstdc++.exp (v3_target_compile_as_c): For cross
