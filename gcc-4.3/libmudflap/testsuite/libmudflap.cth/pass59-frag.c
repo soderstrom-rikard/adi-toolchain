@@ -20,7 +20,8 @@ int main()
   return 0;
 }
 
-/* { dg-output "Hello from thread!\n" } */
+/* PR 5888 - last char of expected output can't be newline */
+/* { dg-output "Hello from thread!\n" { xfail bfin-*-* } } */
 
 #if 0
 
