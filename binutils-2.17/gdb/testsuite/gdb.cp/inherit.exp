@@ -86,7 +86,7 @@ proc test_ptype_si { } {
     # which results are PASS, KFAIL, XFAIL, and FAIL.
 
     set re_tag		"tagless_struct"
-    set XX_tag		"\\._1"
+    set XX_tag		"(\\._1|<anonymous (struct|union)>)"
     set re_class	"(class $re_tag \{${ws}public:|class \{${ws}public:|struct $re_tag \{|struct \{)"
     set XX_class	"(class $XX_tag \{${ws}public:|struct $XX_tag \{)"
     set re_fields	"int one;${ws}int two;"
@@ -115,12 +115,18 @@ proc test_ptype_si { } {
 	    # gcc 3.4.1 -gstabs+
 	    pass "$name"
 	}
+	-re "No symbol \"tagless_struct\" in current context.$nl$gdb_prompt $" {
+	    # Several GCC 4.x versions provide neither a DW_TAG_typedef DIE
+	    # nor use the typedef name as struct tag name.
+	    xfail "$name"
+	}
     }
 
     set name "ptype variable of type tagless struct"
     gdb_test_multiple "ptype v_tagless" $name {
 	-re "type = $XX_class${ws}$re_fields$nl\}$nl$gdb_prompt $" {
 	    # gcc 2.95.3 -gdwarf-2
+	    # gcc 4.3.5 -gdwarf-2
 	    pass "$name"
 	}
 	-re "type = $re_class${ws}$re_fields${ws}$XX_synth_gcc_23$nl\}$nl$gdb_prompt $" {

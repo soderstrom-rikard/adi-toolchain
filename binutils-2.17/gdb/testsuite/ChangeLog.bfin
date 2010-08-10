@@ -1,3 +1,10 @@
+2010-08-10  Steve Kilbane <stephen.kilbane@analog.com>
+
+	* gdb.cp/inherit.exp: [#6145] Take change back from upstream, for 
+	"ptype tagless struct" case (xfail on 4.x), and accept GCC 4.3.5's
+	"<anonymous struct/union>" output for "ptype variable of type
+	tagless struct" case.
+
 2009-05-14  Jie Zhang  <jie.zhang@analog.com>
 
 	* gdb.base/dump.exp: Skip for Blackfin Linux targets.
