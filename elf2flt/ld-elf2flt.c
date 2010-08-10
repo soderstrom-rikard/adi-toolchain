@@ -471,11 +471,29 @@ static void parse_args(int argc, char **argv)
 		append_option_str(&flt_options, fltflags, "\t ");
 }
 
+static char *
+get_self_path(char *argv0) {
+	static char buf[E2F_PATHMAX+1];
+	char path[E2F_PATHMAX+1];
+	ssize_t len;
+	struct stat statbuf;
+
+	/* If we haven't been given an argv0 that is either absolute,
+	   or relative to cwd, try getting something from /proc instead. */
+	if (stat(argv0, &statbuf) || !(S_ISREG(statbuf.st_mode) || S_ISLNK(statbuf.st_mode))) {
+		sprintf(path, "/proc/%d/exe", getpid());
+		if ((len = readlink(path, buf, sizeof(buf))) == -1)
+			fatal("Cannot reference self via %s", argv0);
+		return buf;
+	}
+	return argv0;
+}
+
 int main(int argc, char *argv[])
 {
 	const char *ptr;
 	char *tmp;
-	const char *argv0 = argv[0];
+	const char *argv0 = get_self_path(argv[0]);
 	size_t len;
 	struct stat buf;
 	const char *have_exe = NULL;

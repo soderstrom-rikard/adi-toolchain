@@ -1,3 +1,9 @@
+2010-08-10  Steve Kilbane  <stephen.kilbane@analog.com>
+
+	* ld-elf2flt.c: [#5675] Use /proc/getpid()/exe to track down
+	executable path, if argv[0] isn't right.
+	* stubs.h: provide a suitable path length for same.
+
 2009-05-22  Jie Zhang  <jie.zhang@analog.com>
 
 	* elf2flt.c (output_relocs): Create relocation of persistent data

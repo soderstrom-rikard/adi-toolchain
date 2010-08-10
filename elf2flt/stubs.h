@@ -32,6 +32,24 @@
 # define strsignal(sig) "SIG???"
 #endif
 
+/* for PATH_MAX */
+#ifdef HAVE_LIMITS_H
+#include <limits.h>
+#endif
+/* for MAXPATHLEN */
+#ifdef HAVE_SYS_PARAM_H
+#include <sys/param.h>
+#endif
+#ifdef PATH_MAX
+# define E2F_PATHMAX PATH_MAX
+#else
+# ifdef MAXPATHLEN
+#  define E2F_PATHMAX MAXPATHLEN
+# else
+#  define E2F_PATHMAX 1024
+# endif
+#endif
+
 #define streq(str1, str2) (strcmp(str1, str2) == 0)
 #define streqn(str1, str2) (strncmp(str1, str2, strlen(str2)) == 0)
 
