@@ -1,5 +1,14 @@
 2010-08-10  Stuart Henderson <stuart.henderson@analog.com>
 
+	[#5887] Only include ext/codecvt_specializations.h and ext/enc_filebuf.h
+	if _GLIBCXX_HAVE_ICONV.
+	* testsuite/17_intro/headers/all.cc
+	* testsuite/17_intro/headers/all_c++200x_compatibility.cc
+	* testsuite/17_intro/headers/all_pedantic_errors.cc
+	* testsuite/ext/headers.cc
+
+2010-08-10  Stuart Henderson <stuart.henderson@analog.com>
+
 	[#6134] Enable garbage collection when testing blackfin targets.
 	* testsuite/lib/libstdc++.exp
 
