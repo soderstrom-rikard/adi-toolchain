@@ -1,3 +1,8 @@
+2010-08-10  Stuart Henderson <stuart.henderson@analog.com>
+
+	[#6134] Enable garbage collection when testing blackfin targets.
+	* testsuite/lib/libstdc++.exp
+
 2010-08-05  Steve Kilbane <stephen.kilbane@analog.com>
 
 	[#6101] Remove lax_strtofp xfail condition from test that actually
