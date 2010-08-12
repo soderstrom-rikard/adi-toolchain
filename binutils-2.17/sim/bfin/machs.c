@@ -39,6 +39,7 @@
 #include "dv-bfin_evt.h"
 #include "dv-bfin_gptimer.h"
 #include "dv-bfin_mmu.h"
+#include "dv-bfin_nfc.h"
 #include "dv-bfin_otp.h"
 #include "dv-bfin_ppi.h"
 #include "dv-bfin_pll.h"
@@ -181,7 +182,6 @@ static const struct bfin_memory_layout bf52x_mem[] = {
   LAYOUT (0xFFC01500, 0x50, read_write),	/* PORTG stub */
   LAYOUT (0xFFC01700, 0x50, read_write),	/* PORTH stub */
   LAYOUT (0xFFC03200, 0x50, read_write),	/* PORT_MUX stub */
-  LAYOUT (0xFFC03700, 0x50, read_write),	/* NAND stub */
   LAYOUT (0xFFC03800, 0xd00, read_write),	/* MUSB stub */
   LAYOUT (0xFF800000, 0x4000, read_write),	/* Data A */
   LAYOUT (0xFF804000, 0x4000, read_write),	/* Data A Cache */
@@ -210,6 +210,7 @@ static const struct bfin_dev_layout bf522_dev[] = {
   DEVICE (0xFFC01000, BFIN_MMR_PPI_SIZE,     "bfin_ppi"),
   DEVICE (0xFFC02000, BFIN_MMR_UART_SIZE,    "bfin_uart@1"),
   DEVICE (0xFFC03600, BFIN_MMR_OTP_SIZE,     "bfin_otp"),
+  DEVICE (0xFFC03700, BFIN_MMR_NFC_SIZE,     "bfin_nfc"),
 };
 #define bf523_dev bf522_dev
 #define bf524_dev bf522_dev
@@ -229,6 +230,7 @@ static const struct bfin_dev_layout bf526_dev[] = {
   DEVICE (0xFFC03000, BFIN_MMR_EMAC_SIZE,    "bfin_emac"),
   DEVICE (0, 0x20, "bfin_emac/eth_phy"),
   DEVICE (0xFFC03600, BFIN_MMR_OTP_SIZE,     "bfin_otp"),
+  DEVICE (0xFFC03700, BFIN_MMR_NFC_SIZE,     "bfin_nfc"),
 };
 #define bf527_dev bf526_dev
 
@@ -420,7 +422,6 @@ static const struct bfin_memory_layout bf54x_mem[] = {
   LAYOUT (0xFFC02600, 0x60, read_write),	/* SPORT3 stub */
   LAYOUT (0xFFC03800, 0x70, read_write),	/* ATAPI stub */
   LAYOUT (0xFFC03900, 0x100, read_write),	/* RSI stub */
-  LAYOUT (0xFFC03B00, 0x50, read_write),	/* NAND stub */
   LAYOUT (0xFFC03C00, 0xd00, read_write),	/* MUSB stub */
   LAYOUT (0xFEB00000, 0x20000, read_write_exec),	/* L2 */
   LAYOUT (0xFF800000, 0x4000, read_write),	/* Data A */
@@ -443,6 +444,7 @@ static const struct bfin_dev_layout bf542_dev[] = {
  _DEVICE (0xFFC02100, BFIN_MMR_UART2_SIZE, "bfin_uart2@2", 1),
  _DEVICE (0xFFC02900, BFIN_MMR_EPPI_SIZE,  "bfin_eppi@2", 1),
  _DEVICE (0xFFC03100, BFIN_MMR_UART2_SIZE, "bfin_uart2@3", 1),
+  DEVICE (0xFFC03B00, BFIN_MMR_NFC_SIZE,   "bfin_nfc"),
   DEVICE (0xFFC04300, BFIN_MMR_OTP_SIZE,   "bfin_otp"),
 };
 #define bf544_dev bf542_dev
@@ -454,6 +456,7 @@ static const struct bfin_dev_layout bf547_dev[] = {
  _DEVICE (0xFFC02100, BFIN_MMR_UART2_SIZE, "bfin_uart2@2", 1),
  _DEVICE (0xFFC02900, BFIN_MMR_EPPI_SIZE,  "bfin_eppi@2", 1),
  _DEVICE (0xFFC03100, BFIN_MMR_UART2_SIZE, "bfin_uart2@3", 1),
+  DEVICE (0xFFC03B00, BFIN_MMR_NFC_SIZE,   "bfin_nfc"),
 };
 #define bf548_dev bf547_dev
 #define bf549_dev bf547_dev
