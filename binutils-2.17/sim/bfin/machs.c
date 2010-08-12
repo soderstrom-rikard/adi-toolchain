@@ -142,9 +142,9 @@ static const struct bfin_dev_layout bf512_dev[] = {
   DEVICE (0xFFC00650, BFIN_MMR_GPTIMER_SIZE, "bfin_gptimer@5"),
   DEVICE (0xFFC00660, BFIN_MMR_GPTIMER_SIZE, "bfin_gptimer@6"),
   DEVICE (0xFFC00670, BFIN_MMR_GPTIMER_SIZE, "bfin_gptimer@7"),
-  DEVICE (0xFFC03600, BFIN_MMR_OTP_SIZE,     "bfin_otp"),
   DEVICE (0xFFC01000, BFIN_MMR_PPI_SIZE,     "bfin_ppi"),
   DEVICE (0xFFC02000, BFIN_MMR_UART_SIZE,    "bfin_uart@1"),
+  DEVICE (0xFFC03600, BFIN_MMR_OTP_SIZE,     "bfin_otp"),
 };
 #define bf514_dev bf512_dev
 static const struct bfin_dev_layout bf516_dev[] = {
@@ -157,11 +157,11 @@ static const struct bfin_dev_layout bf516_dev[] = {
   DEVICE (0xFFC00650, BFIN_MMR_GPTIMER_SIZE, "bfin_gptimer@5"),
   DEVICE (0xFFC00660, BFIN_MMR_GPTIMER_SIZE, "bfin_gptimer@6"),
   DEVICE (0xFFC00670, BFIN_MMR_GPTIMER_SIZE, "bfin_gptimer@7"),
-  DEVICE (0xFFC03600, BFIN_MMR_OTP_SIZE,     "bfin_otp"),
   DEVICE (0xFFC01000, BFIN_MMR_PPI_SIZE,     "bfin_ppi"),
   DEVICE (0xFFC02000, BFIN_MMR_UART_SIZE,    "bfin_uart@1"),
   DEVICE (0xFFC03000, BFIN_MMR_EMAC_SIZE,    "bfin_emac"),
   DEVICE (0, 0x20, "bfin_emac/eth_phy"),
+  DEVICE (0xFFC03600, BFIN_MMR_OTP_SIZE,     "bfin_otp"),
 };
 #define bf518_dev bf516_dev
 
@@ -207,9 +207,9 @@ static const struct bfin_dev_layout bf522_dev[] = {
   DEVICE (0xFFC00650, BFIN_MMR_GPTIMER_SIZE, "bfin_gptimer@5"),
   DEVICE (0xFFC00660, BFIN_MMR_GPTIMER_SIZE, "bfin_gptimer@6"),
   DEVICE (0xFFC00670, BFIN_MMR_GPTIMER_SIZE, "bfin_gptimer@7"),
-  DEVICE (0xFFC03600, BFIN_MMR_OTP_SIZE,     "bfin_otp"),
   DEVICE (0xFFC01000, BFIN_MMR_PPI_SIZE,     "bfin_ppi"),
   DEVICE (0xFFC02000, BFIN_MMR_UART_SIZE,    "bfin_uart@1"),
+  DEVICE (0xFFC03600, BFIN_MMR_OTP_SIZE,     "bfin_otp"),
 };
 #define bf523_dev bf522_dev
 #define bf524_dev bf522_dev
@@ -228,6 +228,7 @@ static const struct bfin_dev_layout bf526_dev[] = {
   DEVICE (0xFFC02000, BFIN_MMR_UART_SIZE,    "bfin_uart@1"),
   DEVICE (0xFFC03000, BFIN_MMR_EMAC_SIZE,    "bfin_emac"),
   DEVICE (0, 0x20, "bfin_emac/eth_phy"),
+  DEVICE (0xFFC03600, BFIN_MMR_OTP_SIZE,     "bfin_otp"),
 };
 #define bf527_dev bf526_dev
 
