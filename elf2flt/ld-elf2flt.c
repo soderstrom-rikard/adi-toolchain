@@ -503,7 +503,7 @@ int main(int argc, char *argv[])
 
 	   It's <TARGET_ALIAS>/ that we want here: files in lib/ are for
 	   the host while those in <TARGET_ALIAS>/lib are for the target.
-  	   Make bindir point to the bin dir for bin/<TARGET_ALIAS>-foo.
+	   Make bindir point to the bin dir for bin/<TARGET_ALIAS>-foo.
 	   Make tooldir point to the bin dir for <TARGET_ALIAS>/bin/foo.  */
 	if (streqn(elf2flt_progname, TARGET_ALIAS)) {
 		tmp = concat(argv0_dir, "../" TARGET_ALIAS "/bin/", NULL);
@@ -514,7 +514,6 @@ int main(int argc, char *argv[])
 		if (stat(tmp, &buf) == 0 && S_ISDIR(buf.st_mode))
 			bindir = tmp;
 	}
-		
 
 	/* Typically ld-elf2flt is invoked as `ld` which means error
 	 * messages from it will look like "ld: " which is completely
