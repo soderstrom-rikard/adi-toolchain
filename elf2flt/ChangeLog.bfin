@@ -1,3 +1,9 @@
+2010-08-14  Steve Kilbane  <stephen.kilbane@analog.com>
+
+	* ld-elf2flt.c: [#5675] Better patch, using libiberty's
+	make_relative_prefix() and lbasename() than /proc.
+	* stubs.h: undo previous change.
+
 2010-08-10  Steve Kilbane  <stephen.kilbane@analog.com>
 
 	* ld-elf2flt.c: [#5675] Use /proc/getpid()/exe to track down
