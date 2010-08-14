@@ -3,6 +3,7 @@
 
 #include "bf526-0.0.h"
 #include "bf526-0.1.h"
+#include "bf527-0.0.h"
 #include "bf527-0.1.h"
 #include "bf527-0.2.h"
 
