@@ -82,6 +82,20 @@ end
 document mdl
 Use 'help _md'
 end
+define mdq
+	if $argc == 1
+		md g $arg0
+	else
+		if $argc == 2
+			md g $arg0 $arg1
+		else
+			help _md
+		end
+	end
+end
+document mdq
+Use 'help _md'
+end
 define mdc
 	if $argc == 1
 		md c $arg0
