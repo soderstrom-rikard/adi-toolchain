@@ -10732,7 +10732,7 @@ $as_echo "#define OS_WINDOWS /**/" >>confdefs.h
 	{ $as_echo "$as_me:${as_lineno-$LINENO}: result: Windows" >&5
 $as_echo "Windows" >&6; }
 	backend="windows"
-	LIBS="-lpthreadGC2 -lsetupapi -lole32"
+	LIBS="-lpthreadGC2 -lsetupapi -lole32 -lcfgmgr32"
 	AM_CFLAGS="-Wshadow"
 	AM_LDFLAGS="-no-undefined"
 	;;
