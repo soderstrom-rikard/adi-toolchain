@@ -483,7 +483,7 @@ int main(int argc, char *argv[])
 
 #ifdef __WIN32
 	/* Remove the .exe extension, if it's there.  */
-	size_t len = stren(argv0);
+	size_t len = strlen(argv0);
 	if (len > 4 && streq(&argv0[len - 4], ".exe")) {
 		have_exe = ".exe";
 		len -= 4;
