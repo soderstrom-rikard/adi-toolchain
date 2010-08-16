@@ -1,5 +1,6 @@
 #include "bf51x-0.0.h"
 #include "bf51x-0.1.h"
+#include "bf51x-0.2.h"
 
 #include "bf526-0.0.h"
 #include "bf526-0.1.h"
