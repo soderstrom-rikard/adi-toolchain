@@ -11,8 +11,8 @@
  */
 
 /* This file should be up to date with:
- *  - Revision H, 07/10/2009; ADSP-BF538/BF538F Blackfin Processor Anomaly List
- *  - Revision M, 07/10/2009; ADSP-BF539/BF539F Blackfin Processor Anomaly List
+ *  - Revision I, 05/25/2010; ADSP-BF538/BF538F Blackfin Processor Anomaly List
+ *  - Revision N, 05/25/2010; ADSP-BF539/BF539F Blackfin Processor Anomaly List
  */
 
 #ifndef _MACH_ANOMALY_H_
