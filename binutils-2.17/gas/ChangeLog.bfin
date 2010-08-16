@@ -1,3 +1,7 @@
+2010-08-16  Mike Frysinger  <michael.frysinger@analog.com>
+
+	* config/tc-bfin.c (bfin_cpus[]): Add 0.2 for bf512/bf514/bf516/bf518.
+
 2010-07-30  Mike Frysinger  <michael.frysinger@analog.com>
 
 	* config/tc-bfin.c (bfin_cpus[]): Add 0.1 for bf592.
