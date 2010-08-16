@@ -20,6 +20,7 @@ case $host in
 	AC_MSG_RESULT([Linux])
 	backend="linux"
 	AC_CHECK_LIB(rt, clock_gettime)
+	PC_LIBS_PRIVATE="-lrt"
 	AM_LDFLAGS=""
 	;;
 *-darwin*)
@@ -28,11 +29,13 @@ case $host in
 	AC_DEFINE(USBI_OS_HANDLES_TIMEOUT, [], [Backend handles timeout])
 	AC_MSG_RESULT([Darwin/MacOS X])
 	backend="darwin"
-	AM_LDFLAGS="-Wl,-framework -Wl,IOKit -Wl,-framework -Wl,CoreFoundation -Wl,-prebind -no-undefined"
+	PC_LIBS_PRIVATE="-Wl,-framework,IOKit -Wl,-framework,CoreFoundation -Wl,-prebind -no-undefined"
+	AM_LDFLAGS=${PC_LIBS_PRIVATE}
 	;;
 *)
 	AC_MSG_ERROR([unsupported operating system])
 esac
+AC_SUBST(PC_LIBS_PRIVATE)
 
 AM_CONDITIONAL([OS_LINUX], [test "x$backend" == "xlinux"])
 AM_CONDITIONAL([OS_DARWIN], [test "x$backend" == "xdarwin"])
