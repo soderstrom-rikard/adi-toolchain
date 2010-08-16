@@ -1,3 +1,9 @@
+2010-08-16  Mike Frysinger  <michael.frysinger@analog.com>
+
+	* gcc.target/bfin/mcpu-bf512.c: Check SILICON_REVISION is 0x0002.
+	* gcc.target/bfin/mcpu-bf514.c, gcc.target/bfin/mcpu-bf516.c,
+ 	gcc.target/bfin/mcpu-bf518.c: Likewise.
+
 2010-07-30  Mike Frysinger  <michael.frysinger@analog.com>
 
 	* gcc.target/bfin/mcpu-bf592.c: Check SILICON_REVISION is 0x0001.
