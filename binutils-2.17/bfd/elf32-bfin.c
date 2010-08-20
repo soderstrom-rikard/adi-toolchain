@@ -2887,6 +2887,7 @@ bfinfdpic_relocate_section (bfd * output_bfd,
 						input_section->output_section)
 			 & (SEC_ALLOC | SEC_LOAD)) == (SEC_ALLOC | SEC_LOAD))
 		      {
+			bfd_vma eh_sec_offset, eh_fixup_offset;
 			if (_bfinfdpic_osec_readonly_p (output_bfd,
 						       input_section
 						       ->output_section))
@@ -2897,16 +2898,22 @@ bfinfdpic_relocate_section (bfd * output_bfd,
 			       name, input_bfd, input_section, rel->r_offset);
 			    return FALSE;
 			  }
+			eh_sec_offset = _bfd_elf_section_offset (output_bfd,
+								 info,
+								 input_section,
+								 rel->r_offset);
+			/* If the input section is marked as removed, just emit
+			   -1 as the relocation. */
+			if (eh_sec_offset == (bfd_vma)-1)
+			  eh_fixup_offset = eh_sec_offset;
+			else
+			  eh_fixup_offset = eh_sec_offset
+					    + input_section->output_section->vma
+					    + input_section->output_offset;
 			_bfinfdpic_add_rofixup (output_bfd,
-					       bfinfdpic_gotfixup_section
-					       (info),
-					       _bfd_elf_section_offset
-					       (output_bfd, info,
-						input_section, rel->r_offset)
-					       + input_section
-					       ->output_section->vma
-					       + input_section->output_offset,
-					       picrel);
+						bfinfdpic_gotfixup_section (info),
+						eh_fixup_offset,
+						picrel);
 		      }
 		  }
 		else if ((bfd_get_section_flags (output_bfd,

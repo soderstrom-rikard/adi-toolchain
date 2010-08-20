@@ -1,3 +1,9 @@
+2010-08-20  Steve Kilbane  <stephen.kilbane@analog.com>
+
+	* elf32-bfin.c: If _bfd_elf_section_offset() reports an input
+	section as removed, pass that along to  _bfinfdpic_add_rofixup()
+	instead of trying to compute an offset for a bogus fixup.
+
 2010-07-14  Mike Frysinger  <michael.frysinger@analog.com>
 
 	2006-12-31  H.J. Lu  <hongjiu.lu@intel.com>
