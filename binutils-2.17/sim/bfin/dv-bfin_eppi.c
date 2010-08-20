@@ -178,12 +178,8 @@ bfin_eppi_dma_write_buffer (struct hw *me, const void *source,
 			    unsigned nr_bytes,
 			    int violate_read_only_section)
 {
-  struct bfin_eppi *eppi = hw_data (me);
-  unsigned ret;
-
   HW_TRACE_DMA_WRITE ();
-
-  return nr_bytes;
+  return 0;
 }
 
 static const struct hw_port_descriptor bfin_eppi_ports[] = {
