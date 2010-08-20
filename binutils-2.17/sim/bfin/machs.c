@@ -31,6 +31,7 @@
 #include "dv-bfin_cec.h"
 #include "dv-bfin_ctimer.h"
 #include "dv-bfin_dma.h"
+#include "dv-bfin_dmac.h"
 #include "dv-bfin_ebiu_amc.h"
 #include "dv-bfin_ebiu_ddrc.h"
 #include "dv-bfin_ebiu_sdc.h"
@@ -59,6 +60,10 @@ struct bfin_dev_layout {
   unsigned int dmac;
   const char *dev;
 };
+struct bfin_dmac_layout {
+  address_word base;
+  unsigned int dma_count;
+};
 struct bfin_model_data {
   bu32 chipid;
   int model_num;
@@ -66,6 +71,8 @@ struct bfin_model_data {
   size_t mem_count;
   const struct bfin_dev_layout *dev;
   size_t dev_count;
+  const struct bfin_dmac_layout *dmac;
+  size_t dmac_count;
 };
 
 static const MACH bfin_mach;
@@ -86,6 +93,7 @@ const MACH *sim_machs[] =
 #define bf000_chipid 0
 static const struct bfin_memory_layout bf000_mem[] = {};
 static const struct bfin_dev_layout bf000_dev[] = {};
+static const struct bfin_dmac_layout bf000_dmac[] = {};
 
 #define bf50x_chipid 0x2800
 #define bf504_chipid bf50x_chipid
@@ -103,6 +111,11 @@ static const struct bfin_dev_layout bf50x_dev[] = {
 };
 #define bf504_dev bf50x_dev
 #define bf506_dev bf50x_dev
+static const struct bfin_dmac_layout bf50x_dmac[] = {
+  { BFIN_MMR_DMAC0_BASE, 12, },
+};
+#define bf504_dmac bf50x_dmac
+#define bf506_dmac bf50x_dmac
 
 #define bf51x_chipid 0x27e8
 #define bf512_chipid bf51x_chipid
@@ -165,6 +178,10 @@ static const struct bfin_dev_layout bf516_dev[] = {
   DEVICE (0xFFC03600, BFIN_MMR_OTP_SIZE,     "bfin_otp"),
 };
 #define bf518_dev bf516_dev
+#define bf512_dmac bf50x_dmac
+#define bf514_dmac bf50x_dmac
+#define bf516_dmac bf50x_dmac
+#define bf518_dmac bf50x_dmac
 
 #define bf522_chipid 0x27e4
 #define bf523_chipid 0x27e0
@@ -233,6 +250,12 @@ static const struct bfin_dev_layout bf526_dev[] = {
   DEVICE (0xFFC03700, BFIN_MMR_NFC_SIZE,     "bfin_nfc"),
 };
 #define bf527_dev bf526_dev
+#define bf522_dmac bf50x_dmac
+#define bf523_dmac bf50x_dmac
+#define bf524_dmac bf50x_dmac
+#define bf525_dmac bf50x_dmac
+#define bf526_dmac bf50x_dmac
+#define bf527_dmac bf50x_dmac
 
 #define bf531_chipid 0x27a5
 #define bf532_chipid bf531_chipid
@@ -283,6 +306,11 @@ static const struct bfin_dev_layout bf533_dev[] = {
 };
 #define bf531_dev bf533_dev
 #define bf532_dev bf533_dev
+static const struct bfin_dmac_layout bf533_dmac[] = {
+  { BFIN_MMR_DMAC0_BASE, 8, },
+};
+#define bf531_dmac bf533_dmac
+#define bf532_dmac bf533_dmac
 
 #define bf534_chipid 0x27c6
 #define bf536_chipid 0x27c8
@@ -368,6 +396,9 @@ static const struct bfin_dev_layout bf537_dev[] = {
   DEVICE (0, 0x20, "bfin_emac/eth_phy"),
 };
 #define bf536_dev bf537_dev
+#define bf534_dmac bf50x_dmac
+#define bf536_dmac bf50x_dmac
+#define bf537_dmac bf50x_dmac
 
 #define bf538_chipid 0x27c4
 #define bf539_chipid bf538_chipid
@@ -403,6 +434,11 @@ static const struct bfin_dev_layout bf538_dev[] = {
  _DEVICE (0xFFC02100, BFIN_MMR_UART_SIZE,    "bfin_uart@2", 1),
 };
 #define bf539_dev bf538_dev
+static const struct bfin_dmac_layout bf538_dmac[] = {
+  { BFIN_MMR_DMAC0_BASE,  8, },
+  { BFIN_MMR_DMAC1_BASE, 12, },
+};
+#define bf539_dmac bf538_dmac
 
 #define bf54x_chipid 0x27de
 #define bf542_chipid bf54x_chipid
@@ -460,6 +496,15 @@ static const struct bfin_dev_layout bf547_dev[] = {
 };
 #define bf548_dev bf547_dev
 #define bf549_dev bf547_dev
+static const struct bfin_dmac_layout bf54x_dmac[] = {
+  { BFIN_MMR_DMAC0_BASE, 12, },
+  { BFIN_MMR_DMAC1_BASE, 12, },
+};
+#define bf542_dmac bf54x_dmac
+#define bf544_dmac bf54x_dmac
+#define bf547_dmac bf54x_dmac
+#define bf548_dmac bf54x_dmac
+#define bf549_dmac bf54x_dmac
 
 /* This is only Core A of course ...  */
 #define bf561_chipid 0x27bb
@@ -483,14 +528,20 @@ static const struct bfin_dev_layout bf561_dev[] = {
  _DEVICE (0xFFC01000, BFIN_MMR_PPI_SIZE,  "bfin_ppi@0", 1),
  _DEVICE (0xFFC01300, BFIN_MMR_PPI_SIZE,  "bfin_ppi@1", 1),
 };
+static const struct bfin_dmac_layout bf561_dmac[] = {
+  { BFIN_MMR_DMAC0_BASE, 12, },
+  { BFIN_MMR_DMAC1_BASE, 12, },
+  /* XXX: IMDMA: { 0xFFC01800, 4, }, */
+};
 
 static const struct bfin_model_data bfin_model_data[] =
 {
 #define P(n) \
   [MODEL_BF##n] = { \
     bf##n##_chipid, n, \
-    bf##n##_mem, ARRAY_SIZE (bf##n##_mem), \
-    bf##n##_dev, ARRAY_SIZE (bf##n##_dev), \
+    bf##n##_mem , ARRAY_SIZE (bf##n##_mem ), \
+    bf##n##_dev , ARRAY_SIZE (bf##n##_dev ), \
+    bf##n##_dmac, ARRAY_SIZE (bf##n##_dmac), \
   },
 #include "_proc_list.h"
 #undef P
@@ -520,7 +571,7 @@ bfin_model_hw_tree_init (SIM_DESC sd, SIM_CPU *cpu)
   const MODEL *model = CPU_MODEL (cpu);
   const struct bfin_model_data *mdata = CPU_MODEL_DATA (cpu);
   int mnum = MODEL_NUM (model);
-  unsigned i, num_dmas, dmac;
+  unsigned i, j, dma_chan;
   int amc_size;
 
   /* Map the core devices.  */
@@ -567,77 +618,38 @@ bfin_model_hw_tree_init (SIM_DESC sd, SIM_CPU *cpu)
       sim_hw_parse (sd, "/core/bfin_rtc > rtc rtc /core/bfin_sic");
     }
 
-  /* XXX: Should be pushed to per-model structs.  */
-  dmac = 0;
-  sim_hw_parse (sd, "/core/bfin_dmac@%u/type %i", dmac, mdata->model_num);
-  switch (mdata->model_num)
+  dma_chan = 0;
+  for (i = 0; i < mdata->dmac_count; ++i)
     {
-    case 510 ... 519:
-    case 522 ... 527:
-    case 534:
-    case 536:
-    case 537:
-    case 540 ... 549:
-    case 561:
-      num_dmas = 16;
-      break;
-    case 531 ... 533:
-      num_dmas = 12;
-      break;
-    case 538 ... 539:
-      num_dmas = 12;
-      break;
-    default:
-      num_dmas = 16;
-      break;
-    }
-  for (i = 0; i < num_dmas; ++i)
-    {
-      sim_hw_parse (sd, "/core/bfin_dmac@%u/bfin_dma@%i/reg %#x %i", dmac, i,
-		    0xFFC00C00 + i * BFIN_MMR_DMA_SIZE, BFIN_MMR_DMA_SIZE);
-      if (i < num_dmas - 4)
+      const struct bfin_dmac_layout *dmac = &mdata->dmac[i];
+
+      sim_hw_parse (sd, "/core/bfin_dmac@%u/type %i", i, mdata->model_num);
+
+      /* Hook up the non-mdma channels.  */
+      for (j = 0; j < dmac->dma_count; ++j)
 	{
+	  sim_hw_parse (sd, "/core/bfin_dmac@%u/bfin_dma@%u/reg %#x %i", i,
+			dma_chan, dmac->base + j * BFIN_MMR_DMA_SIZE,
+			BFIN_MMR_DMA_SIZE);
+
 	  /* Could route these into the bfin_dmac and let that
 	     forward it to the SIC, but not much value.  */
-	  sim_hw_parse (sd, "/core/bfin_dmac@%u/bfin_dma@%i > di dma%i /core/bfin_sic", dmac, i, i);
+	  sim_hw_parse (sd, "/core/bfin_dmac@%u/bfin_dma@%u > di dma%u /core/bfin_sic",
+			i, dma_chan, dma_chan);
+
+	  ++dma_chan;
 	}
-    }
-  sim_hw_parse (sd, "/core/bfin_dmac@%u/bfin_dma@%i > di mdma0 /core/bfin_sic", dmac, num_dmas - 4);
-  sim_hw_parse (sd, "/core/bfin_dmac@%u/bfin_dma@%i > di mdma0 /core/bfin_sic", dmac, num_dmas - 3);
-  sim_hw_parse (sd, "/core/bfin_dmac@%u/bfin_dma@%i > di mdma1 /core/bfin_sic", dmac, num_dmas - 2);
-  sim_hw_parse (sd, "/core/bfin_dmac@%u/bfin_dma@%i > di mdma1 /core/bfin_sic", dmac, num_dmas - 1);
 
-  if (mdata->model_num == 538 || mdata->model_num == 539 || mdata->model_num == 561 ||
-      (mdata->model_num >= 540 && mdata->model_num <= 549))
-    {
-      unsigned int off;
-
-      switch (mdata->model_num)
+      /* Hook up the mdma channels -- assume every DMAC has 4.  */
+      for (j = 0; j < 4; ++j)
 	{
-	case 538: off = 8; break;
-	case 561: off = 16; break;
-	default: off = 12; break;
+	  sim_hw_parse (sd, "/core/bfin_dmac@%u/bfin_dma@%u/reg %#x %i",
+			i, j + BFIN_DMAC_MDMA_BASE,
+			dmac->base + (j + dmac->dma_count) * BFIN_MMR_DMA_SIZE,
+			BFIN_MMR_DMA_SIZE);
+	  sim_hw_parse (sd, "/core/bfin_dmac@%u/bfin_dma@%u > di mdma%u /core/bfin_sic",
+			i, j + BFIN_DMAC_MDMA_BASE, (2 * i) + (j / 2));
 	}
-      dmac = 1;
-      num_dmas = 16;
-
-      sim_hw_parse (sd, "/core/bfin_dmac@%u/type %i", dmac, mdata->model_num);
-
-      for (i = 0; i < num_dmas; ++i)
-	{
-	  sim_hw_parse (sd, "/core/bfin_dmac@%u/bfin_dma@%i/reg %#x %i", dmac, i + off,
-			0xFFC01C00 + i * BFIN_MMR_DMA_SIZE, BFIN_MMR_DMA_SIZE);
-	  if (i < num_dmas - 4)
-	    {
-	      /* Could route these into the bfin_dmac and let that
-	         forward it to the SIC, but not much value.  */
-	      sim_hw_parse (sd, "/core/bfin_dmac@%u/bfin_dma@%i > di dma%i /core/bfin_sic", dmac, i + off, i + off);
-	    }
-	}
-      sim_hw_parse (sd, "/core/bfin_dmac@%u/bfin_dma@%i > di mdma0 /core/bfin_sic", dmac, num_dmas - 4 + off);
-      sim_hw_parse (sd, "/core/bfin_dmac@%u/bfin_dma@%i > di mdma0 /core/bfin_sic", dmac, num_dmas - 3 + off);
-      sim_hw_parse (sd, "/core/bfin_dmac@%u/bfin_dma@%i > di mdma1 /core/bfin_sic", dmac, num_dmas - 2 + off);
-      sim_hw_parse (sd, "/core/bfin_dmac@%u/bfin_dma@%i > di mdma1 /core/bfin_sic", dmac, num_dmas - 1 + off);
     }
 
   for (i = 0; i < mdata->dev_count; ++i)

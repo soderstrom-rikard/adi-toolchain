@@ -14,8 +14,3 @@ the CEC to pop things off.
 R0 = [SP++]; gets traced as R0 = [P6++];
 
 merge dv-bfin_evt with dv-bfin_cec since the EVT regs are part of the CEC
-
-DMA channel counting is a little weird as the documentation counts
-	DMAC0: DMA0, DMA1, ... DMA12, DMA11, MDMA0 S/D, MDMA1 S/D
-	DMAC1: DMA12, DMA13, ...
-internally, MDMA0 is using "12" and "13" ...

@@ -36,8 +36,6 @@ struct bfin_dmac
 
   const char **pmap;
   unsigned int pmap_count;
-  const unsigned int *mdma_map;
-  unsigned int mdma_count;
 };
 
 struct hw *
@@ -53,10 +51,10 @@ bfin_dmac_get_peer (struct hw *dma, bu16 pmap)
     {
       /* MDMA channel.  */
       unsigned int chan_num = dv_get_bus_num (dma);
-      if (chan_num < dmac->mdma_count && dmac->mdma_map[chan_num])
-	chan_num = dmac->mdma_map[chan_num];
+      if (chan_num & 1)
+	chan_num &= ~1;
       else
-	hw_abort (me, "No map for mdma channel %i", chan_num);
+	chan_num |= 1;
       sprintf (peer, "%s/bfin_dma@%u", hw_path (me), chan_num);
     }
   else
@@ -81,20 +79,11 @@ bfin_dmac_default_pmap (struct hw *dma)
   struct hw *me = hw_parent (dma);
   struct bfin_dmac *dmac = hw_data (me);
   unsigned int chan_num = dv_get_bus_num (dma);
-  if (chan_num < dmac->pmap_count)
-    return chan_num << 12;
+  if (chan_num < BFIN_DMAC_MDMA_BASE)
+    return (chan_num % 12) << 12;
   else
     return CTYPE;	/* MDMA */
 }
-
-static const unsigned int bfin_dmac_51x_mdma_map[] = {
-  /* MDMA0 */
-  [12] = 13,
-  [13] = 12,
-  /* MDMA1 */
-  [14] = 15,
-  [15] = 14,
-};
 
 static const char *bfin_dmac_51x_pmap[] = {
   "ppi", "emac", "emac", "sport@0", "sport@0", "sport@1",
@@ -118,15 +107,6 @@ static const struct hw_port_descriptor bfin_dmac_51x_ports[] = {
   { "uart@1_rx",  10, 0, input_port, },
   { "uart@1_tx",  11, 0, input_port, },
   { NULL, 0, 0, 0, },
-};
-
-static const unsigned int bfin_dmac_52x_mdma_map[] = {
-  /* MDMA0 */
-  [12] = 13,
-  [13] = 12,
-  /* MDMA1 */
-  [14] = 15,
-  [15] = 14,
 };
 
 static const char *bfin_dmac_52x_pmap[] = {
@@ -155,15 +135,6 @@ static const struct hw_port_descriptor bfin_dmac_52x_ports[] = {
   { NULL, 0, 0, 0, },
 };
 
-static const unsigned int bfin_dmac_533_mdma_map[] = {
-  /* MDMA0 */
-  [8] = 9,
-  [9] = 8,
-  /* MDMA1 */
-  [10] = 11,
-  [11] = 10,
-};
-
 static const char *bfin_dmac_533_pmap[] = {
   "ppi", "sport@0", "sport@0", "sport@1", "sport@1", "spi",
   "uart@0", "uart@0",
@@ -179,15 +150,6 @@ static const struct hw_port_descriptor bfin_dmac_533_ports[] = {
   { "uart@0_tx",   6, 0, input_port, },
   { "uart@0_rx",   7, 0, input_port, },
   { NULL, 0, 0, 0, },
-};
-
-static const unsigned int bfin_dmac_537_mdma_map[] = {
-  /* MDMA0 */
-  [12] = 13,
-  [13] = 12,
-  /* MDMA1 */
-  [14] = 15,
-  [15] = 14,
 };
 
 static const char *bfin_dmac_537_pmap[] = {
@@ -211,15 +173,6 @@ static const struct hw_port_descriptor bfin_dmac_537_ports[] = {
   { NULL, 0, 0, 0, },
 };
 
-static const unsigned int bfin_dmac0_538_mdma_map[] = {
-  /* MDMA0 */
-  [8] = 9,
-  [9] = 8,
-  /* MDMA1 */
-  [10] = 11,
-  [11] = 10,
-};
-
 static const char *bfin_dmac0_538_pmap[] = {
   "ppi", "sport@0", "sport@0", "sport@1", "sport@1", "spi@0",
   "uart@0", "uart@0",
@@ -235,15 +188,6 @@ static const struct hw_port_descriptor bfin_dmac0_538_ports[] = {
   { "uart@0_rx",   6, 0, input_port, },
   { "uart@0_tx",   7, 0, input_port, },
   { NULL, 0, 0, 0, },
-};
-
-static const unsigned int bfin_dmac1_538_mdma_map[] = {
-  /* MDMA0 */
-  [12] = 13,
-  [13] = 12,
-  /* MDMA1 */
-  [14] = 15,
-  [15] = 14,
 };
 
 static const char *bfin_dmac1_538_pmap[] = {
@@ -265,15 +209,6 @@ static const struct hw_port_descriptor bfin_dmac1_538_ports[] = {
   { NULL, 0, 0, 0, },
 };
 
-static const unsigned int bfin_dmac0_54x_mdma_map[] = {
-  /* MDMA0 */
-  [12] = 13,
-  [13] = 12,
-  /* MDMA1 */
-  [14] = 15,
-  [15] = 14,
-};
-
 static const char *bfin_dmac0_54x_pmap[] = {
   "sport@0", "sport@0", "sport@1", "sport@1", "spi@0", "spi@1",
   "uart2@0", "uart2@0", "uart2@1", "uart2@1", "atapi", "atapi",
@@ -293,15 +228,6 @@ static const struct hw_port_descriptor bfin_dmac0_54x_ports[] = {
   { "atapi",      10, 0, input_port, },
   { "atapi",      11, 0, input_port, },
   { NULL, 0, 0, 0, },
-};
-
-static const unsigned int bfin_dmac1_54x_mdma_map[] = {
-  /* MDMA0 */
-  [12] = 13,
-  [13] = 12,
-  /* MDMA1 */
-  [14] = 15,
-  [15] = 14,
 };
 
 static const char *bfin_dmac1_54x_pmap[] = {
@@ -331,15 +257,6 @@ static const struct hw_port_descriptor bfin_dmac1_54x_ports[] = {
   { NULL, 0, 0, 0, },
 };
 
-static const unsigned int bfin_dmac0_561_mdma_map[] = {
-  /* MDMA0 */
-  [12] = 13,
-  [13] = 12,
-  /* MDMA1 */
-  [14] = 15,
-  [15] = 14,
-};
-
 static const char *bfin_dmac0_561_pmap[] = {
   "sport@0", "sport@0", "sport@1", "sport@1", "spi", "uart@0", "uart@0",
 };
@@ -353,15 +270,6 @@ static const struct hw_port_descriptor bfin_dmac0_561_ports[] = {
   { "uart@0_rx",   5, 0, input_port, },
   { "uart@0_tx",   6, 0, input_port, },
   { NULL, 0, 0, 0, },
-};
-
-static const unsigned int bfin_dmac1_561_mdma_map[] = {
-  /* MDMA0 */
-  [28] = 29,
-  [29] = 28,
-  /* MDMA1 */
-  [30] = 31,
-  [31] = 30,
 };
 
 static const char *bfin_dmac1_561_pmap[] = {
@@ -421,8 +329,6 @@ bfin_dmac_finish (struct hw *me)
 	hw_abort (me, "this Blackfin only has a DMAC0");
       dmac->pmap = bfin_dmac_51x_pmap;
       dmac->pmap_count = ARRAY_SIZE (bfin_dmac_51x_pmap);
-      dmac->mdma_map = bfin_dmac_51x_mdma_map;
-      dmac->mdma_count = ARRAY_SIZE (bfin_dmac_51x_mdma_map);
       set_hw_ports (me, bfin_dmac_51x_ports);
       break;
     case 522 ... 527:
@@ -430,8 +336,6 @@ bfin_dmac_finish (struct hw *me)
 	hw_abort (me, "this Blackfin only has a DMAC0");
       dmac->pmap = bfin_dmac_52x_pmap;
       dmac->pmap_count = ARRAY_SIZE (bfin_dmac_52x_pmap);
-      dmac->mdma_map = bfin_dmac_52x_mdma_map;
-      dmac->mdma_count = ARRAY_SIZE (bfin_dmac_52x_mdma_map);
       set_hw_ports (me, bfin_dmac_52x_ports);
       break;
     case 531 ... 533:
@@ -439,8 +343,6 @@ bfin_dmac_finish (struct hw *me)
 	hw_abort (me, "this Blackfin only has a DMAC0");
       dmac->pmap = bfin_dmac_533_pmap;
       dmac->pmap_count = ARRAY_SIZE (bfin_dmac_533_pmap);
-      dmac->mdma_map = bfin_dmac_533_mdma_map;
-      dmac->mdma_count = ARRAY_SIZE (bfin_dmac_533_mdma_map);
       set_hw_ports (me, bfin_dmac_533_ports);
       break;
     case 534:
@@ -450,8 +352,6 @@ bfin_dmac_finish (struct hw *me)
 	hw_abort (me, "this Blackfin only has a DMAC0");
       dmac->pmap = bfin_dmac_537_pmap;
       dmac->pmap_count = ARRAY_SIZE (bfin_dmac_537_pmap);
-      dmac->mdma_map = bfin_dmac_537_mdma_map;
-      dmac->mdma_count = ARRAY_SIZE (bfin_dmac_537_mdma_map);
       set_hw_ports (me, bfin_dmac_537_ports);
       break;
     case 538 ... 539:
@@ -460,15 +360,11 @@ bfin_dmac_finish (struct hw *me)
 	case 0:
 	  dmac->pmap = bfin_dmac0_538_pmap;
 	  dmac->pmap_count = ARRAY_SIZE (bfin_dmac0_538_pmap);
-	  dmac->mdma_map = bfin_dmac0_538_mdma_map;
-	  dmac->mdma_count = ARRAY_SIZE (bfin_dmac0_538_mdma_map);
 	  set_hw_ports (me, bfin_dmac0_538_ports);
 	  break;
 	case 1:
 	  dmac->pmap = bfin_dmac1_538_pmap;
 	  dmac->pmap_count = ARRAY_SIZE (bfin_dmac1_538_pmap);
-	  dmac->mdma_map = bfin_dmac1_538_mdma_map;
-	  dmac->mdma_count = ARRAY_SIZE (bfin_dmac1_538_mdma_map);
 	  set_hw_ports (me, bfin_dmac1_538_ports);
 	  break;
 	default:
@@ -481,15 +377,11 @@ bfin_dmac_finish (struct hw *me)
 	case 0:
 	  dmac->pmap = bfin_dmac0_54x_pmap;
 	  dmac->pmap_count = ARRAY_SIZE (bfin_dmac0_54x_pmap);
-	  dmac->mdma_map = bfin_dmac0_54x_mdma_map;
-	  dmac->mdma_count = ARRAY_SIZE (bfin_dmac0_54x_mdma_map);
 	  set_hw_ports (me, bfin_dmac0_54x_ports);
 	  break;
 	case 1:
 	  dmac->pmap = bfin_dmac1_54x_pmap;
 	  dmac->pmap_count = ARRAY_SIZE (bfin_dmac1_54x_pmap);
-	  dmac->mdma_map = bfin_dmac1_54x_mdma_map;
-	  dmac->mdma_count = ARRAY_SIZE (bfin_dmac1_54x_mdma_map);
 	  set_hw_ports (me, bfin_dmac1_54x_ports);
 	  break;
 	default:
@@ -502,15 +394,11 @@ bfin_dmac_finish (struct hw *me)
 	case 0:
 	  dmac->pmap = bfin_dmac0_561_pmap;
 	  dmac->pmap_count = ARRAY_SIZE (bfin_dmac0_561_pmap);
-	  dmac->mdma_map = bfin_dmac0_561_mdma_map;
-	  dmac->mdma_count = ARRAY_SIZE (bfin_dmac0_561_mdma_map);
 	  set_hw_ports (me, bfin_dmac0_561_ports);
 	  break;
 	case 1:
 	  dmac->pmap = bfin_dmac1_561_pmap;
 	  dmac->pmap_count = ARRAY_SIZE (bfin_dmac1_561_pmap);
-	  dmac->mdma_map = bfin_dmac1_561_mdma_map;
-	  dmac->mdma_count = ARRAY_SIZE (bfin_dmac1_561_mdma_map);
 	  set_hw_ports (me, bfin_dmac1_561_ports);
 	  break;
 	default:

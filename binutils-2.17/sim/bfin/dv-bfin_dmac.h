@@ -21,6 +21,11 @@
 #ifndef DV_BFIN_DMAC_H
 #define DV_BFIN_DMAC_H
 
+#define BFIN_MMR_DMAC0_BASE	0xFFC00C00
+#define BFIN_MMR_DMAC1_BASE	0xFFC01C00
+
+#define BFIN_DMAC_MDMA_BASE	0x100
+
 struct hw *bfin_dmac_get_peer (struct hw *dma, bu16 pmap);
 bu16 bfin_dmac_default_pmap (struct hw *dma);
 
