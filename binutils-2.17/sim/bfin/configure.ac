@@ -35,6 +35,7 @@ SIM_AC_OPTION_HARDWARE(yes,,\
 	bfin_ppi \
 	bfin_rtc \
 	bfin_sic \
+	bfin_spi \
 	bfin_trace \
 	bfin_uart \
 	bfin_uart2 \
