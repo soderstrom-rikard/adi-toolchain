@@ -25,4 +25,8 @@
 /* XXX: This should be pushed into the model data.  */
 #define BFIN_MMR_PPI_SIZE	(4 * 5)
 
+/* PPI_CONTROL Masks.  */
+#define PORT_EN		(1 << 0)
+#define PORT_DIR	(1 << 1)
+
 #endif

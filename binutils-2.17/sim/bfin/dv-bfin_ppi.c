@@ -21,6 +21,13 @@
 
 #include "config.h"
 
+#ifdef HAVE_SDL
+# include <SDL.h>
+#endif
+#ifdef HAVE_DLFCN_H
+# include <dlfcn.h>
+#endif
+
 #include "sim-main.h"
 #include "devices.h"
 #include "dv-bfin_ppi.h"
@@ -38,6 +45,15 @@ struct bfin_ppi
   char saved_byte;
   int saved_count;
 
+  /* GUI state.  */
+  bool initialized;
+  int throttle, throttle_limit;
+  int bpp;  /* _bytes_ per pixel */
+  int curr_line;
+#ifdef HAVE_SDL
+  SDL_Surface *screen;
+#endif
+
   /* Order after here is important -- matches hardware MMR layout.  */
   bu16 BFIN_MMR_16(control);
   bu16 BFIN_MMR_16(status);
@@ -53,9 +69,157 @@ static const char * const mmr_names[] = {
 };
 #define mmr_name(off) mmr_names[(off) / 4]
 
+#ifdef HAVE_SDL
+
+static struct {
+  void *handle;
+  int (*Init) (Uint32 flags);
+  void (*Quit) (void);
+  SDL_Surface *(*SetVideoMode) (int width, int height, int bpp, Uint32 flags);
+  void (*WM_SetCaption) (const char *title, const char *icon);
+  int (*ShowCursor) (int toggle);
+  int (*LockSurface) (SDL_Surface *surface);
+  void (*UnlockSurface) (SDL_Surface *surface);
+  Uint32 (*MapRGB) (const SDL_PixelFormat * const format, const Uint8 r, const Uint8 g, const Uint8 b);
+  void (*UpdateRect) (SDL_Surface *screen, Sint32 x, Sint32 y, Uint32 w, Uint32 h);
+} sdl;
+static const char * const sdl_syms[] = {
+  "SDL_Init",
+  "SDL_Quit",
+  "SDL_SetVideoMode",
+  "SDL_WM_SetCaption",
+  "SDL_ShowCursor",
+  "SDL_LockSurface",
+  "SDL_UnlockSurface",
+  "SDL_MapRGB",
+  "SDL_UpdateRect",
+};
+
+static void
+bfin_ppi_gui_setup (struct bfin_ppi *ppi)
+{
+  /* If we are in TX mode, no display here.  */
+  if (!(ppi->control & PORT_DIR))
+    return;
+
+  /* Load the SDL lib on the fly to avoid hard linking against it.  */
+  if (sdl.handle == NULL)
+    {
+      int i;
+      uintptr_t **funcs;
+
+      sdl.handle = dlopen ("libSDL-1.2.so.0", RTLD_LAZY);
+      if (sdl.handle == NULL)
+	return;
+
+      funcs = (void *) &sdl.Init;
+      for (i = 0; i < ARRAY_SIZE (sdl_syms); ++i)
+	{
+	  funcs[i] = dlsym (sdl.handle, sdl_syms[i]);
+	  if (funcs[i] == NULL)
+	    {
+	      dlclose (sdl.handle);
+	      sdl.handle = NULL;
+	      return;
+	    }
+	}
+    }
+
+  /* Create an SDL window if enabled and we don't have one yet.  */
+  if ((ppi->control & PORT_EN) && !ppi->initialized)
+    {
+      /* XXX: ppi->count must be non-zero ...  */
+      if (sdl.Init (SDL_INIT_VIDEO))
+	return;
+
+      ppi->screen = sdl.SetVideoMode ((ppi->count + 1) / ppi->bpp,
+				      ppi->frame,
+				      ppi->bpp * 8,
+				      SDL_ANYFORMAT|SDL_HWSURFACE);
+      if (!ppi->screen)
+	{
+	  sdl.Quit();
+	  return;
+	}
+
+      sdl.WM_SetCaption ("GDB Blackfin Simulator", NULL);
+      sdl.ShowCursor (0);
+      ppi->throttle = 0;
+      ppi->curr_line = 0;
+      ppi->initialized = true;
+    }
+
+  /* Else break down a window if disabled and we had one.  */
+  else if (!(ppi->control & PORT_EN) && ppi->initialized)
+    {
+      sdl.Quit();
+      ppi->initialized = false;
+    }
+}
+
 static unsigned
-bfin_ppi_io_write_buffer (struct hw *me, const void *source,
-			   int space, address_word addr, unsigned nr_bytes)
+bfin_ppi_gui_update (struct bfin_ppi *ppi, const void *source,
+		     unsigned nr_bytes)
+{
+  const Uint8 *src;
+  Uint32 *pixels;
+  unsigned i;
+
+  if (sdl.handle == NULL)
+    return 0;
+
+  if (sdl.LockSurface(ppi->screen))
+    return 0;
+
+  src = source;
+  pixels = ppi->screen->pixels;
+  pixels += (ppi->curr_line * ppi->screen->w);
+  switch (ppi->bpp)
+    {
+    case 4: /* RGBA */
+      memcpy(pixels, src, nr_bytes);
+      break;
+
+    case 3: /* RGB888 */
+      for (i = 0; i < ppi->screen->w; ++i)
+	{
+	  *pixels++ = sdl.MapRGB(ppi->screen->format, src[0], src[1], src[2]);
+	  src += ppi->bpp;
+	}
+      break;
+
+    case 2: /* RGB565 */
+      /* XXX: todo ...  */
+      break;
+    }
+
+  sdl.UnlockSurface(ppi->screen);
+
+  sdl.UpdateRect(ppi->screen, 0, ppi->curr_line, ppi->screen->w, 1);
+  ppi->curr_line = ++ppi->curr_line % ppi->frame;
+
+  return nr_bytes;
+}
+
+#else
+
+static void
+bfin_ppi_gui_setup (struct bfin_ppi *ppi)
+{
+}
+
+static unsigned
+bfin_ppi_gui_update (struct bfin_ppi *ppi, const void *source,
+		     unsigned nr_bytes)
+{
+  return 0;
+}
+
+#endif
+
+static unsigned
+bfin_ppi_io_write_buffer (struct hw *me, const void *source, int space,
+			  address_word addr, unsigned nr_bytes)
 {
   struct bfin_ppi *ppi = hw_data (me);
   bu32 mmr_off;
@@ -73,6 +237,9 @@ bfin_ppi_io_write_buffer (struct hw *me, const void *source,
   switch (mmr_off)
     {
     case mmr_offset(control):
+      *valuep = value;
+      bfin_ppi_gui_setup (ppi);
+      break;
     case mmr_offset(count):
     case mmr_offset(delay):
     case mmr_offset(frame):
@@ -90,8 +257,8 @@ bfin_ppi_io_write_buffer (struct hw *me, const void *source,
 }
 
 static unsigned
-bfin_ppi_io_read_buffer (struct hw *me, void *dest,
-			  int space, address_word addr, unsigned nr_bytes)
+bfin_ppi_io_read_buffer (struct hw *me, void *dest, int space,
+			 address_word addr, unsigned nr_bytes)
 {
   struct bfin_ppi *ppi = hw_data (me);
   bu32 mmr_off;
@@ -123,7 +290,7 @@ bfin_ppi_io_read_buffer (struct hw *me, void *dest,
 
 static unsigned
 bfin_ppi_dma_read_buffer (struct hw *me, void *dest, int space,
-			   unsigned_word addr, unsigned nr_bytes)
+			  unsigned_word addr, unsigned nr_bytes)
 {
   HW_TRACE_DMA_READ ();
   return 0;
@@ -131,16 +298,23 @@ bfin_ppi_dma_read_buffer (struct hw *me, void *dest, int space,
 
 static unsigned
 bfin_ppi_dma_write_buffer (struct hw *me, const void *source,
-			    int space, unsigned_word addr,
-			    unsigned nr_bytes,
-			    int violate_read_only_section)
+			   int space, unsigned_word addr,
+			   unsigned nr_bytes,
+			   int violate_read_only_section)
 {
   struct bfin_ppi *ppi = hw_data (me);
-  unsigned ret;
 
   HW_TRACE_DMA_WRITE ();
 
-  return 0;
+  if (!ppi->initialized)
+    return 0;
+
+  /* XXX: Make this an option ?  */
+  ppi->throttle = (ppi->throttle + 1) & ppi->throttle_limit;
+  if (ppi->throttle)
+    return 0;
+
+  return bfin_ppi_gui_update (ppi, source, nr_bytes);
 }
 
 static const struct hw_port_descriptor bfin_ppi_ports[] = {
@@ -191,6 +365,12 @@ bfin_ppi_finish (struct hw *me)
   set_hw_ports (me, bfin_ppi_ports);
 
   attach_bfin_ppi_regs (me, ppi);
+
+  /* Initialize the PPI.  */
+  ppi->initialized = false;
+  /* XXX: Make these a dev tree argument.  */
+  ppi->bpp = 24 / 8;
+  ppi->throttle_limit = 0xf;
 }
 
 const struct hw_descriptor dv_bfin_ppi_descriptor[] = {

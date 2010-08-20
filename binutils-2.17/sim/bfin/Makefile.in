@@ -45,6 +45,9 @@ SIM_OBJS = \
 
 INCLUDE = bfin-sim.h
 
+SIM_EXTRA_CFLAGS = @SDL_CFLAGS@
+SIM_EXTRA_LIBS = @SDL_LIBS@
+
 ## COMMON_POST_CONFIG_FRAG
 
 interp.o: interp.c targ-vals.h targ-linux.h devices.h $(INCLUDE)
