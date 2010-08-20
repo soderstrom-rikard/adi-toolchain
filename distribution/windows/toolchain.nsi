@@ -101,7 +101,7 @@ SectionEnd
 
 Section "Examples" SecExamples
   SetOutPath "$INSTDIR\examples"
-  File /r "..\examples\*"
+  File /r "..\..\examples\*"
 SectionEnd
 
 LangString DESC_SecNEWLIB ${LANG_ENGLISH} "Blackfin Toolchain for running on bare metal (no operating system)"
