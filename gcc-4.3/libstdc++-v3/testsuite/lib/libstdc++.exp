@@ -190,7 +190,7 @@ proc libstdc++_init { testfile } {
     # Default settings.
     set cxx [transform "g++"]
     set cxxflags "-g -O2 -D_GLIBCXX_ASSERT -fmessage-length=0"
-    if { [string match "bfin-*-*" $target_triplet] } {
+    if { [string match "bfin-elf-*" $target_triplet] } {
         append cxxflags " -Wl,--gc-sections"
     }
     set cxxpchflags ""
