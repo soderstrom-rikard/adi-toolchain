@@ -28,7 +28,7 @@ unsigned bfin_gui_update (void *state, const void *source, unsigned nr_bytes);
 
 #else
 
-# define bfin_gui_init(...)   NULL
+# define bfin_gui_setup(...)   NULL
 # define bfin_gui_update(...) 0
 
 #endif
