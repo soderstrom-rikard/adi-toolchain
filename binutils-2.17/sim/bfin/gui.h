@@ -23,13 +23,25 @@
 
 #ifdef HAVE_SDL
 
-void *bfin_gui_setup (void *state, int enabled, int height, int width, int bpp);
+enum gui_color {
+  GUI_COLOR_RGB_565,
+  GUI_COLOR_RGB_888,
+  GUI_COLOR_RGBA_8888,
+};
+enum gui_color bfin_gui_color (const char *color);
+int bfin_gui_color_depth (enum gui_color color);
+
+void *bfin_gui_setup (void *state, int enabled, int height, int width,
+		      enum gui_color color);
+
 unsigned bfin_gui_update (void *state, const void *source, unsigned nr_bytes);
 
 #else
 
-# define bfin_gui_setup(...)   NULL
-# define bfin_gui_update(...) 0
+# define bfin_gui_color(...)		0
+# define bfin_gui_color_depth(...)	0
+# define bfin_gui_setup(...)		NULL
+# define bfin_gui_update(...)		0
 
 #endif
 

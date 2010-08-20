@@ -41,7 +41,7 @@ struct bfin_ppi
 
   /* GUI state.  */
   void *gui_state;
-  int bytespp;
+  int color;
 
   /* Order after here is important -- matches hardware MMR layout.  */
   bu16 BFIN_MMR_16(control);
@@ -61,15 +61,18 @@ static const char * const mmr_names[] = {
 static void
 bfin_ppi_gui_setup (struct bfin_ppi *ppi)
 {
+  int bpp;
+
   /* If we are in RX mode, nothing to do.  */
   if (!(ppi->control & PORT_DIR))
     return;
 
+  bpp = bfin_gui_color_depth (ppi->color);
   ppi->gui_state = bfin_gui_setup (ppi->gui_state,
 				   ppi->control & PORT_EN,
-				   (ppi->count + 1) / ppi->bytespp,
+				   (ppi->count + 1) / (bpp / 8),
 				   ppi->frame,
-				   ppi->bytespp * 8);
+				   ppi->color);
 }
 
 static unsigned
@@ -201,6 +204,7 @@ static void
 bfin_ppi_finish (struct hw *me)
 {
   struct bfin_ppi *ppi;
+  const char *color;
 
   ppi = HW_ZALLOC (me, struct bfin_ppi);
 
@@ -214,8 +218,11 @@ bfin_ppi_finish (struct hw *me)
   attach_bfin_ppi_regs (me, ppi);
 
   /* Initialize the PPI.  */
-  /* XXX: Make this a dev tree argument.  */
-  ppi->bytespp = 24 / 8;
+  if (hw_find_property (me, "color"))
+    color = hw_find_string_property (me, "color");
+  else
+    color = NULL;
+  ppi->color = bfin_gui_color (color);
 }
 
 const struct hw_descriptor dv_bfin_ppi_descriptor[] = {

@@ -60,11 +60,13 @@ static const char * const sdl_syms[] = {
 struct gui_state {
   SDL_Surface *screen;
   int throttle, throttle_limit;
+  enum gui_color color;
   int bpp, curr_line;
 };
 
 void *
-bfin_gui_setup (void *state, int enabled, int width, int height, int bpp)
+bfin_gui_setup (void *state, int enabled, int width, int height,
+		enum gui_color color)
 {
   /* Load the SDL lib on the fly to avoid hard linking against it.  */
   if (sdl.handle == NULL)
@@ -99,7 +101,9 @@ bfin_gui_setup (void *state, int enabled, int width, int height, int bpp)
       if (sdl.Init (SDL_INIT_VIDEO))
 	goto error;
 
-      gui->screen = sdl.SetVideoMode (width, height, bpp,
+      gui->color = color;
+      gui->bpp = bfin_gui_color_depth (gui->color);
+      gui->screen = sdl.SetVideoMode (width, height, gui->bpp,
 				      SDL_ANYFORMAT|SDL_HWSURFACE);
       if (!gui->screen)
 	{
@@ -109,7 +113,6 @@ bfin_gui_setup (void *state, int enabled, int width, int height, int bpp)
 
       sdl.WM_SetCaption ("GDB Blackfin Simulator", NULL);
       sdl.ShowCursor (0);
-      gui->bpp = bpp;
       gui->curr_line = 0;
       gui->throttle = 0;
       gui->throttle_limit = 0xf; /* XXX: let people control this ?  */
@@ -154,13 +157,13 @@ bfin_gui_update (void *state, const void *source, unsigned nr_bytes)
   src = source;
   pixels = gui->screen->pixels;
   pixels += (gui->curr_line * gui->screen->w);
-  switch (gui->bpp) /* XXX: Use gui->screen->format.  */
+  switch (gui->color)
     {
-    case 32: /* RGBA */
+    case GUI_COLOR_RGBA_8888:
       memcpy(pixels, src, nr_bytes);
       break;
 
-    case 24: /* RGB888 */
+    case GUI_COLOR_RGB_888:
       for (i = 0; i < gui->screen->w; ++i)
 	{
 	  *pixels++ = sdl.MapRGB(gui->screen->format, src[0], src[1], src[2]);
@@ -168,7 +171,7 @@ bfin_gui_update (void *state, const void *source, unsigned nr_bytes)
 	}
       break;
 
-    case 16: /* RGB565 */
+    case GUI_COLOR_RGB_565:
       /* XXX: todo ...  */
       break;
     }
@@ -179,6 +182,43 @@ bfin_gui_update (void *state, const void *source, unsigned nr_bytes)
   gui->curr_line = ++gui->curr_line % gui->screen->h;
 
   return nr_bytes;
+}
+
+static const struct {
+  const char *name;
+  int depth;
+  enum gui_color color;
+} color_spaces[] = {
+  { "rgb565",   16, GUI_COLOR_RGB_565,   },
+  { "rgb888",   24, GUI_COLOR_RGB_888,   },
+  { "rgba8888", 32, GUI_COLOR_RGBA_8888, },
+};
+
+enum gui_color bfin_gui_color (const char *color)
+{
+  int i;
+
+  if (!color)
+    goto def;
+
+  for (i = 0; i < ARRAY_SIZE (color_spaces); ++i)
+    if (!strcmp (color, color_spaces[i].name))
+      return color_spaces[i].color;
+
+  /* Pick a random default.  */
+ def:
+  return GUI_COLOR_RGB_888;
+}
+
+int bfin_gui_color_depth (enum gui_color color)
+{
+  int i;
+
+  for (i = 0; i < ARRAY_SIZE (color_spaces); ++i)
+    if (color == color_spaces[i].color)
+      return color_spaces[i].depth;
+
+  return 0;
 }
 
 #endif

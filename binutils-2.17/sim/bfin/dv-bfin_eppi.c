@@ -41,7 +41,7 @@ struct bfin_eppi
 
   /* GUI state.  */
   void *gui_state;
-  int bytespp;
+  int color;
 
   /* Order after here is important -- matches hardware MMR layout.  */
   bu16 BFIN_MMR_16(status);
@@ -75,7 +75,7 @@ bfin_eppi_gui_setup (struct bfin_eppi *eppi)
 				    eppi->control & PORT_EN,
 				    eppi->hcount,
 				    eppi->vcount,
-				    eppi->bytespp * 8);
+				    eppi->color);
 }
 
 static unsigned
@@ -244,6 +244,7 @@ static void
 bfin_eppi_finish (struct hw *me)
 {
   struct bfin_eppi *eppi;
+  const char *color;
 
   eppi = HW_ZALLOC (me, struct bfin_eppi);
 
@@ -257,8 +258,11 @@ bfin_eppi_finish (struct hw *me)
   attach_bfin_eppi_regs (me, eppi);
 
   /* Initialize the EPPI.  */
-  /* XXX: Make this a dev tree argument.  */
-  eppi->bytespp = 24 / 8;
+  if (hw_find_property (me, "color"))
+    color = hw_find_string_property (me, "color");
+  else
+    color = NULL;
+  eppi->color = bfin_gui_color (color);
 }
 
 const struct hw_descriptor dv_bfin_eppi_descriptor[] = {
