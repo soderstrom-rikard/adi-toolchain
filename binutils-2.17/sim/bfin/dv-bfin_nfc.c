@@ -58,11 +58,12 @@ struct bfin_nfc
 };
 #define mmr_base()      offsetof(struct bfin_nfc, ctl)
 #define mmr_offset(mmr) (offsetof(struct bfin_nfc, mmr) - mmr_base())
+#define mmr_idx(mmr)    (mmr_offset (mmr) / 4)
 
 static const char * const mmr_names[] = {
   "NFC_CTL", "NFC_STAT", "NFC_IRQSTAT", "NFC_IRQMASK", "NFC_ECC0", "NFC_ECC1",
   "NFC_ECC2", "NFC_ECC3", "NFC_COUNT", "NFC_RST", "NFC_PGCTL", "NFC_READ",
-  "NFC_ADDR", "NFC_CMD", "NFC_DATA_WR", "NFC_DATA_RD",
+  [mmr_idx (addr)] = "NFC_ADDR", "NFC_CMD", "NFC_DATA_WR", "NFC_DATA_RD",
 };
 #define mmr_name(off) (mmr_names[(off) / 4] ? : "<INV>")
 
