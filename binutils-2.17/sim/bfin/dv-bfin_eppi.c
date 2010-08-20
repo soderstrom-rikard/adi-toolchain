@@ -24,8 +24,9 @@
 #include "sim-main.h"
 #include "devices.h"
 #include "dv-bfin_eppi.h"
+#include "gui.h"
 
-/* XXX: This is merely a stub.  Maybe put a simple SDL window up ?  */
+/* XXX: TX is merely a stub.  */
 
 struct bfin_eppi
 {
@@ -37,6 +38,10 @@ struct bfin_eppi
   struct hw_event *handler;
   char saved_byte;
   int saved_count;
+
+  /* GUI state.  */
+  void *gui_state;
+  int bytespp;
 
   /* Order after here is important -- matches hardware MMR layout.  */
   bu16 BFIN_MMR_16(status);
@@ -58,6 +63,20 @@ static const char * const mmr_names[] = {
   "EPPI_FS1P_AVPL", "EPPI_FS2W_LVB", "EPPI_FS2P_LAVF", "EPPI_CLIP", "EPPI_ERR",
 };
 #define mmr_name(off) (mmr_names[(off) / 4] ? : "<INV>")
+
+static void
+bfin_eppi_gui_setup (struct bfin_eppi *eppi)
+{
+  /* If we are in RX mode, nothing to do.  */
+  if (!(eppi->control & PORT_DIR))
+    return;
+
+  eppi->gui_state = bfin_gui_setup (eppi->gui_state,
+				    eppi->control & PORT_EN,
+				    eppi->hcount,
+				    eppi->vcount,
+				    eppi->bytespp * 8);
+}
 
 static unsigned
 bfin_eppi_io_write_buffer (struct hw *me, const void *source,
@@ -99,6 +118,9 @@ bfin_eppi_io_write_buffer (struct hw *me, const void *source,
       *value16p = value;
       break;
     case mmr_offset(control):
+      *value32p = value;
+      bfin_eppi_gui_setup (eppi);
+      break;
     case mmr_offset(fs1w_hbl):
     case mmr_offset(fs1p_avpl):
     case mmr_offset(fsw2_lvb):
@@ -178,8 +200,11 @@ bfin_eppi_dma_write_buffer (struct hw *me, const void *source,
 			    unsigned nr_bytes,
 			    int violate_read_only_section)
 {
+  struct bfin_eppi *eppi = hw_data (me);
+
   HW_TRACE_DMA_WRITE ();
-  return 0;
+
+  return bfin_gui_update (eppi->gui_state, source, nr_bytes);
 }
 
 static const struct hw_port_descriptor bfin_eppi_ports[] = {
@@ -230,6 +255,10 @@ bfin_eppi_finish (struct hw *me)
   set_hw_ports (me, bfin_eppi_ports);
 
   attach_bfin_eppi_regs (me, eppi);
+
+  /* Initialize the EPPI.  */
+  /* XXX: Make this a dev tree argument.  */
+  eppi->bytespp = 24 / 8;
 }
 
 const struct hw_descriptor dv_bfin_eppi_descriptor[] = {

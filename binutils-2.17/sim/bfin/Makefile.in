@@ -29,6 +29,7 @@ SIM_OBJS = \
 	$(SIM_NEW_COMMON_OBJS) \
 	bfin-sim.o \
 	devices.o \
+	gui.o \
 	interp.o \
 	machs.o \
 	sim-cpu.o \
@@ -52,6 +53,7 @@ SIM_EXTRA_LIBS = @SDL_LIBS@
 
 interp.o: interp.c targ-vals.h targ-linux.h devices.h $(INCLUDE)
 bfin-sim.o: bfin-sim.c $(INCLUDE)
+gui.o: gui.c $(INCLUDE)
 machs.o: machs.c $(INCLUDE)
 dv-bfin_cec.o: dv-bfin_cec.c devices.h $(INCLUDE)
 dv-bfin_ctimer.o: dv-bfin_ctimer.c devices.h $(INCLUDE)
