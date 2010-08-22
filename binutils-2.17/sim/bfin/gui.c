@@ -41,6 +41,7 @@ static struct {
   int (*ShowCursor) (int toggle);
   int (*LockSurface) (SDL_Surface *surface);
   void (*UnlockSurface) (SDL_Surface *surface);
+  void (*GetRGB) (Uint32 pixel, const SDL_PixelFormat * const fmt, Uint8 *r, Uint8 *g, Uint8 *b);
   Uint32 (*MapRGB) (const SDL_PixelFormat * const format, const Uint8 r, const Uint8 g, const Uint8 b);
   void (*UpdateRect) (SDL_Surface *screen, Sint32 x, Sint32 y, Uint32 w, Uint32 h);
 } sdl;
@@ -53,43 +54,56 @@ static const char * const sdl_syms[] = {
   "SDL_ShowCursor",
   "SDL_LockSurface",
   "SDL_UnlockSurface",
+  "SDL_GetRGB",
   "SDL_MapRGB",
   "SDL_UpdateRect",
 };
 
 struct gui_state {
   SDL_Surface *screen;
+  const SDL_PixelFormat *format;
   int throttle, throttle_limit;
   enum gui_color color;
-  int bpp, curr_line;
+  int curr_line;
 };
+
+/* Load the SDL lib on the fly to avoid hard linking against it.  */
+static int
+bfin_gui_sdl_setup (void)
+{
+  int i;
+  uintptr_t **funcs;
+
+  if (sdl.handle)
+    return 0;
+
+  sdl.handle = dlopen ("libSDL-1.2.so.0", RTLD_LAZY);
+  if (sdl.handle == NULL)
+    return -1;
+
+  funcs = (void *) &sdl.Init;
+  for (i = 0; i < ARRAY_SIZE (sdl_syms); ++i)
+    {
+      funcs[i] = dlsym (sdl.handle, sdl_syms[i]);
+      if (funcs[i] == NULL)
+	{
+	  dlclose (sdl.handle);
+	  sdl.handle = NULL;
+	  return -1;
+	}
+    }
+
+  return 0;
+}
+
+static const SDL_PixelFormat *bfin_gui_color_format (enum gui_color color);
 
 void *
 bfin_gui_setup (void *state, int enabled, int width, int height,
 		enum gui_color color)
 {
-  /* Load the SDL lib on the fly to avoid hard linking against it.  */
-  if (sdl.handle == NULL)
-    {
-      int i;
-      uintptr_t **funcs;
-
-      sdl.handle = dlopen ("libSDL-1.2.so.0", RTLD_LAZY);
-      if (sdl.handle == NULL)
-	return NULL;
-
-      funcs = (void *) &sdl.Init;
-      for (i = 0; i < ARRAY_SIZE (sdl_syms); ++i)
-	{
-	  funcs[i] = dlsym (sdl.handle, sdl_syms[i]);
-	  if (funcs[i] == NULL)
-	    {
-	      dlclose (sdl.handle);
-	      sdl.handle = NULL;
-	      return NULL;
-	    }
-	}
-    }
+  if (bfin_gui_sdl_setup ())
+    return NULL;
 
   /* Create an SDL window if enabled and we don't have one yet.  */
   if (enabled && !state)
@@ -102,8 +116,8 @@ bfin_gui_setup (void *state, int enabled, int width, int height,
 	goto error;
 
       gui->color = color;
-      gui->bpp = bfin_gui_color_depth (gui->color);
-      gui->screen = sdl.SetVideoMode (width, height, gui->bpp,
+      gui->format = bfin_gui_color_format (gui->color);
+      gui->screen = sdl.SetVideoMode (width, height, 32,
 				      SDL_ANYFORMAT|SDL_HWSURFACE);
       if (!gui->screen)
 	{
@@ -135,13 +149,52 @@ bfin_gui_setup (void *state, int enabled, int width, int height,
   return state;
 }
 
+static int
+SDL_ConvertBlitLineFrom (const Uint8 *src, const SDL_PixelFormat * const format,
+			 SDL_Surface *dst, int dsty)
+{
+  Uint8 r, g, b;
+  Uint32 *pixels;
+  unsigned i, j;
+
+  if (SDL_MUSTLOCK (dst))
+    if (sdl.LockSurface (dst))
+      return 1;
+
+  pixels = dst->pixels;
+  pixels += (dsty * dst->pitch / 4);
+
+  for (i = 0; i < dst->w; ++i)
+    {
+      /* Exract the packed source pixel; RGB or BGR.  */
+      Uint32 pix = 0;
+      for (j = 0; j < format->BytesPerPixel; ++j)
+	if (format->Rshift)
+	  pix = (pix << 8) | src[j];
+	else
+	  pix = pix | ((Uint32)src[j] << (j * 8));
+
+      /* Unpack the source pixel into its components.  */
+      sdl.GetRGB (pix, format, &r, &g, &b);
+      /* Translate into the screen pixel format.  */
+      *pixels++ = sdl.MapRGB (dst->format, r, g, b);
+
+      src += format->BytesPerPixel;
+    }
+
+  if (SDL_MUSTLOCK (dst))
+    sdl.UnlockSurface (dst);
+
+  sdl.UpdateRect (dst, 0, dsty, dst->w, 1);
+
+  return 0;
+}
+
 unsigned
 bfin_gui_update (void *state, const void *source, unsigned nr_bytes)
 {
   struct gui_state *gui = state;
-  const Uint8 *src;
-  Uint32 *pixels;
-  unsigned i;
+  int ret;
 
   if (!gui)
     return 0;
@@ -151,47 +204,50 @@ bfin_gui_update (void *state, const void *source, unsigned nr_bytes)
   if (gui->throttle)
     return 0;
 
-  if (sdl.LockSurface(gui->screen))
+  ret = SDL_ConvertBlitLineFrom (source, gui->format, gui->screen,
+				 gui->curr_line);
+  if (ret)
     return 0;
 
-  src = source;
-  pixels = gui->screen->pixels;
-  pixels += (gui->curr_line * gui->screen->w);
-  switch (gui->color)
-    {
-    case GUI_COLOR_RGBA_8888:
-      memcpy(pixels, src, nr_bytes);
-      break;
-
-    case GUI_COLOR_RGB_888:
-      for (i = 0; i < gui->screen->w; ++i)
-	{
-	  *pixels++ = sdl.MapRGB(gui->screen->format, src[0], src[1], src[2]);
-	  src += 3;
-	}
-      break;
-
-    case GUI_COLOR_RGB_565:
-      /* XXX: todo ...  */
-      break;
-    }
-
-  sdl.UnlockSurface(gui->screen);
-
-  sdl.UpdateRect(gui->screen, 0, gui->curr_line, gui->screen->w, 1);
   gui->curr_line = ++gui->curr_line % gui->screen->h;
 
   return nr_bytes;
 }
 
+#define FMASK(cnt, shift) (((1 << (cnt)) - 1) << (shift))
+#define _FORMAT(bpp, rcnt, gcnt, bcnt, acnt, rsh, gsh, bsh, ash) \
+  NULL, bpp, (bpp)/8, 8-(rcnt), 8-(gcnt), 8-(bcnt), 8-(acnt), rsh, gsh, bsh, ash, \
+  FMASK (rcnt, rsh), FMASK (gcnt, gsh), FMASK (bcnt, bsh), FMASK (acnt, ash),
+#define FORMAT(rcnt, gcnt, bcnt, acnt, rsh, gsh, bsh, ash) \
+  _FORMAT(((((rcnt) + (gcnt) + (bcnt) + (acnt)) + 7) / 8) * 8, \
+	  rcnt, gcnt, bcnt, acnt, rsh, gsh, bsh, ash)
+
+static const SDL_PixelFormat sdl_rgb_565 = {
+  FORMAT (5, 6, 5, 0, 11, 5, 0, 0)
+};
+static const SDL_PixelFormat sdl_bgr_565 = {
+  FORMAT (5, 6, 5, 0, 0, 5, 11, 0)
+};
+static const SDL_PixelFormat sdl_rgb_888 = {
+  FORMAT (8, 8, 8, 0, 16, 8, 0, 0)
+};
+static const SDL_PixelFormat sdl_bgr_888 = {
+  FORMAT (8, 8, 8, 0, 0, 8, 16, 0)
+};
+static const SDL_PixelFormat sdl_rgba_8888 = {
+  FORMAT (8, 8, 8, 8, 24, 16, 8, 0)
+};
+
 static const struct {
   const char *name;
-  int depth;
+  const SDL_PixelFormat *format;
   enum gui_color color;
 } color_spaces[] = {
-  { "rgb565",   16, GUI_COLOR_RGB_565,   },
-  { "rgb888",   24, GUI_COLOR_RGB_888,   },
-  { "rgba8888", 32, GUI_COLOR_RGBA_8888, },
+  { "rgb565",   &sdl_rgb_565,   GUI_COLOR_RGB_565,   },
+  { "bgr565",   &sdl_bgr_565,   GUI_COLOR_BGR_565,   },
+  { "rgb888",   &sdl_rgb_888,   GUI_COLOR_RGB_888,   },
+  { "bgr888",   &sdl_bgr_888,   GUI_COLOR_BGR_888,   },
+  { "rgba8888", &sdl_rgba_8888, GUI_COLOR_RGBA_8888, },
 };
 
 enum gui_color bfin_gui_color (const char *color)
@@ -210,15 +266,21 @@ enum gui_color bfin_gui_color (const char *color)
   return GUI_COLOR_RGB_888;
 }
 
-int bfin_gui_color_depth (enum gui_color color)
+static const SDL_PixelFormat *bfin_gui_color_format (enum gui_color color)
 {
   int i;
 
   for (i = 0; i < ARRAY_SIZE (color_spaces); ++i)
     if (color == color_spaces[i].color)
-      return color_spaces[i].depth;
+      return color_spaces[i].format;
 
-  return 0;
+  return NULL;
+}
+
+int bfin_gui_color_depth (enum gui_color color)
+{
+  const SDL_PixelFormat *format = bfin_gui_color_format (color);
+  return format ? format->BitsPerPixel : 0;
 }
 
 #endif

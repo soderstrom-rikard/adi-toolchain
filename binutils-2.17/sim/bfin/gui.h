@@ -25,7 +25,9 @@
 
 enum gui_color {
   GUI_COLOR_RGB_565,
+  GUI_COLOR_BGR_565,
   GUI_COLOR_RGB_888,
+  GUI_COLOR_BGR_888,
   GUI_COLOR_RGBA_8888,
 };
 enum gui_color bfin_gui_color (const char *color);
