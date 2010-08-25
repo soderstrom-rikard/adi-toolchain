@@ -3,7 +3,7 @@
 ---------------------
 
 First you need the ADI certificate.  It has a SHA1 hash of:
-	B61F9B648BB7B0A397809567880A4E90168A1678
+	BBEAD3B9B7BEC23098B752324E418884029FBDD9
 With that and the cached verisign cross-certificate (MSCV-VSClass3.cer), you
 can sign drivers (code) using the batch files in this dir.
 
