@@ -66,7 +66,7 @@ build_autotooled_pkg()
 		ised "${f}" -e "/^prefix=/s:=.*:=${STAGEDIR}/usr:"
 	done
 
-	run_cmd rm -rf "${build}"
+	clean_build_dir "${build}"
 
 	resume_save
 

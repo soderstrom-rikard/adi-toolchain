@@ -43,6 +43,7 @@ GCC_VERSIONS_DEFAULT=4.3
 NUM_JOBS=0
 SKIP_DEV_CHECKS=false
 WITHOUT_X=false
+CLEAN_BUILD_DIRS=true
 RESUME_BUILD=false
 CBUILD= # the system we are compiling on
 CHOST=  # the system the final compiler will run on
@@ -77,6 +78,7 @@ Usage : $APP_NAME -s SOURCE [-b BUILD]
 -p               Check prerequisites
 -P STRING        Use STRING as the package version (instead of svn revision)
 -r RESULTS_DIR   Compare current tests to old results
+-R               Don't remove build directories when finished compiling
 -s SOURCE        Toolchain Source directory (builds bfin-elf-gcc)
 -T TARGET_IPADDR Test components on hardware
 -t               Test components on simulator
@@ -90,7 +92,7 @@ EOF
 exit ${1:-0}
 }
 
-while getopts b:B:c:C:dDfH:hj:k:K:l:m:o:O:pP:r:s:S:tT:u:U:vwX parameter
+while getopts b:B:c:C:dDfH:hj:k:K:l:m:o:O:pP:Rr:s:S:tT:u:U:vwX parameter
 do
 	case $parameter in
 		p)  CHECK_PRE=true ;;
@@ -98,6 +100,7 @@ do
 		w)  WARN=1 ;;
 		d)  DATE_STAMP=1 ;;
 		D)  SKIP_DEV_CHECKS=true ;;
+		R)  CLEAN_BUILD_DIRS=false ;;
 		v)  VERBOSE=1 ;;
 		f|t|T|r)
 			case ${parameter} in
@@ -437,8 +440,7 @@ build_curses()
 	run_cmd cp *curses.a "${STAGEDIR}"/usr/lib/libcurses.a
 	run_cmd cp "${S}"/curses.h "${STAGEDIR}"/usr/include/
 
-	change_dir "${DIR_BUILD}"
-	run_cmd rm -rf "${WORKDIR}"
+	clean_build_dir "${WORKDIR}"
 }
 
 build_expat()
@@ -467,8 +469,7 @@ build_expat()
 	echo_date "${CHOST}: ${PN}: installing"
 	run_cmd $MAKE installlib DESTDIR="${STAGEDIR}"
 
-	change_dir "${DIR_BUILD}"
-	run_cmd rm -rf "${WORKDIR}"
+	clean_build_dir "${WORKDIR}"
 }
 
 build_pthreads()
@@ -538,9 +539,8 @@ build_zlib()
 	run_cmd cp zlib/libz.a "${STAGEDIR}"/usr/lib/
 	run_cmd cp "${S}"/zlib.h "${S}"/zconf.h "${STAGEDIR}"/usr/include/
 
-	change_dir "${DIR_BUILD}"
 	run_cmd rm -f "${_S}"/gmp "${_S}"/mpfr
-	run_cmd rm -rf "${WORKDIR}"
+	clean_build_dir "${WORKDIR}"
 }
 
 build_gcc()
@@ -678,7 +678,7 @@ build_gcc()
 		$DIR_GCC_SOURCE/mpfr \
 		$DIR_GCC_SOURCE/gmp \
 		${prefix}/${target}/sys-include
-	run_cmd rm -rf "$DIR_GCC_BUILD"
+	clean_build_dir "$DIR_GCC_BUILD"
 
 	resume_save
 }
@@ -741,7 +741,7 @@ build_binutils()
 	fi
 
 	# need to leave build dir behind for elf2flt
-	[ "${target}" = "bfin-linux-uclibc" ] && run_cmd rm -rf "$DIR_BINUTILS_BUILD"
+	[ "${target}" = "bfin-linux-uclibc" ] && clean_build_dir "$DIR_BINUTILS_BUILD"
 
 	resume_save
 }
@@ -783,7 +783,7 @@ build_elf2flt()
 	check_installed_files elf2flt "${prefix}/bin/${target}-" \
 		elf2flt flthdr
 
-	run_cmd rm -rf "$DIR_ELF2FLT_BUILD" "$DIR_BINUTILS_BUILD"
+	clean_build_dir "$DIR_ELF2FLT_BUILD" "$DIR_BINUTILS_BUILD"
 
 	resume_save
 }
@@ -936,7 +936,7 @@ build_uboot()
 	done
 
 	echo_date "U-Boot: cleaning"
-	run_cmd rm -rf "$DIR_UBOOT_BUILD"
+	clean_build_dir "$DIR_UBOOT_BUILD"
 }
 
 build_kernel_headers()
@@ -1150,11 +1150,6 @@ build_uclibc()
 	echo_date "uClibc: cleaning"
 	change_dir $DIR_UCLIBC_SOURCE
 	run_cmd $MAKE CROSS=bfin-elf- distclean
-
-	if [ "$DIR_KBUILD_OUTPUT" != "$KERNEL_SOURCE" ] ; then
-		echo_date "Cleaning kernel"
-		run_cmd rm -rf "$DIR_KBUILD_OUTPUT"
-	fi
 }
 
 #
@@ -1193,6 +1188,10 @@ if [ ! $SKIP_FLAT ] || [ ! $SKIP_FDPIC ] ; then
 	# all of the FLAT/FDPIC libs with the ELF compiler.
 	build_kernel_headers
 	build_uclibc
+fi
+if [ "$DIR_KBUILD_OUTPUT" != "$KERNEL_SOURCE" ]; then
+	echo_date "Cleaning kernel"
+	clean_build_dir "$DIR_KBUILD_OUTPUT"
 fi
 
 if [ ! $SKIP_FLAT ] ; then
@@ -1375,7 +1374,7 @@ build_target_binutils_libs()
 	echo_date "${target}: target libbfd: installing"
 	run_cmd $MAKE install-bfd install-opcodes install-libiberty
 
-	run_cmd rm -rf "${DIR_BINUTILS_BUILD}"
+	clean_build_dir "${DIR_BINUTILS_BUILD}"
 }
 
 if [ ! $SKIP_TARGET_LIBS ] ; then
@@ -1384,8 +1383,7 @@ if [ ! $SKIP_TARGET_LIBS ] ; then
 	[ $SKIP_FDPIC ] || build_target_binutils_libs linux-uclibc "${DIR_LINUX_OUTPUT}"
 fi
 
-change_dir "${DIR_BUILD}"
-run_cmd rm -rf "${STAGEDIR}"
+clean_build_dir "${STAGEDIR}"
 
 resume_clear
 

@@ -186,10 +186,15 @@ change_dir()
 	log_it cd "$@"
 	cd "$@" || die_with_log
 }
+clean_build_dir()
+{
+	change_dir "${DIR_BUILD}"
+	${CLEAN_BUILD_DIRS} && run_cmd rm -rf "$@"
+}
 clean_dir()
 {
-	cd /
-	rm -rf "$@"
+	change_dir "${DIR_BUILD}"
+	run_cmd rm -rf "$@"
 }
 change_clean_dir()
 {
