@@ -47,7 +47,7 @@ RESUME_BUILD=false
 CBUILD= # the system we are compiling on
 CHOST=  # the system the final compiler will run on
 
-unset SKIP_ELF SKIP_JTAG SKIP_LDR SKIP_TARGET_LIBS SKIP_UBOOT SKIP_FLAT SKIP_FDPIC
+unset SKIP_ELF SKIP_GDBPROXY SKIP_JTAG SKIP_LDR SKIP_TARGET_LIBS SKIP_UBOOT SKIP_FLAT SKIP_FDPIC
 
 TEST_OPTS=
 TEST_SIM=
@@ -108,15 +108,16 @@ do
 			;;
 		S)
 			case ${OPTARG} in
-				elf)   SKIP_ELF=true ;;
-				jtag)  SKIP_JTAG=true ;;
-				ldr)   SKIP_LDR=true ;;
-				tlibs) SKIP_TARGET_LIBS=true ;;
+				elf)      SKIP_ELF=true ;;
+				gdbproxy) SKIP_GDBPROXY=true ;;
+				jtag)     SKIP_JTAG=true ;;
+				ldr)      SKIP_LDR=true ;;
+				tlibs)    SKIP_TARGET_LIBS=true ;;
 				u-boot|\
-				uboot) SKIP_UBOOT=true ;;
-				flat)  SKIP_FLAT=true ;;
-				fdpic) SKIP_FDPIC=true ;;
-				*)     error "invalid skip target '${OPTARG}'" ;;
+				uboot)    SKIP_UBOOT=true ;;
+				flat)     SKIP_FLAT=true ;;
+				fdpic)    SKIP_FDPIC=true ;;
+				*)        error "invalid skip target '${OPTARG}'" ;;
 			esac
 			;;
 		s)  DIR_SOURCE=${OPTARG%/} ;;
@@ -358,7 +359,9 @@ if [ -z "${SKIP_JTAG}" ] ; then
 	check_src_pkg libusb
 	check_src_pkg libftdi-1.0 LIBFTDI
 	check_src_pkg urjtag
-	check_src_pkg gdbproxy
+	if [ -z "${SKIP_GDBPROXY}" ] ; then
+		check_src_pkg gdbproxy
+	fi
 fi
 
 : ${DIR_uC_OUTPUT:=${DIR_BUILD}/bfin-uclinux}
@@ -1283,7 +1286,9 @@ if [ -z "${SKIP_JTAG}" ] ; then
 	build_libusb
 	build_libftdi
 	build_urjtag
-	build_gdbproxy
+	if [ -z "${SKIP_GDBPROXY}" ] ; then
+		build_gdbproxy
+	fi
 fi
 
 # Now that we're done with the random libraries, punt them
