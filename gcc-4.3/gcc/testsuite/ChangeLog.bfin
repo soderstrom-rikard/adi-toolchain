@@ -1,3 +1,17 @@
+2010-08-26  Stuart Henderson  <stuart.henderson@analog.com>
+
+	* gcc.c-torture/compile/20050122-2.c: Disable for blackfin until bug
+	5827 is resolved.
+	* gcc.c-torture/compile/20010226-1.c: Likewise.
+	* gcc.c-torture/compile/pr27889.c: Likewise.
+	* gcc.c-torture/compile/nested-1.c: Likewise.
+	* gcc.dg/trampoline-1.c: Likewise.
+	* gcc.dg/torture/nested-fn-1.c: Likewise.
+	* gcc.dg/nested-func-5.c: Likewise.
+	* gcc.dg/debug/debug-3.c: Likewise.
+	* gcc.dg/debug/debug-5.c: Likewise.
+	* gcc.dg/pr34457-1.c: Likewise.
+
 2010-08-16  Mike Frysinger  <michael.frysinger@analog.com>
 
 	* gcc.target/bfin/mcpu-bf512.c: Check SILICON_REVISION is 0x0002.

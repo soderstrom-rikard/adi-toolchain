@@ -1,3 +1,4 @@
+/* { dg-skip-if "Mark as unsupported until Bug 5827 is fixed." { bfin-*-* } } */
 typedef __SIZE_TYPE__ size_t;
 extern int printf (const char *, ...);
 extern void *memset (void *, int, size_t);

@@ -3,6 +3,7 @@
 
 /* { dg-do run } */
 /* { dg-options "-O2" } */
+/* { dg-skip-if "Mark as unsupported until Bug 5827 is fixed." { bfin-*-* } } */
 
 /* This used to fail on various versions of Solaris 2 because the
    trampoline couldn't be made executable.  */

@@ -1,3 +1,4 @@
+/* { dg-skip-if "Mark as unsupported until Bug 5827 is fixed." { bfin-*-* } } */
 /* Related to PR 19484.  */
 extern void foo (void) __attribute__((noreturn));
 int n;

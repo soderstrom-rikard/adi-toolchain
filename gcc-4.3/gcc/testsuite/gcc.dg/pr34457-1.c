@@ -2,6 +2,7 @@
 /* { dg-do compile } */
 /* { dg-options "--combine -O2" } */
 /* { dg-additional-sources "pr34457-2.c" } */
+/* { dg-skip-if "Mark as unsupported until Bug 5827 is fixed." { bfin-*-* } } */
    
 
 typedef __SIZE_TYPE__ size_t;
