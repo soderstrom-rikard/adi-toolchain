@@ -1,3 +1,8 @@
+2010-08-27  Stuart Henderson <stuart.henderson@analog.com>
+
+	[#6134] Change target triplet to bfin-*-elf.
+	* testsuite/lib/libstdc++.exp
+
 2010-08-10  Stuart Henderson <stuart.henderson@analog.com>
 
 	[#5887] Only include ext/codecvt_specializations.h and ext/enc_filebuf.h
