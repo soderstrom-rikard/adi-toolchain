@@ -1,3 +1,4 @@
+/* { dg-skip-if "Mark as unsupported until Bug 5827 is fixed." { bfin-*-* } } */
 extern void abort (void);
 extern void exit (int);
 

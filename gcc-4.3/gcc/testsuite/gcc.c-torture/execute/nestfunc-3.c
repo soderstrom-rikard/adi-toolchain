@@ -1,3 +1,4 @@
+/* { dg-skip-if "Mark as unsupported until Bug 5827 is fixed." { bfin-*-* } } */
 
 extern long foo (long, long, long (*) (long, long));
 extern long use (long (*) (long, long), long, long);
