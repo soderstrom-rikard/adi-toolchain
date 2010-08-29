@@ -974,7 +974,7 @@ static const struct hw_port_descriptor bfin_sic_54x_ports[] = {
 /*{ "reserved",      85, 0, input_port, },*/
   { "gptimer@0",     86, 0, input_port, },
   { "gptimer@1",     87, 0, input_port, },
-/*{ "gptimer@2",     88, 0, input_port, },*/
+  { "gptimer@2",     88, 0, input_port, },
   { "gptimer@3",     89, 0, input_port, },
   { "gptimer@4",     90, 0, input_port, },
   { "gptimer@5",     91, 0, input_port, },
