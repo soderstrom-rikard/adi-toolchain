@@ -574,10 +574,22 @@ static const struct bfin_memory_layout bf561_mem[] = {
   LAYOUT (0xFFA10000, 0x4000, read_write_exec),	/* Inst Cache [1] */
 };
 static const struct bfin_dev_layout bf561_dev[] = {
-  DEVICE (0xFFC00400, BFIN_MMR_UART_SIZE, "bfin_uart@0"),
-  DEVICE (0xFFC00500, BFIN_MMR_SPI_SIZE,  "bfin_spi@0"),
- _DEVICE (0xFFC01000, BFIN_MMR_PPI_SIZE,  "bfin_ppi@0", 1),
- _DEVICE (0xFFC01300, BFIN_MMR_PPI_SIZE,  "bfin_ppi@1", 1),
+  DEVICE (0xFFC00400, BFIN_MMR_UART_SIZE,    "bfin_uart@0"),
+  DEVICE (0xFFC00500, BFIN_MMR_SPI_SIZE,     "bfin_spi@0"),
+  DEVICE (0xFFC00600, BFIN_MMR_GPTIMER_SIZE, "bfin_gptimer@0"),
+  DEVICE (0xFFC00610, BFIN_MMR_GPTIMER_SIZE, "bfin_gptimer@1"),
+  DEVICE (0xFFC00620, BFIN_MMR_GPTIMER_SIZE, "bfin_gptimer@2"),
+  DEVICE (0xFFC00630, BFIN_MMR_GPTIMER_SIZE, "bfin_gptimer@3"),
+  DEVICE (0xFFC00640, BFIN_MMR_GPTIMER_SIZE, "bfin_gptimer@4"),
+  DEVICE (0xFFC00650, BFIN_MMR_GPTIMER_SIZE, "bfin_gptimer@5"),
+  DEVICE (0xFFC00660, BFIN_MMR_GPTIMER_SIZE, "bfin_gptimer@6"),
+  DEVICE (0xFFC00670, BFIN_MMR_GPTIMER_SIZE, "bfin_gptimer@7"),
+ _DEVICE (0xFFC01000, BFIN_MMR_PPI_SIZE,     "bfin_ppi@0", 1),
+ _DEVICE (0xFFC01300, BFIN_MMR_PPI_SIZE,     "bfin_ppi@1", 1),
+  DEVICE (0xFFC01600, BFIN_MMR_GPTIMER_SIZE, "bfin_gptimer@8"),
+  DEVICE (0xFFC01610, BFIN_MMR_GPTIMER_SIZE, "bfin_gptimer@9"),
+  DEVICE (0xFFC01620, BFIN_MMR_GPTIMER_SIZE, "bfin_gptimer@10"),
+  DEVICE (0xFFC01630, BFIN_MMR_GPTIMER_SIZE, "bfin_gptimer@11"),
 };
 static const struct bfin_dmac_layout bf561_dmac[] = {
   { BFIN_MMR_DMAC0_BASE, 12, },
