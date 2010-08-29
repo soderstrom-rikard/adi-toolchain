@@ -101,6 +101,9 @@ static const struct bfin_dmac_layout bf000_dmac[] = {};
 #define bf504_chipid bf50x_chipid
 #define bf506_chipid bf50x_chipid
 static const struct bfin_memory_layout bf50x_mem[] = {
+  LAYOUT (0xFFC00800, 0x60, read_write),	/* SPORT0 stub */
+  LAYOUT (0xFFC00900, 0x60, read_write),	/* SPORT1 stub */
+  LAYOUT (0xFFC03800, 0x100, read_write),	/* RSI stub */
   LAYOUT (0xFF800000, 0x4000, read_write),	/* Data A */
   LAYOUT (0xFF804000, 0x8000, read_write),	/* Data A Cache */
   LAYOUT (0xFFA00000, 0x4000, read_write_exec),	/* Inst A [1] */
@@ -109,7 +112,20 @@ static const struct bfin_memory_layout bf50x_mem[] = {
 #define bf504_mem bf50x_mem
 #define bf506_mem bf50x_mem
 static const struct bfin_dev_layout bf50x_dev[] = {
-  DEVICE (0xFFC00400, BFIN_MMR_UART2_SIZE, "bfin_uart2@0"),
+  DEVICE (0xFFC00400, BFIN_MMR_UART2_SIZE,   "bfin_uart2@0"),
+  DEVICE (0xFFC00500, BFIN_MMR_SPI_SIZE,     "bfin_spi@0"),
+  DEVICE (0xFFC00600, BFIN_MMR_GPTIMER_SIZE, "bfin_gptimer@0"),
+  DEVICE (0xFFC00610, BFIN_MMR_GPTIMER_SIZE, "bfin_gptimer@1"),
+  DEVICE (0xFFC00620, BFIN_MMR_GPTIMER_SIZE, "bfin_gptimer@2"),
+  DEVICE (0xFFC00630, BFIN_MMR_GPTIMER_SIZE, "bfin_gptimer@3"),
+  DEVICE (0xFFC00640, BFIN_MMR_GPTIMER_SIZE, "bfin_gptimer@4"),
+  DEVICE (0xFFC00650, BFIN_MMR_GPTIMER_SIZE, "bfin_gptimer@5"),
+  DEVICE (0xFFC00660, BFIN_MMR_GPTIMER_SIZE, "bfin_gptimer@6"),
+  DEVICE (0xFFC00670, BFIN_MMR_GPTIMER_SIZE, "bfin_gptimer@7"),
+  DEVICE (0xFFC01000, BFIN_MMR_PPI_SIZE,     "bfin_ppi"),
+  DEVICE (0xFFC01400, BFIN_MMR_TWI_SIZE,     "bfin_twi@0"),
+  DEVICE (0xFFC02000, BFIN_MMR_UART2_SIZE,   "bfin_uart2@1"),
+  DEVICE (0xFFC03400, BFIN_MMR_SPI_SIZE,     "bfin_spi@1"),
 };
 #define bf504_dev bf50x_dev
 #define bf506_dev bf50x_dev
@@ -659,7 +675,7 @@ bfin_model_hw_tree_init (SIM_DESC sd, SIM_CPU *cpu)
 
   if (mdata->model_num >= 540 && mdata->model_num <= 549)
     dv_bfin_hw_parse (sd, ebiu_ddrc, EBIU_DDRC);
-  else
+  else if (mdata->model_num >= 510)
     dv_bfin_hw_parse (sd, ebiu_sdc, EBIU_SDC);
 
   dv_bfin_hw_parse (sd, sic, SIC);
@@ -675,7 +691,7 @@ bfin_model_hw_tree_init (SIM_DESC sd, SIM_CPU *cpu)
   sim_hw_parse (sd, "/core/bfin_wdog > nmi   nmi      /core/bfin_cec");
   sim_hw_parse (sd, "/core/bfin_wdog > gpi   watchdog /core/bfin_sic");
 
-  if (mnum != MODEL_BF561)
+  if (mnum != MODEL_BF561 && mdata->model_num > 509)
     {
       dv_bfin_hw_parse (sd, rtc, RTC);
       sim_hw_parse (sd, "/core/bfin_rtc > rtc rtc /core/bfin_sic");
