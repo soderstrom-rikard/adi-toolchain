@@ -1,3 +1,129 @@
+commit a04cbb0095a78aeed3f65aaf06c46069d0ac184a
+Author: Daniel Drake <dan@reactivated.net>
+Date:   Tue May 4 19:01:59 2010 -0300
+
+    v1.0.8 release
+
+commit 53b47299531974fa8901b74a163f3c8ebae4eec9
+Author: Daniel Drake <dan@reactivated.net>
+Date:   Thu Apr 22 18:12:51 2010 -0300
+
+    Linux: don't set SHORT_NOT_OK on bulk out URBs (#20
+    
+    Setting this flag is illegal, and the behaviour we're looking for
+    is already in place for host-to-device transfers without this flag.
+
+commit 1519828b7ee1fce46d4c51fc097d52e01b8e0bb4
+Author: Daniel Drake <dan@reactivated.net>
+Date:   Tue Apr 20 20:14:09 2010 -0300
+
+    Linux: Handle failure to read active configuration during enumeration
+
+commit 45168627cc15aee3875192f34286110dbbd27095
+Author: Nathan Hjelm <hjelmn@me.com>
+Date:   Tue Apr 20 19:43:06 2010 -0300
+
+    Darwin: don't reuse cached descriptors during enumeration
+    
+    Descriptor reuse was causing scans to return invalid information when
+    the device at a location has changed.
+
+commit 3af329db6dcbfb96d24867c757f9e125e5b7b0e5
+Author: Daniel Drake <dan@reactivated.net>
+Date:   Mon Apr 19 19:36:55 2010 -0300
+
+    v1.0.7 release
+
+commit ceb8cacd6d2a4189de0db2ee46d45217511c69be
+Author: Daniel Drake <dan@reactivated.net>
+Date:   Mon Apr 19 19:31:12 2010 -0300
+
+    Document that fd set contents are an internal implementation detail (#36)
+
+commit 9bea500b5747bdeba7c8251d45608558e71a1db5
+Author: Martin Koegler <mkoegler@auto.tuwien.ac.at>
+Date:   Mon Apr 19 19:22:46 2010 -0300
+
+    Linux: correct config descriptor endianness fix
+    
+    The seek_to_next_config codepath deals with both sysfs and usbfs;
+    make sure we only convert values in the usbfs path.
+
+commit 02df59a309e813c50b8230de99e69fb4e1814279
+Author: Martin Koegler <mkoegler@auto.tuwien.ac.at>
+Date:   Mon Apr 5 17:11:32 2010 +0200
+
+    Linux: Fix endianness handling of usbfs config descriptors (#27)
+    
+    driver/usb/core/devio.c function usbdev_read translate the follwing files
+    to CPU endianess:
+    
+    le16_to_cpus(&temp_desc.bcdUSB);
+    le16_to_cpus(&temp_desc.idVendor);
+    le16_to_cpus(&temp_desc.idProduct);
+    le16_to_cpus(&temp_desc.bcdDevice);
+    
+    All other data is passed without any change.
+    
+    libusb/os/linux_usbfs.c calls usbi_parse_descriptor with host_endian=1
+    for config descriptors. According to the kernel code, they must be
+    processed with host_endian=0, as they are not translated by the kernel.
+    
+    Signed-off-by: Martin Koegler <mkoegler@auto.tuwien.ac.at>
+
+commit ec303b01a5d4e51c000a283853af65059fa62285
+Author: Nathan Hjelm <hjelmn@mac.com>
+Date:   Tue Mar 23 16:22:08 2010 -0600
+
+    Darwin: fix enumeration of devices with non-consecutive addresses (#23)
+
+commit cd809e2f7cee3874b7ae16b2c482a8b63a90e4a5
+Author: Bastien Nocera <hadess@hadess.net>
+Date:   Mon Mar 8 10:50:51 2010 +0000
+
+    Add more interface classes
+    
+    As used in bluez.
+
+commit 1ce4aa67d849f5cad8a21072dc1c7b42158ce817
+Author: Nathan Hjelm <hjelmn@mac.com>
+Date:   Thu Mar 18 11:32:32 2010 -0600
+
+    Darwin: Cleanup async callback code, catch request timeouts
+
+commit 68af9f8d731f700267335941a8214d34ab518cc8
+Author: Nathan Hjelm <hjelmn@mac.com>
+Date:   Thu Mar 18 11:31:46 2010 -0600
+
+    Darwin: fix endianness of control setup packet
+    
+    IOUSBLib expects the control request to be in host byte order.
+    Swap the request into host byte order.
+
+commit cfce4d127184f4e4f334976151a0f80594bb5e22
+Author: Nathan Hjelm <hjelmn@mac.com>
+Date:   Mon Feb 15 14:10:08 2010 -0600
+
+    Darwin: fix memory leak in process_device
+    
+    Credit to Mike Colagrosso for finding this bug.
+
+commit 161893cfbefefe315f657677705abe090fc526f2
+Author: Nathan Hjelm <hjelmn@mac.com>
+Date:   Mon Feb 15 14:09:19 2010 -0600
+
+    Darwin: use logging functions
+    
+    Use usbi_warn, usbi_err, and usbi_info instead of _usbi_log.
+
+commit 2a72f38548208044dc3aa62681419d006c35732d
+Author: Nathan Hjelm <hjelmn@mac.com>
+Date:   Mon Feb 15 14:07:44 2010 -0600
+
+    Darwin: support multiple calls to libusb_init
+    
+    Credit to Orin Eman for finding this bug.
+
 commit a4186794d87124503db2f5f51f51ce90bb95daa7
 Author: Daniel Drake <dan@reactivated.net>
 Date:   Sun Nov 22 17:20:53 2009 +0000
