@@ -1,4 +1,4 @@
-AC_INIT(libftdi, 0.17)
+AC_INIT(libftdi, 0.18)
 AM_INIT_AUTOMAKE
 AM_CONFIG_HEADER(config.h)
 
@@ -8,7 +8,7 @@ AM_PROG_LIBTOOL
 AC_PROG_CXX
 
 dnl check for libusb-config
-AC_PATH_PROG(HAVELIBUSB, libusb-config, $PATH)
+AC_CHECK_TOOL(HAVELIBUSB, libusb-config)
 
 if test ! -z "$HAVELIBUSB"; then
    LIBUSB_CFLAGS=`$HAVELIBUSB --cflags`
@@ -47,6 +47,10 @@ AC_ARG_WITH(async-mode,
 ])
 AC_SUBST(ENABLE_ASYNC_MODE)
 
+AC_ARG_WITH(examples,
+  AS_HELP_STRING([--without-examples], [disable example programs]))
+AM_CONDITIONAL(BUILD_EXAMPLES, [test "x$with_examples" != "xno"])
+
 LIBFTDI_MODULES=
 LIBFTDI_MODULES_PKGCONFIG=
 
@@ -81,7 +85,13 @@ fi
 AM_CONDITIONAL(HAVE_LIBFTDIPP, [test "x$ENABLE_LIBFTDIPP" = "x1"])
 
 dnl check for doxygen
-AC_PATH_PROG(DOXYGEN, doxygen)
+AC_ARG_WITH(docs,
+  AS_HELP_STRING([--without-docs], [disable doxygen usage]))
+if test "x$with_docs" != "xno"; then
+  AC_PATH_PROG(DOXYGEN, doxygen)
+else
+  DOXYGEN=
+fi
 AM_CONDITIONAL(HAVE_DOXYGEN, test -n $DOXYGEN)
 
 dnl ============================
@@ -140,9 +150,11 @@ fi
 AC_SUBST(LIBFTDI_MODULES)
 AC_SUBST(LIBFTDI_MODULES_PKGCONFIG)
 
-AC_OUTPUT([libftdi-config],[chmod a+x libftdi-config])
-AC_OUTPUT(Makefile src/Makefile bindings/Makefile bindings/python/Makefile bindings/python/setup.py examples/Makefile doc/Doxyfile doc/Makefile libftdi.pc libftdi.spec)
+AC_CONFIG_FILES([libftdi-config],[chmod a+x libftdi-config])
+AC_CONFIG_FILES(Makefile src/Makefile bindings/Makefile bindings/python/Makefile bindings/python/setup.py examples/Makefile doc/Doxyfile doc/Makefile libftdi.pc libftdi.spec)
 
 if test "x$ENABLE_LIBFTDIPP" = "x1"; then
-    AC_OUTPUT(ftdipp/Makefile libftdipp.pc)
+    AC_CONFIG_FILES(ftdipp/Makefile libftdipp.pc)
 fi
+
+AC_OUTPUT

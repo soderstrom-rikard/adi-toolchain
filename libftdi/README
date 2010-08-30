@@ -1,5 +1,5 @@
 --------------------------------------------------------------------
-libftdi version 0.16
+libftdi version 0.18
 --------------------------------------------------------------------
 
 libftdi - A library (using libusb) to talk to FTDI's UART/FIFO chips
@@ -20,21 +20,19 @@ the initial C++ wrapper implementation.
 
 Changes
 -------
-* C++ wrapper: Reopen the device after calling get_strings() in Context::open() (Marek Vavruša and Intra2net)
-* C++ wrapper: Fixed an inheritance problem (Marek Vavruša and Intra2net)
-* C++ wrapper: Relicensed under GPLv2 + linking exception (Marek Vavruša and Intra2net)
-* Support for FT2232H and FT4232H (David Challis, Alex Harford and Intra2net)
-* Support for mingw cross compile (Uwe Bonnes)
-* Python bindings and minor autoconf cleanup (Tarek Heiland)
-* Code cleanup in various places (Intra2net)
-* Fixed ftdi_read_chipid in some cases (Matthias Richter)
-* eeprom decode function and small cleanups (Marius Kintel)
-* cmake system improvements (Marius Kintel and Intra2net)
-* Fix compilation in -ansi -pedantic mode (Matthias Janke)
+* Add ftdi_eeprom_free() to free allocated memory in eeprom (Wilfried Holzke)
+* More generic error message for the FTDI kernel driver (Intra2net)
+* Honor CPPFLAGS in python wrapper build (Alexander Lehmann)
+* cmake: Fix package creation on 32-bit machines (Uwe Bonnes)
+* Fix swig argument constraints (Intra2net)
+* Don't segfault if device is closed or ftdi context is invalid (Intra2net)
+* Ability to disable build of examples / documentation (Mike Frysinger and Intra2net)
+* Fix typo in python wrapper build (Mike Frysinger)
+* Autoconf build system improvements (Mike Frysinger)
 
 You'll find the newest version of libftdi at:
 http://www.intra2net.com/en/developer/libftdi
 
 --------------------------------------------------------------------
-www.intra2net.com                             2003-2009 Intra2net AG
+www.intra2net.com                             2003-2010 Intra2net AG
 --------------------------------------------------------------------

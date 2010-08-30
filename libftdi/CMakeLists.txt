@@ -1,7 +1,7 @@
 # Project
 project(libftdi)
 set(MAJOR_VERSION 0)
-set(MINOR_VERSION 17)
+set(MINOR_VERSION 18)
 set(VERSION_STRING ${MAJOR_VERSION}.${MINOR_VERSION})
 SET(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}")
 
@@ -42,7 +42,7 @@ set(CPACK_COMPONENT_HEADERS_GROUP    "Development")
 IF(CMAKE_SIZEOF_VOID_P EQUAL 4)
     SET(LIB_SUFFIX "")
     SET(PACK_ARCH "")
-  ELSE(CMAKE_SIZEOF_VOID_P EQUAL 4)
+  ELSE(CMAKE_SIZEOF_VOID_P EQUAL 8)
     SET(LIB_SUFFIX 64)
     SET(PACK_ARCH .x86_64)
 endif(CMAKE_SIZEOF_VOID_P EQUAL 4)
@@ -92,8 +92,11 @@ add_subdirectory(packages)
 
 
 # Documentation
+
+option(DOCUMENTATION "Generate API documentation with Doxygen" ON)
+
 find_package(Doxygen)
-if(DOXYGEN_FOUND)
+if(DOCUMENTATION AND DOXYGEN_FOUND)
 
    # Set variables
    set(PACKAGE libftdi)
@@ -126,7 +129,10 @@ if(DOXYGEN_FOUND)
 
    add_custom_target(docs ALL DEPENDS ${CMAKE_BINARY_DIR}/doc/html/index.html)
 
-endif(DOXYGEN_FOUND)
+   message(STATUS "Generating API documentation with Doxygen")
+else(DOCUMENTATION AND DOXYGEN_FOUND)
+   message(STATUS "Not generating API documentation")
+endif(DOCUMENTATION AND DOXYGEN_FOUND)
 
 # PkgConfig
 set(prefix      ${CMAKE_INSTALL_PREFIX})
