@@ -1,4 +1,13 @@
-AC_INIT([libusb], [1.0.5])
+m4_define(LIBUSB_MAJOR, [1])
+m4_define(LIBUSB_MINOR, [0])
+m4_define(LIBUSB_MICRO, [8])
+
+AC_INIT([libusb], LIBUSB_MAJOR.LIBUSB_MINOR.LIBUSB_MICRO, [libusb-devel@lists.sourceforge.net], [libusb], [http://www.libusb.org/])
+
+AC_SUBST([LIBUSB_VERSION_MAJOR], [LIBUSB_MAJOR])
+AC_SUBST([LIBUSB_VERSION_MINOR], [LIBUSB_MINOR])
+AC_SUBST([LIBUSB_VERSION_MICRO], [LIBUSB_MICRO])
+
 AM_INIT_AUTOMAKE
 AC_CONFIG_SRCDIR([libusb/core.c])
 AC_CONFIG_MACRO_DIR([m4])
@@ -12,24 +21,30 @@ AC_C_INLINE
 AM_PROG_CC_C_O
 AC_DEFINE([_GNU_SOURCE], [], [Use GNU extensions])
 
+AM_MAINTAINER_MODE
+
 AC_MSG_CHECKING([operating system])
 case $host in
 *-linux*)
 	AC_DEFINE(OS_LINUX, [], [Linux backend])
 	AC_SUBST(OS_LINUX)
+	AC_DEFINE([THREADS_POSIX], [], [Use Posix Threads])
 	AC_MSG_RESULT([Linux])
 	backend="linux"
 	AC_CHECK_LIB(rt, clock_gettime)
-	AM_CFLAGS="-pthread -Wshadow"
+	threads="posix"
+	THREAD_CFLAGS="-pthread"
 	AM_LDFLAGS=""
 	;;
 *-darwin*)
 	AC_DEFINE(OS_DARWIN, [], [Darwin backend])
 	AC_SUBST(OS_DARWIN)
+	AC_DEFINE([THREADS_POSIX], [], [Use Posix Threads])
 	AC_DEFINE(USBI_OS_HANDLES_TIMEOUT, [], [Backend handles timeout])
 	AC_MSG_RESULT([Darwin/MacOS X])
 	backend="darwin"
-	AM_CFLAGS="-pthread -Wshadow"
+	threads="posix"
+	THREAD_CFLAGS="-pthread"
 	AM_LDFLAGS="-Wl,-framework -Wl,IOKit -Wl,-framework -Wl,CoreFoundation -Wl,-prebind -no-undefined"
 	;;
 *-mingw*)
@@ -37,26 +52,31 @@ case $host in
 	AC_SUBST(OS_WINDOWS)
 	AC_MSG_RESULT([Windows])
 	backend="windows"
-	LIBS="-lpthreadGC2 -lsetupapi -lole32 -lcfgmgr32"
-	AM_CFLAGS="-Wshadow"	
-	AM_LDFLAGS="-no-undefined"
+	threads="windows"
+	LIBS="-lsetupapi -lole32 -ladvapi32"
+	# -avoid-version to avoid a naming scheme such as libusb-0.dll
+	AM_LDFLAGS="-no-undefined -avoid-version"
+	AC_CHECK_TOOL(RC, windres, no)
 	;;
 *-cygwin*)
 	AC_DEFINE(OS_WINDOWS, [], [Windows backend])
 	AC_SUBST(OS_WINDOWS)
+	AC_DEFINE([THREADS_POSIX], [], [Use Posix Threads])
 	AC_MSG_RESULT([Windows])
 	backend="windows"
-	LIBS="-lpthread -lsetupapi -lole32"
-	AM_CFLAGS=""	
-	AM_LDFLAGS="-no-undefined"
-	;;	
+	threads="posix"
+	LIBS="-lsetupapi -lole32 -ladvapi32"
+	AM_LDFLAGS="-no-undefined -avoid-version"
+	AC_CHECK_TOOL(RC, windres, no)
+	;;
 *)
 	AC_MSG_ERROR([unsupported operating system])
 esac
 
-AM_CONDITIONAL([OS_LINUX], [test "x$backend" == "xlinux"])
-AM_CONDITIONAL([OS_DARWIN], [test "x$backend" == "xdarwin"])
-AM_CONDITIONAL([OS_WINDOWS], [test "x$backend" == "xwindows"])
+AM_CONDITIONAL([OS_LINUX], [test "x$backend" = "xlinux"])
+AM_CONDITIONAL([OS_DARWIN], [test "x$backend" = "xdarwin"])
+AM_CONDITIONAL([OS_WINDOWS], [test "x$backend" = "xwindows"])
+AM_CONDITIONAL([THREADS_POSIX], [test "x$threads" = "xposix"])
 
 # Library versioning
 lt_major="0"
@@ -94,6 +114,8 @@ else
 	fi
 fi
 
+AC_CHECK_TYPES(struct timespec)
+
 # Message logging
 AC_ARG_ENABLE([log], [AS_HELP_STRING([--disable-log], [disable all logging])],
 	[log_enabled=$enableval],
@@ -129,9 +151,9 @@ saved_cflags="$CFLAGS"
 CFLAGS="$CFLAGS -Werror -fvisibility=hidden"
 AC_COMPILE_IFELSE(AC_LANG_PROGRAM([]),
 	[VISIBILITY_CFLAGS="-fvisibility=hidden"
-	 AC_DEFINE([API_EXPORTED], [__attribute__((visibility("default")))], [Default visibility]) ],
+	 AC_DEFINE([DEFAULT_VISIBILITY], [__attribute__((visibility("default")))], [Default visibility]) ],
 	[ VISIBILITY_CFLAGS=""
-	 AC_DEFINE([API_EXPORTED], [], [Default visibility]) ],
+	 AC_DEFINE([DEFAULT_VISIBILITY], [], [Default visibility]) ],
 	])
 CFLAGS="$saved_cflags"
 
@@ -142,12 +164,21 @@ AC_COMPILE_IFELSE(AC_LANG_PROGRAM([]),
 	nopointersign_cflags="-Wno-pointer-sign", nopointersign_cflags="")
 CFLAGS="$saved_cflags"
 
-AM_CFLAGS="$AM_CFLAGS -std=gnu99 $inline_cflags -Wall -Wundef -Wunused -Wstrict-prototypes -Werror-implicit-function-declaration $nopointersign_cflags"
+# sigaction not available on MinGW
+AC_CHECK_FUNC([sigaction], [have_sigaction=yes], [have_sigaction=no])
+AM_CONDITIONAL([HAVE_SIGACTION], [test "x$have_sigaction" = "xyes"])
+
+# headers not available on all platforms but required on others
+AC_CHECK_HEADERS([sys/time.h])
+
+AC_SUBST([THREAD_CFLAGS])
+
+AM_CFLAGS="-std=gnu99 $inline_cflags -Wall -Wundef -Wunused -Wstrict-prototypes -Werror-implicit-function-declaration $nopointersign_cflags -Wshadow"
 
 AC_SUBST(VISIBILITY_CFLAGS)
 AC_SUBST(AM_CFLAGS)
 AC_SUBST(AM_LDFLAGS)
 
-AC_CONFIG_FILES([libusb-1.0.pc] [Makefile] [libusb/Makefile] [examples/Makefile] [doc/Makefile] [doc/doxygen.cfg])
+AC_CONFIG_FILES([libusb-1.0.pc] [Makefile] [libusb/Makefile] [libusb/libusb-1.0.rc] [examples/Makefile] [doc/Makefile] [doc/doxygen.cfg])
 AC_OUTPUT
 

@@ -1,7 +1,7 @@
 /*
  * Windows compat: POSIX compatibility wrapper
- * Copyright (C) 2009 Pete Batard <pbatard@gmail.com>
- *
+ * Copyright (C) 2009-2010 Pete Batard <pbatard@gmail.com>
+ * With contributions from Michael Plante, Orin Eman et al.
  * Parts of poll implementation from libusb-win32, by Stephan Meyer et al.
  *
  * This library is free software; you can redistribute it and/or
@@ -26,17 +26,22 @@
 #pragma warning(disable:4127) // conditional expression is constant
 #endif
 
-#if !defined(ssize_t)
-#if defined (_WIN64)
-#define ssize_t __int64
-#else
-#define ssize_t long
+// Uncomment to have poll return with EINTR as soon as a new transfer (fd) is added
+// This should result in a LIBUSB_ERROR_INTERRUPTED being returned by libusb calls,
+// which should give the app an opportunity to resubmit a new fd set.
+//#define DYNAMIC_FDS
+
+// Handle synchronous completion through the overlapped structure
+#if !defined(STATUS_REPARSE)	// reuse the REPARSE status code
+#define STATUS_REPARSE ((LONG)0x00000104L)
 #endif
-#endif
+#define STATUS_COMPLETED_SYNCHRONOUSLY	STATUS_REPARSE
+#define HasOverlappedIoCompletedSync(lpOverlapped)	(((DWORD)(lpOverlapped)->Internal) == STATUS_COMPLETED_SYNCHRONOUSLY)
 
 enum windows_version {
 	WINDOWS_UNSUPPORTED,
 	WINDOWS_XP,
+	WINDOWS_2003,	// also includes XP 64
 	WINDOWS_VISTA_AND_LATER,
 };
 extern enum windows_version windows_version;
@@ -55,6 +60,7 @@ struct pollfd {
     short events;     /* requested events */
     short revents;    /* returned events */
 };
+
 typedef unsigned int nfds_t;
 
 // access modes
@@ -70,46 +76,28 @@ struct winfd {
 	HANDLE handle;                  // what we need to attach overlapped to the I/O op, so we can poll it
 	OVERLAPPED* overlapped;         // what will report our I/O status
 	enum rw_type rw;                // I/O transfer direction: read *XOR* write (NOT BOTH)
-	BOOLEAN completed_synchronously;// flag for async transfers that completed during request
 };
 extern const struct winfd INVALID_WINFD;
 
-int _libusb_pipe(int pipefd[2]);
-int _libusb_poll(struct pollfd *fds, unsigned int nfds, int timeout);
-ssize_t _libusb_write(int fd, const void *buf, size_t count);
-ssize_t _libusb_read(int fd, void *buf, size_t count);
-int _libusb_close(int fd);
+int usbi_pipe(int pipefd[2]);
+int usbi_poll(struct pollfd *fds, unsigned int nfds, int timeout);
+ssize_t usbi_write(int fd, const void *buf, size_t count);
+ssize_t usbi_read(int fd, void *buf, size_t count);
+int usbi_close(int fd);
 
 void init_polling(void);
 void exit_polling(void);
-struct winfd _libusb_create_fd(HANDLE handle, int access_mode);
-void _libusb_free_fd(int fd);
+struct winfd usbi_create_fd(HANDLE handle, int access_mode);
+void usbi_free_fd(int fd);
 struct winfd fd_to_winfd(int fd);
 struct winfd handle_to_winfd(HANDLE handle);
 struct winfd overlapped_to_winfd(OVERLAPPED* overlapped);
 
-// When building using the MSDDK and sources
+/*
+ * Timeval operations
+ */
 #if defined(DDKBUILD)
-#if !defined(timeval)
-struct timeval {
-        long    tv_sec;         /* seconds */
-        long    tv_usec;        /* and microseconds */
-};
-#endif
-
-#if !defined(timerisset)
-#define timerisset(tvp)         ((tvp)->tv_sec || (tvp)->tv_usec)
-#endif
-
-#if !defined(timercmp)
-#define timercmp(tvp, uvp, cmp) \
-        ((tvp)->tv_sec cmp (uvp)->tv_sec || \
-         (tvp)->tv_sec == (uvp)->tv_sec && (tvp)->tv_usec cmp (uvp)->tv_usec)
-#endif
-
-#if !defined(timerclr)
-#define timerclear(tvp)         (tvp)->tv_sec = (tvp)->tv_usec = 0
-#endif
+#include <winsock.h>	// defines timeval functions on DDK
 #endif
 
 #if !defined(TIMESPEC_TO_TIMEVAL)
@@ -129,3 +117,4 @@ do {                                                    \
 	}                                                   \
 } while (0)
 #endif
+
