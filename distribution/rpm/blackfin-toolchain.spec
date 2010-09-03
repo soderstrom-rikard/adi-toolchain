@@ -314,6 +314,7 @@ rm -rf $RPM_BUILD_ROOT
 %endif
 
 %files elf-gcc-%{gcc_main_ver}
+%defattr(-,root,root)
 %doc %{prefix}/bfin-elf/info/*
 %doc %{prefix}/bfin-elf/man/*
 %{prefix}/bfin-elf/share/*
@@ -376,6 +377,7 @@ rm -rf $RPM_BUILD_ROOT
 
 %if %{optional_gcc}
 %files gcc-%{gcc_addon_ver}-addon
+%defattr(-,root,root)
 %{prefix}/bfin-uclinux/bin/bfin-uclinux-*-%{gcc_addon_fullver}%{EXEEXT}
 %{prefix}/bfin-uclinux/libexec/gcc/bfin-uclinux/%{gcc_addon_fullver}/*
 
@@ -383,12 +385,14 @@ rm -rf $RPM_BUILD_ROOT
 %{prefix}/bfin-linux-uclibc/libexec/gcc/bfin-linux-uclibc/%{gcc_addon_fullver}/*
 
 %files elf-gcc-%{gcc_addon_ver}-addon
+%defattr(-,root,root)
 %{prefix}/bfin-elf/bin/bfin-elf-*-%{gcc_addon_fullver}%{EXEEXT}
 %{prefix}/bfin-elf/lib/gcc/bfin-elf/%{gcc_addon_fullver}/*
 %{prefix}/bfin-elf/libexec/gcc/bfin-elf/%{gcc_addon_fullver}/*
 %endif
 
 %files uclibc-default
+%defattr(-,root,root)
 %{prefix}/bfin-linux-uclibc/bfin-linux-uclibc/include/*
 %{prefix}/bfin-linux-uclibc/bfin-linux-uclibc/lib/*
 %{prefix}/bfin-linux-uclibc/bfin-linux-uclibc/runtime/*
@@ -400,6 +404,7 @@ rm -rf $RPM_BUILD_ROOT
 
 %if %{optional_gcc}
 %files uclibc-default-gcc-%{gcc_addon_ver}-addon
+%defattr(-,root,root)
 %{prefix}/bfin-linux-uclibc/lib/gcc/bfin-linux-uclibc/%{gcc_addon_fullver}/*
 %{prefix}/bfin-uclinux/lib/gcc/bfin-uclinux/%{gcc_addon_fullver}/*
 %endif
