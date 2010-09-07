@@ -16,6 +16,12 @@ touch_tree()
 
 build_autotooled_pkg()
 {
+	local tlib=false
+	if [ "$1" = "--tlib" ] ; then
+		tlib=true
+		shift
+	fi
+
 	local ver
 	local src="$1"
 	local pkg="${src##*/}"
@@ -55,7 +61,7 @@ build_autotooled_pkg()
 		run_cmd_nodie rmdir "$1"/lib/pkgconfig "$1"/lib "$1"/include
 	}
 	at_install "${DIR_ELF_OUTPUT}"
-	if [ $KERNEL_SOURCE ] ; then
+	if ! ${tlib} ; then
 		at_install "${DIR_uC_OUTPUT}"
 		at_install "${DIR_LINUX_OUTPUT}"
 	fi

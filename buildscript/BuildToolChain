@@ -1247,16 +1247,14 @@ build_libusb()
 	# upstream libusb hasn't merged the winusb branch yet
 	local sub
 	case ${CHOST} in *mingw*) sub="-winusb" ;; esac
-	KERNEL_SOURCE= \
-	build_autotooled_pkg "${DIR_LIBUSB_SOURCE}${sub}" \
+	build_autotooled_pkg --tlib "${DIR_LIBUSB_SOURCE}${sub}" \
 		--disable-shared --enable-static
 }
 
 build_libftdi()
 {
 	at_make_args() { echo SUBDIRS=src; }
-	KERNEL_SOURCE= \
-	build_autotooled_pkg "${DIR_LIBFTDI_SOURCE}" \
+	build_autotooled_pkg --tlib "${DIR_LIBFTDI_SOURCE}" \
 		--disable-shared --enable-static --disable-libftdipp \
 		--disable-python-binding --with-async-mode
 }
