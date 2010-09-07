@@ -144,7 +144,7 @@ echo Building in $RPM_BUILD_ROOT
 	-P ADI-%{version}-%{release} \
 	-s `pwd` \
 	-K `pwd`/kbuild_output \
-	-u `pwd`/`echo u-boot-*` \
+	-u `pwd`/u-boot \
 	%{gcc_build_opts} \
 	-o %{prefix}/bfin
 
