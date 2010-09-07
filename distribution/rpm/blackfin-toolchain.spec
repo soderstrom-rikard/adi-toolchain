@@ -200,10 +200,12 @@ rm -rf $RPM_BUILD_ROOT
 %doc %{prefix}/bfin-linux-uclibc/man/*
 %doc %{prefix}/bfin-linux-uclibc/bfin-linux-uclibc/info/*
 %{prefix}/bfin-uclinux/share/*
+%{prefix}/bfin-uclinux/bin/bfin-bsdl2jtag%{EXEEXT}
+%{prefix}/bfin-uclinux/bin/bfin-gdbproxy%{EXEEXT}
+%{prefix}/bfin-uclinux/bin/bfin-jtag%{EXEEXT}
 %{prefix}/bfin-uclinux/bin/bfin-uclinux-addr2line%{EXEEXT}
 %{prefix}/bfin-uclinux/bin/bfin-uclinux-ar%{EXEEXT}
 %{prefix}/bfin-uclinux/bin/bfin-uclinux-as%{EXEEXT}
-%{prefix}/bfin-uclinux/bin/bfin-uclinux-bsdl2jtag%{EXEEXT}
 %{prefix}/bfin-uclinux/bin/bfin-uclinux-c++%{EXEEXT}
 %{prefix}/bfin-uclinux/bin/bfin-uclinux-c++filt%{EXEEXT}
 %{prefix}/bfin-uclinux/bin/bfin-uclinux-cpp%{EXEEXT}
@@ -215,14 +217,12 @@ rm -rf $RPM_BUILD_ROOT
 %{prefix}/bfin-uclinux/bin/bfin-uclinux-gccbug
 %{prefix}/bfin-uclinux/bin/bfin-uclinux-gcov%{EXEEXT}
 %{prefix}/bfin-uclinux/bin/bfin-uclinux-gdb%{EXEEXT}
-%{prefix}/bfin-uclinux/bin/bfin-uclinux-gdbproxy%{EXEEXT}
 %{prefix}/bfin-uclinux/bin/bfin-uclinux-gen_eth_addr%{EXEEXT}
 %{prefix}/bfin-uclinux/bin/bfin-uclinux-gfortran%{EXEEXT}
 %{prefix}/bfin-uclinux/bin/bfin-uclinux-gdbtui%{EXEEXT}
 %if %{x_support}
 %{prefix}/bfin-uclinux/bin/bfin-uclinux-insight%{EXEEXT}
 %endif
-%{prefix}/bfin-uclinux/bin/bfin-uclinux-jtag%{EXEEXT}
 %{prefix}/bfin-uclinux/bin/bfin-uclinux-ldr%{EXEEXT}
 %{prefix}/bfin-uclinux/bin/bfin-uclinux-ld%{EXEEXT}
 %{prefix}/bfin-uclinux/bin/bfin-uclinux-ld.real%{EXEEXT}
@@ -262,10 +262,12 @@ rm -rf $RPM_BUILD_ROOT
 %endif
 
 %{prefix}/bfin-linux-uclibc/share/*
+%{prefix}/bfin-linux-uclibc/bin/bfin-bsdl2jtag%{EXEEXT}
+%{prefix}/bfin-linux-uclibc/bin/bfin-gdbproxy%{EXEEXT}
+%{prefix}/bfin-linux-uclibc/bin/bfin-jtag%{EXEEXT}
 %{prefix}/bfin-linux-uclibc/bin/bfin-linux-uclibc-addr2line%{EXEEXT}
 %{prefix}/bfin-linux-uclibc/bin/bfin-linux-uclibc-ar%{EXEEXT}
 %{prefix}/bfin-linux-uclibc/bin/bfin-linux-uclibc-as%{EXEEXT}
-%{prefix}/bfin-linux-uclibc/bin/bfin-linux-uclibc-bsdl2jtag%{EXEEXT}
 %{prefix}/bfin-linux-uclibc/bin/bfin-linux-uclibc-c++%{EXEEXT}
 %{prefix}/bfin-linux-uclibc/bin/bfin-linux-uclibc-c++filt%{EXEEXT}
 %{prefix}/bfin-linux-uclibc/bin/bfin-linux-uclibc-cpp%{EXEEXT}
@@ -275,14 +277,12 @@ rm -rf $RPM_BUILD_ROOT
 %{prefix}/bfin-linux-uclibc/bin/bfin-linux-uclibc-gccbug
 %{prefix}/bfin-linux-uclibc/bin/bfin-linux-uclibc-gcov%{EXEEXT}
 %{prefix}/bfin-linux-uclibc/bin/bfin-linux-uclibc-gdb%{EXEEXT}
-%{prefix}/bfin-linux-uclibc/bin/bfin-linux-uclibc-gdbproxy%{EXEEXT}
 %{prefix}/bfin-linux-uclibc/bin/bfin-linux-uclibc-gen_eth_addr%{EXEEXT}
 %{prefix}/bfin-linux-uclibc/bin/bfin-linux-uclibc-gfortran%{EXEEXT}
 %{prefix}/bfin-linux-uclibc/bin/bfin-linux-uclibc-gdbtui%{EXEEXT}
 %if %{x_support}
 %{prefix}/bfin-linux-uclibc/bin/bfin-linux-uclibc-insight%{EXEEXT}
 %endif
-%{prefix}/bfin-linux-uclibc/bin/bfin-linux-uclibc-jtag%{EXEEXT}
 %{prefix}/bfin-linux-uclibc/bin/bfin-linux-uclibc-ld%{EXEEXT}
 %{prefix}/bfin-linux-uclibc/bin/bfin-linux-uclibc-ldconfig
 %{prefix}/bfin-linux-uclibc/bin/bfin-linux-uclibc-ldr%{EXEEXT}
@@ -324,10 +324,12 @@ rm -rf $RPM_BUILD_ROOT
 %doc %{prefix}/bfin-elf/info/*
 %doc %{prefix}/bfin-elf/man/*
 %{prefix}/bfin-elf/share/*
+%{prefix}/bfin-elf/bin/bfin-bsdl2jtag%{EXEEXT}
+%{prefix}/bfin-elf/bin/bfin-gdbproxy%{EXEEXT}
+%{prefix}/bfin-elf/bin/bfin-jtag%{EXEEXT}
 %{prefix}/bfin-elf/bin/bfin-elf-addr2line%{EXEEXT}
 %{prefix}/bfin-elf/bin/bfin-elf-ar%{EXEEXT}
 %{prefix}/bfin-elf/bin/bfin-elf-as%{EXEEXT}
-%{prefix}/bfin-elf/bin/bfin-elf-bsdl2jtag%{EXEEXT}
 %{prefix}/bfin-elf/bin/bfin-elf-c++%{EXEEXT}
 %{prefix}/bfin-elf/bin/bfin-elf-c++filt%{EXEEXT}
 %{prefix}/bfin-elf/bin/bfin-elf-cpp%{EXEEXT}
@@ -339,12 +341,10 @@ rm -rf $RPM_BUILD_ROOT
 %{prefix}/bfin-elf/bin/bfin-elf-gccbug
 %{prefix}/bfin-elf/bin/bfin-elf-gcov%{EXEEXT}
 %{prefix}/bfin-elf/bin/bfin-elf-gdb%{EXEEXT}
-%{prefix}/bfin-elf/bin/bfin-elf-gdbproxy%{EXEEXT}
 %{prefix}/bfin-elf/bin/bfin-elf-gdbtui%{EXEEXT}
 %if %{x_support}
 %{prefix}/bfin-elf/bin/bfin-elf-insight%{EXEEXT}
 %endif
-%{prefix}/bfin-elf/bin/bfin-elf-jtag%{EXEEXT}
 %{prefix}/bfin-elf/bin/bfin-elf-ld%{EXEEXT}
 %{prefix}/bfin-elf/bin/bfin-elf-ld.real%{EXEEXT}
 %{prefix}/bfin-elf/bin/bfin-elf-ldr%{EXEEXT}

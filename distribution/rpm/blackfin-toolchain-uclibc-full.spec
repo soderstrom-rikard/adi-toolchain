@@ -1,74 +1,99 @@
+%define bfin_host_strip strip
+%define bfin_targ_strip %{prefix}/bfin-elf/bin/bfin-elf-strip
+%define EXEEXT %{nil}
+%define x_support 0
+%define extra_buildtoolchain_opts %{nil}
+
+%define optional_gcc 0
+%define gcc_main_ver 4.3
+%define gcc_main_fullver %{gcc_main_ver}.5
+%define gcc_addon_ver 4.5
+%define gcc_addon_fullver %{gcc_addon_ver}.0
 
 Name:         blackfin-toolchain-uclibc-full
 URL:          http://blackfin.uclinux.org
-Version:      09r1.1
-Release:      2
+Version:      10r1
+Release:      1
 Requires:     blackfin-toolchain
-Summary:      Wide character libraries for the GNU toolchain for Blackfin
+Summary:      Wide character libraries for the GNU toolchain for the Blackfin processor
 License:      GPL
 Group:        Compilers
-Source:       bfin-gcc-4.3.tar.bz2
-Source1:      bfin-gcc-4.1.tar.bz2
+Source:       bfin-gcc-%{gcc_main_ver}.tar.bz2
+%if %{optional_gcc}
+Source1:      bfin-gcc-%{gcc_addon_ver}.tar.bz2
+%endif
 Source2:      binutils.tar.bz2
 Source3:      kbuild.tar.bz2
 Source4:      full-buildscript.tar.bz2
 Source5:      elf2flt.tar.bz2
-Source6:      genext2fs.tar.bz2
-Source7:      uboot.tar.bz2
-Source8:      libdsp.tar.bz2
-Source9:      cramfs-tools.tar.bz2
-Source10:     uClibc.tar.bz2
-Source11:     ldr-utils.tar.bz2
-Source12:     fdpichdr.tar.bz2
-Source13:     full-config
-#Patch:        mkuboot.diff
-prefix: /opt/uClinux
+Source6:      uClibc.tar.bz2
+Source7:      mpfr.tar.bz2
+Source8:      gmp.tar.bz2
+Source9:      full-config
+prefix:       /opt/uClinux
 BuildRoot:    %{_tmppath}/%{name}-%{version}-build
 
 %description
 This contains a wide character based libc and other support libraries for the
-gcc-4.1 based Blackfin toolchain.
+gcc-%{gcc_main_fullver} based Blackfin Linux toolchains.
 
-%package gcc-4.3-addon
+%if %{optional_gcc}
+%package gcc-%{gcc_addon_ver}-addon
 Requires: blackfin-toolchain-uclibc-full
-Requires: blackfin-toolchain-gcc-4.3-addon
+Requires: blackfin-toolchain-gcc-%{gcc_addon_ver}-addon
 Group:        Compilers
 License:      GPL
-Summary: gcc-4.3 add-on for the Blackfin toolchain
+Summary: gcc-%{gcc_addon_fullver} add-on for the Blackfin toolchain
+%endif
 
-%description gcc-4.3-addon
+%description gcc-%{gcc_addon_ver}-addon
 This contains a wide character based libc and other support libraries for the
-gcc-4.3 based Blackfin toolchain.
+gcc-%{gcc_addon_fullver} based Blackfin Linux toolchains.
 
 %prep
-%setup -b 1 -b 2 -b 3 -b 4 -b 5 -b 6 -b 7 -b 8 -b 9 -b 10 -b 11 -b 12
-#%patch -p1
-cd ..
+%if %{optional_gcc}
+%define extra_setup -a 1
+%endif
+%setup -q -c %{name}-%{version} %{extra_setup} -a 2 -a 3 -a 4 -a 5 -a 6 -a 7 -a 8
 
 %build
-echo $RPM_BUILD_ROOT
-./BuildToolChain -s `pwd`/.. -K `pwd`/../kbuild_output -u `pwd`/../u-boot-2008.10 -c 4.3 -c 4.1 -o %{prefix}/bfin -C %{SOURCE13}
+%if %{optional_gcc}
+%define gcc_build_opts -c %{gcc_addon_ver} -c %{gcc_main_ver}
+%else
+%define gcc_build_opts -c %{gcc_main_ver}
+%endif
+echo Building in $RPM_BUILD_ROOT
+./buildscript/BuildToolChain %{extra_buildtoolchain_opts} \
+	-P ADI-%{version}-%{release} \
+	-s `pwd` \
+	-K `pwd`/kbuild_output \
+	-u `pwd`/u-boot \
+	%{gcc_build_opts} \
+	-o %{prefix}/bfin \
+	-C %{SOURCE9} -S tlibs -S u-boot -S ldr -S jtag -X
 
 %install
 echo Installing in $RPM_BUILD_ROOT
 rm -rf $RPM_BUILD_ROOT/opt
 mkdir -p $RPM_BUILD_ROOT%{prefix}
-(strip %{prefix}/bfin-elf/bin/* || true)
-(strip %{prefix}/bfin-uclinux/bin/* || true)
-(strip %{prefix}/bfin-linux-uclibc/bin/* || true)
-(strip %{prefix}/bfin-elf/libexec/gcc/bfin-elf/4.3.3/cc1* || true)
-(strip %{prefix}/bfin-uclinux/libexec/gcc/bfin-uclinux/4.3.3/cc1* || true)
-(strip %{prefix}/bfin-linux-uclibc/libexec/gcc/bfin-linux-uclibc/4.3.3/cc1* || true)
-(strip %{prefix}/bfin-elf/libexec/gcc/bfin-elf/4.1.2/cc1* || true)
-(strip %{prefix}/bfin-uclinux/libexec/gcc/bfin-uclinux/4.1.2/cc1* || true)
-(strip %{prefix}/bfin-linux-uclibc/libexec/gcc/bfin-linux-uclibc/4.1.2/cc1* || true)
+(%{bfin_host_strip} %{prefix}/bfin-elf/bin/* || true)
+(%{bfin_host_strip} %{prefix}/bfin-uclinux/bin/* || true)
+(%{bfin_host_strip} %{prefix}/bfin-linux-uclibc/bin/* || true)
+%if %{optional_gcc}
+(%{bfin_host_strip} %{prefix}/bfin-elf/libexec/gcc/bfin-elf/%{gcc_addon_fullver}/cc1* || true)
+(%{bfin_host_strip} %{prefix}/bfin-uclinux/libexec/gcc/bfin-uclinux/%{gcc_addon_fullver}/cc1* || true)
+(%{bfin_host_strip} %{prefix}/bfin-linux-uclibc/libexec/gcc/bfin-linux-uclibc/%{gcc_addon_fullver}/cc1* || true)
+%endif
+(%{bfin_host_strip} %{prefix}/bfin-elf/libexec/gcc/bfin-elf/%{gcc_main_fullver}/cc1* || true)
+(%{bfin_host_strip} %{prefix}/bfin-uclinux/libexec/gcc/bfin-uclinux/%{gcc_main_fullver}/cc1* || true)
+(%{bfin_host_strip} %{prefix}/bfin-linux-uclibc/libexec/gcc/bfin-linux-uclibc/%{gcc_main_fullver}/cc1* || true)
 FILES=`find %{prefix}/ -name 'crt*.o'`
-(%{prefix}/bfin-elf/bin/bfin-elf-strip --strip-debug $FILES || true)
+(%{bfin_targ_strip} --strip-debug $FILES || true)
 
-find %{prefix}/ -name crt1.o |xargs %{prefix}/bfin-elf/bin/bfin-elf-strip --strip-debug
+find %{prefix}/ -name crt1.o | xargs %{bfin_targ_strip} --strip-debug
 cp -a %{prefix} $RPM_BUILD_ROOT/opt/
-./find-duplicates.sh  $RPM_BUILD_ROOT%{prefix}/bfin-elf/ $RPM_BUILD_ROOT%{prefix}/bfin-uclinux/ bfin-elf bfin-uclinux
-./find-duplicates.sh  $RPM_BUILD_ROOT%{prefix}/bfin-linux-uclibc/ $RPM_BUILD_ROOT%{prefix}/bfin-uclinux/ bfin-linux-uclibc bfin-uclinux
+./buildscript/find-duplicates.sh  $RPM_BUILD_ROOT%{prefix}/bfin-elf/ $RPM_BUILD_ROOT%{prefix}/bfin-uclinux/ bfin-elf bfin-uclinux
+./buildscript/find-duplicates.sh  $RPM_BUILD_ROOT%{prefix}/bfin-linux-uclibc/ $RPM_BUILD_ROOT%{prefix}/bfin-uclinux/ bfin-linux-uclibc bfin-uclinux
 
 %clean
 rm -rf $RPM_BUILD_ROOT
@@ -78,15 +103,18 @@ rm -rf $RPM_BUILD_ROOT
 %{prefix}/bfin-linux-uclibc/bfin-linux-uclibc/include/*
 %{prefix}/bfin-linux-uclibc/bfin-linux-uclibc/lib/*
 %{prefix}/bfin-linux-uclibc/bfin-linux-uclibc/runtime/*
-%{prefix}/bfin-linux-uclibc/lib/gcc/bfin-linux-uclibc/4.1.2/*
+%{prefix}/bfin-linux-uclibc/lib/gcc/bfin-linux-uclibc/%{gcc_main_fullver}/*
 %{prefix}/bfin-uclinux/bfin-uclinux/include/*
 %{prefix}/bfin-uclinux/bfin-uclinux/lib/*
 %{prefix}/bfin-uclinux/bfin-uclinux/runtime/*
-%{prefix}/bfin-uclinux/lib/gcc/bfin-uclinux/4.1.2/*
+%{prefix}/bfin-uclinux/lib/gcc/bfin-uclinux/%{gcc_main_fullver}/*
 
-%files gcc-4.3-addon
-%{prefix}/bfin-linux-uclibc/lib/gcc/bfin-linux-uclibc/4.3.3/*
-%{prefix}/bfin-uclinux/lib/gcc/bfin-uclinux/4.3.3/*
+%if %{optional_gcc}
+%files gcc-%{gcc_addon_ver}-addon
+%defattr(-,root,root)
+%{prefix}/bfin-linux-uclibc/lib/gcc/bfin-linux-uclibc/%{gcc_addon_fullver}/*
+%{prefix}/bfin-uclinux/lib/gcc/bfin-uclinux/%{gcc_addon_fullver}/*
+%endif
 
 
 %changelog -n blackfin-toolchain-uclibc-wchar
