@@ -24,7 +24,7 @@ Source1:      bfin-gcc-%{gcc_addon_ver}.tar.bz2
 %endif
 Source2:      binutils.tar.bz2
 Source3:      kbuild.tar.bz2
-Source4:      full-buildscript.tar.bz2
+Source4:      buildscript.tar.bz2
 Source5:      elf2flt.tar.bz2
 Source6:      uClibc.tar.bz2
 Source7:      mpfr.tar.bz2
@@ -44,11 +44,11 @@ Requires: blackfin-toolchain-gcc-%{gcc_addon_ver}-addon
 Group:        Compilers
 License:      GPL
 Summary: gcc-%{gcc_addon_fullver} add-on for the Blackfin toolchain
-%endif
 
 %description gcc-%{gcc_addon_ver}-addon
 This contains a wide character based libc and other support libraries for the
 gcc-%{gcc_addon_fullver} based Blackfin Linux toolchains.
+%endif
 
 %prep
 %if %{optional_gcc}
@@ -67,10 +67,9 @@ echo Building in $RPM_BUILD_ROOT
 	-P ADI-%{version}-%{release} \
 	-s `pwd` \
 	-K `pwd`/kbuild_output \
-	-u `pwd`/u-boot \
 	%{gcc_build_opts} \
 	-o %{prefix}/bfin \
-	-C %{SOURCE9} -S tlibs -S u-boot -S ldr -S jtag -X
+	-C %{SOURCE9} -S u-boot -S ldr -S jtag -X
 
 %install
 echo Installing in $RPM_BUILD_ROOT
