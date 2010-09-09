@@ -1,3 +1,17 @@
+2010-09-09  Steve Kilbane  <stephen.kilbane@analog.com>
+
+	[#5827] Add support for flushing instr/data caches when
+	creating trampolines. For Linux-based toolchains, rely on
+	cacheflush() syscall, if anomalies 05-00-0312 or 05-00-0419
+	are in effect. For bare-metal toolchain, use a direct function,
+	but map it to L1 if we have to avoid those anomalies.
+	* config/bfin/bfin.h (CLEAR_INSN_CACHE): invoke syscall, or map
+	directly to __clear_cache_range() function.
+	* config/bfin/bfin.c (initialize_trampoline()): remove the assertion,
+	and call libgcc2's clear_cache() function.
+	* libgcc2.c (clear_cache()): provide local definition of
+	__clear_cache_range(), as we want to map this to L1 if anomalies apply.
+
 2010-08-31  Stuart Henderson  <stuart.henderson@analog.com>
 
 	* config/bfin/bfin.c (bfin_cpus[]): [#6211] Move bf592-0.1 so it is default.

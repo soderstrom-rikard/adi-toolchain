@@ -1413,4 +1413,24 @@ extern int splitting_for_sched, splitting_loops;
 #define TARGET_SUPPORTS_SYNC_CALLS 0
 #endif
 
+/* To clear the instruction cache when a trampoline is initialized, define the following macro. 
+   CLEAR_INSN_CACHE (beg, end)
+
+   If defined, expands to a C expression clearing the instruction
+   cache in the specified interval. The definition of this macro would
+   typically be a series of asm statements. Both beg and end are both
+   pointer expressions. */
+#if defined(__linux__) && (ANOMALY_05000312 || ANOMALY_05000419)
+#define CLEAR_INSN_CACHE(beg,end)		\
+do {						\
+  char *start = (beg);                          \
+  char *finish = (end);                         \
+  cacheflush (start, finish - start, BCACHE);   \
+} while (0)
+#else
+#define CLEAR_INSN_CACHE __clear_cache_range
+#endif
+
+
+
 #endif /*  _BFIN_CONFIG */

@@ -2024,6 +2024,33 @@ __eprintf (const char *string, const char *expression,
 #ifdef L_clear_cache
 /* Clear part of an instruction cache.  */
 
+#ifdef __bfin__
+#if defined(__linux__) && (ANOMALY_05000312 || ANOMALY_05000419)
+#include <asm/cachectl.h>
+#else
+/* This probably shouldn't be here, but we want to have CLEAR_INSN_CACHE
+** call a function in a different memory location, and we can't make calls
+** from here.
+*/
+#if ANOMALY_05000312 || ANOMALY_05000419
+__attribute__ ((l1_text))
+#endif
+static void __clear_cache_range (char *beg, char *end)
+{
+  char *ptr = beg;
+  do {
+    __asm__ __volatile__ ( "FLUSH [%0++];" : "+a" (ptr) : : "memory" );
+  } while (ptr <= end);
+  ptr = beg;
+  __asm__ __volatile__ ("SSYNC;");
+  do {
+    __asm__ __volatile__ ( "IFLUSH [%0++];" : "+a" (ptr) : : "memory" );
+  } while (ptr <= end);
+}
+
+#endif
+#endif
+
 void
 __clear_cache (char *beg __attribute__((__unused__)),
 	       char *end __attribute__((__unused__)))

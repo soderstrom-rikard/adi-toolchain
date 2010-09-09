@@ -2157,12 +2157,6 @@ initialize_trampoline (rtx tramp, rtx fnaddr, rtx cxt)
   rtx addr;
   int i = 0;
 
-  /* We haven't yet decided how to handle trampolines, since the cache
-     needs to be cleared, but there's an anomaly that prevents us using
-     IFLUSH anywhere except L1. So barf for now, so that at least users
-     know that they've got a problem that needs a trampoline. */
-  abort ();
-#if 0
   if (TARGET_FDPIC)
     {
       rtx a = memory_address (Pmode, plus_constant (tramp, 8));
@@ -2170,7 +2164,6 @@ initialize_trampoline (rtx tramp, rtx fnaddr, rtx cxt)
       emit_move_insn (gen_rtx_MEM (SImode, addr), a);
       i = 8;
     }
-
   addr = memory_address (Pmode, plus_constant (tramp, i + 2));
   emit_move_insn (gen_rtx_MEM (HImode, addr), gen_lowpart (HImode, t1));
   emit_insn (gen_ashrsi3 (t1, t1, GEN_INT (16)));
@@ -2182,7 +2175,10 @@ initialize_trampoline (rtx tramp, rtx fnaddr, rtx cxt)
   emit_insn (gen_ashrsi3 (t2, t2, GEN_INT (16)));
   addr = memory_address (Pmode, plus_constant (tramp, i + 14));
   emit_move_insn (gen_rtx_MEM (HImode, addr), gen_lowpart (HImode, t2));
-#endif
+
+  emit_library_call(gen_rtx_SYMBOL_REF (Pmode, "__clear_cache"),
+		    LCT_NORMAL, VOIDmode, 2, tramp, Pmode,
+		    plus_constant (tramp, TRAMPOLINE_SIZE), Pmode);
 }
 
 /* Emit insns to move operands[1] into operands[0].  */
