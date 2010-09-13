@@ -1,3 +1,10 @@
+2010-09-13 David Gibson <david.gibson@analog.com>
+
+	* [6095] Fix for failures g++.old-deja/g++.other/init18.C and
+	g++.old-deja/g++.other/init19.C. atexit wasn't taking into account
+	any global destructors registered once the atexit/destructor cleanup
+	process had begun.
+
 2008-05-15  Jie Zhang  <jie.zhang@analog.com>
 
 	Apply

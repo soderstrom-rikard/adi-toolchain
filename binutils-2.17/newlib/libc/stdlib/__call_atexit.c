@@ -12,6 +12,8 @@
  * otherwise only the handlers from that DSO are called.
  */
 
+
+
 void 
 _DEFUN (__call_exitprocs, (code, d),
 	int code _AND _PTR d)
@@ -21,6 +23,8 @@ _DEFUN (__call_exitprocs, (code, d),
   register struct _on_exit_args * args;
   register int n;
   int i;
+  int copy_ind;
+  int last_ind = 0;
   void (*fn) (void);
 
   p = _GLOBAL_REENT->_atexit;
@@ -32,34 +36,35 @@ _DEFUN (__call_exitprocs, (code, d),
 #else
       args = &p->_on_exit_args;
 #endif
-      for (n = p->_ind - 1; n >= 0; n--)
-	{
-	  i = 1 << n;
+      do {
+        copy_ind = p->_ind;
+        for (n = p->_ind - 1; n >= last_ind; n--)
+        {
+	    i = 1 << n;
 
-	  /* Skip functions not from this dso.  */
-	  if (d && (!args || args->_dso_handle[n] != d))
-	    continue;
+	    /* Skip functions not from this dso.  */
+	    if (d && (!args || args->_dso_handle[n] != d))
+	      continue;
 
-	  /* Remove the function now to protect against the
-	     function calling exit recursively.  */
-	  fn = p->_fns[n];
-	  if (n == p->_ind - 1)
-	    p->_ind--;
-	  else
+	    /* Remove the function now to protect against the
+	       function calling exit recursively.  */
+	    fn = p->_fns[n];
 	    p->_fns[n] = NULL;
 
-	  /* Skip functions that have already been called.  */
-	  if (!fn)
-	    continue;
+	    /* Skip functions that have already been called.  */
+	    if (!fn)
+	      continue;
 
-	  /* Call the function.  */
-	  if (!args || (args->_fntypes & i) == 0)
-	    fn ();
-	  else if ((args->_is_cxa & i) == 0)
-	    (*((void (*)(int, _PTR)) fn))(code, args->_fnargs[n]);
-	  else
-	    (*((void (*)(_PTR)) fn))(args->_fnargs[n]);
-	}
+	    /* Call the function.  */
+	    if (!args || (args->_fntypes & i) == 0)
+	      fn ();
+	    else if ((args->_is_cxa & i) == 0)
+	      (*((void (*)(int, _PTR)) fn))(code, args->_fnargs[n]);
+	    else
+	      (*((void (*)(_PTR)) fn))(args->_fnargs[n]);
+	  }
+          last_ind = copy_ind;
+      } while ( copy_ind != p->_ind );
 
       /* Move to the next block.  Free empty blocks except the last one,
 	 which is part of _GLOBAL_REENT.  */
