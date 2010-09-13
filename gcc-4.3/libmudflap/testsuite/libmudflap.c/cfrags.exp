@@ -13,7 +13,11 @@ foreach flags $MUDFLAP_FLAGS {
                             ${srcdir}/libmudflap.c/hook*.c \
                             ${srcdir}/libmudflap.c/pass*.c]] {
 	set bsrc [file tail $srcfile]
-	setenv MUDFLAP_OPTIONS "-viol-segv"
+        if { ![is_remote target] } {
+            setenv MUDFLAP_OPTIONS "-viol-segv"
+        } else {
+            remote_setenv MUDFLAP_OPTIONS "-viol-segv"
+        }
 	dg-runtest $srcfile $flags "-fmudflap -lmudflap"
     }
 }
