@@ -5,7 +5,10 @@ int main ()
 {
 /* One cannot redeclare __mf_lc_mask in proper C from instrumented
    code, because of the way the instrumentation code emits its decls.  */
-extern unsigned foo __asm__ ("__mf_lc_mask");
+#define _C_SYM(pfx, sym) #pfx sym
+#define C_SYM(pfx, sym) _C_SYM(pfx, sym)
+
+extern unsigned foo __asm__ (C_SYM(__USER_LABEL_PREFIX__, "__mf_lc_mask"));
 unsigned * volatile bar = &foo;
 *bar = 4;
 return 0;

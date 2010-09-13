@@ -1,3 +1,8 @@
+2010-09-13  Stuart Henderson  <Stuart.Henderson@analog.com>
+
+	* testsuite/libmudflap.c/fail18-frag.c: [#6128] Append __USER_LABEL_PREFIX__
+	to asm reference of __mf_lc_mask.
+
 2009-01-10  Jie Zhang  <jie.zhang@analog.com>
 
 	* mf-impl.h (__mf_get_state, __mf_set_state): Don't use
