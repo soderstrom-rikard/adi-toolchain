@@ -28,7 +28,12 @@ foreach flags $MUDFLAP_FLAGS {
     set test "ctors-21 linkage ${flags}"
     if [string match "" $l3]  { pass $test } { fail $test }
 
-    setenv MUDFLAP_OPTIONS "-viol-segv"
+    if { ![is_remote target] } {
+       setenv MUDFLAP_OPTIONS "-viol-segv"
+    } else {
+       remote_setenv MUDFLAP_OPTIONS "-viol-segv"
+    }
+
 
     remote_spawn host "./ctors-12.exe"
     set l5 [remote_wait host 10]
