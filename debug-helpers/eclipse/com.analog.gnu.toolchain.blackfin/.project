@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <projectDescription>
-	<name>com.analog.uclinux.toolchain.gnu</name>
+	<name>com.analog.gnu.toolchain.blackfin</name>
 	<comment></comment>
 	<projects>
 	</projects>
