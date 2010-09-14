@@ -218,239 +218,6 @@
                   valueType="string">
             </option>
          </tool>
-         <optionCategory
-               id="com.analog.gnu.toolchain.blackfin.options.general"
-               name="General">
-         </optionCategory>
-         <option
-               category="com.analog.gnu.toolchain.blackfin.options.general"
-               defaultValue="Unspecified"
-               id="com.analog.gnu.toolchain.blackfin.options.general.proc"
-               isAbstract="false"
-               name="Processor"
-               resourceFilter="all"
-               valueHandler="com.analog.gnu.toolchain.blackfin.build.BlackfinTargets"
-               valueType="enumerated">
-            <enumeratedOptionValue
-                  id="com.analog.gnu.toolchain.blackfin.proc.unspecified"
-                  name="Unspecified">
-            </enumeratedOptionValue>
-            <enumeratedOptionValue
-                  command="bf512"
-                  id="com.analog.gnu.toolchain.blackfin.proc.bf512"
-                  name="BF512">
-            </enumeratedOptionValue>
-            <enumeratedOptionValue
-                  command="bf514"
-                  id="com.analog.gnu.toolchain.blackfin.proc.bf514"
-                  name="BF514">
-            </enumeratedOptionValue>
-            <enumeratedOptionValue
-                  command="bf516"
-                  id="com.analog.gnu.toolchain.blackfin.proc.bf516"
-                  name="BF516">
-            </enumeratedOptionValue>
-            <enumeratedOptionValue
-                  command="bf518"
-                  id="com.analog.gnu.toolchain.blackfin.proc.bf518"
-                  name="BF518">
-            </enumeratedOptionValue>
-            <enumeratedOptionValue
-                  command="bf522"
-                  id="com.analog.gnu.toolchain.blackfin.proc.bf522"
-                  name="BF522">
-            </enumeratedOptionValue>
-            <enumeratedOptionValue
-                  command="bf523"
-                  id="com.analog.gnu.toolchain.blackfin.proc.bf523"
-                  name="BF523">
-            </enumeratedOptionValue>
-            <enumeratedOptionValue
-                  command="bf524"
-                  id="com.analog.gnu.toolchain.blackfin.proc.bf524"
-                  name="BF524">
-            </enumeratedOptionValue>
-            <enumeratedOptionValue
-                  command="bf525"
-                  id="com.analog.gnu.toolchain.blackfin.proc.bf525"
-                  name="BF525">
-            </enumeratedOptionValue>
-            <enumeratedOptionValue
-                  command="bf526"
-                  id="com.analog.gnu.toolchain.blackfin.proc.bf526"
-                  name="BF526">
-            </enumeratedOptionValue>
-            <enumeratedOptionValue
-                  command="bf527"
-                  id="com.analog.gnu.toolchain.blackfin.proc.bf527"
-                  name="BF527">
-            </enumeratedOptionValue>
-            <enumeratedOptionValue
-                  command="bf531"
-                  id="com.analog.gnu.toolchain.blackfin.proc.bf531"
-                  name="BF531">
-            </enumeratedOptionValue>
-            <enumeratedOptionValue
-                  command="bf532"
-                  id="com.analog.gnu.toolchain.blackfin.proc.bf532"
-                  name="BF532">
-            </enumeratedOptionValue>
-            <enumeratedOptionValue
-                  command="bf533"
-                  id="com.analog.gnu.toolchain.blackfin.proc.bf533"
-                  name="BF533">
-            </enumeratedOptionValue>
-            <enumeratedOptionValue
-                  command="bf534"
-                  id="com.analog.gnu.toolchain.blackfin.proc.bf534"
-                  name="BF534">
-            </enumeratedOptionValue>
-            <enumeratedOptionValue
-                  command="bf536"
-                  id="com.analog.gnu.toolchain.blackfin.proc.bf536"
-                  name="BF536">
-            </enumeratedOptionValue>
-            <enumeratedOptionValue
-                  command="bf537"
-                  id="com.analog.gnu.toolchain.blackfin.proc.bf537"
-                  name="BF537">
-            </enumeratedOptionValue>
-            <enumeratedOptionValue
-                  command="bf538"
-                  id="com.analog.gnu.toolchain.blackfin.proc.bf538"
-                  name="BF538">
-            </enumeratedOptionValue>
-            <enumeratedOptionValue
-                  command="bf539"
-                  id="com.analog.gnu.toolchain.blackfin.proc.bf539"
-                  name="BF539">
-            </enumeratedOptionValue>
-            <enumeratedOptionValue
-                  command="bf542"
-                  id="com.analog.gnu.toolchain.blackfin.proc.bf542"
-                  name="BF542">
-            </enumeratedOptionValue>
-            <enumeratedOptionValue
-                  command="bf542m"
-                  id="com.analog.gnu.toolchain.blackfin.proc.bf542m"
-                  name="BF542M">
-            </enumeratedOptionValue>
-            <enumeratedOptionValue
-                  command="bf544"
-                  id="com.analog.gnu.toolchain.blackfin.proc.bf544"
-                  name="BF544">
-            </enumeratedOptionValue>
-            <enumeratedOptionValue
-                  command="bf544m"
-                  id="com.analog.gnu.toolchain.blackfin.proc.bf544m"
-                  name="BF544M">
-            </enumeratedOptionValue>
-            <enumeratedOptionValue
-                  command="bf547"
-                  id="com.analog.gnu.toolchain.blackfin.proc.bf547"
-                  name="BF547">
-            </enumeratedOptionValue>
-            <enumeratedOptionValue
-                  command="bf547m"
-                  id="com.analog.gnu.toolchain.blackfin.proc.bf547m"
-                  name="BF547M">
-            </enumeratedOptionValue>
-            <enumeratedOptionValue
-                  command="bf548"
-                  id="com.analog.gnu.toolchain.blackfin.proc.bf548"
-                  name="BF548">
-            </enumeratedOptionValue>
-            <enumeratedOptionValue
-                  command="bf548m"
-                  id="com.analog.gnu.toolchain.blackfin.proc.bf548m"
-                  name="BF548M">
-            </enumeratedOptionValue>
-            <enumeratedOptionValue
-                  command="bf549"
-                  id="com.analog.gnu.toolchain.blackfin.proc.bf549"
-                  name="BF549">
-            </enumeratedOptionValue>
-            <enumeratedOptionValue
-                  command="bf549m"
-                  id="com.analog.gnu.toolchain.blackfin.proc.bf549m"
-                  name="BF549M">
-            </enumeratedOptionValue>
-            <enumeratedOptionValue
-                  command="bf561"
-                  id="com.analog.gnu.toolchain.blackfin.proc.bf561"
-                  name="BF561">
-            </enumeratedOptionValue>
-         </option>
-         <option
-               category="com.analog.gnu.toolchain.blackfin.options.general"
-               defaultValue="any"
-               id="com.analog.gnu.toolchain.blackfin.options.general.sirev"
-               isAbstract="false"
-               name="Silicon Revision"
-               resourceFilter="all"
-               valueHandler="com.analog.gnu.toolchain.blackfin.build.BlackfinTargets"
-               valueType="enumerated">
-            <enumeratedOptionValue
-                  command="any"
-                  id="com.analog.gnu.toolchain.blackfin.sirev.any"
-                  name="any">
-            </enumeratedOptionValue>
-            <enumeratedOptionValue
-                  command="none"
-                  id="com.analog.gnu.toolchain.blackfin.sirev.none"
-                  name="none">
-            </enumeratedOptionValue>
-            <enumeratedOptionValue
-                  command="0.0"
-                  id="com.analog.gnu.toolchain.blackfin.sirev.0"
-                  name="0.0">
-            </enumeratedOptionValue>
-            <enumeratedOptionValue
-                  command="0.1"
-                  id="com.analog.gnu.toolchain.blackfin.sirev.1"
-                  name="0.1">
-            </enumeratedOptionValue>
-            <enumeratedOptionValue
-                  command="0.2"
-                  id="com.analog.gnu.toolchain.blackfin.sirev.2"
-                  name="0.2">
-            </enumeratedOptionValue>
-            <enumeratedOptionValue
-                  command="0.3"
-                  id="com.analog.gnu.toolchain.blackfin.sirev.3"
-                  name="0.3">
-            </enumeratedOptionValue>
-            <enumeratedOptionValue
-                  command="0.4"
-                  id="com.analog.gnu.toolchain.blackfin.sirev.4"
-                  name="0.4">
-            </enumeratedOptionValue>
-            <enumeratedOptionValue
-                  command="0.5"
-                  id="com.analog.gnu.toolchain.blackfin.sirev.5"
-                  name="0.5">
-            </enumeratedOptionValue>
-            <enumeratedOptionValue
-                  command="0.8"
-                  id="com.analog.gnu.toolchain.blackfin.sirev.8"
-                  name="0.8">
-            </enumeratedOptionValue>
-            <enumeratedOptionValue
-                  command="0.9"
-                  id="com.analog.gnu.toolchain.blackfin.sirev.9"
-                  name="0.9">
-            </enumeratedOptionValue>
-            <enumeratedOptionValue
-                  command="0.7"
-                  id="com.analog.gnu.toolchain.blackfin.sirev.7"
-                  name="0.7">
-            </enumeratedOptionValue>
-            <enumeratedOptionValue
-                  command="0.6"
-                  id="com.analog.gnu.toolchain.blackfin.sirev.6"
-                  name="0.6">
-            </enumeratedOptionValue>
-         </option>
       </toolChain>
       <toolChain
             archList="all"
@@ -989,30 +756,351 @@
    <extension
          point="org.eclipse.debug.ui.launchConfigurationTypeImages">
       <launchConfigurationTypeImage
-            configTypeID="gdb.launchConfigurationType"
-            icon="images/adi-16x16.gif"
-            id="gdb.launchConfigurationTypeImage">
+            configTypeID="gdb.app.elf.launchConfigurationType"
+            icon="icons/obj16/vdsp.gif"
+            id="gdb.app.elf.launchConfigurationTypeImage">
       </launchConfigurationTypeImage>
+      <launchConfigurationTypeImage
+            configTypeID="gdb.app.elf.sim.launchConfigurationType"
+            icon="icons/obj16/vdsp.gif"
+            id="gdb.app.elf.sim.launchConfigurationTypeImage">
+      </launchConfigurationTypeImage>
+      <launchConfigurationTypeImage
+            configTypeID="gdb.kernel.elf.launchConfigurationType"
+            icon="icons/obj16/vdsp.gif"
+            id="gdb.kernel.elf.launchConfigurationTypeImage">
+      </launchConfigurationTypeImage>
+      <launchConfigurationTypeImage
+            configTypeID="gdb.app.flat.launchConfigurationType"
+            icon="icons/obj16/vdsp.gif"
+            id="gdb.app.flat.launchConfigurationTypeImage">
+      </launchConfigurationTypeImage>
+      <launchConfigurationTypeImage
+            configTypeID="gdb.kernel.flat.launchConfigurationType"
+            icon="icons/obj16/vdsp.gif"
+            id="gdb.kernel.flat.launchConfigurationTypeImage">
+      </launchConfigurationTypeImage>      
+      <launchConfigurationTypeImage
+            configTypeID="gdb.app.fdpic.launchConfigurationType"
+            icon="icons/obj16/vdsp.gif"
+            id="gdb.app.fdpic.launchConfigurationTypeImage">
+      </launchConfigurationTypeImage>      
    </extension>
    <extension
          point="org.eclipse.debug.core.launchConfigurationTypes">
       <launchConfigurationType
             delegate="com.analog.gnu.toolchain.blackfin.debug.gdbjtag.GDBJtagLaunchConfigurationDelegate"
-            id="gdb.launchConfigurationType"
+            id="gdb.app.elf.launchConfigurationType"
             modes="debug"
-            name="Blackfin Debug Targets"
+            name="Blackfin Bare Metal Application (ELF) on JTAG Device"
             public="true"
             sourceLocatorId="org.eclipse.cdt.debug.core.sourceLocator"
             sourcePathComputerId="org.eclipse.cdt.debug.core.sourcePathComputer">
       </launchConfigurationType>
+      <launchConfigurationType
+            delegate="com.analog.gnu.toolchain.blackfin.debug.gdbjtag.GDBJtagLaunchConfigurationDelegate"
+            id="gdb.app.elf.sim.launchConfigurationType"
+            modes="debug"
+            name="Blackfin Bare Metal Application (ELF) on Simulator"
+            public="true"
+            sourceLocatorId="org.eclipse.cdt.debug.core.sourceLocator"
+            sourcePathComputerId="org.eclipse.cdt.debug.core.sourcePathComputer">
+      </launchConfigurationType>      
+      <launchConfigurationType
+            delegate="com.analog.gnu.toolchain.blackfin.debug.gdbjtag.GDBJtagLaunchConfigurationDelegate"
+            id="gdb.kernel.elf.launchConfigurationType"
+            modes="debug"
+            name="Blackfin Linux Kernel (ELF)"
+            public="true"
+            sourceLocatorId="org.eclipse.cdt.debug.core.sourceLocator"
+            sourcePathComputerId="org.eclipse.cdt.debug.core.sourcePathComputer">
+      </launchConfigurationType>          
+      <launchConfigurationType
+            delegate="com.analog.gnu.toolchain.blackfin.debug.gdbjtag.GDBJtagLaunchConfigurationDelegate"
+            id="gdb.app.flat.launchConfigurationType"
+            modes="debug"
+            name="Blackfin Linux Application (FLAT)"
+            public="true"
+            sourceLocatorId="org.eclipse.cdt.debug.core.sourceLocator"
+            sourcePathComputerId="org.eclipse.cdt.debug.core.sourcePathComputer">
+      </launchConfigurationType>
+      <launchConfigurationType
+            delegate="com.analog.gnu.toolchain.blackfin.debug.gdbjtag.GDBJtagLaunchConfigurationDelegate"
+            id="gdb.kernel.flat.launchConfigurationType"
+            modes="debug"
+            name="Blackfin Linux Kernel (FLAT)"
+            public="true"
+            sourceLocatorId="org.eclipse.cdt.debug.core.sourceLocator"
+            sourcePathComputerId="org.eclipse.cdt.debug.core.sourcePathComputer">
+      </launchConfigurationType>      
+      <launchConfigurationType
+            delegate="com.analog.gnu.toolchain.blackfin.debug.gdbjtag.GDBJtagLaunchConfigurationDelegate"
+            id="gdb.app.fdpic.launchConfigurationType"
+            modes="debug"
+            name="Blackfin Linux Application (FDPIC)"
+            public="true"
+            sourceLocatorId="org.eclipse.cdt.debug.core.sourceLocator"
+            sourcePathComputerId="org.eclipse.cdt.debug.core.sourcePathComputer">
+      </launchConfigurationType>      
    </extension>
    <extension
          point="org.eclipse.debug.ui.launchConfigurationTabGroups">
       <launchConfigurationTabGroup
             class="com.analog.gnu.toolchain.blackfin.debug.BlackfinDebugLaunchConfigurationTabGroup"
-            id="gdb.launchConfigurationTabGroup"
-            type="gdb.launchConfigurationType">
+            id="gdb.app.elf.launchConfigurationTabGroup"
+            type="gdb.app.elf.launchConfigurationType">
       </launchConfigurationTabGroup>
+      <launchConfigurationTabGroup
+            class="com.analog.gnu.toolchain.blackfin.debug.BlackfinDebugLaunchConfigurationTabGroup"
+            id="gdb.app.elf.sim.launchConfigurationTabGroup"
+            type="gdb.app.elf.sim.launchConfigurationType">
+      </launchConfigurationTabGroup>
+      <launchConfigurationTabGroup
+            class="com.analog.gnu.toolchain.blackfin.debug.BlackfinDebugLaunchConfigurationTabGroup"
+            id="gdb.kernel.elf.launchConfigurationTabGroup"
+            type="gdb.kernel.elf.launchConfigurationType">
+      </launchConfigurationTabGroup>                     
+      <launchConfigurationTabGroup
+            class="com.analog.gnu.toolchain.blackfin.debug.BlackfinDebugLaunchConfigurationTabGroup"
+            id="gdb.app.flat.launchConfigurationTabGroup"
+            type="gdb.app.flat.launchConfigurationType">
+      </launchConfigurationTabGroup>
+      <launchConfigurationTabGroup
+            class="com.analog.gnu.toolchain.blackfin.debug.BlackfinDebugLaunchConfigurationTabGroup"
+            id="gdb.kernel.flat.launchConfigurationTabGroup"
+            type="gdb.kernel.flat.launchConfigurationType">
+      </launchConfigurationTabGroup>      
+      <launchConfigurationTabGroup
+            class="com.analog.gnu.toolchain.blackfin.debug.BlackfinDebugLaunchConfigurationTabGroup"
+            id="gdb.app.fdpic.launchConfigurationTabGroup"
+            type="gdb.app.fdpic.launchConfigurationType">
+      </launchConfigurationTabGroup>      
    </extension>
 
+   <extension
+         point="org.eclipse.debug.ui.launchShortcuts">
+      <shortcut
+            label="Blackfin Linux Application (FLAT)"
+            icon="icons/obj16/vdsp.gif"
+            modes="run, debug"
+            class="com.analog.gnu.toolchain.blackfin.launcher.FLATLaunchShortcut"
+            id="com.analog.gnu.toolchain.blackfin.FLATShortcut">
+         <description
+             mode="debug"
+             description="Debugs a Blackfin Linux application (FLAT)"/>
+         <description
+             mode="run"
+             description="Runs a Blackfin Linux application (FLAT)"/>
+         <configurationType
+               id="gdb.app.flat.launchConfigurationType">
+         </configurationType>
+            
+         <contextualLaunch>
+           <enablement>
+             <with variable="selection">
+               <count value="1"/>
+               <iterate>
+                   <or>
+                     <instanceof value="org.eclipse.cdt.core.model.ICProject"/>
+                     <test
+                           forcePluginActivation="true"
+                           property="com.analog.gnu.toolchain.blackfin.launch.isFLATExecutable"/>
+                     <test
+                           forcePluginActivation="true"
+                           property="com.analog.gnu.toolchain.blackfin.launch.isFLATProject"/>
+                     <and>
+                       <instanceof value="org.eclipse.ui.IFileEditorInput"/>
+                       <adapt type="org.eclipse.core.resources.IResource">
+                         <adapt type="org.eclipse.cdt.core.model.ICElement"/>
+                       </adapt>
+                     </and>
+                   </or>
+               </iterate>
+             </with>
+           </enablement>
+         </contextualLaunch>
+    </shortcut>
+   </extension>
+
+   <extension
+         point="org.eclipse.debug.ui.launchShortcuts">
+      <shortcut
+            label="Blackfin Linux Application (FDPIC)"
+            icon="icons/obj16/vdsp.gif"
+            modes="run, debug"
+            class="com.analog.gnu.toolchain.blackfin.launcher.FDPICLaunchShortcut"
+            id="com.analog.gnu.toolchain.blackfin.FDPICShortcut">
+         <description
+             mode="debug"
+             description="Debugs a Blackfin Linux application (FDPIC)"/>
+         <description
+             mode="run"
+             description="Runs a Blackfin Linux application (FDPIC)"/>
+         <configurationType
+               id="gdb.app.fdpic.launchConfigurationType">
+         </configurationType>
+            
+         <contextualLaunch>
+           <enablement>
+             <with variable="selection">
+               <count value="1"/>
+               <iterate>
+                   <or>
+                     <instanceof value="org.eclipse.cdt.core.model.ICProject"/>
+                     <test
+                           forcePluginActivation="true"
+                           property="com.analog.gnu.toolchain.blackfin.launch.isFDPICExecutable"/>
+                     <test
+                           forcePluginActivation="true"
+                           property="com.analog.gnu.toolchain.blackfin.launch.isFDPICProject"/>
+                     <and>
+                       <instanceof value="org.eclipse.ui.IFileEditorInput"/>
+                       <adapt type="org.eclipse.core.resources.IResource">
+                         <adapt type="org.eclipse.cdt.core.model.ICElement"/>
+                       </adapt>
+                     </and>
+                   </or>
+               </iterate>
+             </with>
+           </enablement>
+         </contextualLaunch>
+    </shortcut>
+   </extension>
+
+   <extension
+         point="org.eclipse.debug.ui.launchShortcuts">
+      <shortcut
+            label="Blackfin Bare Metal Application (ELF) on JTAG Device"
+            icon="icons/obj16/vdsp.gif"
+            modes="run, debug"
+            class="com.analog.gnu.toolchain.blackfin.launcher.ELFLaunchShortcut"
+            id="com.analog.gnu.toolchain.blackfin.ELFShortcut">
+         <description
+             mode="debug"
+             description="Debugs a bare metal Blackfin application (ELF) on a JTAG Device"/>
+         <description
+             mode="run"
+             description="Runs a bare metal Blackfin application (ELF) on a JTAG Device"/>
+         <configurationType
+               id="gdb.app.elf.launchConfigurationType">
+         </configurationType>
+            
+         <contextualLaunch>
+           <enablement>
+             <with variable="selection">
+               <count value="1"/>
+               <iterate>
+                   <or>
+                     <instanceof value="org.eclipse.cdt.core.model.ICProject"/>
+                     <test
+                           forcePluginActivation="true"
+                           property="com.analog.gnu.toolchain.blackfin.launch.isELFExecutable"/>
+                     <test
+                           forcePluginActivation="true"
+                           property="com.analog.gnu.toolchain.blackfin.launch.isELFProject"/>
+                     <and>
+                       <instanceof value="org.eclipse.ui.IFileEditorInput"/>
+                       <adapt type="org.eclipse.core.resources.IResource">
+                         <adapt type="org.eclipse.cdt.core.model.ICElement"/>
+                       </adapt>
+                     </and>
+                   </or>
+               </iterate>
+             </with>
+           </enablement>
+         </contextualLaunch>
+    </shortcut>
+   </extension>
+
+   <extension
+         point="org.eclipse.debug.ui.launchShortcuts">
+      <shortcut
+            label="Blackfin Bare Metal Application (ELF) on Simulator"
+            icon="icons/obj16/vdsp.gif"
+            modes="run, debug"
+            class="com.analog.gnu.toolchain.blackfin.launcher.ELFSimLaunchShortcut"
+            id="com.analog.gnu.toolchain.blackfin.ELFSimShortcut">
+         <description
+             mode="debug"
+             description="Debugs a bare metal Blackfin application (ELF) on a simulator"/>
+         <description
+             mode="run"
+             description="Runs a bare metal Blackfin application (ELF) on a simulator"/>
+         <configurationType
+               id="gdb.app.elf.sim.launchConfigurationType">
+         </configurationType>
+            
+         <contextualLaunch>
+           <enablement>
+             <with variable="selection">
+               <count value="1"/>
+               <iterate>
+                   <or>
+                     <instanceof value="org.eclipse.cdt.core.model.ICProject"/>
+                     <test
+                           forcePluginActivation="true"
+                           property="com.analog.gnu.toolchain.blackfin.launch.isELFExecutable"/>
+                     <test
+                           forcePluginActivation="true"
+                           property="com.analog.gnu.toolchain.blackfin.launch.isELFProject"/>
+                     <and>
+                       <instanceof value="org.eclipse.ui.IFileEditorInput"/>
+                       <adapt type="org.eclipse.core.resources.IResource">
+                         <adapt type="org.eclipse.cdt.core.model.ICElement"/>
+                       </adapt>
+                     </and>
+                   </or>
+               </iterate>
+             </with>
+           </enablement>
+         </contextualLaunch>
+    </shortcut>
+   </extension>
+   
+   <extension point="org.eclipse.core.expressions.propertyTesters">
+      <propertyTester
+            namespace="com.analog.gnu.toolchain.blackfin.launch"
+            properties="isFLATExecutable,isFDPICExecutable,isELFExecutable,isFLATProject,isFDPICProject,isELFProject"
+            type="org.eclipse.core.runtime.IAdaptable"
+            class="com.analog.gnu.toolchain.blackfin.launcher.LaunchPropertyTester"
+            id="com.analog.gnu.toolchain.launch.PropertyTester">
+      </propertyTester>
+   </extension>
+
+   <extension
+         point="org.eclipse.cdt.managedbuilder.ui.newWizardPages">
+      <wizardPage
+            ID="com.analog.gnu.toolchain.blackfin.build.ProcessorPage"
+            operationClass="com.analog.gnu.toolchain.blackfin.build.ProcessorPageRunnable"
+            pageClass="com.analog.gnu.toolchain.blackfin.build.ProcessorPage">
+         <projectType
+               projectTypeID="com.analog.gnu.toolchain.blackfin.target.bfin.elf.exe">
+         </projectType>
+         <projectType
+               projectTypeID="com.analog.gnu.toolchain.blackfin.target.bfin.linux.uclibc.exe">
+         </projectType>
+         <projectType
+               projectTypeID="com.analog.gnu.toolchain.blackfin.target.bfin.uclinux.exe">
+         </projectType>                  
+         <nature
+               natureID="org.eclipse.cdt.core.cnature">
+         </nature>
+         <nature
+               natureID="org.eclipse.cdt.core.ccnature">
+         </nature>
+      </wizardPage>
+   </extension>
+
+   <extension
+         point="org.eclipse.cdt.ui.cPropertyTab">
+      <tab
+            class="com.analog.gnu.toolchain.blackfin.build.ProcessorSettingsTab"
+            icon="icons/obj16/chip_1.png"
+            name="Processor Settings"
+            parent="org.eclipse.cdt.managedbuilder.ui.properties.Page_BuildSettings"
+            tooltip="Allows selection of the processor family, model and silicon revision for this project."
+            weight="002">
+      </tab>
+   </extension>
+      
 </plugin>
