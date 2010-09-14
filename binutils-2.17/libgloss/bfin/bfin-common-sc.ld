@@ -2,7 +2,7 @@
  * The common part of the default linker scripts for standalone executables
  * running on single core Blackfin processors.
  *
- * Copyright (C) 2007, 2008 Analog Devices, Inc.
+ * Copyright (C) 2008 Analog Devices, Inc.
  *
  * The authors hereby grant permission to use, copy, modify, distribute,
  * and license this software and its documentation for any purpose, provided

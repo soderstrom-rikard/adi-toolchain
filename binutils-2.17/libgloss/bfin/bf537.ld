@@ -2,7 +2,7 @@
  * The default linker script for standalone executable running on
  * ADSP-BF537 processor.
  *
- * Copyright (C) 2007, 2008 Analog Devices, Inc.
+ * Copyright (C) 2008 Analog Devices, Inc.
  *
  * The authors hereby grant permission to use, copy, modify, distribute,
  * and license this software and its documentation for any purpose, provided
