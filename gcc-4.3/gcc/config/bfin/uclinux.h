@@ -1,3 +1,7 @@
+#undef SUBTARGET_DRIVER_SELF_SPECS
+#define SUBTARGET_DRIVER_SELF_SPECS \
+  "-mlinux",
+
 #undef  STARTFILE_SPEC
 #define STARTFILE_SPEC \
   "%{mshared-library-id=0|!mshared-library-id=*: crt1.o%s ;: Scrt1.o%s} \

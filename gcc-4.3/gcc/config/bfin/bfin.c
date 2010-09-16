@@ -2176,9 +2176,8 @@ initialize_trampoline (rtx tramp, rtx fnaddr, rtx cxt)
   addr = memory_address (Pmode, plus_constant (tramp, i + 14));
   emit_move_insn (gen_rtx_MEM (HImode, addr), gen_lowpart (HImode, t2));
 
-  emit_library_call(gen_rtx_SYMBOL_REF (Pmode, "__clear_cache"),
-		    LCT_NORMAL, VOIDmode, 2, tramp, Pmode,
-		    plus_constant (tramp, TRAMPOLINE_SIZE), Pmode);
+  emit_insn (gen_clear_cache (copy_rtx (tramp),
+			      plus_constant (tramp, TRAMPOLINE_SIZE)));
 }
 
 /* Emit insns to move operands[1] into operands[0].  */

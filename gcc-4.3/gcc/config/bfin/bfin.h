@@ -1420,17 +1420,5 @@ extern int splitting_for_sched, splitting_loops;
    cache in the specified interval. The definition of this macro would
    typically be a series of asm statements. Both beg and end are both
    pointer expressions. */
-#if defined(__linux__) && (ANOMALY_05000312 || ANOMALY_05000419)
-#define CLEAR_INSN_CACHE(beg,end)		\
-do {						\
-  char *start = (beg);                          \
-  char *finish = (end);                         \
-  cacheflush (start, finish - start, BCACHE);   \
-} while (0)
-#else
-#define CLEAR_INSN_CACHE __clear_cache_range
-#endif
-
-
 
 #endif /*  _BFIN_CONFIG */
