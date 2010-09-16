@@ -6,7 +6,8 @@
 #
 
 CSRC := bsdsetjmp.c clone.c syscall.c \
-	sram-alloc.c sram-free.c dma-memcpy.c
+	sram-alloc.c sram-free.c dma-memcpy.c \
+	cacheflush.c
 
 SSRC := __longjmp.S setjmp.S bsd-_setjmp.S vfork.S
 
