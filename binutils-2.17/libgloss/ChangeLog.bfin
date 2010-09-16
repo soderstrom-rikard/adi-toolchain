@@ -1,3 +1,11 @@
+2010-09-16  Steve Kilbane  <stephen.kilbane@analog.com>
+
+	Add function __clear_cache_range(), for trampoline support.
+	* libgloss/libnosys/Makefile.in : Added clear_cache_range.o
+	* libgloss/libnosys/clear_cache_range.c : new file.
+	* libgloss/bfin/Makefile.in : Added clear_cache_range.o
+	* libgloss/bfin/clear_cache_range.c : new file.
+
 2010-02-11  Mike Frysinger  <michael.frysinger@analog.com>
 
 	* bfin/include/cdefBF504F.h, bfin/include/cdefBF504.h,
