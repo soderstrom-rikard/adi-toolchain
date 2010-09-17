@@ -1,15 +1,20 @@
+2010-09-17  Steve Kilbane  <stephen.kilbane@analog.com>
+
+	* config/bfin/bfin.md: Add missing blank line.
+	* doc/invoke.texi: Document -mlinux option.
+
 2010-09-16  Steve Kilbane  <stephen.kilbane@analog.com>
 
 	[#5827] Revised trampoline flushing support.
-	* libgcc2.c (clear_cache()) : remove the local implementation
+	* libgcc2.c (clear_cache()): remove the local implementation
 	of __clear_cache_range(), now in libgloss.
-	* config/bfin/bfin.opt : add -mlinux option.
-	* config/bfin/linux.h : use -mlinux option.
-	* config/bfin/uclinux.h : use -mlinux option.
-	* config/bfin/bfin.c (initialize_trampoline()) : generate
+	* config/bfin/bfin.opt: add -mlinux option.
+	* config/bfin/linux.h: use -mlinux option.
+	* config/bfin/uclinux.h: use -mlinux option.
+	* config/bfin/bfin.c (initialize_trampoline()): generate
 	clear_cache insn instead of calling library function directly.
-	* config/bfin/bfin.h : Leave CLEAR_INSN_CACHE undefined.
-	* config/bfin/bfin.md : Add a clear_cache pattern that expands to
+	* config/bfin/bfin.h: Leave CLEAR_INSN_CACHE undefined.
+	* config/bfin/bfin.md: Add a clear_cache pattern that expands to
 	a library for cacheflush() on Linux platforms, and __clear_cache_range()
 	otherwise, as determined by the use of the -mlinux option.
 
