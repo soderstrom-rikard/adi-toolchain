@@ -26,6 +26,7 @@ TARGET_bfin=y
 # TARGET_v850 is not set
 # TARGET_vax is not set
 # TARGET_x86_64 is not set
+# TARGET_xtensa is not set
 
 #
 # Target Architecture Features and Options
@@ -70,7 +71,6 @@ PTHREADS_DEBUG_SUPPORT=y
 LINUXTHREADS_OLD=y
 UCLIBC_HAS_SYSLOG=y
 UCLIBC_HAS_LFS=y
-UCLIBC_HAS_STUBS=y
 MALLOC=y
 # MALLOC_SIMPLE is not set
 # MALLOC_STANDARD is not set
@@ -79,6 +79,7 @@ UCLIBC_DYNAMIC_ATEXIT=y
 # COMPAT_ATEXIT is not set
 UCLIBC_SUSV3_LEGACY=y
 UCLIBC_SUSV3_LEGACY_MACROS=y
+# UCLIBC_HAS_STUBS is not set
 # UCLIBC_HAS_SHADOW is not set
 UCLIBC_HAS_PROGRAM_INVOCATION_NAME=y
 UCLIBC_HAS___PROGNAME=y
@@ -183,7 +184,7 @@ UCLIBC_HAS_GLOB=y
 # Library Installation Options
 #
 RUNTIME_PREFIX="/"
-DEVEL_PREFIX="/usr"
+DEVEL_PREFIX="/usr/"
 MULTILIB="."
 
 #
