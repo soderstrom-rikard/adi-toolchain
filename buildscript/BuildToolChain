@@ -50,6 +50,8 @@ CHOST=  # the system the final compiler will run on
 
 unset SKIP_ELF SKIP_GDBPROXY SKIP_JTAG SKIP_LDR SKIP_TARGET_LIBS SKIP_UBOOT SKIP_FLAT SKIP_FDPIC
 
+unset UCLIBC_CFLAGS UCLIBC_CONFIG_FILE UCLIBC_OPTS
+
 TEST_OPTS=
 TEST_SIM=
 TEST_HARDWARE=
@@ -59,9 +61,10 @@ usage() {
 # they are doing.  For maximum reproducibility, not using it is better.
 cat <<-EOF
 Usage : $APP_NAME -s SOURCE [-b BUILD]
+-a OPT=val       Control uClibc options (val may be "n" or "y" or a string)
 -B BINUTILS_VER  Binutils version (default ${BINUTILS_VERSION}).  Can be given once.
 -b BUILD         Build directory (leave blank to use current dir)
--C FILE          Use FILE as uClibc config file, rather than the default.
+-C CONFIG_FILE   Use FILE as uClibc config file, rather than the default.
 -c GCC_VERSION   GCC version (default ${GCC_VERSIONS_DEFAULT}).  Can be given multiple times.
 -d               Date Stamp all output files
 -D               Don't check libraries/headers -- assume all is OK
@@ -92,9 +95,18 @@ EOF
 exit ${1:-0}
 }
 
-while getopts b:B:c:C:dDfH:hj:k:K:l:m:o:O:pP:Rr:s:S:tT:u:U:vwX parameter
+while getopts a:b:B:c:C:dDfH:hj:k:K:l:m:o:O:pP:Rr:s:S:tT:u:U:vwX parameter
 do
 	case $parameter in
+		a)
+			case ${OPTARG} in
+				*=*) ;;
+				*)   error "uClibc option must have a value (like '$OPTARG=y')" ;;
+			esac
+			c=`echo ${OPTARG%%=*} | tr '[:lower:]' '[:upper:]'`
+			v=${OPTARG#*=}
+			UCLIBC_OPTS="${UCLIBC_OPTS} ${c#CONFIG_}=${v}"
+			;;
 		p)  CHECK_PRE=true ;;
 		m)  MAKE=$OPTARG ;;
 		w)  WARN=1 ;;
@@ -598,10 +610,13 @@ build_gcc()
 	fi
 
 	LOCALE="--enable-clocale=generic"
-	if [ "${target}" != "bfin-elf" ] && [ -n "$UCLIBC_CONFIG_FILE" ]; then
-		if grep -qs UCLIBC_HAS_LOCALE=y $UCLIBC_CONFIG_FILE; then
+	if [ "${target}" != "bfin-elf" ] ; then
+		if grep -qs UCLIBC_HAS_LOCALE=y "$UCLIBC_CONFIG_FILE" ; then
 			LOCALE="--enable-clocale=uclibc"
 		fi
+		case " ${UCLIBC_OPTS} " in
+		*" UCLIBC_HAS_LOCALE=y "*) LOCALE="--enable-clocale=uclibc" ;;
+		esac
 	fi
 
 	if [ -e $DIR_GCC_SOURCE/gcc/BASE-VER ] ; then
@@ -1068,7 +1083,16 @@ build_uclibc()
 			;;
 		esac
 
+		# First process all the user's uClibc options so that all
+		# of our own hardcoded options below will win over the user
 		run_cmd cp ${UCLIBC_CONFIG_FILE:-extra/Configs/Config.bfin.default} .config
+		for opt in ${UCLIBC_OPTS} ; do
+			case ${opt} in
+			*=n) unset_opt ${opt%=n} ;;
+			*=y) set_opt ${opt%=y} ;;
+			*=*) set_opt ${opt%%=*} \"${opt#*=}\" ;;
+			esac
+		done
 		set_opt KERNEL_HEADERS \"$DIR_KBUILD_OUTPUT/usr/include\"
 		set_opt MULTILIB \"${uclibc_dir2}\"
 		set_opt UCLIBC_EXTRA_CFLAGS \"${flags} ${UCLIBC_CFLAGS} -Wa,--noexecstack\"
