@@ -7,7 +7,7 @@ define uboot_jtag_load
 	load init.elf
 	continue
 	load u-boot
-	call memset(&_bss_start, 0, &_bss_end - &_bss_start)
+	call memset(&_bss_vma, 0, &_bss_len)
 	continue
 end
 
