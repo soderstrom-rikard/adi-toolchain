@@ -2,7 +2,7 @@
 %define bfin_targ_strip %{prefix}/bfin-elf/bin/bfin-elf-strip
 %define EXEEXT %{nil}
 %define x_support 0
-%define extra_buildtoolchain_opts %{nil}
+%define extra_buildtoolchain_opts -a UCLIBC_HAS_IPV6=y -a UCLIBC_HAS_WCHAR=y
 
 %define optional_gcc 0
 %define gcc_main_ver 4.3
@@ -29,7 +29,6 @@ Source5:      elf2flt.tar.bz2
 Source6:      uClibc.tar.bz2
 Source7:      mpfr.tar.bz2
 Source8:      gmp.tar.bz2
-Source9:      full-config
 prefix:       /opt/uClinux
 BuildRoot:    %{_tmppath}/%{name}-%{version}-build
 
@@ -69,7 +68,7 @@ echo Building in $RPM_BUILD_ROOT
 	-K `pwd`/kbuild_output \
 	%{gcc_build_opts} \
 	-o %{prefix}/bfin \
-	-C %{SOURCE9} -S u-boot -S ldr -S jtag -X
+	-S u-boot -S ldr -S jtag -X
 
 %install
 echo Installing in $RPM_BUILD_ROOT
