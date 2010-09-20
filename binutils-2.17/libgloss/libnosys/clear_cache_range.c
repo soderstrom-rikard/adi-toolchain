@@ -1,5 +1,5 @@
 /*
- * C library support files for the Blackfin processor
+ * clear_cache_range.c - flush a given range of addresses from the cache(s).
  *
  * Copyright (C) 2010 Analog Devices, Inc.
  *
@@ -14,13 +14,16 @@
  * they apply.
  */
 
+#ifdef __BFIN__
 /*
 ** Map to L1 Text because of anomalies 05-00-0312 and 05-00-0419
 */
 
 __attribute__ ((l1_text))
+#endif
 void __clear_cache_range (char *beg, char *end)
 {
+#ifdef __BFIN__
   char *ptr = beg;
   do {
     __asm__ __volatile__ ( "FLUSH [%0++];" : "+a" (ptr) : : "memory" );
@@ -30,5 +33,6 @@ void __clear_cache_range (char *beg, char *end)
   do {
     __asm__ __volatile__ ( "IFLUSH [%0++];" : "+a" (ptr) : : "memory" );
   } while (ptr <= end);
+#endif
 }
 
