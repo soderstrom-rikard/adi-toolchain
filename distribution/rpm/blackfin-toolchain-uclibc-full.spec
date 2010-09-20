@@ -29,6 +29,7 @@ Source5:      elf2flt.tar.bz2
 Source6:      uClibc.tar.bz2
 Source7:      mpfr.tar.bz2
 Source8:      gmp.tar.bz2
+Source9:      libdsp.tar.bz2
 prefix:       /opt/uClinux
 BuildRoot:    %{_tmppath}/%{name}-%{version}-build
 
@@ -53,7 +54,7 @@ gcc-%{gcc_addon_fullver} based Blackfin Linux toolchains.
 %if %{optional_gcc}
 %define extra_setup -a 1
 %endif
-%setup -q -c %{name}-%{version} %{extra_setup} -a 2 -a 3 -a 4 -a 5 -a 6 -a 7 -a 8
+%setup -q -c %{name}-%{version} %{extra_setup} -a 2 -a 3 -a 4 -a 5 -a 6 -a 7 -a 8 -a 9
 
 %build
 %if %{optional_gcc}
