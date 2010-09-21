@@ -347,7 +347,6 @@ static long parse_int (char **end)
   int shiftvalue = 0;
   char * char_bag;
   long value = 0;
-  char c;
   char *arg = *end;
 
   while (*arg && *arg == ' ')
@@ -369,7 +368,7 @@ static long parse_int (char **end)
 
       case '0':  /* Accept different formated integers hex octal and binary. */
         {
-	  c = *++arg;
+	  char c = *++arg;
           arg++;
 	  if (c == 'x' || c == 'X') /* Hex input.  */
 	    fmt = 'h';
@@ -466,7 +465,7 @@ static long parse_int (char **end)
         {
           while (1)
             {
-              int c;
+              char c;
               c = *arg++;
               if (c >= '0' && c <= '9')
                 value = (value * 10) + (c - '0');

@@ -153,7 +153,7 @@
 	(value_match (expr, 24, 0, 2, 1))
 
 
-static int value_match (Expr_Node *expr, int sz, int sign, int mul, int issigned);
+static int value_match (Expr_Node *, int, int, int, int);
 
 extern FILE *errorf;
 extern INSTR_T insn;
@@ -161,11 +161,11 @@ extern INSTR_T insn;
 static Expr_Node *binary (Expr_Op_Type, Expr_Node *, Expr_Node *);
 static Expr_Node *unary  (Expr_Op_Type, Expr_Node *);
 
-static void notethat (char *format, ...);
+static void notethat (char *, ...);
 
 char *current_inputline;
 extern char *yytext;
-int yyerror (char *msg);
+int yyerror (char *);
 
 void error (char *format, ...)
 {
