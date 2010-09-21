@@ -20,13 +20,13 @@
    02110-1301, USA.  */
 
 #ifndef BFIN_PARSE_H
-#define BFIN_PARSE_H  
+#define BFIN_PARSE_H
 
 #include <bfd.h>
 #include "as.h"
 
 #define PCREL	1
-#define CODE_FRAG_SIZE 4096  /* 1 page.  */  
+#define CODE_FRAG_SIZE 4096  /* 1 page.  */
 
 
 /* Definition for all status bits.  */
@@ -39,7 +39,7 @@ typedef enum
   c_uimm2,
   c_uimm3,
   c_imm3,
-  c_pcrel4, 
+  c_pcrel4,
   c_imm4,
   c_uimm4s4,
   c_uimm4,
@@ -47,7 +47,7 @@ typedef enum
   c_negimm5s4,
   c_imm5,
   c_uimm5,
-  c_imm6,  
+  c_imm6,
   c_imm7,
   c_imm8,
   c_uimm8,
@@ -55,7 +55,7 @@ typedef enum
   c_uimm8s4,
   c_pcrel8s4,
   c_lppcrel10,
-  c_pcrel10, 
+  c_pcrel10,
   c_pcrel12,
   c_imm16s4,
   c_luimm16,
@@ -63,9 +63,9 @@ typedef enum
   c_huimm16,
   c_rimm16,
   c_imm16s2,
-  c_uimm16s4, 
+  c_uimm16s4,
   c_uimm16,
-  c_pcrel24 
+  c_pcrel24
 } const_forms_t;
 
 
@@ -91,19 +91,19 @@ typedef enum
 
 enum machine_registers
 {
-  REG_R0    = T_REG_R, REG_R1, REG_R2, REG_R3, REG_R4, REG_R5, REG_R6, REG_R7, 
+  REG_R0    = T_REG_R, REG_R1, REG_R2, REG_R3, REG_R4, REG_R5, REG_R6, REG_R7,
   REG_P0    = T_REG_P, REG_P1, REG_P2, REG_P3, REG_P4, REG_P5, REG_SP, REG_FP,
   REG_I0    = T_REG_I, REG_I1, REG_I2, REG_I3,
-  REG_M0    = T_REG_M, REG_M1, REG_M2, REG_M3, 
+  REG_M0    = T_REG_M, REG_M1, REG_M2, REG_M3,
   REG_B0    = T_REG_B, REG_B1, REG_B2, REG_B3,
-  REG_L0    = T_REG_L, REG_L1, REG_L2, REG_L3, 
+  REG_L0    = T_REG_L, REG_L1, REG_L2, REG_L3,
   REG_A0x   = T_REG_A, REG_A0w, REG_A1x, REG_A1w,
   REG_ASTAT = 0x46,
   REG_RETS  = 0x47,
   REG_LC0   = 0x60, REG_LT0, REG_LB0,  REG_LC1, REG_LT1, REG_LB1,
               REG_CYCLES, REG_CYCLES2,
   REG_USP   = 0x70, REG_SEQSTAT, REG_SYSCFG,
-	      REG_RETI, REG_RETX, REG_RETN, REG_RETE, REG_EMUDAT, 
+	      REG_RETI, REG_RETX, REG_RETN, REG_RETE, REG_EMUDAT,
 
 /* These don't have groups.  */
   REG_sftreset = T_NOGROUP, REG_omode, REG_excause, REG_emucause,
@@ -111,9 +111,9 @@ enum machine_registers
   REG_A0       = 0xc0, REG_A1, REG_CC,
 /* Pseudo registers, used only for distinction from symbols.  */
 		 REG_RL0, REG_RL1, REG_RL2, REG_RL3,
-		 REG_RL4, REG_RL5, REG_RL6, REG_RL7, 
+		 REG_RL4, REG_RL5, REG_RL6, REG_RL7,
 		 REG_RH0, REG_RH1, REG_RH2, REG_RH3,
-		 REG_RH4, REG_RH5, REG_RH6, REG_RH7, 
+		 REG_RH4, REG_RH5, REG_RH6, REG_RH7,
 		 REG_LASTREG
 };
 
@@ -135,7 +135,7 @@ enum statusflags
   S_AV1S,
   S_V = 24,
   S_VS = 25
-}; 
+};
 
 
 enum reg_class
@@ -231,7 +231,7 @@ enum reg_class
 /* Expression value macros.  */
 
 typedef enum
-{ 
+{
   ones_compl,
   twos_compl,
   mult,
@@ -249,7 +249,7 @@ typedef enum
 struct expressionS;
 
 #define SYMBOL_T       symbolS*
- 
+
 struct expression_cell
 {
   int value;
@@ -265,14 +265,14 @@ struct bfin_insn
   int pcrel;
   int reloc;
 };
-    
+
 #define INSTR_T struct bfin_insn*
-#define EXPR_T  struct expression_cell* 
+#define EXPR_T  struct expression_cell*
 
 typedef struct expr_node_struct Expr_Node;
- 
+
 extern INSTR_T gencode (unsigned long x);
-extern INSTR_T conscode (INSTR_T head, INSTR_T tail);   
+extern INSTR_T conscode (INSTR_T head, INSTR_T tail);
 extern INSTR_T conctcode (INSTR_T head, INSTR_T tail);
 extern INSTR_T note_reloc
        (INSTR_T code, Expr_Node *, int reloc,int pcrel);
@@ -280,9 +280,9 @@ extern INSTR_T note_reloc1
        (INSTR_T code, const char * sym, int reloc, int pcrel);
 extern INSTR_T note_reloc2
        (INSTR_T code, const char *symbol, int reloc, int value, int pcrel);
- 
+
 /* Types of expressions.  */
-typedef enum 
+typedef enum
 {
   Expr_Node_Binop,		/* Binary operator.  */
   Expr_Node_Unop,		/* Unary operator.  */
@@ -292,7 +292,7 @@ typedef enum
 } Expr_Node_Type;
 
 /* Types of operators.  */
-typedef enum 
+typedef enum
 {
   Expr_Op_Type_Add,
   Expr_Op_Type_Sub,
@@ -329,17 +329,17 @@ struct expr_node_struct
 
 
 /* Operations on the expression node.  */
-Expr_Node *Expr_Node_Create (Expr_Node_Type type, 
-		         Expr_Node_Value value, 
-			 Expr_Node *Left_Child, 
+Expr_Node *Expr_Node_Create (Expr_Node_Type type,
+		         Expr_Node_Value value,
+			 Expr_Node *Left_Child,
 			 Expr_Node *Right_Child);
 
 /* Generate the reloc structure as a series of instructions.  */
 INSTR_T Expr_Node_Gen_Reloc (Expr_Node *head, int parent_reloc);
- 
+
 #define MKREF(x)	mkexpr (0,x)
 #define ALLOCATE(x)	malloc (x)
- 
+
 #define NULL_CODE ((INSTR_T) 0)
 
 #ifndef EXPR_VALUE
