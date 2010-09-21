@@ -440,16 +440,15 @@ static enum machine_registers decode_allregs[] =
 #define IS_DREG(g,r)	((g) == 0 && (r) < 8)
 #define IS_PREG(g,r)	((g) == 1 && (r) < 8)
 #define IS_AREG(g,r)	((g) == 4 && (r) >= 0 && (r) < 4)
-#define IS_GENREG(g,r)	((((g) == 0 || (g) == 1 ) && (r) < 8 ) || IS_AREG (g, r))
+#define IS_GENREG(g,r)	((((g) == 0 || (g) == 1) && (r) < 8) || IS_AREG (g, r))
 #define IS_DAGREG(g,r)	(((g) == 2 || (g) == 3) && (r) < 8)
 #define IS_SYSREG(g,r) \
   (((g) == 4 && ((r) == 6 || (r) == 7)) || (g) == 6 || (g) == 7)
 #define IS_RESERVEDREG(g,r) \
   (((r) > 7) || ((g) == 4 && ((r) == 4 || (r) == 5)) || (g) == 5)
 
-#define allreg(r,g)	(!(IS_RESERVEDREG(g,r)))
-#define mostreg(r,g)	(!(IS_DREG(g,r) || IS_PREG(g,r) || IS_RESERVEDREG(g,r)))
-
+#define allreg(r,g)	(!IS_RESERVEDREG (g, r))
+#define mostreg(r,g)	(!(IS_DREG (g, r) || IS_PREG (g, r) || IS_RESERVEDREG (g, r)))
 
 #define allregs(x,i)	REGNAME (decode_allregs[((i) << 3) | x])
 #define uimm16s4(x)	fmtconst (c_uimm16s4, x, 0, outf)
@@ -782,35 +781,35 @@ decode_ProgCtrl_0 (TIword iw0, disassemble_info *outf)
     OUTS (outf, "SSYNC");
   else if (prgfunc == 2 && poprnd == 5)
     OUTS (outf, "EMUEXCPT");
-  else if (prgfunc == 3 && IS_DREG (0,poprnd))
+  else if (prgfunc == 3 && IS_DREG (0, poprnd))
     {
       OUTS (outf, "CLI ");
       OUTS (outf, dregs (poprnd));
     }
-  else if (prgfunc == 4 && IS_DREG (0,poprnd))
+  else if (prgfunc == 4 && IS_DREG (0, poprnd))
     {
       OUTS (outf, "STI ");
       OUTS (outf, dregs (poprnd));
     }
-  else if (prgfunc == 5 && IS_PREG (1,poprnd))
+  else if (prgfunc == 5 && IS_PREG (1, poprnd))
     {
       OUTS (outf, "JUMP (");
       OUTS (outf, pregs (poprnd));
       OUTS (outf, ")");
     }
-  else if (prgfunc == 6 && IS_PREG (1,poprnd))
+  else if (prgfunc == 6 && IS_PREG (1, poprnd))
     {
       OUTS (outf, "CALL (");
       OUTS (outf, pregs (poprnd));
       OUTS (outf, ")");
     }
-  else if (prgfunc == 7 && IS_PREG (1,poprnd))
+  else if (prgfunc == 7 && IS_PREG (1, poprnd))
     {
       OUTS (outf, "CALL (PC + ");
       OUTS (outf, pregs (poprnd));
       OUTS (outf, ")");
     }
-  else if (prgfunc == 8 && IS_PREG (1,poprnd))
+  else if (prgfunc == 8 && IS_PREG (1, poprnd))
     {
       OUTS (outf, "JUMP (PC + ");
       OUTS (outf, pregs (poprnd));
@@ -826,7 +825,7 @@ decode_ProgCtrl_0 (TIword iw0, disassemble_info *outf)
       OUTS (outf, "EXCPT ");
       OUTS (outf, uimm4 (poprnd));
     }
-  else if (prgfunc == 11 && IS_PREG (1,poprnd) && poprnd <= 5)
+  else if (prgfunc == 11 && IS_PREG (1, poprnd) && poprnd <= 5)
     {
       OUTS (outf, "TESTSET (");
       OUTS (outf, pregs (poprnd));
@@ -918,7 +917,7 @@ decode_PushPopReg_0 (TIword iw0, disassemble_info *outf)
   if (parallel)
     return 0;
 
-  if (W == 0 && mostreg(reg, grp))
+  if (W == 0 && mostreg (reg, grp))
     {
       OUTS (outf, allregs (reg, grp));
       OUTS (outf, " = [SP++]");
@@ -986,7 +985,7 @@ decode_PushPopMultiple_0 (TIword iw0, disassemble_info *outf)
       OUTS (outf, imm5d (dr));
       OUTS (outf, ") = [SP++]");
     }
-  else if (W == 0 && d == 0 && p == 1  && dr == 0)
+  else if (W == 0 && d == 0 && p == 1 && dr == 0)
     {
       OUTS (outf, "(P5:");
       OUTS (outf, imm5d (pr));

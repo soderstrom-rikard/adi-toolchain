@@ -383,7 +383,6 @@ is_group2 (INSTR_T x)
 static int
 is_store (INSTR_T x)
 {
-
   if (!x)
     return 0;
 
@@ -407,6 +406,7 @@ is_store (INSTR_T x)
       if (w)
 	return 1;
     }
+
   return 0;
 }
 
