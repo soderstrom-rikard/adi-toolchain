@@ -24,7 +24,7 @@
 #include <stdarg.h>
 #include <obstack.h>
 
-#include "bfin-aux.h"  // opcode generating auxiliaries
+#include "bfin-aux.h"  /* Opcode generating auxiliaries.  */
 #include "libbfd.h"
 #include "elf/common.h"
 #include "elf/bfin.h"
