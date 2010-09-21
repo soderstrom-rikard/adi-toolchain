@@ -439,8 +439,8 @@ md_show_usage (FILE * stream)
 {
   fprintf (stream, _(" Blackfin specific assembler options:\n"));
   fprintf (stream, _("  -mcpu=<cpu[-sirevision]> specify the name of the target CPU\n"));
-  fprintf (stream, _("  -mfdpic                 assemble for the FDPIC ABI\n"));
-  fprintf (stream, _("  -mno-fdpic/-mnopic      disable -mfdpic\n"));
+  fprintf (stream, _("  -mfdpic                  assemble for the FDPIC ABI\n"));
+  fprintf (stream, _("  -mno-fdpic/-mnopic       disable -mfdpic\n"));
 }
 
 /* Perform machine-specific initializations.  */
