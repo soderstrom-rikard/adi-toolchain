@@ -39,7 +39,7 @@
 
 #define WORKING_DOT_WORD
 
-extern bfd_boolean bfin_start_label PARAMS ((char *, char *));
+extern bfd_boolean bfin_start_label (char *, char *);
 
 #define md_number_to_chars	number_to_chars_littleendian
 #define md_convert_frag(b,s,f)	as_fatal ("bfin convert_frag\n");
@@ -48,7 +48,7 @@ extern bfd_boolean bfin_start_label PARAMS ((char *, char *));
 #define LEX_BR 6
 
 #define TC_EOL_IN_INSN(PTR) (bfin_eol_in_insn(PTR) ? 1 : 0)
-extern bfd_boolean bfin_eol_in_insn PARAMS ((char *));
+extern bfd_boolean bfin_eol_in_insn (char *);
 
 /* Almost all instructions of Blackfin contain an = character.  */
 #define TC_EQUAL_IN_INSN(C, NAME) 1
@@ -61,14 +61,14 @@ extern bfd_boolean bfin_eol_in_insn PARAMS ((char *));
 
 #define TC_START_LABEL(c, s, ptr) (c == ':' && bfin_start_label (s, ptr))
 #define tc_fix_adjustable(FIX) bfin_fix_adjustable (FIX)
-extern bfd_boolean bfin_fix_adjustable PARAMS ((struct fix *));
+extern bfd_boolean bfin_fix_adjustable (struct fix *);
 
 #define TC_FORCE_RELOCATION(FIX) bfin_force_relocation (FIX)
-extern int bfin_force_relocation PARAMS ((struct fix *));
+extern int bfin_force_relocation (struct fix *);
 
 /* Call md_pcrel_from_section(), not md_pcrel_from().  */
 #define MD_PCREL_FROM_SECTION(FIX, SEC) md_pcrel_from_section (FIX, SEC)
-extern long md_pcrel_from_section PARAMS ((struct fix *, segT));
+extern long md_pcrel_from_section (struct fix *, segT);
 
 /* Values passed to md_apply_fix3 don't include symbol values.  */
 #define MD_APPLY_SYM_VALUE(FIX) 0
