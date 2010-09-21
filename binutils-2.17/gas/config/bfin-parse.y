@@ -20,8 +20,7 @@
    02110-1301, USA.  */
 %{
 
-#include <stdio.h>
-#include <stdarg.h>
+#include "as.h"
 #include <obstack.h>
 
 #include "bfin-aux.h"  /* Opcode generating auxiliaries.  */

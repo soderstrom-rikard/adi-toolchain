@@ -22,7 +22,6 @@
 #include "as.h"
 #include "struc-symbol.h"
 #include "symbols.h"
-#include "obj-elf.h"
 #include "bfin-defs.h"
 #include "obstack.h"
 #include "safe-ctype.h"
@@ -931,11 +930,7 @@ bfin_fix_adjustable (fixS *fixP)
 
 /* Special extra functions that help bfin-parse.y perform its job.  */
 
-#include <stdio.h>
 #include <assert.h>
-#include <obstack.h>
-#include <bfd.h>
-#include "bfin-defs.h"
 
 struct obstack mempool;
 

@@ -20,11 +20,9 @@
    02110-1301, USA.  */
 %{
 
-#include <stdlib.h>
-#include <string.h>
+#include "as.h"
 #include "bfin-defs.h"
 #include "bfin-parse.h"
-#include "as.h"
 
 static long parse_int (char **end);
 static int parse_halfreg (Register *r, int cl, char *hr);

@@ -22,9 +22,6 @@
 #ifndef BFIN_PARSE_H
 #define BFIN_PARSE_H
 
-#include <bfd.h>
-#include "as.h"
-
 #define PCREL	1
 #define CODE_FRAG_SIZE 4096  /* 1 page.  */
 
