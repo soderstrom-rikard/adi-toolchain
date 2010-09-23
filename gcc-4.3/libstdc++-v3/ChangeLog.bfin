@@ -1,3 +1,8 @@
+2010-09-23  Stuart Henderson <stuart.henderson@analog.com>
+
+	[#6134] XFAIL test when bfin-elf on HW runs out of memory at link time.
+	* testsuite/lib/libstdc++.exp
+
 2010-08-27  Stuart Henderson <stuart.henderson@analog.com>
 
 	[#6134] Change target triplet to bfin-*-elf.
