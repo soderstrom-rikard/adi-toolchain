@@ -318,7 +318,27 @@ define show_sdram
 	end
 	printf "\n"
 
-	printf "SDSTAT: 0x%04x\n", *(unsigned short *)0xFFC00A1C
+	set $$SDSTAT = *(unsigned short *)0xFFC00A1C
+	printf "SDSTAT: 0x%04x ", $$SDSTAT
+	if ($$SDSTAT & (1 << 0))
+		printf "(idle) "
+	else
+		printf "(busy) "
+	end
+	if ($$SDSTAT & (1 << 1))
+		printf "(self-refresh) "
+	end
+	if ($$SDSTAT & (1 << 2))
+		printf "(powerup) "
+	end
+	if ($$SDSTAT & (1 << 3))
+		printf "(will power up) "
+	end
+	if ($$SDSTAT & (1 << 4))
+		printf "(EAB error) "
+	end
+	printf "\n"
+
 	printf "SDGCTL: 0x%08x\n", *(unsigned long  *)0xFFC00A10
 end
 
