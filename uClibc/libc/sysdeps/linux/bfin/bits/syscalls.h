@@ -63,7 +63,6 @@ type name(type1 arg1,type2 arg2) {					\
 	long __res;							\
 	__asm__ __volatile__ (						\
 		"excpt 0;\n\t"						\
-		"%0=r0;\n\t"						\
 		: "=q0" (__res)						\
 		: "qA" (__NR_##name),					\
 		  "q0" ((long)(arg1)),					\
