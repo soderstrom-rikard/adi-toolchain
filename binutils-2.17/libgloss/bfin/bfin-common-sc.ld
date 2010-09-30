@@ -70,6 +70,7 @@ SECTIONS
   {
     *(.l2 .l2.*)
   } >MEM_L2 =0
+  .l1.text           : { *(.l1.text .l1.text.*) } >MEM_L1_CODE =0
   .text           :
   {
     *(.text .stub .text.* .gnu.linkonce.t.*)
@@ -158,6 +159,7 @@ SECTIONS
   .jcr            : { KEEP (*(.jcr)) } >MEM_L1_DATA_A
   .data.rel.ro : { *(.data.rel.ro.local* .gnu.linkonce.d.rel.ro.local.*) *(.data.rel.ro* .gnu.linkonce.d.rel.ro.*) } >MEM_L1_DATA_A
   .dynamic        : { *(.dynamic) } >MEM_L1_DATA_A
+  .l1.data        : { *(.l1.data .l1.data.*) } >MEM_L1_DATA_A
   .data           :
   {
     *(.data .data.* .gnu.linkonce.d.*)
