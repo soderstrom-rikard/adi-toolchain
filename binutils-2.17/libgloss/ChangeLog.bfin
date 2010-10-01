@@ -1,3 +1,9 @@
+2010-10-01  Stuart Henderson  <stuart.henderson@analog.com>
+
+	* binutils-2.17/libgloss/bfin/bfin-common-sc.ld : Merge new .l1.X output
+	section into existing .X output section.
+	* binutils-2.17/libgloss/bfin/bfin-common-mc.ld : As above + .b.X variants.
+
 2010-09-30  Stuart Henderson  <stuart.henderson@analog.com>
 
 	* binutils-2.17/libgloss/bfin/bfin-common-sc.ld : Add .l1.data and .l1.text
