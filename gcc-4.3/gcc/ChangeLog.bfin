@@ -1,3 +1,7 @@
+2010-10-01  Steve Kilbane  <stephen.kilbane@analog.com>
+
+	* config/bfin/bfin.md: Load operands into regs before computing len.
+
 2010-09-17  Steve Kilbane  <stephen.kilbane@analog.com>
 
 	* config/bfin/bfin.md: Add missing blank line.

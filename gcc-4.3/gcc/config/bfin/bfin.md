@@ -4647,16 +4647,18 @@
 ; on bare-metal targets.
 
 (define_expand "clear_cache"
-  [(match_operand 0 "pmode_register_operand")
-   (match_operand 1 "pmode_register_operand")]
+  [(match_operand 0 "register_operand")
+   (match_operand 1 "register_operand")]
    ""
    "
 {
   if (TARGET_LINUX) {
-    rtx len = gen_reg_rtx (Pmode);
-    emit_insn (gen_sub3_insn (len, operands[1], operands[0]));
+    rtx r_len = gen_reg_rtx (Pmode);
+    rtx r_start = copy_to_reg (operands[0]);
+    rtx r_end = copy_to_reg (operands[1]);
+    emit_insn (gen_sub3_insn (r_len, r_end, r_start));
     emit_library_call (gen_rtx_SYMBOL_REF (Pmode, \"cacheflush\"),
-		       0, VOIDmode, 3, operands[0], Pmode, len, Pmode,
+		       0, VOIDmode, 3, r_start, Pmode, r_len, SImode,
 		       GEN_INT(3), SImode);
   } else {
     emit_library_call (gen_rtx_SYMBOL_REF (Pmode, \"__clear_cache_range\"),
