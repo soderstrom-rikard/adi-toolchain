@@ -1,3 +1,9 @@
+2010-10-04 Stuart Henderson <stuart.henderson@analog.com>
+
+	* libc/stdlib/__atexit.c: follow up fix for previous check in from Dave,
+	taken from upstream.
+	* libc/stdlib/__call_atexit.c: as above.
+
 2010-09-13 David Gibson <david.gibson@analog.com>
 
 	* [6095] Fix for failures g++.old-deja/g++.other/init18.C and
