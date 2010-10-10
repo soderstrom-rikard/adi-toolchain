@@ -3576,9 +3576,9 @@ asm_1:
 	| LOOP_BEGIN NUMBER
 	{
 	  Expr_Node_Value val;
-  	  val.i_value = $2;
+	  val.i_value = $2;
 	  Expr_Node *tmp = Expr_Node_Create (Expr_Node_Constant, val, NULL, NULL);
-          bfin_loop_attempt_create_label(tmp,1);
+	  bfin_loop_attempt_create_label (tmp, 1);
 	  if (!IS_RELOC (tmp))
 	    return yyerror ("Invalid expression in LOOP_BEGIN statement");
 	  bfin_loop_beginend (tmp, 1);
@@ -3596,9 +3596,9 @@ asm_1:
 	| LOOP_END NUMBER
 	{
 	  Expr_Node_Value val;
-  	  val.i_value = $2;
+	  val.i_value = $2;
 	  Expr_Node *tmp = Expr_Node_Create (Expr_Node_Constant, val, NULL, NULL);
-          bfin_loop_attempt_create_label(tmp,1);
+	  bfin_loop_attempt_create_label (tmp, 1);
 	  if (!IS_RELOC (tmp))
 	    return yyerror ("Invalid expression in LOOP_END statement");
 	  bfin_loop_beginend (tmp, 0);
