@@ -3588,6 +3588,7 @@ asm_1:
 	{
 	  if (!IS_RELOC ($2))
 	    return yyerror ("Invalid expression in LOOP_BEGIN statement");
+
 	  bfin_loop_beginend ($2, 1);
 	  $$ = 0;
 	}
