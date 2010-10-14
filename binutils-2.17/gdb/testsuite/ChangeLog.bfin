@@ -1,3 +1,7 @@
+2010-10-14  Stuart Henderson <stuart.henderson@analog.com>
+
+	* gdb.base/break.c: [#6289] Ensure malloc is linked in.
+
 2010-08-10  Steve Kilbane <stephen.kilbane@analog.com>
 
 	* gdb.cp/inherit.exp: [#6145] Take change back from upstream, for 

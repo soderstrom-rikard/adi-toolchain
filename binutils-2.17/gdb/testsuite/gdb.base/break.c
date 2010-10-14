@@ -66,6 +66,13 @@ extern void marker3 ();
 extern void marker4 ();
 #endif
 
+/* We're used by a test that requires malloc, so make sure it is in
+   the executable.  */
+void *need_malloc ()
+{
+  return malloc (1);
+}
+
 /*
  *	This simple classical example of recursion is useful for
  *	testing stack backtraces and such.
@@ -97,6 +104,10 @@ char *argv[], **envp;
     marker2 (43); /* set breakpoint 20 here */
     marker3 ("stack", "trace"); /* set breakpoint 21 here */
     marker4 (177601976L);
+    /* We're used by a test that requires malloc, so make sure it is
+       in the executable.  */
+    (void)malloc (1);
+
     argc = (argc == 12345); /* This is silly, but we can step off of it */ /* set breakpoint 2 here */
     return argc;  /* set breakpoint 10 here */
 } /* set breakpoint 10a here */
