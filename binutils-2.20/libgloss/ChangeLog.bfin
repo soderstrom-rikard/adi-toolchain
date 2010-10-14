@@ -1,9 +1,0 @@
-2009-09-23  Jie Zhang  <jie.zhang@analog.com>
-
-	* bfin/Makefile.in (basiccrt.o, basiccrts.o): Use
-	-mcpu=bf532-any for the default multilib.
-
-2006-11-09  Jie Zhang  <jie.zhang@analog.com>
-
-	* libnosys/_exit.c (_exit): Cause exception 0 for Blackfin.
-	Prevent division by zero from being optimized away.
