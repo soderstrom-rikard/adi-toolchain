@@ -14,21 +14,19 @@
  * they apply.
  */
 
-/*
-** Map to L1 Text because of anomalies 05-00-0312 and 05-00-0419
-*/
+/* Map to L1 Text because of anomalies 05-00-0312 and 05-00-0419 */
 
 __attribute__ ((l1_text))
 void __clear_cache_range (char *beg, char *end)
 {
   char *ptr = beg;
   do {
-    __asm__ __volatile__ ( "FLUSH [%0++];" : "+a" (ptr) : : "memory" );
+    __asm__ __volatile__ ("FLUSH [%0++];" : "+a" (ptr) : : "memory");
   } while (ptr <= end);
   ptr = beg;
   __asm__ __volatile__ ("SSYNC;");
   do {
-    __asm__ __volatile__ ( "IFLUSH [%0++];" : "+a" (ptr) : : "memory" );
+    __asm__ __volatile__ ("IFLUSH [%0++];" : "+a" (ptr) : : "memory");
   } while (ptr <= end);
 }
 
