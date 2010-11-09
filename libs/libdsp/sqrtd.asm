@@ -185,11 +185,10 @@ _ConvDb2FracEnd:
        r0 = r3 >> 24;
        p1 = r0;
 
-       i0.l = _OnePtFive;          // pointer to const data
-       i0.h = _OnePtFive;
+       LOAD_IND(i0, _OnePtFive, p0);  // pointer to const data
 
-       p0.l = _Zero;               // pointer to const data
-       p0.h = _Zero;               // (required by function ___SQRT_Mult64)
+       LOAD(p0, _Zero);               // pointer to const data
+                                      // (required by function ___SQRT_Mult64)
 
        p2 = p2 + p1;
        r0 = r0 - r0 (ns) || r1 = b[p2] (Z);
