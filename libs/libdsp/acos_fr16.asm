@@ -81,12 +81,7 @@ __acos_fr16:
       IF !CC JUMP RET_ERROR;             // IF FALSE THEN JUMP TO RETURN 0X7FFF
 
 ASIN_RTN2:
-#ifdef __FDPIC__
-      P0 = [P3 + .acoscoef2@GOT17M4];
-#else
-      P0.L = .acoscoef2;                 // POINTER TO ARRAY OF COEFFICIENT 2
-      P0.H = .acoscoef2;
-#endif
+      LOAD(P0, .acoscoef2);              // POINTER TO ARRAY OF COEFFICIENT 2
       R3 = W[P0++] (Z);                      // GET FIRST COEFFICIENT
       R3 <<= 16;                         // ARRANGE IN 32 BIT FORMAT
       A0 = R3 || R3 = W[P0++] (Z);           // INITIALISE A0 WITH FIRST COEFFICIENT
@@ -100,12 +95,7 @@ ASIN_RTN2:
       JUMP RET_VALUE;                    // BRANCH TO RET_VALUE
 
 ASIN_RTN1:
-#ifdef __FDPIC__
-      P0 = [P3 + .acoscoef1@GOT17M4];
-#else
-      P0.L = .acoscoef1;                 // POINTER TO ARRAY OF COEFFICIENT 1
-      P0.H = .acoscoef1;
-#endif
+      LOAD(P0, .acoscoef1);              // POINTER TO ARRAY OF COEFFICIENT 1
       R3 = W[P0++] (Z);                      // GET FIRST COEFFICIENT
       R3 <<= 16;                         // ARRANGE IN 32 BIT FORMAT
       A0 = R3 || R3 = W[P0++] (Z);           // INITIALISE A0 WITH FIRST COEFFICIENT
@@ -119,12 +109,7 @@ ASIN_RTN1:
       JUMP RET_VALUE;                    // BRANCH TO RET_VALUE
 
 ASIN_RTN0:
-#ifdef __FDPIC__
-      P0 = [P3 + .acoscoef0@GOT17M4];
-#else
-      P0.L = .acoscoef0;                 // POINTER TO ARRAY OF COEFFICIENT 0
-      P0.H = .acoscoef0;
-#endif
+      LOAD(P0, .acoscoef0);              // POINTER TO ARRAY OF COEFFICIENT 0
       P1 = 3;                            // P1 = 3 = NO OF COEFFICIENTS
       R1 = R0;                           // LOAD R0(y = x)
       A0 = 0 || R3 = W[P0++] (Z);            // CLEAR A0 AND GET FIRST COEFFICIENT

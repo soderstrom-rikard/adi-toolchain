@@ -62,12 +62,7 @@ __mu_compress:		[--SP]=(R7:5); 	   // PUSH R7-R5 ON STACK
 					I1=R1;				// ADDRESS OF OUTPUT ARRAY
 					L0=0;
 					L1=0;               // CLEAR L0 AND L1 REGISTER
-#ifdef __FDPIC__
-					P2 = [P3 + .chordcoef0@GOT17M4];
-#else
-					P2.L = .chordcoef0; 
-					P2.H = .chordcoef0; //POINTER TO ARRAY OF COEFFICIENT 2
-#endif
+					LOAD(P2, .chordcoef0);		//POINTER TO ARRAY OF COEFFICIENT 2
 					I2=P2;				// STORE THE ADDRESS 	
  					P0=R2;				// R2= NUMBER OF ELEMENTS
 					R5=0xff;        	// INTIALISED TO 0X55

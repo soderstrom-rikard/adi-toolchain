@@ -69,13 +69,7 @@ __tan_fr16:
       CC = R1 < R2;                      // CHECK IF INPUT EXCEEDS PI/4
       IF CC JUMP RET_ERROR;              // IF TRUE, RETURN ZERO
 
-#ifdef __FDPIC__
-      R1 = [P3 + .acoscoef2@GOT17M4];
-      I0 = R1;
-#else
-      I0.L = .tancoef0;                  // POINTER TO ARRAY OF COEFFICIENT 0
-      I0.H = .tancoef0;
-#endif
+      LOAD_IND(I0, .tancoef0, R1);       // POINTER TO ARRAY OF COEFFICIENT 0
       P2 = R0;                           // STORE SIGN
 
       R2.H = R2.L * R2.L || R1 = [I0++]; // R2.H(Y) = X * X AND GET FIRST COEFF

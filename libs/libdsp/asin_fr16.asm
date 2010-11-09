@@ -80,12 +80,7 @@ __asin_fr16:
       IF !CC JUMP RET_ERROR;             // IF FALSE THEN BRANCH TO RETURN 0
 
 ASIN_RTN2:
-#ifdef __FDPIC__
-      P0 = [P3 + .asincoef2@GOT17M4];
-#else
-      P0.L = .asincoef2;                 // POINTER TO ARRAY OF COEFFICIENT 2
-      P0.H = .asincoef2;
-#endif
+      LOAD(P0, .asincoef2);              // POINTER TO ARRAY OF COEFFICIENT 2
       R3 = W[P0++] (Z);                      // GET FIRST COEFFICIENT
       R3 <<= 16;                         // ARRANGE IN 32 BIT FORMAT
       A0 = R3 || R3 = W[P0++] (Z);           // INITIALISE A0 WITH FIRST COEFFICIENT
@@ -99,12 +94,7 @@ ASIN_RTN2:
       JUMP CHECK_FOR_SIGN;               // BRANCH TO CHECK_FOR_SIGN
 
 ASIN_RTN1:
-#ifdef __FDPIC__
-      P0 = [P3 + .asincoef1@GOT17M4];
-#else	
-      P0.L = .asincoef1;                 // POINTER TO ARRAY OF COEFFICIENT 1
-      P0.H = .asincoef1;
-#endif
+      LOAD(P0, .asincoef1);              // POINTER TO ARRAY OF COEFFICIENT 1
       R3 = W[P0++] (Z);                      // GET FIRST COEFFICIENT
       R3 <<= 16;                         // ARRANGE IN 32 BIT FORMAT
       A0 = R3 || R3 = W[P0++] (Z);           // INITIALISE A0 WITH FIRST COEFFICIENT
@@ -119,12 +109,7 @@ ASIN_RTN1:
 
 ASIN_RTN0:
       [--SP] = R7;                       // PUSH R7 REG TO STACK
-#ifdef __FDPIC__
-      P0 = [P3 + .asincoef0@GOT17M4];
-#else	
-      P0.L = .asincoef0;                 // POINTER TO ARRAY OF COEFFICIENT 0
-      P0.H = .asincoef0;
-#endif
+      LOAD(P0, .asincoef0);              // POINTER TO ARRAY OF COEFFICIENT 0
       P1 = 3;                            // P1 = 3 = NO OF COEFFICIENTS
       R7 = R1;                           // LOAD R1(y = x)
       A0 = 0 || R3 = W[P0++] (Z);            // CLEAR A0 AND GET FIRST COEFFICIENT

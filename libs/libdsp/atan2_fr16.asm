@@ -110,13 +110,7 @@ __atan2_fr16:
                                          // WILL BE IN R0 REG
           RETS = [SP++];                 // POP RETS
 
-#ifdef __FDPIC__
-	  R3 = [P5 + .atan2coef@GOT17M4];
-	  I0 = R3;
-#else
-          I0.L = .atan2coef;             // POINTER TO ARRAY OF COEFFICIENTS
-          I0.H = .atan2coef;
-#endif
+          LOAD_IND(I0, .atan2coef, R3);  // POINTER TO ARRAY OF COEFFICIENTS
           P0 = 3;                        // INITIALISE LOOP COUNTER VALUE
           R3 = R0;                       // MAKE A COPY OF QUOTIENT 
                                          // IN R3 (A = B)
