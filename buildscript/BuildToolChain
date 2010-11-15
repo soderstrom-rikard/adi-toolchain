@@ -566,7 +566,7 @@ build_gcc()
 	DIR_GCC_SOURCE=$DIR_SOURCE/gcc-${ver}
 
 	DIR_GCC_BUILD=$DIR_BUILD/gcc_build-${ver}
-	change_clean_dir $DIR_GCC_BUILD
+	change_clean_dir "$DIR_GCC_BUILD"
 	touch_tree "${DIR_GCC_SOURCE}"
 
 	# When doing a canadian cross, we have to use the toolchain on the host.
@@ -710,7 +710,7 @@ build_binutils()
 
 	resume_check ${target}.binutils && return 0
 
-	change_clean_dir $DIR_BINUTILS_BUILD
+	change_clean_dir "$DIR_BINUTILS_BUILD"
 	touch_tree "${DIR_BINUTILS_SOURCE}"
 
 	# Blackfin doesn't utilize xml memory maps so disable this for now
@@ -745,7 +745,7 @@ build_binutils()
 	fi
 	check_installed_files gdb "$DIR_BINUTILS_BUILD/gdb/" ${FILE}
 
-	change_dir $DIR_BINUTILS_BUILD
+	change_dir "$DIR_BINUTILS_BUILD"
 	echo_date "${target}: binutils/gdb: installing"
 	run_cmd $MAKE install-binutils install-gas install-ld install-sim install-gdb
 
@@ -771,7 +771,7 @@ build_elf2flt()
 	DIR_ELF2FLT_BUILD=$DIR_BUILD/elf2flt_build
 
 	echo_date "${target}: elf2flt: configuring"
-	change_clean_dir $DIR_ELF2FLT_BUILD
+	change_clean_dir "$DIR_ELF2FLT_BUILD"
 	touch_tree "${DIR_ELF2FLT_SOURCE}"
 
 	myconf=""
@@ -920,7 +920,7 @@ build_uboot()
 	ver=$(cd /; printf 'e:\n\t@echo $(U_BOOT_VERSION)\ninclude '$DIR_UBOOT'/Makefile\n' | ${MAKE} -f -)
 
 	echo_date "U-Boot: building helper tools (${ver})"
-	change_dir $DIR_UBOOT
+	change_dir "$DIR_UBOOT"
 	DIR_UBOOT_BUILD="$DIR_BUILD/u-boot_build"
 
 	echo_date "U-Boot: cleaning"
@@ -961,7 +961,7 @@ build_kernel_headers()
 
 	echo_date "Configuring Linux Kernel"
 
-	change_dir $KERNEL_SOURCE
+	change_dir "$KERNEL_SOURCE"
 	run_cmd \
 		$MAKE -j1 \
 		headers_check headers_install \
@@ -1052,7 +1052,7 @@ build_uclibc()
 	}
 	unset_opt() { do_opt $1 "# $1 is not set" ; }
 
-	change_dir $DIR_UCLIBC_SOURCE
+	change_dir "$DIR_UCLIBC_SOURCE"
 
 	MULTILIBS=`bfin-elf-gcc --print-multi-lib`
 
@@ -1172,7 +1172,7 @@ build_uclibc()
 	run_cmd find $DIR_LINUX_OUTPUT/bfin-linux-uclibc/runtime -type f -name '*.so' -exec chmod a+rx {} \;
 
 	echo_date "uClibc: cleaning"
-	change_dir $DIR_UCLIBC_SOURCE
+	change_dir "$DIR_UCLIBC_SOURCE"
 	run_cmd $MAKE CROSS=bfin-elf- distclean
 }
 
@@ -1329,7 +1329,7 @@ done
 
 if [ -z $SKIP_TARGET_LIBS ] && [ -e $DIR_SOURCE/libs/Makefile ] ; then
 
-	change_dir $DIR_SOURCE/libs
+	change_dir "$DIR_SOURCE/libs"
 
 	MULTILIBS=`bfin-elf-gcc --print-multi-lib`
 
