@@ -38,6 +38,8 @@ unset DATE_STAMP VERBOSE WARN
 
 PREREQ_FILE="autoconf automake awk /bin/sh bison cp echo flex gcc gettext grep ln m4 make makeinfo mkdir msgfmt mv rm sed tail wc which pkg-config"
 BINUTILS_VERSION=2.17
+GDB_VERSION=${BINUTILS_VERSION}
+NEWLIB_VERSION=${BINUTILS_VERSION}
 GCC_VERSIONS=
 GCC_VERSIONS_DEFAULT=4.3
 NUM_JOBS=0
@@ -69,6 +71,7 @@ Usage : $APP_NAME -s SOURCE [-b BUILD]
 -d               Date Stamp all output files
 -D               Don't check libraries/headers -- assume all is OK
 -f               Add stack checking to all tests
+-G GDB_VER       GDB version (default ${GDB_VERSION}).  Can be given once.
 -h               Help
 -H HOST          Build toolchain to run on HOST.
 -j NUM           Pass -j NUM to make (default is 2x num of CPUs)
@@ -76,6 +79,7 @@ Usage : $APP_NAME -s SOURCE [-b BUILD]
 -k SOURCE        Kernel Source directory (builds bfin-uclinux-gcc)
 -l LANGS         Only build specified gcc languages.
 -m MAKE          Default make (leave blank to use system make)
+-N NEWLIB_VER    Newlib version (default ${NEWLIB_VERSION}).  Can be given once.
 -O OUTPUT        Output directory (leave blank to use build dir)
 -o OUTPUT        Output directory prefix (leave blank to use build dir)
 -p               Check prerequisites
@@ -95,7 +99,7 @@ EOF
 exit ${1:-0}
 }
 
-while getopts a:b:B:c:C:dDfH:hj:k:K:l:m:o:O:pP:Rr:s:S:tT:u:U:vwX parameter
+while getopts a:b:B:c:C:dDG:fH:hj:k:K:l:m:N:o:O:pP:Rr:s:S:tT:u:U:vwX parameter
 do
 	case $parameter in
 		a)
@@ -154,6 +158,8 @@ do
 			fi
 			;;
 		B)  BINUTILS_VERSION=$OPTARG ;;
+		G)  GDB_VERSION=$OPTARG ;;
+		N)  NEWLIB_VERSION=$OPTARG ;;
 		P)  PKGVERSION=$OPTARG ;;
 		c)  GCC_VERSIONS="$GCC_VERSIONS $OPTARG" ;;
 		H)  CHOST=$OPTARG ;;
@@ -326,6 +332,8 @@ cd "${DIR_BUILD}"
 check_fs_case
 
 check_src_pkg binutils-${BINUTILS_VERSION} BINUTILS
+check_src_pkg binutils-${GDB_VERSION} GDB
+check_src_pkg binutils-${NEWLIB_VERSION} NEWLIB
 
 CBUILD=$($DIR_BINUTILS_SOURCE/config.guess)
 BUILD_TARGET="--build=${CBUILD}"
@@ -602,8 +610,8 @@ build_gcc()
 	[ -e $DIR_GCC_SOURCE/../gmp  ] && run_cmd ln -snf ../gmp  $DIR_GCC_SOURCE/gmp
 	[ -e $DIR_GCC_SOURCE/../mpfr ] && run_cmd ln -snf ../mpfr $DIR_GCC_SOURCE/mpfr
 	if [ "${target}" = "bfin-elf" ]; then
-		run_cmd ln -snf $DIR_BINUTILS_SOURCE/newlib $DIR_GCC_SOURCE/
-		run_cmd ln -snf $DIR_BINUTILS_SOURCE/libgloss $DIR_GCC_SOURCE/
+		run_cmd ln -snf $DIR_NEWLIB_SOURCE/newlib $DIR_GCC_SOURCE/
+		run_cmd ln -snf $DIR_NEWLIB_SOURCE/libgloss $DIR_GCC_SOURCE/
 		EXTRA_GCC_CONF="--enable-languages=c,c++"
 	else
 		EXTRA_GCC_CONF=""
@@ -705,13 +713,25 @@ build_binutils()
 {
 	local target="bfin-$1"
 	local prefix="$2"
+	local pkg="binutils/gdb"
+	local split_gdb=false
 
 	DIR_BINUTILS_BUILD=$DIR_BUILD/binutils_build
+	DIR_GDB_BUILD=$DIR_BINUTILS_BUILD
 
 	resume_check ${target}.binutils && return 0
 
 	change_clean_dir "$DIR_BINUTILS_BUILD"
 	touch_tree "${DIR_BINUTILS_SOURCE}"
+	if [ "${DIR_BINUTILS_SOURCE}" != "${DIR_GDB_SOURCE}" ] ; then
+		split_gdb=true
+		pkg="binutils"
+		DIR_GDB_BUILD=$DIR_BUILD/gdb_build
+		touch_tree "${DIR_GDB_SOURCE}"
+	fi
+	if [ "${DIR_BINUTILS_SOURCE}" != "${DIR_NEWLIB_SOURCE}" ] ; then
+		touch_tree "${DIR_NEWLIB_SOURCE}"
+	fi
 
 	# Blackfin doesn't utilize xml memory maps so disable this for now
 	# to avoid the ABI differences between systems
@@ -722,15 +742,16 @@ build_binutils()
 		*)        myconf="--with-sysroot=${prefix}/${target}/runtime";;
 	esac
 
-	echo_date "${target}: binutils/gdb: configuring (${BINUTILS_VERSION})"
-	run_cmd $DIR_BINUTILS_SOURCE/configure \
+	echo_date "${target}: ${pkg}: configuring (${BINUTILS_VERSION})"
+	set -- \
 		$BUILD_TARGET $HOST_TARGET --target=${target} \
 		--prefix=${prefix} ${myconf} $BINUTILS_EXTRA_CONF \
 		--with-bugurl=URL:http://blackfin.uclinux.org/gf/project/toolchain/tracker \
 		--with-pkgversion=$(get_scm_ver $DIR_BINUTILS_SOURCE)
+	run_cmd "$DIR_BINUTILS_SOURCE"/configure "$@"
 
-	echo_date "${target}: binutils/gdb: building"
-	run_cmd $MAKE all-binutils all-gas all-ld all-sim all-gdb
+	echo_date "${target}: ${pkg}: building"
+	run_cmd $MAKE all-binutils all-gas all-ld $(${split_gdb} || echo all-sim all-gdb)
 
 	get_exeext "${DIR_BINUTILS_BUILD}"/binutils/config.log
 	check_installed_files binutils "$DIR_BINUTILS_BUILD/binutils/" \
@@ -739,15 +760,32 @@ build_binutils()
 	check_installed_files gas "$DIR_BINUTILS_BUILD/gas/" as-new
 	check_installed_files ld "$DIR_BINUTILS_BUILD/ld/" ld-new
 
+	if ${split_gdb} ; then
+		change_clean_dir "$DIR_GDB_BUILD"
+
+		echo_date "${target}: gdb: configuring (${GDB_VERSION})"
+		run_cmd "$DIR_GDB_SOURCE"/configure "$@"
+
+		echo_date "${target}: gdb: building"
+		run_cmd $MAKE all-gdb
+	fi
+
 	FILE="gdb"
 	if [ "${WITHOUT_X}" = "false" ] ; then
 		FILE="${FILE} insight"
 	fi
-	check_installed_files gdb "$DIR_BINUTILS_BUILD/gdb/" ${FILE}
+	check_installed_files gdb "$DIR_GDB_BUILD/gdb/" ${FILE}
+	check_installed_files gdb "$DIR_GDB_BUILD/sim/bfin/" run
 
 	change_dir "$DIR_BINUTILS_BUILD"
-	echo_date "${target}: binutils/gdb: installing"
-	run_cmd $MAKE install-binutils install-gas install-ld install-sim install-gdb
+	echo_date "${target}: ${pkg}: installing"
+	run_cmd $MAKE install-binutils install-gas install-ld $(${split_gdb} || echo install-sim install-gdb)
+
+	if ${split_gdb} ; then
+		change_dir "$DIR_GDB_BUILD"
+		echo_date "${target}: gdb: installing"
+		run_cmd $MAKE install-sim install-gdb
+	fi
 
 	if [ "${CBUILD}" != "${CHOST}" ] && ! check_lib readline ${CHOST} 2>/dev/null ; then
 		echo_date "${CHOST}: readline: installing"
@@ -756,7 +794,7 @@ build_binutils()
 	fi
 
 	# need to leave build dir behind for elf2flt
-	[ "${target}" = "bfin-linux-uclibc" ] && clean_build_dir "$DIR_BINUTILS_BUILD"
+	[ "${target}" = "bfin-linux-uclibc" ] && clean_build_dir "$DIR_BINUTILS_BUILD" "$DIR_GDB_BUILD"
 
 	resume_save
 }
