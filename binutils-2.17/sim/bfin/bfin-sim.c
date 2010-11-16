@@ -1986,7 +1986,7 @@ decode_PushPopReg_0 (SIM_CPU *cpu, bu16 iw0)
     {
       TRACE_INSN (cpu, "[--SP] = %s;", reg_name);
       /* Can't push SP */
-      if (INSN_LEN == 8 || grp == 1 && reg == 6)
+      if (INSN_LEN == 8 || (grp == 1 && reg == 6))
 	illegal_instruction_combination (cpu);
 
       sp -= 4;
