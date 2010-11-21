@@ -6296,6 +6296,17 @@ lang_vers_match (struct bfd_elf_version_expr_head *head,
   const char *java_sym = sym;
   struct bfd_elf_version_expr *expr = NULL;
 
+  /* XXX: This is a big ugly hack that breaks non-Blackfin toolchains.
+          The real fix involves bfd_demangle() that has already been
+          merged into newer versions of binutils.  But backporting that
+          is a ton more work, and since we'll be upgrading binutils
+          versions anyways, here it is.  */
+  if (sym[0] == '_')
+    {
+      ++sym;
+      cxx_sym = java_sym = sym;
+    }
+
   if (head->mask & BFD_ELF_VERSION_CXX_TYPE)
     {
       cxx_sym = cplus_demangle (sym, DMGL_PARAMS | DMGL_ANSI);
