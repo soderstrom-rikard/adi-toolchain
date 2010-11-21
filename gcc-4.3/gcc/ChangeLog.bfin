@@ -1,3 +1,10 @@
+2010-11-21  Mike Frysinger  <michael.frysinger@analog.com>
+
+	* mkmap-symver.awk: Move prefix from main to output().
+	* config/bfin/libgcc-bfin.ver: Delete duplicated contents.
+	* config/bfin/t-bfin-linux (SHLIB_MAPFILES): Add libgcc-std.ver.
+	(SHLIB_MKMAP_OPTS): Define.
+
 2010-10-01  Steve Kilbane  <stephen.kilbane@analog.com>
 
 	* config/bfin/bfin.md: Load operands into regs before computing len.

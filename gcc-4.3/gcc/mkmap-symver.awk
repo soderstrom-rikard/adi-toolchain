@@ -81,7 +81,7 @@ $1 == "}" {
 }
 
 {
-  sym = prefix $1;
+  sym = $1;
   if (thislib != "%exclude")
     ver[sym] = thislib;
   else
@@ -108,7 +108,7 @@ function output(lib) {
 
   empty=1
   for (sym in ver)
-    if ((ver[sym] == lib) && (sym in def))
+    if ((ver[sym] == lib) && (prefix sym in def))
       {
 	if (empty)
 	  {
