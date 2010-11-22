@@ -1,3 +1,7 @@
+2010-11-22  Stuart Henderson <stuart.henderson@analog.com>
+
+	* gdb.asm/asm-source.exp: [#6204] Place code in L1 for hardware testing.
+
 2010-10-14  Stuart Henderson <stuart.henderson@analog.com>
 
 	* gdb.base/break.c: [#6289] Ensure malloc is linked in.

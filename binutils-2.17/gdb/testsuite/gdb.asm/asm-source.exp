@@ -53,6 +53,9 @@ switch -glob -- [istarget] {
     }
     "bfin-*-elf" {
         set asm-arch bfin
+	if { "[target_info name]" != "bfin-sim" } {
+	append link-flags " -Ttext=0xFFA00000"
+	}
 	set debug-flags "-g"
     }
     "bfin-*-uclinux" {
