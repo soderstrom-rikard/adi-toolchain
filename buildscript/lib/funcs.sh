@@ -106,7 +106,7 @@ die_with_log()
 	out=$(tail "$ACTUAL_LOGFILE")
 	dump_trace
 
-	[ -n "$*" ] && echo "$*"
+	[ -n "$*" ] && printf '%b\n\n' "$*"
 	echo "Please report an error to http://blackfin.uclinux.org/gf/project/toolchain"
 	echo " Build error at `date`"
 	echo "  occurred $(print_stop_time) into script"
