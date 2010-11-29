@@ -2,11 +2,11 @@
 %if %{windows_build}
 %define mingw_prefix mingw32
 %define __os_install_post %{nil}
-%define bfin_host_strip %{mingw_prefix}/strip
+%define bfin_host_strip %{mingw_prefix}-strip
 %define bfin_targ_strip bfin-elf-strip
 %define EXEEXT .exe
 %define x_support 0
-%define extra_buildtoolchain_opts -H %{mingw_prefix}
+%define extra_buildtoolchain_opts -H %{mingw_prefix} -X
 %else
 %define bfin_host_strip strip
 %define bfin_targ_strip %{prefix}/bfin-elf/bin/bfin-elf-strip
