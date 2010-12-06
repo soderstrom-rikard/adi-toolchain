@@ -194,7 +194,7 @@ scrub_path()
 		if [ -n "${RUN}" ] ; then
 			FOUND=1
 			if [ -z "$CHOST" ] ; then
-				echo "Removing $p from the PATH"
+				echo "Removing from PATH: $p"
 			fi
 		else
 			NEW_PATH=${NEW_PATH:+${NEW_PATH}:}$p
