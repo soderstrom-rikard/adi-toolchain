@@ -534,7 +534,7 @@ build_curses()
 build_expat()
 {
 	# help out mingw targets; some packages (like gdb) like expat
-	if [ "${CBUILD}" = "${CHOST}" ] || check_lib expat ${CHOST} 2>/dev/null ; then
+	if check_lib expat ${CHOST} 2>/dev/null ; then
 		return 0
 	fi
 
@@ -826,10 +826,6 @@ build_binutils()
 		touch_tree "${DIR_NEWLIB_SOURCE}"
 	fi
 
-	# Blackfin doesn't utilize xml memory maps so disable this for now
-	# to avoid the ABI differences between systems
-	export ac_cv_libexpat=no
-
 	case ${target} in
 		bfin-elf) myconf="--without-newlib";;
 		*)        myconf="--with-sysroot=${prefix}/${target}/runtime";;
@@ -839,6 +835,7 @@ build_binutils()
 	set -- \
 		$BUILD_TARGET $HOST_TARGET --target=${target} \
 		--prefix=${prefix} ${myconf} $BINUTILS_EXTRA_CONF \
+		--with-libexpat-prefix="${STAGEDIR}"/usr \
 		--with-bugurl=URL:http://blackfin.uclinux.org/gf/project/toolchain/tracker \
 		--with-pkgversion=$(get_scm_ver $DIR_BINUTILS_SOURCE)
 	run_cmd "$DIR_BINUTILS_SOURCE"/configure "$@"
