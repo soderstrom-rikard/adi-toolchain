@@ -50,13 +50,44 @@ RESUME_BUILD=false
 CBUILD= # the system we are compiling on
 CHOST=  # the system the final compiler will run on
 
-unset SKIP_ELF SKIP_GDBPROXY SKIP_JTAG SKIP_LDR SKIP_TARGET_LIBS SKIP_UBOOT SKIP_FLAT SKIP_FDPIC
+# All the packages we build up
+PKGS_DEFAULT="bfin-elf bfin-uclinux bfin-linux-uclibc u-boot ldr-utils urjtag gdbproxy target-libs"
+PKGS_ALL="${PKGS_DEFAULT} libusb libftdi"
+PKGS_ALIASES="
+	bfin-elf:elf
+	bfin-uclinux:uclinux:flat
+	bfin-linux-uclibc:linux-uclibc:fdpic
+	ldr-utils:ldr
+	u-boot:uboot
+	target-libs:tlibs
+	urjtag:jtag
+"
+unset PKGS_SKIP PKGS_BUILD
 
 unset UCLIBC_CFLAGS UCLIBC_CONFIG_FILE UCLIBC_OPTS
 
 TEST_OPTS=
 TEST_SIM=
 TEST_HARDWARE=
+
+pkgs_alias()
+{
+	local p u="$1"
+
+	if has ${u} ${PKGS_ALL} ; then
+		echo ${u}
+		return 0
+	fi
+
+	for p in ${PKGS_ALIASES} ; do
+		if has ${u} `IFS=:; set -- ${p#*:}; echo $*` ; then
+			echo ${p%%:*}
+			return 0
+		fi
+	done
+
+	return 1
+}
 
 usage() {
 # We don't document the -S option - it's for advanced users who know what
@@ -126,18 +157,10 @@ do
 			TEST_OPTS="${TEST_OPTS} -${parameter} ${OPTARG}"
 			;;
 		S)
-			case ${OPTARG} in
-				elf)      SKIP_ELF=true ;;
-				gdbproxy) SKIP_GDBPROXY=true ;;
-				jtag)     SKIP_JTAG=true ;;
-				ldr)      SKIP_LDR=true ;;
-				tlibs)    SKIP_TARGET_LIBS=true ;;
-				u-boot|\
-				uboot)    SKIP_UBOOT=true ;;
-				flat)     SKIP_FLAT=true ;;
-				fdpic)    SKIP_FDPIC=true ;;
-				*)        error "invalid skip target '${OPTARG}'" ;;
-			esac
+			if ! pkg=`pkgs_alias ${OPTARG}` ; then
+				error "unknown package given to -S: ${OPTARG}"
+			fi
+			PKGS_SKIP="${PKGS_SKIP} ${pkg}"
 			;;
 		s)  DIR_SOURCE=${OPTARG%/} ;;
 		l)
@@ -207,10 +230,39 @@ do
 	esac
 done
 
+pkgs_queue()
+{
+	local p pkg
+	for pkg in "$@" ; do
+		if ! p=`pkgs_alias ${pkg}` ; then
+			error "unknown package: ${pkg}"
+		fi
+		has ${p} ${PKGS_SKIP} && continue
+		has ${p} ${PKGS_BUILD} && continue
+		PKGS_BUILD="${PKGS_BUILD} ${p}"
+	done
+}
+pkgs_queued()
+{
+	local p
+	for p in "$@" ; do
+		p=`pkgs_alias ${p}`
+		has ${p} ${PKGS_BUILD} || return 1
+	done
+	return 0
+}
+pkgs_unqueue()
+{
+	local p
+	for p in "$@" ; do
+		p=`pkgs_alias ${p}`
+		PKGS_BUILD=$(echo $(echo ${PKGS_BUILD} | sed s:${p}::))
+	done
+}
+
 shift $((OPTIND - 1))
-if [ $# -ne 0 ] ; then
-	error "${APP_NAME}: takes no arguments, see --help"
-fi
+[ $# -eq 0 ] && set -- ${PKGS_DEFAULT}
+pkgs_queue "$@"
 
 # binutils-2.20 and later don't include insight
 if [ "${BINUTILS_VERSION}" != "2.17" ] ; then
@@ -244,11 +296,7 @@ fi
 
 ############ Done checking - lets get on to building ###################3
 
-chains=
-[ $SKIP_ELF   ] || chains="${chains} bfin-elf"
-[ $SKIP_FLAT  ] || chains="${chains} bfin-uclinux"
-[ $SKIP_FDPIC ] || chains="${chains} bfin-linux-uclibc"
-notice "Building toolchains" ${chains}
+notice "Building packages" ${PKGS_BUILD}
 
 # Don't set a default here ... let the build system
 # figure out the defaults by loading all languages.
@@ -266,7 +314,7 @@ fi
 export MAKEFLAGS="-j$NUM_JOBS $MAKEFLAGS"
 notice "Utilizing make" "$MAKE $MAKEFLAGS"
 
-[ $SKIP_ELF ] || scrub_path
+scrub_path
 
 ############ FIND SOME DEFAULT PATHS ############################
 # Support the "normal" layout (what we document in examples):
@@ -290,8 +338,8 @@ if [ -z "${KERNEL_SOURCE}" ] ; then
 		fi
 	done
 fi
-[ ${SKIP_FLAT} ] && [ ${SKIP_FDPIC} ] && unset KERNEL_SOURCE
-[ -z "${KERNEL_SOURCE}" ] && SKIP_FLAT=true SKIP_FDPIC=true
+! pkgs_queued flat && ! pkgs_queued fdpic && unset KERNEL_SOURCE
+[ -z "${KERNEL_SOURCE}" ] && pkgs_unqueue flat fdpic
 
 if [ -z "${DIR_UBOOT}" ] ; then
 	for p in ../u-boot ../../u-boot/trunk ; do
@@ -302,8 +350,8 @@ if [ -z "${DIR_UBOOT}" ] ; then
 		fi
 	done
 fi
-[ ${SKIP_UBOOT} ] && unset DIR_UBOOT
-[ -z "${DIR_UBOOT}" ] && SKIP_UBOOT=true
+pkgs_queued u-boot || unset DIR_UBOOT
+[ -z "${DIR_UBOOT}" ] && pkgs_unqueue u-boot
 
 ############ ABSOLUTE PATH TO SOURCE DIRECTORIES ################
 
@@ -322,7 +370,7 @@ mk_output_dir "staging" "${STAGEDIR}"
 
 : ${DIR_ELF_OUTPUT:=${DIR_BUILD}/bfin-elf}
 DIR_ELF_SYSROOT=${DIR_ELF_OUTPUT}/bfin-elf/runtime
-mk_output_dir "ELF" "${DIR_ELF_OUTPUT}" $SKIP_ELF
+pkgs_queued elf && mk_output_dir "ELF" "${DIR_ELF_OUTPUT}"
 
 DIR_LOG=$DIR_BUILD/logs
 mk_output_dir "logs" "${DIR_LOG}"
@@ -360,42 +408,59 @@ for GCC_VER in $GCC_VERSIONS; do
 	check_abs_dir "Path to gcc-${GCC_VER}" "${DIR_SOURCE}/gcc-${GCC_VER}"
 done
 
-check_src_pkg elf2flt
-
-check_src_pkg uClibc
-if [ -n "${UCLIBC_CFLAGS}" ] ; then
-	printf "    uClibc CFLAGS           "
-	# We test (and warn) if any of the CFLAGS for uClibc
-	# don't work on the host compiler
-	for opt in $UCLIBC_CFLAGS ; do
-		printf " %s" "$opt"
-		if check_cc_options gcc $opt ; then
-			printf "(bfin only?)"
-		fi
-	done
-	echo
+if pkgs_queued flat ; then
+	check_src_pkg elf2flt
 fi
-: ${UCLIBC_CFLAGS:=-g -O2}
 
-if [ -z "${SKIP_LDR}" ] ; then
-	check_src_pkg ldr-utils
-fi
-if [ -z "${SKIP_JTAG}" ] ; then
-	check_src_pkg libusb
-	check_src_pkg libftdi-1.0 LIBFTDI
-	check_src_pkg urjtag
-	if [ -z "${SKIP_GDBPROXY}" ] ; then
-		check_src_pkg gdbproxy
+if pkgs_queued flat || pkgs_queued fdpic ; then
+	check_src_pkg uClibc
+	if [ -n "${UCLIBC_CFLAGS}" ] ; then
+		printf "    uClibc CFLAGS           "
+		# We test (and warn) if any of the CFLAGS for uClibc
+		# don't work on the host compiler
+		for opt in $UCLIBC_CFLAGS ; do
+			printf " %s" "$opt"
+			if check_cc_options gcc $opt ; then
+				printf "(bfin only?)"
+			fi
+		done
+		echo
+	fi
+	: ${UCLIBC_CFLAGS:=-g -O2}
+
+	notice "Path to uClibc config" "${UCLIBC_CONFIG_FILE:-$DIR_UCLIBC_SOURCE/extra/Configs/}"
+	if [ -n "$UCLIBC_CONFIG_FILE" ] && [ ! -f "${UCLIBC_CONFIG_FILE}" ] ; then
+		error "Can't find uClibc config file '$UCLIBC_CONFIG_FILE'"
 	fi
 fi
 
+if pkgs_queued ldr-utils ; then
+	pkgs_queue libusb
+	check_src_pkg ldr-utils
+fi
+if pkgs_queued gdbproxy ; then
+	pkgs_queue urjtag
+	check_src_pkg gdbproxy
+fi
+if pkgs_queued urjtag ; then
+	pkgs_queue libusb libftdi
+	check_src_pkg urjtag
+else
+	pkgs_unqueue gdbproxy
+fi
+if pkgs_queued libftdi ; then
+	pkgs_queue libusb
+	check_src_pkg libftdi-1.0 LIBFTDI
+fi
+pkgs_queued libusb && check_src_pkg libusb
+
 : ${DIR_uC_OUTPUT:=${DIR_BUILD}/bfin-uclinux}
 DIR_uC_SYSROOT=${DIR_uC_OUTPUT}/bfin-uclinux/runtime
-mk_output_dir "FLAT" $DIR_uC_OUTPUT $SKIP_FLAT
+pkgs_queued flat && mk_output_dir "FLAT" $DIR_uC_OUTPUT
 
 : ${DIR_LINUX_OUTPUT:=${DIR_BUILD}/bfin-linux-uclibc}
 DIR_LINUX_SYSROOT=${DIR_LINUX_OUTPUT}/bfin-linux-uclibc/runtime
-mk_output_dir "FDPIC" $DIR_LINUX_OUTPUT $SKIP_FDPIC
+pkgs_queued fdpic && mk_output_dir "FDPIC" $DIR_LINUX_OUTPUT
 
 if [ ! $DIR_KBUILD_OUTPUT ] ; then
 	DIR_KBUILD_LOCAL=true
@@ -405,14 +470,10 @@ else
 	DIR_KBUILD_LOCAL=false
 fi
 
-if [ $SKIP_UBOOT ] ; then
+if ! pkgs_queued u-boot ; then
 	echo "U-Boot Source not specified: addon utilties (like 'mkimage') will not be built"
 else
 	check_abs_dir "Path to U-Boot" "${DIR_UBOOT}"
-fi
-notice "Path to uClibc config" "${UCLIBC_CONFIG_FILE:-$DIR_UCLIBC_SOURCE/extra/Configs/}"
-if [ -n "$UCLIBC_CONFIG_FILE" ] && [ ! -f "${UCLIBC_CONFIG_FILE}" ] ; then
-	error "Can't find uClibc config file '$UCLIBC_CONFIG_FILE'"
 fi
 
 ###################### set up log file ###########################
@@ -436,7 +497,7 @@ fi
 
 # Add output dir so when building uclibc, it can find the toolchain
 if [ -n "${NEW_PATH}" ] ; then
-	export PATH=$NEW_PATH:/$DIR_ELF_OUTPUT/bin:/$DIR_uC_OUTPUT/bin:/$DIR_LINUX_OUTPUT/bin
+	PATH=$NEW_PATH:/$DIR_ELF_OUTPUT/bin:/$DIR_uC_OUTPUT/bin:/$DIR_LINUX_OUTPUT/bin
 fi
 
 #################################################################
@@ -608,7 +669,7 @@ build_gcc()
 			chmod a+rx $p/${target}-$t
 		done
 		save_PATH=$PATH
-		export PATH=$p:$PATH
+		PATH=$p:$PATH
 	fi
 
 	echo_date "${target}: gcc: linking external packages"
@@ -985,6 +1046,8 @@ install_all_target_libs()
 
 build_uboot()
 {
+	pkgs_queued u-boot || return 0
+
 	local ver
 	# do the cd to avoid pwd warnings with `make`
 	ver=$(cd /; printf 'e:;@echo $(U_BOOT_VERSION)\ninclude '$DIR_UBOOT'/Makefile\n' | ${MAKE} -f -)
@@ -1294,79 +1357,10 @@ build_uclibc_host_tools()
 	resume_save
 }
 
-#
-# Prep a few 3rd party libs if need be
-#
-run_cmd mkdir -p "${STAGEDIR}"/bin "${STAGEDIR}"/usr/lib/pkgconfig "${STAGEDIR}"/usr/include
-if [ "${CBUILD}" != "${CHOST}" ] ; then
-	# need a local compiling wrapper for the staging dir
-	export PATH=${STAGEDIR}/bin:${PATH}
-	for x in cpp g++ gcc ld ; do
-		run_cmd cp "${DIR_APP}"/staging-compiler "${STAGEDIR}"/bin/${CHOST}-${x}
-	done
-fi
-build_curses
-build_expat
-build_pthreads
-build_zlib
-
-#
-# First build up the ELF toolchain
-#
-if [ "x$SKIP_ELF" = "x" ]; then
-	build_binutils elf $DIR_ELF_OUTPUT
-	build_elf2flt elf $DIR_ELF_OUTPUT
-	for GCC_VER in $GCC_VERSIONS; do
-		build_gcc $GCC_VER elf "${DIR_ELF_OUTPUT}"
-	done
-fi
-
-#
-# Then the FLAT toolchain
-#
-if [ ! $SKIP_FLAT ] ; then
-	build_binutils uclinux $DIR_uC_OUTPUT
-	build_elf2flt uclinux $DIR_uC_OUTPUT
-	build_kernel_headers uclinux $DIR_uC_SYSROOT
-	build_uclibc_headers uclinux $DIR_uC_SYSROOT
-	# build minimal gcc first for uClibc
-	build_gcc ${PRIMARY_GCC_VER} uclinux "${DIR_uC_OUTPUT}" --bare--
-	build_uclibc uclinux $DIR_uC_SYSROOT $DIR_uC_OUTPUT
-	for GCC_VER in $GCC_VERSIONS ; do
-		build_gcc ${GCC_VER} uclinux "${DIR_uC_OUTPUT}"
-	done
-fi
-
-#
-# Then the FDPIC toolchain
-#
-if [ ! $SKIP_FDPIC ] ; then
-	build_binutils linux-uclibc $DIR_LINUX_OUTPUT
-	build_kernel_headers linux-uclibc $DIR_LINUX_SYSROOT
-	build_uclibc_headers linux-uclibc $DIR_LINUX_SYSROOT
-	# build minimal gcc first for uClibc
-	build_gcc ${PRIMARY_GCC_VER} linux-uclibc "${DIR_LINUX_OUTPUT}" --bare--
-	build_uclibc linux-uclibc $DIR_LINUX_SYSROOT $DIR_LINUX_OUTPUT
-	for GCC_VER in $GCC_VERSIONS ; do
-		build_gcc $GCC_VER linux-uclibc "${DIR_LINUX_OUTPUT}"
-	done
-	install_all_target_libs $DIR_LINUX_OUTPUT bfin-linux-uclibc
-fi
-
-if ${DIR_KBUILD_LOCAL} ; then
-	echo_date "linux-headers: cleaning"
-	clean_build_dir "$DIR_KBUILD_OUTPUT"
-fi
-
-# Finally do u-boot if wanted
-[ $SKIP_UBOOT ] || build_uboot
-
-export PKG_CONFIG_PATH="${STAGEDIR}/usr/lib/pkgconfig${PKG_CONFIG_PATH:+:${PKG_CONFIG_PATH}}"
-
-######################## ldr-utils ###########################
-
 build_ldr_utils()
 {
+	pkgs_queued ldr-utils || return 0
+
 	local x t d sf df
 	build_autotooled_pkg "${DIR_LDR_UTILS_SOURCE}"
 
@@ -1381,10 +1375,10 @@ build_ldr_utils()
 	done
 }
 
-######################## urjtag/gdbproxy #######################
-
 build_libusb()
 {
+	pkgs_queued libusb || return 0
+
 	# upstream libusb hasn't merged the winusb branch yet
 	local sub
 	case ${CHOST} in *mingw*) sub="-winusb" ;; esac
@@ -1394,6 +1388,8 @@ build_libusb()
 
 build_libftdi()
 {
+	pkgs_queued libftdi || return 0
+
 	at_make_args() { echo SUBDIRS=src; }
 	build_autotooled_pkg --tlib "${DIR_LIBFTDI_SOURCE}" \
 		--disable-shared --enable-static --disable-libftdipp \
@@ -1402,6 +1398,8 @@ build_libftdi()
 
 build_urjtag()
 {
+	pkgs_queued urjtag || return 0
+
 	at_clean() {
 		# generated files get out of sync with source files; force regen
 		run_cmd rm -f src/bsdl/bsdl_bison.[ch] src/bsdl/bsdl_flex.c \
@@ -1415,41 +1413,14 @@ build_urjtag()
 
 build_gdbproxy()
 {
+	pkgs_queued gdbproxy || return 0
+
 	build_autotooled_pkg "${DIR_GDBPROXY_SOURCE}"
 }
 
-if [ -z "${SKIP_JTAG}" ] || [ -z "${SKIP_LDR}" ] ; then
-	: ${PKG_CONFIG:=pkg-config --static}
-	export PKG_CONFIG
-	build_libusb
-fi
-if [ -z "${SKIP_LDR}" ] ; then
-	build_ldr_utils
-fi
-if [ -z "${SKIP_JTAG}" ] ; then
-	build_libftdi
-	build_urjtag
-	if [ -z "${SKIP_GDBPROXY}" ] ; then
-		build_gdbproxy
-	fi
-fi
-
-# Now that we're done with the random libraries, punt them
-for d in "${DIR_ELF_OUTPUT}" "${DIR_uC_OUTPUT}" "${DIR_LINUX_OUTPUT}" ; do
-	run_cmd rm -rf \
-		"${d}"/lib*/pkgconfig \
-		"${d}"/lib*/lib*.a \
-		"${d}"/lib*/lib*.la \
-		"${d}"/include \
-		"${d}"/bin/*-config
-	find "${d}" -depth -type d -exec rmdir {} \; 2>/dev/null
-done
-
-######################## Done ################################
-
-########################### Target libs ########################
-
-if [ -z $SKIP_TARGET_LIBS ] && [ -e $DIR_SOURCE/libs/Makefile ] ; then
+build_target_libs()
+{
+	pkgs_queued target-libs || return 0
 
 	change_dir "$DIR_SOURCE/libs"
 
@@ -1470,12 +1441,12 @@ if [ -z $SKIP_TARGET_LIBS ] && [ -e $DIR_SOURCE/libs/Makefile ] ; then
 
 		if echo "${dir}" | grep -q -v bf561; then
 			if echo "${flags}" | grep -q mfdpic; then
-				[ $SKIP_FDPIC ] && continue
+				pkgs_queued fdpic || continue
 				suffix=/`echo ${dir} | sed -e 's/mfdpic//' -e 's|/$||'`
 				mlib=
 				destdir="$DIR_LINUX_OUTPUT/bfin-linux-uclibc/runtime"
 			else
-				[ $SKIP_FLAT ] && continue
+				pkgs_queued flat || continue
 				suffix=
 				mlib="/$dir"
 				destdir="$DIR_uC_OUTPUT/bfin-uclinux/runtime"
@@ -1495,13 +1466,13 @@ if [ -z $SKIP_TARGET_LIBS ] && [ -e $DIR_SOURCE/libs/Makefile ] ; then
 	done
 
 	run_cmd $MAKE CROSS=bfin-elf- clean
-fi
-
-########################### Target binutils ########################
+}
 
 build_target_binutils_libs()
 {
 	local target="bfin-$1" out="$2"
+
+	pkgs_queued target-libs ${target} || return 0
 
 	echo_date "${target}: target libbfd: building"
 	change_clean_dir "${DIR_BINUTILS_BUILD}"
@@ -1519,11 +1490,109 @@ build_target_binutils_libs()
 	clean_build_dir "${DIR_BINUTILS_BUILD}"
 }
 
-if [ ! $SKIP_TARGET_LIBS ] ; then
-	export PATH=$DIR_uC_OUTPUT/bin:$DIR_LINUX_OUTPUT/bin:$PATH
-	[ $SKIP_FLAT  ] || build_target_binutils_libs uclinux "${DIR_uC_OUTPUT}"
-	[ $SKIP_FDPIC ] || build_target_binutils_libs linux-uclibc "${DIR_LINUX_OUTPUT}"
+######################## Now for the actual execution #######################
+
+#
+# Prep a few 3rd party libs if need be
+#
+run_cmd mkdir -p "${STAGEDIR}"/bin "${STAGEDIR}"/usr/lib/pkgconfig "${STAGEDIR}"/usr/include
+if [ "${CBUILD}" != "${CHOST}" ] ; then
+	# need a local compiling wrapper for the staging dir
+	PATH=${STAGEDIR}/bin:${PATH}
+	for x in cpp g++ gcc ld ; do
+		run_cmd cp "${DIR_APP}"/staging-compiler "${STAGEDIR}"/bin/${CHOST}-${x}
+	done
 fi
+build_curses
+build_expat
+build_pthreads
+build_zlib
+
+#
+# First build up the ELF toolchain
+#
+if pkgs_queued elf ; then
+	build_binutils elf $DIR_ELF_OUTPUT
+	build_elf2flt elf $DIR_ELF_OUTPUT
+	for GCC_VER in $GCC_VERSIONS ; do
+		build_gcc $GCC_VER elf "${DIR_ELF_OUTPUT}"
+	done
+fi
+
+#
+# Then the FLAT toolchain
+#
+if pkgs_queued flat ; then
+	build_binutils uclinux $DIR_uC_OUTPUT
+	build_elf2flt uclinux $DIR_uC_OUTPUT
+	build_kernel_headers uclinux $DIR_uC_SYSROOT
+	build_uclibc_headers uclinux $DIR_uC_SYSROOT
+	# build minimal gcc first for uClibc
+	build_gcc ${PRIMARY_GCC_VER} uclinux "${DIR_uC_OUTPUT}" --bare--
+	build_uclibc uclinux $DIR_uC_SYSROOT $DIR_uC_OUTPUT
+	for GCC_VER in $GCC_VERSIONS ; do
+		build_gcc ${GCC_VER} uclinux "${DIR_uC_OUTPUT}"
+	done
+fi
+
+#
+# Then the FDPIC toolchain
+#
+if pkgs_queued fdpic ; then
+	build_binutils linux-uclibc $DIR_LINUX_OUTPUT
+	build_kernel_headers linux-uclibc $DIR_LINUX_SYSROOT
+	build_uclibc_headers linux-uclibc $DIR_LINUX_SYSROOT
+	# build minimal gcc first for uClibc
+	build_gcc ${PRIMARY_GCC_VER} linux-uclibc "${DIR_LINUX_OUTPUT}" --bare--
+	build_uclibc linux-uclibc $DIR_LINUX_SYSROOT $DIR_LINUX_OUTPUT
+	for GCC_VER in $GCC_VERSIONS ; do
+		build_gcc $GCC_VER linux-uclibc "${DIR_LINUX_OUTPUT}"
+	done
+	install_all_target_libs $DIR_LINUX_OUTPUT bfin-linux-uclibc
+fi
+
+if ${DIR_KBUILD_LOCAL} ; then
+	echo_date "linux-headers: cleaning"
+	clean_build_dir "$DIR_KBUILD_OUTPUT"
+fi
+
+#
+# Do random add-on packages
+#
+export PKG_CONFIG_PATH="${STAGEDIR}/usr/lib/pkgconfig${PKG_CONFIG_PATH:+:${PKG_CONFIG_PATH}}"
+: ${PKG_CONFIG:=pkg-config --static}
+export PKG_CONFIG
+
+build_uboot
+build_libusb
+build_ldr_utils
+build_libftdi
+build_urjtag
+build_gdbproxy
+
+#
+# Finally do target libraries
+#
+PATH=$DIR_ELF_OUTPUT/bin:$DIR_uC_OUTPUT/bin:$DIR_LINUX_OUTPUT/bin:$PATH
+
+if [ -e $DIR_SOURCE/libs/Makefile ] ; then
+	build_target_libs
+fi
+build_target_binutils_libs uclinux "${DIR_uC_OUTPUT}"
+build_target_binutils_libs linux-uclibc "${DIR_LINUX_OUTPUT}"
+
+########################### Clean up ###########################
+
+# Now that we're done with the random libraries, punt them
+for d in "${DIR_ELF_OUTPUT}" "${DIR_uC_OUTPUT}" "${DIR_LINUX_OUTPUT}" ; do
+	run_cmd rm -rf \
+		"${d}"/lib*/pkgconfig \
+		"${d}"/lib*/lib*.a \
+		"${d}"/lib*/lib*.la \
+		"${d}"/include \
+		"${d}"/bin/*-config
+	find "${d}" -depth -type d -exec rmdir {} \; 2>/dev/null
+done
 
 clean_build_dir "${STAGEDIR}"
 
