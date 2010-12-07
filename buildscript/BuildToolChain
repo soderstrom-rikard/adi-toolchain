@@ -408,7 +408,7 @@ for GCC_VER in $GCC_VERSIONS; do
 	check_abs_dir "Path to gcc-${GCC_VER}" "${DIR_SOURCE}/gcc-${GCC_VER}"
 done
 
-if pkgs_queued flat ; then
+if pkgs_queued elf || pkgs_queued flat ; then
 	check_src_pkg elf2flt
 fi
 
