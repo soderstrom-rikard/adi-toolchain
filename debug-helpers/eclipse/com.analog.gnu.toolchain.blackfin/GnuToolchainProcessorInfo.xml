@@ -10,7 +10,9 @@
 		file-version="1.00" />
 	<!-- list of processors supported by the gnu toolchain -->
 	<processors>
-		<processor name="Unspecified" />	
+		<processor name="Unspecified" />
+		<processor name="BF504" />
+		<processor name="BF506" />
 		<processor name="BF512" />
 		<processor name="BF514" />
 		<processor name="BF516" />
@@ -40,5 +42,6 @@
 		<processor name="BF549" />
 		<processor name="BF549M" />
 		<processor name="BF561" />
+		<processor name="BF592" />
 	</processors>
 </gnu-toolchain-processor-info-xml>
