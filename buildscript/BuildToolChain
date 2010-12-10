@@ -52,7 +52,7 @@ CHOST=  # the system the final compiler will run on
 
 # All the packages we build up
 PKGS_DEFAULT="bfin-elf bfin-uclinux bfin-linux-uclibc u-boot ldr-utils urjtag gdbproxy target-libs"
-PKGS_ALL="${PKGS_DEFAULT} libusb libftdi"
+PKGS_ALL="${PKGS_DEFAULT} expat libusb libftdi"
 PKGS_ALIASES="
 	bfin-elf:elf
 	bfin-uclinux:uclinux:flat
@@ -382,7 +382,9 @@ check_fs_case
 
 check_src_pkg binutils-${BINUTILS_VERSION} BINUTILS
 check_src_pkg binutils-${GDB_VERSION} GDB
-check_src_pkg binutils-${NEWLIB_VERSION} NEWLIB
+if pkgs_queued elf ; then
+	check_src_pkg newlib-${NEWLIB_VERSION} NEWLIB
+fi
 
 CBUILD=$($DIR_BINUTILS_SOURCE/config.guess)
 BUILD_TARGET="--build=${CBUILD}"
@@ -432,6 +434,10 @@ if pkgs_queued flat || pkgs_queued fdpic ; then
 	if [ -n "$UCLIBC_CONFIG_FILE" ] && [ ! -f "${UCLIBC_CONFIG_FILE}" ] ; then
 		error "Can't find uClibc config file '$UCLIBC_CONFIG_FILE'"
 	fi
+fi
+
+if pkgs_queued elf || pkgs_queued flat || pkgs_queued fdpic ; then
+	pkgs_queue expat
 fi
 
 if pkgs_queued ldr-utils ; then
@@ -533,6 +539,8 @@ build_curses()
 
 build_expat()
 {
+	pkgs_queued expat || return 0
+
 	# help out mingw targets; some packages (like gdb) like expat
 	if check_lib expat ${CHOST} 2>/dev/null ; then
 		return 0
