@@ -780,6 +780,7 @@ struct bfrom {
 #define BFROM(rom, sirev, alias_len) BFROMA (0xef000000, rom, sirev, alias_len)
 #define BFROM_STUB { 0, 0, 0, 0, NULL, }
 static const struct bfrom bf50x_roms[] = {
+  BFROM (50x, 0, 0x1000000),
   BFROM_STUB,
 };
 static const struct bfrom bf51x_roms[] = {
