@@ -101,8 +101,12 @@ static const struct bfin_dmac_layout bf000_dmac[] = {};
 #define bf504_chipid bf50x_chipid
 #define bf506_chipid bf50x_chipid
 static const struct bfin_memory_layout bf50x_mem[] = {
+  LAYOUT (0xFFC00700, 0x50, read_write),	/* PORTF stub */
   LAYOUT (0xFFC00800, 0x60, read_write),	/* SPORT0 stub */
   LAYOUT (0xFFC00900, 0x60, read_write),	/* SPORT1 stub */
+  LAYOUT (0xFFC01500, 0x50, read_write),	/* PORTG stub */
+  LAYOUT (0xFFC01700, 0x50, read_write),	/* PORTH stub */
+  LAYOUT (0xFFC03200, 0x50, read_write),	/* PORT_MUX stub */
   LAYOUT (0xFFC03800, 0x100, read_write),	/* RSI stub */
   LAYOUT (0xFF800000, 0x4000, read_write),	/* Data A */
   LAYOUT (0xFF804000, 0x8000, read_write),	/* Data A Cache */
