@@ -1423,10 +1423,10 @@ bfin_sic_finish (struct hw *me)
       sic->bf537.imask = 0;
       sic->bf537.isr = 0;
       sic->bf537.iwr = 0xFFFFFFFF;
-      sic->bf537.iar0 = 0x22211000;
-      sic->bf537.iar1 = 0x43333332;
-      sic->bf537.iar2 = 0x55555444;
-      sic->bf537.iar3 = 0x66655555;
+      sic->bf537.iar0 = 0x00000000;
+      sic->bf537.iar1 = 0x33322221;
+      sic->bf537.iar2 = 0x55444443;
+      sic->bf537.iar3 = 0x66600005;
       break;
     default:
       hw_abort (me, "no support for SIC on this Blackfin model yet");
