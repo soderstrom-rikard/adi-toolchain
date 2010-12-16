@@ -383,7 +383,7 @@ check_fs_case
 check_src_pkg binutils-${BINUTILS_VERSION} BINUTILS
 check_src_pkg binutils-${GDB_VERSION} GDB
 if pkgs_queued elf ; then
-	check_src_pkg newlib-${NEWLIB_VERSION} NEWLIB
+	check_src_pkg binutils-${NEWLIB_VERSION} NEWLIB
 fi
 
 CBUILD=$($DIR_BINUTILS_SOURCE/config.guess)
