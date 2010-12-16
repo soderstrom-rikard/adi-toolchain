@@ -617,6 +617,29 @@ static const struct bfin_dmac_layout bf561_dmac[] = {
   /* XXX: IMDMA: { 0xFFC01800, 4, }, */
 };
 
+#define bf592_chipid 0x20cb
+static const struct bfin_memory_layout bf592_mem[] = {
+  LAYOUT (0xFFC00700, 0x50, read_write),	/* GPIO0 stub */
+  LAYOUT (0xFFC00800, 0x60, read_write),	/* SPORT0 stub */
+  LAYOUT (0xFFC00900, 0x60, read_write),	/* SPORT1 stub */
+  LAYOUT (0xFFC01500, 0x50, read_write),	/* GPIO1 stub */
+};
+static const struct bfin_dev_layout bf592_dev[] = {
+  DEVICE (0xFFC00400, BFIN_MMR_UART_SIZE,    "bfin_uart@0"),
+  DEVICE (0xFFC00500, BFIN_MMR_SPI_SIZE,     "bfin_spi@0"),
+  DEVICE (0xFFC00600, BFIN_MMR_GPTIMER_SIZE, "bfin_gptimer@0"),
+  DEVICE (0xFFC00610, BFIN_MMR_GPTIMER_SIZE, "bfin_gptimer@1"),
+  DEVICE (0xFFC00620, BFIN_MMR_GPTIMER_SIZE, "bfin_gptimer@2"),
+  DEVICE (0xFFC01000, BFIN_MMR_PPI_SIZE,     "bfin_ppi@0"),
+  DEVICE (0xFFC01300, BFIN_MMR_SPI_SIZE,     "bfin_spi@1"),
+  DEVICE (0xFFC01400, BFIN_MMR_TWI_SIZE,     "bfin_twi@0"),
+};
+static const struct bfin_dmac_layout bf592_dmac[] = {
+  /* XXX: there are only 9 channels, but mdma code below assumes that they
+          start right after the dma channels ... */
+  { BFIN_MMR_DMAC0_BASE, 12, },
+};
+
 static const struct bfin_model_data bfin_model_data[] =
 {
 #define P(n) \
@@ -695,7 +718,7 @@ bfin_model_hw_tree_init (SIM_DESC sd, SIM_CPU *cpu)
   sim_hw_parse (sd, "/core/bfin_wdog > nmi   nmi      /core/bfin_cec");
   sim_hw_parse (sd, "/core/bfin_wdog > gpi   watchdog /core/bfin_sic");
 
-  if (mnum != MODEL_BF561 && mdata->model_num > 509)
+  if (mnum != MODEL_BF561 && mdata->model_num > 509 && mdata->model_num < 590)
     {
       dv_bfin_hw_parse (sd, rtc, RTC);
       sim_hw_parse (sd, "/core/bfin_rtc > rtc rtc /core/bfin_sic");
@@ -839,6 +862,10 @@ static const struct bfrom bf561_roms[] = {
   BFROM (561, 5, 0),
   BFROM_STUB,
 };
+static const struct bfrom bf59x_roms[] = {
+  BFROM (59x, 0, 0x1000000),
+  BFROM_STUB,
+};
 
 static void
 bfin_model_map_bfrom (SIM_DESC sd, SIM_CPU *cpu)
@@ -868,6 +895,8 @@ bfin_model_map_bfrom (SIM_DESC sd, SIM_CPU *cpu)
     bfrom = bf54x_roms;
   else if (mnum == 561)
     bfrom = bf561_roms;
+  else if (mnum >= 590 && mnum <= 599)
+    bfrom = bf59x_roms;
   else
     return;
 

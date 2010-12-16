@@ -304,6 +304,24 @@ static const struct hw_port_descriptor bfin_dmac1_561_ports[] = {
   { NULL, 0, 0, 0, },
 };
 
+static const char *bfin_dmac_59x_pmap[] = {
+  "ppi@0", "sport@0", "sport@0", "sport@1", "sport@1", "spi@0",
+  "spi@1", "uart@0", "uart@0",
+};
+
+static const struct hw_port_descriptor bfin_dmac_59x_ports[] = {
+  { "ppi@0",       0, 0, input_port, },
+  { "sport@0_tx",  1, 0, input_port, },
+  { "sport@0_rx",  2, 0, input_port, },
+  { "sport@1_tx",  3, 0, input_port, },
+  { "sport@1_rx",  4, 0, input_port, },
+  { "spi@0",       5, 0, input_port, },
+  { "spi@1",       6, 0, input_port, },
+  { "uart@0_rx",   7, 0, input_port, },
+  { "uart@0_tx",   8, 0, input_port, },
+  { NULL, 0, 0, 0, },
+};
+
 static void
 bfin_dmac_port_event (struct hw *me, int my_port, struct hw *source,
 		      int source_port, int level)
@@ -433,6 +451,13 @@ bfin_dmac_finish (struct hw *me)
 	default:
 	  hw_abort (me, "this Blackfin only has a DMAC0 & DMAC1");
 	}
+      break;
+    case 590 ... 599:
+      if (dmac_num != 0)
+	hw_abort (me, "this Blackfin only has a DMAC0");
+      dmac->pmap = bfin_dmac_59x_pmap;
+      dmac->pmap_count = ARRAY_SIZE (bfin_dmac_59x_pmap);
+      set_hw_ports (me, bfin_dmac_59x_ports);
       break;
     default:
       hw_abort (me, "no support for DMAC on this Blackfin model yet");

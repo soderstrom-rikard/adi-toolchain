@@ -37,3 +37,5 @@
 #include "bf54x_l1-0.2.h"
 
 #include "bf561-0.5.h"
+
+#include "bf59x-0.0.h"

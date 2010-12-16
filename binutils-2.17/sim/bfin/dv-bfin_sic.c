@@ -1172,6 +1172,48 @@ bfin_sic_561_port_event (struct hw *me, int my_port, struct hw *source,
   bfin_sic_561_forward_interrupts (me, sic);
 }
 
+static const struct hw_port_descriptor bfin_sic_59x_ports[] = {
+  BFIN_SIC_TO_CEC_PORTS
+  { "pll",            0, 0, input_port, },
+  { "dma_stat",       1, 0, input_port, },
+  { "ppi@0",          2, 0, input_port, },
+  { "sport@0_stat",   3, 0, input_port, },
+  { "sport@1_stat",   4, 0, input_port, },
+  { "spi@0",          5, 0, input_port, },
+  { "spi@1",          6, 0, input_port, },
+  { "uart@0_stat",    7, 0, input_port, },
+  { "dma0",           8, 0, input_port, },
+  { "dma1",           9, 0, input_port, },
+  { "dma2",          10, 0, input_port, },
+  { "dma3",          11, 0, input_port, },
+  { "dma4",          12, 0, input_port, },
+  { "dma5",          13, 0, input_port, },
+  { "dma6",          14, 0, input_port, },
+  { "dma7",          15, 0, input_port, },
+  { "dma8",          16, 0, input_port, },
+  { "portf_irq_a",   17, 0, input_port, },
+  { "portf_irq_b",   18, 0, input_port, },
+  { "gptimer@0",     19, 0, input_port, },
+  { "gptimer@1",     20, 0, input_port, },
+  { "gptimer@2",     21, 0, input_port, },
+  { "portg_irq_a",   22, 0, input_port, },
+  { "portg_irq_b",   23, 0, input_port, },
+  { "twi@0",         24, 0, input_port, },
+/* XXX: 25 - 28 are supposed to be reserved; see comment in machs.c:bf592_dmac[]  */
+  { "dma9",          25, 0, input_port, },
+  { "dma10",         26, 0, input_port, },
+  { "dma11",         27, 0, input_port, },
+  { "dma12",         28, 0, input_port, },
+/*{ "reserved",      25, 0, input_port, },*/
+/*{ "reserved",      26, 0, input_port, },*/
+/*{ "reserved",      27, 0, input_port, },*/
+/*{ "reserved",      28, 0, input_port, },*/
+  { "mdma0",         29, 0, input_port, },
+  { "mdma1",         30, 0, input_port, },
+  { "watchdog",      31, 0, input_port, },
+  { NULL, 0, 0, 0, },
+};
+
 static void
 attach_bfin_sic_regs (struct hw *me, struct bfin_sic *sic)
 {
@@ -1369,6 +1411,22 @@ bfin_sic_finish (struct hw *me)
       sic->bf561.iar5 = 0x43333333;
       sic->bf561.iar6 = 0x21144444;
       sic->bf561.iar7 = 0x00006552;
+      break;
+    case 590 ... 599:
+      set_hw_io_read_buffer (me, bfin_sic_537_io_read_buffer);
+      set_hw_io_write_buffer (me, bfin_sic_537_io_write_buffer);
+      set_hw_ports (me, bfin_sic_59x_ports);
+      set_hw_port_event (me, bfin_sic_533_port_event);
+      mmr_names = bf537_mmr_names;
+
+      /* Initialize the SIC.  */
+      sic->bf537.imask = 0;
+      sic->bf537.isr = 0;
+      sic->bf537.iwr = 0xFFFFFFFF;
+      sic->bf537.iar0 = 0x22211000;
+      sic->bf537.iar1 = 0x43333332;
+      sic->bf537.iar2 = 0x55555444;
+      sic->bf537.iar3 = 0x66655555;
       break;
     default:
       hw_abort (me, "no support for SIC on this Blackfin model yet");
