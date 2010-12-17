@@ -854,3 +854,28 @@ define show_uart
 	printf "MSR: 0x%02x   SCR: 0x%02x\n", *$$UART_MSR, *$$UART_SCR
 	printf "GCTL: 0x%02x\n", *$$UART_GCTL
 end
+
+define show_uart2
+	if $argc > 0
+		set $$UART_BASE = $arg0
+	else
+		set $$UART_BASE = 0xffc00400
+	end
+	set $$UART_DLL  = (unsigned short *) ($$UART_BASE + 0x00)
+	set $$UART_DLH  = (unsigned short *) ($$UART_BASE + 0x04)
+	set $$UART_GCTL = (unsigned short *) ($$UART_BASE + 0x08)
+	set $$UART_LCR  = (unsigned short *) ($$UART_BASE + 0x0C)
+	set $$UART_MCR  = (unsigned short *) ($$UART_BASE + 0x10)
+	set $$UART_LSR  = (unsigned short *) ($$UART_BASE + 0x14)
+	set $$UART_MSR  = (unsigned short *) ($$UART_BASE + 0x18)
+	set $$UART_SCR  = (unsigned short *) ($$UART_BASE + 0x1C)
+	set $$UART_IER  = (unsigned short *) ($$UART_BASE + 0x20)
+	set $$UART_RBR  = (unsigned short *) ($$UART_BASE + 0x2C)
+
+	printf "DLL: 0x%02x   DLH: 0x%02x\n", *$$UART_DLL, *$$UART_DLH
+	printf "RBR: 0x%02x   IER: 0x%02x\n", *$$UART_RBR, *$$UART_IER
+	printf "            LCR: 0x%02x\n", *$$UART_LCR
+	printf "MCR: 0x%02x   LSR: 0x%02x\n", *$$UART_MCR, *$$UART_LSR
+	printf "MSR: 0x%02x   SCR: 0x%02x\n", *$$UART_MSR, *$$UART_SCR
+	printf "GCTL: 0x%02x\n", *$$UART_GCTL
+end
