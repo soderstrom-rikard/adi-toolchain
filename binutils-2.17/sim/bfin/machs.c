@@ -740,7 +740,7 @@ bfin_model_hw_tree_init (SIM_DESC sd, SIM_CPU *cpu)
 
 	  /* Could route these into the bfin_dmac and let that
 	     forward it to the SIC, but not much value.  */
-	  sim_hw_parse (sd, "/core/bfin_dmac@%u/bfin_dma@%u > di dma%u /core/bfin_sic",
+	  sim_hw_parse (sd, "/core/bfin_dmac@%u/bfin_dma@%u > di dma@%u /core/bfin_sic",
 			i, dma_chan, dma_chan);
 
 	  ++dma_chan;
@@ -753,7 +753,7 @@ bfin_model_hw_tree_init (SIM_DESC sd, SIM_CPU *cpu)
 			i, j + BFIN_DMAC_MDMA_BASE,
 			dmac->base + (j + dmac->dma_count) * BFIN_MMR_DMA_SIZE,
 			BFIN_MMR_DMA_SIZE);
-	  sim_hw_parse (sd, "/core/bfin_dmac@%u/bfin_dma@%u > di mdma%u /core/bfin_sic",
+	  sim_hw_parse (sd, "/core/bfin_dmac@%u/bfin_dma@%u > di mdma@%u /core/bfin_sic",
 			i, j + BFIN_DMAC_MDMA_BASE, (2 * i) + (j / 2));
 	}
     }
