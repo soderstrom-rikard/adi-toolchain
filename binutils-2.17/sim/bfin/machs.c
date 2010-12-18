@@ -863,6 +863,7 @@ static const struct bfrom bf561_roms[] = {
   BFROM_STUB,
 };
 static const struct bfrom bf59x_roms[] = {
+  BFROM (59x, 1, 0x1000000),
   BFROM (59x, 0, 0x1000000),
   BFROM_STUB,
 };

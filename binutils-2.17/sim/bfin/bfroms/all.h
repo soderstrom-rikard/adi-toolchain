@@ -39,3 +39,4 @@
 #include "bf561-0.5.h"
 
 #include "bf59x-0.0.h"
+#define bfrom_bf59x_0_1 bfrom_bf59x_0_0
