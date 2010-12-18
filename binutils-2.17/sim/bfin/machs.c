@@ -623,6 +623,9 @@ static const struct bfin_memory_layout bf592_mem[] = {
   LAYOUT (0xFFC00800, 0x60, read_write),	/* SPORT0 stub */
   LAYOUT (0xFFC00900, 0x60, read_write),	/* SPORT1 stub */
   LAYOUT (0xFFC01500, 0x50, read_write),	/* GPIO1 stub */
+  LAYOUT (0xFF800000, 0x8000, read_write),	/* Data A */
+  LAYOUT (0xFFA00000, 0x4000, read_write_exec),	/* Inst A [1] */
+  LAYOUT (0xFFA04000, 0x4000, read_write_exec),	/* Inst B [1] */
 };
 static const struct bfin_dev_layout bf592_dev[] = {
   DEVICE (0xFFC00400, BFIN_MMR_UART_SIZE,    "bfin_uart@0"),
