@@ -109,7 +109,7 @@ static const struct bfin_memory_layout bf50x_mem[] = {
   LAYOUT (0xFFC03200, 0x50, read_write),	/* PORT_MUX stub */
   LAYOUT (0xFFC03800, 0x100, read_write),	/* RSI stub */
   LAYOUT (0xFF800000, 0x4000, read_write),	/* Data A */
-  LAYOUT (0xFF804000, 0x8000, read_write),	/* Data A Cache */
+  LAYOUT (0xFF804000, 0x4000, read_write),	/* Data A Cache */
   LAYOUT (0xFFA00000, 0x4000, read_write_exec),	/* Inst A [1] */
   LAYOUT (0xFFA04000, 0x4000, read_write_exec),	/* Inst Cache [1] */
 };
