@@ -680,6 +680,7 @@ build_gcc()
 		PATH=$p:$PATH
 	fi
 
+	local epver epdir
 	echo_date "${target}: gcc: linking external packages"
 	run_cmd rm -f \
 		$DIR_GCC_SOURCE/newlib \
@@ -688,11 +689,25 @@ build_gcc()
 		$DIR_GCC_SOURCE/gmp \
 		${prefix}/${target}/sys-include
 	run_cmd ln -s runtime/usr/include ${prefix}/${target}/sys-include
-	[ -e $DIR_GCC_SOURCE/../gmp  ] && run_cmd ln -snf ../gmp  $DIR_GCC_SOURCE/gmp
-	[ -e $DIR_GCC_SOURCE/../mpfr ] && run_cmd ln -snf ../mpfr $DIR_GCC_SOURCE/mpfr
+
+	epdir="$DIR_GCC_SOURCE/../gmp"
+	if [ -e "${epdir}"  ] ; then
+		epver=`"${epdir}"/configure --version | head -n1 | awk '{print $NF}'`
+		echo_date "${target}: gcc: linking gmp (${epver})"
+		run_cmd ln -snf ../gmp $DIR_GCC_SOURCE/
+	fi
+
+	epdir="$DIR_GCC_SOURCE/../mpfr"
+	if [ -e "${epdir}" ] ; then
+		epver=`"${epdir}"/configure --version | head -n1 | awk '{print $NF}'`
+		echo_date "${target}: gcc: linking mpfr (${epver})"
+		run_cmd ln -snf ../mpfr $DIR_GCC_SOURCE/
+	fi
 
 	case ${target} in
 	bfin-elf)
+		epver=`"$DIR_NEWLIB_SOURCE"/newlib/configure --version | head -n1 | awk '{print $NF}'`
+		echo_date "${target}: gcc: linking newlib (${epver} via ${NEWLIB_VERSION})"
 		run_cmd ln -snf $DIR_NEWLIB_SOURCE/newlib $DIR_GCC_SOURCE/
 		run_cmd ln -snf $DIR_NEWLIB_SOURCE/libgloss $DIR_GCC_SOURCE/
 		set -- --enable-languages=c,c++ --with-newlib "$@"
