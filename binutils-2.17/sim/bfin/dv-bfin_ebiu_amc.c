@@ -49,9 +49,7 @@ struct bfin_ebiu_amc
     } bf53x;
     struct {
       bu32 ambctl0, ambctl1;
-      bu32 BFIN_MMR_16(mbsctl);
-      bu32 arbstat, mode;
-      bu16 BFIN_MMR_16(fctl);
+      bu32 mbsctl, arbstat, mode, fctl;
     } bf54x;
   };
 };
@@ -186,7 +184,6 @@ bf54x_ebiu_amc_io_write_buffer (struct hw *me, const void *source, int space,
       break;
     case mmr_offset(bf54x.mbsctl):
       /* XXX: implement this.  */
-      dv_bfin_mmr_require_16 (me, addr, nr_bytes, true);
       break;
     case mmr_offset(bf54x.arbstat):
       /* XXX: implement this.  */
@@ -196,7 +193,6 @@ bf54x_ebiu_amc_io_write_buffer (struct hw *me, const void *source, int space,
       break;
     case mmr_offset(bf54x.fctl):
       /* XXX: implement this.  */
-      dv_bfin_mmr_require_16 (me, addr, nr_bytes, true);
       break;
     default:
       dv_bfin_mmr_invalid (me, addr, nr_bytes, true);
@@ -282,15 +278,15 @@ bf54x_ebiu_amc_io_read_buffer (struct hw *me, void *dest, int space,
   switch (mmr_off)
     {
     case mmr_offset(amgctl):
-    case mmr_offset(bf54x.mbsctl):
-    case mmr_offset(bf54x.fctl):
       dv_bfin_mmr_require_16 (me, addr, nr_bytes, false);
       dv_store_2 (dest, *value16);
       break;
     case mmr_offset(bf54x.ambctl0):
     case mmr_offset(bf54x.ambctl1):
+    case mmr_offset(bf54x.mbsctl):
     case mmr_offset(bf54x.arbstat):
     case mmr_offset(bf54x.mode):
+    case mmr_offset(bf54x.fctl):
       dv_store_4 (dest, *value32);
       break;
     default:
