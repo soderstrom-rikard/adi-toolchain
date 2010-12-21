@@ -33,7 +33,7 @@ struct bfin_sic
   /* Order after here is important -- matches hardware MMR layout.  */
   bu16 BFIN_MMR_16(swrst);
   bu16 BFIN_MMR_16(syscr);
-  bu16 BFIN_MMR_16(rvect);
+  bu16 BFIN_MMR_16(rvect);  /* XXX: BF59x has a 32bit AUX_REVID here.  */
   union {
     struct {
       bu32 imask0;
