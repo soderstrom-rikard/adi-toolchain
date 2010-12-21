@@ -25,30 +25,53 @@
 #include "devices.h"
 #include "dv-bfin_ebiu_amc.h"
 
-/* XXX: BF50x is like BF54x, not BF53x.  */
-
 struct bfin_ebiu_amc
 {
   bu32 base;
   int type;
   bu32 bank_size;
+  unsigned (*io_write) (struct hw *, const void *, int, address_word,
+			unsigned, struct bfin_ebiu_amc *, bu32, bu32);
+  unsigned (*io_read) (struct hw *, void *, int, address_word, unsigned,
+		       struct bfin_ebiu_amc *, bu32, void *, bu16 *, bu32 *);
 
   /* Order after here is important -- matches hardware MMR layout.  */
   bu16 BFIN_MMR_16(amgctl);
-  bu32 ambctl0, ambctl1;
-  /* Newer controllers offer these.  */
-  bu32 BFIN_MMR_16(mbsctl);
-  bu32 arbstat, mode;
-  bu16 BFIN_MMR_16(fctl);
+  union {
+    struct {
+      bu32 ambctl0, ambctl1;
+      bu32 _pad0[5];
+      bu16 BFIN_MMR_16(mode);
+      bu16 BFIN_MMR_16(fctl);
+    } bf50x;
+    struct {
+      bu32 ambctl0, ambctl1;
+    } bf53x;
+    struct {
+      bu32 ambctl0, ambctl1;
+      bu32 BFIN_MMR_16(mbsctl);
+      bu32 arbstat, mode;
+      bu16 BFIN_MMR_16(fctl);
+    } bf54x;
+  };
 };
 #define mmr_base()      offsetof(struct bfin_ebiu_amc, amgctl)
 #define mmr_offset(mmr) (offsetof(struct bfin_ebiu_amc, mmr) - mmr_base())
+#define mmr_idx(mmr)    (mmr_offset (mmr) / 4)
 
-static const char * const mmr_names[] = {
-  "EBIU_AMGCTL", "EBIU_AMBCTL0", "EBIU_AMBCTL1", "EBIU_MSBCTL",
-  "EBIU_ARBSTAT", "EBIU_MODE", "EBIU_FCTL",
+static const char * const bf50x_mmr_names[] = {
+  "EBIU_AMGCTL", "EBIU_AMBCTL0", "EBIU_AMBCTL1",
+  [mmr_idx (bf50x.mode)] = "EBIU_MODE", "EBIU_FCTL",
 };
-#define mmr_name(off) mmr_names[(off) / 4]
+static const char * const bf53x_mmr_names[] = {
+  "EBIU_AMGCTL", "EBIU_AMBCTL0", "EBIU_AMBCTL1",
+};
+static const char * const bf54x_mmr_names[] = {
+  "EBIU_AMGCTL", "EBIU_AMBCTL0", "EBIU_AMBCTL1",
+  "EBIU_MSBCTL", "EBIU_ARBSTAT", "EBIU_MODE", "EBIU_FCTL",
+};
+static const char * const *mmr_names;
+#define mmr_name(off) (mmr_names[(off) / 4] ? : "<INV>")
 
 static void
 bfin_ebiu_amc_write_amgctl (struct hw *me, struct bfin_ebiu_amc *amc,
@@ -84,41 +107,28 @@ bfin_ebiu_amc_write_amgctl (struct hw *me, struct bfin_ebiu_amc *amc,
 }
 
 static unsigned
-bfin_ebiu_amc_io_write_buffer (struct hw *me, const void *source,
-			       int space, address_word addr, unsigned nr_bytes)
+bf50x_ebiu_amc_io_write_buffer (struct hw *me, const void *source, int space,
+				address_word addr, unsigned nr_bytes,
+				struct bfin_ebiu_amc *amc, bu32 mmr_off,
+				bu32 value)
 {
-  struct bfin_ebiu_amc *amc = hw_data (me);
-  bu32 mmr_off;
-  bu32 value;
-
-  value = dv_load_4 (source);
-  mmr_off = addr - amc->base;
-
-  HW_TRACE_WRITE ();
-
   switch (mmr_off)
     {
     case mmr_offset(amgctl):
       dv_bfin_mmr_require_16 (me, addr, nr_bytes, true);
       bfin_ebiu_amc_write_amgctl (me, amc, value);
       break;
-    case mmr_offset(ambctl0):
-      amc->ambctl0 = value;
+    case mmr_offset(bf50x.ambctl0):
+      amc->bf50x.ambctl0 = value;
       break;
-    case mmr_offset(ambctl1):
-      amc->ambctl1 = value;
+    case mmr_offset(bf50x.ambctl1):
+      amc->bf50x.ambctl1 = value;
       break;
-    case mmr_offset(mbsctl):
+    case mmr_offset(bf50x.mode):
       /* XXX: implement this.  */
       dv_bfin_mmr_require_16 (me, addr, nr_bytes, true);
       break;
-    case mmr_offset(arbstat):
-      /* XXX: implement this.  */
-      break;
-    case mmr_offset(mode):
-      /* XXX: implement this.  */
-      break;
-    case mmr_offset(fctl):
+    case mmr_offset(bf50x.fctl):
       /* XXX: implement this.  */
       dv_bfin_mmr_require_16 (me, addr, nr_bytes, true);
       break;
@@ -131,34 +141,104 @@ bfin_ebiu_amc_io_write_buffer (struct hw *me, const void *source,
 }
 
 static unsigned
-bfin_ebiu_amc_io_read_buffer (struct hw *me, void *dest,
-			      int space, address_word addr, unsigned nr_bytes)
+bf53x_ebiu_amc_io_write_buffer (struct hw *me, const void *source, int space,
+				address_word addr, unsigned nr_bytes,
+				struct bfin_ebiu_amc *amc, bu32 mmr_off,
+				bu32 value)
 {
-  struct bfin_ebiu_amc *amc = hw_data (me);
-  bu32 mmr_off;
-  bu32 *value32;
-  bu16 *value16;
-  void *valuep;
-
-  mmr_off = addr - amc->base;
-  valuep = (void *)((unsigned long)amc + mmr_base() + mmr_off);
-  value16 = valuep;
-  value32 = valuep;
-
-  HW_TRACE_READ ();
-
   switch (mmr_off)
     {
     case mmr_offset(amgctl):
-    case mmr_offset(mbsctl):
-    case mmr_offset(fctl):
+      dv_bfin_mmr_require_16 (me, addr, nr_bytes, true);
+      bfin_ebiu_amc_write_amgctl (me, amc, value);
+      break;
+    case mmr_offset(bf53x.ambctl0):
+      amc->bf53x.ambctl0 = value;
+      break;
+    case mmr_offset(bf53x.ambctl1):
+      amc->bf53x.ambctl1 = value;
+      break;
+    default:
+      dv_bfin_mmr_invalid (me, addr, nr_bytes, true);
+      break;
+    }
+
+  return nr_bytes;
+}
+
+static unsigned
+bf54x_ebiu_amc_io_write_buffer (struct hw *me, const void *source, int space,
+				address_word addr, unsigned nr_bytes,
+				struct bfin_ebiu_amc *amc, bu32 mmr_off,
+				bu32 value)
+{
+  switch (mmr_off)
+    {
+    case mmr_offset(amgctl):
+      dv_bfin_mmr_require_16 (me, addr, nr_bytes, true);
+      bfin_ebiu_amc_write_amgctl (me, amc, value);
+      break;
+    case mmr_offset(bf54x.ambctl0):
+      amc->bf54x.ambctl0 = value;
+      break;
+    case mmr_offset(bf54x.ambctl1):
+      amc->bf54x.ambctl1 = value;
+      break;
+    case mmr_offset(bf54x.mbsctl):
+      /* XXX: implement this.  */
+      dv_bfin_mmr_require_16 (me, addr, nr_bytes, true);
+      break;
+    case mmr_offset(bf54x.arbstat):
+      /* XXX: implement this.  */
+      break;
+    case mmr_offset(bf54x.mode):
+      /* XXX: implement this.  */
+      break;
+    case mmr_offset(bf54x.fctl):
+      /* XXX: implement this.  */
+      dv_bfin_mmr_require_16 (me, addr, nr_bytes, true);
+      break;
+    default:
+      dv_bfin_mmr_invalid (me, addr, nr_bytes, true);
+      break;
+    }
+
+  return nr_bytes;
+}
+
+static unsigned
+bfin_ebiu_amc_io_write_buffer (struct hw *me, const void *source, int space,
+			       address_word addr, unsigned nr_bytes)
+{
+  struct bfin_ebiu_amc *amc = hw_data (me);
+  bu32 mmr_off;
+  bu32 value;
+
+  value = dv_load_4 (source);
+  mmr_off = addr - amc->base;
+
+  HW_TRACE_WRITE ();
+
+  return amc->io_write (me, source, space, addr, nr_bytes,
+			amc, mmr_off, value);
+}
+
+static unsigned
+bf50x_ebiu_amc_io_read_buffer (struct hw *me, void *dest, int space,
+			       address_word addr, unsigned nr_bytes,
+			       struct bfin_ebiu_amc *amc, bu32 mmr_off,
+			       void *valuep, bu16 *value16, bu32 *value32)
+{
+  switch (mmr_off)
+    {
+    case mmr_offset(amgctl):
+    case mmr_offset(bf50x.fctl):
       dv_bfin_mmr_require_16 (me, addr, nr_bytes, false);
       dv_store_2 (dest, *value16);
       break;
-    case mmr_offset(ambctl0):
-    case mmr_offset(ambctl1):
-    case mmr_offset(arbstat):
-    case mmr_offset(mode):
+    case mmr_offset(bf50x.ambctl0):
+    case mmr_offset(bf50x.ambctl1):
+    case mmr_offset(bf50x.mode):
       dv_store_4 (dest, *value32);
       break;
     default:
@@ -169,12 +249,82 @@ bfin_ebiu_amc_io_read_buffer (struct hw *me, void *dest,
   return nr_bytes;
 }
 
+static unsigned
+bf53x_ebiu_amc_io_read_buffer (struct hw *me, void *dest, int space,
+			       address_word addr, unsigned nr_bytes,
+			       struct bfin_ebiu_amc *amc, bu32 mmr_off,
+			       void *valuep, bu16 *value16, bu32 *value32)
+{
+  switch (mmr_off)
+    {
+    case mmr_offset(amgctl):
+      dv_bfin_mmr_require_16 (me, addr, nr_bytes, false);
+      dv_store_2 (dest, *value16);
+      break;
+    case mmr_offset(bf53x.ambctl0):
+    case mmr_offset(bf53x.ambctl1):
+      dv_store_4 (dest, *value32);
+      break;
+    default:
+      dv_bfin_mmr_invalid (me, addr, nr_bytes, false);
+      break;
+    }
+
+  return nr_bytes;
+}
+
+static unsigned
+bf54x_ebiu_amc_io_read_buffer (struct hw *me, void *dest, int space,
+			       address_word addr, unsigned nr_bytes,
+			       struct bfin_ebiu_amc *amc, bu32 mmr_off,
+			       void *valuep, bu16 *value16, bu32 *value32)
+{
+  switch (mmr_off)
+    {
+    case mmr_offset(amgctl):
+    case mmr_offset(bf54x.mbsctl):
+    case mmr_offset(bf54x.fctl):
+      dv_bfin_mmr_require_16 (me, addr, nr_bytes, false);
+      dv_store_2 (dest, *value16);
+      break;
+    case mmr_offset(bf54x.ambctl0):
+    case mmr_offset(bf54x.ambctl1):
+    case mmr_offset(bf54x.arbstat):
+    case mmr_offset(bf54x.mode):
+      dv_store_4 (dest, *value32);
+      break;
+    default:
+      dv_bfin_mmr_invalid (me, addr, nr_bytes, false);
+      break;
+    }
+
+  return nr_bytes;
+}
+
+static unsigned
+bfin_ebiu_amc_io_read_buffer (struct hw *me, void *dest, int space,
+			      address_word addr, unsigned nr_bytes)
+{
+  struct bfin_ebiu_amc *amc = hw_data (me);
+  bu32 mmr_off;
+  void *valuep;
+
+  mmr_off = addr - amc->base;
+  valuep = (void *)((unsigned long)amc + mmr_base() + mmr_off);
+
+  HW_TRACE_READ ();
+
+  return amc->io_read (me, dest, space, addr, nr_bytes, amc,
+		       mmr_off, valuep, valuep, valuep);
+}
+
 static void
-attach_bfin_ebiu_amc_regs (struct hw *me, struct bfin_ebiu_amc *amc)
+attach_bfin_ebiu_amc_regs (struct hw *me, struct bfin_ebiu_amc *amc,
+			   unsigned reg_size)
 {
   address_word attach_address;
   int attach_space;
-  unsigned attach_size, reg_size;
+  unsigned attach_size;
   reg_property_spec reg;
 
   if (hw_find_property (me, "reg") == NULL)
@@ -185,12 +335,6 @@ attach_bfin_ebiu_amc_regs (struct hw *me, struct bfin_ebiu_amc *amc)
 
   if (hw_find_property (me, "type") == NULL)
     hw_abort (me, "Missing \"type\" property");
-
-  amc->type = hw_find_integer_property (me, "type");
-  if (amc->type >= 540 && amc->type <= 549)
-    reg_size = BF54X_MMR_EBIU_AMC_SIZE;
-  else
-    reg_size = BFIN_MMR_EBIU_AMC_SIZE;
 
   hw_unit_address_to_attach_address (hw_parent (me),
 				     &reg.address,
@@ -210,6 +354,7 @@ static void
 bfin_ebiu_amc_finish (struct hw *me)
 {
   struct bfin_ebiu_amc *amc;
+  unsigned reg_size;
 
   amc = HW_ZALLOC (me, struct bfin_ebiu_amc);
 
@@ -217,23 +362,67 @@ bfin_ebiu_amc_finish (struct hw *me)
   set_hw_io_read_buffer (me, bfin_ebiu_amc_io_read_buffer);
   set_hw_io_write_buffer (me, bfin_ebiu_amc_io_write_buffer);
 
-  attach_bfin_ebiu_amc_regs (me, amc);
+  amc->type = hw_find_integer_property (me, "type");
 
-  /* Initialize the AMC.  */
-  if ((amc->type >= 540 && amc->type <= 549) ||
-      amc->type == 561)
-    amc->bank_size = 64 * 1024 * 1024;
-  else
-    amc->bank_size = 1 * 1024 * 1024;
-  if (amc->type >= 500 && amc->type <= 509)
-    amc->amgctl = 0x00F3;
-  else if (amc->type >= 540 && amc->type <= 549)
-    amc->amgctl = 0x0002;
-  else
-    amc->amgctl = 0x00F2;
+  switch (amc->type)
+    {
+    case 500 ... 509:
+      amc->io_write = bf50x_ebiu_amc_io_write_buffer;
+      amc->io_read = bf50x_ebiu_amc_io_read_buffer;
+      mmr_names = bf50x_mmr_names;
+      reg_size = sizeof (amc->bf50x) + 4;
+
+      /* Initialize the AMC.  */
+      amc->bank_size     = 1 * 1024 * 1024;
+      amc->amgctl        = 0x00F3;
+      amc->bf50x.ambctl0 = 0x0000FFC2;
+      amc->bf50x.ambctl1 = 0x0000FFC2;
+      amc->bf50x.mode    = 0x0001;
+      amc->bf50x.fctl    = 0x0002;
+      break;
+    case 540 ... 549:
+      amc->io_write = bf54x_ebiu_amc_io_write_buffer;
+      amc->io_read = bf54x_ebiu_amc_io_read_buffer;
+      mmr_names = bf54x_mmr_names;
+      reg_size = sizeof (amc->bf54x) + 4;
+
+      /* Initialize the AMC.  */
+      amc->bank_size     = 64 * 1024 * 1024;
+      amc->amgctl        = 0x0002;
+      amc->bf54x.ambctl0 = 0xFFC2FFC2;
+      amc->bf54x.ambctl1 = 0xFFC2FFC2;
+      amc->bf54x.fctl    = 0x0006;
+      break;
+    case 510 ... 519:
+    case 522 ... 527:
+    case 531 ... 533:
+    case 534:
+    case 536:
+    case 537:
+    case 538 ... 539:
+    case 561:
+      amc->io_write = bf53x_ebiu_amc_io_write_buffer;
+      amc->io_read = bf53x_ebiu_amc_io_read_buffer;
+      mmr_names = bf53x_mmr_names;
+      reg_size = sizeof (amc->bf53x) + 4;
+
+      /* Initialize the AMC.  */
+      if (amc->type == 561)
+	amc->bank_size   = 64 * 1024 * 1024;
+      else
+	amc->bank_size   = 1 * 1024 * 1024;
+      amc->amgctl        = 0x00F2;
+      amc->bf53x.ambctl0 = 0xFFC2FFC2;
+      amc->bf53x.ambctl1 = 0xFFC2FFC2;
+      break;
+    case 590 ... 599: /* BF59x has no AMC.  */
+    default:
+      hw_abort (me, "no support for EBIU AMC on this Blackfin model yet");
+    }
+
+  attach_bfin_ebiu_amc_regs (me, amc, reg_size);
+
   bfin_ebiu_amc_write_amgctl (me, amc, amc->amgctl);
-  amc->ambctl0 = amc->ambctl1 = 0xffc2ffc2;
-  amc->fctl = 0x6;
 }
 
 const struct hw_descriptor dv_bfin_ebiu_amc_descriptor[] = {
