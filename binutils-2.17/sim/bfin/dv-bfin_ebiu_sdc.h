@@ -21,7 +21,6 @@
 #ifndef DV_BFIN_EBIU_SDC_H
 #define DV_BFIN_EBIU_SDC_H
 
-#define BFIN_MMR_EBIU_SDC_BASE	0xFFC00A10
 #define BFIN_MMR_EBIU_SDC_SIZE	(4 * 4)
 
 /* EBIU_SDBCTL Masks */
