@@ -605,7 +605,7 @@ static const struct hw_port_descriptor bfin_sic_50x_ports[] = {
   { "portg_irq_b",  109, 0, input_port, },
   { "mdma@0",       110, 0, input_port, },
   { "mdma@1",       111, 0, input_port, },
-  { "watchdog",     112, 0, input_port, },
+  { "wdog",         112, 0, input_port, },
   { "porth_irq_a",  113, 0, input_port, },
   { "porth_irq_b",  114, 0, input_port, },
   { "acm_stat",     115, 0, input_port, },
@@ -668,7 +668,7 @@ static const struct hw_port_descriptor bfin_sic_51x_ports[] = {
   { "portg_irq_b",  109, 0, input_port, },
   { "mdma@0",       110, 0, input_port, },
   { "mdma@1",       111, 0, input_port, },
-  { "watchdog",     112, 0, input_port, },
+  { "wdog",         112, 0, input_port, },
   { "portf_irq_a",  113, 0, input_port, },
   { "portf_irq_b",  114, 0, input_port, },
   { "spi@0",        115, 0, input_port, },
@@ -731,7 +731,7 @@ static const struct hw_port_descriptor bfin_sic_52x_ports[] = {
   { "portg_irq_b",  109, 0, input_port, },
   { "mdma@0",       110, 0, input_port, },
   { "mdma@1",       111, 0, input_port, },
-  { "watchdog",     112, 0, input_port, },
+  { "wdog",         112, 0, input_port, },
   { "portf_irq_a",  113, 0, input_port, },
   { "portf_irq_b",  114, 0, input_port, },
   { "spi@0",        115, 0, input_port, },
@@ -794,7 +794,7 @@ static const struct hw_port_descriptor bfin_sic_533_ports[] = {
   { "portf_irq_b",   20, 0, input_port, },
   { "mdma@0",        21, 0, input_port, },
   { "mdma@1",        22, 0, input_port, },
-  { "watchdog",      23, 0, input_port, },
+  { "wdog",          23, 0, input_port, },
   { NULL, 0, 0, 0, },
 };
 
@@ -863,7 +863,7 @@ static const struct hw_port_descriptor bfin_sic_537_ports[] = {
   { "portg_irq_b",  280, 0, input_port, },
   { "mdma@0",       290, 0, input_port, },
   { "mdma@1",       300, 0, input_port, },
-  { "watchdog",     310, 0, input_port, },
+  { "wdog",         310, 0, input_port, },
   { "portf_irq_b",  311, 0, input_port, },
   { NULL, 0, 0, 0, },
 };
@@ -912,7 +912,7 @@ static const struct hw_port_descriptor bfin_sic_538_ports[] = {
   { "portf_irq_b",   20, 0, input_port, },
   { "mdma@0",        21, 0, input_port, },
   { "mdma@1",        22, 0, input_port, },
-  { "watchdog",      23, 0, input_port, },
+  { "wdog",          23, 0, input_port, },
   { "dmac@1_stat",   24, 0, input_port, },
   { "sport@2_stat",  25, 0, input_port, },
   { "sport@3_stat",  26, 0, input_port, },
@@ -970,7 +970,7 @@ static const struct hw_port_descriptor bfin_sic_54x_ports[] = {
   { "pint@1",        20, 0, input_port, },
   { "mdma@0",        21, 0, input_port, },
   { "mdma@1",        22, 0, input_port, },
-  { "watchdog",      23, 0, input_port, },
+  { "wdog",          23, 0, input_port, },
   { "dmac@1_stat",   24, 0, input_port, },
   { "sport@2_stat",  25, 0, input_port, },
   { "sport@3_stat",  26, 0, input_port, },
@@ -1139,7 +1139,7 @@ static const struct hw_port_descriptor bfin_sic_561_ports[] = {
   { "mdma@3",       124, 0, input_port, },
   { "imdma@0",      125, 0, input_port, },
   { "imdma@1",      126, 0, input_port, },
-  { "watchdog",     127, 0, input_port, },
+  { "wdog",         127, 0, input_port, },
 /*{ "reserved",     128, 0, input_port, },*/
 /*{ "reserved",     129, 0, input_port, },*/
   { "sup_irq_0",    130, 0, input_port, },
@@ -1210,7 +1210,7 @@ static const struct hw_port_descriptor bfin_sic_59x_ports[] = {
 /*{ "reserved",      28, 0, input_port, },*/
   { "mdma@0",        29, 0, input_port, },
   { "mdma@1",        30, 0, input_port, },
-  { "watchdog",      31, 0, input_port, },
+  { "wdog",          31, 0, input_port, },
   { NULL, 0, 0, 0, },
 };
 

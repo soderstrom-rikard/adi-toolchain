@@ -21,7 +21,6 @@
 #ifndef DV_BFIN_WDOG_H
 #define DV_BFIN_WDOG_H
 
-#define BFIN_MMR_WDOG_BASE	0xFFC00200
 #define BFIN_MMR_WDOG_SIZE	(4 * 3)
 
 /* WDOG_CTL */
