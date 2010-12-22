@@ -1,0 +1,49 @@
+#
+# Misc Blackfin/Linux helper functions
+#
+
+define show_fdpic_loadseg
+	if $argc >= 1
+		set $$loadseg = $arg0
+		if $argc == 2
+			set $$nsegs = $arg1
+		else
+			set $$nsegs = 1
+		end
+	else
+		set $$nsegs = -1
+	end
+	if $$nsegs > 0
+		set $$loadseg_ptr   = ((unsigned long *)($$loadseg))
+		set $$loadseg_addr  = $$loadseg_ptr[0]
+		set $$loadseg_vaddr = $$loadseg_ptr[1]
+		set $$loadseg_memsz = $$loadseg_ptr[2]
+		printf "FDPIC loadseg %i @ %#x\n", $$nsegs, $$loadseg
+		printf "  addr:  %#x\n", $$loadseg_addr
+		printf "  vaddr: %#x\n", $$loadseg_vaddr
+		printf "  memsz: %#x\n", $$loadseg_memsz
+		set $$nsegs = $$nsegs - 1
+		if $$nsegs > 0
+			set $$loadseg_next = $$loadseg + 12
+			show_fdpic_loadseg $$loadseg_next $$nsegs
+		end
+	else
+		help show_fdpic_loadseg
+	end
+end
+
+define show_fdpic_loadmap
+	if $argc == 1
+		set $$loadmap = $arg0
+		set $$loadmap_ptr  = ((unsigned short *)($$loadmap))
+		set $$loadmap_vers = $$loadmap_ptr[0]
+		set $$loadmap_nseg = $$loadmap_ptr[1]
+		set $$loadmap_segs = $$loadmap + 4
+		printf "FDPIC loadmap @ %#x\n", $$loadmap
+		printf "  vers: %#x\n", $$loadmap_vers
+		printf "  negs: %#x\n", $$loadmap_nseg
+		show_fdpic_loadseg $$loadmap_segs $$loadmap_nseg
+	else
+		help show_fdpic_loadmap
+	end
+end
