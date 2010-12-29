@@ -42,17 +42,29 @@ struct dv_bfin {
 
 unsigned int dv_get_bus_num (struct hw *);
 
+static inline bu8 dv_load_1 (const void *ptr)
+{
+  const unsigned char *c = ptr;
+  return c[0];
+}
+
+static inline void dv_store_1 (void *ptr, bu8 val)
+{
+  unsigned char *c = ptr;
+  c[0] = val;
+}
+
 static inline bu16 dv_load_2 (const void *ptr)
 {
   const unsigned char *c = ptr;
-  return (c[1] << 8) | (c[0]);
+  return (c[1] << 8) | dv_load_1 (ptr);
 }
 
 static inline void dv_store_2 (void *ptr, bu16 val)
 {
   unsigned char *c = ptr;
   c[1] = val >> 8;
-  c[0] = val;
+  dv_store_1 (ptr, val);
 }
 
 static inline bu32 dv_load_4 (const void *ptr)
