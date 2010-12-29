@@ -42,6 +42,9 @@ bfin_mmr_invalid (struct hw *me, SIM_CPU *cpu, address_word addr,
       return;
     }
 
+  HW_TRACE ((me, "invalid MMR %s to 0x%08lx length %u",
+	     write ? "write" : "read", (unsigned long) addr, nr_bytes));
+
   /* XXX: is this what hardware does ?  */
   if (addr >= BFIN_CORE_MMR_BASE)
     /* XXX: This should be setting up CPLB fault addrs ?  */
@@ -83,6 +86,8 @@ bfin_mmr_check (struct hw *me, SIM_CPU *cpu, address_word addr,
       if ((addr & 0x3) == 0 && (nr_bytes == 2 || nr_bytes == 4))
 	return true;
     }
+  else
+    return true;
 
   /* Still here ?  Must be crap.  */
   bfin_mmr_invalid (me, cpu, addr, nr_bytes, write);
