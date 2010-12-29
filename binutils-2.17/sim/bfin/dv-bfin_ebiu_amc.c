@@ -34,6 +34,7 @@ struct bfin_ebiu_amc
 			unsigned, struct bfin_ebiu_amc *, bu32, bu32);
   unsigned (*io_read) (struct hw *, void *, int, address_word, unsigned,
 		       struct bfin_ebiu_amc *, bu32, void *, bu16 *, bu32 *);
+  struct hw *slaves[4];
 
   /* Order after here is important -- matches hardware MMR layout.  */
   bu16 BFIN_MMR_16(amgctl);
@@ -75,33 +76,38 @@ static void
 bfin_ebiu_amc_write_amgctl (struct hw *me, struct bfin_ebiu_amc *amc,
 			    bu16 amgctl)
 {
-  bu32 amben, addr, i;
+  struct hw *slave;
+  bu32 amben_old, amben, addr, i;
 
-  amc->amgctl = amgctl;
+  amben_old = MIN ((amc->amgctl >> 1) & 0x7, 4);
   amben = MIN ((amgctl >> 1) & 0x7, 4);
+
+  HW_TRACE ((me, "reattaching banks: AMGCTL 0x%04x[%u] -> 0x%04x[%u]",
+	     amc->amgctl, amben_old, amgctl, amben));
 
   for (i = 0; i < 4; ++i)
     {
-      char c;
-      unsigned read;
-
       addr = BFIN_EBIU_AMC_BASE + i * amc->bank_size;
-      read = sim_core_read_buffer (hw_system (me), NULL, read_map, &c, addr, 1);
+
+      if (i < amben_old)
+	{
+	  HW_TRACE ((me, "detaching bank %u (%#x base)", i, addr));
+	  sim_core_detach (hw_system (me), NULL, 0, 0, addr);
+	}
 
       if (i < amben)
 	{
-	  /* Enable the bank.  */
-	  if (read == 0)
-	    sim_core_attach (hw_system (me), NULL, 0, access_read_write_exec,
-			     0, addr, amc->bank_size, 0, NULL, NULL);
-	}
-      else
-	{
-	  /* Disable the bank.  */
-	  if (read == 1)
-	    sim_core_detach (hw_system (me), NULL, 0, 0, addr);
+	  struct hw *slave = amc->slaves[i];
+
+	  HW_TRACE ((me, "attaching bank %u (%#x base) to %s", i, addr,
+		     slave ? hw_path (slave) : "<floating pins>"));
+
+	  sim_core_attach (hw_system (me), NULL, 0, access_read_write_exec,
+			   0, addr, amc->bank_size, 0, slave, NULL);
 	}
     }
+
+  amc->amgctl = amgctl;
 }
 
 static unsigned
@@ -315,6 +321,28 @@ bfin_ebiu_amc_io_read_buffer (struct hw *me, void *dest, int space,
 }
 
 static void
+bfin_ebiu_amc_attach_address_callback (struct hw *me,
+				       int level,
+				       int space,
+				       address_word addr,
+				       address_word nr_bytes,
+				       struct hw *client)
+{
+  struct bfin_ebiu_amc *amc = hw_data (me);
+
+  HW_TRACE ((me, "attach - level=%d, space=%d, addr=0x%lx, nr_bytes=%lu, client=%s",
+	     level, space, (unsigned long) addr, (unsigned long) nr_bytes, hw_path (client)));
+
+  if (addr + nr_bytes > 4)
+    hw_abort (me, "ebiu amc attaches are done in terms of banks");
+
+  while (nr_bytes--)
+    amc->slaves[addr + nr_bytes] = client;
+
+  bfin_ebiu_amc_write_amgctl (me, amc, amc->amgctl);
+}
+
+static void
 attach_bfin_ebiu_amc_regs (struct hw *me, struct bfin_ebiu_amc *amc,
 			   unsigned reg_size)
 {
@@ -350,6 +378,7 @@ static void
 bfin_ebiu_amc_finish (struct hw *me)
 {
   struct bfin_ebiu_amc *amc;
+  bu32 amgctl;
   unsigned reg_size;
 
   amc = HW_ZALLOC (me, struct bfin_ebiu_amc);
@@ -357,6 +386,7 @@ bfin_ebiu_amc_finish (struct hw *me)
   set_hw_data (me, amc);
   set_hw_io_read_buffer (me, bfin_ebiu_amc_io_read_buffer);
   set_hw_io_write_buffer (me, bfin_ebiu_amc_io_write_buffer);
+  set_hw_attach_address (me, bfin_ebiu_amc_attach_address_callback);
 
   amc->type = hw_find_integer_property (me, "type");
 
@@ -370,7 +400,7 @@ bfin_ebiu_amc_finish (struct hw *me)
 
       /* Initialize the AMC.  */
       amc->bank_size     = 1 * 1024 * 1024;
-      amc->amgctl        = 0x00F3;
+      amgctl             = 0x00F3;
       amc->bf50x.ambctl0 = 0x0000FFC2;
       amc->bf50x.ambctl1 = 0x0000FFC2;
       amc->bf50x.mode    = 0x0001;
@@ -384,7 +414,7 @@ bfin_ebiu_amc_finish (struct hw *me)
 
       /* Initialize the AMC.  */
       amc->bank_size     = 64 * 1024 * 1024;
-      amc->amgctl        = 0x0002;
+      amgctl             = 0x0002;
       amc->bf54x.ambctl0 = 0xFFC2FFC2;
       amc->bf54x.ambctl1 = 0xFFC2FFC2;
       amc->bf54x.fctl    = 0x0006;
@@ -407,7 +437,7 @@ bfin_ebiu_amc_finish (struct hw *me)
 	amc->bank_size   = 64 * 1024 * 1024;
       else
 	amc->bank_size   = 1 * 1024 * 1024;
-      amc->amgctl        = 0x00F2;
+      amgctl             = 0x00F2;
       amc->bf53x.ambctl0 = 0xFFC2FFC2;
       amc->bf53x.ambctl1 = 0xFFC2FFC2;
       break;
@@ -418,7 +448,7 @@ bfin_ebiu_amc_finish (struct hw *me)
 
   attach_bfin_ebiu_amc_regs (me, amc, reg_size);
 
-  bfin_ebiu_amc_write_amgctl (me, amc, amc->amgctl);
+  bfin_ebiu_amc_write_amgctl (me, amc, amgctl);
 }
 
 const struct hw_descriptor dv_bfin_ebiu_amc_descriptor[] = {
