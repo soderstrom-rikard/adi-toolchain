@@ -52,7 +52,7 @@
 #define CB_SYS_setuid32 209
 #define CB_SYS_setgid   210
 #define CB_SYS_setgid32 211
-#include "targ-linux.h"
+#include "linux-targ-map.h"
 
 #include "elf/common.h"
 #include "elf/external.h"
