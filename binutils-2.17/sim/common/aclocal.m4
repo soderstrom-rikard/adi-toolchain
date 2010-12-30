@@ -18,7 +18,7 @@
 #
 # SIM_AC_OUTPUT
 
-AC_DEFUN(SIM_AC_COMMON,
+AC_DEFUN([SIM_AC_COMMON],
 [
 # autoconf.info says this should be called right after AC_INIT.
 AC_CONFIG_HEADER(ifelse([$1],,config.h,[$1]):config.in)
