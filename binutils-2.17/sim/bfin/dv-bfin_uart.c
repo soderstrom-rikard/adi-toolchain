@@ -118,7 +118,7 @@ bfin_uart_reschedule (struct hw *me)
 bu16
 bfin_uart_write_byte (struct hw *me, bu16 thr)
 {
-  char ch = thr;
+  unsigned char ch = thr;
   bfin_uart_write_buffer (me, &ch, 1);
   return thr;
 }
@@ -315,7 +315,7 @@ bfin_uart_read_buffer (struct hw *me, unsigned char *buffer, unsigned nr_bytes)
 	  --uart->saved_count;
 	}
 
-      ret = sim_io_poll_read (sd, 0/*STDIN*/, buffer, nr_bytes - i);
+      ret = sim_io_poll_read (sd, 0/*STDIN*/, (char *) buffer, nr_bytes - i);
       if (ret > 0)
 	i += ret;
     }
@@ -342,7 +342,7 @@ bfin_uart_write_buffer (struct hw *me, const unsigned char *buffer,
 
   if (status & DV_SOCKSER_DISCONNECTED)
     {
-      sim_io_write_stdout (sd, buffer, nr_bytes);
+      sim_io_write_stdout (sd, (const char *) buffer, nr_bytes);
       sim_io_flush_stdout (sd);
     }
   else

@@ -76,7 +76,6 @@ static void
 bfin_ebiu_amc_write_amgctl (struct hw *me, struct bfin_ebiu_amc *amc,
 			    bu16 amgctl)
 {
-  struct hw *slave;
   bu32 amben_old, amben, addr, i;
 
   amben_old = MIN ((amc->amgctl >> 1) & 0x7, 4);

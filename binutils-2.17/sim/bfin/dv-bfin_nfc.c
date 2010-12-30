@@ -175,11 +175,7 @@ bfin_nfc_dma_write_buffer (struct hw *me, const void *source,
 			   unsigned nr_bytes,
 			   int violate_read_only_section)
 {
-  struct bfin_nfc *nfc = hw_data (me);
-  unsigned ret;
-
   HW_TRACE_DMA_WRITE ();
-
   return nr_bytes;
 }
 

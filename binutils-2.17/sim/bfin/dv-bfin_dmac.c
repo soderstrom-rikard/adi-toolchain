@@ -76,9 +76,8 @@ bfin_dmac_get_peer (struct hw *dma, bu16 pmap)
 bu16
 bfin_dmac_default_pmap (struct hw *dma)
 {
-  struct hw *me = hw_parent (dma);
-  struct bfin_dmac *dmac = hw_data (me);
   unsigned int chan_num = dv_get_bus_num (dma);
+
   if (chan_num < BFIN_DMAC_MDMA_BASE)
     return (chan_num % 12) << 12;
   else

@@ -733,7 +733,6 @@ bfin_model_hw_tree_init (SIM_DESC sd, SIM_CPU *cpu)
   const struct bfin_model_data *mdata = CPU_MODEL_DATA (cpu);
   int mnum = MODEL_NUM (model);
   unsigned i, j, dma_chan;
-  int amc_size;
 
   /* Map the core devices.  */
   for (i = 0; i < ARRAY_SIZE (bfin_core_dev); ++i)
@@ -914,7 +913,6 @@ static const struct bfrom bf59x_roms[] = {
 static void
 bfin_model_map_bfrom (SIM_DESC sd, SIM_CPU *cpu)
 {
-  const MODEL *model = CPU_MODEL (cpu);
   const struct bfin_model_data *mdata = CPU_MODEL_DATA (cpu);
   int mnum = mdata->model_num;
   const struct bfrom *bfrom;
@@ -1007,8 +1005,6 @@ bfin_model_get_chipid (SIM_DESC sd)
 bu32
 bfin_model_get_dspid (SIM_DESC sd)
 {
-  SIM_CPU *cpu = STATE_CPU (sd, 0);
-  const struct bfin_model_data *mdata = CPU_MODEL_DATA (cpu);
   return
 	 (0xE5 << 24) |
 	 (0x04 << 16) |

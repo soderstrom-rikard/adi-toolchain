@@ -205,7 +205,6 @@ static void
 bfin_spi_finish (struct hw *me)
 {
   struct bfin_spi *spi;
-  const char *color;
 
   spi = HW_ZALLOC (me, struct bfin_spi);
 

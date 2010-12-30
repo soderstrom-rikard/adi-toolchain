@@ -169,7 +169,6 @@ static unsigned
 bfin_emac_io_write_buffer (struct hw *me, const void *source,
 			   int space, address_word addr, unsigned nr_bytes)
 {
-  SIM_DESC sd = hw_system (me);
   struct bfin_emac *emac = hw_data (me);
   bu32 mmr_off;
   bu32 value;
@@ -530,7 +529,6 @@ static void
 bfin_emac_tap_init (struct hw *me)
 {
 #if WITH_TUN
-  SIM_DESC sd = hw_system (me);
   struct bfin_emac *emac = hw_data (me);
   const hw_unit *unit;
   int flags;

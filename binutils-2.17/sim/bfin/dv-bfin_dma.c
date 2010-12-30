@@ -98,7 +98,7 @@ bfin_dma_get_peer (struct hw *me, struct bfin_dma *dma)
 static void
 bfin_dma_process_desc (struct hw *me, struct bfin_dma *dma)
 {
-  bu8 skip, ndsize = (dma->config & NDSIZE) >> NDSIZE_SHIFT;
+  bu8 ndsize = (dma->config & NDSIZE) >> NDSIZE_SHIFT;
   bu16 _flows[9], *flows = _flows;
 
   HW_TRACE ((me, "dma starting up %#x", dma->config));
@@ -412,7 +412,6 @@ bfin_dma_io_read_buffer (struct hw *me, void *dest, int space,
 {
   struct bfin_dma *dma = hw_data (me);
   bu32 mmr_off;
-  bu32 value;
   bu16 *value16p;
   bu32 *value32p;
   void *valuep;

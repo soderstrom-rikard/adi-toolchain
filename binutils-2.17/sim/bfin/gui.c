@@ -209,7 +209,7 @@ bfin_gui_update (void *state, const void *source, unsigned nr_bytes)
   if (ret)
     return 0;
 
-  gui->curr_line = ++gui->curr_line % gui->screen->h;
+  gui->curr_line = (gui->curr_line + 1) % gui->screen->h;
 
   return nr_bytes;
 }
