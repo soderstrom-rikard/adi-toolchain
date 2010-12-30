@@ -25,6 +25,12 @@
 #include "config.h"
 
 #include <math.h>
+#include <errno.h>
+#include <fcntl.h>
+#include <unistd.h>
+#ifdef HAVE_SYS_MMAN_H
+#include <sys/mman.h>
+#endif
 
 #include "sim-main.h"
 #include "devices.h"
@@ -34,12 +40,13 @@ enum cfi_state
 {
   CFI_STATE_READ,
   CFI_STATE_READ_ID,
-  CFI_STATE_QUERY,
+  CFI_STATE_CFI_QUERY,
   CFI_STATE_PROTECT,
   CFI_STATE_STATUS,
   CFI_STATE_ERASE,
-  CFI_STATE_ERASE_CONFIRM,
   CFI_STATE_WRITE,
+  CFI_STATE_WRITE_BUFFER,
+  CFI_STATE_WRITE_BUFFER_CONFIRM,
 };
 
 struct cfi_query
@@ -90,15 +97,16 @@ struct cfi;
 
 struct cfi_cmdset {
   unsigned id;
+  void (*setup) (struct hw *me, struct cfi *cfi);
   bool (*write) (struct hw *me, struct cfi *cfi, const void *source,
 		 unsigned offset, unsigned value, unsigned nr_bytes);
   bool (*read) (struct hw *me, struct cfi *cfi, void *dest,
-		unsigned offset, unsigned nr_bytes);
+		unsigned offset, unsigned shifted_offset, unsigned nr_bytes);
 };
 
 struct cfi
 {
-  unsigned width, dev_size;
+  unsigned width, dev_size, status;
   enum cfi_state state;
   unsigned char *data;
 
@@ -110,8 +118,8 @@ struct cfi
 };
 
 static const char * const state_names[] = {
-  "READ", "READ_ID", "QUERY", "PROTECT", "STATUS",
-  "ERASE", "ERASE_CONFIRM", "WRITE",
+  "READ", "READ_ID", "CFI_QUERY", "PROTECT", "STATUS", "ERASE", "WRITE",
+  "WRITE_BUFFER", "WRITE_BUFFER_CONFIRM",
 };
 
 static void
@@ -139,6 +147,25 @@ cfi_erase_block (struct hw *me, struct cfi *cfi, unsigned offset)
       break;
     }
 }
+
+static unsigned
+cfi_unshift_addr (struct cfi *cfi, unsigned addr)
+{
+  switch (cfi->width)
+    {
+    case 4: addr >>= 1;
+    case 2: addr >>= 1;
+    }
+  return addr;
+}
+
+static void
+cfi_encode_16bit (unsigned char *data, unsigned num)
+{
+  /* CFI is little endian.  */
+  data[0] = num;
+  data[1] = num >> 8;
+}
 
 static bool
 cmdset_intel_write (struct hw *me, struct cfi *cfi, const void *source,
@@ -151,18 +178,16 @@ cmdset_intel_write (struct hw *me, struct cfi *cfi, const void *source,
       switch (value)
 	{
 	case INTEL_CMD_ERASE_BLOCK:
-	  cfi_erase_block (me, cfi, offset);
-	  cfi->state = CFI_STATE_STATUS;
-	  break;
-	case INTEL_CMD_ERASE_CONFIRM:
-	  cfi->state = CFI_STATE_ERASE_CONFIRM;
+	  cfi->state = CFI_STATE_ERASE;
 	  break;
 	case INTEL_CMD_WRITE:
+	case INTEL_CMD_WRITE_ALT:
 	  cfi->state = CFI_STATE_WRITE;
 	  break;
-	case INTEL_CMD_CLEAR_STATUS:
+	case INTEL_CMD_STATUS_CLEAR:
+	  cfi->status = INTEL_SR_DWS;
 	  break;
-	case INTEL_CMD_PROTECT:
+	case INTEL_CMD_LOCK_SETUP:
 	  cfi->state = CFI_STATE_PROTECT;
 	  break;
 	default:
@@ -170,8 +195,30 @@ cmdset_intel_write (struct hw *me, struct cfi *cfi, const void *source,
 	}
       break;
 
+    case CFI_STATE_ERASE:
+      if (value == INTEL_CMD_ERASE_CONFIRM)
+	{
+	  cfi_erase_block (me, cfi, offset);
+	  cfi->status &= ~(INTEL_SR_PS | INTEL_SR_ES);
+	}
+      else
+	cfi->status |= INTEL_SR_PS | INTEL_SR_ES;
+      cfi->state = CFI_STATE_STATUS;
+      break;
+
     case CFI_STATE_PROTECT:
-      /* XXX: value 0x01 - protect set; value 0xD0 - protect clear.  */
+      switch (value)
+	{
+	case INTEL_CMD_LOCK_BLOCK:
+	case INTEL_CMD_UNLOCK_BLOCK:
+	case INTEL_CMD_LOCK_DOWN_BLOCK:
+	  /* XXX: Handle the command.  */
+	  break;
+	default:
+	  /* Kick out.  */
+	  cfi->status |= INTEL_SR_PS | INTEL_SR_ES;
+	  break;
+	}
       cfi->state = CFI_STATE_STATUS;
       break;
     }
@@ -181,27 +228,54 @@ cmdset_intel_write (struct hw *me, struct cfi *cfi, const void *source,
 
 static bool
 cmdset_intel_read (struct hw *me, struct cfi *cfi, void *dest,
-		   unsigned offset, unsigned nr_bytes)
+		   unsigned offset, unsigned shifted_offset, unsigned nr_bytes)
 {
+  unsigned char *sdest = dest;
+
   switch (cfi->state)
     {
     case CFI_STATE_STATUS:
-      dv_store_1 (dest, 0x80);
+    case CFI_STATE_ERASE:
+      *sdest = cfi->status;
       break;
 
-    case CFI_STATE_ERASE_CONFIRM:
-      dv_store_1 (dest, 0x80);
+    case CFI_STATE_READ_ID:
+      switch (shifted_offset & 0x1ff)
+	{
+	case 0x00:	/* Manufacturer Code.  */
+	  cfi_encode_16bit (dest, INTEL_ID_MANU);
+	  break;
+	case 0x01:	/* Device ID Code.  */
+	  /* XXX: Push to device tree ?  */
+	  cfi_encode_16bit (dest, 0xad);
+	  break;
+	case 0x02:	/* Block lock state.  */
+	  /* XXX: This is per-block ...  */
+	  *sdest = 0x00;
+	  break;
+	case 0x05:	/* Read Configuration Register.  */
+	  cfi_encode_16bit (dest, (1 << 15));
+	  break;
+	default:
+	  return false;
+	}
       break;
 
     default:
-      return true;
+      return false;
     }
 
-  return false;
+  return true;
+}
+
+static void
+cmdset_intel_setup (struct hw *me, struct cfi *cfi)
+{
+  cfi->status = INTEL_SR_DWS;
 }
 
 static const struct cfi_cmdset cfi_cmdset_intel = {
-  CFI_CMDSET_INTEL, cmdset_intel_write, cmdset_intel_read,
+  CFI_CMDSET_INTEL, cmdset_intel_setup, cmdset_intel_write, cmdset_intel_read,
 };
 
 static const struct cfi_cmdset * const cfi_cmdsets[] = {
@@ -209,25 +283,16 @@ static const struct cfi_cmdset * const cfi_cmdsets[] = {
 };
 
 static unsigned
-cfi_unshift_addr (struct cfi *cfi, unsigned addr)
-{
-  switch (cfi->width)
-    {
-    case 4: addr >>= 1;
-    case 2: addr >>= 1;
-    }
-  return addr;
-}
-
-static unsigned
 cfi_io_write_buffer (struct hw *me, const void *source, int space,
 		     address_word addr, unsigned nr_bytes)
 {
   struct cfi *cfi = hw_data (me);
+  const unsigned char *ssource = source;
   enum cfi_state old_state;
-  unsigned addr_off, value;
+  unsigned offset, shifted_offset, value;
 
-  addr_off = addr & (cfi->dev_size - 1);
+  offset = addr & (cfi->dev_size - 1);
+  shifted_offset = cfi_unshift_addr (cfi, offset);
 
   if (cfi->width != nr_bytes)
     {
@@ -238,32 +303,37 @@ cfi_io_write_buffer (struct hw *me, const void *source, int space,
 
   if (cfi->state == CFI_STATE_WRITE)
     {
-      HW_TRACE ((me, "program %#x length %u", addr_off, nr_bytes));
-      memcpy (cfi->data + addr_off, source, nr_bytes);
+      /* NOR flash can only go from 1 to 0.  */
+      unsigned i;
+
+      HW_TRACE ((me, "program %#x length %u", offset, nr_bytes));
+
+      for (i = 0; i < nr_bytes; ++i)
+	cfi->data[offset + i] &= ssource[i];
+
       cfi->state = CFI_STATE_STATUS;
+
       return nr_bytes;
     }
 
-  value = dv_load_1 (source);
+  value = ssource[0];
 
   old_state = cfi->state;
 
-  if (value == CFI_CMD_RESET || value == CFI_CMD_RESET_ALT)
+  if (value == CFI_CMD_READ || value == CFI_CMD_RESET)
     {
       cfi->state = CFI_STATE_READ;
       goto done;
     }
 
-  addr_off = cfi_unshift_addr (cfi, addr_off);
   switch (cfi->state)
     {
     case CFI_STATE_READ:
     case CFI_STATE_READ_ID:
-
-      if (value == CFI_CMD_QUERY)
+      if (value == CFI_CMD_CFI_QUERY)
 	{
-	  if (addr_off == CFI_ADDR_QUERY_START)
-	    cfi->state = CFI_STATE_QUERY;
+	  if (shifted_offset == CFI_ADDR_CFI_QUERY_START)
+	    cfi->state = CFI_STATE_CFI_QUERY;
 	  goto done;
 	}
 
@@ -276,16 +346,17 @@ cfi_io_write_buffer (struct hw *me, const void *source, int space,
       /* Fall through.  */
 
     default:
-      if (!cfi->cmdset->write (me, cfi, source, addr_off, value, nr_bytes))
-	HW_TRACE ((me, "unhandled command %#x at %#x", value, addr_off));
+      if (!cfi->cmdset->write (me, cfi, source, offset, value, nr_bytes))
+	HW_TRACE ((me, "unhandled command %#x at %#x", value, offset));
       break;
     }
 
  done:
-  HW_TRACE ((me, "write 0x%08lx command %#x (%#x); state %s -> %s",
-	     (unsigned long) addr, value,
-	     cfi->width == 2 ? dv_load_2 (source) :
-	     cfi->width == 4 ? dv_load_4 (source) : value,
+  HW_TRACE ((me, "write 0x%08lx command {%#x,%#x,%#x,%#x}; state %s -> %s",
+	     (unsigned long) addr, ssource[0],
+	     nr_bytes > 1 ? ssource[1] : 0,
+	     nr_bytes > 2 ? ssource[2] : 0,
+	     nr_bytes > 3 ? ssource[3] : 0,
 	     state_names[old_state], state_names[cfi->state]));
 
   return nr_bytes;
@@ -297,13 +368,14 @@ cfi_io_read_buffer (struct hw *me, void *dest, int space,
 {
   struct cfi *cfi = hw_data (me);
   unsigned char *sdest = dest;
-  unsigned addr_off;
+  unsigned offset, shifted_offset;
 
-  addr_off = addr & (cfi->dev_size - 1);
+  offset = addr & (cfi->dev_size - 1);
+  shifted_offset = cfi_unshift_addr (cfi, offset);
 
   /* XXX: Is this OK to enforce ?  */
 #if 0
-  if (cfi->width != nr_bytes)
+  if (cfi->state != CFI_STATE_READ && cfi->width != nr_bytes)
     {
       HW_TRACE ((me, "read 0x%08lx length %u does not match flash width %u",
 		 (unsigned long) addr, nr_bytes, cfi->width));
@@ -311,61 +383,44 @@ cfi_io_read_buffer (struct hw *me, void *dest, int space,
     }
 #endif
 
-  HW_TRACE ((me, "%s 0x%08lx length %u",
+  HW_TRACE ((me, "%s read 0x%08lx length %u",
 	     state_names[cfi->state], (unsigned long) addr, nr_bytes));
 
-  addr_off = cfi_unshift_addr (cfi, addr_off);
   switch (cfi->state)
     {
     case CFI_STATE_READ:
-      memcpy (dest, cfi->data + addr_off, nr_bytes);
+      memcpy (dest, cfi->data + offset, nr_bytes);
       break;
 
-    case CFI_STATE_READ_ID:
-      {
-	/* XXX: This isn't right.  */
-	unsigned char *qry = (void *) &cfi->query;
-	memcpy (dest, qry + (addr_off & 0xff), nr_bytes);
-	break;
-      }
-
-    case CFI_STATE_QUERY:
-      if (addr_off >= CFI_ADDR_QUERY_RESULT &&
-	  addr_off < CFI_ADDR_QUERY_RESULT + sizeof (cfi->query) +
+    case CFI_STATE_CFI_QUERY:
+      if (shifted_offset >= CFI_ADDR_CFI_QUERY_RESULT &&
+	  shifted_offset < CFI_ADDR_CFI_QUERY_RESULT + sizeof (cfi->query) +
 		     (cfi->query.num_erase_regions * 4))
 	{
 	  unsigned char *qry;
 
-	  addr_off -= CFI_ADDR_QUERY_RESULT;
-	  if (addr_off >= sizeof (cfi->query))
+	  shifted_offset -= CFI_ADDR_CFI_QUERY_RESULT;
+	  if (shifted_offset >= sizeof (cfi->query))
 	    {
 	      qry = cfi->erase_region_info;
-	      addr_off -= sizeof (cfi->query);
+	      shifted_offset -= sizeof (cfi->query);
 	    }
 	  else
 	    qry = (void *) &cfi->query;
 
-	  sdest[0] = qry[addr_off];
+	  sdest[0] = qry[shifted_offset];
 	  memset (sdest + 1, 0, nr_bytes - 1);
 
 	  break;
 	}
 
     default:
-      if (!cfi->cmdset->read (me, cfi, dest, addr_off, nr_bytes))
+      if (!cfi->cmdset->read (me, cfi, dest, offset, shifted_offset, nr_bytes))
 	HW_TRACE ((me, "unhandled state %s", state_names[cfi->state]));
       break;
     }
 
   return nr_bytes;
-}
-
-static void
-cfi_encode_16bit (unsigned char *data, unsigned num)
-{
-  /* CFI is little endian.  */
-  data[0] = num;
-  data[1] = num >> 8;
 }
 
 static void
@@ -418,6 +473,7 @@ cfi_add_erase_region (struct hw *me, struct cfi *cfi,
                     <typ block erase> <typ chip erase> \
                     <max unit write>  <max buf write>  \
                     <max block erase> <max chip erase>
+       .../file <file> [ro|rw]
      Defaults:
        size: <len> from "reg"
        width: 8
@@ -435,7 +491,8 @@ attach_cfi_regs (struct hw *me, struct cfi *cfi)
   int attach_space;
   unsigned attach_size;
   reg_property_spec reg;
-  int i, ret;
+  bool fd_writable;
+  int i, ret, fd;
   signed_cell ival;
 
   if (hw_find_property (me, "reg") == NULL)
@@ -478,9 +535,6 @@ attach_cfi_regs (struct hw *me, struct cfi *cfi)
   else
     cfi->dev_size = attach_size;
   cfi->query.dev_size = log2 (cfi->dev_size);
-
-  cfi->data = HW_NALLOC (me, unsigned char, cfi->dev_size);
-  memset (cfi->data, 0xff, cfi->dev_size);
 
   /* Extract the desired flash width.  */
   if (hw_find_property (me, "width"))
@@ -557,6 +611,56 @@ attach_cfi_regs (struct hw *me, struct cfi *cfi)
 	  cfi->query.timeouts[i] = ival;
 	}
     }
+
+  /* Extract optional file.  */
+  if (hw_find_property (me, "file"))
+    {
+      const char *file;
+      int flags;
+
+      ret = hw_find_string_array_property (me, "file", 0, &file);
+      if (ret > 2)
+	hw_abort (me, "\"file\" may take only one argument");
+      if (ret == 2)
+	{
+	  const char *writable;
+
+	  hw_find_string_array_property (me, "file", 1, &writable);
+	  fd_writable = !strcmp (writable, "rw");
+	}
+
+      fd = open (file, fd_writable ? O_RDWR : O_RDONLY);
+      if (fd < 0)
+	hw_abort (me, "unable to read file `%s': %s", file, strerror (errno));
+    }
+  else
+    fd = -1;
+
+  /* Figure out where our initial flash data is coming from.  */
+#ifdef HAVE_MMAP
+  if (fd != -1 && fd_writable)
+    {
+      posix_fallocate (fd, 0, cfi->dev_size);
+
+      cfi->data = mmap (NULL, cfi->dev_size,
+			PROT_READ | (fd_writable ? PROT_WRITE : 0),
+			MAP_SHARED, fd, 0);
+
+      if (cfi->data == MAP_FAILED)
+	cfi->data = NULL;
+    }
+#endif
+  if (!cfi->data)
+    {
+      ssize_t read_len;
+
+      cfi->data = HW_NALLOC (me, unsigned char, cfi->dev_size);
+      if (fd != -1)
+	read_len = read (fd, cfi->data, cfi->dev_size);
+      else
+	read_len = 0;
+      memset (cfi->data, 0xff, cfi->dev_size - read_len);
+    }
 }
 
 static void
@@ -575,6 +679,7 @@ cfi_finish (struct hw *me)
   /* Initialize the CFI.  */
   cfi->state = CFI_STATE_READ;
   memcpy (cfi->query.qry, "QRY", 3);
+  cfi->cmdset->setup (me, cfi);
 }
 
 const struct hw_descriptor dv_cfi_descriptor[] = {
