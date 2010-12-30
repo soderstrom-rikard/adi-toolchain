@@ -95,7 +95,8 @@ struct cfi_erase_region
 
 struct cfi;
 
-struct cfi_cmdset {
+struct cfi_cmdset
+{
   unsigned id;
   void (*setup) (struct hw *me, struct cfi *cfi);
   bool (*write) (struct hw *me, struct cfi *cfi, const void *source,
@@ -108,7 +109,7 @@ struct cfi
 {
   unsigned width, dev_size, status;
   enum cfi_state state;
-  unsigned char *data;
+  unsigned char *data, *mmap;
 
   struct cfi_query query;
   const struct cfi_cmdset *cmdset;
@@ -121,7 +122,7 @@ static const char * const state_names[] = {
   "READ", "READ_ID", "CFI_QUERY", "PROTECT", "STATUS", "ERASE", "WRITE",
   "WRITE_BUFFER", "WRITE_BUFFER_CONFIRM",
 };
-
+
 static void
 cfi_erase_block (struct hw *me, struct cfi *cfi, unsigned offset)
 {
@@ -221,6 +222,9 @@ cmdset_intel_write (struct hw *me, struct cfi *cfi, const void *source,
 	}
       cfi->state = CFI_STATE_STATUS;
       break;
+
+    default:
+      return false;
     }
 
   return true;
@@ -424,6 +428,15 @@ cfi_io_read_buffer (struct hw *me, void *dest, int space,
 }
 
 static void
+cfi_delete_callback (struct hw *me)
+{
+  struct cfi *cfi = hw_data (me);
+
+  if (cfi->mmap)
+    munmap (cfi->mmap, cfi->dev_size);
+}
+
+static void
 cfi_add_erase_region (struct hw *me, struct cfi *cfi,
 		      unsigned blocks, unsigned size)
 {
@@ -616,7 +629,6 @@ attach_cfi_regs (struct hw *me, struct cfi *cfi)
   if (hw_find_property (me, "file"))
     {
       const char *file;
-      int flags;
 
       ret = hw_find_string_array_property (me, "file", 0, &file);
       if (ret > 2)
@@ -642,12 +654,14 @@ attach_cfi_regs (struct hw *me, struct cfi *cfi)
     {
       posix_fallocate (fd, 0, cfi->dev_size);
 
-      cfi->data = mmap (NULL, cfi->dev_size,
+      cfi->mmap = mmap (NULL, cfi->dev_size,
 			PROT_READ | (fd_writable ? PROT_WRITE : 0),
 			MAP_SHARED, fd, 0);
 
-      if (cfi->data == MAP_FAILED)
-	cfi->data = NULL;
+      if (cfi->mmap == MAP_FAILED)
+	cfi->mmap = NULL;
+      else
+	cfi->data = cfi->mmap;
     }
 #endif
   if (!cfi->data)
@@ -661,6 +675,7 @@ attach_cfi_regs (struct hw *me, struct cfi *cfi)
 	read_len = 0;
       memset (cfi->data, 0xff, cfi->dev_size - read_len);
     }
+  close (fd);
 }
 
 static void
@@ -673,6 +688,7 @@ cfi_finish (struct hw *me)
   set_hw_data (me, cfi);
   set_hw_io_read_buffer (me, cfi_io_read_buffer);
   set_hw_io_write_buffer (me, cfi_io_write_buffer);
+  set_hw_delete (me, cfi_delete_callback);
 
   attach_cfi_regs (me, cfi);
 
