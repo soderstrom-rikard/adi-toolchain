@@ -169,7 +169,7 @@ do_memopt_add (SIM_DESC sd,
 			  strerror (errno));
 
 	  /* Autosize the mapping to the file length.  */
-	  if (bytes == 0)
+	  if (nr_bytes == 0)
 	    nr_bytes = s.st_size;
 	}
 #endif
