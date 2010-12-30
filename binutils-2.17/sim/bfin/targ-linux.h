@@ -1,4 +1,7 @@
-/* Auto generated:
+#if 0 /* Auto generated: sh ./targ-linux.h
+
+sed -n '1,/^#endif/p' targ-linux.h
+echo
 
 echo '#include <sys/syscall.h>' | \
 bfin-uclinux-gcc -E -dD -P - | \
@@ -6,6 +9,7 @@ sed -r -n \
     -e '1istatic CB_TARGET_DEFS_MAP cb_linux_syscall_map[] = {' \
     -e '$i\ \ { -1, -1 }\n};' \
     -e '/#define __NR_/{s:^.* __NR_(.*) (.*):#ifdef CB_SYS_\1\n# define TARGET_LINUX_SYS_\1 \2\n  { CB_SYS_\1, TARGET_LINUX_SYS_\1 },\n#endif:;p;}'
+echo
 
 echo '#include <errno.h>' | \
 bfin-uclinux-gcc -E -dD -P - | \
@@ -13,6 +17,7 @@ sed -r -n \
     -e '1istatic CB_TARGET_DEFS_MAP cb_linux_errno_map[] = {' \
     -e '$i\ \ { 0, 0 }\n};' \
     -e '/#define E.* [0-9]/{s:^.* (E.*) (.*):#ifdef \1\n# define TARGET_LINUX_\1 \2\n  { \1, TARGET_LINUX_\1 },\n#endif:;p;}'
+echo
 
 echo '#include <fcntl.h>' | \
 bfin-uclinux-gcc -E -dD -P - | \
@@ -20,15 +25,19 @@ sed -r -n \
     -e '1istatic CB_TARGET_DEFS_MAP cb_linux_open_map[] = {' \
     -e '$i\ \ { -1, -1 }\n};' \
     -e '/#define O.* [0-9]/{s:^.* (O_.*) (.*):#ifdef \1\n# define TARGET_LINUX_\1 \2\n  { \1, TARGET_LINUX_\1 },\n#endif:;p;}'
+echo
 
-XXX: nothing uses this ?
+# XXX: nothing uses this ?
 echo '#include <signal.h>' | \
 bfin-uclinux-gcc -E -dD -P - | \
 sed -r -n \
     -e '1istatic CB_TARGET_DEFS_MAP cb_linux_signal_map[] = {' \
     -e '$i\ \ { -1, -1 }\n};' \
     -e '/#define SIG.* [0-9]+$/{s:^.* (SIG.*) (.*):#ifdef \1\n# define TARGET_LINUX_\1 \2\n  { \1, TARGET_LINUX_\1 },\n#endif:;p;}'
+
+exit 0
 */
+#endif
 
 static CB_TARGET_DEFS_MAP cb_linux_syscall_map[] = {
 #ifdef CB_SYS_restart_syscall
@@ -1251,8 +1260,24 @@ static CB_TARGET_DEFS_MAP cb_linux_syscall_map[] = {
 # define TARGET_LINUX_SYS_recvmmsg 370
   { CB_SYS_recvmmsg, TARGET_LINUX_SYS_recvmmsg },
 #endif
+#ifdef CB_SYS_fanotify_init
+# define TARGET_LINUX_SYS_fanotify_init 371
+  { CB_SYS_fanotify_init, TARGET_LINUX_SYS_fanotify_init },
+#endif
+#ifdef CB_SYS_fanotify_mark
+# define TARGET_LINUX_SYS_fanotify_mark 372
+  { CB_SYS_fanotify_mark, TARGET_LINUX_SYS_fanotify_mark },
+#endif
+#ifdef CB_SYS_prlimit64
+# define TARGET_LINUX_SYS_prlimit64 373
+  { CB_SYS_prlimit64, TARGET_LINUX_SYS_prlimit64 },
+#endif
+#ifdef CB_SYS_cacheflush
+# define TARGET_LINUX_SYS_cacheflush 374
+  { CB_SYS_cacheflush, TARGET_LINUX_SYS_cacheflush },
+#endif
 #ifdef CB_SYS_syscall
-# define TARGET_LINUX_SYS_syscall 371
+# define TARGET_LINUX_SYS_syscall 375
   { CB_SYS_syscall, TARGET_LINUX_SYS_syscall },
 #endif
   { -1, -1 }
