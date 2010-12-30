@@ -1,0 +1,583 @@
+/* Common Flash Memory Interface (CFI) model.
+   http://www.spansion.com/Support/AppNotes/CFI_Spec_AN_03.pdf
+   http://www.spansion.com/Support/AppNotes/cfi_100_20011201.pdf
+
+   Copyright (C) 2010 Free Software Foundation, Inc.
+   Contributed by Analog Devices, Inc.
+
+   This file is part of simulators.
+
+   This program is free software; you can redistribute it and/or modify
+   it under the terms of the GNU General Public License as published by
+   the Free Software Foundation; either version 3 of the License, or
+   (at your option) any later version.
+
+   This program is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+   GNU General Public License for more details.
+
+   You should have received a copy of the GNU General Public License
+   along with this program.  If not, see <http://www.gnu.org/licenses/>.  */
+
+/* TODO: support vendor query tables.  */
+
+#include "config.h"
+
+#include <math.h>
+
+#include "sim-main.h"
+#include "devices.h"
+#include "dv-cfi.h"
+
+enum cfi_state
+{
+  CFI_STATE_READ,
+  CFI_STATE_READ_ID,
+  CFI_STATE_QUERY,
+  CFI_STATE_PROTECT,
+  CFI_STATE_STATUS,
+  CFI_STATE_ERASE,
+  CFI_STATE_ERASE_CONFIRM,
+  CFI_STATE_WRITE,
+};
+
+struct cfi_query
+{
+  unsigned char qry[3];
+  unsigned char p_id[2];
+  unsigned char p_adr[2];
+  unsigned char a_id[2];
+  unsigned char a_adr[2];
+  union {
+    unsigned char voltages[4];
+    struct {
+      unsigned char vcc_min;
+      unsigned char vcc_max;
+      unsigned char vpp_min;
+      unsigned char vpp_max;
+    };
+  };
+  union {
+    unsigned char timeouts[8];
+    struct {
+      unsigned char timeout_typ_unit_write;
+      unsigned char timeout_typ_buf_write;
+      unsigned char timeout_typ_block_erase;
+      unsigned char timeout_typ_chip_erase;
+      unsigned char timeout_max_unit_write;
+      unsigned char timeout_max_buf_write;
+      unsigned char timeout_max_block_erase;
+      unsigned char timeout_max_chip_erase;
+    };
+  };
+  unsigned char dev_size;
+  unsigned char iface_desc[2];
+  unsigned char max_buf_write_len[2];
+  unsigned char num_erase_regions;
+  /*unsigned char erase_region_info;*/
+};
+
+struct cfi_erase_region
+{
+  unsigned blocks;
+  unsigned size;
+  unsigned start;
+  unsigned end;
+};
+
+struct cfi;
+
+struct cfi_cmdset {
+  unsigned id;
+  bool (*write) (struct hw *me, struct cfi *cfi, const void *source,
+		 unsigned offset, unsigned value, unsigned nr_bytes);
+  bool (*read) (struct hw *me, struct cfi *cfi, void *dest,
+		unsigned offset, unsigned nr_bytes);
+};
+
+struct cfi
+{
+  unsigned width, dev_size;
+  enum cfi_state state;
+  unsigned char *data;
+
+  struct cfi_query query;
+  const struct cfi_cmdset *cmdset;
+
+  unsigned char *erase_region_info;
+  struct cfi_erase_region *erase_regions;
+};
+
+static const char * const state_names[] = {
+  "READ", "READ_ID", "QUERY", "PROTECT", "STATUS",
+  "ERASE", "ERASE_CONFIRM", "WRITE",
+};
+
+static void
+cfi_erase_block (struct hw *me, struct cfi *cfi, unsigned offset)
+{
+  unsigned i;
+  struct cfi_erase_region *region;
+
+  /* If no erase regions, then we can only do whole chip erase.  */
+  /* XXX: Is this within spec ?  Or must there always be at least one ?  */
+  if (!cfi->query.num_erase_regions)
+    memset (cfi->data, 0xff, cfi->dev_size);
+
+  for (i = 0; i < cfi->query.num_erase_regions; ++i)
+    {
+      region = &cfi->erase_regions[i];
+
+      if (offset >= region->end)
+	continue;
+
+      /* XXX: Does spec require the erase addr to be erase block aligned ?
+	      Maybe this is check is overly cautious ...  */
+      offset &= ~(region->size - 1);
+      memset (cfi->data + offset, 0xff, region->size);
+      break;
+    }
+}
+
+static bool
+cmdset_intel_write (struct hw *me, struct cfi *cfi, const void *source,
+		    unsigned offset, unsigned value, unsigned nr_bytes)
+{
+  switch (cfi->state)
+    {
+    case CFI_STATE_READ:
+    case CFI_STATE_READ_ID:
+      switch (value)
+	{
+	case INTEL_CMD_ERASE_BLOCK:
+	  cfi_erase_block (me, cfi, offset);
+	  cfi->state = CFI_STATE_STATUS;
+	  break;
+	case INTEL_CMD_ERASE_CONFIRM:
+	  cfi->state = CFI_STATE_ERASE_CONFIRM;
+	  break;
+	case INTEL_CMD_WRITE:
+	  cfi->state = CFI_STATE_WRITE;
+	  break;
+	case INTEL_CMD_CLEAR_STATUS:
+	  break;
+	case INTEL_CMD_PROTECT:
+	  cfi->state = CFI_STATE_PROTECT;
+	  break;
+	default:
+	  return false;
+	}
+      break;
+
+    case CFI_STATE_PROTECT:
+      /* XXX: value 0x01 - protect set; value 0xD0 - protect clear.  */
+      cfi->state = CFI_STATE_STATUS;
+      break;
+    }
+
+  return true;
+}
+
+static bool
+cmdset_intel_read (struct hw *me, struct cfi *cfi, void *dest,
+		   unsigned offset, unsigned nr_bytes)
+{
+  switch (cfi->state)
+    {
+    case CFI_STATE_STATUS:
+      dv_store_1 (dest, 0x80);
+      break;
+
+    case CFI_STATE_ERASE_CONFIRM:
+      dv_store_1 (dest, 0x80);
+      break;
+
+    default:
+      return true;
+    }
+
+  return false;
+}
+
+static const struct cfi_cmdset cfi_cmdset_intel = {
+  CFI_CMDSET_INTEL, cmdset_intel_write, cmdset_intel_read,
+};
+
+static const struct cfi_cmdset * const cfi_cmdsets[] = {
+  &cfi_cmdset_intel,
+};
+
+static unsigned
+cfi_unshift_addr (struct cfi *cfi, unsigned addr)
+{
+  switch (cfi->width)
+    {
+    case 4: addr >>= 1;
+    case 2: addr >>= 1;
+    }
+  return addr;
+}
+
+static unsigned
+cfi_io_write_buffer (struct hw *me, const void *source, int space,
+		     address_word addr, unsigned nr_bytes)
+{
+  struct cfi *cfi = hw_data (me);
+  enum cfi_state old_state;
+  unsigned addr_off, value;
+
+  addr_off = addr & (cfi->dev_size - 1);
+
+  if (cfi->width != nr_bytes)
+    {
+      HW_TRACE ((me, "write 0x%08lx length %u does not match flash width %u",
+		 (unsigned long) addr, nr_bytes, cfi->width));
+      return nr_bytes;
+    }
+
+  if (cfi->state == CFI_STATE_WRITE)
+    {
+      HW_TRACE ((me, "program %#x length %u", addr_off, nr_bytes));
+      memcpy (cfi->data + addr_off, source, nr_bytes);
+      cfi->state = CFI_STATE_STATUS;
+      return nr_bytes;
+    }
+
+  value = dv_load_1 (source);
+
+  old_state = cfi->state;
+
+  if (value == CFI_CMD_RESET || value == CFI_CMD_RESET_ALT)
+    {
+      cfi->state = CFI_STATE_READ;
+      goto done;
+    }
+
+  addr_off = cfi_unshift_addr (cfi, addr_off);
+  switch (cfi->state)
+    {
+    case CFI_STATE_READ:
+    case CFI_STATE_READ_ID:
+
+      if (value == CFI_CMD_QUERY)
+	{
+	  if (addr_off == CFI_ADDR_QUERY_START)
+	    cfi->state = CFI_STATE_QUERY;
+	  goto done;
+	}
+
+      if (value == CFI_CMD_READ_ID)
+	{
+	  cfi->state = CFI_STATE_READ_ID;
+	  goto done;
+	}
+
+      /* Fall through.  */
+
+    default:
+      if (!cfi->cmdset->write (me, cfi, source, addr_off, value, nr_bytes))
+	HW_TRACE ((me, "unhandled command %#x at %#x", value, addr_off));
+      break;
+    }
+
+ done:
+  HW_TRACE ((me, "write 0x%08lx command %#x (%#x); state %s -> %s",
+	     (unsigned long) addr, value,
+	     cfi->width == 2 ? dv_load_2 (source) :
+	     cfi->width == 4 ? dv_load_4 (source) : value,
+	     state_names[old_state], state_names[cfi->state]));
+
+  return nr_bytes;
+}
+
+static unsigned
+cfi_io_read_buffer (struct hw *me, void *dest, int space,
+		    address_word addr, unsigned nr_bytes)
+{
+  struct cfi *cfi = hw_data (me);
+  unsigned char *sdest = dest;
+  unsigned addr_off;
+
+  addr_off = addr & (cfi->dev_size - 1);
+
+  /* XXX: Is this OK to enforce ?  */
+#if 0
+  if (cfi->width != nr_bytes)
+    {
+      HW_TRACE ((me, "read 0x%08lx length %u does not match flash width %u",
+		 (unsigned long) addr, nr_bytes, cfi->width));
+      return nr_bytes;
+    }
+#endif
+
+  HW_TRACE ((me, "%s 0x%08lx length %u",
+	     state_names[cfi->state], (unsigned long) addr, nr_bytes));
+
+  addr_off = cfi_unshift_addr (cfi, addr_off);
+  switch (cfi->state)
+    {
+    case CFI_STATE_READ:
+      memcpy (dest, cfi->data + addr_off, nr_bytes);
+      break;
+
+    case CFI_STATE_READ_ID:
+      {
+	/* XXX: This isn't right.  */
+	unsigned char *qry = (void *) &cfi->query;
+	memcpy (dest, qry + (addr_off & 0xff), nr_bytes);
+	break;
+      }
+
+    case CFI_STATE_QUERY:
+      if (addr_off >= CFI_ADDR_QUERY_RESULT &&
+	  addr_off < CFI_ADDR_QUERY_RESULT + sizeof (cfi->query) +
+		     (cfi->query.num_erase_regions * 4))
+	{
+	  unsigned char *qry;
+
+	  addr_off -= CFI_ADDR_QUERY_RESULT;
+	  if (addr_off >= sizeof (cfi->query))
+	    {
+	      qry = cfi->erase_region_info;
+	      addr_off -= sizeof (cfi->query);
+	    }
+	  else
+	    qry = (void *) &cfi->query;
+
+	  sdest[0] = qry[addr_off];
+	  memset (sdest + 1, 0, nr_bytes - 1);
+
+	  break;
+	}
+
+    default:
+      if (!cfi->cmdset->read (me, cfi, dest, addr_off, nr_bytes))
+	HW_TRACE ((me, "unhandled state %s", state_names[cfi->state]));
+      break;
+    }
+
+  return nr_bytes;
+}
+
+static void
+cfi_encode_16bit (unsigned char *data, unsigned num)
+{
+  /* CFI is little endian.  */
+  data[0] = num;
+  data[1] = num >> 8;
+}
+
+static void
+cfi_add_erase_region (struct hw *me, struct cfi *cfi,
+		      unsigned blocks, unsigned size)
+{
+  unsigned num_regions = cfi->query.num_erase_regions;
+  struct cfi_erase_region *region;
+  unsigned char *qry_region;
+
+  /* Store for our own usage.  */
+  region = &cfi->erase_regions[num_regions];
+  region->blocks = blocks;
+  region->size = size;
+  if (num_regions == 0)
+    region->start = 0;
+  else
+    region->start = region[-1].end;
+  region->end = region->start + (blocks * size);
+
+  /* Regions are 4 bytes long.  */
+  qry_region = cfi->erase_region_info + 4 * num_regions;
+
+  /* [0][1] = number erase blocks - 1 */
+  if (blocks > 0xffff + 1)
+    hw_abort (me, "erase blocks %u too big to fit into region info", blocks);
+  cfi_encode_16bit (&qry_region[0], blocks - 1);
+
+  /* [2][3] = block size / 256 bytes */
+  if (size > 0xffff * 256)
+    hw_abort (me, "erase size %u too big to fit into region info", size);
+  cfi_encode_16bit (&qry_region[2], size / 256);
+
+  /* Yet another region.  */
+  cfi->query.num_erase_regions = num_regions + 1;
+}
+
+/* Device tree options:
+     Required:
+       .../reg <addr> <len>
+       .../cmdset <primary; integer> [alt; integer]
+     Optional:
+       .../size <device size (must be pow of 2)>
+       .../width <8|16|32>
+       .../write_size <integer (must be pow of 2)>
+       .../erase_regions <number blocks> <block size> \
+                         [<number blocks> <block size> ...]
+       .../voltage <vcc min> <vcc max> <vpp min> <vpp max>
+       .../timeouts <typ unit write>  <typ buf write>  \
+                    <typ block erase> <typ chip erase> \
+                    <max unit write>  <max buf write>  \
+                    <max block erase> <max chip erase>
+     Defaults:
+       size: <len> from "reg"
+       width: 8
+       write_size: 0 (not supported)
+       erase_region: 1 (can only erase whole chip)
+       voltage: 0.0V (for all)
+       timeouts: typ: 1µs, not supported, 1ms, not supported
+                 max: 1µs, 1ms, 1ms, not supported
+
+  TODO: Verify user args are valid (e.g. voltage is 8 bits).  */
+static void
+attach_cfi_regs (struct hw *me, struct cfi *cfi)
+{
+  address_word attach_address;
+  int attach_space;
+  unsigned attach_size;
+  reg_property_spec reg;
+  int i, ret;
+  signed_cell ival;
+
+  if (hw_find_property (me, "reg") == NULL)
+    hw_abort (me, "Missing \"reg\" property");
+  if (hw_find_property (me, "cmdset") == NULL)
+    hw_abort (me, "Missing \"cmdset\" property");
+
+  if (!hw_find_reg_array_property (me, "reg", 0, &reg))
+    hw_abort (me, "\"reg\" property must contain three addr/size entries");
+
+  hw_unit_address_to_attach_address (hw_parent (me),
+				     &reg.address,
+				     &attach_space, &attach_address, me);
+  hw_unit_size_to_attach_size (hw_parent (me), &reg.size, &attach_size, me);
+
+  hw_attach_address (hw_parent (me),
+		     0, attach_space, attach_address, attach_size, me);
+
+  /* Extract the desired flash command set.  */
+  ret = hw_find_integer_array_property (me, "cmdset", 0, &ival);
+  if (ret != 1 && ret != 2)
+    hw_abort (me, "\"cmdset\" property takes 1 or 2 entries");
+  cfi_encode_16bit (cfi->query.p_id, ival);
+
+  for (i = 0; i < ARRAY_SIZE (cfi_cmdsets); ++i)
+    if (cfi_cmdsets[i]->id == ival)
+      cfi->cmdset = cfi_cmdsets[i];
+  if (cfi->cmdset == NULL)
+    hw_abort (me, "cmdset %u not supported", ival);
+
+  if (ret == 2)
+    {
+      hw_find_integer_array_property (me, "cmdset", 1, &ival);
+      cfi_encode_16bit (cfi->query.a_id, ival);
+    }
+
+  /* Extract the desired device size.  */
+  if (hw_find_property (me, "size"))
+    cfi->dev_size = hw_find_integer_property (me, "size");
+  else
+    cfi->dev_size = attach_size;
+  cfi->query.dev_size = log2 (cfi->dev_size);
+
+  cfi->data = HW_NALLOC (me, unsigned char, cfi->dev_size);
+  memset (cfi->data, 0xff, cfi->dev_size);
+
+  /* Extract the desired flash width.  */
+  if (hw_find_property (me, "width"))
+    {
+      cfi->width = hw_find_integer_property (me, "width");
+      if (cfi->width != 8 && cfi->width != 16 && cfi->width != 32)
+	hw_abort (me, "\"width\" must be 8 or 16 or 32, not %u", cfi->width);
+    }
+  else
+    /* Default to 8 bit.  */
+    cfi->width = 8;
+  /* Turn 8/16/32 into 1/2/4.  */
+  cfi->width /= 8;
+
+  /* Extract optional write buffer size.  */
+  if (hw_find_property (me, "write_size"))
+    {
+      ival = hw_find_integer_property (me, "write_size");
+      cfi_encode_16bit (cfi->query.max_buf_write_len, log2 (ival));
+    }
+
+  /* Extract optional erase regions.  */
+  if (hw_find_property (me, "erase_regions"))
+    {
+      ret = hw_find_integer_array_property (me, "erase_regions", 0, &ival);
+      if (ret % 2)
+	hw_abort (me, "\"erase_regions\" must be specified in sets of 2");
+
+      cfi->erase_region_info = HW_NALLOC (me, unsigned char, ret / 2);
+      cfi->erase_regions = HW_NALLOC (me, struct cfi_erase_region, ret / 2);
+
+      for (i = 0; i < ret; i += 2)
+	{
+	  unsigned blocks, size;
+
+	  hw_find_integer_array_property (me, "erase_regions", i, &ival);
+	  blocks = ival;
+
+	  hw_find_integer_array_property (me, "erase_regions", i + 1, &ival);
+	  size = ival;
+
+	  cfi_add_erase_region (me, cfi, blocks, size);
+	}
+    }
+
+  /* Extract optional voltages.  */
+  if (hw_find_property (me, "voltage"))
+    {
+      unsigned num = ARRAY_SIZE (cfi->query.voltages);
+
+      ret = hw_find_integer_array_property (me, "voltage", 0, &ival);
+      if (ret > num)
+	hw_abort (me, "\"voltage\" may have only %u arguments", num);
+
+      for (i = 0; i < ret; ++i)
+	{
+	  hw_find_integer_array_property (me, "voltage", i, &ival);
+	  cfi->query.voltages[i] = ival;
+	}
+    }
+
+  /* Extract optional timeouts.  */
+  if (hw_find_property (me, "timeout"))
+    {
+      unsigned num = ARRAY_SIZE (cfi->query.timeouts);
+
+      ret = hw_find_integer_array_property (me, "timeout", 0, &ival);
+      if (ret > num)
+	hw_abort (me, "\"timeout\" may have only %u arguments", num);
+
+      for (i = 0; i < ret; ++i)
+	{
+	  hw_find_integer_array_property (me, "timeout", i, &ival);
+	  cfi->query.timeouts[i] = ival;
+	}
+    }
+}
+
+static void
+cfi_finish (struct hw *me)
+{
+  struct cfi *cfi;
+
+  cfi = HW_ZALLOC (me, struct cfi);
+
+  set_hw_data (me, cfi);
+  set_hw_io_read_buffer (me, cfi_io_read_buffer);
+  set_hw_io_write_buffer (me, cfi_io_write_buffer);
+
+  attach_cfi_regs (me, cfi);
+
+  /* Initialize the CFI.  */
+  cfi->state = CFI_STATE_READ;
+  memcpy (cfi->query.qry, "QRY", 3);
+}
+
+const struct hw_descriptor dv_cfi_descriptor[] = {
+  {"cfi", cfi_finish,},
+  {NULL, NULL},
+};
