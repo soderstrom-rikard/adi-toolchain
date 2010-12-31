@@ -626,6 +626,8 @@ attach_cfi_regs (struct hw *me, struct cfi *cfi)
     }
 
   /* Extract optional file.  */
+  fd = -1;
+  fd_writable = false;
   if (hw_find_property (me, "file"))
     {
       const char *file;
@@ -645,8 +647,6 @@ attach_cfi_regs (struct hw *me, struct cfi *cfi)
       if (fd < 0)
 	hw_abort (me, "unable to read file `%s': %s", file, strerror (errno));
     }
-  else
-    fd = -1;
 
   /* Figure out where our initial flash data is coming from.  */
 #ifdef HAVE_MMAP
