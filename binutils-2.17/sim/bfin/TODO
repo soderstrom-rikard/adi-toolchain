@@ -14,3 +14,9 @@ the CEC to pop things off.
 R0 = [SP++]; gets traced as R0 = [P6++];
 
 merge dv-bfin_evt with dv-bfin_cec since the EVT regs are part of the CEC
+
+fix single stepping over debug assert instructions in hardware
+
+exception in IVG5 causes double fault ?
+
+add a "file" option to the async banks to back it
