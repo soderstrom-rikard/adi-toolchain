@@ -41,7 +41,6 @@ SIM_AC_OPTION_HARDWARE(yes,,\
 	bfin_uart \
 	bfin_uart2 \
 	bfin_wdog \
-	cfi \
 	eth_phy \
 )
 
