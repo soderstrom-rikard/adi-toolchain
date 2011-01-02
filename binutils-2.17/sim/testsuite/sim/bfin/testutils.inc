@@ -154,18 +154,18 @@ _main:
 	.endm
 	.macro dbg_fail
 .ifdef BFIN_JTAG
-        R0 = 6;
-        CALL __emu_out;
-        R0.L = 0x6166;  /* 'f'=0x66  'a'=0x61 */
-        R0.H = 0x6c69;  /* 'i'=0x69  'l'=0x6c */
-        CALL __emu_out;
+	R0 = 6;
+	CALL __emu_out;
+	R0.L = 0x6166;  /* 'f'=0x66  'a'=0x61 */
+	R0.H = 0x6c69;  /* 'i'=0x69  'l'=0x6c */
+	CALL __emu_out;
 
-        R0.L = 0x0A;    /* newline */
-        R0.H = 0x0000;
-        CALL __emu_out;
+	R0.L = 0x0A;    /* newline */
+	R0.H = 0x0000;
+	CALL __emu_out;
 1:
-        EMUEXCPT;
-        JUMP 1b;
+	EMUEXCPT;
+	JUMP 1b;
 .else
 	outc_str 'f', 'a', 'i', 'l', '\n'
 .endif
