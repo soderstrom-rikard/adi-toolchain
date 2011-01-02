@@ -408,13 +408,14 @@ cec_exception (SIM_CPU *cpu, int excp)
 
 bu32 cec_cli (SIM_CPU *cpu)
 {
-  struct bfin_cec *cec = CEC_STATE (cpu);
+  struct bfin_cec *cec;
   bu32 old_mask;
-
-  _cec_require_supervisor (cpu, cec);
 
   if (STATE_ENVIRONMENT (CPU_STATE (cpu)) != OPERATING_ENVIRONMENT)
     return 0;
+
+  cec = CEC_STATE (cpu);
+  _cec_require_supervisor (cpu, cec);
 
   /* XXX: what about IPEND[4] ?  */
   old_mask = cec->imask;
@@ -427,13 +428,14 @@ bu32 cec_cli (SIM_CPU *cpu)
 
 void cec_sti (SIM_CPU *cpu, bu32 ints)
 {
-  struct bfin_cec *cec = CEC_STATE (cpu);
+  struct bfin_cec *cec;
   bu32 old_mask;
-
-  _cec_require_supervisor (cpu, cec);
 
   if (STATE_ENVIRONMENT (CPU_STATE (cpu)) != OPERATING_ENVIRONMENT)
     return;
+
+  cec = CEC_STATE (cpu);
+  _cec_require_supervisor (cpu, cec);
 
   /* XXX: what about IPEND[4] ?  */
   old_mask = cec->imask;
