@@ -1872,9 +1872,11 @@ decode_CaCTRL_0 (SIM_CPU *cpu, bu16 iw0)
   int reg = ((iw0 >> 0) & 0x7);
   int op = ((iw0 >> 3) & 0x3);
   bu32 preg = PREG (reg);
+  const char * const sinsn[] = { "PREFETCH", "FLUSHINV", "FLUSH", "IFLUSH", };
 
   PROFILE_COUNT_INSN (cpu, pc, BFIN_INSN_CaCTRL);
   TRACE_EXTRACT (cpu, "%s: a:%i op:%i reg:%i", __func__, a, op, reg);
+  TRACE_INSN (cpu, "%s [P%i%s];", sinsn[op], reg, a ? "++" : "");
 
   if (INSN_LEN == 8)
     /* None of these can be part of a parallel instruction */
@@ -1887,58 +1889,11 @@ decode_CaCTRL_0 (SIM_CPU *cpu, bu16 iw0)
      do we just add the cache line size ?  */
   if (a == 0 && op == 0)
     {
-      TRACE_INSN (cpu, "PREFETCH [P%i];", reg);
-      if (INSN_LEN == 8)
-	illegal_instruction_combination (cpu);
       /* implicit read which may trigger CPLB miss.  */
       GET_BYTE (preg);
     }
-  else if (a == 0 && op == 1)
-    {
-      TRACE_INSN (cpu, "FLUSHINV [P%i];", reg);
-      if (INSN_LEN == 8)
-	illegal_instruction_combination (cpu);
-    }
-  else if (a == 0 && op == 2)
-    {
-      TRACE_INSN (cpu, "FLUSH [P%i];", reg);
-      if (INSN_LEN == 8)
-	illegal_instruction_combination (cpu);
-    }
-  else if (a == 0 && op == 3)
-    {
-      TRACE_INSN (cpu, "IFLUSH [P%i];", reg);
-      if (INSN_LEN == 8)
-	illegal_instruction_combination (cpu);
-    }
-  else if (a == 1 && op == 0)
-    {
-      TRACE_INSN (cpu, "PREFETCH [P%i++];", reg);
-      if (INSN_LEN == 8)
-	illegal_instruction_combination (cpu);
-    }
-  else if (a == 1 && op == 1)
-    {
-      TRACE_INSN (cpu, "FLUSHINV [P%i++];", reg);
-      if (INSN_LEN == 8)
-	illegal_instruction_combination (cpu);
-    }
-  else if (a == 1 && op == 2)
-    {
-      TRACE_INSN (cpu, "FLUSH [P%i++];", reg);
-      if (INSN_LEN == 8)
-	illegal_instruction_combination (cpu);
-    }
-  else if (a == 1 && op == 3)
-    {
-      TRACE_INSN (cpu, "IFLUSH [P%i++];", reg);
-      if (INSN_LEN == 8)
-	illegal_instruction_combination (cpu);
-    }
-  else
-    illegal_instruction (cpu);
 
-  if (a == 1)
+  if (a)
     SET_PREG (reg, preg + BFIN_L1_CACHE_BYTES);
 }
 
