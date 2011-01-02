@@ -791,7 +791,7 @@ algn (bu32 l, bu32 h, bu32 aln)
 }
 
 static bu32
-saturate_s16 (bu64 val, int *overflow)
+saturate_s16 (bu64 val, bu32 *overflow)
 {
   if ((bs64)val < -0x8000ll)
     {
@@ -914,7 +914,7 @@ sub32 (SIM_CPU *cpu, bu32 a, bu32 b, int carry, int sat, int parallel)
 }
 
 static bu32
-add16 (SIM_CPU *cpu, bu16 a, bu16 b, int *carry, int *overfl, int *zero, int *neg, int sat, int scale)
+add16 (SIM_CPU *cpu, bu16 a, bu16 b, bu32 *carry, bu32 *overfl, bu32 *zero, bu32 *neg, int sat, int scale)
 {
   int flgs = (a >> 15) & 1;
   int flgo = (b >> 15) & 1;
@@ -961,7 +961,7 @@ add16 (SIM_CPU *cpu, bu16 a, bu16 b, int *carry, int *overfl, int *zero, int *ne
 }
 
 static bu32
-sub16 (SIM_CPU *cpu, bu16 a, bu16 b, int *carry, int *overfl, int *zero, int *neg, int sat, int scale)
+sub16 (SIM_CPU *cpu, bu16 a, bu16 b, bu32 *carry, bu32 *overfl, bu32 *zero, bu32 *neg, int sat, int scale)
 {
   int flgs = (a >> 15) & 1;
   int flgo = (b >> 15) & 1;
@@ -1280,7 +1280,7 @@ get_extended_acc (SIM_CPU *cpu, int which)
    *PSAT if saturation occurs, 0 otherwise.  */
 static bu64
 decode_multfunc (SIM_CPU *cpu, int h0, int h1, int src0, int src1, int mmod,
-		 int MM, int *psat)
+		 int MM, bu32 *psat)
 {
   bu32 s0 = DREG (src0), s1 = DREG (src1);
   bu32 sgn0, sgn1;
@@ -1375,7 +1375,7 @@ saturate_s40 (bu64 val)
 }
 
 static bu32
-saturate_s32 (bu64 val, int *overflow)
+saturate_s32 (bu64 val, bu32 *overflow)
 {
   if ((bs64)val < -0x80000000ll)
     {
@@ -1393,7 +1393,7 @@ saturate_s32 (bu64 val, int *overflow)
 }
 
 static bu32
-saturate_u32 (bu64 val, int *overflow)
+saturate_u32 (bu64 val, bu32 *overflow)
 {
   if (val > 0xffffffff)
     {
@@ -1405,7 +1405,7 @@ saturate_u32 (bu64 val, int *overflow)
 }
 
 static bu32
-saturate_u16 (bu64 val, int *overflow)
+saturate_u16 (bu64 val, bu32 *overflow)
 {
   if (val > 0xffff)
     {
@@ -1466,7 +1466,7 @@ signbits (bu64 val, int size)
    we want to extract, either a 32 bit multiply or a 40 bit accumulator.  */
 
 static bu32
-extract_mult (SIM_CPU *cpu, bu64 res, int mmod, int MM, int fullword, int *overflow)
+extract_mult (SIM_CPU *cpu, bu64 res, int mmod, int MM, int fullword, bu32 *overflow)
 {
   if (fullword)
     switch (mmod)
@@ -1519,10 +1519,10 @@ extract_mult (SIM_CPU *cpu, bu64 res, int mmod, int MM, int fullword, int *overf
 
 static bu32
 decode_macfunc (SIM_CPU *cpu, int which, int op, int h0, int h1, int src0,
-		int src1, int mmod, int MM, int fullword, int *overflow)
+		int src1, int mmod, int MM, int fullword, bu32 *overflow)
 {
   bu64 acc;
-  int sat = 0, tsat;
+  bu32 sat = 0, tsat;
 
   /* Sign extend accumulator if necessary, otherwise unsigned */
   if (mmod == 0 || mmod == M_T || mmod == M_IS || mmod == M_ISS2 || mmod == M_S2RND || mmod == M_IH || mmod == M_W32)
@@ -3830,7 +3830,7 @@ decode_dsp32mult_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1)
   if (w1)
     {
       bu64 r = decode_multfunc (cpu, h01, h11, src0, src1, mmod, MM, &sat1);
-      res1 = extract_mult (cpu, r, mmod, MM, P, 0);
+      res1 = extract_mult (cpu, r, mmod, MM, P, NULL);
       if (P)
 	STORE (DREG (dst + 1), res1);
       else
@@ -3844,7 +3844,7 @@ decode_dsp32mult_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1)
   if (w0)
     {
       bu64 r = decode_multfunc (cpu, h00, h10, src0, src1, mmod, 0, &sat0);
-      res0 = extract_mult (cpu, r, mmod, 0, P, 0);
+      res0 = extract_mult (cpu, r, mmod, 0, P, NULL);
       if (P)
 	STORE (DREG (dst), res0);
       else
@@ -4149,7 +4149,7 @@ decode_dsp32alu_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1)
     {
       bs40 acc0 = get_extended_acc (cpu, 0);
       bs40 acc1 = get_extended_acc (cpu, 1);
-      int sat;
+      bu32 sat;
 
       if (aop == 0 || aop == 1)
 	TRACE_INSN (cpu, "A%i = A%i (S);", aop, aop);
@@ -4276,7 +4276,6 @@ decode_dsp32alu_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1)
     }
   else if (aop == 3 && aopcde == 12)
     {
-      bs32 signRes;
       bs32 res = DREG (src0);
       bs32 ovX;
       bool sBit_a, sBit_b;
@@ -4411,7 +4410,7 @@ decode_dsp32alu_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1)
       bu32 s1h = s1 >> 16;
       bu32 s1l = s1 & 0xFFFF;
       bu32 t0, t1;
-      bu32 astat, ac1_i = 0, ac0_i = 0, v_i = 0, z_i = 0, n_i = 0;
+      bu32 ac1_i = 0, ac0_i = 0, v_i = 0, z_i = 0, n_i = 0;
 
       TRACE_INSN (cpu, "R%i = R%i %c|%c R%i%s;", dst0, src0,
 		  (aop & 2) ? '-' : '+', (aop & 1) ? '-' : '+', src1,
@@ -4469,7 +4468,7 @@ decode_dsp32alu_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1)
       bu16 s0H = ((DREG (src0) >> 16) & 0xFFFF);
       bu16 s1L =  (DREG (src1) & 0xFFFF);
       bu16 s1H = ((DREG (src1) >> 16) & 0xFFFF);
-      int v_i = 0, n_i = 0, z_i = 0;
+      bu32 v_i = 0, n_i = 0, z_i = 0;
 
       TRACE_INSN (cpu, "R%i = R%i %s R%i, R%i = R%i %s R%i%s;",
 		  dst1, src0, HL ? "+|-" : "+|+", src1,

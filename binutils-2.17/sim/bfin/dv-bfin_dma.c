@@ -158,9 +158,9 @@ bfin_dma_process_desc (struct hw *me, struct bfin_dma *dma)
 	&dma->sah,
 	&dma->config,
 	&dma->x_count,
-	&dma->x_modify,
+	(void *) &dma->x_modify,
 	&dma->y_count,
-	&dma->y_modify,
+	(void *) &dma->y_modify,
       };
 
       switch (dma->config & DMAFLOW)

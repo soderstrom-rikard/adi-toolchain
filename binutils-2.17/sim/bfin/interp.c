@@ -693,7 +693,7 @@ bfin_user_init (SIM_DESC sd, SIM_CPU *cpu, struct bfd *abfd,
   for (i = 0; i < argc; ++i)
     {
       unsigned len = strlen (argv[i]) + 1;
-      sim_write (sd, sp_flat, argv[i], len);
+      sim_write (sd, sp_flat, (void *)argv[i], len);
       sim_write (sd, sp, (void *)&sp_flat, 4);
       sp_flat += len;
       sp += 4;
@@ -705,7 +705,7 @@ bfin_user_init (SIM_DESC sd, SIM_CPU *cpu, struct bfd *abfd,
   for (i = 0; i < envc; ++i)
     {
       unsigned len = strlen (env[i]) + 1;
-      sim_write (sd, sp_flat, env[i], len);
+      sim_write (sd, sp_flat, (void *)env[i], len);
       sim_write (sd, sp, (void *)&sp_flat, 4);
       sp_flat += len;
       sp += 4;
@@ -735,7 +735,7 @@ bfin_os_init (SIM_DESC sd, SIM_CPU *cpu, const char * const *argv)
       while (argv[i])
 	{
 	  bu32 len = strlen (argv[i]);
-	  sim_write (sd, cmdline, argv[i], len);
+	  sim_write (sd, cmdline, (void *)argv[i], len);
 	  cmdline += len;
 	  sim_write (sd, cmdline, &byte, 1);
 	  ++cmdline;
@@ -776,6 +776,9 @@ sim_create_inferior (SIM_DESC sd, struct bfd *abfd,
       break;
     case OPERATING_ENVIRONMENT:
       bfin_os_init (sd, cpu, (void *)argv);
+      break;
+    default:
+      /* Nothing to do for virtual/all envs.  */
       break;
     }
 

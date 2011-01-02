@@ -238,7 +238,7 @@ attach_bfin_otp_regs (struct hw *me, struct bfin_otp *otp)
 static void
 bfin_otp_finish (struct hw *me)
 {
-  bu8 part_str[16];
+  char part_str[16];
   struct bfin_otp *otp;
 
   otp = HW_ZALLOC (me, struct bfin_otp);
