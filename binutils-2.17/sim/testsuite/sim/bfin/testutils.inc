@@ -10,6 +10,7 @@ __panic:
 	.rep 0x10
 	.word 0x0025
 	.endr
+	dbg_fail
 	jump __panic;
 
 	.global __pass
