@@ -226,7 +226,7 @@ IF CC JUMP IFETCHMISALIGNED;   // If EXCAUSE != 0x2A then leave
 dbg_pass;       // if the EXCAUSE is wrong the test will infinite loop
 
 IFETCHMISALIGNED:
-    R7 = RETX;      // Fix up return address
+    R7 = P1;      // Fix up return address
 BITCLR(r7, 0);  // Strip off errant LSB
 RETX = r7;      // and put back in RETX
 
