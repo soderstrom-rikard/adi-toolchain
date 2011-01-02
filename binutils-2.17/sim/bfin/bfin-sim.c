@@ -4607,7 +4607,7 @@ decode_dsp32alu_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1)
     {
       bs40 acc0 = get_extended_acc (cpu, 0);
       bs40 acc1 = get_extended_acc (cpu, 1);
-      bs40 val0, val1;
+      bs40 val0, val1, sval0, sval1;
       bu32 sat, sat_i;
 
       TRACE_INSN (cpu, "R%i = A%i + A%i, R%i = A%i - A%i%s",
@@ -4626,19 +4626,14 @@ decode_dsp32alu_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1)
       else
 	val0 = acc1 - acc0;
 
+      sval0 = saturate_s32 (val0, &sat);
+      sat_i = sat;
+      sval1 = saturate_s32 (val1, &sat);
+      sat_i |= sat;
       if (s)
 	{
-	  val0 = saturate_s32 (val0, &sat);
-	  sat_i = sat;
-	  val1 = saturate_s32 (val1, &sat);
-	  sat_i |= sat;
-	}
-      else
-	{
-	  if ((bu40)val0 > 0xFFFFFFFF)
-	    sat_i = 1;
-	  if ((bu40)val1 > 0xFFFFFFFF)
-	    sat_i = 1;
+	  val0 = sval0;
+	  val1 = sval1;
 	}
 
       STORE (DREG (dst0), val0);
