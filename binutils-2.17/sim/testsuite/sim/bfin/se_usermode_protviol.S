@@ -178,6 +178,7 @@ BEGIN:
     R1 = -1;
 
 // the following instructions should EXCEPT
+    R6 = 0x2E;      // EXCAUSE 0x2E means Illegal Use Supervidor Resource
 
 RAISE 15;
 CLI R0;
@@ -210,7 +211,6 @@ RETE = r1;
     [ -- SP ] = RETN;
     [ -- SP ] = RETE;
 
-USP = [sp++];
 SEQSTAT = [sp++];
 SYSCFG = [sp++];
 RETI = [sp++];
@@ -222,6 +222,9 @@ RTX;
 RTN;
 RTI;
 RTE;
+
+    R6 = 0x22;      // EXCAUSE 0x22 means Illegal Insn Combination
+USP = [sp++];
 
 CHECK_INIT_DEF(p0); //CHECK_INIT(p0, 0xFF7FFFFC);
                     // Xhandler counts all EXCAUSE = 0x2B;
@@ -245,7 +248,6 @@ XHANDLE:            // Exception Handler 3
     R7 = SEQSTAT;
     R7 <<= 26;
     R7 >>= 26;      // only want EXCAUSE
-    R6 = 0x2E;      // EXCAUSE 0x2E means Illegal Use Supervidor Resource
 CC = r7 == r6;
 IF CC JUMP IFETCHPROTVIOL;   // If EXCAUSE != 0x2E then leave
 
