@@ -7,10 +7,10 @@
 	.text
 	# Pad with EMUEXCPT to make sure "jump to 0" always fails
 __panic:
-	.rep 0x10
+	.rep 0xf
 	.word 0x0025
 	.endr
-	dbg_fail
+	abort;
 	jump __panic;
 
 	.global __pass
