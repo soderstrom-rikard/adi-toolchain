@@ -35,10 +35,6 @@
 #include "sim-main.h"
 #include "sim-hw.h"
 
-/* XXX: common gdb code doesn't define these by default.  */
-#define CB_SYS_argc    100
-#define CB_SYS_argn    101
-#define CB_SYS_argnlen 102
 #include "targ-vals.h"
 
 #define CB_SYS_ioctl    200 /* XXX: hack for simple uClibc stdio!  */
