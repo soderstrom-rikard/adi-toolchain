@@ -2,7 +2,7 @@
 // Description: Multi-issue Illegal Combinations
 # mach: bfin
 # sim: --environment operating
-# xfail: "missing a few checks" bfin-*
+# xfail: "missing a few checks; hardware doesnt seem to match PRM?" bfin-*
 
 #include "test.h"
 .include "testutils.inc"
@@ -549,6 +549,7 @@ XHANDLE:            // Exception Handler 3
 CC = r7 == r6;
 IF CC JUMP ILLEGALCOMBINATION;   // If EXCAUSE != 0x22 then leave
 
+dbg_fail;
 JUMP.S OUT;       // if the EXCAUSE is wrong the test will infinite loop
 
 ILLEGALCOMBINATION:
@@ -561,7 +562,6 @@ RETX = r7;      // and put back in RETX
     R5 += 1;        // Increment global counter
 
 OUT:
-dbg_fail;
     ( R7:6 ) = [ SP ++ ];
 ASTAT = [sp++];
 
