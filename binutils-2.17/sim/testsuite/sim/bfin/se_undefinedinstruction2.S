@@ -137,6 +137,7 @@ RTI;
 
 STARTSUP:
 LD32_LABEL(p1, BEGIN);
+r4 = p1;
 
 LD32(p0, EVT15);
 
@@ -198,7 +199,7 @@ BEGIN:
     .dw 0x16D ;
     .dw 0x16E ;
     .dw 0x16F ;
-#if 1
+#if 0
 	// EMUDAT = [SP++]; is valid
     .dw 0x13F ;
 	// [SP++] = EMUDAT; is valid
@@ -215,7 +216,7 @@ BEGIN:
     .dw 0x216 ;
     .dw 0x217 ;
     .dw 0x305 ;
-#if 1
+#if 0
 	// Not documented, but hardware takes them
 	// CC = <reserved astat>
     .dw 0x307 ;
@@ -245,7 +246,7 @@ BEGIN:
     .dw 0x31F ;
 #endif
     .dw 0x325 ;
-#if 1
+#if 0
 	// Not documented, but hardware takes them
 	// CC |= <reserved astat>
     .dw 0x327 ;
@@ -275,7 +276,7 @@ BEGIN:
     .dw 0x33F ;
 #endif
     .dw 0x345 ;
-#if 1
+#if 0
 	// Not documented, but hardware takes them
 	// CC &= <reserved astat>
     .dw 0x347 ;
@@ -305,7 +306,7 @@ BEGIN:
     .dw 0x35F ;
 #endif
     .dw 0x365 ;
-#if 1
+#if 0
 	// Not documented, but hardware takes them
 	// CC ^= <reserved astat>
     .dw 0x367 ;
@@ -335,7 +336,7 @@ BEGIN:
     .dw 0x37F ;
 #endif
     .dw 0x385 ;
-#if 1
+#if 0
 	// Not documented, but hardware takes them
 	// <reserved astat> = CC
     .dw 0x387 ;
@@ -365,7 +366,7 @@ BEGIN:
     .dw 0x39F ;
 #endif
     .dw 0x3A5 ;
-#if 1
+#if 0
 	// Not documented, but hardware takes them
 	// <reserved astat> |= CC
     .dw 0x3A7 ;
@@ -395,7 +396,7 @@ BEGIN:
     .dw 0x3BF ;
 #endif
     .dw 0x3C5 ;
-#if 1
+#if 0
 	// Not documented, but hardware takes them
 	// <reserved astat> &= CC
     .dw 0x3C7 ;
@@ -425,7 +426,7 @@ BEGIN:
     .dw 0x3DF ;
 #endif
     .dw 0x3E5 ;
-#if 1
+#if 0
 	// Not documented, but hardware takes them
 	// <reserved astat> ^= CC
     .dw 0x3E7 ;
@@ -1638,7 +1639,7 @@ BEGIN:
     .dw 0x39ED ;
     .dw 0x39EE ;
     .dw 0x39EF ;
-#if 1
+#if 0
 	// EMUDAT = Dreg; is valid
     .dw 0x3E38 ;
     .dw 0x3E39 ;
@@ -1657,67 +1658,70 @@ BEGIN:
     .dw 0x3E7D ;
     .dw 0x3E7E ;
     .dw 0x3E7F ;
-#endif
-.ifndef BFIN_HW
-	// XXX: hardware doesnt trigger illegal exception ?
+	// EMUDAT = Ireg; is valid
     .dw 0x3EB8 ;
     .dw 0x3EB9 ;
     .dw 0x3EBA ;
     .dw 0x3EBB ;
+	// EMUDAT = Mreg; is valid
     .dw 0x3EBC ;
     .dw 0x3EBD ;
     .dw 0x3EBE ;
     .dw 0x3EBF ;
+	// EMUDAT = Breg; is valid
     .dw 0x3EF8 ;
     .dw 0x3EF9 ;
     .dw 0x3EFA ;
     .dw 0x3EFB ;
+	// EMUDAT = Lreg; is valid
     .dw 0x3EFC ;
     .dw 0x3EFD ;
     .dw 0x3EFE ;
     .dw 0x3EFF ;
+	// EMUDAT = Areg; is valid
     .dw 0x3F38 ;
     .dw 0x3F39 ;
     .dw 0x3F3A ;
     .dw 0x3F3B ;
-.endif
+#endif
     .dw 0x3F3C ;
     .dw 0x3F3D ;
-.ifndef BFIN_HW
-	// XXX: hardware doesnt trigger illegal exception ?
+#if 0
+	// EMUDAT = ASTAT; is valid
     .dw 0x3F3E ;
+	// EMUDAT = RETS; is valid
     .dw 0x3F3F ;
+	// EMUDAT = loopregs; is valid
     .dw 0x3FB8 ;
     .dw 0x3FB9 ;
     .dw 0x3FBA ;
     .dw 0x3FBB ;
     .dw 0x3FBC ;
     .dw 0x3FBD ;
+	// EMUDAT = cycles; is valid
     .dw 0x3FBE ;
     .dw 0x3FBF ;
-.endif
-#if 1
 	// EMUDAT = USP; is valid
     .dw 0x3FF8 ;
-#endif
-.ifndef BFIN_HW
-	// XXX: hardware doesnt trigger illegal exception ?
+	// EMUDAT = SEQSTAT; is valid
     .dw 0x3FF9 ;
+	// EMUDAT = SYSCFG; is valid
     .dw 0x3FFA ;
+	// EMDUAT = RET[IXNE]; is valid
     .dw 0x3FFB ;
     .dw 0x3FFC ;
     .dw 0x3FFD ;
     .dw 0x3FFE ;
+	// EMUDAT = EMUDAT; is valid
     .dw 0x3FFF ;
-.endif
-#if 1
 	// Dreg = EMUDAT; is valid
     .dw 0x31C7 ;
     .dw 0x31CF ;
     .dw 0x31D7 ;
     .dw 0x31DF ;
-    .dw 0x31E7 ;
 #if 0
+	// R4 = EMUDAT; breaks the test
+    .dw 0x31E7 ;
 	// R5 = EMUDAT; breaks the test
     .dw 0x31EF ;
 #endif
@@ -1732,53 +1736,62 @@ BEGIN:
     .dw 0x33EF ;
     .dw 0x33F7 ;
     .dw 0x33FF ;
-#endif
-.ifndef BFIN_HW
-	// XXX: hardware doesnt trigger illegal exception ?
+	// Ireg = EMUDAT; is valid
     .dw 0x35C7 ;
     .dw 0x35CF ;
     .dw 0x35D7 ;
     .dw 0x35DF ;
+	// Mreg = EMUDAT; is valid
     .dw 0x35E7 ;
     .dw 0x35EF ;
     .dw 0x35F7 ;
     .dw 0x35FF ;
+	// EMUDAT = Breg; is valid
     .dw 0x37C7 ;
     .dw 0x37CF ;
     .dw 0x37D7 ;
     .dw 0x37DF ;
+	// EMUDAT = Lreg; is valid
     .dw 0x37E7 ;
     .dw 0x37EF ;
     .dw 0x37F7 ;
     .dw 0x37FF ;
-.endif
+#endif
     .dw 0x39C7 ;
     .dw 0x39CF ;
     .dw 0x39D7 ;
     .dw 0x39DF ;
     .dw 0x39E7 ;
     .dw 0x39EF ;
-.ifndef BFIN_HW
-	// XXX: hardware doesnt trigger illegal exception ?
+#if 0
+	// ASTAT = EMUDAT; is valid
     .dw 0x39F7 ;
+	// RETS = EMUDAT; is valid
     .dw 0x39FF ;
+	// loopregs = EMUDAT; is valid
     .dw 0x3DC7 ;
     .dw 0x3DCF ;
     .dw 0x3DD7 ;
     .dw 0x3DDF ;
     .dw 0x3DE7 ;
     .dw 0x3DEF ;
+	// cycles = EMUDAT; is valid
     .dw 0x3DF7 ;
     .dw 0x3DFF ;
+	// USP = EMUDAT; is valid
     .dw 0x3FC7 ;
+	// SEQSTAT = EMUDAT; is valid
     .dw 0x3FCF ;
+	// SYSCFG = EMUDAT; is valid
     .dw 0x3FD7 ;
+	// RET[IXNE] = EMUDAT; is valid
     .dw 0x3FDF ;
     .dw 0x3FE7 ;
     .dw 0x3FEF ;
     .dw 0x3FF7 ;
+	// EMUDAT = EMUDAT; is valid
     .dw 0x3FFF ;
-.endif
+#endif
     .dw 0x3D80 ;
     .dw 0x3D81 ;
     .dw 0x3D82 ;
@@ -1849,80 +1862,80 @@ BEGIN:
     .dw 0x3DC4 ;
     .dw 0x3DC5 ;
     .dw 0x3DC6 ;
-.ifndef BFIN_HW
-	// XXX: hardware doesnt trigger illegal exception ?
+#if 0
+	// loopregs = EMUDAT; is valid
     .dw 0x3DC7 ;
-.endif
+#endif
     .dw 0x3DC9 ;
     .dw 0x3DCA ;
     .dw 0x3DCB ;
     .dw 0x3DCC ;
     .dw 0x3DCD ;
     .dw 0x3DCE ;
-.ifndef BFIN_HW
-	// XXX: hardware doesnt trigger illegal exception ?
+#if 0
+	// loopregs = EMUDAT; is valid
     .dw 0x3DCF ;
-.endif
+#endif
     .dw 0x3DD1 ;
     .dw 0x3DD2 ;
     .dw 0x3DD3 ;
     .dw 0x3DD4 ;
     .dw 0x3DD5 ;
     .dw 0x3DD6 ;
-.ifndef BFIN_HW
-	// XXX: hardware doesnt trigger illegal exception ?
+#if 0
+	// loopregs = EMUDAT; is valid
     .dw 0x3DD7 ;
-.endif
+#endif
     .dw 0x3DD9 ;
     .dw 0x3DDA ;
     .dw 0x3DDB ;
     .dw 0x3DDC ;
     .dw 0x3DDD ;
     .dw 0x3DDE ;
-.ifndef BFIN_HW
-	// XXX: hardware doesnt trigger illegal exception ?
+#if 0
+	// loopregs = EMUDAT; is valid
     .dw 0x3DDF ;
-.endif
+#endif
     .dw 0x3DE1 ;
     .dw 0x3DE2 ;
     .dw 0x3DE3 ;
     .dw 0x3DE4 ;
     .dw 0x3DE5 ;
     .dw 0x3DE6 ;
-.ifndef BFIN_HW
-	// XXX: hardware doesnt trigger illegal exception ?
+#if 0
+	// loopregs = EMUDAT; is valid
     .dw 0x3DE7 ;
-.endif
+#endif
     .dw 0x3DE9 ;
     .dw 0x3DEA ;
     .dw 0x3DEB ;
     .dw 0x3DEC ;
     .dw 0x3DED ;
     .dw 0x3DEE ;
-.ifndef BFIN_HW
-	// XXX: hardware doesnt trigger illegal exception ?
+#if 0
+	// loopregs = EMUDAT; is valid
     .dw 0x3DEF ;
-.endif
+#endif
     .dw 0x3DF1 ;
     .dw 0x3DF2 ;
     .dw 0x3DF3 ;
     .dw 0x3DF4 ;
     .dw 0x3DF5 ;
     .dw 0x3DF6 ;
-.ifndef BFIN_HW
-	// XXX: hardware doesnt trigger illegal exception ?
+#if 0
+	// cycles = EMUDAT; is valid
     .dw 0x3DF7 ;
-.endif
+#endif
     .dw 0x3DF9 ;
     .dw 0x3DFA ;
     .dw 0x3DFB ;
     .dw 0x3DFC ;
     .dw 0x3DFD ;
     .dw 0x3DFE ;
-.ifndef BFIN_HW
-	// XXX: hardware doesnt trigger illegal exception ?
+#if 0
+	// cycles = EMUDAT; is valid
     .dw 0x3DFF ;
-.endif
+#endif
     .dw 0x3F88 ;
     .dw 0x3F89 ;
     .dw 0x3F8A ;
@@ -1971,84 +1984,89 @@ BEGIN:
     .dw 0x3FB5 ;
     .dw 0x3FB6 ;
     .dw 0x3FB7 ;
-.ifndef BFIN_HW
-	// XXX: hardware doesnt trigger illegal exception ?
+#if 0
+	// EMUDAT = loopregs; is valid
     .dw 0x3FB8 ;
     .dw 0x3FB9 ;
     .dw 0x3FBA ;
     .dw 0x3FBB ;
     .dw 0x3FBC ;
     .dw 0x3FBD ;
+	// EMUDAT = cycles; is valid
     .dw 0x3FBE ;
     .dw 0x3FBF ;
-.endif
+#endif
     .dw 0x3FC9 ;
     .dw 0x3FCA ;
     .dw 0x3FCB ;
     .dw 0x3FCC ;
     .dw 0x3FCD ;
     .dw 0x3FCE ;
-.ifndef BFIN_HW
-	// XXX: hardware doesnt trigger illegal exception ?
+#if 0
+	// SEQSTAT = EMUDAT; is valid
     .dw 0x3FCF ;
-.endif
+#endif
     .dw 0x3FD1 ;
     .dw 0x3FD2 ;
     .dw 0x3FD3 ;
     .dw 0x3FD4 ;
     .dw 0x3FD5 ;
     .dw 0x3FD6 ;
-.ifndef BFIN_HW
-	// XXX: hardware doesnt trigger illegal exception ?
+#if 0
+	// SYSCFG = EMUDAT; is valid
     .dw 0x3FD7 ;
-.endif
+#endif
     .dw 0x3FD9 ;
     .dw 0x3FDA ;
     .dw 0x3FDB ;
     .dw 0x3FDC ;
     .dw 0x3FDD ;
     .dw 0x3FDE ;
-.ifndef BFIN_HW
-	// XXX: hardware doesnt trigger illegal exception ?
+#if 0
+	// RET[IXNE] = EMUDAT; is valid
     .dw 0x3FDF ;
-.endif
+#endif
     .dw 0x3FE1 ;
     .dw 0x3FE2 ;
     .dw 0x3FE3 ;
     .dw 0x3FE4 ;
     .dw 0x3FE5 ;
     .dw 0x3FE6 ;
-.ifndef BFIN_HW
-	// XXX: hardware doesnt trigger illegal exception ?
+#if 0
+	// RET[IXNE] = EMUDAT; is valid
     .dw 0x3FE7 ;
-.endif
+#endif
     .dw 0x3FE9 ;
     .dw 0x3FEA ;
     .dw 0x3FEB ;
     .dw 0x3FEC ;
     .dw 0x3FED ;
     .dw 0x3FEE ;
-.ifndef BFIN_HW
-	// XXX: hardware doesnt trigger illegal exception ?
+#if 0
+	// RET[IXNE] = EMUDAT; is valid
     .dw 0x3FEF ;
-.endif
+#endif
     .dw 0x3FF1 ;
     .dw 0x3FF2 ;
     .dw 0x3FF3 ;
     .dw 0x3FF4 ;
     .dw 0x3FF5 ;
     .dw 0x3FF6 ;
-.ifndef BFIN_HW
-	// XXX: hardware doesnt trigger illegal exception ?
+#if 0
+	// RET[IXNE] = EMUDAT; is valid
     .dw 0x3FF7 ;
+	// EMUDAT = SEQSTAT; is valid
     .dw 0x3FF9 ;
+	// EMUDAT = SYSCFG; is valid
     .dw 0x3FFA ;
+	// EMDUAT = RET[IXNE]; is valid
     .dw 0x3FFB ;
     .dw 0x3FFC ;
     .dw 0x3FFD ;
     .dw 0x3FFE ;
+	// EMUDAT = EMUDAT; is valid
     .dw 0x3FFF ;
-.endif
+#endif
     .dw 0x39B0 ;
     .dw 0x39B1 ;
     .dw 0x39B2 ;
@@ -2071,20 +2089,20 @@ BEGIN:
     .dw 0x39F4 ;
     .dw 0x39F5 ;
     .dw 0x39F6 ;
-.ifndef BFIN_HW
-	// XXX: hardware doesnt trigger illegal exception ?
+#if 0
+	// ASTAT = EMUDAT; is valid
     .dw 0x39F7 ;
-.endif
+#endif
     .dw 0x39F9 ;
     .dw 0x39FA ;
     .dw 0x39FB ;
     .dw 0x39FC ;
     .dw 0x39FD ;
     .dw 0x39FE ;
-.ifndef BFIN_HW
-	// XXX: hardware doesnt trigger illegal exception ?
+#if 0
+	// RETS = EMUDAT; is valid
     .dw 0x39FF ;
-.endif
+#endif
     .dw 0x3D06 ;
     .dw 0x3D07 ;
     .dw 0x3D0E ;
@@ -2113,11 +2131,12 @@ BEGIN:
     .dw 0x3F2F ;
     .dw 0x3F36 ;
     .dw 0x3F37 ;
-.ifndef BFIN_HW
-	// XXX: hardware doesnt trigger illegal exception ?
+#if 0
+	// EMUDAT = ASTAT; is valid
     .dw 0x3F3E ;
+	// EMUDAT = RETS; is valid
     .dw 0x3F3F ;
-.endif
+#endif
     .dw 0x3936 ;
     .dw 0x3937 ;
     .dw 0x393E ;
@@ -2298,17 +2317,18 @@ BEGIN:
     .dw 0x3EB5 ;
     .dw 0x3EB6 ;
     .dw 0x3EB7 ;
-.ifndef BFIN_HW
-	// XXX: hardware doesnt trigger illegal exception ?
+#if 0
+	// EMUDAT = Ireg; is valid
     .dw 0x3EB8 ;
     .dw 0x3EB9 ;
     .dw 0x3EBA ;
     .dw 0x3EBB ;
+	// EMUDAT = Mreg; is valid
     .dw 0x3EBC ;
     .dw 0x3EBD ;
     .dw 0x3EBE ;
     .dw 0x3EBF ;
-.endif
+#endif
     .dw 0x3EC8 ;
     .dw 0x3EC9 ;
     .dw 0x3ECA ;
@@ -2357,17 +2377,18 @@ BEGIN:
     .dw 0x3EF5 ;
     .dw 0x3EF6 ;
     .dw 0x3EF7 ;
-.ifndef BFIN_HW
-	// XXX: hardware doesnt trigger illegal exception ?
+#if 0
+	// EMUDAT = Breg; is valid
     .dw 0x3EF8 ;
     .dw 0x3EF9 ;
     .dw 0x3EFA ;
     .dw 0x3EFB ;
+	// EMUDAT = Lreg; is valid
     .dw 0x3EFC ;
     .dw 0x3EFD ;
     .dw 0x3EFE ;
     .dw 0x3EFF ;
-.endif
+#endif
     .dw 0x38B0 ;
     .dw 0x38B1 ;
     .dw 0x38B2 ;
@@ -2400,7 +2421,7 @@ BEGIN:
     .dw 0x38FD ;
     .dw 0x38FE ;
     .dw 0x38FF ;
-#if 1
+#if 0
 	// Preg = sysreg; is valid
     .dw 0x3380 ;
     .dw 0x3381 ;
@@ -2609,80 +2630,80 @@ BEGIN:
     .dw 0x35C4 ;
     .dw 0x35C5 ;
     .dw 0x35C6 ;
-.ifndef BFIN_HW
-	// XXX: hardware doesnt trigger illegal exception ?
+#if 0
+	// Ireg = EMUDAT; is valid
     .dw 0x35C7 ;
-.endif
+#endif
     .dw 0x35C9 ;
     .dw 0x35CA ;
     .dw 0x35CB ;
     .dw 0x35CC ;
     .dw 0x35CD ;
     .dw 0x35CE ;
-.ifndef BFIN_HW
-	// XXX: hardware doesnt trigger illegal exception ?
+#if 0
+	// Ireg = EMUDAT; is valid
     .dw 0x35CF ;
-.endif
+#endif
     .dw 0x35D1 ;
     .dw 0x35D2 ;
     .dw 0x35D3 ;
     .dw 0x35D4 ;
     .dw 0x35D5 ;
     .dw 0x35D6 ;
-.ifndef BFIN_HW
-	// XXX: hardware doesnt trigger illegal exception ?
+#if 0
+	// Ireg = EMUDAT; is valid
     .dw 0x35D7 ;
-.endif
+#endif
     .dw 0x35D9 ;
     .dw 0x35DA ;
     .dw 0x35DB ;
     .dw 0x35DC ;
     .dw 0x35DD ;
     .dw 0x35DE ;
-.ifndef BFIN_HW
-	// XXX: hardware doesnt trigger illegal exception ?
+#if 0
+	// Ireg = EMUDAT; is valid
     .dw 0x35DF ;
-.endif
+#endif
     .dw 0x35E1 ;
     .dw 0x35E2 ;
     .dw 0x35E3 ;
     .dw 0x35E4 ;
     .dw 0x35E5 ;
     .dw 0x35E6 ;
-.ifndef BFIN_HW
-	// XXX: hardware doesnt trigger illegal exception ?
+#if 0
+	// Mreg = EMUDAT; is valid
     .dw 0x35E7 ;
-.endif
+#endif
     .dw 0x35E9 ;
     .dw 0x35EA ;
     .dw 0x35EB ;
     .dw 0x35EC ;
     .dw 0x35ED ;
     .dw 0x35EE ;
-.ifndef BFIN_HW
-	// XXX: hardware doesnt trigger illegal exception ?
+#if 0
+	// Mreg = EMUDAT; is valid
     .dw 0x35EF ;
-.endif
+#endif
     .dw 0x35F1 ;
     .dw 0x35F2 ;
     .dw 0x35F3 ;
     .dw 0x35F4 ;
     .dw 0x35F5 ;
     .dw 0x35F6 ;
-.ifndef BFIN_HW
-	// XXX: hardware doesnt trigger illegal exception ?
+#if 0
+	// Mreg = EMUDAT; is valid
     .dw 0x35F7 ;
-.endif
+#endif
     .dw 0x35F9 ;
     .dw 0x35FA ;
     .dw 0x35FB ;
     .dw 0x35FC ;
     .dw 0x35FD ;
     .dw 0x35FE ;
-.ifndef BFIN_HW
-	// XXX: hardware doesnt trigger illegal exception ?
+#if 0
+	// Mreg = EMUDAT; is valid
     .dw 0x35FF ;
-.endif
+#endif
     .dw 0x3780 ;
     .dw 0x3781 ;
     .dw 0x3782 ;
@@ -2753,80 +2774,80 @@ BEGIN:
     .dw 0x37C4 ;
     .dw 0x37C5 ;
     .dw 0x37C6 ;
-.ifndef BFIN_HW
-	// XXX: hardware doesnt trigger illegal exception ?
+#if 0
+	// EMUDAT = Breg; is valid
     .dw 0x37C7 ;
-.endif
+#endif
     .dw 0x37C9 ;
     .dw 0x37CA ;
     .dw 0x37CB ;
     .dw 0x37CC ;
     .dw 0x37CD ;
     .dw 0x37CE ;
-.ifndef BFIN_HW
-	// XXX: hardware doesnt trigger illegal exception ?
+#if 0
+	// EMUDAT = Breg; is valid
     .dw 0x37CF ;
-.endif
+#endif
     .dw 0x37D1 ;
     .dw 0x37D2 ;
     .dw 0x37D3 ;
     .dw 0x37D4 ;
     .dw 0x37D5 ;
     .dw 0x37D6 ;
-.ifndef BFIN_HW
-	// XXX: hardware doesnt trigger illegal exception ?
+#if 0
+	// EMUDAT = Breg; is valid
     .dw 0x37D7 ;
-.endif
+#endif
     .dw 0x37D9 ;
     .dw 0x37DA ;
     .dw 0x37DB ;
     .dw 0x37DC ;
     .dw 0x37DD ;
     .dw 0x37DE ;
-.ifndef BFIN_HW
-	// XXX: hardware doesnt trigger illegal exception ?
+#if 0
+	// EMUDAT = Breg; is valid
     .dw 0x37DF ;
-.endif
+#endif
     .dw 0x37E1 ;
     .dw 0x37E2 ;
     .dw 0x37E3 ;
     .dw 0x37E4 ;
     .dw 0x37E5 ;
     .dw 0x37E6 ;
-.ifndef BFIN_HW
-	// XXX: hardware doesnt trigger illegal exception ?
+#if 0
+	// EMUDAT = Lreg; is valid
     .dw 0x37E7 ;
-.endif
+#endif
     .dw 0x37E9 ;
     .dw 0x37EA ;
     .dw 0x37EB ;
     .dw 0x37EC ;
     .dw 0x37ED ;
     .dw 0x37EE ;
-.ifndef BFIN_HW
-	// XXX: hardware doesnt trigger illegal exception ?
+#if 0
+	// EMUDAT = Lreg; is valid
     .dw 0x37EF ;
-.endif
+#endif
     .dw 0x37F1 ;
     .dw 0x37F2 ;
     .dw 0x37F3 ;
     .dw 0x37F4 ;
     .dw 0x37F5 ;
     .dw 0x37F6 ;
-.ifndef BFIN_HW
-	// XXX: hardware doesnt trigger illegal exception ?
+#if 0
+	// EMUDAT = Lreg; is valid
     .dw 0x37F7 ;
-.endif
+#endif
     .dw 0x37F9 ;
     .dw 0x37FA ;
     .dw 0x37FB ;
     .dw 0x37FC ;
     .dw 0x37FD ;
     .dw 0x37FE ;
-.ifndef BFIN_HW
-	// XXX: hardware doesnt trigger illegal exception ?
+#if 0
+	// EMUDAT = Lreg; is valid
     .dw 0x37FF ;
-.endif
+#endif
     .dw 0x3506 ;
     .dw 0x3507 ;
     .dw 0x350E ;
@@ -3012,7 +3033,7 @@ BEGIN:
 CHECK_INIT_DEF(p0);  //CHECK_INIT(p0, 0xFF7FFFFC);
                     // Xhandler counts all EXCAUSE = 0x21;
 .ifndef BFIN_HW
-CHECKREG(r5, 2651 - 371); // count of all 16 bit UI's.
+CHECKREG(r5, 2651 - 507); // count of all 16 bit UI's.
 .else
 CHECKREG(r5, 2651 - 524); // count of all 16 bit UI's.
 .endif
@@ -3052,6 +3073,10 @@ dbg_fail;
 
 UNDEFINEDINSTRUCTION:
     R7 = RETX;      // Fix up return address
+
+    r4 += 2;
+    CC = r4 == r7;
+    if !CC jump fail;
 
     R7 += 2;        // skip offending 16 bit instruction
 
