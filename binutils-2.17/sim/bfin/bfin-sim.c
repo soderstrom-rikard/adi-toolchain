@@ -1673,6 +1673,7 @@ decode_ProgCtrl_0 (SIM_CPU *cpu, bu16 iw0, bu32 pc)
     {
       bu32 newpc = RETSREG;
       TRACE_INSN (cpu, "RTS;");
+      IFETCH_CHECK (newpc);
       if (INSN_LEN == 8)
 	illegal_instruction_combination (cpu);
       TRACE_BRANCH (cpu, pc, newpc, -1, "RTS");
@@ -1682,7 +1683,9 @@ decode_ProgCtrl_0 (SIM_CPU *cpu, bu16 iw0, bu32 pc)
     }
   else if (prgfunc == 1 && poprnd == 1)
     {
+      bu32 newpc = RETIREG;
       TRACE_INSN (cpu, "RTI;");
+//      IFETCH_CHECK (newpc);
       if (INSN_LEN == 8)
 	illegal_instruction_combination (cpu);
       cec_return (cpu, -1);
@@ -1690,7 +1693,10 @@ decode_ProgCtrl_0 (SIM_CPU *cpu, bu16 iw0, bu32 pc)
     }
   else if (prgfunc == 1 && poprnd == 2)
     {
+      bu32 newpc = RETXREG;
       TRACE_INSN (cpu, "RTX;");
+      /* XXX: Not sure if this is what the hardware does.  */
+      IFETCH_CHECK (newpc);
       if (INSN_LEN == 8)
 	illegal_instruction_combination (cpu);
       cec_return (cpu, IVG_EVX);
@@ -1698,7 +1704,10 @@ decode_ProgCtrl_0 (SIM_CPU *cpu, bu16 iw0, bu32 pc)
     }
   else if (prgfunc == 1 && poprnd == 3)
     {
+      bu32 newpc = RETNREG;
       TRACE_INSN (cpu, "RTN;");
+      /* XXX: Not sure if this is what the hardware does.  */
+      IFETCH_CHECK (newpc);
       if (INSN_LEN == 8)
 	illegal_instruction_combination (cpu);
       cec_return (cpu, IVG_NMI);
@@ -1774,6 +1783,7 @@ decode_ProgCtrl_0 (SIM_CPU *cpu, bu16 iw0, bu32 pc)
     {
       bu32 newpc = PREG (poprnd);
       TRACE_INSN (cpu, "JUMP (P%i);", poprnd);
+      IFETCH_CHECK (newpc);
       if (INSN_LEN == 8)
 	illegal_instruction_combination (cpu);
       TRACE_BRANCH (cpu, pc, newpc, -1, "JUMP (Preg)");
@@ -1786,6 +1796,7 @@ decode_ProgCtrl_0 (SIM_CPU *cpu, bu16 iw0, bu32 pc)
     {
       bu32 newpc = PREG (poprnd);
       TRACE_INSN (cpu, "CALL (P%i);", poprnd);
+      IFETCH_CHECK (newpc);
       if (INSN_LEN == 8)
 	illegal_instruction_combination (cpu);
       TRACE_BRANCH (cpu, pc, newpc, -1, "CALL (Preg)");
@@ -1801,6 +1812,7 @@ decode_ProgCtrl_0 (SIM_CPU *cpu, bu16 iw0, bu32 pc)
     {
       bu32 newpc = pc + PREG (poprnd);
       TRACE_INSN (cpu, "CALL (PC + P%i);", poprnd);
+      IFETCH_CHECK (newpc);
       if (INSN_LEN == 8)
 	illegal_instruction_combination (cpu);
       TRACE_BRANCH (cpu, pc, newpc, -1, "CALL (PC + Preg)");
@@ -1814,6 +1826,7 @@ decode_ProgCtrl_0 (SIM_CPU *cpu, bu16 iw0, bu32 pc)
     {
       bu32 newpc = pc + PREG (poprnd);
       TRACE_INSN (cpu, "JUMP (PC + P%i);", poprnd);
+      IFETCH_CHECK (newpc);
       if (INSN_LEN == 8)
 	illegal_instruction_combination (cpu);
       TRACE_BRANCH (cpu, pc, newpc, -1, "JUMP (PC + Preg)");
@@ -1887,10 +1900,21 @@ decode_CaCTRL_0 (SIM_CPU *cpu, bu16 iw0)
      to check behavior of the post increment.  Should we be aligning
      the value to the cache line before adding the cache line size, or
      do we just add the cache line size ?  */
-  if (a == 0 && op == 0)
-    {
-      /* implicit read which may trigger CPLB miss.  */
-      GET_BYTE (preg);
+  if (op == 0)
+    {	/* PREFETCH */
+      mmu_check_cache_addr (cpu, preg, false, false);
+    }
+  else if (op == 1)
+    {	/* FLUSHINV */
+      mmu_check_cache_addr (cpu, preg, true, false);
+    }
+  else if (op == 2)
+    {	/* FLUSH */
+      mmu_check_cache_addr (cpu, preg, true, false);
+    }
+  else if (op == 3)
+    {	/* IFLUSH */
+      mmu_check_cache_addr (cpu, preg, false, true);
     }
 
   if (a)

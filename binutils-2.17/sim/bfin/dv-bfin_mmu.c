@@ -26,7 +26,8 @@
 #include "dv-bfin_mmu.h"
 #include "dv-bfin_cec.h"
 
-/* XXX: Should this really be two blocks of registers ?  */
+/* XXX: Should this really be two blocks of registers ?  PRM describes
+        these as two Content Addressable Memory (CAM) blocks.  */
 
 struct bfin_mmu
 {
@@ -294,53 +295,66 @@ bfin_mmu_option_handler (SIM_DESC sd, sim_cpu *current_cpu, int opt,
 
 #define MMU_STATE(cpu) DV_STATE_CACHED (cpu, mmu)
 
+static void
+_mmu_log_ifault (SIM_CPU *cpu, struct bfin_mmu *mmu, bu32 pc, bool supv)
+{
+  mmu->icplb_fault_addr = pc;
+  mmu->icplb_fault_status = supv << 17;
+}
+
 void
 mmu_log_ifault (SIM_CPU *cpu)
 {
-  struct bfin_mmu *mmu = MMU_STATE (cpu);
-  mmu->icplb_fault_addr = PCREG;
-  mmu->icplb_fault_status = (cec_get_ivg (cpu) >= 0) << 17;
+  _mmu_log_ifault (cpu, MMU_STATE (cpu), PCREG, cec_get_ivg (cpu) >= 0);
+}
+
+static void
+_mmu_log_fault (SIM_CPU *cpu, struct bfin_mmu *mmu, bu32 addr, bool write,
+		bool inst, bool miss, bool supv, bool dag1, bu32 faults)
+{
+  bu32 *fault_status, *fault_addr;
+
+  /* No logging in non-OS mode.  */
+  if (!mmu)
+    return;
+
+  fault_status = inst ? &mmu->icplb_fault_status : &mmu->dcplb_fault_status;
+  fault_addr = inst ? &mmu->icplb_fault_addr : &mmu->dcplb_fault_addr;
+  /* ICPLB regs always get updated.  */
+  if (!inst)
+    _mmu_log_ifault (cpu, mmu, PCREG, supv);
+
+  *fault_addr = addr;
+  *fault_status =
+	(miss << 19) |
+	(dag1 << 18) |
+	(supv << 17) |
+	(write << 16) |
+	faults;
 }
 
 static void
 _mmu_process_fault (SIM_CPU *cpu, struct bfin_mmu *mmu, bu32 addr, bool write,
-		    bool inst, bool unaligned, bool miss)
+		    bool inst, bool unaligned, bool miss, bool supv, bool dag1)
 {
-  bool supv = cec_is_supervisor_mode (cpu);
-  bu32 *fault_status, *fault_addr;
+  int excp;
 
-  if (mmu)
-    {
-      fault_status = inst ? &mmu->icplb_fault_status : &mmu->dcplb_fault_status;
-      fault_addr = inst ? &mmu->icplb_fault_addr : &mmu->dcplb_fault_addr;
-      /* ICPLB regs always get updated.  */
-      if (!inst)
-	{
-	  mmu->icplb_fault_addr = PCREG;
-	  mmu->icplb_fault_status = supv << 17;
-	}
-
-      *fault_addr = addr;
-      *fault_status =
-	(miss << 19) |
-	((BFIN_CPU_STATE.multi_pc == PCREG + 6) << 18) |
-	(supv << 17) |
-	(write << 16);
-    }
-
-  /* XXX: correct precedence order ?  Multiple exceptions ?  */
-  if (addr >= BFIN_SYSTEM_MMR_BASE)
-    cec_exception (cpu, VEC_ILL_RES);
-  else if (unaligned)
-    cec_exception (cpu, inst ? VEC_MISALI_I : VEC_MISALI_D);
+  /* See order in mmu_check_addr() */
+  if (unaligned)
+    excp = inst ? VEC_MISALI_I : VEC_MISALI_D;
+  else if (addr >= BFIN_SYSTEM_MMR_BASE)
+    excp = VEC_ILL_RES;
+  else if (!mmu)
+    excp = inst ? VEC_CPLB_I_M : VEC_CPLB_M;
   else
     {
-      if (mmu)
-	/* XXX: When exactly does hardware do exception vs IVHW ?  */
-	cec_hwerr (cpu, HWERR_EXTERN_ADDR);
-      else
-	cec_exception (cpu, inst ? VEC_CPLB_I_M : VEC_CPLB_M);
+      /* Misses are hardware errors.  */
+      cec_hwerr (cpu, HWERR_EXTERN_ADDR);
+      return;
     }
+
+  _mmu_log_fault (cpu, mmu, addr, write, inst, miss, supv, dag1, 0);
+  cec_exception (cpu, excp);
 }
 
 void
@@ -355,11 +369,65 @@ mmu_process_fault (SIM_CPU *cpu, bu32 addr, bool write, bool inst,
   else
     mmu = MMU_STATE (cpu);
 
-  _mmu_process_fault (cpu, mmu, addr, write, inst, unaligned, miss);
+  _mmu_process_fault (cpu, mmu, addr, write, inst, unaligned, miss,
+		      cec_is_supervisor_mode (cpu),
+		      BFIN_CPU_STATE.multi_pc == PCREG + 6);
 }
 
-void
-mmu_check_addr (SIM_CPU *cpu, bu32 addr, bool write, bool inst, int size)
+/* Return values:
+    -2: no known problems
+    -1: valid
+     0: miss
+     1: protection violation
+     2: multiple hits
+     3: unaligned
+     4: miss; hwerr  */
+static int
+mmu_check_implicit_addr (SIM_CPU *cpu, bu32 addr, bool inst, int size,
+			 bool supv, bool dag1)
+{
+  bool l1 = ((addr & 0xFF000000) == 0xFF000000);
+  bu32 amask = (addr & 0xFFF00000);
+
+  if (addr & (size - 1))
+    return 3;
+
+  /* MMRs may never be executable or accessed from usermode.  */
+  if (addr >= BFIN_SYSTEM_MMR_BASE)
+    {
+      if (inst)
+	return 0;
+      else if (!supv || dag1)
+	return 1;
+      else
+	return -1;
+    }
+  else if (inst)
+    {
+      /* Some regions are not executable.  */
+      /* XXX: Should this be in the model data ?  Core B 561 ?  */
+      if (l1)
+	return (amask == 0xFFA00000) ? -1 : 1;
+    }
+  else
+    {
+      /* Some regions are not readable.  */
+      /* XXX: Should this be in the model data ?  Core B 561 ?  */
+      if (l1)
+	return (amask != 0xFFA00000) ? -1 : 4;
+    }
+
+  return -2;
+}
+
+/* Exception order per the PRM (first has highest):
+     Inst Multiple CPLB Hits
+     Inst Misaligned Access
+     Inst Protection Violation
+     Inst CPLB Miss
+  Only the alignment matters in non-OS mode though.  */
+static int
+_mmu_check_addr (SIM_CPU *cpu, bu32 addr, bool write, bool inst, int size)
 {
   SIM_DESC sd = CPU_STATE (cpu);
   struct bfin_mmu *mmu;
@@ -368,61 +436,37 @@ mmu_check_addr (SIM_CPU *cpu, bu32 addr, bool write, bool inst, int size)
   bool supv, do_excp, dag1;
   int i, hits;
 
-  if (STATE_ENVIRONMENT (sd) == OPERATING_ENVIRONMENT)
-    mmu = MMU_STATE (cpu);
-  else
-    mmu = NULL;
+  supv = cec_is_supervisor_mode (cpu);
+  dag1 = (BFIN_CPU_STATE.multi_pc == PCREG + 6);
 
-  if (addr & (size - 1))
-    _mmu_process_fault (cpu, mmu, addr, write, inst, true, false);
+  if (STATE_ENVIRONMENT (sd) != OPERATING_ENVIRONMENT || bfin_mmu_skip_cplbs)
+    {
+      int ret = mmu_check_implicit_addr (cpu, addr, inst, size, supv, dag1);
+      /* Valid hits and misses are OK in non-OS envs.  */
+      if (ret < 0)
+	return 0;
+      _mmu_process_fault (cpu, NULL, addr, write, inst, (ret == 3), false, supv, dag1);
+    }
 
-  if (mmu == NULL || bfin_mmu_skip_cplbs)
-    return;
-
+  mmu = MMU_STATE (cpu);
   fault_status = inst ? &mmu->icplb_fault_status : &mmu->dcplb_fault_status;
   fault_addr = inst ? &mmu->icplb_fault_addr : &mmu->dcplb_fault_addr;
   mem_control = inst ? &mmu->imem_control : &mmu->dmem_control;
   cplb_addr = inst ? &mmu->icplb_addr[0] : &mmu->dcplb_addr[0];
   cplb_data = inst ? &mmu->icplb_data[0] : &mmu->dcplb_data[0];
-  supv = cec_is_supervisor_mode (cpu);
-  dag1 = (BFIN_CPU_STATE.multi_pc == PCREG + 6);
 
   faults = 0;
   hits = 0;
   do_excp = false;
 
-  /* DAG1 can never access MMRs.  */
-  if (dag1)
-    {
-      /* XXX: Some old tests say DAG1 can't hit scratchpad ...
-              Need to verify hardware behavior.  */
-      if (addr >= BFIN_SYSTEM_MMR_BASE)
-	{
-	  hits = 1;
-	  goto process_excp;
-	}
-    }
-
-  /* Some things are never executable.  */
-  if (inst)
-    {
-      if (addr >= BFIN_SYSTEM_MMR_BASE)
-	goto process_excp;
-    }
-
   /* CPLBs disabled -> little to do.  */
   if (!(*mem_control & ENCPLB))
     {
-      /* User mode cannot access MMRs.  */
-      if (addr >= BFIN_SYSTEM_MMR_BASE && !supv)
-	{
-	  hits = 1;
-	  goto process_excp;
-	}
-
-      return;
+      hits = 1;
+      goto implicit_check;
     }
 
+  /* Check all the CPLBs first.  */
   for (i = 0; i < 16; ++i)
     {
       const bu32 pages[4] = { 0x400, 0x1000, 0x100000, 0x400000 };
@@ -457,52 +501,74 @@ mmu_check_addr (SIM_CPU *cpu, bu32 addr, bool write, bool inst, int size)
     }
 
   /* Handle default/implicit CPLBs.  */
-  if (hits == 0)
+  if (!do_excp && hits < 2)
     {
-      if (addr >= BFIN_SYSTEM_MMR_BASE)
+      int ihits;
+ implicit_check:
+      ihits = mmu_check_implicit_addr (cpu, addr, inst, size, supv, dag1);
+      switch (ihits)
 	{
-	  if (supv)
-	    return;
-	  hits = 1;
-	  do_excp = true;
-	}
-      else if (addr >= BFIN_L1_SRAM_SCRATCH && addr < BFIN_L1_SRAM_SCRATCH_END)
-	{
-	  if (!inst)
-	    return;
+	/* No faults and one match -> good to go.  */
+	case -1: return 0;
+	case -2:
+	  if (hits == 1)
+	    return 0;
+	  break;
+	case 4:
+	  cec_hwerr (cpu, HWERR_EXTERN_ADDR);
+	  return 0;
+	default:
+	  hits = ihits;
 	}
     }
+  else
+    /* Normalize hit count so hits==2 is always multiple hit exception.  */
+    hits = MIN (2, hits);
 
-  /* No faults and one match -> good to go.  */
-  if (!do_excp && hits == 1)
+  _mmu_log_fault (cpu, mmu, addr, write, inst, hits == 0, supv, dag1, faults);
+
+  if (inst)
+    {
+      int iexcps[] = { VEC_CPLB_I_M, VEC_CPLB_I_VL, VEC_CPLB_I_MHIT, VEC_MISALI_I };
+      return iexcps[hits];
+    }
+  else
+    {
+      int dexcps[] = { VEC_CPLB_M, VEC_CPLB_VL, VEC_CPLB_MHIT, VEC_MISALI_D };
+      return dexcps[hits];
+    }
+}
+
+void
+mmu_check_addr (SIM_CPU *cpu, bu32 addr, bool write, bool inst, int size)
+{
+  int excp = _mmu_check_addr (cpu, addr, write, inst, size);
+  if (excp)
+    cec_exception (cpu, excp);
+}
+
+void
+mmu_check_cache_addr (SIM_CPU *cpu, bu32 addr, bool write, bool inst)
+{
+  bu32 cacheaddr;
+  int excp;
+
+  cacheaddr = addr & ~(BFIN_L1_CACHE_BYTES - 1);
+  excp = _mmu_check_addr (cpu, cacheaddr, write, inst, BFIN_L1_CACHE_BYTES);
+  if (excp == 0)
     return;
 
- process_excp:
-  /* ICPLB regs always get updated.  */
-  if (!inst)
+  /* Most exceptions are ignored with cache funcs.  */
+  /* XXX: Not sure if we should be ignoring CPLB misses.  */
+  if (inst)
     {
-      mmu->icplb_fault_addr = PCREG;
-      mmu->icplb_fault_status = supv << 17;
+      if (excp == VEC_CPLB_I_VL)
+	return;
     }
-
-  *fault_status =
-	(!hits << 19) |
-	(dag1 << 18) |
-	(supv << 17) |
-	(write << 16) |
-	faults;
-  *fault_addr = addr;
-
-  switch (hits)
+  else
     {
-    case 0:
-      cec_exception (cpu, inst ? VEC_CPLB_I_M : VEC_CPLB_M);
-      break;
-    case 1:
-      cec_exception (cpu, inst ? VEC_CPLB_I_VL : VEC_CPLB_VL);
-      break;
-    default:
-      cec_exception (cpu, inst ? VEC_CPLB_I_MHIT : VEC_CPLB_MHIT);
-      break;
+      if (excp == VEC_CPLB_VL)
+	return;
     }
+  cec_exception (cpu, excp);
 }

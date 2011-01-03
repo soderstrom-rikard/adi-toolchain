@@ -327,6 +327,7 @@ do { \
 #define GET_LONG(taddr) _GET_MEM(taddr, 32)
 
 #define IFETCH(taddr) __GET_MEM(taddr, 16, true, exec_map)
+#define IFETCH_CHECK(taddr) mmu_check_addr (cpu, taddr, false, true, 2)
 
 extern void bfin_syscall (SIM_CPU *);
 extern bu32 interp_insn_bfin (SIM_CPU *, bu32);
