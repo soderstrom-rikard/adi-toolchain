@@ -50,7 +50,7 @@
 			    ((x) == M_ISS2) || \
 			    ((x) == M_IU))
 
-#define is_macmod_hmove(x) (((x) == 0) ||\
+#define is_macmod_hmove(x) (((x) == 0) || \
 			    ((x) == M_IS) || \
 			    ((x) == M_FU) || \
 			    ((x) == M_IU) || \
@@ -60,8 +60,7 @@
 			    ((x) == M_ISS2) || \
 			    ((x) == M_IH))
 
-
-#define HOST_LONG_WORD_SIZE (sizeof(long)*8)
+#define HOST_LONG_WORD_SIZE (sizeof(long) * 8)
 
 #define SIGNEXTEND(v, n) (((bs32)(v) << (HOST_LONG_WORD_SIZE - (n))) >> (HOST_LONG_WORD_SIZE - (n)))
 
@@ -713,7 +712,7 @@ lshift (SIM_CPU *cpu, bu64 val, int cnt, int size, bool saturate)
 {
   int i, j, real_cnt = cnt > size ? size : cnt;
   bu64 sgn = ~((val >> (size - 1)) - 1);
-  int mask_cnt = size - 1; // - real_cnt
+  int mask_cnt = size - 1;
   bu64 masked, new_val = val, tmp;
   bu64 mask = ~0;
 
@@ -1685,7 +1684,7 @@ decode_ProgCtrl_0 (SIM_CPU *cpu, bu16 iw0, bu32 pc)
     {
       bu32 newpc = RETIREG;
       TRACE_INSN (cpu, "RTI;");
-//      IFETCH_CHECK (newpc);
+      /* Do not do IFETCH_CHECK here -- LSB has special meaning.  */
       if (INSN_LEN == 8)
 	illegal_instruction_combination (cpu);
       cec_return (cpu, -1);
