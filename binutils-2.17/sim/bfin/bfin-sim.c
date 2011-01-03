@@ -1660,8 +1660,8 @@ decode_ProgCtrl_0 (SIM_CPU *cpu, bu16 iw0, bu32 pc)
      +---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
      | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 |.prgfunc.......|.poprnd........|
      +---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+  */
-  int poprnd = ((iw0 >> 0) & 0xf);
-  int prgfunc = ((iw0 >> 4) & 0xf);
+  int poprnd  = ((iw0 >> ProgCtrl_poprnd_bits) & ProgCtrl_poprnd_mask);
+  int prgfunc = ((iw0 >> ProgCtrl_prgfunc_bits) & ProgCtrl_prgfunc_mask);
 
   PROFILE_COUNT_INSN (cpu, pc, BFIN_INSN_ProgCtrl);
   TRACE_EXTRACT (cpu, "%s: poprnd:%i prgfunc:%i", __func__, poprnd, prgfunc);
@@ -1682,7 +1682,6 @@ decode_ProgCtrl_0 (SIM_CPU *cpu, bu16 iw0, bu32 pc)
     }
   else if (prgfunc == 1 && poprnd == 1)
     {
-      bu32 newpc = RETIREG;
       TRACE_INSN (cpu, "RTI;");
       /* Do not do IFETCH_CHECK here -- LSB has special meaning.  */
       if (INSN_LEN == 8)
@@ -1880,9 +1879,9 @@ decode_CaCTRL_0 (SIM_CPU *cpu, bu16 iw0)
      +---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
      | 0 | 0 | 0 | 0 | 0 | 0 | 1 | 0 | 0 | 1 |.a.|.op....|.reg.......|
      +---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+  */
-  int a = ((iw0 >> 5) & 0x1);
-  int reg = ((iw0 >> 0) & 0x7);
-  int op = ((iw0 >> 3) & 0x3);
+  int a   = ((iw0 >> CaCTRL_a_bits) & CaCTRL_a_mask);
+  int op  = ((iw0 >> CaCTRL_op_bits) & CaCTRL_op_mask);
+  int reg = ((iw0 >> CaCTRL_reg_bits) & CaCTRL_reg_mask);
   bu32 preg = PREG (reg);
   const char * const sinsn[] = { "PREFETCH", "FLUSHINV", "FLUSH", "IFLUSH", };
 
@@ -1927,9 +1926,9 @@ decode_PushPopReg_0 (SIM_CPU *cpu, bu16 iw0)
      +---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
      | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 1 | 0 |.W.|.grp.......|.reg.......|
      +---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+  */
-  int grp = ((iw0 >> 3) & 0x7);
-  int reg = ((iw0 >> 0) & 0x7);
-  int W = ((iw0 >> 6) & 0x1);
+  int W   = ((iw0 >> PushPopReg_W_bits) & PushPopReg_W_mask);
+  int grp = ((iw0 >> PushPopReg_grp_bits) & PushPopReg_grp_mask);
+  int reg = ((iw0 >> PushPopReg_reg_bits) & PushPopReg_reg_mask);
   const char *reg_name = get_allreg_name (grp, reg);
   bu32 value;
   bu32 sp = SPREG;
@@ -1987,11 +1986,11 @@ decode_PushPopMultiple_0 (SIM_CPU *cpu, bu16 iw0)
      +---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
      | 0 | 0 | 0 | 0 | 0 | 1 | 0 |.d.|.p.|.W.|.dr........|.pr........|
      +---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+  */
-  int p = ((iw0 >> 7) & 0x1);
-  int pr = ((iw0 >> 0) & 0x7);
-  int d = ((iw0 >> 8) & 0x1);
-  int dr = ((iw0 >> 3) & 0x7);
-  int W = ((iw0 >> 6) & 0x1);
+  int p  = ((iw0 >> PushPopMultiple_p_bits) & PushPopMultiple_p_mask);
+  int d  = ((iw0 >> PushPopMultiple_d_bits) & PushPopMultiple_d_mask);
+  int W  = ((iw0 >> PushPopMultiple_W_bits) & PushPopMultiple_W_mask);
+  int dr = ((iw0 >> PushPopMultiple_dr_bits) & PushPopMultiple_dr_mask);
+  int pr = ((iw0 >> PushPopMultiple_pr_bits) & PushPopMultiple_pr_mask);
   int i;
   bu32 sp = SPREG;
 
@@ -2065,11 +2064,11 @@ decode_ccMV_0 (SIM_CPU *cpu, bu16 iw0)
      +---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
      | 0 | 0 | 0 | 0 | 0 | 1 | 1 |.T.|.d.|.s.|.dst.......|.src.......|
      +---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+  */
-  int src = ((iw0 >> 0) & 0x7);
-  int dst = ((iw0 >> 3) & 0x7);
-  int s = ((iw0 >> 6) & 0x1);
-  int d = ((iw0 >> 7) & 0x1);
-  int T = ((iw0 >> 8) & 0x1);
+  int s  = ((iw0 >> CCmv_s_bits) & CCmv_s_mask);
+  int d  = ((iw0 >> CCmv_d_bits) & CCmv_d_mask);
+  int T  = ((iw0 >> CCmv_T_bits) & CCmv_T_mask);
+  int src = ((iw0 >> CCmv_src_bits) & CCmv_src_mask);
+  int dst = ((iw0 >> CCmv_dst_bits) & CCmv_dst_mask);
   int cond = T ? CCREG : ! CCREG;
 
   PROFILE_COUNT_INSN (cpu, pc, BFIN_INSN_ccMV);
@@ -2093,11 +2092,11 @@ decode_CCflag_0 (SIM_CPU *cpu, bu16 iw0)
      +---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
      | 0 | 0 | 0 | 0 | 1 |.I.|.opc.......|.G.|.y.........|.x.........|
      +---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+  */
-  int x = ((iw0 >> 0) & 0x7);
-  int y = ((iw0 >> 3) & 0x7);
-  int I = ((iw0 >> 10) & 0x1);
-  int opc = ((iw0 >> 7) & 0x7);
-  int G = ((iw0 >> 6) & 0x1);
+  int x = ((iw0 >> CCflag_x_bits) & CCflag_x_mask);
+  int y = ((iw0 >> CCflag_y_bits) & CCflag_y_mask);
+  int I = ((iw0 >> CCflag_I_bits) & CCflag_I_mask);
+  int G = ((iw0 >> CCflag_G_bits) & CCflag_G_mask);
+  int opc = ((iw0 >> CCflag_opc_bits) & CCflag_opc_mask);
 
   PROFILE_COUNT_INSN (cpu, pc, BFIN_INSN_CCflag);
   TRACE_EXTRACT (cpu, "%s: I:%i opc:%i G:%i y:%i x:%i",
@@ -2216,8 +2215,8 @@ decode_CC2dreg_0 (SIM_CPU *cpu, bu16 iw0)
      +---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
      | 0 | 0 | 0 | 0 | 0 | 0 | 1 | 0 | 0 | 0 | 0 |.op....|.reg.......|
      +---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+  */
-  int reg = ((iw0 >> 0) & 0x7);
-  int op = ((iw0 >> 3) & 0x3);
+  int op  = ((iw0 >> CC2dreg_op_bits) & CC2dreg_op_mask);
+  int reg = ((iw0 >> CC2dreg_reg_bits) & CC2dreg_reg_mask);
 
   PROFILE_COUNT_INSN (cpu, pc, BFIN_INSN_CC2dreg);
   TRACE_EXTRACT (cpu, "%s: op:%i reg:%i", __func__, op, reg);
@@ -2254,9 +2253,9 @@ decode_CC2stat_0 (SIM_CPU *cpu, bu16 iw0)
      +---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
      | 0 | 0 | 0 | 0 | 0 | 0 | 1 | 1 |.D.|.op....|.cbit..............|
      +---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+  */
-  int cbit = ((iw0 >> 0) & 0x1f);
-  int D = ((iw0 >> 7) & 0x1);
-  int op = ((iw0 >> 5) & 0x3);
+  int D    = ((iw0 >> CC2stat_D_bits) & CC2stat_D_mask);
+  int op   = ((iw0 >> CC2stat_op_bits) & CC2stat_op_mask);
+  int cbit = ((iw0 >> CC2stat_cbit_bits) & CC2stat_cbit_mask);
   bu32 pval;
 
   const char * const op_names[] = { "", "|", "&", "^" } ;
@@ -2332,9 +2331,9 @@ decode_BRCC_0 (SIM_CPU *cpu, bu16 iw0, bu32 pc)
      +---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
      | 0 | 0 | 0 | 1 |.T.|.B.|.offset................................|
      +---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+  */
-  int B = ((iw0 >> 10) & 0x1);
-  int T = ((iw0 >> 11) & 0x1);
-  int offset = ((iw0 >> 0) & 0x3ff);
+  int B = ((iw0 >> BRCC_B_bits) & BRCC_B_mask);
+  int T = ((iw0 >> BRCC_T_bits) & BRCC_T_mask);
+  int offset = ((iw0 >> BRCC_offset_bits) & BRCC_offset_mask);
   int cond = T ? CCREG : ! CCREG;
   int pcrel = pcrel10 (offset);
 
@@ -2371,7 +2370,7 @@ decode_UJUMP_0 (SIM_CPU *cpu, bu16 iw0, bu32 pc)
      +---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
      | 0 | 0 | 1 | 0 |.offset........................................|
      +---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+  */
-  int offset = ((iw0 >> 0) & 0xfff);
+  int offset = ((iw0 >> UJump_offset_bits) & UJump_offset_mask);
   int pcrel = pcrel12 (offset);
   bu32 newpc = pc + pcrel;
 
@@ -2399,10 +2398,10 @@ decode_REGMV_0 (SIM_CPU *cpu, bu16 iw0)
      +---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
      | 0 | 0 | 1 | 1 |.gd........|.gs........|.dst.......|.src.......|
      +---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+  */
-  int src = ((iw0 >> 0) & 0x7);
-  int gs = ((iw0 >> 6) & 0x7);
-  int dst = ((iw0 >> 3) & 0x7);
-  int gd = ((iw0 >> 9) & 0x7);
+  int gs  = ((iw0 >> RegMv_gs_bits) & RegMv_gs_mask);
+  int gd  = ((iw0 >> RegMv_gd_bits) & RegMv_gd_mask);
+  int src = ((iw0 >> RegMv_src_bits) & RegMv_src_mask);
+  int dst = ((iw0 >> RegMv_dst_bits) & RegMv_dst_mask);
   const char *srcreg_name = get_allreg_name (gs, src);
   const char *dstreg_name = get_allreg_name (gd, dst);
 
@@ -2454,9 +2453,9 @@ decode_ALU2op_0 (SIM_CPU *cpu, bu16 iw0)
      +---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
      | 0 | 1 | 0 | 0 | 0 | 0 |.opc...........|.src.......|.dst.......|
      +---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+  */
-  int src = ((iw0 >> 3) & 0x7);
-  int opc = ((iw0 >> 6) & 0xf);
-  int dst = ((iw0 >> 0) & 0x7);
+  int src = ((iw0 >> ALU2op_src_bits) & ALU2op_src_mask);
+  int opc = ((iw0 >> ALU2op_opc_bits) & ALU2op_opc_mask);
+  int dst = ((iw0 >> ALU2op_dst_bits) & ALU2op_dst_mask);
 
   PROFILE_COUNT_INSN (cpu, pc, BFIN_INSN_ALU2op);
   TRACE_EXTRACT (cpu, "%s: opc:%i src:%i dst:%i", __func__, opc, src, dst);
@@ -2560,9 +2559,9 @@ decode_PTR2op_0 (SIM_CPU *cpu, bu16 iw0)
      +---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
      | 0 | 1 | 0 | 0 | 0 | 1 | 0 |.opc.......|.src.......|.dst.......|
      +---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+  */
-  int src = ((iw0 >> 3) & 0x7);
-  int opc = ((iw0 >> 6) & 0x7);
-  int dst = ((iw0 >> 0) & 0x7);
+  int src = ((iw0 >> PTR2op_src_bits) & PTR2op_dst_mask);
+  int opc = ((iw0 >> PTR2op_opc_bits) & PTR2op_opc_mask);
+  int dst = ((iw0 >> PTR2op_dst_bits) & PTR2op_dst_mask);
 
   PROFILE_COUNT_INSN (cpu, pc, BFIN_INSN_PTR2op);
   TRACE_EXTRACT (cpu, "%s: opc:%i src:%i dst:%i", __func__, opc, src, dst);
@@ -2613,9 +2612,9 @@ decode_LOGI2op_0 (SIM_CPU *cpu, bu16 iw0)
      +---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
      | 0 | 1 | 0 | 0 | 1 |.opc.......|.src...............|.dst.......|
      +---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+  */
-  int src = ((iw0 >> 3) & 0x1f);
-  int opc = ((iw0 >> 8) & 0x7);
-  int dst = ((iw0 >> 0) & 0x7);
+  int src = ((iw0 >> LOGI2op_src_bits) & LOGI2op_src_mask);
+  int opc = ((iw0 >> LOGI2op_opc_bits) & LOGI2op_opc_mask);
+  int dst = ((iw0 >> LOGI2op_dst_bits) & LOGI2op_dst_mask);
   int uimm = uimm5 (src);
   const char *uimm_str = uimm5_str (uimm);
 
@@ -2691,10 +2690,10 @@ decode_COMP3op_0 (SIM_CPU *cpu, bu16 iw0)
      +---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
      | 0 | 1 | 0 | 1 |.opc.......|.dst.......|.src1......|.src0......|
      +---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+  */
-  int src0 = ((iw0 >> 0) & 0x7);
-  int src1 = ((iw0 >> 3) & 0x7);
-  int opc = ((iw0 >> 9) & 0x7);
-  int dst = ((iw0 >> 6) & 0x7);
+  int opc  = ((iw0 >> COMP3op_opc_bits) & COMP3op_opc_mask);
+  int dst  = ((iw0 >> COMP3op_dst_bits) & COMP3op_dst_mask);
+  int src0 = ((iw0 >> COMP3op_src0_bits) & COMP3op_src0_mask);
+  int src1 = ((iw0 >> COMP3op_src1_bits) & COMP3op_src1_mask);
 
   PROFILE_COUNT_INSN (cpu, pc, BFIN_INSN_COMP3op);
   TRACE_EXTRACT (cpu, "%s: opc:%i dst:%i src1:%i src0:%i",
@@ -2753,15 +2752,15 @@ decode_COMPI2opD_0 (SIM_CPU *cpu, bu16 iw0)
 {
   /* COMPI2opD
      +---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-     | 0 | 1 | 1 | 0 | 0 |.op|.isrc......................|.dst.......|
+     | 0 | 1 | 1 | 0 | 0 |.op|..src......................|.dst.......|
      +---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+  */
-  int isrc = ((iw0 >> 3) & 0x7f);
-  int dst = ((iw0 >> 0) & 0x7);
-  int op = ((iw0 >> 10) & 0x1);
-  int imm = imm7 (isrc);
+  int op  = ((iw0 >> COMPI2opD_op_bits) & COMPI2opD_op_mask);
+  int dst = ((iw0 >> COMPI2opD_dst_bits) & COMPI2opD_dst_mask);
+  int src = ((iw0 >> COMPI2opD_src_bits) & COMPI2opD_src_mask);
+  int imm = imm7 (src);
 
   PROFILE_COUNT_INSN (cpu, pc, BFIN_INSN_COMPI2opD);
-  TRACE_EXTRACT (cpu, "%s: op:%i isrc:%i dst:%i", __func__, op, isrc, dst);
+  TRACE_EXTRACT (cpu, "%s: op:%i src:%i dst:%i", __func__, op, src, dst);
   TRACE_DECODE (cpu, "%s: imm7:%#x", __func__, imm);
 
   if (op == 0)
@@ -2783,9 +2782,9 @@ decode_COMPI2opP_0 (SIM_CPU *cpu, bu16 iw0)
      +---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
      | 0 | 1 | 1 | 0 | 1 |.op|.src.......................|.dst.......|
      +---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+  */
-  int src = ((iw0 >> 3) & 0x7f);
-  int dst = ((iw0 >> 0) & 0x7);
-  int op = ((iw0 >> 10) & 0x1);
+  int op  = ((iw0 >> COMPI2opP_op_bits) & COMPI2opP_op_mask);
+  int src = ((iw0 >> COMPI2opP_src_bits) & COMPI2opP_src_mask);
+  int dst = ((iw0 >> COMPI2opP_dst_bits) & COMPI2opP_dst_mask);
   int imm = imm7 (src);
 
   PROFILE_COUNT_INSN (cpu, pc, BFIN_INSN_COMPI2opP);
@@ -2811,11 +2810,11 @@ decode_LDSTpmod_0 (SIM_CPU *cpu, bu16 iw0)
      +---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
      | 1 | 0 | 0 | 0 |.W.|.aop...|.reg.......|.idx.......|.ptr.......|
      +---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+  */
-  int aop = ((iw0 >> 9) & 0x3);
-  int idx = ((iw0 >> 3) & 0x7);
-  int ptr = ((iw0 >> 0) & 0x7);
-  int reg = ((iw0 >> 6) & 0x7);
-  int W = ((iw0 >> 11) & 0x1);
+  int W   = ((iw0 >> LDSTpmod_W_bits) & LDSTpmod_W_mask);
+  int aop = ((iw0 >> LDSTpmod_aop_bits) & LDSTpmod_aop_mask);
+  int idx = ((iw0 >> LDSTpmod_idx_bits) & LDSTpmod_idx_mask);
+  int ptr = ((iw0 >> LDSTpmod_ptr_bits) & LDSTpmod_ptr_mask);
+  int reg = ((iw0 >> LDSTpmod_reg_bits) & LDSTpmod_reg_mask);
   bu32 addr, val;
 
   PROFILE_COUNT_INSN (cpu, pc, BFIN_INSN_LDSTpmod);
@@ -2929,10 +2928,10 @@ decode_dagMODim_0 (SIM_CPU *cpu, bu16 iw0)
      +---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
      | 1 | 0 | 0 | 1 | 1 | 1 | 1 | 0 |.br| 1 | 1 |.op|.m.....|.i.....|
      +---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+  */
-  int i = ((iw0 >> 0) & 0x3);
-  int br = ((iw0 >> 7) & 0x1);
-  int m = ((iw0 >> 2) & 0x3);
-  int op = ((iw0 >> 4) & 0x1);
+  int i  = ((iw0 >> DagMODim_i_bits) & DagMODim_i_mask);
+  int m  = ((iw0 >> DagMODim_m_bits) & DagMODim_m_mask);
+  int br = ((iw0 >> DagMODim_br_bits) & DagMODim_br_mask);
+  int op = ((iw0 >> DagMODim_op_bits) & DagMODim_op_mask);
 
   PROFILE_COUNT_INSN (cpu, pc, BFIN_INSN_dagMODim);
   TRACE_EXTRACT (cpu, "%s: br:%i op:%i m:%i i:%i", __func__, br, op, m, i);
@@ -2963,8 +2962,8 @@ decode_dagMODik_0 (SIM_CPU *cpu, bu16 iw0)
      +---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
      | 1 | 0 | 0 | 1 | 1 | 1 | 1 | 1 | 0 | 1 | 1 | 0 |.op....|.i.....|
      +---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+  */
-  int i = ((iw0 >> 0) & 0x3);
-  int op = ((iw0 >> 2) & 0x3);
+  int i  = ((iw0 >> DagMODik_i_bits) & DagMODik_i_mask);
+  int op = ((iw0 >> DagMODik_op_bits) & DagMODik_op_mask);
 
   PROFILE_COUNT_INSN (cpu, pc, BFIN_INSN_dagMODik);
   TRACE_EXTRACT (cpu, "%s: op:%i i:%i", __func__, op, i);
@@ -3000,11 +2999,11 @@ decode_dspLDST_0 (SIM_CPU *cpu, bu16 iw0)
      +---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
      | 1 | 0 | 0 | 1 | 1 | 1 |.W.|.aop...|.m.....|.i.....|.reg.......|
      +---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+  */
-  int aop = ((iw0 >> 7) & 0x3);
-  int i = ((iw0 >> 3) & 0x3);
-  int m = ((iw0 >> 5) & 0x3);
-  int reg = ((iw0 >> 0) & 0x7);
-  int W = ((iw0 >> 9) & 0x1);
+  int i   = ((iw0 >> DspLDST_i_bits) & DspLDST_i_mask);
+  int m   = ((iw0 >> DspLDST_m_bits) & DspLDST_m_mask);
+  int W   = ((iw0 >> DspLDST_W_bits) & DspLDST_W_mask);
+  int aop = ((iw0 >> DspLDST_aop_bits) & DspLDST_aop_mask);
+  int reg = ((iw0 >> DspLDST_reg_bits) & DspLDST_reg_mask);
   bu32 addr;
 
   PROFILE_COUNT_INSN (cpu, pc, BFIN_INSN_dspLDST);
@@ -3163,12 +3162,12 @@ decode_LDST_0 (SIM_CPU *cpu, bu16 iw0)
      +---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
      | 1 | 0 | 0 | 1 |.sz....|.W.|.aop...|.Z.|.ptr.......|.reg.......|
      +---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+  */
-  int aop = ((iw0 >> 7) & 0x3);
-  int Z = ((iw0 >> 6) & 0x1);
-  int sz = ((iw0 >> 10) & 0x3);
-  int reg = ((iw0 >> 0) & 0x7);
-  int ptr = ((iw0 >> 3) & 0x7);
-  int W = ((iw0 >> 9) & 0x1);
+  int Z   = ((iw0 >> LDST_Z_bits) & LDST_Z_mask);
+  int W   = ((iw0 >> LDST_W_bits) & LDST_W_mask);
+  int sz  = ((iw0 >> LDST_sz_bits) & LDST_sz_mask);
+  int aop = ((iw0 >> LDST_aop_bits) & LDST_aop_mask);
+  int reg = ((iw0 >> LDST_reg_bits) & LDST_reg_mask);
+  int ptr = ((iw0 >> LDST_ptr_bits) & LDST_ptr_mask);
   const char * const posts[] = { "++", "--", "" };
   const char *post = posts[aop];
 
@@ -3257,10 +3256,10 @@ decode_LDSTiiFP_0 (SIM_CPU *cpu, bu16 iw0)
      +---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+  */
   /* This isn't exactly a grp:reg as this insn only supports Dregs & Pregs,
      but for our usage, its functionality the same thing.  */
-  int reg = ((iw0 >> 0) & 0x7);
   int grp = ((iw0 >> 3) & 0x1);
-  int offset = ((iw0 >> 4) & 0x1f);
-  int W = ((iw0 >> 9) & 0x1);
+  int reg = ((iw0 >> LDSTiiFP_reg_bits) & 0x7 /*LDSTiiFP_reg_mask*/);
+  int offset = ((iw0 >> LDSTiiFP_offset_bits) & LDSTiiFP_offset_mask);
+  int W = ((iw0 >> LDSTiiFP_W_bits) & LDSTiiFP_W_mask);
   bu32 imm = negimm5s4 (offset);
   bu32 ea = FPREG + imm;
   const char *imm_str = negimm5s4_str (offset);
@@ -3290,11 +3289,11 @@ decode_LDSTii_0 (SIM_CPU *cpu, bu16 iw0)
      +---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
      | 1 | 0 | 1 |.W.|.op....|.offset........|.ptr.......|.reg.......|
      +---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+  */
-  int reg = ((iw0 >> 0) & 0x7);
-  int ptr = ((iw0 >> 3) & 0x7);
-  int offset = ((iw0 >> 6) & 0xf);
-  int op = ((iw0 >> 10) & 0x3);
-  int W = ((iw0 >> 12) & 0x1);
+  int reg = ((iw0 >> LDSTii_reg_bit) & LDSTii_reg_mask);
+  int ptr = ((iw0 >> LDSTii_ptr_bit) & LDSTii_ptr_mask);
+  int offset = ((iw0 >> LDSTii_offset_bit) & LDSTii_offset_mask);
+  int op = ((iw0 >> LDSTii_op_bit) & LDSTii_op_mask);
+  int W = ((iw0 >> LDSTii_W_bit) & LDSTii_W_mask);
   bu32 imm, ea;
   const char *imm_str;
 
@@ -3364,11 +3363,11 @@ decode_LoopSetup_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1, bu32 pc)
      | 1 | 1 | 1 | 0 | 0 | 0 | 0 | 0 | 1 |.rop...|.c.|.soffset.......|
      |.reg...........| - | - |.eoffset...............................|
      +---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+  */
-  int rop = ((iw0 >> 5) & 0x3);
-  int soffset = ((iw0 >> 0) & 0xf);
-  int c = ((iw0 >> 4) & 0x1);
-  int eoffset = ((iw1 >> 0) & 0x3ff);
-  int reg = ((iw1 >> 12) & 0xf);
+  int c   = ((iw0 >> (LoopSetup_c_bits - 16)) & LoopSetup_c_mask);
+  int reg = ((iw1 >> LoopSetup_reg_bits) & LoopSetup_reg_mask);
+  int rop = ((iw0 >> (LoopSetup_rop_bits - 16)) & LoopSetup_rop_mask);
+  int soffset = ((iw0 >> (LoopSetup_soffset_bits - 16)) & LoopSetup_soffset_mask);
+  int eoffset = ((iw1 >> LoopSetup_eoffset_bits) & LoopSetup_eoffset_mask);
   int spcrel = pcrel4 (soffset);
   int epcrel = lppcrel10 (eoffset);
 
@@ -3407,12 +3406,12 @@ decode_LDIMMhalf_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1)
      | 1 | 1 | 1 | 0 | 0 | 0 | 0 | 1 |.Z.|.H.|.S.|.grp...|.reg.......|
      |.hword.........................................................|
      +---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+  */
-  int H = ((iw0 >> 6) & 0x1);
-  int grp = ((iw0 >> 3) & 0x3);
-  int Z = ((iw0 >> 7) & 0x1);
-  int S = ((iw0 >> 5) & 0x1);
-  int hword = ((iw1 >> 0) & 0xffff);
-  int reg = ((iw0 >> 0) & 0x7);
+  int H = ((iw0 >> (LDIMMhalf_H_bits - 16)) & LDIMMhalf_H_mask);
+  int Z = ((iw0 >> (LDIMMhalf_Z_bits - 16)) & LDIMMhalf_Z_mask);
+  int S = ((iw0 >> (LDIMMhalf_S_bits - 16)) & LDIMMhalf_S_mask);
+  int reg = ((iw0 >> (LDIMMhalf_reg_bits - 16)) & LDIMMhalf_reg_mask);
+  int grp = ((iw0 >> (LDIMMhalf_grp_bits - 16)) & LDIMMhalf_grp_mask);
+  int hword = ((iw1 >> LDIMMhalf_hword_bits) & LDIMMhalf_hword_mask);
   bu32 val;
   const char *val_str;
   const char *reg_name = get_allreg_name (grp, reg);
@@ -3458,10 +3457,10 @@ decode_CALLa_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1, bu32 pc)
      | 1 | 1 | 1 | 0 | 0 | 0 | 1 |.S.|.msw...........................|
      |.lsw...........................................................|
      +---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+  */
-  int S = ((iw0 >> 8) & 0x1);
+  int S   = ((iw0 >> (CALLa_S_bits - 16)) & CALLa_S_mask);
   int lsw = ((iw1 >> 0) & 0xffff);
   int msw = ((iw0 >> 0) & 0xff);
-  int pcrel = pcrel24 (((msw) << 16) | (lsw));
+  int pcrel = pcrel24 ((msw << 16) | lsw);
   bu32 newpc = pc + pcrel;
 
   PROFILE_COUNT_INSN (cpu, pc, BFIN_INSN_CALLa);
@@ -3495,12 +3494,12 @@ decode_LDSTidxI_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1)
      | 1 | 1 | 1 | 0 | 0 | 1 |.W.|.Z.|.sz....|.ptr.......|.reg.......|
      |.offset........................................................|
      +---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+  */
-  int Z = ((iw0 >> 8) & 0x1);
-  int sz = ((iw0 >> 6) & 0x3);
-  int reg = ((iw0 >> 0) & 0x7);
-  int ptr = ((iw0 >> 3) & 0x7);
-  int offset = ((iw1 >> 0) & 0xffff);
-  int W = ((iw0 >> 9) & 0x1);
+  int Z = ((iw0 >> (LDSTidxI_Z_bits - 16)) & LDSTidxI_Z_mask);
+  int W = ((iw0 >> (LDSTidxI_W_bits - 16)) & LDSTidxI_W_mask);
+  int sz = ((iw0 >> (LDSTidxI_sz_bits - 16)) & LDSTidxI_sz_mask);
+  int reg = ((iw0 >> (LDSTidxI_reg_bits - 16)) & LDSTidxI_reg_mask);
+  int ptr = ((iw0 >> (LDSTidxI_ptr_bits - 16)) & LDSTidxI_ptr_mask);
+  int offset = ((iw1 >> LDSTidxI_offset_bits) & LDSTidxI_offset_mask);
   bu32 imm_16s4 = imm16s4 (offset);
   bu32 imm_16s2 = imm16s2 (offset);
   bu32 imm_16 = imm16 (offset);
@@ -3584,8 +3583,8 @@ decode_linkage_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1)
      | 1 | 1 | 1 | 0 | 1 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 |.R.|
      |.framesize.....................................................|
      +---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+  */
-  int R = ((iw0 >> 0) & 0x1);
-  int framesize = ((iw1 >> 0) & 0xffff);
+  int R = ((iw0 >> (Linkage_R_bits - 16)) & Linkage_R_mask);
+  int framesize = ((iw1 >> Linkage_framesize_bits) & Linkage_framesize_mask);
   bu32 sp;
 
   PROFILE_COUNT_INSN (cpu, pc, BFIN_INSN_linkage);
@@ -3633,22 +3632,21 @@ decode_dsp32mac_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1)
      | 1 | 1 | 0 | 0 |.M.| 0 | 0 |.mmod..........|.MM|.P.|.w1|.op1...|
      |.h01|.h11|.w0|.op0...|.h00|.h10|.dst.......|.src0......|.src1..|
      +---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+  */
-  int op1 = ((iw0 >> 0) & 0x3);
-  int w1 = ((iw0 >> 2) & 0x1);
-  int P = ((iw0 >> 3) & 0x1);
-  int MM = ((iw0 >> 4) & 0x1);
-  int mmod = ((iw0 >> 5) & 0xf);
-  int M = ((iw0 >> 11) & 0x1);
-
-  int w0 = ((iw1 >> 13) & 0x1);
-  int src1 = ((iw1 >> 0) & 0x7);
-  int src0 = ((iw1 >> 3) & 0x7);
-  int dst = ((iw1 >> 6) & 0x7);
-  int h10 = ((iw1 >> 9) & 0x1);
-  int h00 = ((iw1 >> 10) & 0x1);
-  int op0 = ((iw1 >> 11) & 0x3);
-  int h11 = ((iw1 >> 14) & 0x1);
-  int h01 = ((iw1 >> 15) & 0x1);
+  int op1  = ((iw0 >> (DSP32Mac_op1_bits - 16)) & DSP32Mac_op1_mask);
+  int w1   = ((iw0 >> (DSP32Mac_w1_bits - 16)) & DSP32Mac_w1_mask);
+  int P    = ((iw0 >> (DSP32Mac_p_bits - 16)) & DSP32Mac_p_mask);
+  int MM   = ((iw0 >> (DSP32Mac_MM_bits - 16)) & DSP32Mac_MM_mask);
+  int mmod = ((iw0 >> (DSP32Mac_mmod_bits - 16)) & DSP32Mac_mmod_mask);
+  int M    = ((iw0 >> (DSP32Mac_M_bits - 16)) & DSP32Mac_M_mask);
+  int w0   = ((iw1 >> DSP32Mac_w0_bits) & DSP32Mac_w0_mask);
+  int src0 = ((iw1 >> DSP32Mac_src0_bits) & DSP32Mac_src0_mask);
+  int src1 = ((iw1 >> DSP32Mac_src1_bits) & DSP32Mac_src1_mask);
+  int dst  = ((iw1 >> DSP32Mac_dst_bits) & DSP32Mac_dst_mask);
+  int h10  = ((iw1 >> DSP32Mac_h10_bits) & DSP32Mac_h10_mask);
+  int h00  = ((iw1 >> DSP32Mac_h00_bits) & DSP32Mac_h00_mask);
+  int op0  = ((iw1 >> DSP32Mac_op0_bits) & DSP32Mac_op0_mask);
+  int h11  = ((iw1 >> DSP32Mac_h11_bits) & DSP32Mac_h11_mask);
+  int h01  = ((iw1 >> DSP32Mac_h01_bits) & DSP32Mac_h01_mask);
 
   bu32 res0, res1;
   bu32 res = DREG (dst);
@@ -3750,22 +3748,21 @@ decode_dsp32mult_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1)
      | 1 | 1 | 0 | 0 |.M.| 0 | 1 |.mmod..........|.MM|.P.|.w1|.op1...|
      |.h01|.h11|.w0|.op0...|.h00|.h10|.dst.......|.src0......|.src1..|
      +---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+  */
-  int op1 = ((iw0 >> 0) & 0x3);
-  int w1 = ((iw0 >> 2) & 0x1);
-  int P = ((iw0 >> 3) & 0x1);
-  int MM = ((iw0 >> 4) & 0x1);
-  int mmod = ((iw0 >> 5) & 0xf);
-  int M = ((iw0 >> 11) & 0x1);
-
-  int src1 = ((iw1 >> 0) & 0x7);
-  int src0 = ((iw1 >> 3) & 0x7);
-  int dst = ((iw1 >> 6) & 0x7);
-  int h10 = ((iw1 >> 9) & 0x1);
-  int h00 = ((iw1 >> 10) & 0x1);
-  int op0 = ((iw1 >> 11) & 0x3);
-  int w0 = ((iw1 >> 13) & 0x1);
-  int h01 = ((iw1 >> 15) & 0x1);
-  int h11 = ((iw1 >> 14) & 0x1);
+  int op1  = ((iw0 >> (DSP32Mac_op1_bits - 16)) & DSP32Mac_op1_mask);
+  int w1   = ((iw0 >> (DSP32Mac_w1_bits - 16)) & DSP32Mac_w1_mask);
+  int P    = ((iw0 >> (DSP32Mac_p_bits - 16)) & DSP32Mac_p_mask);
+  int MM   = ((iw0 >> (DSP32Mac_MM_bits - 16)) & DSP32Mac_MM_mask);
+  int mmod = ((iw0 >> (DSP32Mac_mmod_bits - 16)) & DSP32Mac_mmod_mask);
+  int M    = ((iw0 >> (DSP32Mac_M_bits - 16)) & DSP32Mac_M_mask);
+  int w0   = ((iw1 >> DSP32Mac_w0_bits) & DSP32Mac_w0_mask);
+  int src0 = ((iw1 >> DSP32Mac_src0_bits) & DSP32Mac_src0_mask);
+  int src1 = ((iw1 >> DSP32Mac_src1_bits) & DSP32Mac_src1_mask);
+  int dst  = ((iw1 >> DSP32Mac_dst_bits) & DSP32Mac_dst_mask);
+  int h10  = ((iw1 >> DSP32Mac_h10_bits) & DSP32Mac_h10_mask);
+  int h00  = ((iw1 >> DSP32Mac_h00_bits) & DSP32Mac_h00_mask);
+  int op0  = ((iw1 >> DSP32Mac_op0_bits) & DSP32Mac_op0_mask);
+  int h11  = ((iw1 >> DSP32Mac_h11_bits) & DSP32Mac_h11_mask);
+  int h01  = ((iw1 >> DSP32Mac_h01_bits) & DSP32Mac_h01_mask);
 
   bu32 res0, res1;
   bu32 res = DREG (dst);
@@ -3853,16 +3850,16 @@ decode_dsp32alu_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1)
      | 1 | 1 | 0 | 0 |.M.| 1 | 0 | - | - | - |.HL|.aopcde............|
      |.aop...|.s.|.x.|.dst0......|.dst1......|.src0......|.src1......|
      +---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+  */
-  int aop = ((iw1 >> 14) & 0x3);
-  int s = ((iw1 >> 13) & 0x1);
-  int HL = ((iw0 >> 5) & 0x1);
-  int x = ((iw1 >> 12) & 0x1);
-  int src0 = ((iw1 >> 3) & 0x7);
-  int src1 = ((iw1 >> 0) & 0x7);
-  int dst0 = ((iw1 >> 9) & 0x7);
-  int aopcde = ((iw0 >> 0) & 0x1f);
-  int dst1 = ((iw1 >> 6) & 0x7);
-  int M = ((iw0 >> 11) & 0x1);
+  int s    = ((iw1 >> DSP32Alu_s_bits) & DSP32Alu_s_mask);
+  int x    = ((iw1 >> DSP32Alu_x_bits) & DSP32Alu_x_mask);
+  int aop  = ((iw1 >> DSP32Alu_aop_bits) & DSP32Alu_aop_mask);
+  int src0 = ((iw1 >> DSP32Alu_src0_bits) & DSP32Alu_src0_mask);
+  int src1 = ((iw1 >> DSP32Alu_src1_bits) & DSP32Alu_src1_mask);
+  int dst0 = ((iw1 >> DSP32Alu_dst0_bits) & DSP32Alu_dst0_mask);
+  int dst1 = ((iw1 >> DSP32Alu_dst1_bits) & DSP32Alu_dst1_mask);
+  int M    = ((iw0 >> (DSP32Alu_M_bits - 16)) & DSP32Alu_M_mask);
+  int HL   = ((iw0 >> (DSP32Alu_HL_bits - 16)) & DSP32Alu_HL_mask);
+  int aopcde = ((iw0 >> (DSP32Alu_aopcde_bits - 16)) & DSP32Alu_aopcde_mask);
 
   PROFILE_COUNT_INSN (cpu, pc, BFIN_INSN_dsp32alu);
   TRACE_EXTRACT (cpu, "%s: M:%i HL:%i aopcde:%i aop:%i s:%i x:%i dst0:%i "
@@ -4968,13 +4965,13 @@ decode_dsp32shift_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1)
      | 1 | 1 | 0 | 0 |.M.| 1 | 1 | 0 | 0 | - | - |.sopcde............|
      |.sop...|.HLs...|.dst0......| - | - | - |.src0......|.src1......|
      +---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+  */
-  int src0 = ((iw1 >> 3) & 0x7);
-  int src1 = ((iw1 >> 0) & 0x7);
-  int sop = ((iw1 >> 14) & 0x3);
-  int dst0 = ((iw1 >> 9) & 0x7);
-  int M = ((iw0 >> 11) & 0x1);
-  int sopcde = ((iw0 >> 0) & 0x1f);
-  int HLs = ((iw1 >> 12) & 0x3);
+  int HLs  = ((iw1 >> DSP32Shift_HLs_bits) & DSP32Shift_HLs_mask);
+  int sop  = ((iw1 >> DSP32Shift_sop_bits) & DSP32Shift_sop_mask);
+  int src0 = ((iw1 >> DSP32Shift_src0_bits) & DSP32Shift_src0_mask);
+  int src1 = ((iw1 >> DSP32Shift_src1_bits) & DSP32Shift_src1_mask);
+  int dst0 = ((iw1 >> DSP32Shift_dst0_bits) & DSP32Shift_dst0_mask);
+  int sopcde = ((iw0 >> (DSP32Shift_sopcde_bits - 16)) & DSP32Shift_sopcde_mask);
+  int M = ((iw0 >> (DSP32Shift_M_bits - 16)) & DSP32Shift_M_mask);
 
   PROFILE_COUNT_INSN (cpu, pc, BFIN_INSN_dsp32shift);
   TRACE_EXTRACT (cpu, "%s: M:%i sopcde:%i sop:%i HLs:%i dst0:%i src0:%i src1:%i",
@@ -5512,15 +5509,15 @@ decode_dsp32shiftimm_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1)
      | 1 | 1 | 0 | 0 |.M.| 1 | 1 | 0 | 1 | - | - |.sopcde............|
      |.sop...|.HLs...|.dst0......|.immag.................|.src1......|
      +---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+  */
-  int src1 = ((iw1 >> 0) & 0x7);
-  int sop = ((iw1 >> 14) & 0x3);
-  int immag = ((iw1 >> 3) & 0x3f);
-  int newimmag = (-(iw1 >> 3) & 0x3f);
-  int dst0 = ((iw1 >> 9) & 0x7);
-  int M = ((iw0 >> 11) & 0x1);
-  int sopcde = ((iw0 >> 0) & 0x1f);
-  int HLs = ((iw1 >> 12) & 0x3);
-  int bit8 = immag >> 5;
+  int src1     = ((iw1 >> DSP32ShiftImm_src1_bits) & DSP32ShiftImm_src1_mask);
+  int sop      = ((iw1 >> DSP32ShiftImm_sop_bits) & DSP32ShiftImm_sop_mask);
+  int bit8     = ((iw1 >> 8) & 0x1);
+  int immag    = ((iw1 >> DSP32ShiftImm_immag_bits) & DSP32ShiftImm_immag_mask);
+  int newimmag = (-(iw1 >> DSP32ShiftImm_immag_bits) & DSP32ShiftImm_immag_mask);
+  int dst0     = ((iw1 >> DSP32ShiftImm_dst0_bits) & DSP32ShiftImm_dst0_mask);
+  int M        = ((iw0 >> (DSP32ShiftImm_M_bits - 16)) & DSP32ShiftImm_M_mask);
+  int sopcde   = ((iw0 >> (DSP32ShiftImm_sopcde_bits - 16)) & DSP32ShiftImm_sopcde_mask);
+  int HLs      = ((iw1 >> DSP32ShiftImm_HLs_bits) & DSP32ShiftImm_HLs_mask);
 
   PROFILE_COUNT_INSN (cpu, pc, BFIN_INSN_dsp32shiftimm);
   TRACE_EXTRACT (cpu, "%s: M:%i sopcde:%i sop:%i HLs:%i dst0:%i immag:%#x src1:%i",
@@ -5743,9 +5740,9 @@ decode_psedoDEBUG_0 (SIM_CPU *cpu, bu16 iw0)
      | 1 | 1 | 1 | 1 | 1 | 0 | 0 | 0 |.fn....|.grp.......|.reg.......|
      +---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+  */
   SIM_DESC sd = CPU_STATE (cpu);
-  int grp = ((iw0 >> 3) & 0x7);
-  int fn = ((iw0 >> 6) & 0x3);
-  int reg = ((iw0 >> 0) & 0x7);
+  int fn  = ((iw0 >> PseudoDbg_fn_bits) & PseudoDbg_fn_mask);
+  int grp = ((iw0 >> PseudoDbg_grp_bits) & PseudoDbg_grp_mask);
+  int reg = ((iw0 >> PseudoDbg_reg_bits) & PseudoDbg_reg_mask);
 
   PROFILE_COUNT_INSN (cpu, pc, BFIN_INSN_psedoDEBUG);
   TRACE_EXTRACT (cpu, "%s: fn:%i grp:%i reg:%i", __func__, fn, grp, reg);
@@ -5799,7 +5796,7 @@ decode_psedoOChar_0 (SIM_CPU *cpu, bu16 iw0)
      +---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
      | 1 | 1 | 1 | 1 | 1 | 0 | 0 | 1 |.ch............................|
      +---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+  */
-  int ch = ((iw0 >> 0) & 0xff);
+  int ch = ((iw0 >> PseudoChr_ch_bits) & PseudoChr_ch_mask);
 
   PROFILE_COUNT_INSN (cpu, pc, BFIN_INSN_psedoOChar);
   TRACE_EXTRACT (cpu, "%s: ch:%#x", __func__, ch);
@@ -5817,11 +5814,11 @@ decode_psedodbg_assert_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1, bu32 pc)
      |.expected......................................................|
      +---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+  */
   SIM_DESC sd = CPU_STATE (cpu);
+  int expected = ((iw1 >> PseudoDbg_Assert_expected_bits) & PseudoDbg_Assert_expected_mask);
+  int dbgop    = ((iw0 >> (PseudoDbg_Assert_dbgop_bits - 16)) & PseudoDbg_Assert_dbgop_mask);
+  int grp      = ((iw0 >> (PseudoDbg_Assert_grp_bits - 16)) & PseudoDbg_Assert_grp_mask);
+  int regtest  = ((iw0 >> (PseudoDbg_Assert_regtest_bits - 16)) & PseudoDbg_Assert_regtest_mask);
   bu16 actual;
-  bu16 expected = ((iw1 >> 0) & 0xffff);
-  int dbgop = ((iw0 >> 6) & 0x3);
-  int grp = ((iw0 >> 3) & 0x7);
-  int regtest = ((iw0 >> 0) & 0x7);
   bu32 val = reg_read (cpu, grp, regtest);
   const char *reg_name = get_allreg_name (grp, regtest);
   const char *dbg_name, *dbg_appd;
