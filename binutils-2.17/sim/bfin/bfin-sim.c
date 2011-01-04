@@ -1,4 +1,4 @@
-/* Simulator for Analog Devices Blackfin processers.
+/* Simulator for Analog Devices Blackfin processors.
 
    Copyright (C) 2005-2010 Free Software Foundation, Inc.
    Contributed by Analog Devices, Inc.
