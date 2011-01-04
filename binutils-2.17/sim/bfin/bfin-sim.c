@@ -3242,9 +3242,9 @@ decode_LDST_0 (SIM_CPU *cpu, bu16 iw0)
     }
 
   if (aop == 0)
-    SET_PREG (ptr, PREG (ptr) + (sz == 0 ? 4 : sz == 1 ? 2 : 1));
+    SET_PREG (ptr, PREG (ptr) + (1 << (2 - sz)));
   if (aop == 1)
-    SET_PREG (ptr, PREG (ptr) - (sz == 0 ? 4 : sz == 1 ? 2 : 1));
+    SET_PREG (ptr, PREG (ptr) - (1 << (2 - sz)));
 }
 
 static void
