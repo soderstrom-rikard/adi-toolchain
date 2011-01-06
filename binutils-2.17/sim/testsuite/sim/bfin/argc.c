@@ -1,7 +1,7 @@
 /* Basic argc/argv tests.
 # mach: bfin
 # cc: -msim
-# prog: a bb ccc dddd
+# progopts: a bb ccc dddd
 */
 
 int streq(const char *s1, const char *s2)
