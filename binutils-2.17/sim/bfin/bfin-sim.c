@@ -3170,6 +3170,7 @@ decode_LDST_0 (SIM_CPU *cpu, bu16 iw0)
   int ptr = ((iw0 >> LDST_ptr_bits) & LDST_ptr_mask);
   const char * const posts[] = { "++", "--", "" };
   const char *post = posts[aop];
+  const char *ptr_name = get_allreg_name (1, ptr);
 
   PROFILE_COUNT_INSN (cpu, pc, BFIN_INSN_LDST);
   TRACE_EXTRACT (cpu, "%s: sz:%i W:%i aop:%i Z:%i ptr:%i reg:%i",
@@ -3182,34 +3183,34 @@ decode_LDST_0 (SIM_CPU *cpu, bu16 iw0)
     {
       if (sz == 0 && Z == 0)
 	{
-	  TRACE_INSN (cpu, "R%i = [P%i%s];", reg, ptr, post);
+	  TRACE_INSN (cpu, "R%i = [%s%s];", reg, ptr_name, post);
 	  SET_DREG (reg, GET_LONG (PREG (ptr)));
 	}
       else if (sz == 0 && Z == 1)
 	{
-	  TRACE_INSN (cpu, "P%i = [P%i%s];", reg, ptr, post);
+	  TRACE_INSN (cpu, "P%i = [%s%s];", reg, ptr_name, post);
 	  if (aop < 2 && ptr == reg)
 	    illegal_instruction_combination (cpu);
 	  SET_PREG (reg, GET_LONG (PREG (ptr)));
 	}
       else if (sz == 1 && Z == 0)
 	{
-	  TRACE_INSN (cpu, "R%i = W[P%i%s] (Z);", reg, ptr, post);
+	  TRACE_INSN (cpu, "R%i = W[%s%s] (Z);", reg, ptr_name, post);
 	  SET_DREG (reg, GET_WORD (PREG (ptr)));
 	}
       else if (sz == 1 && Z == 1)
 	{
-	  TRACE_INSN (cpu, "R%i = W[P%i%s] (X);", reg, ptr, post);
+	  TRACE_INSN (cpu, "R%i = W[%s%s] (X);", reg, ptr_name, post);
 	  SET_DREG (reg, (bs32) (bs16) GET_WORD (PREG (ptr)));
 	}
       else if (sz == 2 && Z == 0)
 	{
-	  TRACE_INSN (cpu, "R%i = B[P%i%s] (Z);", reg, ptr, post);
+	  TRACE_INSN (cpu, "R%i = B[%s%s] (Z);", reg, ptr_name, post);
 	  SET_DREG (reg, GET_BYTE (PREG (ptr)));
 	}
       else if (sz == 2 && Z == 1)
 	{
-	  TRACE_INSN (cpu, "R%i = B[P%i%s] (X);", reg, ptr, post);
+	  TRACE_INSN (cpu, "R%i = B[%s%s] (X);", reg, ptr_name, post);
 	  SET_DREG (reg, (bs32) (bs8) GET_BYTE (PREG (ptr)));
 	}
       else
@@ -3219,22 +3220,22 @@ decode_LDST_0 (SIM_CPU *cpu, bu16 iw0)
     {
       if (sz == 0 && Z == 0)
 	{
-	  TRACE_INSN (cpu, "[P%i%s] = R%i;", ptr, post, reg);
+	  TRACE_INSN (cpu, "[%s%s] = R%i;", ptr_name, post, reg);
 	  PUT_LONG (PREG (ptr), DREG (reg));
 	}
       else if (sz == 0 && Z == 1)
 	{
-	  TRACE_INSN (cpu, "[P%i%s] = P%i;", ptr, post, reg);
+	  TRACE_INSN (cpu, "[%s%s] = P%i;", ptr_name, post, reg);
 	  PUT_LONG (PREG (ptr), PREG (reg));
 	}
       else if (sz == 1 && Z == 0)
 	{
-	  TRACE_INSN (cpu, "W[P%i%s] = R%i;", ptr, post, reg);
+	  TRACE_INSN (cpu, "W[%s%s] = R%i;", ptr_name, post, reg);
 	  PUT_WORD (PREG (ptr), DREG (reg));
 	}
       else if (sz == 2 && Z == 0)
 	{
-	  TRACE_INSN (cpu, "B[P%i%s] = R%i;", ptr, post, reg);
+	  TRACE_INSN (cpu, "B[%s%s] = R%i;", ptr_name, post, reg);
 	  PUT_BYTE (PREG (ptr), DREG (reg));
 	}
       else
