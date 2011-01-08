@@ -1086,7 +1086,7 @@ bfin_get_reg (SIM_CPU *cpu, int rn)
     case SIM_BFIN_L3_REGNUM: return &LREG (3);
     case SIM_BFIN_RETS_REGNUM: return &RETSREG;
     case SIM_BFIN_A0_DOT_X_REGNUM: return &AXREG (0);
-    case SIM_BFIN_AO_DOT_W_REGNUM: return &AWREG (0);
+    case SIM_BFIN_A0_DOT_W_REGNUM: return &AWREG (0);
     case SIM_BFIN_A1_DOT_X_REGNUM: return &AXREG (1);
     case SIM_BFIN_A1_DOT_W_REGNUM: return &AWREG (1);
     case SIM_BFIN_LC0_REGNUM: return &LCREG (0);
