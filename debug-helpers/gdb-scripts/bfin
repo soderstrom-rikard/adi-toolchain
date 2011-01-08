@@ -879,3 +879,56 @@ define show_uart2
 	printf "MSR: 0x%02x   SCR: 0x%02x\n", *$$UART_MSR, *$$UART_SCR
 	printf "GCTL: 0x%02x\n", *$$UART_GCTL
 end
+
+define _otp_save
+	set $$s_pc = $pc
+	set $$s_r0 = $r0
+	set $$s_r1 = $r1
+	set $$s_r2 = $r2
+	set $$s_mm = (unsigned long *)0xFFB00000
+	set $$s_m0 = $$s_mm[0]
+	set $$s_m1 = $$s_mm[1]
+end
+define _otp_restore
+	set $pc = $$s_pc
+	set $r0 = $$s_r0
+	set $r1 = $$s_r1
+	set $r2 = $$s_r2
+	set $$s_mm[0] = $$s_m0
+	set $$s_mm[1] = $$s_m1
+end
+
+define _otp_read
+	set $pc = 0xef00001a
+	set $r0 = $arg0
+	set $r1 = $arg1
+	set $r2 = 0xFFB00000
+	
+end
+define otp_read
+	if $argc == 0
+		set $$OTP_PAGE = 0
+	else
+		set $$OTP_PAGE = $arg0
+	end
+
+	printf "OTP Page 0x%02x: ", $$OTP_PAGE
+	_otp_save
+	_otp_read $$OTP_PAGE, 0
+	_otp_read $$OTP_PAGE, 1
+	_otp_restore
+end
+
+define otp_dump
+	_otp_save
+	set $$page = 0
+	while $$page < 0xe0
+		printf "0x%02x: ", $$page
+		_otp_read $$page, 0
+		printf "%08x %08x ", $$OTP_PAGE_L, $$OTP_PAGE_H
+		_otp_read $$page, 1
+		printf "%08x %08x ", $$OTP_PAGE_L, $$OTP_PAGE_H
+		$$page++
+	end
+	_otp_restore
+end

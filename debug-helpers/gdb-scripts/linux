@@ -47,3 +47,280 @@ define show_fdpic_loadmap
 		help show_fdpic_loadmap
 	end
 end
+
+define show_pt_dynamic
+	if $argc == 1
+		set $$dynamic = (unsigned long *)$arg0
+
+		while $$dynamic[0]
+			printf "tag: %#10x  val: %#x\n", $$dynamic[0], $$dynamic[1]
+			set $$dynamic += 2
+		end
+	else
+		help show_pt_dynamic
+	end
+end
+
+define show_char_char_array
+	if $argc == 1
+		set $$ccarr = (char **)$arg0
+		while *$$ccarr != 0
+			x/s *$$ccarr
+			set $$ccarr += 1
+			set $$stack += 4
+		end
+	else
+		help show_char_char_array
+	end
+end
+
+define show_auxvec
+	if $argc == 1
+		set $$auxvec = (unsigned long *)$arg0
+		while *$$auxvec != 0
+			set $$aux = $$auxvec[0]
+			set $$val = $$auxvec[1]
+			printf "%#x:       AT_", $$auxvec
+			if $$aux == 1
+				printf "IGNORE  "
+			end
+			if $$aux == 2
+				printf "EXECFD  "
+			end
+			if $$aux == 3
+				printf "PHDR    "
+				set $$at_phdr = $$val
+			end
+			if $$aux == 4
+				printf "PHENT   "
+			end
+			if $$aux == 5
+				printf "PHNUM   "
+				set $$at_phnum = $$val
+			end
+			if $$aux == 6
+				printf "PAGESZ  "
+			end
+			if $$aux == 7
+				printf "BASE    "
+				set $$at_base = $$val
+			end
+			if $$aux == 8
+				printf "FLAGS   "
+			end
+			if $$aux == 9
+				printf "ENTRY   "
+			end
+			if $$aux == 10
+				printf "NOTELF  "
+			end
+			if $$aux == 11
+				printf "UID     "
+			end
+			if $$aux == 12
+				printf "EUID    "
+			end
+			if $$aux == 13
+				printf "GID     "
+			end
+			if $$aux == 14
+				printf "EGID    "
+			end
+			if $$aux == 15
+				printf "PLATFORM"
+			end
+			if $$aux == 16
+				printf "HWCAP   "
+			end
+			if $$aux == 17
+				printf "CLKTCK  "
+			end
+			if $$aux == 18
+				printf "FPUCW   "
+			end
+			if $$aux == 23
+				printf "SECURE  "
+			end
+			if $$aux == 31
+				printf "EXECFN  "
+			end
+			if $$aux > 18 && $$aux != 23 && $$aux != 31
+				printf "%#08x", $$aux
+			end
+			printf ": %u (%#x)\n", $$val, $$val
+			set $$auxvec += 2
+		end
+	else
+		help show_auxvec
+	end
+end
+
+define show_ehdr
+	if $argc == 1
+		set $$ehdr = $$at_base
+
+		printf "%#x: Ehdr  ident      : %s\n", $$ehdr, $$ehdr
+		set $$ehdr += 16
+
+		printf "%#x:       type       : %#x\n", $$ehdr, *(unsigned short *)$$ehdr
+		set $$ehdr += 2
+
+		printf "%#x:       machine    : %u\n", $$ehdr, *(unsigned short *)$$ehdr
+		set $$ehdr += 2
+
+		printf "%#x:       version    : %u\n", $$ehdr, *(unsigned long *)$$ehdr
+		set $$ehdr += 4
+
+		printf "%#x:       entry      : %#x\n", $$ehdr, *(unsigned long *)$$ehdr
+		set $$ehdr += 4
+
+		printf "%#x:       phoff      : %#x\n", $$ehdr, *(unsigned long *)$$ehdr
+		set $$ehdr += 4
+
+		printf "%#x:       shoff      : %#x\n", $$ehdr, *(unsigned long *)$$ehdr
+		set $$ehdr += 4
+
+		printf "%#x:       flags      : %#x\n", $$ehdr, *(unsigned long *)$$ehdr
+		set $$ehdr += 4
+
+		printf "%#x:       ehsize     : %#x\n", $$ehdr, *(unsigned short *)$$ehdr
+		set $$ehdr += 2
+
+		printf "%#x:       phentsize  : %#x\n", $$ehdr, *(unsigned short *)$$ehdr
+		set $$ehdr += 2
+
+		printf "%#x:       phnum      : %u\n", $$ehdr, *(unsigned short *)$$ehdr
+		set $$ehdr += 2
+
+		printf "%#x:       shentsize  : %#x\n", $$ehdr, *(unsigned short *)$$ehdr
+		set $$ehdr += 2
+
+		printf "%#x:       shnum      : %u\n", $$ehdr, *(unsigned short *)$$ehdr
+		set $$ehdr += 2
+
+		printf "%#x:       shstrndx   : %u\n", $$ehdr, *(unsigned short *)$$ehdr
+		set $$ehdr += 2
+	else
+		help show_ehdr
+	end
+end
+
+define show_phdr
+	if $argc == 1
+		set $$phdr = $arg0
+
+		set $$phdr_type = *(unsigned long *)$$phdr
+		printf "%#x: Phdr  type       : %u (PT_", $$phdr, $$phdr_type
+		if $$phdr_type == 0
+			printf "NULL"
+		end
+		if $$phdr_type == 1
+			printf "LOAD"
+		end
+		if $$phdr_type == 2
+			printf "DYNAMIC"
+		end
+		if $$phdr_type == 3
+			printf "INTERP"
+		end
+		if $$phdr_type == 4
+			printf "NOTE"
+		end
+		if $$phdr_type == 5
+			printf "SHLIB"
+		end
+		if $$phdr_type == 6
+			printf "PHDR"
+		end
+		if $$phdr_type == 7
+			printf "TLS"
+		end
+		if $$phdr_type == 8
+			printf "NUM"
+		end
+		if $$phdr_type == 0x6474e550
+			printf "GNU_EH_FRAME"
+		end
+		if $$phdr_type == 0x6474e551
+			printf "GNU_STACK"
+		end
+		if $$phdr_type == 0x6474e552
+			printf "GNU_RELRO"
+		end
+		if $$phdr_type > 8 && !($$phdr_type >= 0x6474e550 && $$phdr_type <=0x6474e552)
+			printf "%#x", $$phdr_type
+		end
+		printf ")\n"
+		set $$phdr += 4
+
+		printf "%#x:       offset     : %#x\n", $$phdr, *(unsigned long *)$$phdr
+		set $$phdr += 4
+
+		printf "%#x:       vaddr      : %#x\n", $$phdr, *(unsigned long *)$$phdr
+		set $$phdr += 4
+
+		printf "%#x:       paddr      : %#x\n", $$phdr, *(unsigned long *)$$phdr
+		set $$phdr += 4
+
+		printf "%#x:       filesz     : %#x\n", $$phdr, *(unsigned long *)$$phdr
+		set $$phdr += 4
+
+		printf "%#x:       memsz      : %#x\n", $$phdr, *(unsigned long *)$$phdr
+		set $$phdr += 4
+
+		printf "%#x:       flags      : %#x\n", $$phdr, *(unsigned long *)$$phdr
+		set $$phdr += 4
+
+		printf "%#x:       align      : %#x\n", $$phdr, *(unsigned long *)$$phdr
+		set $$phdr += 4
+	else
+		help show_phdr
+	end
+end
+
+define show_phdrs
+	if $argc == 2
+		set $$phdrs = $arg0
+		set $$phnum = $arg1
+
+		while $$phnum
+			show_phdr $$phdrs
+			set $$phdrs += 0x20
+			set $$phnum -= 1
+		end
+	else
+		help show_phdrs
+	end
+end
+
+define show_argc_argv_envp_aux
+	if $argc == 1
+		set $$stack = (unsigned long)$arg0
+		printf "%#x: argc  %u\n", $$stack, *(unsigned long *)$$stack
+
+		set $$stack += 4
+		printf "%#x: argv[]\n", $$stack
+		show_char_char_array $$stack
+
+		set $$stack += 4
+		printf "%#x: envp[]\n", $$stack
+		show_char_char_array $$stack
+
+		set $$at_base = 0
+		set $$at_phdr = 0
+		set $$at_phnum = 0
+
+		set $$stack += 4
+		printf "%#x: auxvec\n", $$stack
+		show_auxvec $$stack
+
+		if $$at_base
+			show_ehdr $$at_base
+		end
+		if $$at_phdr && $$at_phnum
+			show_phdrs $$at_phdr $$at_phnum
+		end
+	else
+		help show_argc_argv_envp_aux
+	end
+end
