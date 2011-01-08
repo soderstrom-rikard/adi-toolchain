@@ -37,23 +37,26 @@
 
 #include "targ-vals.h"
 
-#define CB_SYS_ioctl    200 /* XXX: hack for simple uClibc stdio!  */
-#define CB_SYS_mmap2    201 /* XXX: this gets us malloc()  */
-#define CB_SYS_dup2     202
-#define CB_SYS_getuid   203
-#define CB_SYS_getuid32 205
-#define CB_SYS_getgid   206
-#define CB_SYS_getgid32 207
-#define CB_SYS_setuid   208
-#define CB_SYS_setuid32 209
-#define CB_SYS_setgid   210
-#define CB_SYS_setgid32 211
+#define CB_SYS_ioctl    201  /* XXX: hack for simple uClibc stdio!  */
+#define CB_SYS_mmap2    202  /* XXX: this gets us malloc()  */
+#define CB_SYS_munmap   203
+#define CB_SYS_dup2     204
+#define CB_SYS_getuid   205
+#define CB_SYS_getuid32 206
+#define CB_SYS_getgid   207
+#define CB_SYS_getgid32 208
+#define CB_SYS_setuid   209
+#define CB_SYS_setuid32 210
+#define CB_SYS_setgid   211
+#define CB_SYS_setgid32 212
+#define CB_SYS_pread    213
 #include "linux-targ-map.h"
 
 #include "elf/common.h"
 #include "elf/external.h"
 #include "elf/internal.h"
 #include "elf/bfin.h"
+#include "elf-bfd.h"
 
 #include "dv-bfin_cec.h"
 #include "dv-bfin_mmu.h"
@@ -207,26 +210,49 @@ bfin_syscall (SIM_CPU *cpu)
       break;
 
     case CB_SYS_mmap2:
-      /* XXX: Support enough of mmap to get malloc().  No one checks
-              munmap() return value in malloc(), so skip that syscall.  */
-      if (sc.arg4 & 0x20 /*MAP_ANONYMOUS*/)
-	{
-	  static bu32 heap = BFIN_DEFAULT_MEM_SIZE / 2;
-	  sc.result = heap;
-	  heap += sc.arg2;
-	  /* Keep it page aligned.  */
-	  heap = ALIGN (heap, 4096);
-	}
-      else
-	{
-	  sc.result = -1;
+      {
+	static bu32 heap = BFIN_DEFAULT_MEM_SIZE / 2;
+
+	sc.errcode = 0;
+
+	if (sc.arg4 & 0x20 /*MAP_ANONYMOUS*/)
+	  /* XXX: We don't handle zeroing, but default is all zeros.  */;
+	else if (args[4] >= MAX_CALLBACK_FDS)
 	  sc.errcode = TARGET_ENOSYS;
-	}
+	else
+	  {
+	    char *data = xmalloc (sc.arg2);
+
+	    /* XXX: Should add a cb->pread.  */
+	    if (pread (cb->fdmap[args[4]], data, sc.arg2, args[5]) == sc.arg2)
+	      sc.write_mem (cb, &sc, heap, data, sc.arg2);
+	    else
+	      sc.errcode = TARGET_EINVAL;
+
+	    free (data);
+	  }
+
+	if (sc.errcode)
+	  {
+	    sc.result = -1;
+	    break;
+	  }
+
+	sc.result = heap;
+	heap += sc.arg2;
+	/* Keep it page aligned.  */
+	heap = ALIGN (heap, 4096);
+
+	break;
+      }
+
+    case CB_SYS_munmap:
+      /* XXX: meh, just lie for mmap().  */
+      sc.result = 0;
       break;
 
     case CB_SYS_dup2:
-      if (cb->fdmap[sc.arg1] > MAX_CALLBACK_FDS ||
-	  cb->fdmap[sc.arg2] > MAX_CALLBACK_FDS)
+      if (sc.arg1 >= MAX_CALLBACK_FDS || sc.arg2 >= MAX_CALLBACK_FDS)
 	{
 	  sc.result = -1;
 	  sc.errcode = TARGET_EINVAL;
@@ -235,6 +261,53 @@ bfin_syscall (SIM_CPU *cpu)
 	{
 	  sc.result = dup2 (cb->fdmap[sc.arg1], cb->fdmap[sc.arg2]);
 	  goto sys_finish;
+	}
+      break;
+
+    /* XXX: Should add a cb->pread.  */
+    case CB_SYS_pread:
+      if (sc.arg1 >= MAX_CALLBACK_FDS)
+	{
+	  sc.result = -1;
+	  sc.errcode = TARGET_EINVAL;
+	}
+      else
+	{
+	  long old_pos, read_result, read_errcode;
+
+	  /* Get current filepos.  */
+	  sc.func = TARGET_LINUX_SYS_lseek;
+	  sc.arg2 = 0;
+	  sc.arg3 = SEEK_CUR;
+	  cb_syscall (cb, &sc);
+	  if (sc.result == -1)
+	    break;
+	  old_pos = sc.result;
+
+	  /* Move to the new pos.  */
+	  sc.func = TARGET_LINUX_SYS_lseek;
+	  sc.arg2 = args[3];
+	  sc.arg3 = SEEK_SET;
+	  cb_syscall (cb, &sc);
+	  if (sc.result == -1)
+	    break;
+
+	  /* Read the data.  */
+	  sc.func = TARGET_LINUX_SYS_read;
+	  sc.arg2 = args[1];
+	  sc.arg3 = args[2];
+	  cb_syscall (cb, &sc);
+	  read_result = sc.result;
+	  read_errcode = sc.errcode;
+
+	  /* Move back to the old pos.  */
+	  sc.func = TARGET_LINUX_SYS_lseek;
+	  sc.arg2 = old_pos;
+	  sc.arg3 = SEEK_SET;
+	  cb_syscall (cb, &sc);
+
+	  sc.result = read_result;
+	  sc.errcode = read_errcode;
 	}
       break;
 
@@ -536,6 +609,141 @@ static const char stat_map[] =
 /* Some utils don't like having a NULL environ.  */
 static const char * const simple_env[] = { "HOME=/", "PATH=/bin", NULL };
 
+static bool
+bfin_fdpic_load (SIM_DESC sd, SIM_CPU *cpu, struct bfd *abfd, bu32 *sp,
+		 bu32 *elf_addrs, char **ldso_path)
+{
+  bool ret;
+  int i;
+
+  Elf_Internal_Ehdr *iehdr;
+  Elf32_External_Ehdr ehdr;
+  Elf_Internal_Phdr *phdrs;
+  unsigned char *data;
+  long phdr_size;
+  int phdrc;
+  bu32 nsegs;
+
+  static bu32 load_offset;
+  bu32 max_load_addr;
+
+  unsigned char null[4] = { 0, 0, 0, 0 };
+
+  elf_addrs[0] = bfd_get_start_address (abfd) + load_offset;
+
+  ret = false;
+  *ldso_path = NULL;
+
+  /* See if this an FDPIC ELF.  */
+  phdrs = NULL;
+  if (!abfd)
+    goto skip_fdpic_init;
+  if (bfd_seek (abfd, 0, SEEK_SET) != 0)
+    goto skip_fdpic_init;
+  if (bfd_bread (&ehdr, sizeof (ehdr), abfd) != sizeof (ehdr))
+    goto skip_fdpic_init;
+  iehdr = elf_elfheader (abfd);
+  if (!(iehdr->e_flags & EF_BFIN_FDPIC))
+    goto skip_fdpic_init;
+
+  /* Grab the Program Headers to set up the loadsegs on the stack.  */
+  phdr_size = bfd_get_elf_phdr_upper_bound (abfd);
+  if (phdr_size == -1)
+    goto skip_fdpic_init;
+  phdrs = xmalloc (phdr_size);
+  phdrc = bfd_get_elf_phdrs (abfd, phdrs);
+  if (phdrc == -1)
+    goto skip_fdpic_init;
+
+  /* Push the Ehdr onto the stack.  */
+  *sp -= sizeof (ehdr);
+  elf_addrs[3] = *sp;
+  sim_write (sd, *sp, (void *)&ehdr, sizeof (ehdr));
+
+  /* And the Exec's Phdrs onto the stack.  */
+  if (STATE_PROG_BFD (sd) == abfd)
+    {
+      phdr_size = iehdr->e_phentsize * iehdr->e_phnum;
+      if (bfd_seek (abfd, iehdr->e_phoff, SEEK_SET) != 0)
+	goto skip_fdpic_init;
+      data = xmalloc (phdr_size);
+      if (bfd_bread (data, phdr_size, abfd) != phdr_size)
+	goto skip_fdpic_init;
+      *sp -= phdr_size;
+      elf_addrs[1] = *sp;
+      elf_addrs[2] = phdrc;
+      sim_write (sd, *sp, data, phdr_size);
+      free (data);
+    }
+
+  /* Now push all the loadsegs.  */
+  nsegs = 0;
+  max_load_addr = 0;
+  for (i = phdrc; i >= 0; --i)
+    if (phdrs[i].p_type == PT_LOAD)
+      {
+	Elf_Internal_Phdr *p = &phdrs[i];
+	bu32 paddr, vaddr, memsz, filesz;
+
+	paddr = p->p_paddr + load_offset;
+	vaddr = p->p_vaddr;
+	memsz = p->p_memsz;
+	filesz = p->p_filesz;
+
+	data = xmalloc (memsz);
+	if (memsz != filesz)
+	  memset (data + filesz, 0, memsz - filesz);
+
+	if (bfd_seek (abfd, p->p_offset, SEEK_SET) == 0 &&
+	    bfd_bread (data, filesz, abfd) == filesz)
+	  sim_write (sd, paddr, data, memsz);
+
+	free (data);
+
+	max_load_addr = MAX (paddr + memsz, max_load_addr);
+
+	*sp -= 12;
+	sim_write (sd, *sp+0, (void *)&paddr, 4); /* loadseg.addr */
+	sim_write (sd, *sp+4, (void *)&vaddr, 4); /* loadseg.p_vaddr */
+	sim_write (sd, *sp+8, (void *)&memsz, 4); /* loadseg.p_memsz */
+	++nsegs;
+      }
+    else if (phdrs[i].p_type == PT_DYNAMIC)
+      {
+	elf_addrs[4] = phdrs[i].p_paddr;
+	if (STATE_PROG_BFD (sd) != abfd)
+	  elf_addrs[4] += load_offset;
+      }
+    else if (phdrs[i].p_type == PT_INTERP)
+      {
+	uint32_t off = phdrs[i].p_offset;
+	uint32_t len = phdrs[i].p_filesz;
+
+	*ldso_path = xmalloc (len);
+	if (bfd_seek (abfd, off, SEEK_SET) != 0 ||
+	    bfd_bread (*ldso_path, len, abfd) != len)
+	  {
+	    free (*ldso_path);
+	    *ldso_path = NULL;
+	  }
+      }
+
+  /* Update the load offset with a few extra pages.  */
+  load_offset = ALIGN (MAX (max_load_addr, load_offset), 0x10000);
+  load_offset += 0x10000;
+
+  /* Push the summary loadmap info onto the stack last.  */
+  *sp -= 4;
+  sim_write (sd, *sp+0, null, 2); /* loadmap.version */
+  sim_write (sd, *sp+2, (void *)&nsegs, 2); /* loadmap.nsegs */
+
+  ret = true;
+ skip_fdpic_init:
+  free (phdrs);
+
+  return ret;
+}
+
 static void
 bfin_user_init (SIM_DESC sd, SIM_CPU *cpu, struct bfd *abfd,
 		const char * const *argv, const char * const *env)
@@ -563,74 +771,63 @@ bfin_user_init (SIM_DESC sd, SIM_CPU *cpu, struct bfd *abfd,
 
   bu32 sp, sp_flat;
 
-  Elf32_External_Ehdr ehdr;
-  Elf_Internal_Phdr *phdrs;
-  long phdr_size;
-  int phdrc;
-  bu32 fdpic, pt_dynamic;
+  /* at_entry, at_phdr, at_phnum, at_base, pt_dynamic */
+  bu32 elf_addrs[5];
   bu32 auxvt, auxvt_size;
+  bu32 exec_loadmap, ldso_loadmap;
+  char *ldso_path;
 
   unsigned char null[4] = { 0, 0, 0, 0 };
 
   host_callback *cb = STATE_CALLBACK (sd);
 
-  /* See if this an FDPIC ELF.  */
-  phdrs = NULL;
-  auxvt = 0;
-  if (!abfd)
-    goto skip_fdpic_init;
-  if (bfd_seek (abfd, 0, SEEK_SET) != 0)
-    goto skip_fdpic_init;
-  if (bfd_bread (&ehdr, sizeof (ehdr), abfd) != sizeof (ehdr))
-    goto skip_fdpic_init;
-  if (!(ehdr.e_flags[0] & EF_BFIN_FDPIC))
-    goto skip_fdpic_init;
+  elf_addrs[0] = bfd_get_start_address (abfd);
+  elf_addrs[1] = elf_addrs[2] = elf_addrs[3] = 0;
 
-  /* Grab the Program Headers to set up the loadsegs on the stack.  */
-  phdr_size = bfd_get_elf_phdr_upper_bound (abfd);
-  if (phdr_size == -1)
-    goto skip_fdpic_init;
-  phdrs = xmalloc (phdr_size);
-  phdrc = bfd_get_elf_phdrs (abfd, phdrs);
-  if (phdrc == -1)
-    goto skip_fdpic_init;
+  /* First try to load this as an FDPIC executable.  */
   sp = SPREG;
-  /* XXX: Static FDPIC loads with lma==vma.  */
-  fdpic = 0;
-  for (i = phdrc; i >= 0; --i)
-    if (phdrs[i].p_type == PT_LOAD)
-      {
-	bu32 v;
-	sp -= 12;
-	v = phdrs[i].p_paddr;
-	sim_write (sd, sp+0, (void *)&v, 4); /* loadseg.addr */
-	v = phdrs[i].p_vaddr;
-	sim_write (sd, sp+4, (void *)&v, 4); /* loadseg.p_vaddr */
-	v = phdrs[i].p_memsz;
-	sim_write (sd, sp+8, (void *)&v, 4); /* loadseg.p_memsz */
-	++fdpic;
-      }
-    else if (phdrs[i].p_type == PT_DYNAMIC)
-      pt_dynamic = phdrs[i].p_paddr;
-    else if (phdrs[i].p_type == PT_INTERP)
-      sim_io_eprintf (sd, "bfin-sim: dynamic FDPIC not supported\n");
+  if (!bfin_fdpic_load (sd, cpu, STATE_PROG_BFD (sd), &sp, elf_addrs, &ldso_path))
+    goto skip_fdpic_init;
+  exec_loadmap = sp;
 
-  /* Push the summary loadmap info onto the stack last.  */
-  sp -= 4;
-  sim_write (sd, sp+0, null, 2); /* loadmap.version */
-  sim_write (sd, sp+2, (void *)&fdpic, 2); /* loadmap.nsegs */
+  /* If the FDPIC needs an interpreter, then load it up too.  */
+  if (ldso_path)
+    {
+      const char *ldso_full_path = concat (simulator_sysroot, ldso_path, NULL);
+      struct bfd *ldso_bfd;
+
+      ldso_bfd = bfd_openr (ldso_full_path, STATE_TARGET (sd));
+      if (!ldso_bfd)
+	{
+	  sim_io_eprintf (sd, "bfin-sim: bfd open failed: %s\n", ldso_full_path);
+	  goto static_fdpic;
+	}
+      if (!bfd_check_format (ldso_bfd, bfd_object))
+	sim_io_eprintf (sd, "bfin-sim: bfd format not valid: %s\n", ldso_full_path);
+      bfd_set_arch_info (ldso_bfd, STATE_ARCHITECTURE (sd));
+
+      if (!bfin_fdpic_load (sd, cpu, ldso_bfd, &sp, elf_addrs, &ldso_path))
+	sim_io_eprintf (sd, "bfin-sim: FDPIC ldso failed to load: %s\n", ldso_full_path);
+      if (ldso_path)
+	sim_io_eprintf (sd, "bfin-sim: FDPIC ldso (%s) needs an interpreter (%s) !?\n",
+			ldso_full_path, ldso_path);
+
+      ldso_loadmap = sp;
+    }
+  else
+ static_fdpic:
+    ldso_loadmap = 0;
 
   /* Finally setup the registers required by the FDPIC ABI.  */
   SET_DREG (7, 0); /* Zero out FINI funcptr -- ldso will set this up.  */
-  SET_PREG (0, sp); /* Exec loadmap addr.  */
-  /* XXX: Only static FDPIC is supported atm.  */
-  SET_PREG (1, 0); /* Interp loadmap addr.  */
-  SET_PREG (2, pt_dynamic); /* PT_DYNAMIC map addr.  */
+  SET_PREG (0, exec_loadmap); /* Exec loadmap addr.  */
+  SET_PREG (1, ldso_loadmap); /* Interp loadmap addr.  */
+  SET_PREG (2, elf_addrs[4]); /* PT_DYNAMIC map addr.  */
 
   auxvt = 1;
   SET_SPREG (sp);
  skip_fdpic_init:
-  free (phdrs);
+  sim_pc_set (cpu, elf_addrs[0]);
 
   /* Figure out how much storage the argv/env strings need.  */
   argc = count_argc (argv);
@@ -660,19 +857,23 @@ bfin_user_init (SIM_DESC sd, SIM_CPU *cpu, struct bfd *abfd,
   auxvt = (at); \
   sim_write (sd, sp, (void *)&auxvt, 4)
   auxvt_size = 0;
+      unsigned int egid = getegid (), gid = getgid ();
+      unsigned int euid = geteuid (), uid = getuid ();
       AT_PUSH (AT_NULL, 0);
-      AT_PUSH (AT_PAGESZ, 4096);
-      AT_PUSH (AT_UID, getuid ());
-      AT_PUSH (AT_GID, getgid ());
-      AT_PUSH (AT_EUID, geteuid ());
-      AT_PUSH (AT_EGID, getegid ());
-      AT_PUSH (AT_HWCAP, 0);
+      AT_PUSH (AT_SECURE, egid != gid || euid != uid);
+      AT_PUSH (AT_EGID, egid);
+      AT_PUSH (AT_GID, gid);
+      AT_PUSH (AT_EUID, euid);
+      AT_PUSH (AT_UID, uid);
+      AT_PUSH (AT_ENTRY, elf_addrs[0]);
       AT_PUSH (AT_FLAGS, 0);
-      AT_PUSH (AT_PHDR, 0 /* addr where PT's are mapped */);
-      AT_PUSH (AT_PHNUM, 0 /*phdrc*/);
-      /*AT_PUSH (AT_ENTRY, ehdr.e_entry);*/
-      AT_PUSH (AT_BASE, 0 /* addr wheer Ehdr is mapped */);
+      AT_PUSH (AT_BASE, elf_addrs[3]);
+      AT_PUSH (AT_PHNUM, elf_addrs[2]);
+      AT_PUSH (AT_PHENT, sizeof (Elf32_External_Phdr));
+      AT_PUSH (AT_PHDR, elf_addrs[1]);
       AT_PUSH (AT_CLKTCK, 100); /* XXX: This ever not 100 ?  */
+      AT_PUSH (AT_PAGESZ, 4096);
+      AT_PUSH (AT_HWCAP, 0);
 #undef AT_PUSH
     }
   SET_SPREG (sp);
