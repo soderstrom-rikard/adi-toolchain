@@ -254,7 +254,7 @@ bfin_otp_finish (struct hw *me)
   otp->timing  = 0x00001485;
 
   /* Semi-random value for unique chip id.  */
-  bfin_otp_write_page_val2 (otp, FPS00, (bu64)otp, ~((bu64)otp));
+  bfin_otp_write_page_val2 (otp, FPS00, (unsigned long)otp, ~(unsigned long)otp);
 
   /* XXX: Should push this to models info.  */
   memset (part_str, 0, sizeof (part_str));
