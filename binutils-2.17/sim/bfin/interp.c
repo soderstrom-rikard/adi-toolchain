@@ -782,7 +782,7 @@ bfin_user_init (SIM_DESC sd, SIM_CPU *cpu, struct bfd *abfd,
   host_callback *cb = STATE_CALLBACK (sd);
 
   elf_addrs[0] = bfd_get_start_address (abfd);
-  elf_addrs[1] = elf_addrs[2] = elf_addrs[3] = 0;
+  elf_addrs[1] = elf_addrs[2] = elf_addrs[3] = elf_addrs[4] = 0;
 
   /* First try to load this as an FDPIC executable.  */
   sp = SPREG;
