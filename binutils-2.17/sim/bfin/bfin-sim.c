@@ -3999,9 +3999,9 @@ decode_dsp32alu_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1)
 
       TRACE_INSN (cpu, "R%i.%c = R%i.%c %c R%i.%c%s;",
 		  dst0, HL ? 'H' : 'L',
-		  src0, aop & 2 ? 'L' : 'H',
+		  src0, aop & 2 ? 'H' : 'L',
 		  aopcde == 2 ? '+' : '-',
-		  src1, aop & 1 ? 'L' : 'H',
+		  src1, aop & 1 ? 'H' : 'L',
 		  amod1 (s, x));
 
       s1 = DREG (src0);
