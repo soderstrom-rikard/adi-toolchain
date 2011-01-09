@@ -2562,43 +2562,45 @@ decode_PTR2op_0 (SIM_CPU *cpu, bu16 iw0)
   int src = ((iw0 >> PTR2op_src_bits) & PTR2op_dst_mask);
   int opc = ((iw0 >> PTR2op_opc_bits) & PTR2op_opc_mask);
   int dst = ((iw0 >> PTR2op_dst_bits) & PTR2op_dst_mask);
+  const char *src_name = get_allreg_name (1, src);
+  const char *dst_name = get_allreg_name (1, dst);
 
   PROFILE_COUNT_INSN (cpu, pc, BFIN_INSN_PTR2op);
   TRACE_EXTRACT (cpu, "%s: opc:%i src:%i dst:%i", __func__, opc, src, dst);
 
   if (opc == 0)
     {
-      TRACE_INSN (cpu, "P%i -= P%i", dst, src);
+      TRACE_INSN (cpu, "%s -= %s", dst_name, src_name);
       SET_PREG (dst, PREG (dst) - PREG (src));
     }
   else if (opc == 1)
     {
-      TRACE_INSN (cpu, "P%i = P%i << 2", dst, src);
+      TRACE_INSN (cpu, "%s = %s << 2", dst_name, src_name);
       SET_PREG (dst, PREG (src) << 2);
     }
   else if (opc == 3)
     {
-      TRACE_INSN (cpu, "P%i = P%i >> 2", dst, src);
+      TRACE_INSN (cpu, "%s = %s >> 2", dst_name, src_name);
       SET_PREG (dst, PREG (src) >> 2);
     }
   else if (opc == 4)
     {
-      TRACE_INSN (cpu, "P%i = P%i >> 1", dst, src);
+      TRACE_INSN (cpu, "%s = %s >> 1", dst_name, src_name);
       SET_PREG (dst, PREG (src) >> 1);
     }
   else if (opc == 5)
     {
-      TRACE_INSN (cpu, "P%i += P%i (BREV)", dst, src);
+      TRACE_INSN (cpu, "%s += %s (BREV)", dst_name, src_name);
       SET_PREG (dst, add_brev (PREG (dst), PREG (src)));
     }
   else if (opc == 6)
     {
-      TRACE_INSN (cpu, "P%i = (P%i + P%i) << 1", dst, dst, src);
+      TRACE_INSN (cpu, "%s = (%s + %s) << 1", dst_name, dst_name, src_name);
       SET_PREG (dst, (PREG (dst) + PREG (src)) << 1);
     }
   else if (opc == 7)
     {
-      TRACE_INSN (cpu, "P%i = (P%i + P%i) << 2", dst, dst, src);
+      TRACE_INSN (cpu, "%s = (%s + %s) << 2", dst_name, dst_name, src_name);
       SET_PREG (dst, (PREG (dst) + PREG (src)) << 2);
     }
   else
@@ -2786,6 +2788,7 @@ decode_COMPI2opP_0 (SIM_CPU *cpu, bu16 iw0)
   int src = ((iw0 >> COMPI2opP_src_bits) & COMPI2opP_src_mask);
   int dst = ((iw0 >> COMPI2opP_dst_bits) & COMPI2opP_dst_mask);
   int imm = imm7 (src);
+  const char *dst_name = get_allreg_name (1, dst);
 
   PROFILE_COUNT_INSN (cpu, pc, BFIN_INSN_COMPI2opP);
   TRACE_EXTRACT (cpu, "%s: op:%i src:%i dst:%i", __func__, op, src, dst);
@@ -2793,12 +2796,12 @@ decode_COMPI2opP_0 (SIM_CPU *cpu, bu16 iw0)
 
   if (op == 0)
     {
-      TRACE_INSN (cpu, "P%i = %s;", dst, imm7_str (imm));
+      TRACE_INSN (cpu, "%s = %s;", dst_name, imm7_str (imm));
       SET_PREG (dst, imm);
     }
   else if (op == 1)
     {
-      TRACE_INSN (cpu, "P%i += %s;", dst, imm7_str (imm));
+      TRACE_INSN (cpu, "%s += %s;", dst_name, imm7_str (imm));
       SET_PREG (dst, PREG (dst) + imm);
     }
 }
@@ -3297,6 +3300,7 @@ decode_LDSTii_0 (SIM_CPU *cpu, bu16 iw0)
   int W = ((iw0 >> LDSTii_W_bit) & LDSTii_W_mask);
   bu32 imm, ea;
   const char *imm_str;
+  const char *ptr_name = get_allreg_name (1, ptr);
 
   PROFILE_COUNT_INSN (cpu, pc, BFIN_INSN_LDSTii);
   TRACE_EXTRACT (cpu, "%s: W:%i op:%i offset:%#x ptr:%i reg:%i",
@@ -3317,22 +3321,22 @@ decode_LDSTii_0 (SIM_CPU *cpu, bu16 iw0)
     {
       if (op == 0)
 	{
-	  TRACE_INSN (cpu, "R%i = [P%i + %s];", reg, ptr, imm_str);
+	  TRACE_INSN (cpu, "R%i = [%s + %s];", reg, ptr_name, imm_str);
 	  SET_DREG (reg, GET_LONG (ea));
 	}
       else if (op == 1)
 	{
-	  TRACE_INSN (cpu, "R%i = W[P%i + %s] (Z);", reg, ptr, imm_str);
+	  TRACE_INSN (cpu, "R%i = W[%s + %s] (Z);", reg, ptr_name, imm_str);
 	  SET_DREG (reg, GET_WORD (ea));
 	}
       else if (op == 2)
 	{
-	  TRACE_INSN (cpu, "R%i = W[P%i + %s] (X);", reg, ptr, imm_str);
+	  TRACE_INSN (cpu, "R%i = W[%s + %s] (X);", reg, ptr_name, imm_str);
 	  SET_DREG (reg, (bs32) (bs16) GET_WORD (ea));
 	}
       else if (op == 3)
 	{
-	  TRACE_INSN (cpu, "P%i = [P%i + %s];", reg, ptr, imm_str);
+	  TRACE_INSN (cpu, "P%i = [%s + %s];", reg, ptr_name, imm_str);
 	  SET_PREG (reg, GET_LONG (ea));
 	}
     }
@@ -3340,17 +3344,17 @@ decode_LDSTii_0 (SIM_CPU *cpu, bu16 iw0)
     {
       if (op == 0)
 	{
-	  TRACE_INSN (cpu, "[P%i + %s] = R%i;", ptr, imm_str, reg);
+	  TRACE_INSN (cpu, "[%s + %s] = R%i;", ptr_name, imm_str, reg);
 	  PUT_LONG (ea, DREG (reg));
 	}
       else if (op == 1)
 	{
-	  TRACE_INSN (cpu, "W[P%i + %s] = R%i;", ptr, imm_str, reg);
+	  TRACE_INSN (cpu, "W[%s + %s] = R%i;", ptr_name, imm_str, reg);
 	  PUT_WORD (ea, DREG (reg));
 	}
       else if (op == 3)
 	{
-	  TRACE_INSN (cpu, "[P%i + %s] = P%i;", ptr, imm_str, reg);
+	  TRACE_INSN (cpu, "[%s + %s] = P%i;", ptr_name, imm_str, reg);
 	  PUT_LONG (ea, PREG (reg));
 	}
     }
