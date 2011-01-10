@@ -54,6 +54,8 @@ struct sim_state {
 #define STATE_CPU(sd,n) ((sd)->cpu[0])
 #endif
   /* ... simulator specific members ... */
+  struct bfin_board_data board;
+#define STATE_BOARD_DATA(sd) (&(sd)->board)
   sim_state_base base;
 };
 

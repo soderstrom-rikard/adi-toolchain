@@ -533,10 +533,13 @@ sim_open (SIM_OPEN_KIND kind, host_callback *callback,
   /* These options override any module options.
      Obviously ambiguity should be avoided, however the caller may wish to
      augment the meaning of an option.  */
-  {
-    extern const OPTION bfin_mmu_options[];
-    sim_add_option_table (sd, NULL, bfin_mmu_options);
-  }
+#define e_sim_add_option_table(sd, options) \
+  do { \
+    extern const OPTION options[]; \
+    sim_add_option_table (sd, NULL, options); \
+  } while (0)
+  e_sim_add_option_table (sd, bfin_mmu_options);
+  e_sim_add_option_table (sd, bfin_mach_options);
 
   /* getopt will print the error message so we just have to exit if this fails.
      FIXME: Hmmm...  in the case of gdb we need getopt to call

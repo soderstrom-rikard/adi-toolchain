@@ -53,6 +53,8 @@
 #include "dv-bfin_uart2.h"
 #include "dv-bfin_wdog.h"
 
+static const MACH bfin_mach;
+
 struct bfin_memory_layout {
   address_word addr, len;
   unsigned mask;	/* see mapmask in sim_core_attach() */
@@ -75,14 +77,6 @@ struct bfin_model_data {
   size_t dev_count;
   const struct bfin_dmac_layout *dmac;
   size_t dmac_count;
-};
-
-static const MACH bfin_mach;
-
-const MACH *sim_machs[] =
-{
-  & bfin_mach,
-  NULL
 };
 
 #define LAYOUT(_addr, _len, _mask) { .addr = _addr, .len = _len, .mask = access_##_mask, }
@@ -731,6 +725,7 @@ bfin_model_hw_tree_init (SIM_DESC sd, SIM_CPU *cpu)
 {
   const MODEL *model = CPU_MODEL (cpu);
   const struct bfin_model_data *mdata = CPU_MODEL_DATA (cpu);
+  const struct bfin_board_data *board = STATE_BOARD_DATA (sd);
   int mnum = MODEL_NUM (model);
   unsigned i, j, dma_chan;
 
@@ -826,6 +821,10 @@ bfin_model_hw_tree_init (SIM_DESC sd, SIM_CPU *cpu)
     }
 
  done:
+  /* Add any additional user board content.  */
+  if (board->hw_file)
+    sim_do_commandf (sd, "hw-file %s", board->hw_file);
+
   /* Trigger all the new devices' finish func.  */
   hw_tree_finish (dv_get_device (cpu, "/"));
 }
@@ -914,10 +913,10 @@ static void
 bfin_model_map_bfrom (SIM_DESC sd, SIM_CPU *cpu)
 {
   const struct bfin_model_data *mdata = CPU_MODEL_DATA (cpu);
+  const struct bfin_board_data *board = STATE_BOARD_DATA (sd);
   int mnum = mdata->model_num;
   const struct bfrom *bfrom;
-  /* XXX: Add option for people to specify this.  */
-  int sirev = -1;
+  unsigned int sirev;
 
   if (mnum >= 500 && mnum <= 509)
     bfrom = bf50x_roms;
@@ -942,7 +941,9 @@ bfin_model_map_bfrom (SIM_DESC sd, SIM_CPU *cpu)
   else
     return;
 
-  if (sirev == -1)
+  if (board->sirev_valid)
+    sirev = board->sirev;
+  else
     sirev = bfrom->sirev;
   while (bfrom->buf)
     {
@@ -996,8 +997,9 @@ bfin_model_get_chipid (SIM_DESC sd)
 {
   SIM_CPU *cpu = STATE_CPU (sd, 0);
   const struct bfin_model_data *mdata = CPU_MODEL_DATA (cpu);
+  const struct bfin_board_data *board = STATE_BOARD_DATA (sd);
   return
-	 (0x3 << 28) /* XXX: silicon rev */ |
+	 (board->sirev << 28) |
 	 (mdata->chipid << 12) |
 	 (((0xE5 << 1) | 1) & 0xFF);
 }
@@ -1005,10 +1007,11 @@ bfin_model_get_chipid (SIM_DESC sd)
 bu32
 bfin_model_get_dspid (SIM_DESC sd)
 {
+  const struct bfin_board_data *board = STATE_BOARD_DATA (sd);
   return
 	 (0xE5 << 24) |
 	 (0x04 << 16) |
-	 (0x3) /* XXX: silicon rev */;
+	 (board->sirev);
 }
 
 static void
@@ -1221,3 +1224,59 @@ static const MACH bfin_mach =
   bfin_init_cpu,
   bfin_prepare_run
 };
+
+const MACH *sim_machs[] =
+{
+  & bfin_mach,
+  NULL
+};
+
+/* Device option parsing.  */
+
+static DECLARE_OPTION_HANDLER (bfin_mach_option_handler);
+
+enum {
+  OPTION_MACH_SIREV = OPTION_START,
+  OPTION_MACH_HW_BOARD_FILE,
+};
+
+const OPTION bfin_mach_options[] =
+{
+  { {"sirev", required_argument, NULL, OPTION_MACH_SIREV },
+      '\0', "NUMBER", "Set CPU silicon revision",
+      bfin_mach_option_handler, NULL },
+
+  { {"hw-board-file", required_argument, NULL, OPTION_MACH_HW_BOARD_FILE },
+      '\0', "FILE", "Add the supplemental devices listed in the file",
+      bfin_mach_option_handler, NULL },
+
+  { {NULL, no_argument, NULL, 0}, '\0', NULL, NULL, NULL, NULL }
+};
+
+static SIM_RC
+bfin_mach_option_handler (SIM_DESC sd, sim_cpu *current_cpu, int opt,
+			  char *arg, int is_command)
+{
+  struct bfin_board_data *board = STATE_BOARD_DATA (sd);
+
+  switch (opt)
+    {
+    case OPTION_MACH_SIREV:
+      board->sirev_valid = 1;
+      board->sirev = atoi (arg);
+      if (board->sirev > 0xf)
+	{
+	  sim_io_eprintf (sd, "sirev '%s' needs to fit into 4 bits\n", arg);
+	  return SIM_RC_FAIL;
+	}
+      return SIM_RC_OK;
+
+    case OPTION_MACH_HW_BOARD_FILE:
+      board->hw_file = xstrdup (arg);
+      return SIM_RC_OK;
+
+    default:
+      sim_io_eprintf (sd, "Unknown Blackfin option %d\n", opt);
+      return SIM_RC_FAIL;
+    }
+}

@@ -38,6 +38,12 @@ typedef enum mach_attr {
 
 #define CPU_MODEL_NUM(cpu) MODEL_NUM (CPU_MODEL (cpu))
 
+/* XXX: Some of this probably belongs in CPU_MODEL.  */
+struct bfin_board_data {
+  unsigned int sirev, sirev_valid;
+  const char *hw_file;
+};
+
 void bfin_model_cpu_init (SIM_DESC, SIM_CPU *);
 bu32 bfin_model_get_chipid (SIM_DESC);
 bu32 bfin_model_get_dspid (SIM_DESC);
