@@ -99,7 +99,7 @@ stmp-bsp: force
 	for dir in .. ${SUBDIRS}; do \
 	  if [ x$$dir != x.. ]; then \
 	    if [ -d $$dir ]; then \
-	      (cd $$dir; $(MAKE) $(FLAGS_TO_PASS)); \
+	      (cd $$dir; $(MAKE) $(FLAGS_TO_PASS)) || exit $$?; \
 	    else true; fi; \
 	  else true; fi; \
 	done
@@ -110,7 +110,7 @@ install: force
 	for dir in .. ${SUBDIRS}; do \
 	  if [ x$$dir != x.. ]; then \
 	    if [ -d $$dir ]; then \
-	      (cd $$dir; $(MAKE) $(FLAGS_TO_PASS) install); \
+	      (cd $$dir; $(MAKE) $(FLAGS_TO_PASS) install) || exit $$?; \
 	    else true; fi; \
 	  else true; fi; \
 	done
