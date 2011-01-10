@@ -40,9 +40,9 @@ typedef struct _sim_cpu SIM_CPU;
 #include "sim-base.h"
 
 struct _sim_cpu {
-   /* ... simulator specific members ... */
-   struct bfin_cpu_state state;
-   sim_cpu_base base;
+  /* ... simulator specific members ... */
+  struct bfin_cpu_state state;
+  sim_cpu_base base;
 };
 #define BFIN_CPU_STATE ((cpu)->state)
 
@@ -53,7 +53,7 @@ struct sim_state {
 #else
 #define STATE_CPU(sd,n) ((sd)->cpu[0])
 #endif
-   /* ... simulator specific members ... */
+  /* ... simulator specific members ... */
   sim_state_base base;
 };
 
