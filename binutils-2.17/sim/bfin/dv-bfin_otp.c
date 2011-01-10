@@ -240,6 +240,8 @@ bfin_otp_finish (struct hw *me)
 {
   char part_str[16];
   struct bfin_otp *otp;
+  unsigned int fps03;
+  int type = hw_find_integer_property (me, "type");
 
   otp = HW_ZALLOC (me, struct bfin_otp);
 
@@ -256,11 +258,46 @@ bfin_otp_finish (struct hw *me)
   /* Semi-random value for unique chip id.  */
   bfin_otp_write_page_val2 (otp, FPS00, (unsigned long)otp, ~(unsigned long)otp);
 
-  /* XXX: Should push this to models info.  */
   memset (part_str, 0, sizeof (part_str));
-  sprintf (part_str, "ADSP-BF%iX", hw_find_integer_property (me, "type"));
-  part_str[14] = (FPS03_BF518 >> 0) & 0xff;
-  part_str[15] = (FPS03_BF518 >> 8) & 0xff;
+  sprintf (part_str, "ADSP-BF%iX", type);
+  switch (type)
+    {
+    case 512:
+      fps03 = FPS03_BF512;
+      break;
+    case 514:
+      fps03 = FPS03_BF514;
+      break;
+    case 516:
+      fps03 = FPS03_BF516;
+      break;
+    case 518:
+      fps03 = FPS03_BF518;
+      break;
+    case 522:
+      fps03 = FPS03_BF522;
+      break;
+    case 523:
+      fps03 = FPS03_BF523;
+      break;
+    case 524:
+      fps03 = FPS03_BF524;
+      break;
+    case 525:
+      fps03 = FPS03_BF525;
+      break;
+    case 526:
+      fps03 = FPS03_BF526;
+      break;
+    case 527:
+      fps03 = FPS03_BF527;
+      break;
+    default:
+      fps03 = 0;
+      break;
+    }
+  part_str[14] = (fps03 >> 0);
+  part_str[15] = (fps03 >> 8);
   bfin_otp_write_page_val (otp, FPS03, (void *)part_str);
 }
 
