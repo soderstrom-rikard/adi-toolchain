@@ -253,7 +253,13 @@ static const char * const excp_decoded[] = {
 int
 cec_get_ivg (SIM_CPU *cpu)
 {
-  return _cec_get_ivg (CEC_STATE (cpu));
+  switch (STATE_ENVIRONMENT (CPU_STATE (cpu)))
+    {
+    case OPERATING_ENVIRONMENT:
+      return _cec_get_ivg (CEC_STATE (cpu));
+    default:
+      return IVG_USER;
+    }
 }
 
 static bool
