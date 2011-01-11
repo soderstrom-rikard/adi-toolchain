@@ -131,6 +131,8 @@ bfin_syscall (SIM_CPU *cpu)
   host_callback *cb = STATE_CALLBACK (sd);
   bu32 args[6];
   CB_SYSCALL sc;
+  char _tbuf[512], *tbuf = _tbuf;
+  int fmt_ret_hex = 0;
 
   CB_SYSCALL_INIT (&sc);
 
@@ -165,13 +167,16 @@ bfin_syscall (SIM_CPU *cpu)
   switch (cb_target_to_host_syscall (cb, sc.func))
     {
     case CB_SYS_exit:
+      tbuf += sprintf (tbuf, "exit(%i)", args[0]);
       sim_engine_halt (sd, cpu, NULL, PCREG, sim_exited, sc.arg1);
 
     case CB_SYS_argc:
+      tbuf += sprintf (tbuf, "argc()");
       sc.result = count_argc (argv);
       break;
     case CB_SYS_argnlen:
       {
+      tbuf += sprintf (tbuf, "argnlen(%u)", args[0]);
 	if (sc.arg1 < count_argc (argv))
 	  sc.result = strlen (argv[sc.arg1]);
 	else
@@ -180,6 +185,7 @@ bfin_syscall (SIM_CPU *cpu)
       break;
     case CB_SYS_argn:
       {
+	tbuf += sprintf (tbuf, "argn(%u)", args[0]);
 	if (sc.arg1 < count_argc (argv))
 	  {
 	    const char *argn = argv[sc.arg1];
@@ -197,6 +203,7 @@ bfin_syscall (SIM_CPU *cpu)
 
     case CB_SYS_ioctl:
       /* XXX: hack just enough to get basic stdio w/uClibc ...  */
+      tbuf += sprintf (tbuf, "ioctl(%i, %#x, %u)", args[0], args[1], args[2]);
       if (sc.arg2 == 0x5401)
 	{
 	  sc.result = !isatty (sc.arg1);
@@ -212,6 +219,10 @@ bfin_syscall (SIM_CPU *cpu)
     case CB_SYS_mmap2:
       {
 	static bu32 heap = BFIN_DEFAULT_MEM_SIZE / 2;
+
+	fmt_ret_hex = 1;
+	tbuf += sprintf (tbuf, "mmap(%#x, %u, %#x, %#x, %i, %u)",
+			 args[0], args[1], args[2], args[3], args[4], args[5]);
 
 	sc.errcode = 0;
 
@@ -248,10 +259,12 @@ bfin_syscall (SIM_CPU *cpu)
 
     case CB_SYS_munmap:
       /* XXX: meh, just lie for mmap().  */
+      tbuf += sprintf (tbuf, "munmap(%#x, %u)", args[0], args[1]);
       sc.result = 0;
       break;
 
     case CB_SYS_dup2:
+      tbuf += sprintf (tbuf, "dup2(%i, %i)", args[0], args[1]);
       if (sc.arg1 >= MAX_CALLBACK_FDS || sc.arg2 >= MAX_CALLBACK_FDS)
 	{
 	  sc.result = -1;
@@ -266,6 +279,8 @@ bfin_syscall (SIM_CPU *cpu)
 
     /* XXX: Should add a cb->pread.  */
     case CB_SYS_pread:
+      tbuf += sprintf (tbuf, "pread(%i, %#x, %u, %i)",
+		       args[0], args[1], args[2], args[3]);
       if (sc.arg1 >= MAX_CALLBACK_FDS)
 	{
 	  sc.result = -1;
@@ -313,24 +328,71 @@ bfin_syscall (SIM_CPU *cpu)
 
     case CB_SYS_getuid:
     case CB_SYS_getuid32:
+      tbuf += sprintf (tbuf, "getuid()");
       sc.result = getuid ();
       goto sys_finish;
     case CB_SYS_getgid:
     case CB_SYS_getgid32:
+      tbuf += sprintf (tbuf, "getgid()");
       sc.result = getgid ();
       goto sys_finish;
     case CB_SYS_setuid:
       sc.arg1 &= 0xffff;
     case CB_SYS_setuid32:
+      tbuf += sprintf (tbuf, "setuid(%u)", args[0]);
       sc.result = setuid (sc.arg1);
       goto sys_finish;
     case CB_SYS_setgid:
       sc.arg1 &= 0xffff;
     case CB_SYS_setgid32:
+      tbuf += sprintf (tbuf, "setgid(%u)", args[0]);
       sc.result = setgid (sc.arg1);
       goto sys_finish;
 
+    case CB_SYS_open:
+      tbuf += sprintf (tbuf, "open(%#x, %#x, %o)", args[0], args[1], args[2]);
+      goto case_default;
+    case CB_SYS_close:
+      tbuf += sprintf (tbuf, "close(%i)", args[0]);
+      goto case_default;
+    case CB_SYS_read:
+      tbuf += sprintf (tbuf, "read(%i, %#x, %u)", args[0], args[1], args[2]);
+      goto case_default;
+    case CB_SYS_write:
+      tbuf += sprintf (tbuf, "write(%i, %#x, %u)", args[0], args[1], args[2]);
+      goto case_default;
+    case CB_SYS_lseek:
+      tbuf += sprintf (tbuf, "lseek(%i, %i, %i)", args[0], args[1], args[2]);
+      goto case_default;
+    case CB_SYS_unlink:
+      tbuf += sprintf (tbuf, "unlink(%#x)", args[0]);
+      goto case_default;
+    case CB_SYS_truncate:
+      tbuf += sprintf (tbuf, "truncate(%#x, %i)", args[0], args[1]);
+      goto case_default;
+    case CB_SYS_ftruncate:
+      tbuf += sprintf (tbuf, "ftruncate(%i, %i)", args[0], args[1]);
+      goto case_default;
+    case CB_SYS_rename:
+      tbuf += sprintf (tbuf, "rename(%#x, %#x)", args[0], args[1]);
+      goto case_default;
+    case CB_SYS_stat:
+      tbuf += sprintf (tbuf, "stat(%#x, %#x)", args[0], args[1]);
+      goto case_default;
+    case CB_SYS_fstat:
+      tbuf += sprintf (tbuf, "fstat(%i, %#x)", args[0], args[1]);
+      goto case_default;
+    case CB_SYS_lstat:
+      tbuf += sprintf (tbuf, "lstat(%i, %#x)", args[0], args[1]);
+      goto case_default;
+    case CB_SYS_pipe:
+      tbuf += sprintf (tbuf, "pipe(%#x, %#x)", args[0], args[1]);
+      goto case_default;
+
     default:
+      tbuf += sprintf (tbuf, "???_%i(%#x, %#x, %#x, %#x, %#x, %#x)", sc.func,
+		       args[0], args[1], args[2], args[3], args[4], args[5]);
+    case_default:
       cb_syscall (cb, &sc);
       break;
 
@@ -343,23 +405,37 @@ bfin_syscall (SIM_CPU *cpu)
 		sc.func, args[0], args[1], args[2], args[3], args[4], args[5],
 		sc.result, sc.errcode);
 
+  tbuf += sprintf (tbuf, " = ");
   if (STATE_ENVIRONMENT (sd) == USER_ENVIRONMENT)
     {
       if (sc.result == -1)
 	{
+	  tbuf += sprintf (tbuf, "-1 (error = %i)", sc.errcode);
 	  if (sc.errcode == cb_host_to_target_errno (cb, ENOSYS))
-	    sim_io_eprintf (sd, "bfin-sim: unimplemented syscall %i (@ PC %#x)\n", sc.func, PCREG);
+	    {
+	      sim_io_eprintf (sd, "bfin-sim: %#x: unimplemented syscall %i\n",
+			      PCREG, sc.func);
+	    }
 	  SET_DREG (0, -sc.errcode);
 	}
       else
-	SET_DREG (0, sc.result);
+	{
+	  if (fmt_ret_hex)
+	    tbuf += sprintf (tbuf, "%#lx", sc.result);
+	  else
+	    tbuf += sprintf (tbuf, "%lu", sc.result);
+	  SET_DREG (0, sc.result);
+	}
     }
   else
     {
+      tbuf += sprintf (tbuf, "%lu (error = %i)", sc.result, sc.errcode);
       SET_DREG (0, sc.result);
       /* Blackfin libgloss only expects R0 to be updated, not R1.  */
       /*SET_DREG (1, sc.errcode);*/
     }
+
+  TRACE_SYSCALL (cpu, "%s", _tbuf);
 }
 
 void
