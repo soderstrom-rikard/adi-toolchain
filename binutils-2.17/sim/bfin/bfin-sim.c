@@ -3518,9 +3518,6 @@ decode_LDSTidxI_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1)
   bu32 imm_16s4 = imm16s4 (offset);
   bu32 imm_16s2 = imm16s2 (offset);
   bu32 imm_16 = imm16 (offset);
-  const char *imm_16s4_str = imm16s4_str (offset);
-  const char *imm_16s2_str = imm16s2_str (offset);
-  const char *imm_16_str = imm16_str (offset);
 
   PROFILE_COUNT_INSN (cpu, pc, BFIN_INSN_LDSTidxI);
   TRACE_EXTRACT (cpu, "%s: W:%i Z:%i sz:%i ptr:%i reg:%i offset:%#x",
@@ -3533,33 +3530,38 @@ decode_LDSTidxI_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1)
     {
       if (sz == 0 && Z == 0)
 	{
-	  TRACE_INSN (cpu, "R%i = [%s + %s];", reg, ptr_name, imm_16s4_str);
+	  TRACE_INSN (cpu, "R%i = [%s + %s];",
+		      reg, ptr_name, imm16s4_str (offset));
 	  SET_DREG (reg, GET_LONG (PREG (ptr) + imm_16s4));
 	}
       else if (sz == 0 && Z == 1)
 	{
 	  TRACE_INSN (cpu, "%s = [%s + %s];",
-		      get_preg_name (reg), ptr_name, imm_16s4_str);
+		      get_preg_name (reg), ptr_name, imm16s4_str (offset));
 	  SET_PREG (reg, GET_LONG (PREG (ptr) + imm_16s4));
 	}
       else if (sz == 1 && Z == 0)
 	{
-	  TRACE_INSN (cpu, "R%i = W[%s + %s] (Z);", reg, ptr_name, imm_16s2_str);
+	  TRACE_INSN (cpu, "R%i = W[%s + %s] (Z);",
+		      reg, ptr_name, imm16s2_str (offset));
 	  SET_DREG (reg, GET_WORD (PREG (ptr) + imm_16s2));
 	}
       else if (sz == 1 && Z == 1)
 	{
-	  TRACE_INSN (cpu, "R%i = W[%s + %s] (X);", reg, ptr_name, imm_16s2_str);
+	  TRACE_INSN (cpu, "R%i = W[%s + %s] (X);",
+		      reg, ptr_name, imm16s2_str (offset));
 	  SET_DREG (reg, (bs32) (bs16) GET_WORD (PREG (ptr) + imm_16s2));
 	}
       else if (sz == 2 && Z == 0)
 	{
-	  TRACE_INSN (cpu, "R%i = B[%s + %s] (Z);", reg, ptr_name, imm_16_str);
+	  TRACE_INSN (cpu, "R%i = B[%s + %s] (Z);",
+		      reg, ptr_name, imm16_str (offset));
 	  SET_DREG (reg, GET_BYTE (PREG (ptr) + imm_16));
 	}
       else if (sz == 2 && Z == 1)
 	{
-	  TRACE_INSN (cpu, "R%i = B[%s + %s] (X);", reg, ptr_name, imm_16_str);
+	  TRACE_INSN (cpu, "R%i = B[%s + %s] (X);",
+		      reg, ptr_name, imm16_str (offset));
 	  SET_DREG (reg, (bs32) (bs8) GET_BYTE (PREG (ptr) + imm_16));
 	}
     }
@@ -3570,23 +3572,26 @@ decode_LDSTidxI_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1)
 
       if (sz == 0 && Z == 0)
 	{
-	  TRACE_INSN (cpu, "[%s + %s] = R%i;", ptr_name, imm_16s4_str, reg);
+	  TRACE_INSN (cpu, "[%s + %s] = R%i;", ptr_name,
+		      imm16s4_str (offset), reg);
 	  PUT_LONG (PREG (ptr) + imm_16s4, DREG (reg));
 	}
       else if (sz == 0 && Z == 1)
 	{
 	  TRACE_INSN (cpu, "[%s + %s] = %s;",
-		      ptr_name, imm_16s4_str, get_preg_name (reg));
+		      ptr_name, imm16s4_str (offset), get_preg_name (reg));
 	  PUT_LONG (PREG (ptr) + imm_16s4, PREG (reg));
 	}
       else if (sz == 1 && Z == 0)
 	{
-	  TRACE_INSN (cpu, "W[%s + %s] = R%i;", ptr_name, imm_16s2_str, reg);
+	  TRACE_INSN (cpu, "W[%s + %s] = R%i;",
+		      ptr_name, imm16s2_str (offset), reg);
 	  PUT_WORD (PREG (ptr) + imm_16s2, DREG (reg));
 	}
       else if (sz == 2 && Z == 0)
 	{
-	  TRACE_INSN (cpu, "B[%s + %s] = R%i;", ptr_name, imm_16_str, reg);
+	  TRACE_INSN (cpu, "B[%s + %s] = R%i;",
+		      ptr_name, imm16_str (offset), reg);
 	  PUT_BYTE (PREG (ptr) + imm_16, DREG (reg));
 	}
     }
