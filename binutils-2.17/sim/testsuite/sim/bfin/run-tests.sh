@@ -101,11 +101,10 @@ testit() {
 			tmp1=`expr index "${out}" "program stopped with signal 4"`
 			if [ ${tmp1} -eq 1 ] ; then
 				 printf 'illegal instruction\n'
-			else if [ -n "${tmp}" ] ; then
-					printf 'FAIL at line '
-					addr=`echo $out | sed 's:^[A-Za-z ]*::' | sed 's:^0x[0-9][0-9] ::' | sed 's:^[A-Za-z ]*::' | awk '{print $1}'`
-					bfin-elf-addr2line -e ${x} ${addr} | awk -F "/" '{print $NF}'
-				fi
+			elif [ -n "${tmp}" ] ; then
+				printf 'FAIL at line '
+				addr=`echo $out | sed 's:^[A-Za-z ]*::' | sed 's:^0x[0-9][0-9] ::' | sed 's:^[A-Za-z ]*::' | awk '{print $1}'`
+				bfin-elf-addr2line -e ${x} ${addr} | awk -F "/" '{print $NF}'
 			fi
 		elif [ "${name}" = "HOST" ] ; then
 			rsh_out=`rsh -l root $boardip '/bin/dmesg -c | /bin/grep -e DBGA -e "FAULT "'`
@@ -124,7 +123,7 @@ testit() {
 	else
 		if [ ! -z "${fail}" ] ; then
 			unexpected_pass=$(( unexpected_pass + 1 ))
-			echo !!!Expected fail, but pass
+			echo "!!!Expected fail, but pass"
 		else
 			expected_pass=$(( expected_pass + 1 ))
 		fi
