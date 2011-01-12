@@ -88,47 +88,47 @@ testit() {
 
 	local name=$1 x=$2 y=`echo $2 | sed 's:\.[xX]$::'` out rsh_out addr
 	shift; shift
-        local fail=`grep xfail ${y}`
-	if [ "${name}" == "HOST" -a ! -f $x ] ; then
-		return;
-        fi
+	local fail=`grep xfail ${y}`
+	if [ "${name}" = "HOST" -a ! -f $x ] ; then
+		return
+	fi
 	printf '%-5s %-40s' ${name} ${x}
 	out=`"$@" ${x} 2>&1`
 	(pf "${out}")
-        if [ $?  -ne 0 ] ; then
-	  if [ "${name}" == "SIM" ] ; then
-	    tmp=`echo ${out} | awk '{print $3}' | sed 's/://'`
-	    tmp1=`expr index "${out}" "program stopped with signal 4"`
-	    if [ ${tmp1} -eq 1 ] ; then
-	       printf 'illegal instruction\n'
-	    else if [ -n "${tmp}" ] ; then
-	        printf 'FAIL at line '
-                addr=`echo $out | sed 's:^[A-Za-z ]*::' | sed 's:^0x[0-9][0-9] ::' | sed 's:^[A-Za-z ]*::' | awk '{print $1}'`
-	        bfin-elf-addr2line -e ${x} ${addr} | awk -F "/" '{print $NF}'
-	      fi
-            fi
-	  elif [ "${name}" == "HOST" ] ; then
-            rsh_out=`rsh -l root $boardip '/bin/dmesg -c | /bin/grep -e DBGA -e "FAULT "'`
-	    tmp=`echo ${rsh_out} |  sed 's:\].*$::' | awk '{print $NF}' | awk -F ":" '{print $NF}'`
-	    if [ -n "${tmp}" ] ; then
-	       echo "${rsh_out}"
-               printf 'FAIL at line '
-	       bfin-elf-addr2line -e ${x} $(echo ${rsh_out} |  sed 's:\].*$::' | awk '{print $NF}') | awk -F "/" '{print $NF}'
-	    fi
-	  fi
-	  ret=$(( ret + 1 ))
-          if [ -z "${fail}" ] ; then
-            unexpected_fail=$(( unexpected_fail + 1 ))
-            echo "!!!Expected Pass, but fail"
-          fi
-        else
-          if [ ! -z "${fail}" ] ; then
-            unexpected_pass=$(( unexpected_pass + 1 ))
-            echo !!!Expected fail, but pass
-          else
-	    expected_pass=$(( expected_pass + 1 ))
-          fi
-        fi
+	if [ $? -ne 0 ] ; then
+		if [ "${name}" = "SIM" ] ; then
+			tmp=`echo ${out} | awk '{print $3}' | sed 's/://'`
+			tmp1=`expr index "${out}" "program stopped with signal 4"`
+			if [ ${tmp1} -eq 1 ] ; then
+				 printf 'illegal instruction\n'
+			else if [ -n "${tmp}" ] ; then
+					printf 'FAIL at line '
+					addr=`echo $out | sed 's:^[A-Za-z ]*::' | sed 's:^0x[0-9][0-9] ::' | sed 's:^[A-Za-z ]*::' | awk '{print $1}'`
+					bfin-elf-addr2line -e ${x} ${addr} | awk -F "/" '{print $NF}'
+				fi
+			fi
+		elif [ "${name}" = "HOST" ] ; then
+			rsh_out=`rsh -l root $boardip '/bin/dmesg -c | /bin/grep -e DBGA -e "FAULT "'`
+			tmp=`echo ${rsh_out} | sed 's:\].*$::' | awk '{print $NF}' | awk -F ":" '{print $NF}'`
+			if [ -n "${tmp}" ] ; then
+				echo "${rsh_out}"
+				printf 'FAIL at line '
+				bfin-elf-addr2line -e ${x} $(echo ${rsh_out} | sed 's:\].*$::' | awk '{print $NF}') | awk -F "/" '{print $NF}'
+			fi
+		fi
+		ret=$(( ret + 1 ))
+		if [ -z "${fail}" ] ; then
+			unexpected_fail=$(( unexpected_fail + 1 ))
+			echo "!!!Expected Pass, but fail"
+		fi
+	else
+		if [ ! -z "${fail}" ] ; then
+			unexpected_pass=$(( unexpected_pass + 1 ))
+			echo !!!Expected fail, but pass
+		else
+			expected_pass=$(( expected_pass + 1 ))
+		fi
+	fi
 }
 
 pf() {
@@ -212,9 +212,9 @@ if [ ${ret} -eq 0 ] ; then
 	exit 0
 else
 	echo number of failures ${ret}
-        if [ ${unexpected_pass} -gt 0 ] ; then
+	if [ ${unexpected_pass} -gt 0 ] ; then
 		echo "Unexpected passes: ${unexpected_pass}"
-        fi
+	fi
 	if [ ${unexpected_fail} -gt 0 ] ; then
 		echo "Unexpected fails: ${unexpected_fail}"
 	fi
