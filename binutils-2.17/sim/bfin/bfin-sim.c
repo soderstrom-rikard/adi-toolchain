@@ -2538,7 +2538,7 @@ decode_ALU2op_0 (SIM_CPU *cpu, bu16 iw0)
   else if (opc == 14)
     {
       bu32 val = DREG (src);
-      TRACE_INSN (cpu, "R%i = - R%i.B;", dst, src);
+      TRACE_INSN (cpu, "R%i = - R%i;", dst, src);
       SET_DREG (dst, -val);
       setflags_nz (cpu, DREG (dst));
       SET_ASTATREG (v, val == 0x80000000);
@@ -2549,7 +2549,7 @@ decode_ALU2op_0 (SIM_CPU *cpu, bu16 iw0)
     }
   else if (opc == 15)
     {
-      TRACE_INSN (cpu, "R%i = ~ R%i.B;", dst, src);
+      TRACE_INSN (cpu, "R%i = ~ R%i;", dst, src);
       SET_DREG (dst, ~DREG (src));
       setflags_logical (cpu, DREG (dst));
     }
