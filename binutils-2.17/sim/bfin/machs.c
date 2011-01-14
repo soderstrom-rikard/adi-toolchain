@@ -1263,6 +1263,9 @@ bfin_mach_option_handler (SIM_DESC sd, sim_cpu *current_cpu, int opt,
     {
     case OPTION_MACH_SIREV:
       board->sirev_valid = 1;
+      /* Accept (and throw away) a leading "0." in the version.  */
+      if (!strncmp (arg, "0.", 2))
+	arg += 2;
       board->sirev = atoi (arg);
       if (board->sirev > 0xf)
 	{
