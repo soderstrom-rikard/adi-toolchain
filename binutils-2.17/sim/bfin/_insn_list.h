@@ -1,5 +1,9 @@
 /* Only bother with insn groups rather than exact insn (for now?).  */
-I(ProgCtrl)
+I(ProgCtrl_nop)
+I(ProgCtrl_branch)
+I(ProgCtrl_sync)
+I(ProgCtrl_cec)
+I(ProgCtrl_atomic)
 I(CaCTRL)
 I(PushPopReg)
 I(PushPopMultiple)

@@ -1668,14 +1668,17 @@ decode_ProgCtrl_0 (SIM_CPU *cpu, bu16 iw0, bu32 pc)
   int poprnd  = ((iw0 >> ProgCtrl_poprnd_bits) & ProgCtrl_poprnd_mask);
   int prgfunc = ((iw0 >> ProgCtrl_prgfunc_bits) & ProgCtrl_prgfunc_mask);
 
-  PROFILE_COUNT_INSN (cpu, pc, BFIN_INSN_ProgCtrl);
   TRACE_EXTRACT (cpu, "%s: poprnd:%i prgfunc:%i", __func__, poprnd, prgfunc);
 
   if (prgfunc == 0 && poprnd == 0)
-    TRACE_INSN (cpu, "NOP;");
+    {
+      PROFILE_COUNT_INSN (cpu, pc, BFIN_INSN_ProgCtrl_nop);
+      TRACE_INSN (cpu, "NOP;");
+    }
   else if (prgfunc == 1 && poprnd == 0)
     {
       bu32 newpc = RETSREG;
+      PROFILE_COUNT_INSN (cpu, pc, BFIN_INSN_ProgCtrl_branch);
       TRACE_INSN (cpu, "RTS;");
       IFETCH_CHECK (newpc);
       if (INSN_LEN == 8)
@@ -1687,6 +1690,7 @@ decode_ProgCtrl_0 (SIM_CPU *cpu, bu16 iw0, bu32 pc)
     }
   else if (prgfunc == 1 && poprnd == 1)
     {
+      PROFILE_COUNT_INSN (cpu, pc, BFIN_INSN_ProgCtrl_branch);
       TRACE_INSN (cpu, "RTI;");
       /* Do not do IFETCH_CHECK here -- LSB has special meaning.  */
       if (INSN_LEN == 8)
@@ -1697,6 +1701,7 @@ decode_ProgCtrl_0 (SIM_CPU *cpu, bu16 iw0, bu32 pc)
   else if (prgfunc == 1 && poprnd == 2)
     {
       bu32 newpc = RETXREG;
+      PROFILE_COUNT_INSN (cpu, pc, BFIN_INSN_ProgCtrl_branch);
       TRACE_INSN (cpu, "RTX;");
       /* XXX: Not sure if this is what the hardware does.  */
       IFETCH_CHECK (newpc);
@@ -1708,6 +1713,7 @@ decode_ProgCtrl_0 (SIM_CPU *cpu, bu16 iw0, bu32 pc)
   else if (prgfunc == 1 && poprnd == 3)
     {
       bu32 newpc = RETNREG;
+      PROFILE_COUNT_INSN (cpu, pc, BFIN_INSN_ProgCtrl_branch);
       TRACE_INSN (cpu, "RTN;");
       /* XXX: Not sure if this is what the hardware does.  */
       IFETCH_CHECK (newpc);
@@ -1718,6 +1724,7 @@ decode_ProgCtrl_0 (SIM_CPU *cpu, bu16 iw0, bu32 pc)
     }
   else if (prgfunc == 1 && poprnd == 4)
     {
+      PROFILE_COUNT_INSN (cpu, pc, BFIN_INSN_ProgCtrl_branch);
       TRACE_INSN (cpu, "RTE;");
       if (INSN_LEN == 8)
 	illegal_instruction_combination (cpu);
@@ -1729,6 +1736,7 @@ decode_ProgCtrl_0 (SIM_CPU *cpu, bu16 iw0, bu32 pc)
       SIM_DESC sd = CPU_STATE (cpu);
       sim_events *events = STATE_EVENTS (sd);
 
+      PROFILE_COUNT_INSN (cpu, pc, BFIN_INSN_ProgCtrl_sync);
       /* XXX: in supervisor mode, utilizes wake up sources
          in user mode, it's a NOP ...  */
       TRACE_INSN (cpu, "IDLE;");
@@ -1744,6 +1752,7 @@ decode_ProgCtrl_0 (SIM_CPU *cpu, bu16 iw0, bu32 pc)
     }
   else if (prgfunc == 2 && poprnd == 3)
     {
+      PROFILE_COUNT_INSN (cpu, pc, BFIN_INSN_ProgCtrl_sync);
       /* just NOP it */
       TRACE_INSN (cpu, "CSYNC;");
       if (INSN_LEN == 8)
@@ -1752,6 +1761,7 @@ decode_ProgCtrl_0 (SIM_CPU *cpu, bu16 iw0, bu32 pc)
     }
   else if (prgfunc == 2 && poprnd == 4)
     {
+      PROFILE_COUNT_INSN (cpu, pc, BFIN_INSN_ProgCtrl_sync);
       /* just NOP it */
       TRACE_INSN (cpu, "SSYNC;");
       if (INSN_LEN == 8)
@@ -1762,6 +1772,7 @@ decode_ProgCtrl_0 (SIM_CPU *cpu, bu16 iw0, bu32 pc)
     }
   else if (prgfunc == 2 && poprnd == 5)
     {
+      PROFILE_COUNT_INSN (cpu, pc, BFIN_INSN_ProgCtrl_cec);
       TRACE_INSN (cpu, "EMUEXCPT;");
       if (INSN_LEN == 8)
 	illegal_instruction_combination (cpu);
@@ -1769,6 +1780,7 @@ decode_ProgCtrl_0 (SIM_CPU *cpu, bu16 iw0, bu32 pc)
     }
   else if (prgfunc == 3 && poprnd < 8)
     {
+      PROFILE_COUNT_INSN (cpu, pc, BFIN_INSN_ProgCtrl_cec);
       TRACE_INSN (cpu, "CLI R%i;", poprnd);
       if (INSN_LEN == 8)
 	illegal_instruction_combination (cpu);
@@ -1776,6 +1788,7 @@ decode_ProgCtrl_0 (SIM_CPU *cpu, bu16 iw0, bu32 pc)
     }
   else if (prgfunc == 4 && poprnd < 8)
     {
+      PROFILE_COUNT_INSN (cpu, pc, BFIN_INSN_ProgCtrl_cec);
       TRACE_INSN (cpu, "STI R%i;", poprnd);
       if (INSN_LEN == 8)
 	illegal_instruction_combination (cpu);
@@ -1785,6 +1798,7 @@ decode_ProgCtrl_0 (SIM_CPU *cpu, bu16 iw0, bu32 pc)
   else if (prgfunc == 5 && poprnd < 8)
     {
       bu32 newpc = PREG (poprnd);
+      PROFILE_COUNT_INSN (cpu, pc, BFIN_INSN_ProgCtrl_branch);
       TRACE_INSN (cpu, "JUMP (%s);", get_preg_name (poprnd));
       IFETCH_CHECK (newpc);
       if (INSN_LEN == 8)
@@ -1798,6 +1812,7 @@ decode_ProgCtrl_0 (SIM_CPU *cpu, bu16 iw0, bu32 pc)
   else if (prgfunc == 6 && poprnd < 8)
     {
       bu32 newpc = PREG (poprnd);
+      PROFILE_COUNT_INSN (cpu, pc, BFIN_INSN_ProgCtrl_branch);
       TRACE_INSN (cpu, "CALL (%s);", get_preg_name (poprnd));
       IFETCH_CHECK (newpc);
       if (INSN_LEN == 8)
@@ -1814,6 +1829,7 @@ decode_ProgCtrl_0 (SIM_CPU *cpu, bu16 iw0, bu32 pc)
   else if (prgfunc == 7 && poprnd < 8)
     {
       bu32 newpc = pc + PREG (poprnd);
+      PROFILE_COUNT_INSN (cpu, pc, BFIN_INSN_ProgCtrl_branch);
       TRACE_INSN (cpu, "CALL (PC + %s);", get_preg_name (poprnd));
       IFETCH_CHECK (newpc);
       if (INSN_LEN == 8)
@@ -1828,6 +1844,7 @@ decode_ProgCtrl_0 (SIM_CPU *cpu, bu16 iw0, bu32 pc)
   else if (prgfunc == 8 && poprnd < 8)
     {
       bu32 newpc = pc + PREG (poprnd);
+      PROFILE_COUNT_INSN (cpu, pc, BFIN_INSN_ProgCtrl_branch);
       TRACE_INSN (cpu, "JUMP (PC + %s);", get_preg_name (poprnd));
       IFETCH_CHECK (newpc);
       if (INSN_LEN == 8)
@@ -1841,6 +1858,7 @@ decode_ProgCtrl_0 (SIM_CPU *cpu, bu16 iw0, bu32 pc)
   else if (prgfunc == 9)
     {
       int raise = uimm4 (poprnd);
+      PROFILE_COUNT_INSN (cpu, pc, BFIN_INSN_ProgCtrl_cec);
       TRACE_INSN (cpu, "RAISE %s;", uimm4_str (raise));
       if (INSN_LEN == 8)
 	illegal_instruction_combination (cpu);
@@ -1854,6 +1872,7 @@ decode_ProgCtrl_0 (SIM_CPU *cpu, bu16 iw0, bu32 pc)
   else if (prgfunc == 10)
     {
       int excpt = uimm4 (poprnd);
+      PROFILE_COUNT_INSN (cpu, pc, BFIN_INSN_ProgCtrl_cec);
       TRACE_INSN (cpu, "EXCPT %s;", uimm4_str (excpt));
       if (INSN_LEN == 8)
 	illegal_instruction_combination (cpu);
@@ -1864,6 +1883,7 @@ decode_ProgCtrl_0 (SIM_CPU *cpu, bu16 iw0, bu32 pc)
     {
       bu32 addr = PREG (poprnd);
       bu8 byte;
+      PROFILE_COUNT_INSN (cpu, pc, BFIN_INSN_ProgCtrl_atomic);
       TRACE_INSN (cpu, "TESTSET (%s);", get_preg_name (poprnd));
       if (INSN_LEN == 8)
 	illegal_instruction_combination (cpu);
