@@ -1,0 +1,138 @@
+#!/bin/bash
+# http://createrepo.baseurl.org/
+
+set -e
+
+key="0FDE6100"
+frs_pkg_id="74"
+frs_svn_rel_id="344"
+rpmdir=/var/lib/gforge/filesystem/distros/rpm
+frsdir=../../frsrelease
+
+mkdir -p $rpmdir
+cd $rpmdir
+mkdir -p $frsdir
+
+host=$1
+if false ; then #[[ -n $host ]] ; then
+	files=$(ssh $host cd $rpmdir \; find $frsdir -name "'blackfin-*.rpm'")
+	for f in ${files} ; do
+		mkdir -p ${f%/*}
+		rsync -a --inplace ${host}:${rpmdir}/${f} ${f}
+	done
+fi
+
+mkhtmlidx() {
+	[[ -z $1 ]] && set -- .
+	(
+	cat <<-EOF
+		<html>
+		<body>
+		This is the raw toolchain RPM; please see the documentation for how to use:<br>
+		<a href="https://docs.blackfin.uclinux.org/doku.php?id=toolchain:installing">Installing the Blackfin toolchain</a><br>
+		<pre>
+		<a href="../">../</a>
+	EOF
+
+	find "$1" \
+		-maxdepth 1 -mindepth 1 \
+		-type d \
+		-printf '<a href="%P/">%P/</a>\n' | sort
+	find "$1" \
+		-maxdepth 1 -mindepth 1 \
+		-type f \
+		-printf '<a href="%P">%P</a>\n' | sort
+
+	cat <<-EOF
+		</pre>
+		</body>
+		</html>
+	EOF
+
+	) > index.html
+}
+
+mkrepomd() {
+	local repo=$1; shift
+	local filelist
+
+	filelist=$(mktemp -p /tmp/)
+	gforge-db-query "$@" | \
+		sed -r \
+			-e 's:((.)(.)(.).?)\|(.*):\2/\3/\4/\1/\5:' \
+			-e "s:^:${frsdir}/:" \
+		> ${filelist}
+
+	if [[ -n $host ]] ; then
+		local f
+		for f in $(<${filelist}) ; do
+			rsync -a --inplace ${host}:${rpmdir}/${f} ${f}
+		done
+	fi
+
+	mkdir -p ${repo}
+	pushd ${repo} >/dev/null
+	sed -i 's:^:../:' ${filelist}
+
+	createrepo \
+		--update \
+		--quiet \
+		--database \
+		--pkglist=${filelist} \
+		.
+	rm -f ${filelist}
+
+	pushd repodata >/dev/null
+	rm -f repomd.xml.asc
+	gpg -a --detach-sign --default-key ${key} repomd.xml
+	gpg -a --export ${key} > repomd.xml.key
+	mkhtmlidx
+	popd >/dev/null
+
+	mkhtmlidx
+	popd >/dev/null
+}
+
+#
+# create "current" repo
+#
+curr_rel_id=$(gforge-db-query \
+	SELECT frs_release_id \
+	FROM frs_release \
+	WHERE \
+		frs_package_id = ${frs_pkg_id} AND \
+		is_released = true \
+	ORDER BY release_date DESC \
+	LIMIT 1
+)
+mkrepomd current \
+	"SELECT filesystem_id, file_name \
+	FROM filesystem fs \
+	WHERE \
+		(ref_id = ${curr_rel_id} OR ref_id = ${frs_svn_rel_id}) AND \
+		file_name like 'blackfin-%.rpm'"
+
+#
+# create "legacy" repo
+#
+mkrepomd legacy \
+	"SELECT filesystem_id, file_name \
+	FROM filesystem fs \
+		JOIN frs_release fr ON fs.ref_id = fr.frs_release_id \
+		JOIN frs_package fp ON fr.frs_package_id = fp.frs_package_id \
+	WHERE \
+		fr.frs_release_id != ${curr_rel_id} AND \
+		fp.frs_package_id = ${frs_pkg_id} AND \
+		fr.is_released = true AND \
+		file_name like 'blackfin-%.rpm'"
+
+#
+# create helper html pages
+#
+mkhtmlidx
+
+if [[ -n $host ]] ; then
+	rsync -a --delete --inplace ./ ${host}:${rpmdir}/
+fi
+
+exit 0
