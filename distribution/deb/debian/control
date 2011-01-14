@@ -1,0 +1,28 @@
+Source: blackfin-toolchain@TAG@
+Section: devel
+Priority: extra
+Maintainer: <toolchain-devel@blackfin.uclinux.org>
+
+Package: blackfin-toolchain-elf@TAG@
+Architecture: @ARCH@
+Suggests: blackfin-toolchain-uclinux@TAG@, blackfin-toolchain-linux-uclibc@TAG@
+@DESC-svn@Description: Nightly builds of the Blackfin toolchain from SVN trunk.
+@DESC@Description: Release build of the Blackfin toolchain.
+  This toolchain is used to build up Blackfin ELFs that will run with no
+  operating system (on the bare metal).
+
+Package: blackfin-toolchain-uclinux@TAG@
+Architecture: @ARCH@
+Suggests: blackfin-toolchain-elf@TAG@, blackfin-toolchain-linux-uclibc@TAG@
+@DESC-svn@Description: Nightly builds of the Blackfin toolchain from SVN trunk.
+@DESC@Description: Release build of the Blackfin toolchain.
+  This toolchain is used to build up Blackfin FLAT files that will run
+  under the Linux operating system.
+
+Package: blackfin-toolchain-linux-uclibc@TAG@
+Architecture: @ARCH@
+Suggests: blackfin-toolchain-elf@TAG@, blackfin-toolchain-uclinux@TAG@
+@DESC-svn@Description: Nightly builds of the Blackfin toolchain from SVN trunk.
+@DESC@Description: Release build of the Blackfin toolchain.
+  This toolchain is used to build up Blackfin FDPIC ELFs that will run
+  under the Linux operating system.

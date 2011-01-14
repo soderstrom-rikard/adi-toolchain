@@ -1,0 +1,50 @@
+#!/usr/bin/make -f
+
+# Use v4 compatability mode, so ldconfig gets added to maint scripts.
+export DH_COMPAT=4
+
+build:
+	dh_testdir
+
+clean:
+	dh_testdir
+	dh_testroot
+	dh_clean -d
+
+binary-indep: build
+
+binary-arch: build
+	dh_testdir
+	dh_testroot
+	dh_clean -k -d
+	dh_installdirs
+
+	#test -d ../../../@VER@
+	set -e ; \
+	for p in elf uclinux linux-uclibc ; do \
+		base="debian/blackfin-toolchain-$${p}@TAG@/opt/uClinux@TAG@/bfin-$${p}" ; \
+		mkdir -p $${base} ; \
+		chmod -R 755 debian/blackfin-toolchain-$${p}@TAG@/opt ; \
+		chown -R 0:0 debian/blackfin-toolchain-$${p}@TAG@/opt ; \
+		cp -a ../*-$${p}/* $${base}/ ; \
+	done
+
+#
+# If you need to move files around in debian/$(PACKAGE) or do some
+# binary patching, do it here
+#
+
+
+# This has been known to break on some wacky binaries.
+#	dh_strip
+	dh_compress
+#	dh_fixperms
+#	dh_makeshlibs
+	dh_installdeb
+	-dh_shlibdeps
+	dh_gencontrol
+	dh_md5sums
+	dh_builddeb
+
+binary: binary-indep binary-arch
+.PHONY: build clean binary-indep binary-arch binary

@@ -1,0 +1,123 @@
+#!/bin/bash
+
+set -e
+
+bfin_key="0FDE6100"
+
+if [[ $1 == -a ]] ; then
+	exec dpkg --print-architecture
+fi
+
+if [ -z "$2" ] ; then
+	echo "Usage: ${0##*/} [-s] [-d dir] <ver> <arch>"
+	exit 1
+fi
+
+if [[ $1 == "-s" ]] ; then
+	root=/usr/local/src/blackfin
+
+	shift
+	debian_dir="${root}/bin/debian"
+	ver=$1
+	dver=$1
+	arch=$2
+	tag="-svn"
+	branch="unstable"
+	base=${3:-${root}/toolchains}
+
+	cd ${base}/${ver}/pkgs
+	for t in ../bfin-* ; do
+		rm -f ${t##*/}
+		ln -s $t
+	done
+else
+	debian_dir="../debian"
+	if [[ $1 == "-d" ]] ; then
+		gforge=$2
+		shift 2
+	else
+		gforge=/var/lib/gforge/filesystem/frsrelease
+	fi
+	ver=$1
+	dver=${1#20}
+	dver=${dver/-RC/-}
+	dver="20${dver/-/-rc}"
+	#dver=${1%:*}
+	#ver=${1#*:}
+	arch=$2
+	#tag="-svn"
+	tag=
+	branch="stable"
+
+	if ! files=$(find ${gforge} -name "*${ver}.${arch}.tar.bz2" | grep -v uclibc-full | grep -v gcc-3.4) ; then
+		echo "no files found :("
+		exit 1
+	fi
+
+	if false ; then
+	doit=""
+	for f in ${files} ; do
+		printf "Add %s? [Y/n] " "${f##*/}"
+		read y
+		case ${y} in
+			y|Y|"") ;;
+			*)   continue;;
+		esac
+		doit="${doit} ${f}"
+	done
+
+	printf "Processing Files:\n%s\n\n" "${doit}"
+	else
+	doit=${files}
+	fi
+
+	rm -rf output
+	mkdir output
+	cd output
+
+	for f in ${doit} ; do
+		tar jpxf ${f}
+	done
+
+	mv opt/uClinux/* .
+	rmdir opt/uClinux opt
+fi
+
+rm -rf debs
+mkdir debs
+rsync -a --delete ${debian_dir}/ debs/debian/
+cd debs
+
+case ${arch} in
+	x86_64) arch=amd64;;
+esac
+
+[[ -n ${tag} ]] \
+	&& sed -i '/^@DESC@/d' debian/control \
+	|| sed -i '/^@DESC-svn@/d' debian/control
+sed -i \
+	-e "s|@DESC[^@]*@||g" \
+	-e "s|@ARCH@|${arch}|g" \
+	-e "s|@VER@|${dver}|g" \
+	-e "s|@DATE@|$(date -R --utc)|g" \
+	-e "s|@TAG@|${tag}|g" \
+	debian/*
+
+gpg -K ${bfin_key} >/dev/null 2>&1 \
+	&& kopts="-k${bfin_key}" \
+	|| kopts="-us"
+dpkg-buildpackage -b -B -d -a${arch} ${kopts}
+
+#exit 0
+#make -f debian/rules VER=${ver} TAG=${tag} binary-arch
+cd ..
+rm -rf debs
+[[ -n ${tag} ]] && rm -f bfin-*
+dpkg-scanpackages . /dev/null dists/${branch}/main/binary-${arch}/ | sed 's:/\./:/:' | gzip -9c > Packages.gz
+cat << EOF > Release
+Archive: ${branch}
+Component: main
+Origin: Analog Devices, Inc.
+Label: Binary builds of the Open Source Blackfin Toolchain
+Architecture: ${arch}
+EOF

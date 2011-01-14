@@ -1,0 +1,40 @@
+------------------------
+Building Debian Packages
+------------------------
+
+----------
+ Overview
+----------
+
+First you need the release toolchain tarballs.  We will take those, unpack
+them, and then create binary .deb packages.
+
+Most of the time, this will be run on the gforge server itself, so the default
+search path will be the gforge directory:
+	/var/lib/gforge/filesystem/frsrelease/
+
+When the scripts are done, the .deb files (among other things) will be placed
+in the $PWD/output/ folder.  Simply move those to the Debian tree.  On the
+server, you can find it here:
+	/var/lib/gforge/filesystem/distros/debian/
+You'll want to put the i386 files in the stable i386 subdir.
+
+The Debian tree needs to have its metadata files regenerated, so do that now.
+Go into each dir with updated .deb files and simply run `make`.
+
+-------------
+ Perquisites
+-------------
+
+You'll need all the Debian helper packages installed.  Such as:
+	debhelper
+	dpkg-dev
+
+To sign them, you'll also need to install gnupg.
+
+------
+ Misc
+------
+
+The debian/ subdir contains random control files used during the creation of
+the .deb archives.
