@@ -688,6 +688,8 @@ static const char stat_map[] =
 /* Some utils don't like having a NULL environ.  */
 static const char * const simple_env[] = { "HOME=/", "PATH=/bin", NULL };
 
+static bu32 fdpic_load_offset;
+
 static bool
 bfin_fdpic_load (SIM_DESC sd, SIM_CPU *cpu, struct bfd *abfd, bu32 *sp,
 		 bu32 *elf_addrs, char **ldso_path)
@@ -703,12 +705,9 @@ bfin_fdpic_load (SIM_DESC sd, SIM_CPU *cpu, struct bfd *abfd, bu32 *sp,
   int phdrc;
   bu32 nsegs;
 
-  static bu32 load_offset;
   bu32 max_load_addr;
 
   unsigned char null[4] = { 0, 0, 0, 0 };
-
-  elf_addrs[0] = bfd_get_start_address (abfd) + load_offset;
 
   ret = false;
   *ldso_path = NULL;
@@ -725,6 +724,10 @@ bfin_fdpic_load (SIM_DESC sd, SIM_CPU *cpu, struct bfd *abfd, bu32 *sp,
   if (!(iehdr->e_flags & EF_BFIN_FDPIC))
     goto skip_fdpic_init;
 
+  if (STATE_OPEN_KIND (sd) == SIM_OPEN_DEBUG)
+    sim_io_printf (sd, "Loading FDPIC ELF %s\n Load base: %#x\n ELF entry: %#x\n",
+		   bfd_get_filename (abfd), fdpic_load_offset, elf_addrs[0]);
+
   /* Grab the Program Headers to set up the loadsegs on the stack.  */
   phdr_size = bfd_get_elf_phdr_upper_bound (abfd);
   if (phdr_size == -1)
@@ -738,6 +741,8 @@ bfin_fdpic_load (SIM_DESC sd, SIM_CPU *cpu, struct bfd *abfd, bu32 *sp,
   *sp -= sizeof (ehdr);
   elf_addrs[3] = *sp;
   sim_write (sd, *sp, (void *)&ehdr, sizeof (ehdr));
+  if (STATE_OPEN_KIND (sd) == SIM_OPEN_DEBUG)
+    sim_io_printf (sd, " Elf_Ehdr: %#x\n", *sp);
 
   /* And the Exec's Phdrs onto the stack.  */
   if (STATE_PROG_BFD (sd) == abfd)
@@ -753,7 +758,13 @@ bfin_fdpic_load (SIM_DESC sd, SIM_CPU *cpu, struct bfd *abfd, bu32 *sp,
       elf_addrs[2] = phdrc;
       sim_write (sd, *sp, data, phdr_size);
       free (data);
+      if (STATE_OPEN_KIND (sd) == SIM_OPEN_DEBUG)
+	sim_io_printf (sd, " Elf_Phdrs: %#x\n", *sp);
     }
+
+  /* Since we're relocating things ourselves, we need to relocate
+     the start address as well.  */
+  elf_addrs[0] = bfd_get_start_address (abfd) + fdpic_load_offset;
 
   /* Now push all the loadsegs.  */
   nsegs = 0;
@@ -764,10 +775,14 @@ bfin_fdpic_load (SIM_DESC sd, SIM_CPU *cpu, struct bfd *abfd, bu32 *sp,
 	Elf_Internal_Phdr *p = &phdrs[i];
 	bu32 paddr, vaddr, memsz, filesz;
 
-	paddr = p->p_paddr + load_offset;
+	paddr = p->p_paddr + fdpic_load_offset;
 	vaddr = p->p_vaddr;
 	memsz = p->p_memsz;
 	filesz = p->p_filesz;
+
+	if (STATE_OPEN_KIND (sd) == SIM_OPEN_DEBUG)
+	  sim_io_printf (sd, " PHDR %i: vma %#x lma %#x filesz %#x memsz %#x\n",
+			 i, vaddr, paddr, filesz, memsz);
 
 	data = xmalloc (memsz);
 	if (memsz != filesz)
@@ -789,9 +804,9 @@ bfin_fdpic_load (SIM_DESC sd, SIM_CPU *cpu, struct bfd *abfd, bu32 *sp,
       }
     else if (phdrs[i].p_type == PT_DYNAMIC)
       {
-	elf_addrs[4] = phdrs[i].p_paddr;
-	if (STATE_PROG_BFD (sd) != abfd)
-	  elf_addrs[4] += load_offset;
+	elf_addrs[4] = phdrs[i].p_paddr + fdpic_load_offset;
+	if (STATE_OPEN_KIND (sd) == SIM_OPEN_DEBUG)
+	  sim_io_printf (sd, " PT_DYNAMIC: %#x\n", elf_addrs[4]);
       }
     else if (phdrs[i].p_type == PT_INTERP)
       {
@@ -805,11 +820,13 @@ bfin_fdpic_load (SIM_DESC sd, SIM_CPU *cpu, struct bfd *abfd, bu32 *sp,
 	    free (*ldso_path);
 	    *ldso_path = NULL;
 	  }
+	else if (STATE_OPEN_KIND (sd) == SIM_OPEN_DEBUG)
+	  sim_io_printf (sd, " PT_INTERP: %s\n", *ldso_path);
       }
 
   /* Update the load offset with a few extra pages.  */
-  load_offset = ALIGN (MAX (max_load_addr, load_offset), 0x10000);
-  load_offset += 0x10000;
+  fdpic_load_offset = ALIGN (MAX (max_load_addr, fdpic_load_offset), 0x10000);
+  fdpic_load_offset += 0x10000;
 
   /* Push the summary loadmap info onto the stack last.  */
   *sp -= 4;
@@ -862,6 +879,9 @@ bfin_user_init (SIM_DESC sd, SIM_CPU *cpu, struct bfd *abfd,
 
   elf_addrs[0] = bfd_get_start_address (abfd);
   elf_addrs[1] = elf_addrs[2] = elf_addrs[3] = elf_addrs[4] = 0;
+
+  /* Keep the load addresses consistent between runs.  */
+  fdpic_load_offset = 0;
 
   /* First try to load this as an FDPIC executable.  */
   sp = SPREG;
