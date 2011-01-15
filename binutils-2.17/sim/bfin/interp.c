@@ -51,6 +51,7 @@
 #define CB_SYS_setgid32 212
 #define CB_SYS_pread    213
 #include "linux-targ-map.h"
+#include "linux-fixed-code.h"
 
 #include "elf/common.h"
 #include "elf/external.h"
@@ -880,14 +881,21 @@ bfin_user_init (SIM_DESC sd, SIM_CPU *cpu, struct bfd *abfd,
   elf_addrs[0] = bfd_get_start_address (abfd);
   elf_addrs[1] = elf_addrs[2] = elf_addrs[3] = elf_addrs[4] = 0;
 
-  /* Keep the load addresses consistent between runs.  */
-  fdpic_load_offset = 0;
+  /* Keep the load addresses consistent between runs.  Also make sure we make
+     space for the fixed code region (part of the Blackfin Linux ABI).  */
+  fdpic_load_offset = 0x1000;
 
   /* First try to load this as an FDPIC executable.  */
   sp = SPREG;
   if (!bfin_fdpic_load (sd, cpu, STATE_PROG_BFD (sd), &sp, elf_addrs, &ldso_path))
     goto skip_fdpic_init;
   exec_loadmap = sp;
+
+  /* If that worked, then load the fixed code region.  We only do this for
+     FDPIC ELFs atm because they are PIEs and let us relocate them without
+     manual fixups.  FLAT files however require location processing which
+     we do not do ourselves, and they link with a VMA of 0.  */
+  sim_write (sd, 0x400, bfin_linux_fixed_code, sizeof (bfin_linux_fixed_code));
 
   /* If the FDPIC needs an interpreter, then load it up too.  */
   if (ldso_path)
