@@ -112,5 +112,3 @@ CHECKREG r3, 0x0002CBB0;
 
 
 pass
-
-

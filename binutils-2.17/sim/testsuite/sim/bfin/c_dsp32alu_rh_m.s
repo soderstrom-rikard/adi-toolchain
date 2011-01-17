@@ -261,5 +261,3 @@ CHECKREG r7, 0x7FFF7777;
 
 
 pass
-
-

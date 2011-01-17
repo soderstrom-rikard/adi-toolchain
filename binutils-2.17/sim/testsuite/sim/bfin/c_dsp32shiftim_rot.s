@@ -60,4 +60,3 @@
 	CHECKREG r7, 0x780D9A2B;
 
 	pass
-

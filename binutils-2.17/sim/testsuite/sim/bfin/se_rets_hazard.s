@@ -12,8 +12,6 @@ BOOT:
 
 
 
-	A0 = 0;	// reset accumulators
-	A1 = 0;
 
 	ASTAT = r0;	// reset sequencer registers
 
@@ -55,4 +53,3 @@ SUB1:               // Code goes here
 	RETS = [sp++];
 	RTS;
 	R6.L = 0xBAD;
-

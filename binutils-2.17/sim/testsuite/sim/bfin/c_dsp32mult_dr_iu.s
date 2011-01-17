@@ -5,11 +5,6 @@
 .include "testutils.inc"
 	start
 
-
-
-
-A1 = A0 = 0;
-
 imm32 r0, 0x00010002;
 imm32 r1, 0x00023004;
 imm32 r2, 0x03843725;
@@ -215,5 +210,3 @@ CHECKREG r7, 0xFFFFFFFF;
 
 
 pass
-
-

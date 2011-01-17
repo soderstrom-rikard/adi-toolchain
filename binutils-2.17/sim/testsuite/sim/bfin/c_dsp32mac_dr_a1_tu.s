@@ -143,5 +143,3 @@ CHECKREG r7, 0xFEC9CBFC;
 
 
 pass
-
-

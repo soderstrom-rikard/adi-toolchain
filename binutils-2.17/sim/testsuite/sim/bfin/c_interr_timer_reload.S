@@ -284,4 +284,3 @@ RTI;
 .space (STACKSIZE);
 STACK:
 NOP;NOP;NOP;NOP;NOP;NOP;NOP; // needed for icache bug
-

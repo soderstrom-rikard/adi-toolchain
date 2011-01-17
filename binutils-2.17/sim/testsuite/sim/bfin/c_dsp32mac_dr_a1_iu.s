@@ -143,5 +143,3 @@ CHECKREG r7, 0xAC776686;
 
 
 pass
-
-

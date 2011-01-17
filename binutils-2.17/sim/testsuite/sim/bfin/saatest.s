@@ -220,4 +220,3 @@ tstvecK:
 	.dw 0x0000
 	.dw 0x0000
 	.dw 0x0000
-

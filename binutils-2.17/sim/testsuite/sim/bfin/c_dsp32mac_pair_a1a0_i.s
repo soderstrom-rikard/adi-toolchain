@@ -290,4 +290,3 @@
 	CHECKREG fp, 0x081F86A8;
 
 	pass
-

@@ -272,5 +272,3 @@ CHECKREG r7, 0xC04FE214;
 
 
 pass
-
-

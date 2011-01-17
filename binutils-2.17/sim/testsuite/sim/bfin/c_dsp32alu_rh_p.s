@@ -261,5 +261,3 @@ CHECKREG r7, 0xDB7B7977;
 
 
 pass
-
-

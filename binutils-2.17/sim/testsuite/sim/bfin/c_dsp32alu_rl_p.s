@@ -261,5 +261,3 @@ CHECKREG r7, 0x8666B182;
 
 
 pass
-
-

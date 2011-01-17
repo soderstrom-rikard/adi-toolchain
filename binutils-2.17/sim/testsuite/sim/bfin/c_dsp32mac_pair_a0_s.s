@@ -243,4 +243,3 @@
 	CHECKREG p4, 0x9D6AA7E4;
 
 	pass
-

@@ -304,4 +304,3 @@
 	CHECKREG fp, 0xE8C082D4;
 
 	pass
-

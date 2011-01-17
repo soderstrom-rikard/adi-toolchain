@@ -20,4 +20,3 @@
 	fail
 1:
 	pass
-

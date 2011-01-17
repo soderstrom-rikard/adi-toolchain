@@ -32,4 +32,3 @@
 	CHECKREG R1, 0;
 
 	pass
-

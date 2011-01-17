@@ -598,4 +598,3 @@
 	CHECKREG r7,  0x80000007;
 
 	pass
-

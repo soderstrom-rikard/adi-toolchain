@@ -155,4 +155,3 @@
 	CHECKREG fp, 0x62CEFB58;
 
 	pass
-

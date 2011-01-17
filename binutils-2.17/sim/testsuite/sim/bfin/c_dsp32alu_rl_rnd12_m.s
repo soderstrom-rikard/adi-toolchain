@@ -259,4 +259,3 @@
 	CHECKREG r7, 0x8B667FFF;
 
 	pass
-

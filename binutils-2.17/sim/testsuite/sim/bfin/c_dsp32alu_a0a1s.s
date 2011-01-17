@@ -80,5 +80,3 @@ CHECKREG r7, 0xF666AEB7;
 
 
 pass
-
-

@@ -117,5 +117,3 @@ CHECKREG r7, 0xCF173844;
 
 
 pass
-
-

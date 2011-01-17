@@ -484,4 +484,3 @@
 	CHECKREG r7, 0x4D5E6F00;
 
 	pass
-

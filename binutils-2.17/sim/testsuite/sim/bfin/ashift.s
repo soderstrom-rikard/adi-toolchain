@@ -321,4 +321,3 @@ ashift_test 0x0001, -33, 0x7fff, (S);
 ashift_test 0x0001, -34, 0x7fff, (S);
 
 	pass
-

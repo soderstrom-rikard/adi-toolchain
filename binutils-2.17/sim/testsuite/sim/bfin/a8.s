@@ -39,4 +39,3 @@
 	R7 = R1.B;
 	DBGA ( R4.l , 32898 );	DBGA ( R4.h , 0xffff);
 	pass
-

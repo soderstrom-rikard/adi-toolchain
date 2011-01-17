@@ -5,11 +5,6 @@
 .include "testutils.inc"
 	start
 
-
-
-
-A1 = A0 = 0;
-
 // test the default (signed fraction) rounding U=0 I=0 T=0
 imm32 r0, 0xab235615;
 imm32 r1, 0xcfba5117;
@@ -199,5 +194,3 @@ CHECKREG r7, 0xC56F3A91;
 
 
 pass
-
-

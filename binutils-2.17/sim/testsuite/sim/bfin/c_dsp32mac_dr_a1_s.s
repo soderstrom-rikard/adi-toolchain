@@ -143,5 +143,3 @@ CHECKREG r7, 0xB0C50D4E;
 
 
 pass
-
-

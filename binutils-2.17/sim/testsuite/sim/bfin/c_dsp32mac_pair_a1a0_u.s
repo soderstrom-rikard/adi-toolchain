@@ -290,4 +290,3 @@
 	CHECKREG fp, 0x228A5420;
 
 	pass
-

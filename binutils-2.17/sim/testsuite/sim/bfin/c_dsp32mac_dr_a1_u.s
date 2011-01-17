@@ -168,5 +168,3 @@ CHECKREG r7, 0x30FA159E;
 
 
 pass
-
-

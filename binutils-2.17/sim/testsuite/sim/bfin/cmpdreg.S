@@ -38,4 +38,3 @@
 	CHECKREG R7, (_UNSET);
 
 	pass;
-

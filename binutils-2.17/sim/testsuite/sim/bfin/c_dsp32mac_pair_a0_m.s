@@ -127,4 +127,3 @@
 	CHECKREG p4, 0x06E3E0DC;
 
 	pass
-

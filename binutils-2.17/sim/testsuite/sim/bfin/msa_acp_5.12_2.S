@@ -56,4 +56,3 @@
 	dbga(r7.h,0xe);
 
 	pass;
-

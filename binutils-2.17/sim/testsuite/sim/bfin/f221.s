@@ -26,7 +26,6 @@ UserCode:
 	I3.H = 0x20a9;
 	B3 = 0x4552 (Z);
 	B3.H = 0x15f0;
-	A1 = A0 = 0;
 
 	// should except - r4 dep
 	// R4 = R4 >> 25 || W [ I3 ++ ] = R0.H || R4 = [ I3 ];

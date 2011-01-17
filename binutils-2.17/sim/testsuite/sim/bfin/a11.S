@@ -384,4 +384,3 @@
 	CHECKREG R0, (_VS|_AZ);
 
 	pass
-

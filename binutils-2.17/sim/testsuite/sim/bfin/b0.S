@@ -49,4 +49,3 @@
 	R0 = ASTAT;	CHECKREG R0, (_AV0|_AC0|_AC0_COPY|_AZ);
 
 	pass
-

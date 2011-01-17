@@ -125,5 +125,3 @@ CHECKREG r7, 0xFDB5083C;
 
 
 pass
-
-

@@ -260,4 +260,3 @@
 	CHECKREG r7, 0x8B668000;
 
 	pass
-

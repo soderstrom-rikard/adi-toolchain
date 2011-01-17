@@ -90,4 +90,3 @@ input_b:
 	.align 4;
 output:
 	.space (40);
-

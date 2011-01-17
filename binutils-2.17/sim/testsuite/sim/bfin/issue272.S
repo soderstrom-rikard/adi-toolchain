@@ -21,4 +21,3 @@
 	CHECKREG R2, 0x80000000;
 
 	pass
-

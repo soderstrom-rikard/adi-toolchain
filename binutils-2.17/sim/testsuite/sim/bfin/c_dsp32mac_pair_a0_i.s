@@ -245,4 +245,3 @@
 	CHECKREG p4, 0xFBE08004;
 
 	pass
-

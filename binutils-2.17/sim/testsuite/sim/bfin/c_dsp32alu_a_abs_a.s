@@ -32,5 +32,3 @@ CHECKREG r2, 0x5A9876EF;
 
 
 pass
-
-

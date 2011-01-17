@@ -84,9 +84,6 @@
 
 DUMMY:
 
-	a0 = 0;         // reset accumulators
-	a1 = 0;
-
 	r0 = 0 (z);
 
 	LT0 = r0;       // set loop counters to something deterministic

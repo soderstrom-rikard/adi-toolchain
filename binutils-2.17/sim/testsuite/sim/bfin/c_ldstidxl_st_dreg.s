@@ -775,3 +775,6 @@ DATA_ADDR_2:
 	.dd 0xF4F5F6F7
 	.dd 0xF8F9FAFB
 	.dd 0xFCFDFEFF
+
+// Make sure there is space for us to scribble
+	.space (0x2000);

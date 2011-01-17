@@ -73,5 +73,3 @@ CHECKREG r7, 0x31BB2F08;
 
 
 pass
-
-

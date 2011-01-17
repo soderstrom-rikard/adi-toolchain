@@ -336,8 +336,3 @@ KSTACK:
     .space (STACKSIZE);
 USTACK:
 //  .space (STACKSIZE);  // adding this may solve the problem
-
-
-
-
-

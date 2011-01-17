@@ -31,5 +31,3 @@ CHECKREG r7, 0xFFFFAE78;
 
 
 pass
-
-

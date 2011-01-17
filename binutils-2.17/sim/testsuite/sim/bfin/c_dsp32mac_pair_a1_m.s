@@ -125,4 +125,3 @@
 	CHECKREG p4, 0xF2418D94;
 
 	pass
-

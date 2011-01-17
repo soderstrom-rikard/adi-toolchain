@@ -33,5 +33,3 @@ CHECKREG r5, 0x2789AB1D;
 
 
 pass
-
-

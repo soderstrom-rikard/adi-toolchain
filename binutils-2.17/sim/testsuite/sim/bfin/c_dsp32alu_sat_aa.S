@@ -39,4 +39,3 @@
 	CHECKREG r5, 0xEFADBC8A;
 
 	pass
-

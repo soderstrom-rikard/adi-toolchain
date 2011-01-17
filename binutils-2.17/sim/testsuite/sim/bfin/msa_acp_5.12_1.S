@@ -69,4 +69,3 @@
 	r7 = astat;
 	checkreg r7, (_AV1S|_AV1|_AV0S|_AV0|_AC0|_AC0_COPY|_AN)
 	pass
-

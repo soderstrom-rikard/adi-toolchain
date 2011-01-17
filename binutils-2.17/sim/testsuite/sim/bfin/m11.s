@@ -70,4 +70,3 @@ data0:
 	.dw 0x8010
 	.dw 0x00ff
 	.dw 0x0000
-

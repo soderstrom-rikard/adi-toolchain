@@ -150,4 +150,3 @@
 	CHECKREG fp, 0xBB976699;
 
 	pass
-

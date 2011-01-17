@@ -630,5 +630,3 @@ dbg_pass;
 
     .space (STACKSIZE);
     USTACK:
-
-

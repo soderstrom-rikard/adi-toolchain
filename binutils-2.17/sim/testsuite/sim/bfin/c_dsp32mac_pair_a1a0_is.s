@@ -290,4 +290,3 @@
 	CHECKREG fp, 0xE9E0EF3E;
 
 	pass
-

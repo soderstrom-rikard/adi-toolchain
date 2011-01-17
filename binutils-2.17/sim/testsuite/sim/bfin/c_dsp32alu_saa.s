@@ -68,4 +68,3 @@
 	CHECKREG r7, 0x0105011B;
 
 	pass
-

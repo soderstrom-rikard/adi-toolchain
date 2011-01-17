@@ -262,5 +262,3 @@ CHECKREG r7, 0xFE09DBEE;
 
 
 pass
-
-

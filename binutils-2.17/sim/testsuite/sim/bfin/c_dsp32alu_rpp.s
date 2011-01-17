@@ -264,5 +264,3 @@ CHECKREG r7, 0xAFF72BCC;
 
 
 pass
-
-

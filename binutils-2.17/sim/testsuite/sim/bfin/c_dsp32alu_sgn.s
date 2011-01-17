@@ -37,5 +37,3 @@ CHECKREG r3, 0xE1E2E1E2;
 
 
 pass
-
-

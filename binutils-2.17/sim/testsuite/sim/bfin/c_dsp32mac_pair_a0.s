@@ -127,4 +127,3 @@
 	CHECKREG p4, 0xF750102E;
 
 	pass
-

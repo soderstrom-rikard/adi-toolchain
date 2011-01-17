@@ -117,5 +117,3 @@ CHECKREG r7, 0xFD3CE337;
 
 
 pass
-
-

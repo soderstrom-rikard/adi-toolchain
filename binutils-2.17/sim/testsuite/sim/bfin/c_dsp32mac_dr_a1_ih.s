@@ -143,5 +143,3 @@ CHECKREG r7, 0xFA223404;
 
 
 pass
-
-

@@ -123,4 +123,3 @@
 	CHECKREG r7, 0xFFFFFFFF;
 
 	pass
-

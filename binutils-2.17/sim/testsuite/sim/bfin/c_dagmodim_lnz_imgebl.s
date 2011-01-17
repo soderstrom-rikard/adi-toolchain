@@ -106,4 +106,3 @@ CHECKREG r7, 0x00000FF2;
 
 
 pass
-

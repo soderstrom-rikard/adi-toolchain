@@ -33,4 +33,3 @@
 	R0 = A1.x;	DBGA ( R0.L , 0 );
 
 	pass
-

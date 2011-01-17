@@ -342,4 +342,3 @@ RTI;
 .space (STACKSIZE);
 KSTACK:
 NOP;NOP;NOP;NOP;NOP;NOP;NOP; // needed for icache bug
-

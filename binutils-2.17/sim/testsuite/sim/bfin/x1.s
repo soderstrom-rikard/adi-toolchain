@@ -77,4 +77,3 @@ checkreg r3, 0x0002fffe;
 
 
 	pass
-

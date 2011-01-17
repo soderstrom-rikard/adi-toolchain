@@ -117,5 +117,3 @@ CHECKREG r7, 0x2ED15DDC;
 
 
 pass
-
-

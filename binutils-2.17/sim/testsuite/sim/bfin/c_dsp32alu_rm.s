@@ -260,5 +260,3 @@ CHECKREG r7, 0x80000000;
 
 
 pass
-
-

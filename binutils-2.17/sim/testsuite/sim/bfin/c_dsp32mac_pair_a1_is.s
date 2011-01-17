@@ -241,4 +241,3 @@
 	CHECKREG p4, 0xCFC52130;
 
 	pass
-

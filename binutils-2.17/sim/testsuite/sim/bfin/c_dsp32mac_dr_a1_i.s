@@ -271,5 +271,3 @@ CHECKREG r7, 0x0BFFDDEF;
 
 
 pass
-
-

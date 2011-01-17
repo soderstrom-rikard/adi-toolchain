@@ -106,9 +106,6 @@ CSYNC;
 
 DUMMY:
 
-    A0 = 0;         // reset accumulators
-    A1 = 0;
-
     R0 = 0 (Z);
 
 LT0 = r0;       // set loop counters to something deterministic
@@ -456,7 +453,3 @@ USTACK:
 .dd 0xA9B0B1B2
 .dd 0xB3B4B5B6
 .dd 0xB7B8B9C0
-
-
-
-

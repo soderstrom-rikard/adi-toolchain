@@ -7,10 +7,6 @@
 
 	INIT_R_REGS(0);
 
-	A0 = 0;
-	A1 = 0;
-	ASTAT = r0;
-
 	loadsym sp, DATA_ADDR_1, 0x24;
 	p0 = sp;
 
@@ -62,4 +58,3 @@ DATA:
 
 	.space (0x100);
 KSTACK:
-

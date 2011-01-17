@@ -111,4 +111,3 @@
 	CC = AC0;	R7 = CC; DBGA ( R7.L , 0x1 );
 
 	pass
-

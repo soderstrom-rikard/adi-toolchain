@@ -15,9 +15,6 @@
 	imm32 r6, _UNSET;
 	imm32 r7, _UNSET;
 
-	A0 = 0;
-	A1 = 0;
-
 // test CC = AC      0-0, 0-1, 1-0, 1-1
 	imm32 R7, 0x00;
 	ASTAT = R7;	// cc = 0, AC0 = 0

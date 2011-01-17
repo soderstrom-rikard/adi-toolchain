@@ -256,4 +256,3 @@
 	CHECKREG r7, 0x9297E777;
 
 	pass
-

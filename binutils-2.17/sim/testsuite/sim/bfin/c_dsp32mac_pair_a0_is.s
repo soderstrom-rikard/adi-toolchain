@@ -243,4 +243,3 @@
 	CHECKREG p4, 0x0371F06E;
 
 	pass
-

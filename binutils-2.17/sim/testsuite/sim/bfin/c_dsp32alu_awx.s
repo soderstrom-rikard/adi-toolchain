@@ -59,5 +59,3 @@ CHECKREG r5, 0x00000000;
 
 
 pass
-
-

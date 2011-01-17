@@ -8,8 +8,6 @@
 
 INIT_R_REGS 0;
 
-A0 = 0;
-A1 = 0;
 ASTAT = r0;
 
 P1 = 12;
@@ -93,4 +91,3 @@ CHECKREG r6, 0x00000076;
 CHECKREG r7, 0x0000005A;
 
 pass
-

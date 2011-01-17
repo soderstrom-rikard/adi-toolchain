@@ -40,9 +40,6 @@ INIT_M_REGS(0);
 INIT_L_REGS(0);
 INIT_B_REGS(0);
 
-    A0 = 0;         // reset accumulators
-    A1 = 0;
-
 ASTAT = r0;     // reset sequencer registers
 
 //

@@ -61,6 +61,3 @@ CHECKREG r7, 0x03C68ACF;
 
 
 pass
-
-
-

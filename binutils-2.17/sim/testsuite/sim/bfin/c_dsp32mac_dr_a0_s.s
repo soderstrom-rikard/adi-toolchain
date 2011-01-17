@@ -117,5 +117,3 @@ CHECKREG r7, 0x041C3834;
 
 
 pass
-
-

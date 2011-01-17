@@ -117,5 +117,3 @@ CHECKREG r7, 0x22002A7E;
 
 
 pass
-
-

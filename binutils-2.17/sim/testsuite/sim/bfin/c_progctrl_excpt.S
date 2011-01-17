@@ -106,9 +106,6 @@ LD32(p0, EVT_OVERRIDE);
 
 DUMMY:
 
-    A0 = 0;         // reset accumulators
-    A1 = 0;
-
     R0 = 0 (Z);
 
 LT0 = r0;       // set loop counters to something deterministic
@@ -262,9 +259,3 @@ KSTACK:
 
     .space (STACKSIZE);
 USTACK:
-
-
-
-
-
-

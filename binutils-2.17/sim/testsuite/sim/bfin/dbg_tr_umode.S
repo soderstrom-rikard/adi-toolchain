@@ -312,5 +312,3 @@ KSTACK:
 
     .space (STACKSIZE);
 USTACK:
-
-

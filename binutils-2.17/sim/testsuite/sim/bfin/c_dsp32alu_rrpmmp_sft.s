@@ -260,4 +260,3 @@
 	CHECKREG r7, 0x0000dfdc;
 
 	pass
-

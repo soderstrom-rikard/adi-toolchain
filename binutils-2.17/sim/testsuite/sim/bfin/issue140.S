@@ -20,4 +20,3 @@
 	CHECKREG R7, (_VS|_V|_V_COPY);
 
 	pass
-

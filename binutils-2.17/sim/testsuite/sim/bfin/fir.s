@@ -199,4 +199,3 @@ coef:
 	.data
 output:
 	.space (128*4)
-

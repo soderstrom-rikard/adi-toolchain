@@ -263,5 +263,3 @@ CHECKREG r7, 0x816016DC;
 
 
 pass
-
-

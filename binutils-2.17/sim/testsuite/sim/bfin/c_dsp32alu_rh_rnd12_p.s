@@ -260,4 +260,3 @@
 	CHECKREG r7, 0x6D64E707;
 
 	pass
-

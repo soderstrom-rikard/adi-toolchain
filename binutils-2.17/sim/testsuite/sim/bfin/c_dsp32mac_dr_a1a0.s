@@ -155,4 +155,3 @@
 	CHECKREG fp, 0x7DBDF6B0;
 
 	pass
-

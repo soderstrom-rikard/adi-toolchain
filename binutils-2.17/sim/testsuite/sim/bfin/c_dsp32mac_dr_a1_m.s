@@ -204,5 +204,3 @@ CHECKREG r7, 0x006F124B;
 
 
 pass
-
-

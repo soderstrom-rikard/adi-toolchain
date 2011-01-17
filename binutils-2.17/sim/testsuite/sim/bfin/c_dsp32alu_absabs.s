@@ -60,5 +60,3 @@ CHECKREG r7, 0x0EEE0001;
 
 
 pass
-
-

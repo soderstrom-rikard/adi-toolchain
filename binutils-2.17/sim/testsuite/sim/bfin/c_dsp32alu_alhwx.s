@@ -126,4 +126,3 @@
 	CHECKREG r7, 0x889AA7B7;
 
 	pass
-

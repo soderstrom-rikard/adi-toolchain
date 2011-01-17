@@ -134,10 +134,6 @@ CSYNC;
     // Re-enable events
 STI R1;
 
-    // Reset accumulator registers
-    A0 = 0;
-    A1 = 0;
-
     // Reset loop counters to deterministic values
     R0 = 0 (Z);
 
@@ -482,5 +478,3 @@ dbg_pass;
 
     .space (STACKSIZE);
     USTACK:
-
-

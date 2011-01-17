@@ -243,4 +243,3 @@
 	CHECKREG p4, 0xA9070C4A;
 
 	pass
-

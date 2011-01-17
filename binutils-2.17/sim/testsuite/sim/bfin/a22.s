@@ -81,4 +81,3 @@
 	_DBG ASTAT;
 
 	pass
-

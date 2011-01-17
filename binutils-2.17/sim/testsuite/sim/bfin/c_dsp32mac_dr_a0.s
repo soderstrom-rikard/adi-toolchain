@@ -122,5 +122,3 @@ CHECKREG r7, 0xFCEFF6EC;
 
 
 pass
-
-

@@ -125,4 +125,3 @@
 	CHECKREG p4, 0x08024998;
 
 	pass
-

@@ -24,4 +24,3 @@
 	DBGA ( R3.H , 0xc000 );
 
 	pass
-

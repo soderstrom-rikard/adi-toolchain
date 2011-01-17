@@ -143,5 +143,3 @@ CHECKREG r7, 0xFDAC3404;
 
 
 pass
-
-

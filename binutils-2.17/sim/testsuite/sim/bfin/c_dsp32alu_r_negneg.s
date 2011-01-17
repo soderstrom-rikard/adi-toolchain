@@ -86,5 +86,3 @@ CHECKREG r7, 0xD87754A3;
 
 
 pass
-
-

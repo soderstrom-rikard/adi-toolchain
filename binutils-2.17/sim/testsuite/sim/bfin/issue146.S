@@ -30,4 +30,3 @@
 	CHECKREG R0, (_VS|_V|_V_COPY|_AN);
 
 	pass
-

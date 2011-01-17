@@ -68,5 +68,3 @@ CHECKREG r7, 0xBC913448;
 
 
 pass
-
-

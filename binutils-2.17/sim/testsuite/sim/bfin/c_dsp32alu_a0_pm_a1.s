@@ -37,5 +37,3 @@ CHECKREG r6, 0x25BCE0F1;
 
 
 pass
-
-

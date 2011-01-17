@@ -296,4 +296,3 @@
 	DBGA ( R5.H , 0xffff );	DBGA ( R5.L , 0xff8a );
 
 	pass
-

@@ -3,9 +3,6 @@
 .include "testutils.inc"
 	start
 
-	R0 = A1.w;
-	R2 = R0.H*R2.L (IS);
-
 	p0=10;
 	loadsym i0, foo;
 

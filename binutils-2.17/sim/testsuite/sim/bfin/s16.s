@@ -168,4 +168,3 @@
 	CC = AN;	R7 = CC; DBGA ( R7.L , 0x0 );
 
 	pass
-

@@ -335,5 +335,3 @@ handler:
 	// Nops to work around ICache bug
 	NOP;NOP;NOP;NOP;NOP;
 	NOP;NOP;NOP;NOP;NOP;
-
-

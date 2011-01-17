@@ -18,4 +18,3 @@
 	dbga(r0.h, 0xff90);
 
 	pass
-
