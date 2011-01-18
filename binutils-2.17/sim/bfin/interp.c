@@ -745,9 +745,15 @@ bfin_fdpic_load (SIM_DESC sd, SIM_CPU *cpu, struct bfd *abfd, bu32 *sp,
   if (STATE_OPEN_KIND (sd) == SIM_OPEN_DEBUG)
     sim_io_printf (sd, " Elf_Ehdr: %#x\n", *sp);
 
+  /* Since we're relocating things ourselves, we need to relocate
+     the start address as well.  */
+  elf_addrs[0] = bfd_get_start_address (abfd) + fdpic_load_offset;
+
   /* And the Exec's Phdrs onto the stack.  */
   if (STATE_PROG_BFD (sd) == abfd)
     {
+      elf_addrs[4] = elf_addrs[0];
+
       phdr_size = iehdr->e_phentsize * iehdr->e_phnum;
       if (bfd_seek (abfd, iehdr->e_phoff, SEEK_SET) != 0)
 	goto skip_fdpic_init;
@@ -762,10 +768,6 @@ bfin_fdpic_load (SIM_DESC sd, SIM_CPU *cpu, struct bfd *abfd, bu32 *sp,
       if (STATE_OPEN_KIND (sd) == SIM_OPEN_DEBUG)
 	sim_io_printf (sd, " Elf_Phdrs: %#x\n", *sp);
     }
-
-  /* Since we're relocating things ourselves, we need to relocate
-     the start address as well.  */
-  elf_addrs[0] = bfd_get_start_address (abfd) + fdpic_load_offset;
 
   /* Now push all the loadsegs.  */
   nsegs = 0;
@@ -805,9 +807,9 @@ bfin_fdpic_load (SIM_DESC sd, SIM_CPU *cpu, struct bfd *abfd, bu32 *sp,
       }
     else if (phdrs[i].p_type == PT_DYNAMIC)
       {
-	elf_addrs[4] = phdrs[i].p_paddr + fdpic_load_offset;
+	elf_addrs[5] = phdrs[i].p_paddr + fdpic_load_offset;
 	if (STATE_OPEN_KIND (sd) == SIM_OPEN_DEBUG)
-	  sim_io_printf (sd, " PT_DYNAMIC: %#x\n", elf_addrs[4]);
+	  sim_io_printf (sd, " PT_DYNAMIC: %#x\n", elf_addrs[5]);
       }
     else if (phdrs[i].p_type == PT_INTERP)
       {
@@ -868,8 +870,8 @@ bfin_user_init (SIM_DESC sd, SIM_CPU *cpu, struct bfd *abfd,
 
   bu32 sp, sp_flat;
 
-  /* at_entry, at_phdr, at_phnum, at_base, pt_dynamic */
-  bu32 elf_addrs[5];
+  /* start, at_phdr, at_phnum, at_base, at_entry, pt_dynamic */
+  bu32 elf_addrs[6];
   bu32 auxvt, auxvt_size;
   bu32 exec_loadmap, ldso_loadmap;
   char *ldso_path;
@@ -878,8 +880,8 @@ bfin_user_init (SIM_DESC sd, SIM_CPU *cpu, struct bfd *abfd,
 
   host_callback *cb = STATE_CALLBACK (sd);
 
-  elf_addrs[0] = bfd_get_start_address (abfd);
-  elf_addrs[1] = elf_addrs[2] = elf_addrs[3] = elf_addrs[4] = 0;
+  elf_addrs[0] = elf_addrs[4] = bfd_get_start_address (abfd);
+  elf_addrs[1] = elf_addrs[2] = elf_addrs[3] = elf_addrs[5] = 0;
 
   /* Keep the load addresses consistent between runs.  Also make sure we make
      space for the fixed code region (part of the Blackfin Linux ABI).  */
@@ -929,7 +931,7 @@ bfin_user_init (SIM_DESC sd, SIM_CPU *cpu, struct bfd *abfd,
   SET_DREG (7, 0); /* Zero out FINI funcptr -- ldso will set this up.  */
   SET_PREG (0, exec_loadmap); /* Exec loadmap addr.  */
   SET_PREG (1, ldso_loadmap); /* Interp loadmap addr.  */
-  SET_PREG (2, elf_addrs[4]); /* PT_DYNAMIC map addr.  */
+  SET_PREG (2, elf_addrs[5]); /* PT_DYNAMIC map addr.  */
 
   auxvt = 1;
   SET_SPREG (sp);
@@ -972,7 +974,7 @@ bfin_user_init (SIM_DESC sd, SIM_CPU *cpu, struct bfd *abfd,
       AT_PUSH (AT_GID, gid);
       AT_PUSH (AT_EUID, euid);
       AT_PUSH (AT_UID, uid);
-      AT_PUSH (AT_ENTRY, elf_addrs[0]);
+      AT_PUSH (AT_ENTRY, elf_addrs[4]);
       AT_PUSH (AT_FLAGS, 0);
       AT_PUSH (AT_BASE, elf_addrs[3]);
       AT_PUSH (AT_PHNUM, elf_addrs[2]);
