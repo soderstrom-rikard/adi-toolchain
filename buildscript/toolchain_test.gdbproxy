@@ -102,12 +102,6 @@ log_test_results ()
 
 }
 
-########################################################
-
-if [ -z $UBOOT_SUBDIR ] ; then
-  UBOOT_SUBDIR=`ls -ltr $CHECKOUT/u-boot | grep u-boot-\[0-9.\]* | head -1 | awk '{print $8}'`
-fi
-
 
 ######## Do svn update and show svn info for each project.
 cd $CHECKOUT
@@ -135,7 +129,7 @@ EOF
   cd $TOOLCHAIN_BUILDSCRIPT 
 
 # For branch testing, use -K kbuild_output.
-# ./BuildToolChain  -j 1 -w -s $CHECKOUT/toolchain -b $USER/temp -K $CHECKOUT/toolchain/kbuild_output  -u $CHECKOUT/u-boot/$UBOOT_SUBDIR  -c $TOOLCHAIN_VERSION  -D
+# ./BuildToolChain  -j 1 -w -s $CHECKOUT/toolchain -b $USER/temp -K $CHECKOUT/toolchain/kbuild_output  -u $CHECKOUT/u-boot -c $TOOLCHAIN_VERSION  -D
 
 # For trunk testing, use -k $CHECKOUT/uclinux-dist/linux-2.6.x.
   ./BuildToolChain  -j 1 -w -s $CHECKOUT/toolchain -b $USER/temp -k $CHECKOUT/uclinux-dist/linux-2.6.x  -c $TOOLCHAIN_VERSION -D 
