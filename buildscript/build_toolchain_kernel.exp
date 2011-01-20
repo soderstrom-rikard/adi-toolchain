@@ -513,6 +513,10 @@ while 1 {
             send "M\r"
         }
 
+        -re "Sound card support \\\(SOUND\\\) \\\[.*]" {
+            send "N\r"
+        }
+
         "\\\(*) \\\[*]" {
             sleep .05
             send "\r"
@@ -1055,10 +1059,6 @@ if { $kernel_config == "flat_lib" || $kernel_config == "fdpic_lib" } {
                 } else {
                     send "N\r"
                 }
-            }
-
-            -re "ALSA for SoC audio support \\\(SND_SOC\\\) \\\[.*]" {
-                send "N\r"
             }
 
             "\\\(*) \\\[*]" {
