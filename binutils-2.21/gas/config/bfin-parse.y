@@ -3478,7 +3478,7 @@ asm_1:
 	  if ($1.regno != REG_SP)
 	    yyerror ("Stack Pointer expected");
 
-	  if (IS_ALLREG ($3))
+	  if (IS_ALLREG ($3) && ($3.regno != REG_SP))
 	    {
 	      notethat ("PushPopReg: [ -- SP ] = allregs\n");
 	      $$ = PUSHPOPREG (&$3, 1);
