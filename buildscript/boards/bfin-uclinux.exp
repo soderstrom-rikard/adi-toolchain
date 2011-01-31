@@ -1,0 +1,5 @@
+# Testing bfin-uclinux toolchain via rcp/gdbserver on a Linux system
+
+load_generic_config "bfin-fmt-flat"
+load_generic_config "bfin-target-linux"
+

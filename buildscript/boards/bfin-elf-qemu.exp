@@ -1,0 +1,7 @@
+# Testing bfin-elf toolchain via QEMU
+
+# Override the cpu setting
+set adi_mcpu_flags "-msim"
+
+load_generic_config "bfin-fmt-elf"
+load_generic_config "bfin-target-qemu"

@@ -1,0 +1,17 @@
+# Board definition fragment for all Blackfin test targets
+
+#load_generic_config "gdb-comm"
+
+# No linker script needed.
+set_board_info ldscript "";
+
+# General compiler settings
+set_board_info compiler "[find_gcc]"
+
+# multilib_flags should be set to a proper -mcpu= option when
+# testing on hardware.
+set_board_info multilib_flags "$adi_mcpu_flags"
+
+# Find the sysroot
+set _adi_libc [exec [find_gcc] -print-file-name=libc.so.0]   
+set adi_sysroot [join [lrange [split "$_adi_libc" /] 0 end-2] /]

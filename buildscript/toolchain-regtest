@@ -45,7 +45,11 @@ BINUTILS_PATH=
 GDB_PATH=
 GCC_PATH=
 
-VALID_TEST_TARGETS="elf-sim elf-jtag uclinux linux-uclibc"
+VALID_TEST_TARGETS="
+	elf-sim elf-jtag
+	uclinux uclinux-qemu
+	linux-uclibc linux-uclibc-sim linux-uclibc-qemu
+"
 TEST_TARGETS=
 _test_targets()
 {
@@ -88,7 +92,7 @@ Usage : $APP_NAME -s SOURCE [OPTIONS] [[!]TEST[=/path/to/testsuite]] [...]
 -r RESULTS_DIR   Compare current tests to old results
 -s SOURCE        Toolchain Source directory (where to find testsuites)
 -T TARGET_IPADDR Test components on hardware
--t TARGET        Test target (${VALID_TEST_TARGETS})
+-t TARGET        Test target (`echo ${VALID_TEST_TARGETS}`)
 -u SOURCE        Uboot Source directory
 -v               Verbose
 -w               Warnings to be sent to a different log file
@@ -451,8 +455,9 @@ fi
 get_tuple()
 {
 	case $1 in
-		elf-*) echo bfin-elf ;;
-		*)     echo bfin-$1 ;;
+		elf*)          echo bfin-elf ;;
+		uclinux*)      echo bfin-uclinux ;;
+		linux-uclibc*) echo bfin-linux-uclibc ;;
 	esac
 }
 
@@ -461,7 +466,7 @@ get_tuple()
 clean_hardware()
 {
 	# only clean targets running under Linux
-	case $1 in *linux*) ;; *) return 0 ;; esac
+	test_targets_has LINUX || return 0
 
 	run_rsh_nodie 'free; find / /tmp/ /root/ -maxdepth 1 -type f -name "[^.]*" -exec rm "{}" \; ; free'
 
@@ -495,7 +500,7 @@ copy_test_results()
 prepare_target()
 {
 	# only clean targets running Linux
-	case $1 in *linux*) ;; *) return 0 ;; esac
+	test_targets_has LINUX || return 0
 
 	log_it "preparing target board for more tests"
 
@@ -527,8 +532,7 @@ check_tests_OK()
 {
 	local pid=$1
 
-	case $3 in
-	*linux*)
+	if test_targets_has LINUX ; then
 		local timeout=0 limit=3
 		while :; do
 			# Check on the Host - if the test is done - quit
@@ -551,10 +555,10 @@ check_tests_OK()
 			fi
 			sleep 5
 		done
-		;;
 
-	*) wait ;;
-	esac
+	else
+		wait
+	fi
 }
 
 detect()
@@ -837,9 +841,9 @@ test_libmudflap()
 	{
 		local test_src="$1" test_output="$2"
 		case ${test_target} in
-			uclinux)      build_libmudflapth=1 LIBS="" ;;
-			linux-uclibc) build_libmudflapth=1 LIBS="-ldl" ;;
-			*)            build_libmudflapth=0 LIBS="" ;;
+			uclinux*)      build_libmudflapth=1 LIBS="" ;;
+			linux-uclibc*) build_libmudflapth=1 LIBS="-ldl" ;;
+			*)             build_libmudflapth=0 LIBS="" ;;
 		esac
 		sed \
 			-e "s/@LIBS@/$LIBS/g" \
@@ -915,6 +919,7 @@ run_tests()
 	local hardware
 	case ${test_target} in
 		*-sim)  hardware="simulator" ;;
+		*-qemu) hardware="qemu" ;;
 		*-jtag) hardware="jtag" ;;
 		*)      hardware="hardware (${TARGET_IPADDR})" ;;
 	esac
@@ -922,16 +927,17 @@ run_tests()
 
 	TARGET_TRIPLET=`$DIR_APP/config.sub $target_alias`
 
+	export ADI_TARGET_LIST="bfin-${test_target}"
 	prepare_target ${test_target}
 
 	tt="binutils gas ld gdb gcc g++ gfortran objc libstdc++"
 	case ${test_target} in
-		elf-sim)      tt="${tt} sim" ;;
-		elf-jtag)     tt="${tt} newlib" ;;
-		uclinux)      tt="${tt} libmudflap" ;;
-		linux-uclibc) tt="${tt} libmudflap libgomp"
-		              [ -n "$CHECK_LIB" ] && prepare_target_solibs
-		              ;;
+		elf-sim)       tt="${tt} sim" ;;
+		elf-jtag)      tt="${tt} newlib" ;;
+		uclinux*)      tt="${tt} libmudflap" ;;
+		linux-uclibc*) tt="${tt} libmudflap libgomp"
+		               [ -n "$CHECK_LIB" ] && prepare_target_solibs
+		               ;;
 	esac
 	for t in ${tt} ; do
 		test_has ${t} || continue
@@ -1015,10 +1021,13 @@ run_tests()
 	echo
 }
 
-
 ###################### Setting up test  ##########################
 
 mk_output_dir "boards" "${DIR_BUILD}/boards" "don't clean"
+
+#
+# Set up global site.exp
+#
 
 STACK_CHECKING_SET=
 if [ $STACK_CHECKING ] ; then
@@ -1029,62 +1038,18 @@ if [ $SERIAL_DEBUG_PORT ] ; then
 	SERIAL_DEBUG_PORT_SET='set_board_info use_serial_debug 1\nset GDBFLAGS "-nx -b 57600"'
 fi
 
-#
-# Set up simulator (bfin-elf) stuff
-#
-input=$(cat $DIR_BOARDS/bfin-sim.exp)
-echo "${input}" > $DIR_BUILD/boards/bfin-sim.exp
+: ${CPU_TYPE_REV:=bf537-0.2}
+CPU_TYPE_REV="-mcpu=${CPU_TYPE_REV}"
 
-#
-# Set up jtag (bfin-elf) stuff
-#
-cat <<EOF > $DIR_BUILD/boards/gdb-init-commands
-set breakpoint pending off
-set remotetimeout 150
-EOF
-cat <<EOF > $DIR_BUILD/boards/bfin-elf.exp
-$(cat $DIR_BOARDS/bfin-elf.exp.1)
-set_board_info gdb_init_command "source $DIR_BUILD/boards/gdb-init-commands"
-EOF
-input=$(cat $DIR_BOARDS/bfin.exp)
-echo "${input}" > $DIR_BUILD/boards/bfin.exp
-
-#
-# Set up hardware FLAT (bfin-uclinux)
-#
-cat <<EOF > $DIR_BUILD/boards/bfin-uclinux.exp
-$(cat $DIR_BOARDS/bfin-uclinux.exp.1)
-set_board_info hostname $TARGET_IPADDR
-set_board_info sockethost $TARGET_IPADDR:
-`printf "$STACK_CHECKING_SET\n"`
-`printf "$SERIAL_DEBUG_PORT_SET\n"`
-EOF
-
-#
-# Set up hardware FDPIC (bfin-linux-uclibc)
-#
-cat <<EOF > $DIR_BUILD/boards/bfin-linux-uclibc.exp
-$(cat $DIR_BOARDS/bfin-linux-uclibc.exp.1)
-set_board_info multilib_flags "-mcpu=$CPU_TYPE_REV"
-set_board_info hostname $TARGET_IPADDR
-set_board_info sockethost $TARGET_IPADDR:
-`printf "$STACK_CHECKING_SET\n"`
-`printf "$SERIAL_DEBUG_PORT_SET\n"`
-EOF
-
-#
-# Set up common test files
-#
-tlist=$(
-	test_targets_has elf-sim && printf "bfin-sim "
-	test_targets_has elf-jtag && printf "bfin-elf "
-)
-cat <<EOF > $DIR_BUILD/boards/site.exp
-$(cat $DIR_BOARDS/site.exp.1)
-lappend boards_dir "$DIR_BUILD/boards"
-$(sed -e "/set target_list { bfin-sim }/s:{.*}:{ $tlist }:" $DIR_BOARDS/site.exp.2)
-EOF
 export DEJAGNU=$DIR_BUILD/boards/site.exp
+(
+sed \
+	-e "s:@BOARDS_DIR@:$DIR_BUILD/boards:" \
+	-e "s:@MCPU_FLAGS@:${CPU_TYPE_REV} ${STACK_CHECKING:+-mstack-check-l1}:" \
+	-e "s:@HOSTNAME@:$TARGET_IPADDR:" \
+	"${DIR_BOARDS}"/site.exp.in
+`printf "$SERIAL_DEBUG_PORT_SET\n"`
+) > "${DEJAGNU}"
 
 #
 # Finally run the actual tests

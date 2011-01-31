@@ -1,0 +1,19 @@
+These dejagnu files are organized as follows:
+
+Global config files:
+	- site.exp (generated from site.exp.in)
+		- specific test settings used by all targets
+
+Test targets:
+	- bfin-elf*.exp
+		- files for testing the bfin-elf toolchain
+	- bfin-uclinux*.exp
+		- files for testing the bfin-uclinux toolchain
+	- bfin-linux-uclibc*.exp
+		- files for testing the bfin-linux-uclibc toolchain
+
+Helper fragments:
+	- bfin-fmt*.exp
+		- for testing specific file formats
+	- bfin-target*.exp
+		- for testing specific Blackfin targets

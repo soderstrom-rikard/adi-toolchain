@@ -1,0 +1,10 @@
+# Board definition fragment for testing an ELF (bare-metal) toolchain
+
+# Common Blackfin format settings
+load_generic_config "bfin-fmt"
+
+# We only support newlib on this target. We assume that all multilib
+# options have been specified before we get here.
+
+set_board_info cflags    "[newlib_include_flags] $adi_mcpu_flags"
+set_board_info ldflags   "[libgloss_link_flags] [newlib_link_flags]"

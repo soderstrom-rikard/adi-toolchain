@@ -1,0 +1,6 @@
+# Testing bfin-linux-uclibc toolchain via GNU Sim
+
+load_generic_config "bfin-fmt-fdpic"
+load_generic_config "bfin-target-sim"
+
+set_board_info sim,options "--env user --sysroot $adi_sysroot"

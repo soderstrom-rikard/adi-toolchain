@@ -1,0 +1,4 @@
+# Testing bfin-linux-uclibc toolchain via rcp/gdbserver on a Linux system
+
+load_generic_config "bfin-fmt-fdpic"
+load_generic_config "bfin-target-linux"

@@ -1,3 +1,21 @@
+# Site.exp skeleton for all Blackfin test targets
+
+# Needed for isnative.
+load_lib "framework.exp"
+
+# Make sure we look in the right place for the board description files.
+if ![info exists boards_dir] {
+    set boards_dir {}
+}
+
+set adi_boards_dir "@BOARDS_DIR@"
+lappend boards_dir "$adi_boards_dir"
+
+# For sim targets, use -msim.  Otherwise, pick the right -mcpu value.
+set adi_mcpu_flags "@MCPU_FLAGS@"
+
+# For testing Linux targets (rsh/rcp)
+set adi_hostname "@HOSTNAME@"
 
 #
 # Determine target machines for all known targets
@@ -26,18 +44,21 @@ case "$target_triplet" in {
     }
 
     { bfin-*-elf } {
-	set target_list { bfin-sim }
-	# set target_list { bfin-elf }
+	set target_list { bfin-elf-sim bfin-elf }
     }
     { bfin-*-uclinux* } {
-	set target_list { bfin-uclinux }
+	set target_list { bfin-uclinux bfin-uclinux-qemu }
     }
     { bfin-*-linux-uclibc* } {
-	set target_list { bfin-linux-uclibc }
+	set target_list { bfin-linux-uclibc bfin-linux-uclibc-sim bfin-linux-uclibc-qemu }
     }
     default {
 	set target_list { "unix" }
     }
+}
+set adi_target_list [array get env ADI_TARGET_LIST]
+if [ llength $adi_target_list ] {
+    set target_list [lindex $adi_target_list 1]
 }
 
 #
