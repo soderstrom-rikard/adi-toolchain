@@ -3,6 +3,8 @@
 # To build for hardware, use:
 # bfin-linux-uclibc-gcc -nostdlib -g -Wa,--defsym,BFIN_HOST=1 foo.s
 
+# MACRO: start
+# All assembler tests should start with a call to "start"
 	.macro start
 	.text
 	# Pad with EMUEXCPT to make sure "jump to 0" always fails
@@ -87,11 +89,15 @@ _main:
 .endif
 	.endm
 
+# MACRO: system_call
+# Make a libgloss/Linux system call
 	.macro system_call nr:req
 	P0 = \nr (X);
 	EXCPT 0;
 	.endm
 
+# MACRO: exit
+# Quit the current test
 	.macro exit rc:req
 	R0 = \rc (X);
 .ifndef BFIN_HOST
@@ -103,14 +109,22 @@ _main:
 	system_call 1
 	.endm
 
+# MACRO: pass
+# Write 'pass' to stdout via syscalls and quit;
+# meant for non-OS operating environments
 	.macro pass
 	CALL __pass;
 	.endm
 
+# MACRO: fail
+# Write 'fail' to stdout via syscalls and quit;
+# meant for non-OS operating environments
 	.macro fail
 	CALL __fail;
 	.endm
 
+# MACRO: write
+# Just like the write() C function; uses system calls
 	.macro write fd:req, buf:req, count:req
 .ifndef BFIN_HOST
 	P0.H = _params;
@@ -127,12 +141,18 @@ _main:
 .endif
 	.endm
 
+# MACRO: outc_str
+# Output a string using the debug OUTC insn
 	.macro outc_str ch:req, more:vararg
 	OUTC \ch;
 	.ifnb \more
 	outc_str \more
 	.endif
 	.endm
+
+# MACRO: dbg_pass
+# Write 'pass' to stdout and quit (all via debug insns);
+# meant for OS operating environments
 	.macro dbg_pass
 .ifdef BFIN_JTAG
 	R0 = 6;
@@ -152,6 +172,10 @@ _main:
 	HLT;
 .endif
 	.endm
+
+# MACRO: dbg_fail
+# Write 'fail' to stdout and quit (all via debug insns);
+# meant for OS operating environments
 	.macro dbg_fail
 .ifdef BFIN_JTAG
 	R0 = 6;
@@ -172,11 +196,15 @@ _main:
 	ABORT;
 	.endm
 
+# MACRO: imm32
+# Load a 32bit immediate directly into a register
 	.macro imm32 reg:req, val:req
 	\reg\().L = ((\val) & 0xffff);
 	\reg\().H = (((\val) >> 16) & 0xffff);
 	.endm
 
+# MACRO: dmm32
+# Load a 32bit immediate indirectly into a register
 	.macro dmm32 reg:req, val:req
 	[--SP] = R0;
 	imm32 R0, \val
@@ -184,6 +212,8 @@ _main:
 	R0 = [SP++];
 	.endm
 
+# MACRO: loadsym
+# Load a symbol directly into a register
 .ifndef BFIN_HOST
 	.macro loadsym reg:req, sym:req, offset=0
 	\reg\().L = (\sym\() + \offset\());
@@ -204,11 +234,14 @@ _main:
 	.endm
 .endif
 
+# MACRO: CHECKREG
+# Use debug insns to verify the value of a register matches
 	.macro CHECKREG reg:req, val:req
-	DBGA (\reg\().L, ((\val) & 0xffff));
-	DBGA (\reg\().H, (((\val) >> 16) & 0xffff));
+	DBGAL (\reg, ((\val) & 0xffff));
+	DBGAH (\reg, (((\val) >> 16) & 0xffff));
 	.endm
 
+# internal helper macros; ignore them
 	.macro __init_regs reg:req, max:req, x:req, val:req
 	.ifle (\x - \max)
 	\reg\()\x\().L = ((\val) & 0xffff);
@@ -226,6 +259,13 @@ _main:
 	__init_regs \reg, \max, 7, \val
 	.endm
 
+# MACRO: init_r_regs
+# MACRO: init_p_regs
+# MACRO: init_b_regs
+# MACRO: init_i_regs
+# MACRO: init_l_regs
+# MACRO: init_m_regs
+# Set the specified group of regs to the specified value
 	.macro init_r_regs val:req
 	_init_regs R, 7, \val
 	.endm
