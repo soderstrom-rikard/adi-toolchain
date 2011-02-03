@@ -16,7 +16,7 @@ cp() {
 	fi
 }
 spec=${1:-`echo *.spec 2>/dev/null`}
-[[ -e ${spec} ]] || err "need a spec file"
+[ -e "${spec}" ] || err "need a spec file"
 shift
 
 export RPM_BUILD_ROOT=${spec%/*}/rpm-build
@@ -59,7 +59,6 @@ done
 
 # generate the shared spec env
 (
-echo 'pwd'
 # the global defines
 echo 'nil='
 sed -n -e '1,/^Name:/p' ${spec} | grep -v '^Name:'
@@ -70,18 +69,6 @@ awk '$0 ~ /^[^#]*:/ { system("printf " $1 " | tr [:upper:] [:lower:]"); $1 = "";
 
 # we need a few vars ourselves
 . ./.spec.env.sh
-if false ; then
-set -x
-echo "$( \
-	nil=; \
-	( \
-	awk '$0 ~ /^[^#]*:/ { system("printf " $1 " | tr [:upper:] [:lower:]"); $1 = ""; print }' ${spec} \
-		| sed -n -e '/^[[:alnum:]]*:/{s|^\([^:]*\):[[:space:]]*\(.*\)|\1="\2"|;p}' ; \
-	sed -n -e '/^%define/{s:^%define \([^ ]*\) \(.*\):\1="\2":;p}' ${spec} \
-	) | sed -e 's:%{:${:g' \
-)" > .spec.env.sh
-set +x
-fi
 
 dov() { echo "$@"; "$@"; }
 do_setup() {
@@ -127,9 +114,11 @@ do_patch() {
 
 	local x has_p=false has_f=false has_s=false
 	for x in "$@" ; do
-		[[ $x == -p* ]] && has_p=true
-		[[ $x == -f ]] && has_f=true
-		[[ $x == -s ]] && has_s=true
+		case $x in
+			-p*) has_p=true ;;
+			-f)  has_f=true ;;
+			-s)  has_s=true ;;
+		esac
 	done
 	${has_p} || set -- "$@" -p0
 	${has_f} || set -- "$@" -f
@@ -153,7 +142,7 @@ for step in "$@" ; do
 	cd .
 done
 
-if [[ " $* " == *" install "* ]] ; then
+case " $* " in *" install "*)
 	find "${RPM_BUILD_ROOT}" -perm +1 -type f -exec file {} + | \
 	while read line ; do
 		case ${line} in
@@ -163,4 +152,4 @@ if [[ " $* " == *" install "* ]] ; then
 	osn=`sw_vers -productName | sed -e 's:Mac ::' -e 's: :_:g'`
 	osv=`sw_vers -productVersion`
 	tar cf ../${name}-${version}-${release}.${osn}-${osv}.`arch`.tar -C "${RPM_BUILD_ROOT}" ./
-fi
+;; esac
