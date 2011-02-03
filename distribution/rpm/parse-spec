@@ -28,42 +28,96 @@ esac
 
 steps="prep clean build install files"
 order=$(grep `printf -- '-e ^%%%s$ ' ${steps}` ${spec} | sed s:%::g)
+filter_spec() {
+	sed \
+		-e 's:%{:${:g' \
+		-e 's:%setup\>:do_setup:' \
+		-e 's:%patch:do_patch __:' \
+		-e '/%if/{s:^%if :if test ":;s:$:" != 0; then:}' \
+		-e 's:%else:else:' \
+		-e 's:%endif:fi:' \
+		-e '/%define/{s:^%define :\t:;s: :=":;s:$:":;}'
+}
 make_script() {
-	sed -n -e "/^%${1}$/,/^%${last}$/{s:^%${1}$:#/bin/bash:;p}" ${spec} \
-		| sed \
-			-e 's:%{:${:g' \
-			-e 's:%setup\>:do_setup:' \
-			-e 's:%patch:do_patch __:' \
-		| grep -v "^%${last}$" \
+	(
+	echo '#/bin/bash'
+	echo '. ../.spec.env.sh'
+	# then the actual step
+	sed -n -e "/^%${1}$/,/^%${last}$/p" ${spec}
+	) | filter_spec | \
+		grep -v \
+			-e "^%${1}$" \
+			-e "^%${last}$" \
 		> .spec.$1.sh
+	chmod a+rx .spec.$1.sh
 	last=$1
 }
+echo "### Ripping apart ${spec}"
 for step in `printf '%s\n' "${order}" | tac` ; do
 	make_script ${step}
 done
 
-eval "$( \
+# generate the shared spec env
+(
+echo 'pwd'
+# the global defines
+echo 'nil='
+sed -n -e '1,/^Name:/p' ${spec} | grep -v '^Name:'
+# the package settings
+awk '$0 ~ /^[^#]*:/ { system("printf " $1 " | tr [:upper:] [:lower:]"); $1 = ""; print }' ${spec} \
+	| sed -n -e '/^[[:alnum:]]*:/{s|^\([^:]*\):[[:space:]]*\(.*\)|\1="\2"|;p}'
+) | filter_spec > .spec.env.sh
+
+# we need a few vars ourselves
+. ./.spec.env.sh
+if false ; then
+set -x
+echo "$( \
 	nil=; \
 	( \
 	awk '$0 ~ /^[^#]*:/ { system("printf " $1 " | tr [:upper:] [:lower:]"); $1 = ""; print }' ${spec} \
 		| sed -n -e '/^[[:alnum:]]*:/{s|^\([^:]*\):[[:space:]]*\(.*\)|\1="\2"|;p}' ; \
 	sed -n -e '/^%define/{s:^%define \([^ ]*\) \(.*\):\1="\2":;p}' ${spec} \
 	) | sed -e 's:%{:${:g' \
-)"
+)" > .spec.env.sh
+set +x
+fi
 
 dov() { echo "$@"; "$@"; }
 do_setup() {
+	local a b c n="${name}-${version}" t
 	echo do_setup: "$@"
-	cd ..
-	dov tar xf ${source}
 	while [ -n "$1" ] ; do
 		case $1 in
-		-b) shift; eval dov tar xf \${source$1};;
+		-a) shift; eval a=\"${a} \${source$1}\";;
+		-b) shift; eval b=\"${b} \${source$1}\";;
+		-c) c=1; shift; n=$1;;
+		-q) :;;
 		*)  err do_setup: unknown opt $1;;
 		esac
 		shift
 	done
-	cd ${name}-${version} || err
+
+	dov cd ..
+	dov rm -rf "${n}"
+	if [ -n "${c}" ] ; then
+		dov mkdir "${n}" || err
+		dov cd "${n}" || err
+	fi
+	dov tar xf ../${source}
+	dov cd ..
+
+	if [ -n "${b}" ] ; then
+		for t in ${b} ; do
+			dov tar xf ${t}
+		done
+	fi
+	dov cd "${n}" || err
+	if [ -n "${a}" ] ; then
+		for t in ${a} ; do
+			dov tar xf ../${t}
+		done
+	fi
 }
 # the -P option is not supported
 do_patch() {
@@ -81,7 +135,7 @@ do_patch() {
 	${has_f} || set -- "$@" -f
 	${has_s} || set -- "$@" -s
 	echo "do_patch: $patch $*"
-	patch "$@" < "$p" || err
+	patch "$@" < "../$p" || err
 }
 
 if [ $# -eq 0 ] ; then
@@ -95,6 +149,8 @@ for step in "$@" ; do
 	sh=".spec.${step}.sh"
 	echo "### Running ${step}"
 	(. ../$sh) || err
+	# in case the dir is recreated
+	cd .
 done
 
 if [[ " $* " == *" install "* ]] ; then
