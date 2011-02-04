@@ -151,5 +151,5 @@ case " $* " in *" install "*)
 	done
 	osn=`sw_vers -productName | sed -e 's:Mac ::' -e 's: :_:g'`
 	osv=`sw_vers -productVersion`
-	tar cf ../${name}-${version}-${release}.${osn}-${osv}.`arch`.tar -C "${RPM_BUILD_ROOT}" ./
+	tar cf - -C "${RPM_BUILD_ROOT}" ./ | bzip2 > ../${name}-${version}-${release}.${osn}-${osv}.`arch`.tar.bz2
 ;; esac
