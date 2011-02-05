@@ -318,7 +318,7 @@ static const enum machine_registers decode_pregs[] =
 
 #define pregs(x)	REGNAME (decode_pregs[(x) & 7])
 #define spfp(x)		REGNAME (decode_spfp[(x) & 1])
-#define dregs_hilo(x,i)	REGNAME (decode_dregs_hilo[((i) << 3)|x])
+#define dregs_hilo(x, i)	REGNAME (decode_dregs_hilo[((i) << 3) | (x)])
 #define accum_ext(x)	REGNAME (decode_accum_ext[(x) & 1])
 #define accum_word(x)	REGNAME (decode_accum_word[(x) & 1])
 #define accum(x)	REGNAME (decode_accum[(x) & 1])
@@ -357,7 +357,7 @@ static const enum machine_registers decode_gregs[] =
   REG_P0, REG_P1, REG_P2, REG_P3, REG_P4, REG_P5, REG_SP, REG_FP,
 };
 
-#define gregs(x,i) REGNAME (decode_gregs[((i) << 3)|x])
+#define gregs(x, i) REGNAME (decode_gregs[((i) << 3) | (x)])
 
 /* [dregs pregs (iregs mregs) (bregs lregs)].  */
 static const enum machine_registers decode_regs[] =
@@ -368,7 +368,7 @@ static const enum machine_registers decode_regs[] =
   REG_B0, REG_B1, REG_B2, REG_B3, REG_L0, REG_L1, REG_L2, REG_L3,
 };
 
-#define regs(x,i) REGNAME (decode_regs[((i) << 3)|x])
+#define regs(x, i) REGNAME (decode_regs[((i) << 3) | (x)])
 
 /* [dregs pregs (iregs mregs) (bregs lregs) Low Half].  */
 static const enum machine_registers decode_regs_lo[] =
@@ -379,7 +379,8 @@ static const enum machine_registers decode_regs_lo[] =
   REG_BL0, REG_BL1, REG_BL2, REG_BL3, REG_LL0, REG_LL1, REG_LL2, REG_LL3,
 };
 
-#define regs_lo(x,i) REGNAME (decode_regs_lo[((i) << 3)|x])
+#define regs_lo(x, i) REGNAME (decode_regs_lo[((i) << 3) | (x)])
+
 /* [dregs pregs (iregs mregs) (bregs lregs) High Half].  */
 static const enum machine_registers decode_regs_hi[] =
 {
@@ -389,7 +390,7 @@ static const enum machine_registers decode_regs_hi[] =
   REG_BH0, REG_BH1, REG_BH2, REG_BH3, REG_LH0, REG_LH1, REG_LH2, REG_LH3,
 };
 
-#define regs_hi(x,i) REGNAME (decode_regs_hi[((i) << 3)|x])
+#define regs_hi(x, i) REGNAME (decode_regs_hi[((i) << 3) | (x)])
 
 static const enum machine_registers decode_statbits[] =
 {
@@ -442,7 +443,7 @@ static const enum machine_registers decode_allregs[] =
 #define allreg(r,g)	(!IS_RESERVEDREG (g, r))
 #define mostreg(r,g)	(!(IS_DREG (g, r) || IS_PREG (g, r) || IS_RESERVEDREG (g, r)))
 
-#define allregs(x,i)	REGNAME (decode_allregs[((i) << 3) | x])
+#define allregs(x, i)	REGNAME (decode_allregs[((i) << 3) | (x)])
 #define uimm16s4(x)	fmtconst (c_uimm16s4, x, 0, outf)
 #define uimm16s4d(x)	fmtconst (c_uimm16s4d, x, 0, outf)
 #define pcrel4(x)	fmtconst (c_pcrel4, x, pc, outf)
@@ -676,7 +677,7 @@ struct saved_state
 }  saved_state;
 
 #define DREG(x)         (saved_state.dpregs[x])
-#define GREG(x,i)       DPREG ((x) | (i << 3))
+#define GREG(x, i)      DPREG ((x) | (i << 3))
 #define DPREG(x)        (saved_state.dpregs[x])
 #define DREG(x)         (saved_state.dpregs[x])
 #define PREG(x)         (saved_state.dpregs[x + 8])
