@@ -677,10 +677,10 @@ struct saved_state
 }  saved_state;
 
 #define DREG(x)         (saved_state.dpregs[x])
-#define GREG(x, i)      DPREG ((x) | (i << 3))
+#define GREG(x, i)      DPREG ((x) | ((i) << 3))
 #define DPREG(x)        (saved_state.dpregs[x])
 #define DREG(x)         (saved_state.dpregs[x])
-#define PREG(x)         (saved_state.dpregs[x + 8])
+#define PREG(x)         (saved_state.dpregs[(x) + 8])
 #define SPREG           PREG (6)
 #define FPREG           PREG (7)
 #define IREG(x)         (saved_state.iregs[x])
