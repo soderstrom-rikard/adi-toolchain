@@ -17,6 +17,9 @@ You should have received a copy of the GNU General Public License
 along with this file; see the file COPYING.  If not, write to the Free
 Software Foundation, 51 Franklin Street - Fifth Floor, Boston, MA 02110-1301, USA.  */
 
+#ifndef OPCODE_BFIN_H
+#define OPCODE_BFIN_H
+
 /* Common to all DSP32 instructions.  */
 #define BIT_MULTI_INS 0x0800
 
@@ -1724,3 +1727,5 @@ typedef struct
   DagMODik_op_bits,	DagMODik_op_mask,	\
   DagMODik_code_bits,	DagMODik_code_mask	\
 };
+
+#endif
