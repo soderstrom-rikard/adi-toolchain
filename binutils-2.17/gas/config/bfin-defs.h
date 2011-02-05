@@ -22,6 +22,8 @@
 #ifndef BFIN_PARSE_H
 #define BFIN_PARSE_H
 
+#include "opcode/bfin.h"
+
 #define PCREL	1
 #define CODE_FRAG_SIZE 4096  /* 1 page.  */
 
@@ -165,17 +167,6 @@ enum reg_class
   rc_allregs,
   LIM_REG_CLASSES
 };
-
-/* mmod field.  */
-#define M_S2RND 1
-#define M_T     2
-#define M_W32   3
-#define M_FU    4
-#define M_TFU   6
-#define M_IS    8
-#define M_ISS2  9
-#define M_IH    11
-#define M_IU    12
 
 /* Register type checking macros.  */
 
