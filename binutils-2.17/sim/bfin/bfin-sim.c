@@ -32,34 +32,6 @@
 #include "dv-bfin_cec.h"
 #include "dv-bfin_mmu.h"
 
-#define M_S2RND 1
-#define M_T     2
-#define M_W32   3
-#define M_FU    4
-#define M_TFU   6
-#define M_IS    8
-#define M_ISS2  9
-#define M_IH    11
-#define M_IU    12
-
-/* Valid flag settings */
-#define is_macmod_pmove(x) (((x) == 0) || \
-			    ((x) == M_IS) || \
-			    ((x) == M_FU) || \
-			    ((x) == M_S2RND) || \
-			    ((x) == M_ISS2) || \
-			    ((x) == M_IU))
-
-#define is_macmod_hmove(x) (((x) == 0) || \
-			    ((x) == M_IS) || \
-			    ((x) == M_FU) || \
-			    ((x) == M_IU) || \
-			    ((x) == M_T) || \
-			    ((x) == M_TFU) || \
-			    ((x) == M_S2RND) || \
-			    ((x) == M_ISS2) || \
-			    ((x) == M_IH))
-
 #define HOST_LONG_WORD_SIZE (sizeof (long) * 8)
 
 #define SIGNEXTEND(v, n) (((bs32)(v) << (HOST_LONG_WORD_SIZE - (n))) >> (HOST_LONG_WORD_SIZE - (n)))
