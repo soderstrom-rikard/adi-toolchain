@@ -128,19 +128,19 @@ fmtconst (const_forms_t cf, TIword x, bfd_vma pc, disassemble_info *outf)
       if (constant_formats[cf].pcrel)
 	ea += pc;
 
-     /* truncate to 32-bits for proper symbol lookup/matching */
-     ea = (bu32)ea;
+      /* truncate to 32-bits for proper symbol lookup/matching */
+      ea = (bu32)ea;
 
-     if (outf->symbol_at_address_func (ea, outf) || !constant_formats[cf].exact)
-       {
+      if (outf->symbol_at_address_func (ea, outf) || !constant_formats[cf].exact)
+	{
 	  outf->print_address_func (ea, outf);
 	  return "";
-       }
-     else
-       {
+	}
+      else
+	{
 	  sprintf (buf, "%lx", (unsigned long) x);
 	  return buf;
-       }
+	}
     }
 
   /* Negative constants have an implied sign bit.  */
@@ -1379,7 +1379,7 @@ decode_REGMV_0 (TIword iw0, disassemble_info *outf)
   int src = ((iw0 >> RegMv_src_bits) & RegMv_src_mask);
   int dst = ((iw0 >> RegMv_dst_bits) & RegMv_dst_mask);
 
- /* Reserved slots cannot be a src/dst.  */
+  /* Reserved slots cannot be a src/dst.  */
   if (IS_RESERVEDREG (gs, src) || IS_RESERVEDREG (gd, dst))
     goto invalid_move;
 
@@ -2086,16 +2086,16 @@ decode_dagMODik_0 (TIword iw0, disassemble_info *outf)
   else
     return 0;
 
- if (! parallel )
-   {
-     OUTS (outf, ";\t\t/* (  ");
-     if (op == 0 || op == 1)
-       OUTS (outf, "2");
-     else if (op == 2 || op == 3)
+  if (! parallel)
+    {
+      OUTS (outf, ";\t\t/* (  ");
+      if (op == 0 || op == 1)
+	OUTS (outf, "2");
+      else if (op == 2 || op == 3)
 	OUTS (outf, "4");
-     OUTS (outf, ") */");
-    comment = 1;
-  }
+      OUTS (outf, ") */");
+      comment = 1;
+    }
 
   return 2;
 }
@@ -2736,7 +2736,7 @@ decode_LDIMMhalf_0 (TIword iw0, TIword iw1, disassemble_info *outf)
       OUTS (outf, " (X)");
     }
   else if (H == 0 && S == 1 && Z == 0)
-   {
+    {
       OUTS (outf, regs (reg, grp));
       OUTS (outf, " = ");
       OUTS (outf, imm16 (hword));
@@ -2793,14 +2793,14 @@ decode_LDIMMhalf_0 (TIword iw0, TIword iw1, disassemble_info *outf)
     }
   if (S == 1 || Z == 1)
     {
-       OUTS (outf, ";\t\t/*\t\t");
-       OUTS (outf, regs (reg, grp));
-       OUTS (outf, "=0x");
-       OUTS (outf, huimm32e (*pval));
-       OUTS (outf, "(");
-       OUTS (outf, imm32 (*pval));
-       OUTS (outf, ") */");
-       comment = 1;
+      OUTS (outf, ";\t\t/*\t\t");
+      OUTS (outf, regs (reg, grp));
+      OUTS (outf, "=0x");
+      OUTS (outf, huimm32e (*pval));
+      OUTS (outf, "(");
+      OUTS (outf, imm32 (*pval));
+      OUTS (outf, ") */");
+      comment = 1;
     }
   return 4;
 }
@@ -4689,8 +4689,8 @@ _print_insn_bfin (bfd_vma pc, disassemble_info *outf)
     {
       if (parallel)
 	{
-	   OUTS (outf, "ILLEGAL");
-	   return 0;
+	  OUTS (outf, "ILLEGAL");
+	  return 0;
 	}
       OUTS (outf, "MNOP");
       return 4;
@@ -4776,7 +4776,6 @@ _print_insn_bfin (bfd_vma pc, disassemble_info *outf)
   return rv;
 }
 
-
 int
 print_insn_bfin (bfd_vma pc, disassemble_info *outf)
 {
@@ -4805,7 +4804,7 @@ print_insn_bfin (bfd_vma pc, disassemble_info *outf)
       len = _print_insn_bfin (pc + 4, outf);
       outf->fprintf_func (outf->stream, " || ");
       if (len != 2)
-	  legal = 0;
+	legal = 0;
       len = _print_insn_bfin (pc + 6, outf);
       if (len != 2)
 	legal = 0;
