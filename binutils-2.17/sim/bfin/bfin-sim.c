@@ -3371,6 +3371,9 @@ decode_LoopSetup_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1, bu32 pc)
   TRACE_DECODE (cpu, "%s: s_pcrel4:%#x e_lppcrel10:%#x",
 		__func__, spcrel, epcrel);
 
+  if (reg > 7)
+    illegal_instruction (cpu);
+
   if (rop == 0)
     {
       TRACE_INSN (cpu, "LSETUP (%#x, %#x) LC%i;", spcrel, epcrel, c);
