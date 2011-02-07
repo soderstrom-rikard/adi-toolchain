@@ -282,9 +282,15 @@ struct bfin_cpu_state
     TRACE_REGISTER (cpu, "wrote ASTAT["#field"] = %i", __v); \
     ASTATREG (field) = __v; \
     if (&ASTATREG (field) == &ASTATREG (ac0)) \
-      ASTATREG (ac0_copy) = __v; \
+      { \
+	TRACE_REGISTER (cpu, "wrote ASTAT["#field"_copy] = %i", __v); \
+	ASTATREG (ac0_copy) = __v; \
+      } \
     else if (&ASTATREG (field) == &ASTATREG (v)) \
-      ASTATREG (v_copy) = __v; \
+      { \
+	TRACE_REGISTER (cpu, "wrote ASTAT["#field"_copy] = %i", __v); \
+	ASTATREG (v_copy) = __v; \
+      } \
   } while (0)
 #define SET_CCREG(val) SET_ASTATREG (cc, val)
 
