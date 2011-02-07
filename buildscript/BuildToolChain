@@ -849,6 +849,9 @@ build_binutils()
 		touch_tree "${DIR_NEWLIB_SOURCE}"
 	fi
 
+	# generated files get out of sync with source files; force regen
+	run_cmd rm -f gas/bfin-lex.c gas/bfin-parse.[ch]
+
 	case ${target} in
 		bfin-elf) myconf="--without-newlib";;
 		*)        myconf="--with-sysroot=${prefix}/${target}/runtime";;
