@@ -20,3 +20,9 @@ fix single stepping over debug assert instructions in hardware
 exception in IVG5 causes double fault ?
 
 add a "file" option to the async banks to back it
+
+tests:
+	- check AN bits with Dreg subtraction
+		R0 = R1 - R2;
+	- check astat bits with vector add/sub +|+
+	- check acc with VIT_MAX and similiar insns
