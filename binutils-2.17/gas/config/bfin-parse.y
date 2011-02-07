@@ -2681,6 +2681,9 @@ asm_1:
 	{
 	  if (IS_PREG ($3))
 	    {
+	      if ($3.regno == REG_SP || $3.regno == REG_FP)
+		return yyerror ("Bad register for TESTSET");
+
 	      notethat ("ProgCtrl: TESTSET (pregs )\n");
 	      $$ = PROGCTRL (11, $3.regno & CODE_MASK);
 	    }
