@@ -560,7 +560,7 @@ aligndir (int r0, disassemble_info *outf)
 }
 
 static int
-decode_multfunc (int h0, int h1, int src0, int src1, disassemble_info * outf)
+decode_multfunc (int h0, int h1, int src0, int src1, disassemble_info *outf)
 {
   const char *s0, *s1;
 
@@ -581,7 +581,7 @@ decode_multfunc (int h0, int h1, int src0, int src1, disassemble_info * outf)
 }
 
 static int
-decode_macfunc (int which, int op, int h0, int h1, int src0, int src1, disassemble_info * outf)
+decode_macfunc (int which, int op, int h0, int h1, int src0, int src1, disassemble_info *outf)
 {
   const char *a;
   const char *sop = "<unknown op>";
@@ -674,7 +674,7 @@ struct saved_state
   int msize;
   unsigned char *memory;
   unsigned long bfd_mach;
-}  saved_state;
+} saved_state;
 
 #define DREG(x)         (saved_state.dpregs[x])
 #define GREG(x, i)      DPREG ((x) | ((i) << 3))
