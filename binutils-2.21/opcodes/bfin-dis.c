@@ -45,6 +45,7 @@ typedef unsigned int bu32;
 
 struct private
 {
+  TIword iw0;
   int comment, parallel;
 };
 
@@ -4694,6 +4695,7 @@ _print_insn_bfin (bfd_vma pc, disassemble_info *outf)
 
   if (ifetch (pc, outf, &iw0))
     return -1;
+  priv->iw0 = iw0;
 
   if ((iw0 & 0xc000) == 0xc000)
     {
@@ -4800,15 +4802,11 @@ int
 print_insn_bfin (bfd_vma pc, disassemble_info *outf)
 {
   struct private priv;
-  TIword iw0;
   int count;
 
   priv.parallel = 0;
   priv.comment = 0;
   outf->private_data = &priv;
-
-  if (ifetch (pc, outf, &iw0))
-    return -1;
 
   count = _print_insn_bfin (pc, outf);
   if (count == -1)
@@ -4816,8 +4814,8 @@ print_insn_bfin (bfd_vma pc, disassemble_info *outf)
 
   /* Proper display of multiple issue instructions.  */
 
-  if (count == 4 && (iw0 & 0xc000) == 0xc000 && (iw0 & BIT_MULTI_INS)
-      && ((iw0 & 0xe800) != 0xe800 /* Not Linkage.  */ ))
+  if (count == 4 && (priv.iw0 & 0xc000) == 0xc000 && (priv.iw0 & BIT_MULTI_INS)
+      && ((priv.iw0 & 0xe800) != 0xe800 /* Not Linkage.  */ ))
     {
       int legal = 1;
       int len;
