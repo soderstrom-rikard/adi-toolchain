@@ -3374,6 +3374,9 @@ decode_LoopSetup_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1, bu32 pc)
   if (reg > 7)
     illegal_instruction (cpu);
 
+  if (INSN_LEN == 8)
+    illegal_instruction_combination (cpu);
+
   if (rop == 0)
     {
       TRACE_INSN (cpu, "LSETUP (%#x, %#x) LC%i;", spcrel, epcrel, c);
@@ -3418,6 +3421,9 @@ decode_LDIMMhalf_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1)
   PROFILE_COUNT_INSN (cpu, pc, BFIN_INSN_LDIMMhalf);
   TRACE_EXTRACT (cpu, "%s: Z:%i H:%i S:%i grp:%i reg:%i hword:%#x",
 		 __func__, Z, H, S, grp, reg, hword);
+
+  if (INSN_LEN == 8)
+    illegal_instruction_combination (cpu);
 
   if (S == 1)
     val = imm16 (hword), val_str = imm16_str (hword);
