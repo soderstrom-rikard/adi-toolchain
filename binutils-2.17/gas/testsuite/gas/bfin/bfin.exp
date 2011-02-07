@@ -13,7 +13,7 @@ proc run_list_test { name opts } {
     pass $testname
 }
 if [istarget bfin*-*-*] {
-	run_dump_test "16bit_illegals"
+	run_dump_test "allinsn16"
 	run_dump_test "arithmetic"
 	run_dump_test "arith_mode"
 	run_dump_test "bit"
