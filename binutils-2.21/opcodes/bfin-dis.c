@@ -43,8 +43,10 @@ typedef long TIword;
 
 typedef unsigned int bu32;
 
-static char comment = 0;
-static char parallel = 0;
+struct private
+{
+  int comment, parallel;
+};
 
 typedef enum
 {
@@ -723,6 +725,7 @@ get_allreg (int grp, int reg)
 static int
 decode_ProgCtrl_0 (TIword iw0, disassemble_info *outf)
 {
+  struct private *priv = outf->private_data;
   /* ProgCtrl
      +---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
      | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 |.prgfunc.......|.poprnd........|
@@ -732,7 +735,7 @@ decode_ProgCtrl_0 (TIword iw0, disassemble_info *outf)
 
   if (prgfunc == 0 && poprnd == 0)
     OUTS (outf, "NOP");
-  else if (parallel)
+  else if (priv->parallel)
     return 0;
   else if (prgfunc == 1 && poprnd == 0)
     OUTS (outf, "RTS");
@@ -810,6 +813,7 @@ decode_ProgCtrl_0 (TIword iw0, disassemble_info *outf)
 static int
 decode_CaCTRL_0 (TIword iw0, disassemble_info *outf)
 {
+  struct private *priv = outf->private_data;
   /* CaCTRL
      +---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
      | 0 | 0 | 0 | 0 | 0 | 0 | 1 | 0 | 0 | 1 |.a.|.op....|.reg.......|
@@ -818,7 +822,7 @@ decode_CaCTRL_0 (TIword iw0, disassemble_info *outf)
   int op  = ((iw0 >> CaCTRL_op_bits) & CaCTRL_op_mask);
   int reg = ((iw0 >> CaCTRL_reg_bits) & CaCTRL_reg_mask);
 
-  if (parallel)
+  if (priv->parallel)
     return 0;
 
   if (a == 0 && op == 0)
@@ -877,6 +881,7 @@ decode_CaCTRL_0 (TIword iw0, disassemble_info *outf)
 static int
 decode_PushPopReg_0 (TIword iw0, disassemble_info *outf)
 {
+  struct private *priv = outf->private_data;
   /* PushPopReg
      +---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
      | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 1 | 0 |.W.|.grp.......|.reg.......|
@@ -885,7 +890,7 @@ decode_PushPopReg_0 (TIword iw0, disassemble_info *outf)
   int grp = ((iw0 >> PushPopReg_grp_bits) & PushPopReg_grp_mask);
   int reg = ((iw0 >> PushPopReg_reg_bits) & PushPopReg_reg_mask);
 
-  if (parallel)
+  if (priv->parallel)
     return 0;
 
   if (W == 0 && mostreg (reg, grp))
@@ -906,6 +911,7 @@ decode_PushPopReg_0 (TIword iw0, disassemble_info *outf)
 static int
 decode_PushPopMultiple_0 (TIword iw0, disassemble_info *outf)
 {
+  struct private *priv = outf->private_data;
   /* PushPopMultiple
      +---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
      | 0 | 0 | 0 | 0 | 0 | 1 | 0 |.d.|.p.|.W.|.dr........|.pr........|
@@ -916,7 +922,7 @@ decode_PushPopMultiple_0 (TIword iw0, disassemble_info *outf)
   int dr = ((iw0 >> PushPopMultiple_dr_bits) & PushPopMultiple_dr_mask);
   int pr = ((iw0 >> PushPopMultiple_pr_bits) & PushPopMultiple_pr_mask);
 
-  if (parallel)
+  if (priv->parallel)
     return 0;
 
   if (pr > 5)
@@ -970,6 +976,7 @@ decode_PushPopMultiple_0 (TIword iw0, disassemble_info *outf)
 static int
 decode_ccMV_0 (TIword iw0, disassemble_info *outf)
 {
+  struct private *priv = outf->private_data;
   /* ccMV
      +---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
      | 0 | 0 | 0 | 0 | 0 | 1 | 1 |.T.|.d.|.s.|.dst.......|.src.......|
@@ -980,7 +987,7 @@ decode_ccMV_0 (TIword iw0, disassemble_info *outf)
   int src = ((iw0 >> CCmv_src_bits) & CCmv_src_mask);
   int dst = ((iw0 >> CCmv_dst_bits) & CCmv_dst_mask);
 
-  if (parallel)
+  if (priv->parallel)
     return 0;
 
   if (T == 1)
@@ -1005,6 +1012,7 @@ decode_ccMV_0 (TIword iw0, disassemble_info *outf)
 static int
 decode_CCflag_0 (TIword iw0, disassemble_info *outf)
 {
+  struct private *priv = outf->private_data;
   /* CCflag
      +---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
      | 0 | 0 | 0 | 0 | 1 |.I.|.opc.......|.G.|.y.........|.x.........|
@@ -1015,7 +1023,7 @@ decode_CCflag_0 (TIword iw0, disassemble_info *outf)
   int G = ((iw0 >> CCflag_G_bits) & CCflag_G_mask);
   int opc = ((iw0 >> CCflag_opc_bits) & CCflag_opc_mask);
 
-  if (parallel)
+  if (priv->parallel)
     return 0;
 
   if (opc == 0 && I == 0 && G == 0)
@@ -1183,6 +1191,7 @@ decode_CCflag_0 (TIword iw0, disassemble_info *outf)
 static int
 decode_CC2dreg_0 (TIword iw0, disassemble_info *outf)
 {
+  struct private *priv = outf->private_data;
   /* CC2dreg
      +---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
      | 0 | 0 | 0 | 0 | 0 | 0 | 1 | 0 | 0 | 0 | 0 |.op....|.reg.......|
@@ -1190,7 +1199,7 @@ decode_CC2dreg_0 (TIword iw0, disassemble_info *outf)
   int op  = ((iw0 >> CC2dreg_op_bits) & CC2dreg_op_mask);
   int reg = ((iw0 >> CC2dreg_reg_bits) & CC2dreg_reg_mask);
 
-  if (parallel)
+  if (priv->parallel)
     return 0;
 
   if (op == 0)
@@ -1214,6 +1223,7 @@ decode_CC2dreg_0 (TIword iw0, disassemble_info *outf)
 static int
 decode_CC2stat_0 (TIword iw0, disassemble_info *outf)
 {
+  struct private *priv = outf->private_data;
   /* CC2stat
      +---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
      | 0 | 0 | 0 | 0 | 0 | 0 | 1 | 1 |.D.|.op....|.cbit..............|
@@ -1224,7 +1234,7 @@ decode_CC2stat_0 (TIword iw0, disassemble_info *outf)
 
   const char *bitname = statbits (cbit);
 
-  if (parallel)
+  if (priv->parallel)
     return 0;
 
   if (decode_statbits[cbit] == REG_LASTREG)
@@ -1289,6 +1299,7 @@ decode_CC2stat_0 (TIword iw0, disassemble_info *outf)
 static int
 decode_BRCC_0 (TIword iw0, bfd_vma pc, disassemble_info *outf)
 {
+  struct private *priv = outf->private_data;
   /* BRCC
      +---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
      | 0 | 0 | 0 | 1 |.T.|.B.|.offset................................|
@@ -1297,7 +1308,7 @@ decode_BRCC_0 (TIword iw0, bfd_vma pc, disassemble_info *outf)
   int T = ((iw0 >> BRCC_T_bits) & BRCC_T_mask);
   int offset = ((iw0 >> BRCC_offset_bits) & BRCC_offset_mask);
 
-  if (parallel)
+  if (priv->parallel)
     return 0;
 
   if (T == 1 && B == 1)
@@ -1331,13 +1342,14 @@ decode_BRCC_0 (TIword iw0, bfd_vma pc, disassemble_info *outf)
 static int
 decode_UJUMP_0 (TIword iw0, bfd_vma pc, disassemble_info *outf)
 {
+  struct private *priv = outf->private_data;
   /* UJUMP
      +---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
      | 0 | 0 | 1 | 0 |.offset........................................|
      +---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+  */
   int offset = ((iw0 >> UJump_offset_bits) & UJump_offset_mask);
 
-  if (parallel)
+  if (priv->parallel)
     return 0;
 
   OUTS (outf, "JUMP.S 0x");
@@ -1581,6 +1593,7 @@ decode_PTR2op_0 (TIword iw0, disassemble_info *outf)
 static int
 decode_LOGI2op_0 (TIword iw0, disassemble_info *outf)
 {
+  struct private *priv = outf->private_data;
   /* LOGI2op
      +---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
      | 0 | 1 | 0 | 0 | 1 |.opc.......|.src...............|.dst.......|
@@ -1589,7 +1602,7 @@ decode_LOGI2op_0 (TIword iw0, disassemble_info *outf)
   int opc = ((iw0 >> LOGI2op_opc_bits) & LOGI2op_opc_mask);
   int dst = ((iw0 >> LOGI2op_dst_bits) & LOGI2op_dst_mask);
 
-  if (parallel)
+  if (priv->parallel)
     return 0;
 
   if (opc == 0)
@@ -1601,7 +1614,7 @@ decode_LOGI2op_0 (TIword iw0, disassemble_info *outf)
       OUTS (outf, ");\t\t/* bit");
       OUTS (outf, imm7d (src));
       OUTS (outf, " */");
-      comment = 1;
+      priv->comment = 1;
     }
   else if (opc == 1)
     {
@@ -1612,7 +1625,7 @@ decode_LOGI2op_0 (TIword iw0, disassemble_info *outf)
       OUTS (outf, ");\t\t/* bit");
       OUTS (outf, imm7d (src));
       OUTS (outf, " */");
-      comment = 1;
+      priv->comment = 1;
     }
   else if (opc == 2)
     {
@@ -1623,7 +1636,7 @@ decode_LOGI2op_0 (TIword iw0, disassemble_info *outf)
       OUTS (outf, ");\t\t/* bit");
       OUTS (outf, imm7d (src));
       OUTS (outf, " */");
-      comment = 1;
+      priv->comment = 1;
     }
   else if (opc == 3)
     {
@@ -1634,7 +1647,7 @@ decode_LOGI2op_0 (TIword iw0, disassemble_info *outf)
       OUTS (outf, ");\t\t/* bit");
       OUTS (outf, imm7d (src));
       OUTS (outf, " */");
-      comment = 1;
+      priv->comment = 1;
     }
   else if (opc == 4)
     {
@@ -1645,7 +1658,7 @@ decode_LOGI2op_0 (TIword iw0, disassemble_info *outf)
       OUTS (outf, ");\t\t/* bit");
       OUTS (outf, imm7d (src));
       OUTS (outf, " */");
-      comment = 1;
+      priv->comment = 1;
     }
   else if (opc == 5)
     {
@@ -1765,6 +1778,7 @@ decode_COMP3op_0 (TIword iw0, disassemble_info *outf)
 static int
 decode_COMPI2opD_0 (TIword iw0, disassemble_info *outf)
 {
+  struct private *priv = outf->private_data;
   /* COMPI2opD
      +---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
      | 0 | 1 | 1 | 0 | 0 |.op|..src......................|.dst.......|
@@ -1775,7 +1789,7 @@ decode_COMPI2opD_0 (TIword iw0, disassemble_info *outf)
 
   bu32 *pval = get_allreg (0, dst);
 
-  if (parallel)
+  if (priv->parallel)
     return 0;
 
   /* Since we don't have 32-bit immediate loads, we allow the disassembler
@@ -1802,7 +1816,7 @@ decode_COMPI2opD_0 (TIword iw0, disassemble_info *outf)
       OUTS (outf, "(");
       OUTS (outf, imm32 (*pval));
       OUTS (outf, ") */");
-      comment = 1;
+      priv->comment = 1;
     }
   else if (op == 1)
     {
@@ -1812,7 +1826,7 @@ decode_COMPI2opD_0 (TIword iw0, disassemble_info *outf)
       OUTS (outf, ";\t\t/* (");
       OUTS (outf, imm7d (src));
       OUTS (outf, ") */");
-      comment = 1;
+      priv->comment = 1;
     }
   else
     return 0;
@@ -1823,6 +1837,7 @@ decode_COMPI2opD_0 (TIword iw0, disassemble_info *outf)
 static int
 decode_COMPI2opP_0 (TIword iw0, disassemble_info *outf)
 {
+  struct private *priv = outf->private_data;
   /* COMPI2opP
      +---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
      | 0 | 1 | 1 | 0 | 1 |.op|.src.......................|.dst.......|
@@ -1833,7 +1848,7 @@ decode_COMPI2opP_0 (TIword iw0, disassemble_info *outf)
 
   bu32 *pval = get_allreg (1, dst);
 
-  if (parallel)
+  if (priv->parallel)
     return 0;
 
   if (op == 0)
@@ -1857,7 +1872,7 @@ decode_COMPI2opP_0 (TIword iw0, disassemble_info *outf)
       OUTS (outf, "(");
       OUTS (outf, imm32 (*pval));
       OUTS (outf, ") */");
-      comment = 1;
+      priv->comment = 1;
     }
   else if (op == 1)
     {
@@ -1867,7 +1882,7 @@ decode_COMPI2opP_0 (TIword iw0, disassemble_info *outf)
       OUTS (outf, ";\t\t/* (");
       OUTS (outf, imm7d (src));
       OUTS (outf, ") */");
-      comment = 1;
+      priv->comment = 1;
     }
   else
     return 0;
@@ -2034,6 +2049,7 @@ decode_dagMODim_0 (TIword iw0, disassemble_info *outf)
 static int
 decode_dagMODik_0 (TIword iw0, disassemble_info *outf)
 {
+  struct private *priv = outf->private_data;
   /* dagMODik
      +---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
      | 1 | 0 | 0 | 1 | 1 | 1 | 1 | 1 | 0 | 1 | 1 | 0 |.op....|.i.....|
@@ -2064,7 +2080,7 @@ decode_dagMODik_0 (TIword iw0, disassemble_info *outf)
   else
     return 0;
 
-  if (! parallel)
+  if (! priv->parallel)
     {
       OUTS (outf, ";\t\t/* (  ");
       if (op == 0 || op == 1)
@@ -2072,7 +2088,7 @@ decode_dagMODik_0 (TIword iw0, disassemble_info *outf)
       else if (op == 2 || op == 3)
 	OUTS (outf, "4");
       OUTS (outf, ") */");
-      comment = 1;
+      priv->comment = 1;
     }
 
   return 2;
@@ -2587,6 +2603,7 @@ decode_LDSTii_0 (TIword iw0, disassemble_info *outf)
 static int
 decode_LoopSetup_0 (TIword iw0, TIword iw1, bfd_vma pc, disassemble_info *outf)
 {
+  struct private *priv = outf->private_data;
   /* LoopSetup
      +---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
      | 1 | 1 | 1 | 0 | 0 | 0 | 0 | 0 | 1 |.rop...|.c.|.soffset.......|
@@ -2598,7 +2615,7 @@ decode_LoopSetup_0 (TIword iw0, TIword iw1, bfd_vma pc, disassemble_info *outf)
   int soffset = ((iw0 >> (LoopSetup_soffset_bits - 16)) & LoopSetup_soffset_mask);
   int eoffset = ((iw1 >> LoopSetup_eoffset_bits) & LoopSetup_eoffset_mask);
 
-  if (parallel)
+  if (priv->parallel)
     return 0;
 
   if (rop == 0)
@@ -2645,6 +2662,7 @@ decode_LoopSetup_0 (TIword iw0, TIword iw1, bfd_vma pc, disassemble_info *outf)
 static int
 decode_LDIMMhalf_0 (TIword iw0, TIword iw1, disassemble_info *outf)
 {
+  struct private *priv = outf->private_data;
   /* LDIMMhalf
      +---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
      | 1 | 1 | 1 | 0 | 0 | 0 | 0 | 1 |.Z.|.H.|.S.|.grp...|.reg.......|
@@ -2659,7 +2677,7 @@ decode_LDIMMhalf_0 (TIword iw0, TIword iw1, disassemble_info *outf)
 
   bu32 *pval = get_allreg (grp, reg);
 
-  if (parallel)
+  if (priv->parallel)
     return 0;
 
   /* Since we don't have 32-bit immediate loads, we allow the disassembler
@@ -2767,7 +2785,7 @@ decode_LDIMMhalf_0 (TIword iw0, TIword iw1, disassemble_info *outf)
 	}
 
       OUTS (outf, " */");
-      comment = 1;
+      priv->comment = 1;
     }
   if (S == 1 || Z == 1)
     {
@@ -2778,7 +2796,7 @@ decode_LDIMMhalf_0 (TIword iw0, TIword iw1, disassemble_info *outf)
       OUTS (outf, "(");
       OUTS (outf, imm32 (*pval));
       OUTS (outf, ") */");
-      comment = 1;
+      priv->comment = 1;
     }
   return 4;
 }
@@ -2786,6 +2804,7 @@ decode_LDIMMhalf_0 (TIword iw0, TIword iw1, disassemble_info *outf)
 static int
 decode_CALLa_0 (TIword iw0, TIword iw1, bfd_vma pc, disassemble_info *outf)
 {
+  struct private *priv = outf->private_data;
   /* CALLa
      +---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
      | 1 | 1 | 1 | 0 | 0 | 0 | 1 |.S.|.msw...........................|
@@ -2795,7 +2814,7 @@ decode_CALLa_0 (TIword iw0, TIword iw1, bfd_vma pc, disassemble_info *outf)
   int lsw = ((iw1 >> 0) & 0xffff);
   int msw = ((iw0 >> 0) & 0xff);
 
-  if (parallel)
+  if (priv->parallel)
     return 0;
 
   if (S == 1)
@@ -2923,6 +2942,7 @@ decode_LDSTidxI_0 (TIword iw0, TIword iw1, disassemble_info *outf)
 static int
 decode_linkage_0 (TIword iw0, TIword iw1, disassemble_info *outf)
 {
+  struct private *priv = outf->private_data;
   /* linkage
      +---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
      | 1 | 1 | 1 | 0 | 1 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 |.R.|
@@ -2931,7 +2951,7 @@ decode_linkage_0 (TIword iw0, TIword iw1, disassemble_info *outf)
   int R = ((iw0 >> (Linkage_R_bits - 16)) & Linkage_R_mask);
   int framesize = ((iw1 >> Linkage_framesize_bits) & Linkage_framesize_mask);
 
-  if (parallel)
+  if (priv->parallel)
     return 0;
 
   if (R == 0)
@@ -2941,7 +2961,7 @@ decode_linkage_0 (TIword iw0, TIword iw1, disassemble_info *outf)
       OUTS (outf, ";\t\t/* (");
       OUTS (outf, uimm16s4d (framesize));
       OUTS (outf, ") */");
-      comment = 1;
+      priv->comment = 1;
     }
   else if (R == 1)
     OUTS (outf, "UNLINK");
@@ -4517,6 +4537,7 @@ decode_dsp32shiftimm_0 (TIword iw0, TIword iw1, disassemble_info *outf)
 static int
 decode_pseudoDEBUG_0 (TIword iw0, disassemble_info *outf)
 {
+  struct private *priv = outf->private_data;
   /* pseudoDEBUG
      +---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
      | 1 | 1 | 1 | 1 | 1 | 0 | 0 | 0 |.fn....|.grp.......|.reg.......|
@@ -4525,7 +4546,7 @@ decode_pseudoDEBUG_0 (TIword iw0, disassemble_info *outf)
   int grp = ((iw0 >> PseudoDbg_grp_bits) & PseudoDbg_grp_mask);
   int reg = ((iw0 >> PseudoDbg_reg_bits) & PseudoDbg_reg_mask);
 
-  if (parallel)
+  if (priv->parallel)
     return 0;
 
   if (reg == 0 && fn == 3)
@@ -4576,13 +4597,14 @@ decode_pseudoDEBUG_0 (TIword iw0, disassemble_info *outf)
 static int
 decode_pseudoOChar_0 (TIword iw0, disassemble_info *outf)
 {
+  struct private *priv = outf->private_data;
   /* psedoOChar
      +---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
      | 1 | 1 | 1 | 1 | 1 | 0 | 0 | 1 |.ch............................|
      +---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+  */
   int ch = ((iw0 >> PseudoChr_ch_bits) & PseudoChr_ch_mask);
 
-  if (parallel)
+  if (priv->parallel)
     return 0;
 
   OUTS (outf, "OUTC ");
@@ -4594,6 +4616,7 @@ decode_pseudoOChar_0 (TIword iw0, disassemble_info *outf)
 static int
 decode_pseudodbg_assert_0 (TIword iw0, TIword iw1, disassemble_info *outf)
 {
+  struct private *priv = outf->private_data;
   /* pseudodbg_assert
      +---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
      | 1 | 1 | 1 | 1 | 0 | - | - | - | dbgop |.grp.......|.regtest...|
@@ -4604,7 +4627,7 @@ decode_pseudodbg_assert_0 (TIword iw0, TIword iw1, disassemble_info *outf)
   int grp      = ((iw0 >> (PseudoDbg_Assert_grp_bits - 16)) & PseudoDbg_Assert_grp_mask);
   int regtest  = ((iw0 >> (PseudoDbg_Assert_regtest_bits - 16)) & PseudoDbg_Assert_regtest_mask);
 
-  if (parallel)
+  if (priv->parallel)
     return 0;
 
   if (dbgop == 0)
@@ -4664,6 +4687,7 @@ ifetch (bfd_vma pc, disassemble_info *outf, TIword *iw)
 static int
 _print_insn_bfin (bfd_vma pc, disassemble_info *outf)
 {
+  struct private *priv = outf->private_data;
   TIword iw0;
   TIword iw1;
   int rv = 0;
@@ -4683,7 +4707,7 @@ _print_insn_bfin (bfd_vma pc, disassemble_info *outf)
 
   if ((iw0 & 0xf7ff) == 0xc003 && iw1 == 0x1800)
     {
-      if (parallel)
+      if (priv->parallel)
 	{
 	  OUTS (outf, "ILLEGAL");
 	  return 0;
@@ -4775,8 +4799,13 @@ _print_insn_bfin (bfd_vma pc, disassemble_info *outf)
 int
 print_insn_bfin (bfd_vma pc, disassemble_info *outf)
 {
+  struct private priv;
   TIword iw0;
   int count;
+
+  priv.parallel = 0;
+  priv.comment = 0;
+  outf->private_data = &priv;
 
   if (ifetch (pc, outf, &iw0))
     return -1;
@@ -4793,7 +4822,7 @@ print_insn_bfin (bfd_vma pc, disassemble_info *outf)
       int legal = 1;
       int len;
 
-      parallel = 1;
+      priv.parallel = 1;
       OUTS (outf, " || ");
       len = _print_insn_bfin (pc + 4, outf);
       OUTS (outf, " || ");
@@ -4808,19 +4837,16 @@ print_insn_bfin (bfd_vma pc, disassemble_info *outf)
       else
 	{
 	  OUTS (outf, ";\t\t/* ILLEGAL PARALLEL INSTRUCTION */");
-	  comment = 1;
+	  priv.comment = 1;
 	  count = 0;
 	}
-      parallel = 0;
     }
 
-  if (!comment)
+  if (!priv.comment)
     OUTS (outf, ";");
 
   if (count == 0)
     return 2;
-
-  comment = 0;
 
   return count;
 }
