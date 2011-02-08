@@ -20,7 +20,7 @@ include(selfcheck.inc)
 #endif
 
 // This test embeds .text offsets, so pad our test so it lines up.
-.space 4
+.space 0x64
 
 // Boot code
 
