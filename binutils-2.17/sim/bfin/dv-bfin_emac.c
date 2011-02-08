@@ -46,6 +46,8 @@
 #include "dv-bfin_emac.h"
 
 /* XXX: This doesn't support partial DMA transfers.  */
+/* XXX: The TUN pieces should be pushed to the PHY so that we work with
+        multiple "networks" and the PHY takes care of it.  */
 
 struct bfin_emac
 {
