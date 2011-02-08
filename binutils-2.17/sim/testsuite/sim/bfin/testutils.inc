@@ -22,17 +22,13 @@ __pass:
 .ifdef BFIN_JTAG
 __emu_out:
 	/* DBGSTAT */
-	P0.L = 0x5008;
-	P0.H = 0xFFE0;
-1:
-	R7 = [P0];
+	imm32 P0 0xFFE05008;
+
+1:	R7 = [P0];
 	CC = BITTST (R7,0);
 	IF CC JUMP 1b;
+
 	EMUDAT = R0;
-2:
-	R7 = [P0];
-	CC = BITTST (R7,0);
-	IF CC JUMP 2b;
 	RTS;
 .endif
 	.global __fail
