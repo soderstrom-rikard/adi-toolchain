@@ -195,8 +195,12 @@ _main:
 # MACRO: imm32
 # Load a 32bit immediate directly into a register
 	.macro imm32 reg:req, val:req
+	.if (\val) & ~0x7fff
 	\reg\().L = ((\val) & 0xffff);
 	\reg\().H = (((\val) >> 16) & 0xffff);
+	.else
+	\reg = \val;
+	.endif
 	.endm
 
 # MACRO: dmm32
@@ -240,8 +244,7 @@ _main:
 # internal helper macros; ignore them
 	.macro __init_regs reg:req, max:req, x:req, val:req
 	.ifle (\x - \max)
-	\reg\()\x\().L = ((\val) & 0xffff);
-	\reg\()\x\().H = (((\val) >> 16) & 0xffff);
+	imm32 \reg\()\x, \val
 	.endif
 	.endm
 	.macro _init_regs reg:req, max:req, val:req
