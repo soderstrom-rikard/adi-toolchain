@@ -3618,7 +3618,7 @@ decode_linkage_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1)
       sp -= size;
       CYCLE_DELAY = 3;
     }
-  else if (framesize == 0)
+  else
     {
       /* Restore SP from FP.  */
       sp = FPREG;
@@ -3631,8 +3631,6 @@ decode_linkage_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1)
       sp += 4;
       CYCLE_DELAY = 2;
     }
-  else
-    illegal_instruction (cpu);
 
   SET_SPREG (sp);
 }
