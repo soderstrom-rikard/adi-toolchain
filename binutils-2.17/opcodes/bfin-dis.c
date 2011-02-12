@@ -4708,7 +4708,7 @@ _print_insn_bfin (bfd_vma pc, disassemble_info *outf)
     /* 16bit insn.  */
     iw1 = 0;
 
-  if ((iw0 & 0xf7ff) == 0xc003 && iw1 == 0x1800)
+  if ((iw0 & 0xf7ff) == 0xc003 && (iw1 & 0xfe00) == 0x1800)
     {
       if (priv->parallel)
 	{
