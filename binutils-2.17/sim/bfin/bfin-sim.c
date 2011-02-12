@@ -5936,7 +5936,7 @@ _interp_insn_bfin (SIM_CPU *cpu, bu32 pc)
   if (INSN_LEN == 0)
     INSN_LEN = insn_len;
 
-  if ((iw0 & 0xf7ff) == 0xc003 && iw1 == 0x1800)
+  if ((iw0 & 0xf7ff) == 0xc003 && (iw1 & 0xfe00) == 0x1800)
     {
       PROFILE_COUNT_INSN (cpu, pc, BFIN_INSN_dsp32mac);
       TRACE_INSN (cpu, "MNOP;");
