@@ -1,5 +1,6 @@
 # Blackfin testcase for unlink insn with any immediate value
 # mach: bfin
+# sim: --environment operating
 
 #include "test.h"
 	.include "testutils.inc"
