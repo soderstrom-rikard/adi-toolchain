@@ -90,3 +90,6 @@
 .*:113: Error: Preg expected in address. Input text was \).
 .*:114: Error: Preg expected in address. Input text was \).
 .*:115: Error: Dreg expected for destination operand. Input text was \).
+.*:117: Error: Destination Dregs \(full\) must differ by one.
+.*:118: Error: Destination Dregs \(half\) must match.
+.*:119: Error: Destination Dreg sizes \(full or half\) must match.
