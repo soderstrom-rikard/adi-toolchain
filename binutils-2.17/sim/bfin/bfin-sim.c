@@ -374,53 +374,79 @@ get_allreg (SIM_CPU *cpu, int grp, int reg)
 }
 
 static const char *
+amod0 (int s0, int x0)
+{
+  static const char * const mod0[] = {
+    "", " (S)", " (CO)", " (SCO)",
+  };
+  int i = s0 + (x0 << 1);
+
+  if (i < ARRAY_SIZE (mod0))
+    return mod0[i];
+  else
+    return "";
+}
+
+static const char *
 amod0amod2 (int s0, int x0, int aop0)
 {
-  if (s0 == 1 && x0 == 0 && aop0 == 0)
-    return " (S)";
-  else if (s0 == 0 && x0 == 1 && aop0 == 0)
-    return " (CO)";
-  else if (s0 == 1 && x0 == 1 && aop0 == 0)
-    return " (SCO)";
-  else if (s0 == 0 && x0 == 0 && aop0 == 2)
-    return " (ASR)";
-  else if (s0 == 1 && x0 == 0 && aop0 == 2)
-    return " (S, ASR)";
-  else if (s0 == 0 && x0 == 1 && aop0 == 2)
-    return  " (CO, ASR)";
-  else if (s0 == 1 && x0 == 1 && aop0 == 2)
-    return " (SCO, ASR)";
-  else if (s0 == 0 && x0 == 0 && aop0 == 3)
-    return " (ASL)";
-  else if (s0 == 1 && x0 == 0 && aop0 == 3)
-    return " (S, ASL)";
-  else if (s0 == 0 && x0 == 1 && aop0 == 3)
-    return " (CO, ASL)";
-  else if (s0 == 1 && x0 == 1 && aop0 == 3)
-    return " (SCO, ASL)";
-  return "";
+  static const char * const mod02[] = {
+    "", " (S)", " (CO)", " (SCO)",
+    "", "", "", "",
+    " (ASR)", " (S, ASR)", " (CO, ASR)", " (SCO, ASR)",
+    " (ASL)", " (S, ASL)", " (CO, ASL)", " (SCO, ASL)",
+  };
+  int i = s0 + (x0 << 1) + (aop0 << 2);
+
+  if (i < ARRAY_SIZE (mod02))
+    return mod02[i];
+  else
+    return "";
 }
 
 static const char *
 amod1 (int s0, int x0)
 {
-  if (s0 == 0 && x0 == 0)
-    return " (NS)";
-  else if (s0 == 1 && x0 == 0)
-    return " (S)";
-  return "";
+  static const char * const mod1[] = {
+    " (NS)", " (S)",
+  };
+  int i = s0 + (x0 << 1);
+
+  if (i < ARRAY_SIZE (mod1))
+    return mod1[i];
+  else
+    return "";
 }
 
 static const char *
-amod0 (int s0, int x0)
+mac_optmode (int mmod, int MM)
 {
-  if (s0 == 1 && x0 == 0)
-    return " (S)";
-  else if (s0 == 0 && x0 == 1)
-    return " (CO)";
-  else if (s0 == 1 && x0 == 1)
-    return " (SCO)";
-  return "";
+  static const char * const omode[] = {
+    [(M_S2RND << 1) + 0] = " (S2RND)",
+    [(M_T     << 1) + 0] = " (T)",
+    [(M_W32   << 1) + 0] = " (W32)",
+    [(M_FU    << 1) + 0] = " (FU)",
+    [(M_TFU   << 1) + 0] = " (TFU)",
+    [(M_IS    << 1) + 0] = " (IS)",
+    [(M_ISS2  << 1) + 0] = " (ISS2)",
+    [(M_IH    << 1) + 0] = " (IH)",
+    [(M_IU    << 1) + 0] = " (IU)",
+    [(M_S2RND << 1) + 1] = " (M, S2RND)",
+    [(M_T     << 1) + 1] = " (M, T)",
+    [(M_W32   << 1) + 1] = " (M, W32)",
+    [(M_FU    << 1) + 1] = " (M, FU)",
+    [(M_TFU   << 1) + 1] = " (M, TFU)",
+    [(M_IS    << 1) + 1] = " (M, IS)",
+    [(M_ISS2  << 1) + 1] = " (M, ISS2)",
+    [(M_IH    << 1) + 1] = " (M, IH)",
+    [(M_IU    << 1) + 1] = " (M, IU)",
+  };
+  int i = MM + (mmod << 1);
+
+  if (i < ARRAY_SIZE (omode) && omode[i])
+    return omode[i];
+  else
+    return "";
 }
 
 static const char *
@@ -3662,6 +3688,10 @@ decode_dsp32mac_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1)
   bu32 res = DREG (dst);
   bu32 v_i = 0, zero = 0;
 
+  static const char * const ops[] = { "=", "+=", "-=" };
+  char _buf[128], *buf = _buf;
+  int _MM = MM;
+
   PROFILE_COUNT_INSN (cpu, pc, BFIN_INSN_dsp32mac);
   TRACE_EXTRACT (cpu, "%s: M:%i mmod:%i MM:%i P:%i w1:%i op1:%i h01:%i h11:%i "
 		      "w0:%i op0:%i h00:%i h10:%i dst:%i src0:%i src1:%i",
@@ -3671,38 +3701,36 @@ decode_dsp32mac_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1)
   if (w0 == 0 && w1 == 0 && op1 == 3 && op0 == 3)
     illegal_instruction (cpu);
 
-  if (op1 == 3 && MM)
-    illegal_instruction (cpu);
-
   if ((w1 || w0) && mmod == M_W32)
     illegal_instruction (cpu);
 
   if (((1 << mmod) & (P ? 0x131b : 0x1b5f)) == 0)
     illegal_instruction (cpu);
 
-  /* XXX: Missing TRACE_INSN - this is as good as it gets for now  */
-  if (w0 && w1 && P)
-    TRACE_INSN (cpu, "R%i = macfunc, R%i = macfunc", dst + 1, dst);
-  else if (w0 && P)
-    TRACE_INSN (cpu, "R%i = macfunc", dst);
-  else if (w1 && P)
-    TRACE_INSN (cpu, "R%i = macfunc", dst + 1);
-  else if (w0 && !P)
-    TRACE_INSN (cpu, "R%i.L = macfunc", dst);
-  else if (w1 && !P)
-    TRACE_INSN (cpu, "R%i.H = macfunc", dst);
-  else if (!w0 && !w1 && (op1 != 3 && op0 != 3))
-    TRACE_INSN (cpu, "A0 = macfunc, A1 = macfunc");
-  else if (!w0 && w1 && (op1 != 3 && op0 != 3))
-    TRACE_INSN (cpu, "A1 = macfunc");
-  else if (w0 && !w1 && (op1 != 3 && op0 != 3))
-    TRACE_INSN (cpu, "A0 = macfunc");
-
+  /* First handle MAC1 side.  */
   if (w1 == 1 || op1 != 3)
     {
       bu32 res1 = decode_macfunc (cpu, 1, op1, h01, h11, src0, src1, mmod, MM, P, &v_i);
+
+      if (w1)
+	buf += sprintf (buf, P ? "R%i" : "R%i.H", dst + P);
+
       if (op1 == 3)
-	zero = !!(res1 == 0);
+	{
+	  buf += sprintf (buf, " = A1");
+	  zero = !!(res1 == 0);
+	}
+      else
+	{
+	  if (w1)
+	    buf += sprintf (buf, " = (");
+	  buf += sprintf (buf, "A1 %s R%i.%c * R%i.%c", ops[op1],
+			  src0, h01 ? 'H' : 'L',
+			  src1, h11 ? 'H' : 'L');
+	  if (w1)
+	    buf += sprintf (buf, ")");
+	}
+
       if (w1)
 	{
 	  if (P)
@@ -3714,12 +3742,40 @@ decode_dsp32mac_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1)
 	      res = REG_H_L (res1 << 16, res);
 	    }
 	}
+
+      if (w0 == 1 || op0 != 3)
+	{
+	  if (_MM)
+	    buf += sprintf (buf, " (M)");
+	  _MM = 0;
+	  buf += sprintf (buf, ", ");
+	}
     }
+
+  /* Then handle MAC0 side.  */
   if (w0 == 1 || op0 != 3)
     {
       bu32 res0 = decode_macfunc (cpu, 0, op0, h00, h10, src0, src1, mmod, 0, P, &v_i);
-      if (op1 == 3)
-	zero |= !!(res0 == 0);
+
+      if (w0)
+	buf += sprintf (buf, P ? "R%i" : "R%i.L", dst);
+
+      if (op0 == 3)
+	{
+	  buf += sprintf (buf, " = A0");
+	  zero |= !!(res0 == 0);
+	}
+      else
+	{
+	  if (w0)
+	    buf += sprintf (buf, " = (");
+	  buf += sprintf (buf, "A0 %s R%i.%c * R%i.%c", ops[op0],
+			  src0, h00 ? 'H' : 'L',
+			  src1, h10 ? 'H' : 'L');
+	  if (w0)
+	    buf += sprintf (buf, ")");
+	}
+
       if (w0)
 	{
 	  if (P)
@@ -3732,6 +3788,8 @@ decode_dsp32mac_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1)
 	    }
 	}
     }
+
+  TRACE_INSN (cpu, "%s%s;", _buf, mac_optmode (mmod, _MM));
 
   if (!P && (w0 || w1))
     {
@@ -3776,6 +3834,8 @@ decode_dsp32mult_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1)
 
   bu32 res = DREG (dst);
   bu32 sat0 = 0, sat1 = 0;
+  char _buf[128], *buf = _buf;
+  int _MM = MM;
 
   PROFILE_COUNT_INSN (cpu, pc, BFIN_INSN_dsp32mult);
   TRACE_EXTRACT (cpu, "%s: M:%i mmod:%i MM:%i P:%i w1:%i op1:%i h01:%i h11:%i "
@@ -3792,29 +3852,24 @@ decode_dsp32mult_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1)
   if (!P && ((op1 != 0) || (op0 != 0) || !is_macmod_hmove (mmod)))
     illegal_instruction (cpu);
 
-  if (w0 && w1 && P)
-    TRACE_INSN (cpu, "R%i:%i = dsp32mult", dst + 1, dst);
-  else if (w0 && w1 && !P)
-    TRACE_INSN (cpu, "R%i.L = R%i.%s * R%i.%s, R%i.H = R%i.%s * R%i.%s;",
-		dst, src0, h01 ? "L" : "H" , src1, h11 ? "L" : "H",
-		dst, src0, h00 ? "L" : "H" , src1, h10 ? "L" : "H");
-  else if (w0 && P)
-    TRACE_INSN (cpu, "R%i = R%i.%s * R%i.%s;",
-		dst, src0, h00 ? "L" : "H" , src1, h10 ? "L" : "H");
-  else if (w1 && P)
-    TRACE_INSN (cpu, "R%i = R%i.%s * R%i.%s;",
-		dst + 1, src0, h01 ? "L" : "H" , src1, h11 ? "L" : "H");
-  else if (w0 && !P)
-    TRACE_INSN (cpu, "R%i.L = R%i.%s * R%i.%s;",
-		dst, src0, h00 ? "L" : "H" , src1, h10 ? "L" : "H");
-  else if (w1 && !P)
-    TRACE_INSN (cpu, "R%i.H = R%i.%s * R%i.%s;",
-		dst, src0, h01 ? "L" : "H" , src1, h11 ? "L" : "H");
-
+  /* First handle MAC1 side.  */
   if (w1)
     {
       bu64 r = decode_multfunc (cpu, h01, h11, src0, src1, mmod, MM, &sat1);
       bu32 res1 = extract_mult (cpu, r, mmod, MM, P, NULL);
+
+      buf += sprintf (buf, P ? "R%i" : "R%i.H", dst + P);
+      buf += sprintf (buf, " = R%i.%c * R%i.%c",
+		      src0, h01 ? 'H' : 'L',
+		      src1, h11 ? 'H' : 'L');
+      if (w0)
+	{
+	  if (_MM)
+	    buf += sprintf (buf, " (M)");
+	  _MM = 0;
+	  buf += sprintf (buf, ", ");
+	}
+
       if (P)
 	STORE (DREG (dst + 1), res1);
       else
@@ -3825,10 +3880,17 @@ decode_dsp32mult_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1)
 	}
     }
 
+  /* First handle MAC0 side.  */
   if (w0)
     {
       bu64 r = decode_multfunc (cpu, h00, h10, src0, src1, mmod, 0, &sat0);
       bu32 res0 = extract_mult (cpu, r, mmod, 0, P, NULL);
+
+      buf += sprintf (buf, P ? "R%i" : "R%i.L", dst);
+      buf += sprintf (buf, " = R%i.%c * R%i.%c",
+		      src0, h01 ? 'H' : 'L',
+		      src1, h11 ? 'H' : 'L');
+
       if (P)
 	STORE (DREG (dst), res0);
       else
@@ -3838,6 +3900,8 @@ decode_dsp32mult_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1)
 	  res = REG_H_L (res, res0);
 	}
     }
+
+  TRACE_INSN (cpu, "%s%s;", _buf, mac_optmode (mmod, _MM));
 
   if (!P && (w0 || w1))
     STORE (DREG (dst), res);
@@ -5521,24 +5585,45 @@ decode_dsp32shiftimm_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1)
       bu16 in = DREG (src1) >> ((HLs & 1) ? 16 : 0);
       bu16 result;
       bu32 v;
+
       if (sop == 0)
-	/* dregs_hi/lo = dregs_hi/lo >>> imm4 */
-	/* XXX: TRACE_INSN (cpu, "???"); */
-	result = ashiftrt (cpu, in, newimmag, 16);
+	{
+	  TRACE_INSN (cpu, "R%i.%c = R%i.%c >>> %i;",
+		      dst0, (HLs & 2) ? 'H' : 'L',
+		      src1, (HLs & 1) ? 'H' : 'L', newimmag);
+	  result = ashiftrt (cpu, in, newimmag, 16);
+	}
       else if (sop == 1 && bit8 == 0)
-	/*  dregs_hi/lo = dregs_hi/lo << imm4 (S) */
-	result = lshift (cpu, in, immag, 16, 1);
+	{
+	  TRACE_INSN (cpu, "R%i.%c = R%i.%c << %i (S);",
+		      dst0, (HLs & 2) ? 'H' : 'L',
+		      src1, (HLs & 1) ? 'H' : 'L', immag);
+	  result = lshift (cpu, in, immag, 16, 1);
+	}
       else if (sop == 1 && bit8)
-	/* dregs_hi/lo = dregs_hi/lo >>> imm4 (S) */
-	result = lshift (cpu, in, immag, 16, 1);
+	{
+	  TRACE_INSN (cpu, "R%i.%c = R%i.%c >>> %i (S);",
+		      dst0, (HLs & 2) ? 'H' : 'L',
+		      src1, (HLs & 1) ? 'H' : 'L', immag);
+	  result = lshift (cpu, in, immag, 16, 1);
+	}
       else if (sop == 2 && bit8)
-	/* dregs_hi/lo = dregs_hi/lo >> imm4 */
-	result = lshiftrt (cpu, in, newimmag, 16);
+	{
+	  TRACE_INSN (cpu, "R%i.%c = R%i.%c >> %i;",
+		      dst0, (HLs & 2) ? 'H' : 'L',
+		      src1, (HLs & 1) ? 'H' : 'L', newimmag);
+	  result = lshiftrt (cpu, in, newimmag, 16);
+	}
       else if (sop == 2 && bit8 == 0)
-	/* dregs_hi/lo = dregs_hi/lo << imm4 */
-	result = lshift (cpu, in, immag, 16, 0);
+	{
+	  TRACE_INSN (cpu, "R%i.%c = R%i.%c << %i;",
+		      dst0, (HLs & 2) ? 'H' : 'L',
+		      src1, (HLs & 1) ? 'H' : 'L', immag);
+	  result = lshift (cpu, in, immag, 16, 0);
+	}
       else
 	illegal_instruction (cpu);
+
       v = DREG (dst0);
       if (HLs & 2)
 	STORE (DREG (dst0), (v & 0xFFFF) | (result << 16));
