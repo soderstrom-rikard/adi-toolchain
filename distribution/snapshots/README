@@ -1,0 +1,35 @@
+these are the scripts used on the build server to automatically generate
+the various development snapshots (toolchain/u-boot/uclinux-dist/etc...).
+
+the main file you're concerned with is:
+	nightly-snaps
+
+it assumes a filesystem layout like so:
+	/usr/local/src/blackfin/
+	 |- svn/
+	 |  |- linux-kernel/
+	 |  |- toolchain/
+	 |  |- u-boot/
+	 |  \- uclinux-dist/
+	 |- git/
+	 |  |- linux-kernel/
+	 |  |- toolchain/
+	 |  \- u-boot/
+	 |- bin/
+	 |- nightly/
+	 \- toolchains/
+
+the bin dir comes from:
+	git://sources.blackfin.uclinux.org/git/users/vapier/bin.git
+
+the nightly dir will be automatically created and populated with log files
+as the script runs
+
+the toolchains dir too will be automatically created and used to store the
+generated Blackfin toolchains.  by default, Linux 32bit and 64bit builds
+are done, as well as Win32.
+
+the svn/git trees are not created automatically for you.  you'll need to
+check things out yourself.  note: you could probably get away with only
+checking out the uclinux-dist from svn as git is generally preferred due
+to the increased speed.

@@ -1,0 +1,354 @@
+#!/bin/bash
+
+set -e
+
+export LC_ALL=C
+export PATH=/usr/local/bin:/usr/local/sbin:/usr/bin:/bin:/usr/sbin:/bin:${PATH}
+
+[[ -z ${FLOCKER} ]] && exec env FLOCKER=true flock -en $0 -c "$0 $*" || :
+
+usage() {
+	cat <<-EOF
+	Usage: nightly-snaps [options]
+
+	Options:
+	  -ss   Skip scm snapshot generation
+	  -sS   Skip scm pulling as well
+	  -st   Skip toolchain build
+	  -su   Skip Das U-Boot build
+	  -sU   Skip uClinux dist build
+	  -ft   Force toolchain build
+	  -fu   Force Das U-Boot build
+	  -fU   Force uClinux dist build
+	EOF
+
+	exit ${1:-0}
+}
+
+SKIP_SCM=false
+SKIP_SCM_PULL=false
+SKIP_TOOLCHAIN=false
+SKIP_UBOOT=false
+SKIP_UCLINUX=false
+FORCE_TOOLCHAIN=false
+FORCE_UBOOT=false
+FORCE_UCLINUX=false
+while [[ -n $1 ]] ; do
+	case $1 in
+		-ss) SKIP_SCM=true;;
+		-sS) SKIP_SCM=true SKIP_SCM_PULL=true;;
+		-st) SKIP_TOOLCHAIN=true;;
+		-su) SKIP_UBOOT=true;;
+		-sU) SKIP_UCLINUX=true;;
+		-ft) FORCE_TOOLCHAIN=true;;
+		-fu) FORCE_UBOOT=true;;
+		-fU) FORCE_UCLINUX=true;;
+		-h)  usage;;
+		*)   echo "Invalid argument: $1"; usage 1;;
+	esac
+	shift
+done
+
+send_file_to_gforge() {
+	local compress=false rename=false
+	[[ $1 == -Z ]] && compress=true && shift
+	[[ $1 == -R ]] && rename=true && shift
+	local src=$1 dst=${2:-${src##*/}}
+	if ${compress} ; then
+		bzip2 -k -f "${src}"
+		src=${src}.bz2
+		dst=${dst}.bz2
+	fi
+	if ${rename} ; then
+		ssh sources filesystem-rename-file /var/lib/gforge/filesystem/frsrelease/?/?/?/*/"$3" ${dst}
+	fi
+	rsync -T /tmp -aL ${src} sources:/var/lib/gforge/filesystem/frsrelease/?/?/?/*/${dst} </dev/null
+	ssh sources /usr/local/bin/fix-filesystem-size /var/lib/gforge/filesystem/frsrelease/?/?/?/*/${dst} </dev/null
+	if ${compress} ; then
+		rm -f "${src}"
+	fi
+}
+
+root=/usr/local/src/blackfin
+
+logdir=${root}/nightly
+mkdir -p ${logdir}
+
+(
+set -x
+
+date
+
+cd ${root}
+
+[ -d git ] && scm=git || scm=svn
+
+# scm_dir <src repo> <sub path>
+scm_dir() {
+	local x
+	[[ ${scm} == svn ]] && x="/trunk"
+	echo ${root}/${scm}/$1${x}/$2
+}
+
+bfin_mk_dir_ln() {
+	local dir=$1 src=${root}/bin/$2 dst=$1/${3:-$2}
+	mkdir -p ${dir}
+	[[ -e ${dst} ]] || ln -s ${src} ${dst}
+}
+
+### pull svn ###
+if ! ${SKIP_SCM_PULL} ; then
+	if [[ ${scm} != "svn" ]] ; then
+		bfin_mk_dir_ln svn update-svn update
+		pushd svn
+		./update -f >& /dev/null
+		popd
+	else
+		bfin_mk_dir_ln git update-git update
+	fi
+	pushd ${scm}
+	./update >& ${logdir}/${scm}.log
+	popd
+fi
+if ! ${SKIP_SCM} ; then
+	bfin_mk_dir_ln ${scm} make-scm-snaps make-snaps
+	pushd ${scm}
+
+	### generate svn snaps ###
+	# only update snap once a ~week
+	touch .snap.timestamp
+	SNAP_STAMP=$(date +%s)
+	OLD_STAMP=$(<.snap.timestamp)
+	: ${OLD_STAMP:=${SNAP_STAMP}}
+	if [[ $((SNAP_STAMP - OLD_STAMP)) -gt $((6 * 60 * 60)) ]] ; then
+		rm -f *-svn-*.tar.bz2
+		./make-snaps -u --linux-2.6.x >& ${logdir}/${scm}-snaps.log
+		for s in *-svn-*.tar.bz2 ; do
+			[[ -e ${s} ]] || continue
+			send_file_to_gforge ${s} ${s%-*.tar.bz2}.src.tar.bz2
+			rm ${s}
+		done
+		echo "${SNAP_STAMP}" > .snap.timestamp
+	fi
+
+	popd
+fi
+
+### generate the toolchain (as needed) ###
+make_toolchain() {
+	local arch=$1
+
+	bfin_mk_dir_ln . build-toolchain
+	set -- -w -s
+	${FORCE_TOOLCHAIN} && set -- "$@" -f || :
+	[[ -n ${arch} ]] && set -- "$@" -S ${arch} || :
+	./build-toolchain "$@" >& ${logdir}/toolchain.${arch}.log
+	curr=$(find . -maxdepth 1 -mindepth 1 -type d -name '20??????' -printf '%P\n' | sort | tail -n 1)
+	touch ${logdir}/toolchain.last
+	last=$(<${logdir}/toolchain.last)
+
+	[[ ${curr} == ${last} ]] && return 0
+
+	if [[ -z ${arch} ]] ; then
+		arch=$(uname -m)
+		case ${arch} in
+			i?86) arch=i386;;
+		esac
+	fi
+
+	for t in elf linux-uclibc uclinux ; do
+		send_file_to_gforge "${curr}/pkgs/toolchain-${curr}-${t}.tar.bz2" "blackfin-toolchain-${t}-SVN.${arch}.tar.bz2"
+	done
+
+	distdir=$(scm_dir toolchain distribution)
+
+	#
+	# convert to rpms
+	#
+	[[ -e build-rpms ]] || ln -s "${distdir}"/rpm/build-snapshot-rpms build-rpms
+	./build-rpms "${PWD}/${curr}" ${curr} "${distdir}"/rpm/snapshot.spec \
+		>& "${logdir}"/toolchain-rpm.${arch}.log
+	for t in elf linux-uclibc uclinux ; do
+		send_file_to_gforge \
+			"${curr}/pkgs/blackfin-toolchain-snapshot-${t}-SVN-${curr}.${arch}.rpm" \
+			"blackfin-toolchain-snapshot-${t}-SVN.${arch}.rpm"
+	done
+
+	#
+	# convert to debs
+	#
+	[[ -e build-debs ]] || ln -s "${distdir}"/debian/build-toolchain-debs build-debs
+	local darch=$(./build-debs -a)
+	./build-debs -s ${curr} ${darch} ${PWD} >& "${logdir}"/toolchain-deb.${arch}.log
+	pushd ${curr}/pkgs
+	rm -rf binary-${darch}
+	mkdir binary-${darch}
+	for f in Packages.gz Release *.deb ; do
+		ln ${f} binary-${darch}/${f}
+	done
+	rsync -T /tmp -a --delete binary-${darch}/ sources:/var/lib/gforge/filesystem/distros/debian/dists/unstable/main/binary-${darch}/
+	rm -rf binary-${darch}
+	popd
+
+	#
+	# send log files
+	#
+	pushd ${curr}/logs
+	log_base=blackfin-toolchain-build-logs-linux-SVN-${curr}-${arch}
+
+	rm -rf "${log_base}"
+	mkdir -p "${log_base}"
+	bzcat log.bz2 > ${log_base}/buildscript.log
+	bzcat script.bz2 > ${log_base}/script-output.log
+	cp "${logdir}"/toolchain-{deb,rpm}.${arch}.log ${log_base}/
+
+	tar jcf ${log_base}.tar.bz2 ${log_base}
+	send_file_to_gforge -R \
+		"${log_base}.tar.bz2" \
+		"${log_base}.tar.bz2" \
+		"blackfin-toolchain-build-logs-linux-SVN-*-${arch}.tar.bz2"
+	rm -rf ${log_base}*
+
+	popd
+}
+make_win32_toolchain() {
+	#
+	# build up windows toolchain
+	#
+	bfin_mk_dir_ln win32 build-toolchain-win32 build-toolchain
+
+	pushd win32
+
+	find -maxdepth 1 -mindepth 1 -type d -name '20??????' | sort -r | sed 1,10d | xargs rm -rf
+	if ./build-toolchain >& ${logdir}/toolchain-win32.log ; then
+		pushd ${curr}/logs
+		log_base=blackfin-toolchain-build-logs-win32-SVN-${curr}
+
+		mkdir ${log_base}
+		bzcat log.bz2 > ${log_base}/buildscript.log
+		bzcat script.bz2 > ${log_base}/script-output.log
+		bzcat nsis.log.bz2 > ${log_base}/nsis.log
+		cp "${logdir}"/toolchain-win32.log ${log_base}/
+
+		tar jcf ${log_base}.tar.bz2 ${log_base}
+		send_file_to_gforge -R \
+			"${log_base}.tar.bz2" \
+			"${log_base}.tar.bz2" \
+			"blackfin-toolchain-build-logs-win32-SVN-*.tar.bz2"
+		rm -rf ${log_base}*
+
+		popd
+
+		send_file_to_gforge ${curr}/pkgs/blackfin-toolchain-win32-SVN*.exe blackfin-toolchain-win32-SVN.exe
+	fi
+
+	popd
+}
+if ! ${SKIP_TOOLCHAIN} ; then
+	if [[ ! -e toolchains ]] ; then
+		mkdir -p toolchains/{i386,win32,x86_64}
+	fi
+
+	pushd toolchains
+	echo 10 > .config.num.to.keep
+
+	#
+	# build up the normal binaries
+	#
+	if [ -e build-toolchain ] ; then
+		make_toolchain
+	else
+		for arch in $(find -maxdepth 1 -type d -printf '%P ') ; do
+			[[ ${arch} == win* ]] && continue
+			pushd ${arch}
+			make_toolchain ${arch}
+			popd
+		done
+	fi
+	echo ${curr} > ${logdir}/toolchain.last
+	make_win32_toolchain
+
+	popd
+fi
+
+source bin/bfin-alias
+bfin_path -q
+
+### build u-boot (as needed) ###
+
+# Return 0 if same
+compare_revs()
+{
+	local repo=$1 force=$2
+	revfile=${logdir}/${repo}.svnrev
+
+	touch "${revfile}"
+	local old=$(<"${revfile}")
+	svn_curr=$(${root}/bin/get-svn-rev .)
+
+	if ${force} || [[ ${old} != ${svn_curr} ]] ; then
+		return 0
+	else
+		return 1
+	fi
+}
+
+if ! ${SKIP_UBOOT} ; then
+	pushd git/u-boot
+
+	if compare_revs u-boot ${FORCE_UBOOT} ; then
+
+		rm -rf ../RELEASE
+		./BUILD-RELEASE >& ${logdir}/u-boot.log || :
+		uver=$(sed -e 's:[[:space:]]*(ADI-::' -e 's:)[[:space:]]*::' localversion-adi)
+
+		pushd ../RELEASE
+
+		# Punt the source tarball
+		rm -f u-boot-20*.tar.bz2
+		# Only upload untested binaries for boards that have uart recovery
+		for f in u-boot-*.tar.bz2 ; do
+			if tar tf ${f} | grep -qs uart ; then
+				send_file_to_gforge -R \
+					"${f}" \
+					"${f/${uver}/SVN-${svn_curr}}" \
+					"${f/${uver}/SVN-*}"
+			fi
+		done
+
+		popd
+		rm -rf ../RELEASE
+		echo "${svn_curr}" > "${revfile}"
+
+	fi
+
+	popd
+fi
+
+### build uimages (as needed) ###
+if ! ${SKIP_UCLINUX} ; then
+	pushd svn/uclinux-dist/trunk
+
+	if compare_revs uclinux-dist ${FORCE_UCLINUX} ; then
+
+		rm -rf LOG
+		./MAKEALL bfin >& ${logdir}/uclinux-dist.log || :
+		cd LOG
+		for u in */uImage ; do
+			B=${u%/uImage}                                  # AnalogDevices_BF548-EZKIT
+			b=$(echo ${B#*_} | tr '[:upper:]' '[:lower:]')  # bf548-ezkit
+			send_file_to_gforge -Z -R "${B}.log" "uImage-SVN-r${svn_curr}-${b}.log" "uImage-SVN-*${b}.log*"
+			send_file_to_gforge -R "${u}" "uImage-SVN-r${svn_curr}-${b}" "uImage-SVN-*${b}"
+		done
+		echo "${svn_curr}" > "${revfile}"
+
+	fi
+
+	popd
+fi
+
+date
+
+) >& ${logdir}/nightly.log
+
+exit 0
