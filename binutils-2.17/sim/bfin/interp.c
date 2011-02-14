@@ -29,6 +29,7 @@
 #include <errno.h>
 #include <fcntl.h>
 #include <unistd.h>	/* dup2 */
+#include <sys/time.h>
 
 #include "gdb/callback.h"
 #include "gdb/signals.h"
@@ -37,19 +38,28 @@
 
 #include "targ-vals.h"
 
-#define CB_SYS_ioctl    201  /* XXX: hack for simple uClibc stdio!  */
-#define CB_SYS_mmap2    202  /* XXX: this gets us malloc()  */
-#define CB_SYS_munmap   203
-#define CB_SYS_dup2     204
-#define CB_SYS_getuid   205
-#define CB_SYS_getuid32 206
-#define CB_SYS_getgid   207
-#define CB_SYS_getgid32 208
-#define CB_SYS_setuid   209
-#define CB_SYS_setuid32 210
-#define CB_SYS_setgid   211
-#define CB_SYS_setgid32 212
-#define CB_SYS_pread    213
+/* The numbers here do not matter.  They just need to be unique.  */
+#define CB_SYS_ioctl        201
+#define CB_SYS_mmap2        202
+#define CB_SYS_munmap       203
+#define CB_SYS_dup2         204
+#define CB_SYS_getuid       205
+#define CB_SYS_getuid32     206
+#define CB_SYS_getgid       207
+#define CB_SYS_getgid32     208
+#define CB_SYS_setuid       209
+#define CB_SYS_setuid32     210
+#define CB_SYS_setgid       211
+#define CB_SYS_setgid32     212
+#define CB_SYS_pread        213
+#define CB_SYS__llseek      214
+#define CB_SYS_getcwd       215
+#define CB_SYS_stat64       216
+#define CB_SYS_lstat64      217
+#define CB_SYS_fstat64      218
+#define CB_SYS_ftruncate64  219
+#define CB_SYS_gettimeofday 220
+#define CB_SYS_access       221
 #include "linux-targ-map.h"
 #include "linux-fixed-code.h"
 
@@ -80,6 +90,21 @@
 #ifndef HAVE_SETGID
 # define setgid(gid) -1
 #endif
+
+static const char stat_map_32[] =
+/* Linux kernel 32bit layout:  */
+"st_dev,2:space,2:st_ino,4:st_mode,2:st_nlink,2:st_uid,2:st_gid,2:st_rdev,2:"
+"space,2:st_size,4:st_blksize,4:st_blocks,4:st_atime,4:st_atimensec,4:"
+"st_mtime,4:st_mtimensec,4:st_ctime,4:st_ctimensec,4:space,4:space,4";
+/* uClibc public ABI 32bit layout:
+"st_dev,8:space,2:space,2:st_ino,4:st_mode,4:st_nlink,4:st_uid,4:st_gid,4:"
+"st_rdev,8:space,2:space,2:st_size,4:st_blksiez,4:st_blocks,4:st_atime,4:"
+"st_atimensec,4:st_mtime,4:st_mtimensec,4:st_ctime,4:st_ctimensec,4:space,4:"
+"space,4"; */
+static const char stat_map_64[] =
+"st_dev,8:space,4:space,4:st_mode,4:st_nlink,4:st_uid,4:st_gid,4:st_rdev,8:"
+"space,4:st_size,8:st_blksize,4:st_blocks,8:st_atime,4:st_atimensec,4:"
+"st_mtime,4:st_mtimensec,4:st_ctime,4:st_ctimensec,4:st_ino,8";
 
 /* Count the number of arguments in an argv.  */
 static int
@@ -132,6 +157,7 @@ bfin_syscall (SIM_CPU *cpu)
   host_callback *cb = STATE_CALLBACK (sd);
   bu32 args[6];
   CB_SYSCALL sc;
+  char *p;
   char _tbuf[512], *tbuf = _tbuf;
   int fmt_ret_hex = 0;
 
@@ -202,6 +228,44 @@ bfin_syscall (SIM_CPU *cpu)
       }
       break;
 
+    case CB_SYS_gettimeofday:
+      {
+	struct timeval _tv, *tv = &_tv;
+	struct timezone _tz, *tz = &_tz;
+
+	tbuf += sprintf (tbuf, "gettimeofday(%#x, %#x)", args[0], args[1]);
+
+	if (sc.arg1 == 0)
+	  tv = NULL;
+	if (sc.arg2 == 0)
+	  tz = NULL;
+	sc.result = gettimeofday (tv, tz);
+
+	if (sc.result == 0)
+	  {
+	    bu32 t;
+
+	    if (tv)
+	      {
+		t = tv->tv_sec;
+		sc.write_mem (cb, &sc, sc.arg1, (void *)&t, 4);
+		t = tv->tv_usec;
+		sc.write_mem (cb, &sc, sc.arg1 + 4, (void *)&t, 4);
+	      }
+
+	    if (sc.arg2)
+	      {
+		t = tz->tz_minuteswest;
+		sc.write_mem (cb, &sc, sc.arg1, (void *)&t, 4);
+		t = tz->tz_dsttime;
+		sc.write_mem (cb, &sc, sc.arg1 + 4, (void *)&t, 4);
+	      }
+	  }
+	else
+	  goto sys_finish;
+      }
+      break;
+
     case CB_SYS_ioctl:
       /* XXX: hack just enough to get basic stdio w/uClibc ...  */
       tbuf += sprintf (tbuf, "ioctl(%i, %#x, %u)", args[0], args[1], args[2]);
@@ -222,7 +286,7 @@ bfin_syscall (SIM_CPU *cpu)
 	static bu32 heap = BFIN_DEFAULT_MEM_SIZE / 2;
 
 	fmt_ret_hex = 1;
-	tbuf += sprintf (tbuf, "mmap(%#x, %u, %#x, %#x, %i, %u)",
+	tbuf += sprintf (tbuf, "mmap2(%#x, %u, %#x, %#x, %i, %u)",
 			 args[0], args[1], args[2], args[3], args[4], args[5]);
 
 	sc.errcode = 0;
@@ -236,7 +300,7 @@ bfin_syscall (SIM_CPU *cpu)
 	    char *data = xmalloc (sc.arg2);
 
 	    /* XXX: Should add a cb->pread.  */
-	    if (pread (cb->fdmap[args[4]], data, sc.arg2, args[5]) == sc.arg2)
+	    if (pread (cb->fdmap[args[4]], data, sc.arg2, args[5] << 12) == sc.arg2)
 	      sc.write_mem (cb, &sc, heap, data, sc.arg2);
 	    else
 	      sc.errcode = TARGET_EINVAL;
@@ -275,6 +339,29 @@ bfin_syscall (SIM_CPU *cpu)
 	{
 	  sc.result = dup2 (cb->fdmap[sc.arg1], cb->fdmap[sc.arg2]);
 	  goto sys_finish;
+	}
+      break;
+
+    case CB_SYS__llseek:
+      tbuf += sprintf (tbuf, "llseek(%i, %u, %u, %#x, %u)",
+		       args[0], args[1], args[2], args[3], args[4]);
+      sc.func = TARGET_LINUX_SYS_lseek;
+      if (sc.arg2)
+	{
+	  sc.result = -1;
+	  sc.errcode = TARGET_EINVAL;
+	}
+      else
+	{
+	  sc.arg2 = sc.arg3;
+	  sc.arg3 = args[4];
+	  cb_syscall (cb, &sc);
+	  if (sc.result != -1)
+	    {
+	      bu32 z = 0;
+	      sc.write_mem (cb, &sc, args[3], (void *)&sc.result, 4);
+	      sc.write_mem (cb, &sc, args[3] + 4, (void *)&z, 4);
+	    }
 	}
       break;
 
@@ -327,6 +414,50 @@ bfin_syscall (SIM_CPU *cpu)
 	}
       break;
 
+    case CB_SYS_getcwd:
+      tbuf += sprintf (tbuf, "getcwd(%#x, %u)", args[0], args[1]);
+
+      p = alloca (sc.arg2);
+      if (getcwd (p, sc.arg2) == NULL)
+	{
+	  sc.result = -1;
+	  sc.errcode = TARGET_EINVAL;
+	}
+      else
+	{
+	  sc.write_mem (cb, &sc, sc.arg1, p, sc.arg2);
+	  sc.result = sc.arg1;
+	}
+      break;
+
+    case CB_SYS_stat64:
+      tbuf += sprintf (tbuf, "stat64(%#x, %u)", args[0], args[1]);
+      cb->stat_map = stat_map_64;
+      sc.func = TARGET_LINUX_SYS_stat;
+      cb_syscall (cb, &sc);
+      cb->stat_map = stat_map_32;
+      break;
+    case CB_SYS_lstat64:
+      tbuf += sprintf (tbuf, "lstat64(%#x, %u)", args[0], args[1]);
+      cb->stat_map = stat_map_64;
+      sc.func = TARGET_LINUX_SYS_lstat;
+      cb_syscall (cb, &sc);
+      cb->stat_map = stat_map_32;
+      break;
+    case CB_SYS_fstat64:
+      tbuf += sprintf (tbuf, "fstat64(%#x, %u)", args[0], args[1]);
+      cb->stat_map = stat_map_64;
+      sc.func = TARGET_LINUX_SYS_fstat;
+      cb_syscall (cb, &sc);
+      cb->stat_map = stat_map_32;
+      break;
+
+    case CB_SYS_ftruncate64:
+      tbuf += sprintf (tbuf, "ftruncate64(%u, %u)", args[0], args[1]);
+      sc.func = TARGET_LINUX_SYS_ftruncate;
+      cb_syscall (cb, &sc);
+      break;
+
     case CB_SYS_getuid:
     case CB_SYS_getuid32:
       tbuf += sprintf (tbuf, "getuid()");
@@ -349,6 +480,25 @@ bfin_syscall (SIM_CPU *cpu)
       tbuf += sprintf (tbuf, "setgid(%u)", args[0]);
       sc.result = setgid (sc.arg1);
       goto sys_finish;
+
+    case CB_SYS_getpid:
+      tbuf += sprintf (tbuf, "getpid()");
+      sc.result = getpid ();
+      goto sys_finish;
+    case CB_SYS_kill:
+      tbuf += sprintf (tbuf, "kill(%u, %i)", args[0], args[1]);
+      /* Only let the app kill itself.  */
+      if (sc.arg1 != getpid ())
+	{
+	  sc.result = -1;
+	  sc.errcode = TARGET_EPERM;
+	}
+      else
+	{
+	  sc.result = kill (sc.arg1, sc.arg2);
+	  goto sys_finish;
+	}
+      break;
 
     case CB_SYS_open:
       tbuf += sprintf (tbuf, "open(%#x, %#x, %o)", args[0], args[1], args[2]);
@@ -399,7 +549,10 @@ bfin_syscall (SIM_CPU *cpu)
 
     sys_finish:
       if (sc.result == -1)
-	sc.errcode = cb->get_errno (cb);
+	{
+	  cb->last_errno = errno;
+	  sc.errcode = cb->get_errno (cb);
+	}
     }
 
   TRACE_EVENTS (cpu, "syscall_%i(%#x, %#x, %#x, %#x, %#x, %#x) = %li (error = %i)",
@@ -674,17 +827,6 @@ sim_close (SIM_DESC sd, int quitting)
 {
   sim_module_uninstall (sd);
 }
-
-static const char stat_map[] =
-/* Linux kernel 32bit layout:  */
-"st_dev,2:space,2:st_ino,4:st_mode,2:st_nlink,2:st_uid,2:st_gid,2:st_rdev,2:"
-"space,2:st_size,4:st_blksize,4:st_blocks,4:st_atime,4:st_atimensec,4:"
-"st_mtime,4:st_mtimensec,4:st_ctime,4:st_ctimensec,4:space,4:space,4";
-/* uClibc public ABI 32bit layout:
-"st_dev,8:space,2:space,2:st_ino,4:st_mode,4:st_nlink,4:st_uid,4:st_gid,4:"
-"st_rdev,8:space,2:space,2:st_size,4:st_blksiez,4:st_blocks,4:st_atime,4:"
-"st_atimensec,4:st_mtime,4:st_mtimensec,4:st_ctime,4:st_ctimensec,4:space,4:"
-"space,4"; */
 
 /* Some utils don't like having a NULL environ.  */
 static const char * const simple_env[] = { "HOME=/", "PATH=/bin", NULL };
@@ -1022,7 +1164,7 @@ bfin_user_init (SIM_DESC sd, SIM_CPU *cpu, struct bfd *abfd,
   cb->errno_map = cb_linux_errno_map;
   cb->open_map = cb_linux_open_map;
   cb->signal_map = cb_linux_signal_map;
-  cb->stat_map = stat_map;
+  cb->stat_map = stat_map_32;
 }
 
 static void
