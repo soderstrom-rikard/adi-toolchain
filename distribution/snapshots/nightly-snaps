@@ -110,9 +110,11 @@ if ! ${SKIP_SCM_PULL} ; then
 	./update >& ${logdir}/${scm}.log
 	popd
 fi
+distdir=$(scm_dir toolchain distribution)
+
 if ! ${SKIP_SCM} ; then
-	bfin_mk_dir_ln ${scm} make-scm-snaps make-snaps
 	pushd ${scm}
+	[[ -e make-snaps ]] || ln -s "${distdir}"/snapshots/make-scm-snaps make-snaps
 
 	### generate svn snaps ###
 	# only update snap once a ~week
@@ -159,8 +161,6 @@ make_toolchain() {
 	for t in elf linux-uclibc uclinux ; do
 		send_file_to_gforge "${curr}/pkgs/toolchain-${curr}-${t}.tar.bz2" "blackfin-toolchain-${t}-SVN.${arch}.tar.bz2"
 	done
-
-	distdir=$(scm_dir toolchain distribution)
 
 	#
 	# convert to rpms

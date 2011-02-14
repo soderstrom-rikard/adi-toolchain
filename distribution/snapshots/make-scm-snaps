@@ -1,0 +1,87 @@
+#!/bin/bash
+
+set -e
+set -x
+
+export LC_ALL=C
+
+usage() {
+	cat <<-EOF
+	Usage: make-scm-snaps [options] [svn trees]
+
+	Options:
+	  -u, --update      only build snap if last one was diff
+	  -b, --branch      make snap from specified branch
+	  --linux-2.6.x     when generating uclinux-dist, include linux-2.6.x
+	EOF
+	exit 1
+}
+
+UPDATE=false
+KERNEL_HACK=false
+BRANCH="trunk"
+while [[ -n $1 ]] ; do
+	case $1 in
+		-u|--update)   UPDATE=true;;
+		-b|--branch)   shift; BRANCH=$1;;
+		--linux-2.6.x) KERNEL_HACK=true;;
+		-*)            usage;;
+		*)             break;;
+	esac
+	shift
+done
+
+branch=${BRANCH}
+
+root=/usr/local/src/blackfin
+
+for s in ${*:-toolchain u-boot uclinux-dist} ; do
+	if [[ -d ${s}/.svn ]] ; then
+		scm="svn"
+		[[ ${branch} != "trunk" ]] \
+			&& src="${s}/branches/${branch}" \
+			|| src="${s}/${branch}"
+	elif [[ -d ${s}/.git ]] ; then
+		scm="git"
+		src="${s}"
+	else
+		echo "error: unable to handle dir: ${s}"
+		exit 1
+	fi
+
+	rm -rf .snaps
+	mkdir -p .snaps
+
+	rev=$(${root}/bin/get-svn-rev "${src}")
+	if ${UPDATE} && [[ -e .snap.${s}.${branch} ]] ; then
+		lastrev=$(cat .snap.${s}.${branch})
+		[[ ${lastrev} == ${rev} ]] && continue
+	fi
+	dir="${s}-${branch}-svn-${rev}"
+	dst=".snaps/${dir}"
+	rm -rf "${dst}"*
+
+	if [[ ${scm} == "svn" ]] ; then
+		svn -q export --ignore-externals ${src} ${dst}
+		if ${KERNEL_HACK} && [[ ${s} == "uclinux-dist" ]] ; then
+			svn -q export --ignore-externals linux-kernel/${src%${s}/} ${dst}/linux-2.6.x
+		fi
+		tar jcf ${dir}.tar.bz2 -C .snaps ${dir}
+	else
+		export GIT_DIR=${s}/.git
+		if ${KERNEL_HACK} && [[ ${s} == "uclinux-dist" ]] ; then
+			git archive --prefix=${dir}/ ${branch} | tar xf - -C .snaps
+			git --git-dir=linux-kernel/.git archive --prefix=${dir}/linux-2.6.x/ ${branch} | tar xf - -C .snaps
+			tar jcf ${dir}.tar.bz2 -C .snaps ${dir}
+		else
+			git archive --prefix=${dir}/ ${branch} | bzip2 > ${dir}.tar.bz2
+		fi
+		unset GIT_DIR
+	fi
+
+	echo "${rev}" > .snap.${s}.${branch}
+
+	rm -rf .snaps
+done
+
+exit 0
