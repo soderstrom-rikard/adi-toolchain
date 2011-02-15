@@ -22,11 +22,14 @@ binary-arch: build
 	#test -d ../../../@VER@
 	set -e ; \
 	for p in elf uclinux linux-uclibc ; do \
-		base="debian/blackfin-toolchain-$${p}@TAG@/opt/uClinux@TAG@/bfin-$${p}" ; \
+		root="debian/blackfin-toolchain-$${p}@TAG@" ; \
+		base="$${root}/opt/uClinux@TAG@/bfin-$${p}" ; \
 		mkdir -p $${base} ; \
-		chmod -R 755 debian/blackfin-toolchain-$${p}@TAG@/opt ; \
-		chown -R 0:0 debian/blackfin-toolchain-$${p}@TAG@/opt ; \
 		cp -a ../*-$${p}/* $${base}/ ; \
+		chown -R 0:0 $${root} ; \
+		find $${root} -type d -exec chmod 755 {} + ; \
+		find $${root} -type f -exec chmod a+r {} + ; \
+		find $${root} -type f -perm 1 -exec chmod a+x {} + ; \
 	done
 
 #
