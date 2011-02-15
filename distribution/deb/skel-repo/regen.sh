@@ -1,8 +1,6 @@
 #!/bin/bash
 set -ex
 
-cd /
-
 #
 # First sync the repo files from svn
 #
@@ -22,7 +20,7 @@ rm -rf "${t}"
 # Then see if any files need rebuilding
 #
 
-pushd dists >/dev/null
+pushd "${t}/dists" >/dev/null
 
 for d in */ ; do
 	d=${d%/}
