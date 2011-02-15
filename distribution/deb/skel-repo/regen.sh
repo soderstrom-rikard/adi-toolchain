@@ -20,7 +20,7 @@ rm -rf "${t}"
 # Then see if any files need rebuilding
 #
 
-pushd "${t}/dists" >/dev/null
+pushd "${d}/dists" >/dev/null
 
 for d in */ ; do
 	d=${d%/}
