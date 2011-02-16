@@ -16,10 +16,10 @@ To use this repository, you need to place the appropriate lines in your
 /etc/apt/sources.list file or a file in /etc/apt/sources.list.d/.
 
 If you wish to install released toolchains, then use:
-	deb http://blackfin.uclinux.org/debian stable main
+	deb http://download.analog.com/27516/distros/debian stable main
 
 If you wish to install nightly builds of SVN trunk, then use:
-	deb http://blackfin.uclinux.org/debian unstable main
+	deb http://download.analog.com/27516/distros/debian unstable main
 
 You can have both packages installed at the same time without conflicts.  The
 release will install into:
@@ -28,7 +28,7 @@ while the nightly builds will install into:
 	/opt/uClinux-SVN/
 
 You will also probably want to grab our signing key and add it to your apt:
-	# wget http://blackfin.uclinux.org/debian/apt.key
+	# wget http://download.analog.com/27516/distros/debian/apt.key
 	# apt-key add apt.key
 
 Note that while we label them "nightly builds", we obviously do not rebuild
