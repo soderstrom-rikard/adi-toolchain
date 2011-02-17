@@ -1,3 +1,8 @@
+2011-02-17  Mike Frysinger  <michael.frysinger@analog.com>
+
+	* config/bfin/bfin.c (bfin_cpus[]): Add 0.4 for
+	bf542/bf544/bf547/bf548/bf549.
+
 2010-11-21  Mike Frysinger  <michael.frysinger@analog.com>
 
 	* mkmap-symver.awk: Move prefix from main to output().
