@@ -53,6 +53,7 @@
 #include "dv-bfin_uart.h"
 #include "dv-bfin_uart2.h"
 #include "dv-bfin_wdog.h"
+#include "dv-bfin_wp.h"
 
 static const MACH bfin_mach;
 
@@ -712,6 +713,7 @@ static const struct bfin_dev_layout bfin_core_dev[] = {
   CORE_DEVICE (jtag, JTAG),
   CORE_DEVICE (mmu, MMU),
   CORE_DEVICE (trace, TRACE),
+  CORE_DEVICE (wp, WP),
 };
 
 #define dv_bfin_hw_parse(sd, dv, DV) \
