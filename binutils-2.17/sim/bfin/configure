@@ -4812,6 +4812,7 @@ hardware="$hardware \
 	bfin_eppi \
 	bfin_evt \
 	bfin_gptimer \
+	bfin_jtag \
 	bfin_mmu \
 	bfin_nfc \
 	bfin_otp \

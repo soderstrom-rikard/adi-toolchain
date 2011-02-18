@@ -39,6 +39,7 @@
 #include "dv-bfin_eppi.h"
 #include "dv-bfin_evt.h"
 #include "dv-bfin_gptimer.h"
+#include "dv-bfin_jtag.h"
 #include "dv-bfin_mmu.h"
 #include "dv-bfin_nfc.h"
 #include "dv-bfin_otp.h"
@@ -708,6 +709,7 @@ static const struct bfin_dev_layout bfin_core_dev[] = {
   CORE_DEVICE (cec, CEC),
   CORE_DEVICE (ctimer, CTIMER),
   CORE_DEVICE (evt, EVT),
+  CORE_DEVICE (jtag, JTAG),
   CORE_DEVICE (mmu, MMU),
   CORE_DEVICE (trace, TRACE),
 };
