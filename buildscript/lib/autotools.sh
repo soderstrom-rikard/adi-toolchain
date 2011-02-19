@@ -5,6 +5,7 @@ reset_autotool_hooks()
 {
 	at_clean() { :; }
 	at_make_args() { :; }
+	at_install_post() { :; }
 }
 
 touch_tree()
@@ -59,6 +60,7 @@ build_autotooled_pkg()
 		run_cmd_nodie mv "$1"/lib/*.a "${STAGEDIR}"/usr/lib/
 		run_cmd_nodie mv "$1"/lib/pkgconfig/* "${STAGEDIR}"/usr/lib/pkgconfig/
 		run_cmd_nodie rmdir "$1"/lib/pkgconfig "$1"/lib "$1"/include
+		at_install_post
 	}
 	at_install "${DIR_ELF_OUTPUT}"
 	if ! ${tlib} ; then

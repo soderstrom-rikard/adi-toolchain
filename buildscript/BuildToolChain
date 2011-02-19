@@ -1428,6 +1428,13 @@ build_urjtag()
 		run_cmd rm -f src/bsdl/bsdl_bison.[ch] src/bsdl/bsdl_flex.c \
 			src/svf/svf_bison.[ch] src/svf/svf_flex.c
 	}
+	at_install_post() {
+		# let the local jtag find its data files while debugging
+		if [ ! -e src/apps/share/urjtag ] ; then
+			mkdir -p src/apps/share
+			ln -s ../../../../../urjtag/data src/apps/share/urjtag
+		fi
+	}
 
 	build_autotooled_pkg "${DIR_URJTAG_SOURCE}" \
 		--disable-shared --enable-static --enable-relocatable \
