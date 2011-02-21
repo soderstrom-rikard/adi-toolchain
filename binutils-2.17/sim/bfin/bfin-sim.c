@@ -34,7 +34,8 @@
 
 #define HOST_LONG_WORD_SIZE (sizeof (long) * 8)
 
-#define SIGNEXTEND(v, n) (((bs32)(v) << (HOST_LONG_WORD_SIZE - (n))) >> (HOST_LONG_WORD_SIZE - (n)))
+#define SIGNEXTEND(v, n) \
+  (((bs32)(v) << (HOST_LONG_WORD_SIZE - (n))) >> (HOST_LONG_WORD_SIZE - (n)))
 
 static __attribute__ ((noreturn)) void
 illegal_instruction (SIM_CPU *cpu)
@@ -79,9 +80,10 @@ unhandled_instruction (SIM_CPU *cpu, const char *insn)
 typedef enum
 {
   c_0, c_1, c_4, c_2, c_uimm2, c_uimm3, c_imm3, c_pcrel4,
-  c_imm4, c_uimm4s4, c_uimm4s4d, c_uimm4, c_uimm4s2, c_negimm5s4, c_imm5, c_imm5d, c_uimm5, c_imm6,
-  c_imm7, c_imm7d, c_imm8, c_uimm8, c_pcrel8, c_uimm8s4, c_pcrel8s4, c_lppcrel10, c_pcrel10,
-  c_pcrel12, c_imm16s4, c_luimm16, c_imm16, c_imm16d, c_huimm16, c_rimm16, c_imm16s2, c_uimm16s4,
+  c_imm4, c_uimm4s4, c_uimm4s4d, c_uimm4, c_uimm4s2, c_negimm5s4, c_imm5,
+  c_imm5d, c_uimm5, c_imm6, c_imm7, c_imm7d, c_imm8, c_uimm8, c_pcrel8,
+  c_uimm8s4, c_pcrel8s4, c_lppcrel10, c_pcrel10, c_pcrel12, c_imm16s4,
+  c_luimm16, c_imm16, c_imm16d, c_huimm16, c_rimm16, c_imm16s2, c_uimm16s4,
   c_uimm16s4d, c_uimm16, c_pcrel24, c_uimm32, c_imm32, c_huimm32, c_huimm32e,
 } const_forms_t;
 
@@ -293,7 +295,7 @@ fmtconst_val (const_forms_t cf, bu32 x, bu32 pc)
 #define huimm32(x)	fmtconst_val (c_huimm32, x, 0)
 #define huimm32e(x)	fmtconst_val (c_huimm32e, x, 0)
 
-/* Table C-4. Core Register Encoding Map */
+/* Table C-4. Core Register Encoding Map.  */
 const char * const greg_names[] =
 {
   "R0",    "R1",      "R2",     "R3",    "R4",    "R5",    "R6",     "R7",
@@ -335,7 +337,7 @@ get_allreg (SIM_CPU *cpu, int grp, int reg)
      REG_LC0, REG_LT0, REG_LB0, REG_LC1, REG_LT1, REG_LB1, REG_CYCLES,
      REG_CYCLES2,
      REG_USP, REG_SEQSTAT, REG_SYSCFG, REG_RETI, REG_RETX, REG_RETN, REG_RETE,
-     REG_LASTREG */
+     REG_LASTREG  */
   switch (fullreg >> 2)
     {
     case 0: case 1: return &DREG (reg);
@@ -731,27 +733,27 @@ lshift (SIM_CPU *cpu, bu64 val, int cnt, int size, bool saturate)
   masked = new_val & mask;
 
   /* If an operation would otherwise cause a positive value to overflow
-   * and become negative, instead, saturation limits the result to the
-   * maximum positive value for the size register being used.
-   *
-   * Conversely, if an operation would otherwise cause a negative value
-   * to overflow and become positive, saturation limits the result to the
-   * maximum negative value for the register size.
-   *
-   * However, it's a little more complex than looking at sign bits, we need
-   * to see if we are shifting the sign information away...
-   */
+     and become negative, instead, saturation limits the result to the
+     maximum positive value for the size register being used.
+
+     Conversely, if an operation would otherwise cause a negative value
+     to overflow and become positive, saturation limits the result to the
+     maximum negative value for the register size.
+
+     However, it's a little more complex than looking at sign bits, we need
+     to see if we are shifting the sign information away...  */
   tmp = val & ((~mask << 1) | 1);
 
   j = 0;
   for (i = 1; i <= real_cnt && saturate; i++)
     {
-      if ((tmp & ((bu64)1 << (size - 1))) != (((val >> mask_cnt) & 0x1 ) << mask_cnt ))
+      if ((tmp & ((bu64)1 << (size - 1))) !=
+	  (((val >> mask_cnt) & 0x1) << mask_cnt))
 	j++;
       tmp <<= 1;
     }
-  saturate &= (!sgn && (new_val & (1 << mask_cnt))) ||
-	      (sgn && !(new_val & (1 << mask_cnt)));
+  saturate &= (!sgn && (new_val & (1 << mask_cnt)))
+	      || (sgn && !(new_val & (1 << mask_cnt)));
 
   switch (size)
     {
@@ -917,7 +919,8 @@ sub32 (SIM_CPU *cpu, bu32 a, bu32 b, int carry, int sat, int parallel)
 }
 
 static bu32
-add16 (SIM_CPU *cpu, bu16 a, bu16 b, bu32 *carry, bu32 *overfl, bu32 *zero, bu32 *neg, int sat, int scale)
+add16 (SIM_CPU *cpu, bu16 a, bu16 b, bu32 *carry, bu32 *overfl,
+       bu32 *zero, bu32 *neg, int sat, int scale)
 {
   int flgs = (a >> 15) & 1;
   int flgo = (b >> 15) & 1;
@@ -930,12 +933,13 @@ add16 (SIM_CPU *cpu, bu16 a, bu16 b, bu32 *carry, bu32 *overfl, bu32 *zero, bu32
     case 0:
       break;
     case 2:
-      /* (ASR) */
-      v = (a >> 1) + (a & 0x8000) + (b >> 1) + (b & 0x8000) + (((a & 1) + (b & 1)) >> 1);
+      /* (ASR)  */
+      v = (a >> 1) + (a & 0x8000) + (b >> 1) + (b & 0x8000)
+	  + (((a & 1) + (b & 1)) >> 1);
       v |= -(v & 0x8000);
       break;
     case 3:
-      /* (ASL) */
+      /* (ASL)  */
       v = (v << 1);
       break;
     default:
@@ -964,7 +968,8 @@ add16 (SIM_CPU *cpu, bu16 a, bu16 b, bu32 *carry, bu32 *overfl, bu32 *zero, bu32
 }
 
 static bu32
-sub16 (SIM_CPU *cpu, bu16 a, bu16 b, bu32 *carry, bu32 *overfl, bu32 *zero, bu32 *neg, int sat, int scale)
+sub16 (SIM_CPU *cpu, bu16 a, bu16 b, bu32 *carry, bu32 *overfl,
+       bu32 *zero, bu32 *neg, int sat, int scale)
 {
   int flgs = (a >> 15) & 1;
   int flgo = (b >> 15) & 1;
@@ -977,16 +982,17 @@ sub16 (SIM_CPU *cpu, bu16 a, bu16 b, bu32 *carry, bu32 *overfl, bu32 *zero, bu32
     case 0:
       break;
     case 2:
-      /* (ASR) */
+      /* (ASR)  */
       if (sat)
-	v = ((a >> 1) + (a & 0x8000)) - ( (b >> 1) + (b & 0x8000)) + (((a & 1)-(b & 1)));
+	v = ((a >> 1) + (a & 0x8000)) - ( (b >> 1) + (b & 0x8000))
+	    + (((a & 1)-(b & 1)));
       else
 	{
 	  v = ((v & 0xFFFF) >> 1);
-	  if ((!flgs & !flgo & flgn) ||
-	      (flgs & !flgo & !flgn) ||
-	      (flgs & flgo & flgn) ||
-	      (flgs & !flgo & flgn))
+	  if ((!flgs & !flgo & flgn)
+	      || (flgs & !flgo & !flgn)
+	      || (flgs & flgo & flgn)
+	      || (flgs & !flgo & flgn))
 	    v |= 0x8000;
 	}
       v |= -(v & 0x8000);
@@ -994,7 +1000,7 @@ sub16 (SIM_CPU *cpu, bu16 a, bu16 b, bu32 *carry, bu32 *overfl, bu32 *zero, bu32
       overflow = (flgs ^ flgo) & (flgn ^ flgs);
       break;
     case 3:
-      /* (ASL) */
+      /* (ASL)  */
       v <<= 1;
       if (v > (bs64)0x7fff || v < (bs64)-0xffff)
 	overflow = 1;
@@ -1102,18 +1108,17 @@ xor_reduce (bu64 acc0, bu64 acc1)
 }
 
 /* DIVS ( Dreg, Dreg ) ;
- * Initialize for DIVQ. Set the AQ status bit based on the signs of
- * the 32-bit dividend and the 16-bit divisor. Left shift the dividend
- * one bit. Copy AQ into the dividend LSB.
- */
+   Initialize for DIVQ.  Set the AQ status bit based on the signs of
+   the 32-bit dividend and the 16-bit divisor.  Left shift the dividend
+   one bit.  Copy AQ into the dividend LSB.  */
 static bu32
 divs (SIM_CPU *cpu, bu32 pquo, bu16 divisor)
 {
   bu16 r = pquo >> 16;
   int aq;
 
-  aq = (r ^ divisor) >> 15;  /* extract msb's and compute quotient bit */
-  SET_ASTATREG (aq, aq);     /* update global quotient state */
+  aq = (r ^ divisor) >> 15;  /* Extract msb's and compute quotient bit.  */
+  SET_ASTATREG (aq, aq);     /* Update global quotient state.  */
 
   pquo <<= 1;
   pquo |= aq;
@@ -1122,11 +1127,10 @@ divs (SIM_CPU *cpu, bu32 pquo, bu16 divisor)
 }
 
 /* DIVQ ( Dreg, Dreg ) ;
- * Based on AQ status bit, either add or subtract the divisor from
- * the dividend. Then set the AQ status bit based on the MSBs of the
- * 32-bit dividend and the 16-bit divisor. Left shift the dividend one
- * bit. Copy the logical inverse of AQ into the dividend LSB.
- */
+   Based on AQ status bit, either add or subtract the divisor from
+   the dividend.  Then set the AQ status bit based on the MSBs of the
+   32-bit dividend and the 16-bit divisor.  Left shift the dividend one
+   bit.  Copy the logical inverse of AQ into the dividend LSB.  */
 static bu32
 divq (SIM_CPU *cpu, bu32 pquo, bu16 divisor)
 {
@@ -1139,8 +1143,8 @@ divq (SIM_CPU *cpu, bu32 pquo, bu16 divisor)
   else
     r = af - divisor;
 
-  aq = (r ^ divisor) >> 15;  /* extract msb's and compute quotient bit */
-  SET_ASTATREG (aq, aq);     /* update global quotient state */
+  aq = (r ^ divisor) >> 15;  /* Extract msb's and compute quotient bit.  */
+  SET_ASTATREG (aq, aq);     /* Update global quotient state.  */
 
   pquo <<= 1;
   pquo |= !aq;
@@ -1149,8 +1153,7 @@ divq (SIM_CPU *cpu, bu32 pquo, bu16 divisor)
 }
 
 /* ONES ( Dreg ) ;
- * Count the number of bits set to 1 in the 32bit value.
- */
+   Count the number of bits set to 1 in the 32bit value.  */
 static bu32
 ones (bu32 val)
 {
@@ -1227,7 +1230,7 @@ reg_read (SIM_CPU *cpu, int grp, int reg)
     /* Reads of CYCLES reloads CYCLES2 from the shadow.  */
     SET_CYCLES2REG (CYCLES2SHDREG);
   else if ((whichreg == &AXREG (1) || whichreg == &AXREG (0)) && (value & 0x80))
-    /* sign extend if necessary */
+    /* Sign extend if necessary.  */
     value |= 0xFFFFFF00;
 
   return value;
@@ -1366,7 +1369,7 @@ saturate_s40_astat (bu64 val, bu32 *v)
       *v = 1;
       return ((bu64)1 << 39) - 1;
     }
-  *v = 0; /* no overflow */
+  *v = 0; /* No overflow.  */
   return val;
 }
 
@@ -1469,7 +1472,8 @@ signbits (bu64 val, int size)
    we want to extract, either a 32 bit multiply or a 40 bit accumulator.  */
 
 static bu32
-extract_mult (SIM_CPU *cpu, bu64 res, int mmod, int MM, int fullword, bu32 *overflow)
+extract_mult (SIM_CPU *cpu, bu64 res, int mmod, int MM,
+	      int fullword, bu32 *overflow)
 {
   if (fullword)
     switch (mmod)
@@ -1527,19 +1531,21 @@ decode_macfunc (SIM_CPU *cpu, int which, int op, int h0, int h1, int src0,
   bu64 acc;
   bu32 sat = 0, tsat;
 
-  /* Sign extend accumulator if necessary, otherwise unsigned */
-  if (mmod == 0 || mmod == M_T || mmod == M_IS || mmod == M_ISS2 || mmod == M_S2RND || mmod == M_IH || mmod == M_W32)
+  /* Sign extend accumulator if necessary, otherwise unsigned.  */
+  if (mmod == 0 || mmod == M_T || mmod == M_IS || mmod == M_ISS2
+      || mmod == M_S2RND || mmod == M_IH || mmod == M_W32)
     acc = get_extended_acc (cpu, which);
   else
     acc = get_unextended_acc (cpu, which);
 
-  if (MM && (mmod == M_T || mmod == M_IS || mmod == M_ISS2 || mmod == M_S2RND || mmod == M_IH || mmod == M_W32))
+  if (MM && (mmod == M_T || mmod == M_IS || mmod == M_ISS2
+      || mmod == M_S2RND || mmod == M_IH || mmod == M_W32))
     acc |= -(acc & 0x80000000);
 
   if (op != 3)
     {
       bu8 sgn0 = (acc >> 31) & 1;
-      /* this can't saturate, so we don't keep track of the sat flag */
+      /* This can't saturate, so we don't keep track of the sat flag.  */
       bu64 res = decode_multfunc (cpu, h0, h1, src0, src1, mmod,
 				  MM, &tsat);
 
@@ -1606,7 +1612,8 @@ decode_macfunc (SIM_CPU *cpu, int which, int op, int h0, int h1, int src0,
 	    acc = 0x7fffffffull, sat = 1;
 	  break;
 	case M_W32:
-	  if (sgn0 && (sgn0 != ((acc >> 31) & 1)) && (((acc >> 32) & 0xFF) == 0xff))
+	  if (sgn0 && (sgn0 != ((acc >> 31) & 1))
+	      && (((acc >> 32) & 0xFF) == 0xff))
 	    acc = 0x80000000;
 	  acc &= 0xffffffff;
 	  if (acc & 0x80000000)
@@ -1741,7 +1748,7 @@ decode_ProgCtrl_0 (SIM_CPU *cpu, bu16 iw0, bu32 pc)
   else if (prgfunc == 2 && poprnd == 3)
     {
       PROFILE_COUNT_INSN (cpu, pc, BFIN_INSN_ProgCtrl_sync);
-      /* just NOP it */
+      /* Just NOP it.  */
       TRACE_INSN (cpu, "CSYNC;");
       if (INSN_LEN == 8)
 	illegal_instruction_combination (cpu);
@@ -1750,7 +1757,7 @@ decode_ProgCtrl_0 (SIM_CPU *cpu, bu16 iw0, bu32 pc)
   else if (prgfunc == 2 && poprnd == 4)
     {
       PROFILE_COUNT_INSN (cpu, pc, BFIN_INSN_ProgCtrl_sync);
-      /* just NOP it */
+      /* Just NOP it.  */
       TRACE_INSN (cpu, "SSYNC;");
       if (INSN_LEN == 8)
 	illegal_instruction_combination (cpu);
@@ -1903,7 +1910,7 @@ decode_CaCTRL_0 (SIM_CPU *cpu, bu16 iw0)
   TRACE_INSN (cpu, "%s [%s%s];", sinsn[op], get_preg_name (reg), a ? "++" : "");
 
   if (INSN_LEN == 8)
-    /* None of these can be part of a parallel instruction */
+    /* None of these can be part of a parallel instruction.  */
     illegal_instruction_combination (cpu);
 
   /* No cache simulation, so these are (mostly) all NOPs.
@@ -1912,19 +1919,19 @@ decode_CaCTRL_0 (SIM_CPU *cpu, bu16 iw0)
      the value to the cache line before adding the cache line size, or
      do we just add the cache line size ?  */
   if (op == 0)
-    {	/* PREFETCH */
+    {	/* PREFETCH  */
       mmu_check_cache_addr (cpu, preg, false, false);
     }
   else if (op == 1)
-    {	/* FLUSHINV */
+    {	/* FLUSHINV  */
       mmu_check_cache_addr (cpu, preg, true, false);
     }
   else if (op == 2)
-    {	/* FLUSH */
+    {	/* FLUSH  */
       mmu_check_cache_addr (cpu, preg, true, false);
     }
   else if (op == 3)
-    {	/* IFLUSH */
+    {	/* IFLUSH  */
       mmu_check_cache_addr (cpu, preg, false, true);
     }
 
@@ -1956,11 +1963,11 @@ decode_PushPopReg_0 (SIM_CPU *cpu, bu16 iw0)
 
   if (W == 0)
     {
-      /* Dreg and Preg are not supported by this instruction */
+      /* Dreg and Preg are not supported by this instruction.  */
       if (grp == 0 || grp == 1)
 	illegal_instruction (cpu);
       TRACE_INSN (cpu, "%s = [SP++];", reg_name);
-      /* Can't pop USP while in userspace */
+      /* Can't pop USP while in userspace.  */
       if (INSN_LEN == 8 || (grp == 7 && reg == 0 && cec_is_user_mode(cpu)))
 	illegal_instruction_combination (cpu);
       /* XXX: The valid register check is in reg_write(), so we might
@@ -1975,7 +1982,7 @@ decode_PushPopReg_0 (SIM_CPU *cpu, bu16 iw0)
   else
     {
       TRACE_INSN (cpu, "[--SP] = %s;", reg_name);
-      /* Can't push SP */
+      /* Can't push SP.  */
       if (INSN_LEN == 8 || (grp == 1 && reg == 6))
 	illegal_instruction_combination (cpu);
 
@@ -2011,8 +2018,8 @@ decode_PushPopMultiple_0 (SIM_CPU *cpu, bu16 iw0)
   TRACE_EXTRACT (cpu, "%s: d:%i p:%i W:%i dr:%i pr:%i",
 		 __func__, d, p, W, dr, pr);
 
-  if ((d == 0 && p == 0) || (p && imm5 (pr) > 5) ||
-      (d && !p && pr) || (p && !d && dr))
+  if ((d == 0 && p == 0) || (p && imm5 (pr) > 5)
+      || (d && !p && pr) || (p && !d && dr))
     illegal_instruction (cpu);
 
   if (W == 1)
@@ -2178,24 +2185,24 @@ decode_CCflag_0 (SIM_CPU *cpu, bu16 iw0)
 
       switch (opc)
 	{
-	default: /* shutup useless gcc warnings */
-	case 0: /* signed */
+	default: /* Shutup useless gcc warnings.  */
+	case 0: /* signed  */
 	  op = "==";
 	  cc = az;
 	  break;
-	case 1:	/* signed */
+	case 1:	/* signed  */
 	  op = "<";
 	  cc = an;
 	  break;
-	case 2:	/* signed */
+	case 2:	/* signed  */
 	  op = "<=";
 	  cc = an || az;
 	  break;
-	case 3:	/* unsigned */
+	case 3:	/* unsigned  */
 	  op = "<";
 	  cc = !ac0;
 	  break;
-	case 4:	/* unsigned */
+	case 4:	/* unsigned  */
 	  op = "<=";
 	  cc = !ac0 || az;
 	  break;
@@ -2206,7 +2213,8 @@ decode_CCflag_0 (SIM_CPU *cpu, bu16 iw0)
 		    issigned ? imm3_str (y) : uimm3_str (y), sign);
       else
 	{
-	  TRACE_DECODE (cpu, "%s %c%i:%x %c%i:%x", __func__, s, x, srcop,  d, y, dstop);
+	  TRACE_DECODE (cpu, "%s %c%i:%x %c%i:%x", __func__,
+			s, x, srcop,  d, y, dstop);
 	  TRACE_INSN (cpu, "CC = %c%i %s %c%i%s;", s, x, op, d, y, sign);
 	}
 
@@ -2429,16 +2437,16 @@ decode_REGMV_0 (SIM_CPU *cpu, bu16 iw0)
   if (reg_is_reserved (gs, src) || reg_is_reserved (gd, dst))
     goto invalid_move;
 
-  /* Standard register moves  */
-  if ((gs < 2) ||				/* Dregs/Pregs as source  */
-      (gd < 2) ||				/* Dregs/Pregs as dest    */
-      (gs == 4 && src < 4) ||			/* Accumulators as source */
-      (gd == 4 && dst < 4 && (gs < 4)) ||	/* Accumulators as dest   */
-      (gs == 7 && src == 7 && !(gd == 4 && dst < 4)) ||	/* EMUDAT as src  */
-      (gd == 7 && dst == 7)) 			/* EMUDAT as dest         */
+  /* Standard register moves.  */
+  if ((gs < 2)						/* Dregs/Pregs src  */
+      || (gd < 2)					/* Dregs/Pregs dst  */
+      || (gs == 4 && src < 4)				/* Accumulators src  */
+      || (gd == 4 && dst < 4 && (gs < 4))		/* Accumulators dst  */
+      || (gs == 7 && src == 7 && !(gd == 4 && dst < 4))	/* EMUDAT src  */
+      || (gd == 7 && dst == 7)) 			/* EMUDAT dst  */
     goto valid_move;
 
-  /* dareg = dareg (IMBL) */
+  /* dareg = dareg (IMBL)  */
   if (gs < 4 && gd < 4)
     goto valid_move;
 
@@ -2447,8 +2455,8 @@ decode_REGMV_0 (SIM_CPU *cpu, bu16 iw0)
     goto valid_move;
 
   /* USP can move between genregs (only check Accumulators).  */
-  if (((gs == 7 && src == 0) && (gd == 4 && dst < 4)) ||
-      ((gd == 7 && dst == 0) && (gs == 4 && src < 4)))
+  if (((gs == 7 && src == 0) && (gd == 4 && dst < 4))
+      || ((gd == 7 && dst == 0) && (gs == 4 && src < 4)))
     goto valid_move;
 
   /* Still here ?  Invalid reg pair.  */
@@ -2750,8 +2758,7 @@ decode_COMP3op_0 (SIM_CPU *cpu, bu16 iw0)
       const char *src1_name = get_preg_name (src1);
 
       /* If src0 == src1 this is disassembled as a shift by 1, but this
-       * distinction doesn't matter for our purposes.
-       */
+         distinction doesn't matter for our purposes.  */
       if (shift)
 	TRACE_INSN (cpu, "%s = (%s + %s) << %#x;",
 		    dst_name, src0_name, src1_name, shift);
@@ -2868,7 +2875,6 @@ decode_LDSTpmod_0 (SIM_CPU *cpu, bu16 iw0)
   else if (aop == 0 && W == 0)
     {
       TRACE_INSN (cpu, "R%i = [%s ++ %s];", reg, ptr_name, idx_name);
-      /* dregs = [pregs ++ pregs] */
       addr = PREG (ptr);
       val = GET_LONG (addr);
       STORE (DREG (reg), val);
@@ -3351,7 +3357,8 @@ decode_LDSTii_0 (SIM_CPU *cpu, bu16 iw0)
 	}
       else if (op == 3)
 	{
-	  TRACE_INSN (cpu, "%s = [%s + %s];", get_preg_name (reg), ptr_name, imm_str);
+	  TRACE_INSN (cpu, "%s = [%s + %s];",
+		      get_preg_name (reg), ptr_name, imm_str);
 	  SET_PREG (reg, GET_LONG (ea));
 	}
     }
@@ -3369,7 +3376,8 @@ decode_LDSTii_0 (SIM_CPU *cpu, bu16 iw0)
 	}
       else if (op == 3)
 	{
-	  TRACE_INSN (cpu, "[%s + %s] = %s;", ptr_name, imm_str, get_preg_name (reg));
+	  TRACE_INSN (cpu, "[%s + %s] = %s;",
+		      ptr_name, imm_str, get_preg_name (reg));
 	  PUT_LONG (ea, PREG (reg));
 	}
     }
@@ -3710,7 +3718,8 @@ decode_dsp32mac_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1)
   /* First handle MAC1 side.  */
   if (w1 == 1 || op1 != 3)
     {
-      bu32 res1 = decode_macfunc (cpu, 1, op1, h01, h11, src0, src1, mmod, MM, P, &v_i);
+      bu32 res1 = decode_macfunc (cpu, 1, op1, h01, h11, src0,
+				  src1, mmod, MM, P, &v_i);
 
       if (w1)
 	buf += sprintf (buf, P ? "R%i" : "R%i.H", dst + P);
@@ -3755,7 +3764,8 @@ decode_dsp32mac_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1)
   /* Then handle MAC0 side.  */
   if (w0 == 1 || op0 != 3)
     {
-      bu32 res0 = decode_macfunc (cpu, 0, op0, h00, h10, src0, src1, mmod, 0, P, &v_i);
+      bu32 res0 = decode_macfunc (cpu, 0, op0, h00, h10, src0,
+				  src1, mmod, 0, P, &v_i);
 
       if (w0)
 	buf += sprintf (buf, P ? "R%i" : "R%i.L", dst);
@@ -3962,18 +3972,18 @@ decode_dsp32alu_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1)
       TRACE_INSN (cpu, "R%i.%s = R%i %s R%i (RND12)", dst0, HL ? "L" : "H",
 		  src0, aop & 0x1 ? "-" : "+", src1);
 
-      /* If subtract, just invert and add one */
+      /* If subtract, just invert and add one.  */
       if (aop & 0x1)
 	val1 = ~val1 + 1;
 
-      /* Get the sign bits, since we need them later */
+      /* Get the sign bits, since we need them later.  */
       sBit1 = !!(val0 & 0x80000000);
       sBit2 = !!(val1 & 0x80000000);
 
       res = val0 + val1;
 
       sBitRes1 = !!(res & 0x80000000);
-      /* Round to the 12th bit */
+      /* Round to the 12th bit.  */
       res += 0x0800;
       sBitRes2 = !!(res & 0x80000000);
 
@@ -3981,22 +3991,21 @@ decode_dsp32alu_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1)
       signRes >>= 27;
 
       /* Overflow if
-       * pos + pos = neg
-       * neg + neg = pos
-       * positive_res + positive_round = neg
-       * shift and upper 4 bits where not the same
-       */
-      if ((!(sBit1 ^ sBit2) && (sBit1 ^ sBitRes1)) ||
-	  (!sBit1 && !sBit2 && sBitRes2) ||
-	  ((signRes != 0) && (signRes != -1)))
+           pos + pos = neg
+           neg + neg = pos
+           positive_res + positive_round = neg
+         Shift and upper 4 bits where not the same.  */
+      if ((!(sBit1 ^ sBit2) && (sBit1 ^ sBitRes1))
+	  || (!sBit1 && !sBit2 && sBitRes2)
+	  || ((signRes != 0) && (signRes != -1)))
 	{
-	  /* Both X1 and X2 Neg res is neg overflow */
+	  /* Both X1 and X2 Neg res is neg overflow.  */
 	  if (sBit1 && sBit2)
 	    res = 0x80000000;
-	  /* Both X1 and X2 Pos res is pos overflow */
+	  /* Both X1 and X2 Pos res is pos overflow.  */
 	  else if (!sBit1 && !sBit2)
 	    res = 0x7FFFFFFF;
-	  /* Pos+Neg or Neg+Pos take the sign of the result */
+	  /* Pos+Neg or Neg+Pos take the sign of the result.  */
 	  else if (sBitRes1)
 	    res = 0x80000000;
 	  else
@@ -4006,7 +4015,7 @@ decode_dsp32alu_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1)
 	}
       else
 	{
-	  /* Shift up now after overflow detection */
+	  /* Shift up now after overflow detection.  */
 	  ovX = 0;
 	  res <<= 4;
 	}
@@ -4033,16 +4042,16 @@ decode_dsp32alu_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1)
       TRACE_INSN (cpu, "R%i.%s = R%i %s R%i (RND20)", dst0, HL ? "L" : "H",
 		  src0, aop & 0x1 ? "-" : "+", src1);
 
-      /* If subtract, just invert and add one */
+      /* If subtract, just invert and add one.  */
       if (aop & 0x1)
 	val1 = ~val1 + 1;
 
       res = (val0 >> 4) + (val1 >> 4) + (((val0 & 0xf) + (val1 & 0xf)) >> 4);
       res += 0x8000;
-      /* Don't sign extend during the shift */
+      /* Don't sign extend during the shift.  */
       res = ((bu32)res >> 16);
 
-      /* Don't worry about overflows, since we are shifting right */
+      /* Don't worry about overflows, since we are shifting right.  */
 
       if (HL)
 	STORE (DREG (dst0), REG_H_L (res << 16, DREG (dst0)));
@@ -4115,7 +4124,7 @@ decode_dsp32alu_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1)
 
       if (s == 1)
 	{
-	  /* A0 -= A1 (W32) */
+	  /* A0 -= A1 (W32)  */
 	  if (acc0 & (bu64)0x8000000000ll)
 	    acc0 &= 0x80ffffffffll, sat = 1;
 	  else
@@ -4217,7 +4226,7 @@ decode_dsp32alu_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1)
 	acc1 = 1;
 
       SET_ASTATREG (az, (acc0 == 0) || (acc1 == 0));
-      SET_ASTATREG (an, ((acc0 >> 31) & 1) || ((acc1 >> 31) & 1) );
+      SET_ASTATREG (an, ((acc0 >> 31) & 1) || ((acc1 >> 31) & 1));
     }
   else if (aop == 3 && (s == 0 || s == 1) && aopcde == 8)
     {
@@ -4313,14 +4322,15 @@ decode_dsp32alu_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1)
       bool sBit_a, sBit_b;
 
       TRACE_INSN (cpu, "R%i.%s = R%i (RND);", dst0, HL == 0 ? "L" : "H", src0);
-      TRACE_DECODE (cpu, "R%i.%s = R%i:%#x (RND);", dst0, HL == 0 ? "L" : "H", src0, res);
+      TRACE_DECODE (cpu, "R%i.%s = R%i:%#x (RND);", dst0,
+		    HL == 0 ? "L" : "H", src0, res);
 
       sBit_b = !!(res & 0x80000000);
 
       res += 0x8000;
       sBit_a = !!(res & 0x80000000);
 
-      /* Overflow if the sign bit changed when we rounded */
+      /* Overflow if the sign bit changed when we rounded.  */
       if ((res >> 16) && (sBit_b != sBit_a))
 	{
 	  ovX = 1;
@@ -4474,8 +4484,8 @@ decode_dsp32alu_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1)
     }
   else if (aop == 1 && aopcde == 12)
     {
-      bu32 val0 = (((AWREG (0) & 0xFFFF0000) >> 16) + (AWREG (0) & 0xFFFF)) & 0xFFFF;
-      bu32 val1 = (((AWREG (1) & 0xFFFF0000) >> 16) + (AWREG (1) & 0xFFFF)) & 0xFFFF;
+      bu32 val0 = ((AWREG (0) >> 16) + (AWREG (0) & 0xFFFF)) & 0xFFFF;
+      bu32 val1 = ((AWREG (1) >> 16) + (AWREG (1) & 0xFFFF)) & 0xFFFF;
 
       TRACE_INSN (cpu, "R%i = A1.L + A1.H, R%i = A0.L + A0.H;", dst1, dst0);
 
@@ -4562,7 +4572,7 @@ decode_dsp32alu_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1)
       acc0 += acc1;
       acc0 = saturate_s40_astat (acc0, &v);
 
-      if (aop == 2 && s == 1)   /* A0 += A1 (W32) */
+      if (aop == 2 && s == 1)   /* A0 += A1 (W32)  */
 	{
 	  if (acc0 & (bs40)0x8000000000ll)
 	    acc0 &= 0x80ffffffffll;
@@ -4578,7 +4588,7 @@ decode_dsp32alu_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1)
 
       if (aop == 0 || aop == 1)
 	{
-	  if (aop)	/* Dregs_lo = A0 += A1 */
+	  if (aop)	/* Dregs_lo = A0 += A1  */
 	    {
 	      dreg = saturate_s32 (rnd16 (acc0) << 16, &sat);
 	      if (HL)
@@ -4586,7 +4596,7 @@ decode_dsp32alu_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1)
 	      else
 		STORE (DREG (dst0), REG_H_L (DREG (dst0), dreg >> 16));
 	    }
-	  else		/* Dregs = A0 += A1 */
+	  else		/* Dregs = A0 += A1  */
 	    {
 	      dreg = saturate_s32 (acc0, &sat);
 	      STORE (DREG (dst0), dreg);
@@ -4646,8 +4656,9 @@ decode_dsp32alu_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1)
 		  dst1, !aop, aop, dst0, !aop, aop, amod1 (s, x));
       TRACE_DECODE (cpu, "R%i = A%i:%#"PRIx64" + A%i:%#"PRIx64", "
 			 "R%i = A%i:%#"PRIx64" - A%i:%#"PRIx64"%s",
-		dst1, !aop, aop ? acc0 : acc1, aop, aop ? acc1 : acc0,
-		dst0, !aop, aop ? acc0 : acc1, aop, aop ? acc1 : acc0, amod1 (s, x));
+		    dst1, !aop, aop ? acc0 : acc1, aop, aop ? acc1 : acc0,
+		    dst0, !aop, aop ? acc0 : acc1, aop, aop ? acc1 : acc0,
+		    amod1 (s, x));
 
       if (dst0 == dst1)
 	illegal_instruction_combination (cpu);
@@ -4692,7 +4703,7 @@ decode_dsp32alu_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1)
       bu32 s0, s1;
       bs16 tmp0, tmp1, tmp2, tmp3;
 
-      /* This instruction is only defined for register pairs R1:0 and R3:2 */
+      /* This instruction is only defined for register pairs R1:0 and R3:2.  */
       if (!((src0 == 0 || src0 == 2) && (src1 == 0 || src1 == 2)))
 	illegal_instruction (cpu);
 
@@ -4700,9 +4711,8 @@ decode_dsp32alu_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1)
 		  src1 + 1, src1, s ? " (R)" :"");
 
       /* Bit s determines the order of the two registers from a pair:
-       * if s=0 the low-order bytes come from the low reg in the pair,
-       * and if s=1 the low-order bytes come from the high reg.
-       */
+         if s=0 the low-order bytes come from the low reg in the pair,
+         and if s=1 the low-order bytes come from the high reg.  */
 
       if (s)
 	{
@@ -4715,10 +4725,9 @@ decode_dsp32alu_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1)
 	  s1 = algn (s1L, s1H, IREG (1) & 3);
 	}
 
-      /* find the absolute difference between pairs,
-       * make it absolute, then add it to the existing accumulator half
-       */
-      /* Byte 0 */
+      /* Find the absolute difference between pairs, make it
+         absolute, then add it to the existing accumulator half.  */
+      /* Byte 0  */
       tmp0  = ((s0 << 24) >> 24) - ((s1 << 24) >> 24);
       tmp1  = ((s0 << 16) >> 24) - ((s1 << 16) >> 24);
       tmp2  = ((s0 <<  8) >> 24) - ((s1 <<  8) >> 24);
@@ -5050,8 +5059,7 @@ decode_dsp32shift_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1)
 	val = (bu16)((DREG (src1) & 0xFFFF0000) >> 16);
 
       /* Positive shift magnitudes produce Logical Left shifts.
-       * Negative shift magnitudes produce Arithmetic Right shifts.
-       */
+         Negative shift magnitudes produce Arithmetic Right shifts.  */
       if (shft <= 0)
 	val = ashiftrt (cpu, val, -shft, 16);
       else
@@ -5167,8 +5175,8 @@ decode_dsp32shift_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1)
     }
   else if ((sop == 0 || sop == 1 || sop == 2) && sopcde == 2)
     {
-      /* dregs = [LA]SHIFT dregs BY dregs_lo (opt_S) */
-      /* sop == 1 : opt_S */
+      /* dregs = [LA]SHIFT dregs BY dregs_lo (opt_S)  */
+      /* sop == 1 : opt_S  */
       bu32 v = DREG (src1);
       /* LSHIFT uses sign extended low 6 bits of dregs_lo.  */
       bs32 shft = (bs8)(DREG (src0) << 2) >> 2;
@@ -5289,10 +5297,8 @@ decode_dsp32shift_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1)
     }
   else if (sop == 1 && sopcde == 7)
     {
-      /*
-       * Exponent adjust on two 16-bit inputs. Select smallest norm
-       * among 3 inputs
-       */
+      /* Exponent adjust on two 16-bit inputs.  Select
+         smallest norm among 3 inputs.  */
       bs16 src1_hi = (DREG (src1) & 0xFFFF0000) >> 16;
       bs16 src1_lo = (DREG (src1) & 0xFFFF);
       bu16 src0_lo = (DREG (src0) & 0xFFFF);
@@ -5317,9 +5323,7 @@ decode_dsp32shift_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1)
     }
   else if (sop == 2 && sopcde == 7)
     {
-      /*
-       * exponent adjust on single 16-bit register
-       */
+      /* Exponent adjust on single 16-bit register.  */
       bu16 tmp;
       bu16 src0_lo = (bu16)(DREG (src0) & 0xFFFF);
 
@@ -5477,13 +5481,12 @@ decode_dsp32shift_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1)
   else if ((sop == 2 || sop == 3) && sopcde == 10)
     {
       /* The first dregs is the "background" while the second dregs is the
-       * "foreground".  The fg reg is used to overlay the bg reg and is:
-       * | nnnn nnnn | nnnn nnnn | xxxp pppp | xxxL LLLL |
-       *  n = the fg bit field
-       *  p = bit position in bg reg to start LSB of fg field
-       *  L = number of fg bits to extract
-       * Using (X) sign-extends the fg bit field.
-       */
+         "foreground".  The fg reg is used to overlay the bg reg and is:
+         | nnnn nnnn | nnnn nnnn | xxxp pppp | xxxL LLLL |
+           n = the fg bit field
+           p = bit position in bg reg to start LSB of fg field
+           L = number of fg bits to extract
+         Using (X) sign-extends the fg bit field.  */
       bu32 fg = DREG (src0);
       bu32 bg = DREG (src1);
       bu32 len = fg & 0x1f;
@@ -5940,7 +5943,7 @@ _interp_insn_bfin (SIM_CPU *cpu, bu32 pc)
   iw0 = IFETCH (pc);
   if ((iw0 & 0xc000) != 0xc000)
     {
-      /* 16-bit opcode */
+      /* 16-bit opcode.  */
       insn_len = 2;
       if (INSN_LEN == 0)
 	INSN_LEN = insn_len;
@@ -6004,7 +6007,7 @@ _interp_insn_bfin (SIM_CPU *cpu, bu32 pc)
 
   /* Grab the next 16 bits to determine if it's a 32-bit or 64-bit opcode.  */
   iw1 = IFETCH (pc + 2);
-  if ((iw0 & BIT_MULTI_INS) && (iw0 & 0xe800) != 0xe800 /* not linkage */)
+  if ((iw0 & BIT_MULTI_INS) && (iw0 & 0xe800) != 0xe800 /* not linkage  */)
     {
       SIM_DESC sd = CPU_STATE (cpu);
       trace_prefix (sd, cpu, NULL_CIA, pc, TRACE_LINENUM_P (cpu),
@@ -6084,7 +6087,8 @@ interp_insn_bfin (SIM_CPU *cpu, bu32 pc)
     {
       bu32 *addr = BFIN_CPU_STATE.stores[i].addr;
       *addr = BFIN_CPU_STATE.stores[i].val;
-      TRACE_REGISTER (cpu, "dequeuing write %s = %#x", get_store_name (cpu, addr), *addr);
+      TRACE_REGISTER (cpu, "dequeuing write %s = %#x",
+		      get_store_name (cpu, addr), *addr);
     }
 
   cycles_inc (cpu, CYCLE_DELAY);

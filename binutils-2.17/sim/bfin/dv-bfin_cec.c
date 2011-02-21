@@ -317,16 +317,15 @@ cec_exception (SIM_CPU *cpu, int excp)
 		cec_get_ivg (cpu));
 
   /* Ideally what would happen here for real hardware exceptions (not
-   * fake sim ones) is that:
-   *  - For service exceptions (excp <= 0x11):
-   *     RETX is the _next_ PC which can be tricky with jumps/hardware loops/...
-   *  - For error exceptions (excp > 0x11):
-   *     RETX is the _current_ PC (i.e. the one causing the exception)
-   *  - PC is loaded with EVT3 MMR
-   *  - ILAT/IPEND in CEC is updated depending on current IVG level
-   *  - the fault address MMRs get updated with data/instruction info
-   *  - Execution continues on in the EVT3 handler
-   */
+     fake sim ones) is that:
+      - For service exceptions (excp <= 0x11):
+         RETX is the _next_ PC which can be tricky with jumps/hardware loops/...
+      - For error exceptions (excp > 0x11):
+         RETX is the _current_ PC (i.e. the one causing the exception)
+      - PC is loaded with EVT3 MMR
+      - ILAT/IPEND in CEC is updated depending on current IVG level
+      - the fault address MMRs get updated with data/instruction info
+      - Execution continues on in the EVT3 handler  */
 
   /* Handle simulator exceptions first.  */
   switch (excp)
@@ -361,10 +360,10 @@ cec_exception (SIM_CPU *cpu, int excp)
 	{
 	  /* ICPLB regs always get updated.  */
 	  /* XXX: Should optimize this call path ...  */
-	  if (excp != VEC_MISALI_I && excp != VEC_MISALI_D &&
-	      excp != VEC_CPLB_I_M && excp != VEC_CPLB_M &&
-	      excp != VEC_CPLB_I_VL && excp != VEC_CPLB_VL &&
-	      excp != VEC_CPLB_I_MHIT && excp != VEC_CPLB_MHIT)
+	  if (excp != VEC_MISALI_I && excp != VEC_MISALI_D
+	      && excp != VEC_CPLB_I_M && excp != VEC_CPLB_M
+	      && excp != VEC_CPLB_I_VL && excp != VEC_CPLB_VL
+	      && excp != VEC_CPLB_I_MHIT && excp != VEC_CPLB_MHIT)
 	    mmu_log_ifault (cpu);
 	  _cec_raise (cpu, CEC_STATE (cpu), IVG_EVX);
 	  /* We need to restart the engine so that we don't return
@@ -383,16 +382,16 @@ cec_exception (SIM_CPU *cpu, int excp)
       bfin_syscall (cpu);
       break;
 
-    case VEC_EXCPT01:	/* userspace gdb breakpoint */
+    case VEC_EXCPT01:	/* Userspace gdb breakpoint.  */
       sigrc = SIM_SIGTRAP;
       break;
 
-    case VEC_UNDEF_I:	/* undefined instruction */
+    case VEC_UNDEF_I:	/* Undefined instruction.  */
       sigrc = SIM_SIGILL;
       break;
 
-    case VEC_ILL_RES:	/* illegal supervisor resource */
-    case VEC_MISALI_I:	/* misaligned instruction */
+    case VEC_ILL_RES:	/* Illegal supervisor resource.  */
+    case VEC_MISALI_I:	/* Misaligned instruction.  */
       sigrc = SIM_SIGBUS;
       break;
 
@@ -516,9 +515,9 @@ _cec_raise (SIM_CPU *cpu, struct bfin_cec *cec, int ivg)
       /* Anything lower might trigger a double fault.  */
       if (curr_ivg <= ivg)
 	{
-	  /* Double fault ! :( */
+	  /* Double fault ! :(  */
 	  SET_EXCAUSE (VEC_UNCOV);
-	  /* XXX: SET_RETXREG (...); */
+	  /* XXX: SET_RETXREG (...);  */
 	  sim_io_error (sd, "%s: double fault at 0x%08x ! :(", __func__, PCREG);
 	  excp_to_sim_halt (sim_stopped, SIM_SIGABRT);
 	}
@@ -536,7 +535,7 @@ _cec_raise (SIM_CPU *cpu, struct bfin_cec *cec, int ivg)
     }
   else if (ivg < curr_ivg || (snen && ivg == curr_ivg))
     {
-      /* Do transition! */
+      /* Do transition!  */
       bu32 oldpc;
 
  process_int:
@@ -604,7 +603,7 @@ _cec_raise (SIM_CPU *cpu, struct bfin_cec *cec, int ivg)
 	cec_irpten_enable (cpu, cec);
     }
 
-  /* When moving between states, don't let internal states bleed through */
+  /* When moving between states, don't let internal states bleed through.  */
   DIS_ALGN_EXPT &= ~1;
 
   /* When going from user to super, we set LSB in LB regs to avoid
@@ -725,8 +724,8 @@ cec_return (SIM_CPU *cpu, int ivg)
     default:
       /* RTI -- not valid in emulation, nmi, exception, or user.  */
       /* XXX: What does the hardware do ?  */
-      if (curr_ivg == IVG_EMU || curr_ivg == IVG_NMI ||
-	  curr_ivg == IVG_EVX || curr_ivg == IVG_USER)
+      if (curr_ivg == IVG_EMU || curr_ivg == IVG_NMI
+	  || curr_ivg == IVG_EVX || curr_ivg == IVG_USER)
 	cec_exception (cpu, VEC_ILL_RES);
       break;
     case IVG_IRPTEN:

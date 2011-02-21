@@ -794,19 +794,19 @@ bfin_model_hw_tree_init (SIM_DESC sd, SIM_CPU *cpu)
       sim_hw_parse (sd, "/core/%s/type %i", dev->dev, mdata->model_num);
       if (strchr (dev->dev, '/'))
 	continue;
-      if (!strncmp (dev->dev, "bfin_uart", 9) ||
-	  !strncmp (dev->dev, "bfin_emac", 9) ||
-	  !strncmp (dev->dev, "bfin_sport", 10))
+      if (!strncmp (dev->dev, "bfin_uart", 9)
+	  || !strncmp (dev->dev, "bfin_emac", 9)
+	  || !strncmp (dev->dev, "bfin_sport", 10))
 	{
 	  const char *sint = dev->dev + 5;
 	  sim_hw_parse (sd, "/core/%s > tx   %s_tx   /core/bfin_dmac@%u", dev->dev, sint, dev->dmac);
 	  sim_hw_parse (sd, "/core/%s > rx   %s_rx   /core/bfin_dmac@%u", dev->dev, sint, dev->dmac);
 	  sim_hw_parse (sd, "/core/%s > stat %s_stat /core/bfin_sic", dev->dev, sint);
 	}
-      else if (!strncmp (dev->dev, "bfin_gptimer", 12) ||
-	       !strncmp (dev->dev, "bfin_ppi", 8) ||
-	       !strncmp (dev->dev, "bfin_spi", 8) ||
-	       !strncmp (dev->dev, "bfin_twi", 8))
+      else if (!strncmp (dev->dev, "bfin_gptimer", 12)
+	       || !strncmp (dev->dev, "bfin_ppi", 8)
+	       || !strncmp (dev->dev, "bfin_spi", 8)
+	       || !strncmp (dev->dev, "bfin_twi", 8))
 	{
 	  const char *sint = dev->dev + 5;
 	  sim_hw_parse (sd, "/core/%s > stat %s /core/bfin_sic", dev->dev, sint);

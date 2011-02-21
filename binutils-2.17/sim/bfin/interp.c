@@ -28,7 +28,7 @@
 #include <signal.h>
 #include <errno.h>
 #include <fcntl.h>
-#include <unistd.h>	/* dup2 */
+#include <unistd.h>
 #include <sys/time.h>
 
 #include "gdb/callback.h"
@@ -100,7 +100,7 @@ static const char stat_map_32[] =
 "st_dev,8:space,2:space,2:st_ino,4:st_mode,4:st_nlink,4:st_uid,4:st_gid,4:"
 "st_rdev,8:space,2:space,2:st_size,4:st_blksiez,4:st_blocks,4:st_atime,4:"
 "st_atimensec,4:st_mtime,4:st_mtimensec,4:st_ctime,4:st_ctimensec,4:space,4:"
-"space,4"; */
+"space,4";  */
 static const char stat_map_64[] =
 "st_dev,8:space,4:space,4:st_mode,4:st_nlink,4:st_uid,4:st_gid,4:st_rdev,8:"
 "space,4:st_size,8:st_blksize,4:st_blocks,8:st_atime,4:st_atimensec,4:"
@@ -625,8 +625,8 @@ step_once (SIM_CPU *cpu)
   /* Handle hardware single stepping when lower than EVT3, and when SYSCFG
      has already had the SSSTEP bit enabled.  */
   ssstep = false;
-  if (STATE_ENVIRONMENT (sd) == OPERATING_ENVIRONMENT &&
-      (SYSCFGREG & SYSCFG_SSSTEP))
+  if (STATE_ENVIRONMENT (sd) == OPERATING_ENVIRONMENT
+      && (SYSCFGREG & SYSCFG_SSSTEP))
     {
       int ivg = cec_get_ivg (cpu);
       if (ivg == -1 || ivg > 3)
@@ -675,9 +675,9 @@ step_once (SIM_CPU *cpu)
 
 void
 sim_engine_run (SIM_DESC sd,
-		int next_cpu_nr, /* ignore */
-		int nr_cpus, /* ignore */
-		int siggnal) /* ignore */
+		int next_cpu_nr, /* ignore  */
+		int nr_cpus, /* ignore  */
+		int siggnal) /* ignore  */
 {
   bu32 ticks;
   SIM_CPU *cpu;
@@ -933,8 +933,8 @@ bfin_fdpic_load (SIM_DESC sd, SIM_CPU *cpu, struct bfd *abfd, bu32 *sp,
 	if (memsz != filesz)
 	  memset (data + filesz, 0, memsz - filesz);
 
-	if (bfd_seek (abfd, p->p_offset, SEEK_SET) == 0 &&
-	    bfd_bread (data, filesz, abfd) == filesz)
+	if (bfd_seek (abfd, p->p_offset, SEEK_SET) == 0
+	    && bfd_bread (data, filesz, abfd) == filesz)
 	  sim_write (sd, paddr, data, memsz);
 
 	free (data);
@@ -942,9 +942,9 @@ bfin_fdpic_load (SIM_DESC sd, SIM_CPU *cpu, struct bfd *abfd, bu32 *sp,
 	max_load_addr = MAX (paddr + memsz, max_load_addr);
 
 	*sp -= 12;
-	sim_write (sd, *sp+0, (void *)&paddr, 4); /* loadseg.addr */
-	sim_write (sd, *sp+4, (void *)&vaddr, 4); /* loadseg.p_vaddr */
-	sim_write (sd, *sp+8, (void *)&memsz, 4); /* loadseg.p_memsz */
+	sim_write (sd, *sp+0, (void *)&paddr, 4); /* loadseg.addr  */
+	sim_write (sd, *sp+4, (void *)&vaddr, 4); /* loadseg.p_vaddr  */
+	sim_write (sd, *sp+8, (void *)&memsz, 4); /* loadseg.p_memsz  */
 	++nsegs;
       }
     else if (phdrs[i].p_type == PT_DYNAMIC)
@@ -959,8 +959,8 @@ bfin_fdpic_load (SIM_DESC sd, SIM_CPU *cpu, struct bfd *abfd, bu32 *sp,
 	uint32_t len = phdrs[i].p_filesz;
 
 	*ldso_path = xmalloc (len);
-	if (bfd_seek (abfd, off, SEEK_SET) != 0 ||
-	    bfd_bread (*ldso_path, len, abfd) != len)
+	if (bfd_seek (abfd, off, SEEK_SET) != 0
+	    || bfd_bread (*ldso_path, len, abfd) != len)
 	  {
 	    free (*ldso_path);
 	    *ldso_path = NULL;
@@ -975,8 +975,8 @@ bfin_fdpic_load (SIM_DESC sd, SIM_CPU *cpu, struct bfd *abfd, bu32 *sp,
 
   /* Push the summary loadmap info onto the stack last.  */
   *sp -= 4;
-  sim_write (sd, *sp+0, null, 2); /* loadmap.version */
-  sim_write (sd, *sp+2, (void *)&nsegs, 2); /* loadmap.nsegs */
+  sim_write (sd, *sp+0, null, 2); /* loadmap.version  */
+  sim_write (sd, *sp+2, (void *)&nsegs, 2); /* loadmap.nsegs  */
 
   ret = true;
  skip_fdpic_init:
@@ -1012,7 +1012,7 @@ bfin_user_init (SIM_DESC sd, SIM_CPU *cpu, struct bfd *abfd,
 
   bu32 sp, sp_flat;
 
-  /* start, at_phdr, at_phnum, at_base, at_entry, pt_dynamic */
+  /* start, at_phdr, at_phnum, at_base, at_entry, pt_dynamic  */
   bu32 elf_addrs[6];
   bu32 auxvt, auxvt_size;
   bu32 exec_loadmap, ldso_loadmap;
@@ -1084,14 +1084,14 @@ bfin_user_init (SIM_DESC sd, SIM_CPU *cpu, struct bfd *abfd,
   argc = count_argc (argv);
   if (argc == -1)
     argc = 0;
-  argv_flat = argc; /* NUL bytes */
+  argv_flat = argc; /* NUL bytes  */
   for (i = 0; i < argc; ++i)
     argv_flat += strlen (argv[i]);
 
   if (!env)
     env = simple_env;
   envc = count_argc (env);
-  env_flat = envc; /* NUL bytes */
+  env_flat = envc; /* NUL bytes  */
   for (i = 0; i < envc; ++i)
     env_flat += strlen (env[i]);
 
