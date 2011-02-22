@@ -1,4 +1,4 @@
-/* Simulator for Analog Devices Blackfin processors.
+/* Blackfin instruction classes list
 
    Copyright (C) 2005-2011 Free Software Foundation, Inc.
    Contributed by Analog Devices, Inc.
@@ -20,39 +20,45 @@
    Foundation, Inc., 51 Franklin Street, Fifth Floor,
    Boston, MA 02110-1301, USA.  */
 
-#ifndef _BFIN_MACHS_H_
-#define _BFIN_MACHS_H_
-
-typedef enum model_type {
-#define P(n) MODEL_BF##n,
-#include "proc_list.def"
-#undef P
-  MODEL_MAX
-} MODEL_TYPE;
-
-typedef enum mach_attr {
-  MACH_BASE,
-  MACH_BFIN,
-  MACH_MAX
-} MACH_ATTR;
-
-#define CPU_MODEL_NUM(cpu) MODEL_NUM (CPU_MODEL (cpu))
-
-/* XXX: Some of this probably belongs in CPU_MODEL.  */
-struct bfin_board_data {
-  unsigned int sirev, sirev_valid;
-  const char *hw_file;
-};
-
-void bfin_model_cpu_init (SIM_DESC, SIM_CPU *);
-bu32 bfin_model_get_chipid (SIM_DESC);
-bu32 bfin_model_get_dspid (SIM_DESC);
-
-enum {
-#define I(insn) BFIN_INSN_##insn,
-#include "insn_list.def"
-#undef I
-  BFIN_INSN_MAX
-};
-
-#endif
+/* Only bother with insn groups rather than exact insn (for now?).  */
+I(ProgCtrl_nop)
+I(ProgCtrl_branch)
+I(ProgCtrl_sync)
+I(ProgCtrl_cec)
+I(ProgCtrl_atomic)
+I(CaCTRL)
+I(PushPopReg)
+I(PushPopMultiple)
+I(ccMV)
+I(CCflag)
+I(CC2dreg)
+I(CC2stat)
+I(BRCC)
+I(UJUMP)
+I(REGMV)
+I(ALU2op)
+I(PTR2op)
+I(LOGI2op)
+I(COMP3op)
+I(COMPI2opD)
+I(COMPI2opP)
+I(LDSTpmod)
+I(dagMODim)
+I(dagMODik)
+I(dspLDST)
+I(LDST)
+I(LDSTiiFP)
+I(LDSTii)
+I(LoopSetup)
+I(LDIMMhalf)
+I(CALLa)
+I(LDSTidxI)
+I(linkage)
+I(dsp32mac)
+I(dsp32mult)
+I(dsp32alu)
+I(dsp32shift)
+I(dsp32shiftimm)
+I(psedoDEBUG)
+I(psedoOChar)
+I(psedodbg_assert)

@@ -700,7 +700,7 @@ static const struct bfin_model_data bfin_model_data[] =
     bf##n##_dev , ARRAY_SIZE (bf##n##_dev ), \
     bf##n##_dmac, ARRAY_SIZE (bf##n##_dmac), \
   },
-#include "_proc_list.h"
+#include "proc_list.def"
 #undef P
 };
 
@@ -1185,7 +1185,7 @@ bfin_insn_name (SIM_CPU *cpu, int i)
 {
   static const char * const insn_name[] = {
 #define I(insn) #insn,
-#include "_insn_list.h"
+#include "insn_list.def"
 #undef I
   };
   return insn_name[i];
@@ -1210,7 +1210,7 @@ bfin_prepare_run (SIM_CPU *cpu)
 static const MODEL bfin_models[] =
 {
 #define P(n) { "bf"#n, & bfin_mach, MODEL_BF##n, NULL, bfin_model_init },
-#include "_proc_list.h"
+#include "proc_list.def"
 #undef P
   { 0, NULL, 0, NULL, NULL, }
 };

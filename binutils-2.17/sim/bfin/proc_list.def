@@ -1,4 +1,4 @@
-/* Simulator for Analog Devices Blackfin processors.
+/* Blackfin processor list
 
    Copyright (C) 2005-2011 Free Software Foundation, Inc.
    Contributed by Analog Devices, Inc.
@@ -20,39 +20,33 @@
    Foundation, Inc., 51 Franklin Street, Fifth Floor,
    Boston, MA 02110-1301, USA.  */
 
-#ifndef _BFIN_MACHS_H_
-#define _BFIN_MACHS_H_
-
-typedef enum model_type {
-#define P(n) MODEL_BF##n,
-#include "proc_list.def"
-#undef P
-  MODEL_MAX
-} MODEL_TYPE;
-
-typedef enum mach_attr {
-  MACH_BASE,
-  MACH_BFIN,
-  MACH_MAX
-} MACH_ATTR;
-
-#define CPU_MODEL_NUM(cpu) MODEL_NUM (CPU_MODEL (cpu))
-
-/* XXX: Some of this probably belongs in CPU_MODEL.  */
-struct bfin_board_data {
-  unsigned int sirev, sirev_valid;
-  const char *hw_file;
-};
-
-void bfin_model_cpu_init (SIM_DESC, SIM_CPU *);
-bu32 bfin_model_get_chipid (SIM_DESC);
-bu32 bfin_model_get_dspid (SIM_DESC);
-
-enum {
-#define I(insn) BFIN_INSN_##insn,
-#include "insn_list.def"
-#undef I
-  BFIN_INSN_MAX
-};
-
-#endif
+/* First entry is the default model.  */
+P(537)
+P(504)
+P(506)
+P(512)
+P(514)
+P(516)
+P(518)
+P(522)
+P(523)
+P(524)
+P(525)
+P(526)
+P(527)
+P(531)
+P(532)
+P(533)
+P(534)
+/*P(535)*/
+P(536)
+P(538)
+P(539)
+P(542)
+P(544)
+P(547)
+P(548)
+P(549)
+P(561)
+P(592)
+P(000)
