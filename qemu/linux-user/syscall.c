@@ -4247,6 +4247,14 @@ static inline abi_long host_to_target_stat64(void *cpu_env,
 }
 #endif
 
+#ifdef TARGET_NR_sram_alloc
+struct sram_frag {
+    struct sram_frag *next;
+    abi_ulong addr, size;
+};
+static struct sram_frag *sfrags;
+#endif
+
 #if defined(CONFIG_USE_NPTL)
 /* ??? Using host futex calls even when target atomic operations
    are not really atomic probably breaks things.  However implementing
@@ -5423,6 +5431,7 @@ abi_long do_syscall(void *cpu_env, int num, abi_long arg1,
 
             if (!lock_user_struct(VERIFY_READ, sel, arg1, 1))
                 goto efault;
+
             nsel = tswapl(sel->n);
             inp = tswapl(sel->inp);
             outp = tswapl(sel->outp);
@@ -5432,10 +5441,6 @@ abi_long do_syscall(void *cpu_env, int num, abi_long arg1,
             ret = do_select(nsel, inp, outp, exp, tvp);
         }
         break;
-#endif
-#ifdef TARGET_NR_pselect6
-    case TARGET_NR_pselect6:
-	    goto unimplemented_nowarn;
 #endif
     case TARGET_NR_symlink:
         {
@@ -5607,6 +5612,72 @@ abi_long do_syscall(void *cpu_env, int num, abi_long arg1,
 #ifdef TARGET_NR_munlockall
     case TARGET_NR_munlockall:
         ret = get_errno(munlockall());
+        break;
+#endif
+#ifdef TARGET_NR_sram_alloc
+    case TARGET_NR_sram_alloc:
+        {
+            /* We don't want L1 insn to be read/write, but doing that
+             * keeps standard qemu funcs from being able to read/write
+             * that too.  So grant r/w access to all. */
+            int prot = PROT_READ | PROT_WRITE;
+            if ((arg2 & 1 /*L1_INST_SRAM*/) || (arg2 & 8 /*L2_SRAM*/)) {
+                prot |= PROT_EXEC;
+            }
+
+            ret = get_errno(target_mmap(0, arg1, prot, MAP_PRIVATE |
+                                        MAP_ANONYMOUS, -1, 0));
+
+            if (!is_error(ret)) {
+                struct sram_frag *sf = malloc(sizeof(*sf));
+                sf->addr = ret;
+                sf->size = arg1;
+                if (sfrags) {
+                    sf->next = sfrags;
+                    sfrags = sf;
+                } else {
+                    sf->next = NULL;
+                    sfrags = sf;
+                }
+            }
+        }
+        break;
+#endif
+#ifdef TARGET_NR_sram_free
+    case TARGET_NR_sram_free:
+        {
+            struct sram_frag *sf, *prev;
+
+            ret = -TARGET_EINVAL;
+
+            sf = prev = sfrags;
+            while (sf) {
+                if (sf->addr == arg1) {
+                    ret = get_errno(target_munmap(arg1, sf->size));
+                    if (!is_error(ret)) {
+                        if (sfrags == sf) {
+                            sfrags = sf->next;
+                        } else {
+                            prev->next = sf->next;
+                        }
+                        free(sf);
+                    }
+                    break;
+                }
+                prev = sf;
+                sf = sf->next;
+            }
+        }
+        break;
+#endif
+#ifdef TARGET_NR_dma_memcpy
+    case TARGET_NR_dma_memcpy:
+        p = alloca(arg3);
+        if (copy_from_user(p, arg2, arg3))
+            goto efault;
+        if (copy_to_user(arg1, p, arg3))
+            goto efault;
+        ret = arg1;
         break;
 #endif
     case TARGET_NR_truncate:
@@ -6225,9 +6296,32 @@ abi_long do_syscall(void *cpu_env, int num, abi_long arg1,
         }
         break;
 #endif /* TARGET_NR_getdents64 */
-#ifdef TARGET_NR__newselect
+#if defined(TARGET_NR__newselect) || defined(TARGET_NR_pselect6)
+# ifdef TARGET_NR__newselect
     case TARGET_NR__newselect:
-        ret = do_select(arg1, arg2, arg3, arg4, arg5);
+# endif
+# ifdef TARGET_NR_pselect6
+    case TARGET_NR_pselect6:
+# endif
+        {
+            sigset_t origmask;
+
+            if (num == TARGET_NR_pselect6) {
+                sigset_t set;
+                abi_ulong mask;
+
+                /* XXX: convert arg5 timespec into timeval */
+
+                mask = arg6;
+                target_to_host_old_sigset(&set, &mask);
+                sigprocmask(SIG_SETMASK, &set, &origmask);
+            }
+
+            ret = do_select(arg1, arg2, arg3, arg4, arg5);
+
+            if (num == TARGET_NR_pselect6)
+                 sigprocmask(SIG_SETMASK, &origmask, NULL);
+        }
         break;
 #endif
 #ifdef TARGET_NR_poll
@@ -6451,7 +6545,7 @@ abi_long do_syscall(void *cpu_env, int num, abi_long arg1,
     case TARGET_NR_sigaltstack:
 #if defined(TARGET_I386) || defined(TARGET_ARM) || defined(TARGET_MIPS) || \
     defined(TARGET_SPARC) || defined(TARGET_PPC) || defined(TARGET_ALPHA) || \
-    defined(TARGET_M68K)
+    defined(TARGET_M68K) || defined(TARGET_BFIN)
         ret = do_sigaltstack(arg1, arg2, get_sp_from_cpustate((CPUState *)cpu_env));
         break;
 #else

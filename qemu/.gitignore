@@ -35,6 +35,8 @@ qemu-io
 qemu-monitor.texi
 QMP/qmp-commands.txt
 .gdbinit
+.gdb_history
+core
 *.a
 *.aux
 *.cp
@@ -53,6 +55,10 @@ QMP/qmp-commands.txt
 *.o
 .pc
 patches
+*.diff
+*.patch
+*.rej
+*.orig
 pc-bios/bios-pq/status
 pc-bios/vgabios-pq/status
 pc-bios/optionrom/linuxboot.bin
