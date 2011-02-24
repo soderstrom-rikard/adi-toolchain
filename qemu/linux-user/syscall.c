@@ -235,6 +235,12 @@ _syscall6(int,sys_futex,int *,uaddr,int,op,int,val,
           const struct timespec *,timeout,int *,uaddr2,int,val3)
 #endif
 #endif
+#define __NR_sys_sched_getaffinity __NR_sched_getaffinity
+_syscall3(int, sys_sched_getaffinity, pid_t, pid, unsigned int, len,
+          unsigned long *, user_mask_ptr);
+#define __NR_sys_sched_setaffinity __NR_sched_setaffinity
+_syscall3(int, sys_sched_setaffinity, pid_t, pid, unsigned int, len,
+          unsigned long *, user_mask_ptr);
 
 static bitmask_transtbl fcntl_flags_tbl[] = {
   { TARGET_O_ACCMODE,   TARGET_O_WRONLY,    O_ACCMODE,   O_WRONLY,    },
@@ -529,6 +535,15 @@ static int sys_inotify_init1(int flags)
 #undef TARGET_NR_inotify_rm_watch
 #endif /* CONFIG_INOTIFY  */
 
+#if defined(TARGET_NR_ppoll)
+#ifndef __NR_ppoll
+# define __NR_ppoll -1
+#endif
+#define __NR_sys_ppoll __NR_ppoll
+_syscall5(int, sys_ppoll, struct pollfd *, fds, nfds_t, nfds,
+          struct timespec *, timeout, const __sigset_t *, sigmask,
+          size_t, sigsetsize)
+#endif
 
 extern int personality(int);
 extern int flock(int, int);
@@ -1448,7 +1463,7 @@ static abi_long do_getsockopt(int sockfd, int level, int optname,
             return -TARGET_EFAULT;
         if (len < 0)
             return -TARGET_EINVAL;
-        lv = sizeof(int);
+        lv = sizeof(lv);
         ret = get_errno(getsockopt(sockfd, level, optname, &val, &lv));
         if (ret < 0)
             return ret;
@@ -1485,7 +1500,7 @@ static abi_long do_getsockopt(int sockfd, int level, int optname,
                 return -TARGET_EFAULT;
             if (len < 0)
                 return -TARGET_EINVAL;
-            lv = sizeof(int);
+            lv = sizeof(lv);
             ret = get_errno(getsockopt(sockfd, level, optname, &val, &lv));
             if (ret < 0)
                 return ret;
@@ -4255,6 +4270,14 @@ struct sram_frag {
 static struct sram_frag *sfrags;
 #endif
 
+#ifdef TARGET_NR_sram_alloc
+struct sram_frag {
+    struct sram_frag *next;
+    abi_ulong addr, size;
+};
+static struct sram_frag *sfrags;
+#endif
+
 #if defined(CONFIG_USE_NPTL)
 /* ??? Using host futex calls even when target atomic operations
    are not really atomic probably breaks things.  However implementing
@@ -5680,6 +5703,72 @@ abi_long do_syscall(void *cpu_env, int num, abi_long arg1,
         ret = arg1;
         break;
 #endif
+#ifdef TARGET_NR_sram_alloc
+    case TARGET_NR_sram_alloc:
+        {
+            /* We don't want L1 insn to be read/write, but doing that
+             * keeps standard qemu funcs from being able to read/write
+             * that too.  So grant r/w access to all. */
+            int prot = PROT_READ | PROT_WRITE;
+            if ((arg2 & 1 /*L1_INST_SRAM*/) || (arg2 & 8 /*L2_SRAM*/)) {
+                prot |= PROT_EXEC;
+            }
+
+            ret = get_errno(target_mmap(0, arg1, prot, MAP_PRIVATE |
+                                        MAP_ANONYMOUS, -1, 0));
+
+            if (!is_error(ret)) {
+                struct sram_frag *sf = malloc(sizeof(*sf));
+                sf->addr = ret;
+                sf->size = arg1;
+                if (sfrags) {
+                    sf->next = sfrags;
+                    sfrags = sf;
+                } else {
+                    sf->next = NULL;
+                    sfrags = sf;
+                }
+            }
+        }
+        break;
+#endif
+#ifdef TARGET_NR_sram_free
+    case TARGET_NR_sram_free:
+        {
+            struct sram_frag *sf, *prev;
+
+            ret = -TARGET_EINVAL;
+
+            sf = prev = sfrags;
+            while (sf) {
+                if (sf->addr == arg1) {
+                    ret = get_errno(target_munmap(arg1, sf->size));
+                    if (!is_error(ret)) {
+                        if (sfrags == sf) {
+                            sfrags = sf->next;
+                        } else {
+                            prev->next = sf->next;
+                        }
+                        free(sf);
+                    }
+                    break;
+                }
+                prev = sf;
+                sf = sf->next;
+            }
+        }
+        break;
+#endif
+#ifdef TARGET_NR_dma_memcpy
+    case TARGET_NR_dma_memcpy:
+        p = alloca(arg3);
+        if (copy_from_user(p, arg2, arg3))
+            goto efault;
+        if (copy_to_user(arg1, p, arg3))
+            goto efault;
+        ret = arg1;
+        break;
+#endif
     case TARGET_NR_truncate:
         if (!(p = lock_user_string(arg1)))
             goto efault;
@@ -6324,8 +6413,13 @@ abi_long do_syscall(void *cpu_env, int num, abi_long arg1,
         }
         break;
 #endif
-#ifdef TARGET_NR_poll
+#if defined(TARGET_NR_poll) || defined(TARGET_NR_ppoll)
+# ifdef TARGET_NR_poll
     case TARGET_NR_poll:
+# endif
+# ifdef TARGET_NR_ppoll
+    case TARGET_NR_ppoll:
+# endif
         {
             struct target_pollfd *target_pfd;
             unsigned int nfds = arg2;
@@ -6336,12 +6430,51 @@ abi_long do_syscall(void *cpu_env, int num, abi_long arg1,
             target_pfd = lock_user(VERIFY_WRITE, arg1, sizeof(struct target_pollfd) * nfds, 1);
             if (!target_pfd)
                 goto efault;
+
             pfd = alloca(sizeof(struct pollfd) * nfds);
             for(i = 0; i < nfds; i++) {
                 pfd[i].fd = tswap32(target_pfd[i].fd);
                 pfd[i].events = tswap16(target_pfd[i].events);
             }
-            ret = get_errno(poll(pfd, nfds, timeout));
+
+# ifdef TARGET_NR_ppoll
+            if (num == TARGET_NR_ppoll) {
+                struct timespec _timeout_ts, *timeout_ts = &_timeout_ts;
+                target_sigset_t *target_set;
+                sigset_t _set, *set = &_set;
+
+                if (arg3) {
+                    if (target_to_host_timespec(timeout_ts, arg3)) {
+                        unlock_user(target_pfd, arg1, 0);
+                        goto efault;
+                    }
+                } else {
+                    timeout_ts = NULL;
+                }
+
+                if (arg4) {
+                    target_set = lock_user(VERIFY_READ, arg4, sizeof(target_sigset_t), 1);
+                    if (!target_set) {
+                        unlock_user(target_pfd, arg1, 0);
+                        goto efault;
+                    }
+                    target_to_host_sigset(set, target_set);
+                } else {
+                    set = NULL;
+                }
+
+                ret = get_errno(sys_ppoll(pfd, nfds, timeout_ts, set, _NSIG/8));
+
+                if (!is_error(ret) && arg3) {
+                    host_to_target_timespec(arg3, timeout_ts);
+                }
+                if (arg4) {
+                    unlock_user(target_set, arg4, 0);
+                }
+            } else
+# endif
+                ret = get_errno(poll(pfd, nfds, timeout));
+
             if (!is_error(ret)) {
                 for(i = 0; i < nfds; i++) {
                     target_pfd[i].revents = tswap16(pfd[i].revents);
@@ -6394,6 +6527,67 @@ abi_long do_syscall(void *cpu_env, int num, abi_long arg1,
         /* We don't implement this, but ENOTDIR is always a safe
            return value. */
         ret = -TARGET_ENOTDIR;
+        break;
+    case TARGET_NR_sched_getaffinity:
+        {
+            unsigned int mask_size;
+            unsigned long *mask;
+
+            /*
+             * sched_getaffinity needs multiples of ulong, so need to take
+             * care of mismatches between target ulong and host ulong sizes.
+             */
+            if (arg2 & (sizeof(abi_ulong) - 1)) {
+                ret = -TARGET_EINVAL;
+                break;
+            }
+            mask_size = (arg2 + (sizeof(*mask) - 1)) & ~(sizeof(*mask) - 1);
+
+            mask = alloca(mask_size);
+            ret = get_errno(sys_sched_getaffinity(arg1, mask_size, mask));
+
+            if (!is_error(ret)) {
+                if (arg2 > ret) {
+                    /* Zero out any extra space kernel didn't fill */
+                    unsigned long zero = arg2 - ret;
+                    p = alloca(zero);
+                    memset(p, 0, zero);
+                    if (copy_to_user(arg3 + zero, p, zero)) {
+                        goto efault;
+                    }
+                    arg2 = ret;
+                }
+                if (copy_to_user(arg3, mask, arg2)) {
+                    goto efault;
+                }
+                ret = arg2;
+            }
+        }
+        break;
+    case TARGET_NR_sched_setaffinity:
+        {
+            unsigned int mask_size;
+            unsigned long *mask;
+
+            /*
+             * sched_setaffinity needs multiples of ulong, so need to take
+             * care of mismatches between target ulong and host ulong sizes.
+             */
+            if (arg2 & (sizeof(abi_ulong) - 1)) {
+                ret = -TARGET_EINVAL;
+                break;
+            }
+            mask_size = (arg2 + (sizeof(*mask) - 1)) & ~(sizeof(*mask) - 1);
+
+            mask = alloca(mask_size);
+            if (!lock_user_struct(VERIFY_READ, p, arg3, 1)) {
+                goto efault;
+            }
+            memcpy(mask, p, arg2);
+            unlock_user_struct(p, arg2, 0);
+
+            ret = get_errno(sys_sched_setaffinity(arg1, mask_size, mask));
+        }
         break;
     case TARGET_NR_sched_setparam:
         {
