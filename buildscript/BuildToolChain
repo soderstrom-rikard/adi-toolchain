@@ -51,7 +51,7 @@ CBUILD= # the system we are compiling on
 CHOST=  # the system the final compiler will run on
 
 # All the packages we build up
-PKGS_DEFAULT="bfin-elf bfin-uclinux bfin-linux-uclibc u-boot ldr-utils urjtag gdbproxy target-libs"
+PKGS_DEFAULT="bfin-elf bfin-uclinux bfin-linux-uclibc qemu u-boot ldr-utils urjtag gdbproxy target-libs"
 PKGS_ALL="${PKGS_DEFAULT} expat libusb libftdi"
 PKGS_ALIASES="
 	bfin-elf:elf
@@ -440,6 +440,9 @@ if pkgs_queued elf || pkgs_queued flat || pkgs_queued fdpic ; then
 	pkgs_queue expat
 fi
 
+if pkgs_queued qemu ; then
+	check_src_pkg qemu
+fi
 if pkgs_queued ldr-utils ; then
 	pkgs_queue libusb
 	check_src_pkg ldr-utils
@@ -1380,6 +1383,38 @@ build_uclibc_host_tools()
 	resume_save
 }
 
+build_qemu()
+{
+	pkgs_queued qemu || return 0
+
+	# qemu doesn't have a standard autoconf script
+	local cbuild=${BUILD_TARGET} chost=${HOST_TARGET}
+	BUILD_TARGET= HOST_TARGET=
+
+	build_autotooled_pkg "${DIR_QEMU_SOURCE}" \
+		--interp-prefix=${DIR_LINUX_SYSROOT} \
+		--disable-werror \
+		--disable-strip \
+		--target-list=bfin-linux-user \
+		--disable-system
+
+	BUILD_TARGET=${cbuild} chost=${HOST_TARGET}
+
+	# rename "qemu-bfin" to "$CTARGET-qemu" and "bfin-qemu"
+	local x t d sf df
+	for x in elf:${DIR_ELF_OUTPUT} uclinux:${DIR_uC_OUTPUT} linux-uclibc:${DIR_LINUX_OUTPUT} ; do
+		t=${x%%:*}
+		d=${x##*:}
+		sf="${d}/bin/qemu-bfin$EXEEXT"
+		df="${d}/bin/bfin-${t}-qemu$EXEEXT"
+		[ -e "${sf}" ] || continue
+		run_cmd mv "${sf}" "${df}"
+		sf=${df##*/}
+		df="${d}/bin/bfin-qemu$EXEEXT"
+		run_cmd ln -sf "${sf}" "${df}"
+	done
+}
+
 build_ldr_utils()
 {
 	pkgs_queued ldr-utils || return 0
@@ -1594,6 +1629,7 @@ export PKG_CONFIG_PATH="${STAGEDIR}/usr/lib/pkgconfig${PKG_CONFIG_PATH:+:${PKG_C
 export PKG_CONFIG
 
 build_uboot
+build_qemu
 build_libusb
 build_ldr_utils
 build_libftdi
