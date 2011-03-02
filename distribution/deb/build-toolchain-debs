@@ -15,6 +15,7 @@ if [ -z "$2" ] ; then
 
 	Usage: ${0##*/} [-d dir] <ver> <arch>
 	build debs based on a release
+	EOF
 	exit 1
 fi
 
