@@ -9,21 +9,24 @@ if [[ $1 == -a ]] ; then
 fi
 
 if [ -z "$2" ] ; then
-	echo "Usage: ${0##*/} [-s] [-d dir] <ver> <arch>"
+	cat <<-EOF
+	Usage: ${0##*/} -s <ver> <arch> <debian srcdir> <toolchain output>
+	build debs based on a snapshot
+
+	Usage: ${0##*/} [-d dir] <ver> <arch>
+	build debs based on a release
 	exit 1
 fi
 
 if [[ $1 == "-s" ]] ; then
-	root=/usr/local/src/blackfin
-
 	shift
-	debian_dir="${root}/bin/debian"
 	ver=$1
 	dver=$1
 	arch=$2
 	tag="-svn"
 	branch="unstable"
-	base=${3:-${root}/toolchains}
+	debian_dir=$3
+	base=$4
 
 	cd ${base}/${ver}/pkgs
 	for t in ../bfin-* ; do

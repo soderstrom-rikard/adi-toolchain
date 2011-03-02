@@ -179,7 +179,7 @@ make_toolchain() {
 	#
 	[[ -e build-debs ]] || ln -s "${distdir}"/debian/build-toolchain-debs build-debs
 	local darch=$(./build-debs -a)
-	./build-debs -s ${curr} ${darch} ${PWD} >& "${logdir}"/toolchain-deb.${arch}.log
+	./build-debs -s ${curr} ${darch} "${distdir}"/debian ${PWD} >& "${logdir}"/toolchain-deb.${arch}.log
 	pushd ${curr}/pkgs
 	rm -rf binary-${darch}
 	mkdir binary-${darch}
