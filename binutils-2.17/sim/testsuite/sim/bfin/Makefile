@@ -33,6 +33,6 @@ DO_HOST = bfin-linux-uclibc-gcc -Wa,--defsym,BFIN_HOST=1 $(FLAGS) -static
 %.S.X: %.S ; $(DO_HOST)
 
 clean:
-	rm -f *.[xX] *.o
+	rm -f *.[jxX] *.o
 
 .PHONY: all clean
