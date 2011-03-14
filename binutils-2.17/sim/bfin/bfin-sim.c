@@ -1561,10 +1561,11 @@ extract_mult (SIM_CPU *cpu, bu64 res, int mmod, int MM,
 
 static bu32
 decode_macfunc (SIM_CPU *cpu, int which, int op, int h0, int h1, int src0,
-		int src1, int mmod, int MM, int fullword, bu32 *overflow)
+		int src1, int mmod, int MM, int fullword, bu32 *overflow,
+		bu32 *neg)
 {
   bu64 acc;
-  bu32 sat = 0, tsat;
+  bu32 sat = 0, tsat, ret;
 
   /* Sign extend accumulator if necessary, otherwise unsigned.  */
   if (mmod == 0 || mmod == M_T || mmod == M_IS || mmod == M_ISS2
@@ -1657,6 +1658,9 @@ decode_macfunc (SIM_CPU *cpu, int which, int op, int h0, int h1, int src0,
 	default:
 	  illegal_instruction (cpu);
 	}
+
+      if (acc & 0x8000000000ull)
+	*neg = 1;
     }
 
   STORE (AXREG (which), (acc >> 32) & 0xff);
@@ -1665,7 +1669,20 @@ decode_macfunc (SIM_CPU *cpu, int which, int op, int h0, int h1, int src0,
   if (sat)
     STORE (ASTATREG (avs[which]), sat);
 
-  return extract_mult (cpu, acc, mmod, MM, fullword, overflow);
+  ret = extract_mult (cpu, acc, mmod, MM, fullword, overflow);
+
+  if (!fullword)
+    {
+      if (ret & 0x8000)
+	*neg = 1;
+    }
+  else
+    {
+      if (ret & 0x80000000)
+	*neg = 1;
+    }
+
+  return ret;
 }
 
 bu32
@@ -3701,7 +3718,7 @@ decode_dsp32mac_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1)
   int h01  = ((iw1 >> DSP32Mac_h01_bits) & DSP32Mac_h01_mask);
 
   bu32 res = DREG (dst);
-  bu32 v_i = 0, zero = 0;
+  bu32 v_i = 0, zero = 0, n_1 = 0, n_0 = 0;
 
   static const char * const ops[] = { "=", "+=", "-=" };
   char _buf[128], *buf = _buf;
@@ -3726,7 +3743,7 @@ decode_dsp32mac_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1)
   if (w1 == 1 || op1 != 3)
     {
       bu32 res1 = decode_macfunc (cpu, 1, op1, h01, h11, src0,
-				  src1, mmod, MM, P, &v_i);
+				  src1, mmod, MM, P, &v_i, &n_1);
 
       if (w1)
 	buf += sprintf (buf, P ? "R%i" : "R%i.H", dst + P);
@@ -3772,7 +3789,7 @@ decode_dsp32mac_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1)
   if (w0 == 1 || op0 != 3)
     {
       bu32 res0 = decode_macfunc (cpu, 0, op0, h00, h10, src0,
-				  src1, mmod, 0, P, &v_i);
+				  src1, mmod, 0, P, &v_i, &n_0);
 
       if (w0)
 	buf += sprintf (buf, P ? "R%i" : "R%i.L", dst);
@@ -3821,8 +3838,16 @@ decode_dsp32mac_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1)
       if (v_i)
 	SET_ASTATREG (vs, v_i);
     }
-  if (op0 == 3 || op1 == 3)
-    SET_ASTATREG (az, zero);
+
+  if ((w0 == 1 && op0 == 3) || (w1 == 1 && op1 == 3))
+    {
+      SET_ASTATREG (az, zero);
+      if (!(w0 == 1 && op0 == 3))
+	n_0 = 0;
+      if (!(w1 == 1 && op1 == 3))
+	n_1 = 0;
+      SET_ASTATREG (an, n_1 | n_0);
+    }
 }
 
 static void
