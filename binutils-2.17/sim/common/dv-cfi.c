@@ -430,10 +430,12 @@ cfi_io_read_buffer (struct hw *me, void *dest, int space,
 static void
 cfi_delete_callback (struct hw *me)
 {
+#ifdef HAVE_MMAP
   struct cfi *cfi = hw_data (me);
 
   if (cfi->mmap)
     munmap (cfi->mmap, cfi->dev_size);
+#endif
 }
 
 static void
