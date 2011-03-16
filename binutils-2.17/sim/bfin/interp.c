@@ -295,6 +295,7 @@ bfin_syscall (SIM_CPU *cpu)
 	  sc.errcode = TARGET_ENOSYS;
 	else
 	  {
+#ifdef HAVE_PREAD
 	    char *data = xmalloc (sc.arg2);
 
 	    /* XXX: Should add a cb->pread.  */
@@ -304,6 +305,9 @@ bfin_syscall (SIM_CPU *cpu)
 	      sc.errcode = TARGET_EINVAL;
 
 	    free (data);
+#else
+	    sc.errcode = TARGET_ENOSYS;
+#endif
 	  }
 
 	if (sc.errcode)
@@ -493,8 +497,13 @@ bfin_syscall (SIM_CPU *cpu)
 	}
       else
 	{
+#ifdef HAVE_KILL
 	  sc.result = kill (sc.arg1, sc.arg2);
 	  goto sys_finish;
+#else
+	  sc.result = -1;
+	  sc.errcode = TARGET_ENOSYS;
+#endif
 	}
       break;
 
