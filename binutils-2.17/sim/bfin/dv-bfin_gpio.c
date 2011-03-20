@@ -50,7 +50,8 @@ struct bfin_gpio
 #define mmr_base()      offsetof(struct bfin_gpio, data)
 #define mmr_offset(mmr) (offsetof(struct bfin_gpio, mmr) - mmr_base())
 
-static const char * const mmr_names[] = {
+static const char * const mmr_names[] =
+{
   "PORTIO", "PORTIO_CLEAR", "PORTIO_SET", "PORTIO_TOGGLE", "PORTIO_MASKA",
   "PORTIO_MASKA_CLEAR", "PORTIO_MASKA_SET", "PORTIO_MASKA_TOGGLE",
   "PORTIO_MASKB", "PORTIO_MASKB_CLEAR", "PORTIO_MASKB_SET",
@@ -161,7 +162,8 @@ bfin_gpio_io_read_buffer (struct hw *me, void *dest, int space,
   return nr_bytes;
 }
 
-static const struct hw_port_descriptor bfin_gpio_ports[] = {
+static const struct hw_port_descriptor bfin_gpio_ports[] =
+{
   { "mask_a", 0, 0, output_port, },
   { "mask_b", 1, 0, output_port, },
   { "p0",     0, 0, input_port, },
@@ -278,7 +280,8 @@ bfin_gpio_finish (struct hw *me)
   attach_bfin_gpio_regs (me, port);
 }
 
-const struct hw_descriptor dv_bfin_gpio_descriptor[] = {
+const struct hw_descriptor dv_bfin_gpio_descriptor[] =
+{
   {"bfin_gpio", bfin_gpio_finish,},
   {NULL, NULL},
 };

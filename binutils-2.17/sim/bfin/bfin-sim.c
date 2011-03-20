@@ -75,7 +75,8 @@ unhandled_instruction (SIM_CPU *cpu, const char *insn)
   illegal_instruction (cpu);
 }
 
-static const char * const astat_names[] = {
+static const char * const astat_names[] =
+{
   [ 0] = "AZ",
   [ 1] = "AN",
   [ 2] = "AC0_COPY",
