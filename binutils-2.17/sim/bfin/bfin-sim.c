@@ -5437,7 +5437,7 @@ decode_dsp32shift_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1)
     }
   else if ((sop == 0 || sop == 1) && sopcde == 9)
     {
-      bs40 acc0 = get_extended_acc (cpu, 0);
+      bs40 acc0 = get_unextended_acc (cpu, 0);
       bs16 sL, sH, out;
 
       TRACE_INSN (cpu, "R%i.L = VIT_MAX (R%i) (AS%c);",
@@ -5447,7 +5447,7 @@ decode_dsp32shift_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1)
       sH = DREG (src1) >> 16;
 
       if (sop & 1)
-	acc0 >>= 1;
+	acc0 = (acc0 & 0xfeffffffffull) >> 1;
       else
 	acc0 <<= 1;
 
