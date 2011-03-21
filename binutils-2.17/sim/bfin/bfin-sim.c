@@ -5742,9 +5742,18 @@ decode_dsp32shiftimm_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1)
       bu32 astat;
 
       TRACE_INSN (cpu, "R%i = R%i << %i (V,S);", dst0, src1, count);
-      val0 = lshift (cpu, val0, count, 16, 1);
-      astat = ASTAT;
-      val1 = lshift (cpu, val1, count, 16, 1);
+      if (count >= 0)
+	{
+	  val0 = lshift (cpu, val0, count, 16, 1);
+	  astat = ASTAT;
+	  val1 = lshift (cpu, val1, count, 16, 1);
+	}
+      else
+	{
+	  val0 = ashiftrt (cpu, val0, -count, 16);
+	  astat = ASTAT;
+	  val1 = ashiftrt (cpu, val1, -count, 16);
+	}
       SET_ASTAT (ASTAT | astat);
 
       STORE (DREG (dst0), (val0 << 16) | val1);
