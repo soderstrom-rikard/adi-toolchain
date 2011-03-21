@@ -571,43 +571,6 @@ build_expat()
 	clean_build_dir "${WORKDIR}"
 }
 
-build_pthreads()
-{
-	# help out mingw targets; some packages (like urjtag/ldr-utils) like pthreads
-	if [ "${CBUILD}" = "${CHOST}" ] || check_lib pthreads ${CHOST} 2>/dev/null ; then
-		return 0
-	fi
-
-	PN="pthreads"
-	S=$(echo $DIR_BINUTILS_SOURCE/../pthreads-*)
-	WORKDIR=$DIR_BUILD/${PN}_build
-
-	[ -d "${S}" ] || return 0
-
-	PV=$(awk '$2 == "PTW32_VERSION" {print $NF; exit}' "${S}"/pthread.h | sed 's:,:.:g')
-
-	echo_date "${CHOST}: ${PN}: building (${PV})"
-	change_dir "${S}"
-	run_cmd $MAKE realclean
-	run_cmd $MAKE GC CROSS=${CHOST}- # for win64: LFLAGS=-lw32_32
-
-	echo_date "${CHOST}: ${PN}: installing"
-	run_cmd cp libpthreadGC2.a "${STAGEDIR}"/usr/lib/libpthread.a
-	run_cmd cp pthread.h semaphore.h sched.h "${STAGEDIR}"/usr/include/
-
-	# blah, need to include the shared dll
-	local d
-	for d in "${DIR_ELF_OUTPUT}" "${DIR_uC_OUTPUT}" "${DIR_LINUX_OUTPUT}" ; do
-		run_cmd mkdir -p "${d}"/bin
-		run_cmd cp pthreadGC2.dll "${d}"/bin/
-	done
-
-	echo_date "${CHOST}: ${PN}: cleaning"
-	run_cmd $MAKE realclean
-
-	change_dir "${DIR_BUILD}"
-}
-
 build_zlib()
 {
 	# help out mingw targets; some packages (like elf2flt) need zlib
@@ -1567,7 +1530,6 @@ if [ "${CBUILD}" != "${CHOST}" ] ; then
 fi
 build_curses
 build_expat
-build_pthreads
 build_zlib
 
 #
