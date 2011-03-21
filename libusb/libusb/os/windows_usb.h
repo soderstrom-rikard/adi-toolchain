@@ -65,14 +65,14 @@ extern char *_strdup(const char *strSource);
 // _beginthreadex is MSVCRT => unavailable for cygwin. Fallback to using CreateThread
 #define _beginthreadex(a, b, c, d, e, f) CreateThread(a, b, (LPTHREAD_START_ROUTINE)c, d, e, f)
 #endif
-#define safe_free(p) do {if (p != NULL) {free(p); p = NULL;}} while(0)
+#define safe_free(p) do {if (p != NULL) {free((void*)p); p = NULL;}} while(0)
 #define safe_closehandle(h) do {if (h != INVALID_HANDLE_VALUE) {CloseHandle(h); h = INVALID_HANDLE_VALUE;}} while(0)
 #define safe_min(a, b) min((size_t)(a), (size_t)(b))
 #define safe_strcp(dst, dst_max, src, count) do {memcpy(dst, src, safe_min(count, dst_max)); \
 	((char*)dst)[safe_min(count, dst_max)-1] = 0;} while(0)
 #define safe_strcpy(dst, dst_max, src) safe_strcp(dst, dst_max, src, safe_strlen(src)+1)
-#define safe_strncat(dst, dst_max, src, count) strncat(dst, src, min(count, dst_max - strlen(dst) - 1))
-#define safe_strcat(dst, dst_max, src) safe_strncat(dst, dst_max, src, strlen(src)+1)
+#define safe_strncat(dst, dst_max, src, count) strncat(dst, src, safe_min(count, dst_max - safe_strlen(dst) - 1))
+#define safe_strcat(dst, dst_max, src) safe_strncat(dst, dst_max, src, safe_strlen(src)+1)
 #define safe_strcmp(str1, str2) strcmp(((str1==NULL)?"<NULL>":str1), ((str2==NULL)?"<NULL>":str2))
 #define safe_strncmp(str1, str2, count) strncmp(((str1==NULL)?"<NULL>":str1), ((str2==NULL)?"<NULL>":str2), count)
 #define safe_strlen(str) ((str==NULL)?0:strlen(str))
@@ -82,7 +82,7 @@ extern char *_strdup(const char *strSource);
 inline void upperize(char* str) {
 	size_t i;
 	if (str == NULL) return;
-	for (i=0; i<strlen(str); i++)
+	for (i=0; i<safe_strlen(str); i++)
 		str[i] = (char)toupper((int)str[i]);
 }
 
@@ -95,8 +95,9 @@ inline void upperize(char* str) {
 #define MAX_PATH_LENGTH             128
 #define MAX_KEY_LENGTH              256
 #define MAX_TIMER_SEMAPHORES        128
-#define TIMER_REQUEST_RETRY_MS		100
+#define TIMER_REQUEST_RETRY_MS      100
 #define ERR_BUFFER_SIZE             256
+#define LIST_SEPARATOR              ';'
 
 // Handle code for HID interface that have been claimed ("dibs")
 #define INTERFACE_CLAIMED           ((HANDLE)(intptr_t)0xD1B5)
@@ -129,6 +130,7 @@ const GUID CLASS_GUID_COMPOSITE     = { 0x36FC9E60, 0xC465, 0x11cF, {0x80, 0x56,
 
 struct windows_usb_api_backend {
 	const uint8_t id;
+	const char* designation;
 	const GUID *class_guid;  // The Class GUID (for fallback in case the driver name cannot be read)
 	const char **driver_name_list; // Driver name, without .sys, e.g. "usbccgp"
 	const uint8_t nb_driver_names;
@@ -196,6 +198,21 @@ struct libusb_hid_descriptor {
 #define LIBUSB_REQ_TYPE(request_type) ((request_type) & (0x03 << 5))
 #define LIBUSB_REQ_IN(request_type) ((request_type) & LIBUSB_ENDPOINT_IN)
 #define LIBUSB_REQ_OUT(request_type) (!LIBUSB_REQ_IN(request_type))
+
+// The following are used for HID reports IOCTLs
+#define HID_CTL_CODE(id) \
+  CTL_CODE (FILE_DEVICE_KEYBOARD, (id), METHOD_NEITHER, FILE_ANY_ACCESS)
+#define HID_BUFFER_CTL_CODE(id) \
+  CTL_CODE (FILE_DEVICE_KEYBOARD, (id), METHOD_BUFFERED, FILE_ANY_ACCESS)
+#define HID_IN_CTL_CODE(id) \
+  CTL_CODE (FILE_DEVICE_KEYBOARD, (id), METHOD_IN_DIRECT, FILE_ANY_ACCESS)
+#define HID_OUT_CTL_CODE(id) \
+  CTL_CODE (FILE_DEVICE_KEYBOARD, (id), METHOD_OUT_DIRECT, FILE_ANY_ACCESS)
+
+#define IOCTL_HID_GET_FEATURE                 HID_OUT_CTL_CODE(100)
+#define IOCTL_HID_GET_INPUT_REPORT            HID_OUT_CTL_CODE(104)
+#define IOCTL_HID_SET_FEATURE                 HID_IN_CTL_CODE(100)
+#define IOCTL_HID_SET_OUTPUT_REPORT           HID_IN_CTL_CODE(101)
 
 enum libusb_hid_request_type {
 	HID_REQ_GET_REPORT = 0x01,
@@ -312,12 +329,18 @@ struct windows_transfer_priv {
 	size_t hid_expected_size;
 };
 
+// used to match a device driver (including filter drivers) against a supported API
+struct driver_lookup {
+	char list[MAX_KEY_LENGTH+1];// REG_MULTI_SZ list of services (driver) names
+	const DWORD reg_prop;		// SPDRP registry key to use to retreive list
+	const char* designation;	// internal designation (for debug output)
+};
 
 /*
  * API macros - from libusb-win32 1.x
  */
 #define DLL_DECLARE(api, ret, name, args)                     \
-  typedef ret (api * __dll_##name##_t)args; __dll_##name##_t name
+  typedef ret (api * __dll_##name##_t)args; __dll_##name##_t name = NULL
 
 #define DLL_LOAD(dll, name, ret_on_failure)                   \
 	do {                                                      \
@@ -345,7 +368,7 @@ struct windows_transfer_priv {
 typedef DWORD DEVNODE, DEVINST;
 typedef DEVNODE *PDEVNODE, *PDEVINST;
 typedef DWORD RETURN_TYPE;
-typedef RETURN_TYPE	CONFIGRET;
+typedef RETURN_TYPE CONFIGRET;
 
 #define CR_SUCCESS                              0x00000000
 #define CR_NO_SUCH_DEVNODE                      0x0000000D
@@ -468,7 +491,7 @@ typedef struct _USB_INTERFACE_DESCRIPTOR {
 typedef struct _USB_CONFIGURATION_DESCRIPTOR {
   UCHAR  bLength;
   UCHAR  bDescriptorType;
-  USHORT  wTotalLength;
+  USHORT wTotalLength;
   UCHAR  bNumInterfaces;
   UCHAR  bConfigurationValue;
   UCHAR  iConfiguration;

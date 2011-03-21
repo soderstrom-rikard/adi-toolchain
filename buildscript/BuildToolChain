@@ -1437,10 +1437,7 @@ build_libusb()
 {
 	pkgs_queued libusb || return 0
 
-	# upstream libusb hasn't merged the winusb branch yet
-	local sub
-	case ${CHOST} in *mingw*) sub="-winusb" ;; esac
-	build_autotooled_pkg --tlib "${DIR_LIBUSB_SOURCE}${sub}" \
+	build_autotooled_pkg --tlib "${DIR_LIBUSB_SOURCE}" \
 		--disable-shared --enable-static
 }
 
