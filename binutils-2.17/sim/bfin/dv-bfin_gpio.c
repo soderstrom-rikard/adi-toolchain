@@ -214,7 +214,7 @@ bfin_gpio_port_event (struct hw *me, int my_port, struct hw *source,
   if (port->edge & bit)
     {
       /* Pin is edge triggered.  */
-      if (!(port->both & bit))
+      if (port->both & bit)
 	{
 	  /* Both edges.  */
 	  if (olvl == nlvl)
