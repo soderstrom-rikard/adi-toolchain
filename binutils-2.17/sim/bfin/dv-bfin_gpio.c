@@ -198,15 +198,20 @@ bfin_gpio_port_event (struct hw *me, int my_port, struct hw *source,
   bool olvl, nlvl;
   bu32 bit = (1 << my_port);
 
+  /* Normalize the level value.  A simulated device can send any value
+     it likes to us, but in reality we only care about 0 and 1.  This
+     lets us assume only those two values below.  */
+  level = !!level;
+
   /* Only screw with state if this pin is set as an input.  */
-  if (!(port->dir & port->inen & bit))
+  if ((port->dir & bit) || !(port->inen & bit))
     return;
 
   /* Get the old pin state for calculating an interrupt.  */
   olvl = !!(port->data & bit);
 
   /* Update the new pin state.  */
-  port->data = (port->data & ~bit) | (level << bit);
+  port->data = (port->data & ~bit) | (level << my_port);
 
   /* See if this state transition will generate an interrupt.  */
   nlvl = !!(port->data & bit);
