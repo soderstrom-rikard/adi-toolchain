@@ -812,24 +812,6 @@ static const struct hw_port_descriptor bfin_sic_533_ports[] =
   { NULL, 0, 0, 0, },
 };
 
-static void
-bfin_sic_533_port_event (struct hw *me, int my_port, struct hw *source,
-			 int source_port, int level)
-{
-  struct bfin_sic *sic = hw_data (me);
-  bu32 bit = 1 << DEC_PIN (my_port);
-
-  /* SIC only exists to forward interrupts from the system to the CEC.  */
-  sic->bf537.isr |= bit;
-
-  /* XXX: Handle SIC wakeup source ?
-  if (sic->bf537.iwr & bit)
-    What to do ?;
-   */
-
-  bfin_sic_537_forward_interrupts (me, sic);
-}
-
 /* The encoding here is uglier due to multiple sources being muxed into
    the same interrupt line.  So give each pin an arbitrary "SIC" so that
    the resulting id is unique across all ports.  */
@@ -1340,7 +1322,7 @@ bfin_sic_finish (struct hw *me)
       set_hw_io_read_buffer (me, bfin_sic_537_io_read_buffer);
       set_hw_io_write_buffer (me, bfin_sic_537_io_write_buffer);
       set_hw_ports (me, bfin_sic_533_ports);
-      set_hw_port_event (me, bfin_sic_533_port_event);
+      set_hw_port_event (me, bfin_sic_537_port_event);
       mmr_names = bf537_mmr_names;
 
       /* Initialize the SIC.  */
@@ -1438,7 +1420,7 @@ bfin_sic_finish (struct hw *me)
       set_hw_io_read_buffer (me, bfin_sic_537_io_read_buffer);
       set_hw_io_write_buffer (me, bfin_sic_537_io_write_buffer);
       set_hw_ports (me, bfin_sic_59x_ports);
-      set_hw_port_event (me, bfin_sic_533_port_event);
+      set_hw_port_event (me, bfin_sic_537_port_event);
       mmr_names = bf537_mmr_names;
 
       /* Initialize the SIC.  */
