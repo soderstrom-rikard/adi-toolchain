@@ -2,7 +2,7 @@
    http://www.spansion.com/Support/AppNotes/CFI_Spec_AN_03.pdf
    http://www.spansion.com/Support/AppNotes/cfi_100_20011201.pdf
 
-   Copyright (C) 2010 Free Software Foundation, Inc.
+   Copyright (C) 2010-2011 Free Software Foundation, Inc.
    Contributed by Analog Devices, Inc.
 
    This file is part of simulators.
@@ -36,6 +36,8 @@
 #include "devices.h"
 #include "dv-cfi.h"
 
+/* Flashes are simple state machines, so here we cover all the different states
+   a device might be in at any particular time.  */
 enum cfi_state
 {
   CFI_STATE_READ,
@@ -49,42 +51,79 @@ enum cfi_state
   CFI_STATE_WRITE_BUFFER_CONFIRM,
 };
 
+/* This is the structure that all CFI conforming devices must provided when
+   asked for it.  This allows a single driver to dynamically support different
+   flash geometries without having to hardcode specs.
+
+   If you want to start mucking about here, you should just grab the CFI spec
+   and review that (see top of this file for URIs).  */
 struct cfi_query
 {
+  /* This is always 'Q' 'R' 'Y'.  */
   unsigned char qry[3];
+  /* Primary vendor ID.  */
   unsigned char p_id[2];
+  /* Primary query table address.  */
   unsigned char p_adr[2];
+  /* Alternate vendor ID.  */
   unsigned char a_id[2];
+  /* Alternate query table address.  */
   unsigned char a_adr[2];
-  union {
+  union
+  {
+    /* Voltage levels.  */
     unsigned char voltages[4];
-    struct {
+    struct
+    {
+      /* Normal min voltage level.  */
       unsigned char vcc_min;
+      /* Normal max voltage level.  */
       unsigned char vcc_max;
+      /* Programming min volage level.  */
       unsigned char vpp_min;
+      /* Programming max volage level.  */
       unsigned char vpp_max;
     };
   };
-  union {
+  union
+  {
+    /* Operational timeouts.  */
     unsigned char timeouts[8];
-    struct {
+    struct
+    {
+      /* Typical timeout for writing a single "unit".  */
       unsigned char timeout_typ_unit_write;
+      /* Typical timeout for writing a single "buffer".  */
       unsigned char timeout_typ_buf_write;
+      /* Typical timeout for erasing a block.  */
       unsigned char timeout_typ_block_erase;
+      /* Typical timeout for erasing the chip.  */
       unsigned char timeout_typ_chip_erase;
+      /* Max timeout for writing a single "unit".  */
       unsigned char timeout_max_unit_write;
+      /* Max timeout for writing a single "buffer".  */
       unsigned char timeout_max_buf_write;
+      /* Max timeout for erasing a block.  */
       unsigned char timeout_max_block_erase;
+      /* Max timeout for erasing the chip.  */
       unsigned char timeout_max_chip_erase;
     };
   };
+  /* Flash size is 2^dev_size bytes.  */
   unsigned char dev_size;
+  /* Flash device interface description.  */
   unsigned char iface_desc[2];
+  /* Max length of a single buffer write is 2^max_buf_write_len bytes.  */
   unsigned char max_buf_write_len[2];
+  /* Number of erase regions.  */
   unsigned char num_erase_regions;
+  /* The erase regions would now be an array after this point, but since
+     it is dynamic, we'll provide that from "struct cfi" when requested.  */
   /*unsigned char erase_region_info;*/
 };
 
+/* Flashes may have regions with different erase sizes.  There is one
+   structure per erase region.  */
 struct cfi_erase_region
 {
   unsigned blocks;
@@ -95,6 +134,11 @@ struct cfi_erase_region
 
 struct cfi;
 
+/* Flashes are accessed via commands -- you write a certain number to a special
+   address to change the flash state and access info other than the data.  Diff
+   companies have implemented their own command set.  This structure abstracts
+   the different command sets so that we can support multiple ones with just a
+   single sim driver.  */
 struct cfi_cmdset
 {
   unsigned id;
@@ -105,6 +149,8 @@ struct cfi_cmdset
 		unsigned offset, unsigned shifted_offset, unsigned nr_bytes);
 };
 
+/* The per-flash state.  Much of this comes from the device tree which people
+   declare themselves.  See top of attach_cfi_regs() for more info.  */
 struct cfi
 {
   unsigned width, dev_size, status;
@@ -118,11 +164,14 @@ struct cfi
   struct cfi_erase_region *erase_regions;
 };
 
-static const char * const state_names[] = {
+/* Helpful strings which are used with HW_TRACE.  */
+static const char * const state_names[] =
+{
   "READ", "READ_ID", "CFI_QUERY", "PROTECT", "STATUS", "ERASE", "WRITE",
   "WRITE_BUFFER", "WRITE_BUFFER_CONFIRM",
 };
 
+/* Erase the block specified by the offset into the given CFI flash.  */
 static void
 cfi_erase_block (struct hw *me, struct cfi *cfi, unsigned offset)
 {
@@ -149,6 +198,8 @@ cfi_erase_block (struct hw *me, struct cfi *cfi, unsigned offset)
     }
 }
 
+/* Depending on the bus width, addresses might be bit shifted.  This helps
+   us normalize everything without cluttering up the rest of the code.  */
 static unsigned
 cfi_unshift_addr (struct cfi *cfi, unsigned addr)
 {
@@ -160,14 +211,17 @@ cfi_unshift_addr (struct cfi *cfi, unsigned addr)
   return addr;
 }
 
+/* CFI requires all values to be little endian in its structure, so this
+   helper writes a 16bit value into a little endian byte buffer.  */
 static void
 cfi_encode_16bit (unsigned char *data, unsigned num)
 {
-  /* CFI is little endian.  */
   data[0] = num;
   data[1] = num >> 8;
 }
 
+/* The functions required to implement the Intel command set.  */
+
 static bool
 cmdset_intel_write (struct hw *me, struct cfi *cfi, const void *source,
 		    unsigned offset, unsigned value, unsigned nr_bytes)
@@ -278,14 +332,22 @@ cmdset_intel_setup (struct hw *me, struct cfi *cfi)
   cfi->status = INTEL_SR_DWS;
 }
 
-static const struct cfi_cmdset cfi_cmdset_intel = {
+static const struct cfi_cmdset cfi_cmdset_intel =
+{
   CFI_CMDSET_INTEL, cmdset_intel_setup, cmdset_intel_write, cmdset_intel_read,
 };
-
-static const struct cfi_cmdset * const cfi_cmdsets[] = {
+
+/* All of the supported command sets get listed here.  We then walk this
+   array to see if the user requested command set is implemented.  */
+static const struct cfi_cmdset * const cfi_cmdsets[] =
+{
   &cfi_cmdset_intel,
 };
 
+/* All writes to the flash address space come here.  Using the state machine,
+   we figure out what to do with this specific write.  All common code sits
+   here and if there is a request we can't process, we hand it off to the
+   command set-specific write function.  */
 static unsigned
 cfi_io_write_buffer (struct hw *me, const void *source, int space,
 		     address_word addr, unsigned nr_bytes)
@@ -366,6 +428,10 @@ cfi_io_write_buffer (struct hw *me, const void *source, int space,
   return nr_bytes;
 }
 
+/* All reads to the flash address space come here.  Using the state machine,
+   we figure out what to return -- actual data stored in the flash, the CFI
+   query structure, some status info, or something else ?  Any requests that
+   we can't handle are passed to the command set-specific read function.  */
 static unsigned
 cfi_io_read_buffer (struct hw *me, void *dest, int space,
 		    address_word addr, unsigned nr_bytes)
@@ -427,6 +493,8 @@ cfi_io_read_buffer (struct hw *me, void *dest, int space,
   return nr_bytes;
 }
 
+/* Clean up any state when this device is removed (e.g. when shutting down,
+   or when reloading via gdb).  */
 static void
 cfi_delete_callback (struct hw *me)
 {
@@ -438,6 +506,7 @@ cfi_delete_callback (struct hw *me)
 #endif
 }
 
+/* Helper function to easily add CFI erase regions to the existing set.  */
 static void
 cfi_add_erase_region (struct hw *me, struct cfi *cfi,
 		      unsigned blocks, unsigned size)
@@ -677,9 +746,12 @@ attach_cfi_regs (struct hw *me, struct cfi *cfi)
 	read_len = 0;
       memset (cfi->data, 0xff, cfi->dev_size - read_len);
     }
+
   close (fd);
 }
 
+/* Once we've been declared in the device tree, this is the main entry point.
+   So allocate state, attach memory addresses, and all that fun stuff.  */
 static void
 cfi_finish (struct hw *me)
 {
@@ -700,7 +772,9 @@ cfi_finish (struct hw *me)
   cfi->cmdset->setup (me, cfi);
 }
 
-const struct hw_descriptor dv_cfi_descriptor[] = {
+/* Every device is required to declare this.  */
+const struct hw_descriptor dv_cfi_descriptor[] =
+{
   {"cfi", cfi_finish,},
   {NULL, NULL},
 };
