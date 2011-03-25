@@ -36,8 +36,8 @@
 #include "devices.h"
 #include "dv-cfi.h"
 
-/* Flashes are simple state machines, so here we cover all the different states
-   a device might be in at any particular time.  */
+/* Flashes are simple state machines, so here we cover all the
+   different states a device might be in at any particular time.  */
 enum cfi_state
 {
   CFI_STATE_READ,
@@ -51,12 +51,12 @@ enum cfi_state
   CFI_STATE_WRITE_BUFFER_CONFIRM,
 };
 
-/* This is the structure that all CFI conforming devices must provided when
-   asked for it.  This allows a single driver to dynamically support different
-   flash geometries without having to hardcode specs.
+/* This is the structure that all CFI conforming devices must provided
+   when asked for it.  This allows a single driver to dynamically support
+   different flash geometries without having to hardcode specs.
 
-   If you want to start mucking about here, you should just grab the CFI spec
-   and review that (see top of this file for URIs).  */
+   If you want to start mucking about here, you should just grab the
+   CFI spec and review that (see top of this file for URIs).  */
 struct cfi_query
 {
   /* This is always 'Q' 'R' 'Y'.  */
@@ -134,11 +134,11 @@ struct cfi_erase_region
 
 struct cfi;
 
-/* Flashes are accessed via commands -- you write a certain number to a special
-   address to change the flash state and access info other than the data.  Diff
-   companies have implemented their own command set.  This structure abstracts
-   the different command sets so that we can support multiple ones with just a
-   single sim driver.  */
+/* Flashes are accessed via commands -- you write a certain number to
+   a special address to change the flash state and access info other
+   than the data.  Diff companies have implemented their own command
+   set.  This structure abstracts the different command sets so that
+   we can support multiple ones with just a single sim driver.  */
 struct cfi_cmdset
 {
   unsigned id;
@@ -149,8 +149,9 @@ struct cfi_cmdset
 		unsigned offset, unsigned shifted_offset, unsigned nr_bytes);
 };
 
-/* The per-flash state.  Much of this comes from the device tree which people
-   declare themselves.  See top of attach_cfi_regs() for more info.  */
+/* The per-flash state.  Much of this comes from the device tree which
+   people declare themselves.  See top of attach_cfi_regs() for more
+   info.  */
 struct cfi
 {
   unsigned width, dev_size, status;
@@ -198,21 +199,22 @@ cfi_erase_block (struct hw *me, struct cfi *cfi, unsigned offset)
     }
 }
 
-/* Depending on the bus width, addresses might be bit shifted.  This helps
-   us normalize everything without cluttering up the rest of the code.  */
+/* Depending on the bus width, addresses might be bit shifted.  This
+   helps us normalize everything without cluttering up the rest of
+   the code.  */
 static unsigned
 cfi_unshift_addr (struct cfi *cfi, unsigned addr)
 {
   switch (cfi->width)
     {
-    case 4: addr >>= 1;
+    case 4: addr >>= 1; /* fallthrough.  */
     case 2: addr >>= 1;
     }
   return addr;
 }
 
-/* CFI requires all values to be little endian in its structure, so this
-   helper writes a 16bit value into a little endian byte buffer.  */
+/* CFI requires all values to be little endian in its structure, so
+   this helper writes a 16bit value into a little endian byte buffer.  */
 static void
 cfi_encode_16bit (unsigned char *data, unsigned num)
 {
@@ -344,10 +346,10 @@ static const struct cfi_cmdset * const cfi_cmdsets[] =
   &cfi_cmdset_intel,
 };
 
-/* All writes to the flash address space come here.  Using the state machine,
-   we figure out what to do with this specific write.  All common code sits
-   here and if there is a request we can't process, we hand it off to the
-   command set-specific write function.  */
+/* All writes to the flash address space come here.  Using the state
+   machine, we figure out what to do with this specific write.  All
+   common code sits here and if there is a request we can't process,
+   we hand it off to the command set-specific write function.  */
 static unsigned
 cfi_io_write_buffer (struct hw *me, const void *source, int space,
 		     address_word addr, unsigned nr_bytes)
@@ -428,10 +430,11 @@ cfi_io_write_buffer (struct hw *me, const void *source, int space,
   return nr_bytes;
 }
 
-/* All reads to the flash address space come here.  Using the state machine,
-   we figure out what to return -- actual data stored in the flash, the CFI
-   query structure, some status info, or something else ?  Any requests that
-   we can't handle are passed to the command set-specific read function.  */
+/* All reads to the flash address space come here.  Using the state
+   machine, we figure out what to return -- actual data stored in the
+   flash, the CFI query structure, some status info, or something else ?
+   Any requests that we can't handle are passed to the command set-
+   specific read function.  */
 static unsigned
 cfi_io_read_buffer (struct hw *me, void *dest, int space,
 		    address_word addr, unsigned nr_bytes)
@@ -493,8 +496,8 @@ cfi_io_read_buffer (struct hw *me, void *dest, int space,
   return nr_bytes;
 }
 
-/* Clean up any state when this device is removed (e.g. when shutting down,
-   or when reloading via gdb).  */
+/* Clean up any state when this device is removed (e.g. when shutting
+   down, or when reloading via gdb).  */
 static void
 cfi_delete_callback (struct hw *me)
 {
@@ -720,9 +723,9 @@ attach_cfi_regs (struct hw *me, struct cfi *cfi)
     }
 
   /* Figure out where our initial flash data is coming from.  */
-#ifdef HAVE_MMAP
   if (fd != -1 && fd_writable)
     {
+#ifdef HAVE_MMAP
       posix_fallocate (fd, 0, cfi->dev_size);
 
       cfi->mmap = mmap (NULL, cfi->dev_size,
@@ -733,25 +736,41 @@ attach_cfi_regs (struct hw *me, struct cfi *cfi)
 	cfi->mmap = NULL;
       else
 	cfi->data = cfi->mmap;
-    }
+#else
+      sim_io_eprintf (hw_system (me),
+		      "cfi: sorry, file write support requires mmap()\n");
 #endif
+    }
   if (!cfi->data)
     {
-      ssize_t read_len;
+      size_t read_len;
 
       cfi->data = HW_NALLOC (me, unsigned char, cfi->dev_size);
+
       if (fd != -1)
-	read_len = read (fd, cfi->data, cfi->dev_size);
+	{
+	  /* Use stdio to avoid EINTR issues with read().  */
+	  FILE *fp = fdopen (fd, "r");
+
+	  if (fp)
+	    read_len = fread (cfi->data, 1, cfi->dev_size, fp);
+	  else
+	    read_len = 0;
+
+	  /* Don't need to fclose() with fdopen("r").  */
+	}
       else
 	read_len = 0;
+
       memset (cfi->data, 0xff, cfi->dev_size - read_len);
     }
 
   close (fd);
 }
 
-/* Once we've been declared in the device tree, this is the main entry point.
-   So allocate state, attach memory addresses, and all that fun stuff.  */
+/* Once we've been declared in the device tree, this is the main
+   entry point. So allocate state, attach memory addresses, and
+   all that fun stuff.  */
 static void
 cfi_finish (struct hw *me)
 {
