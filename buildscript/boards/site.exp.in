@@ -9,6 +9,7 @@ if ![info exists boards_dir] {
 }
 
 set adi_boards_dir "@BOARDS_DIR@"
+lappend boards_dir "@BOARDS_BUILD_DIR@"
 lappend boards_dir "$adi_boards_dir"
 
 # For sim targets, use -msim.  Otherwise, pick the right -mcpu value.

@@ -1044,7 +1044,8 @@ CPU_TYPE_REV="-mcpu=${CPU_TYPE_REV}"
 export DEJAGNU=$DIR_BUILD/boards/site.exp
 (
 sed \
-	-e "s:@BOARDS_DIR@:$DIR_BUILD/boards:" \
+	-e "s:@BOARDS_DIR@:${DIR_BOARDS}:" \
+	-e "s:@BOARDS_BUILD_DIR@:$DIR_BUILD/boards:" \
 	-e "s:@MCPU_FLAGS@:${CPU_TYPE_REV} ${STACK_CHECKING:+-mstack-check-l1}:" \
 	-e "s:@HOSTNAME@:$TARGET_IPADDR:" \
 	"${DIR_BOARDS}"/site.exp.in
