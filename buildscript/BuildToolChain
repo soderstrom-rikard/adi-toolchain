@@ -1138,6 +1138,10 @@ build_uclibc_core()
 
 	local ARGS="V=1"
 
+	# workaround make behavior which causes it to search system paths
+	# for a .config file.  Such as /usr/include/../../.config.
+	run_cmd touch .config
+
 	echo_date "${target}: uClibc: cleaning"
 	run_cmd $MAKE $ARGS distclean
 
