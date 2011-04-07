@@ -1441,7 +1441,7 @@ build_urjtag()
 	}
 	at_install_post() {
 		# let the local jtag find its data files while debugging
-		if [ ! -e src/apps/share/urjtag ] ; then
+		if [ ! -L src/apps/share/urjtag ] ; then
 			mkdir -p src/apps/share
 			ln -s ../../../../../urjtag/data src/apps/share/urjtag
 		fi
