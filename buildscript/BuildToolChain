@@ -1591,7 +1591,7 @@ if pkgs_queued fdpic ; then
 	install_all_target_libs $DIR_LINUX_OUTPUT bfin-linux-uclibc
 fi
 
-if ${DIR_KBUILD_LOCAL} ; then
+if pkgs_queued_any flat fdpic && ${DIR_KBUILD_LOCAL} ; then
 	echo_date "linux-headers: cleaning"
 	clean_build_dir "$DIR_KBUILD_OUTPUT"
 fi
