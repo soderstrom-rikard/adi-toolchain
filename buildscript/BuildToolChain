@@ -1324,12 +1324,15 @@ build_uclibc_headers()
 
 	resume_check ${target}.uclibc.headers && return 0
 
-	# do the cd to avoid pwd warnings with `make`
-	ver=$(cd /; printf 'e:;@echo $(VERSION)\ninclude '$DIR_UCLIBC_SOURCE'/Rules.mak\n' | ${MAKE} -f -)
+	change_dir "$DIR_UCLIBC_SOURCE"
+
+	# workaround make behavior which causes it to search system paths
+	# for a .config file.  Such as /usr/include/../../.config.
+	run_cmd touch .config
+
+	ver=$(printf 'e:;@echo $(VERSION)\ninclude '$DIR_UCLIBC_SOURCE'/Rules.mak\n' | ${MAKE} -f - 2>/dev/null)
 
 	echo_date "${target}: uClibc: installing headers (${ver})"
-
-	change_dir "$DIR_UCLIBC_SOURCE"
 
 	build_uclibc_config "${target}" "${sysroot}" .config-used-for_${target}-headers
 
