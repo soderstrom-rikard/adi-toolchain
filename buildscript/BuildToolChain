@@ -684,6 +684,9 @@ build_gcc()
 
 	case ${target} in
 	bfin-elf)
+		if [ "${DIR_BINUTILS_SOURCE}" != "${DIR_NEWLIB_SOURCE}" ] ; then
+			touch_tree "${DIR_NEWLIB_SOURCE}"
+		fi
 		epver=`"$DIR_NEWLIB_SOURCE"/newlib/configure --version | head -n1 | awk '{print $NF}'`
 		echo_date "${target}: gcc: linking newlib (${epver} via ${NEWLIB_VERSION})"
 		run_cmd ln -snf $DIR_NEWLIB_SOURCE/newlib $DIR_GCC_SOURCE/
@@ -822,9 +825,6 @@ build_binutils()
 		pkg="binutils"
 		DIR_GDB_BUILD=$DIR_BUILD/gdb_build
 		touch_tree "${DIR_GDB_SOURCE}"
-	fi
-	if [ "${DIR_BINUTILS_SOURCE}" != "${DIR_NEWLIB_SOURCE}" ] ; then
-		touch_tree "${DIR_NEWLIB_SOURCE}"
 	fi
 
 	# generated files get out of sync with source files; force regen
