@@ -222,7 +222,7 @@ sim_core_map_attach (SIM_DESC sd,
       last_mapping = &next_mapping->next;
       next_mapping = next_mapping->next;
     }
-  
+
   /* check insertion point correct */
   SIM_ASSERT (next_mapping == NULL || next_mapping->level >= level);
   if (next_mapping != NULL && next_mapping->level == level
@@ -378,7 +378,7 @@ sim_core_attach (SIM_DESC sd,
     }
 
   /* attach the region to all applicable access maps */
-  for (map = 0; 
+  for (map = 0;
        map < nr_maps;
        map++)
     {
@@ -390,7 +390,7 @@ sim_core_attach (SIM_DESC sd,
 	  free_buffer = NULL;
 	}
     }
-  
+
   /* Just copy this map to each of the processor specific data structures.
      FIXME - later this will be replaced by true processor specific
      maps. */
@@ -540,9 +540,9 @@ sim_core_read_buffer (SIM_DESC sd,
 				   (unsigned_1*)buffer + count,
 				   mapping->space,
 				   raddr,
-				   nr_bytes, 
+				   nr_bytes,
 				   sd,
-				   cpu, 
+				   cpu,
 				   cia) != nr_bytes)
 	  break;
 	count += nr_bytes;
@@ -609,7 +609,7 @@ sim_core_write_buffer (SIM_DESC sd,
 				      raddr,
 				      nr_bytes,
 				      sd,
-				      cpu, 
+				      cpu,
 				      cia) != nr_bytes)
 	    break;
 	  count += nr_bytes;
@@ -674,7 +674,7 @@ sim_core_set_xor (SIM_DESC sd,
 	    core->byte_xor = WITH_XOR_ENDIAN - 1;
 	  else
 	    core->byte_xor = 0;
-	}	  
+	}
     }
   }
   else {
@@ -751,8 +751,8 @@ sim_core_xor_read_buffer (SIM_DESC sd,
     }
 }
 #endif
-  
-  
+
+
 #if EXTERN_SIM_CORE_P
 unsigned
 sim_core_xor_write_buffer (SIM_DESC sd,

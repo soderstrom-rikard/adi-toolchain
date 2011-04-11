@@ -315,7 +315,7 @@ full_name_of_hw (struct hw *leaf,
       strcat (buf, hw_name (leaf));
       strcat (buf, unit);
     }
-  
+
   /* return it usefully */
   if (buf == full_name)
     buf = hw_strdup (leaf, full_name);
@@ -364,7 +364,7 @@ hw_create (struct sim_state *sd,
 	root = root->parent_of_hw;
       hw->root_of_hw = root;
     }
-  
+
   /* a unique identifier for the device on the parents bus */
   if (parent != NULL)
     {
@@ -426,7 +426,7 @@ hw_create (struct sim_state *sd,
   create_hw_event_data (hw);
   create_hw_handle_data (hw);
   create_hw_instance_data (hw);
-  
+
   return hw;
 }
 
@@ -463,7 +463,7 @@ hw_finish (struct hw *me)
 	   && hw_find_property (hw_root (me), "global-trace?") != NULL
 	   && hw_find_boolean_property (hw_root (me), "global-trace?"))
     me->trace_of_hw_p = 1;
-    
+
 
   /* Allow the real device to override any methods */
   me->base_of_hw->descriptor->to_finish (me);

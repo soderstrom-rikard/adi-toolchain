@@ -50,7 +50,7 @@ extern int asprintf (char **result, const char *format, ...);
 #endif
 
 
-	
+
 /* Some versions of GCC include an attribute operator, define it */
 
 #if !defined (__attribute__)

@@ -84,7 +84,7 @@
 		if (ALU16_HAD_OVERFLOW) \
 		  sim_engine_halt (...); \
 		(RES) = ALU16_OVERFLOW_RESULT
-   
+
    	ALU*_HAD_CARRY_BORROW: Returns a nonzero value if unsigned
    	overflow or underflow (also referred to as carry and borrow)
    	occurred.
@@ -95,8 +95,8 @@
 		#define ALU64_END(RES) \
 		State.carry = ALU64_HAD_CARRY_BORROW; \
 		(RES) = ALU64_CARRY_BORROW_RESULT
-   
-   
+
+
    Addition:
 
 	ALU*_ADD(VAL): Add VAL to the ALU accumulator.  Record any
@@ -137,7 +137,7 @@
 /* Twos complement arithmetic - addition/subtraction - carry/borrow
    (or you thought you knew the answer to 0-0)
 
-   
+
 
    Notation and Properties:
 
@@ -156,7 +156,7 @@
    UMAXn: The upper bound of an unsigned N bit value (the lower
    bound is always zero).
 
-   Un: UMAXn + 1.  Unsigned arithmetic is computed `modulo (Un)'.  
+   Un: UMAXn + 1.  Unsigned arithmetic is computed `modulo (Un)'.
 
    X[p]: Is bit P of X.  X[0] denotes the least significant bit.
 
@@ -195,7 +195,7 @@
    The two N bit operands are sign extended to M>N bits and then
    added.  Overflow occurs when SIGN_BIT<n> and SIGN_BIT<m> do not
    match.
-  
+
    		Rm = (SEXTn (Xn) + SEXTn (Yn))
 		V = MSBn ((Rm >> (M - N)) ^ Rm)
 
@@ -243,7 +243,7 @@
 
    The following table lists the output for all given inputs into a
    full-adder.
-  
+
          I  X  Y  R | C
         ------------+---
          0  0  0  0 | 0
@@ -266,7 +266,7 @@
 
        XY\R  0  1
           +-------
-       00 |  0  0 
+       00 |  0  0
        01 |  1  0
        11 |  1  1
        10 |  1  0
@@ -277,7 +277,7 @@
 
    Verifying:
 
-         I  X  Y  R | C | X&Y  X&~R Y&~R 
+         I  X  Y  R | C | X&Y  X&~R Y&~R
         ------------+---+---------------
          0  0  0  0 | 0 |  0    0    0
          0  0  1  1 | 0 |  0    0    0

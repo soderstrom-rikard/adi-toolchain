@@ -34,7 +34,7 @@ with this program; if not, write to the Free Software Foundation, Inc.,
          CIA_ADDR to return the integral value.  *-/
      /-* #define CIA_ADDR(cia) (...) *-/
      #include "sim-base.h"
-   
+
    finally, two data types `struct _sim_cpu' and `struct sim_state'
    are defined:
 

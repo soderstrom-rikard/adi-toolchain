@@ -121,7 +121,7 @@ union sem {
 #ifdef __GNUC__
 #define SEM_SET_FULL_CODE(abuf, idesc) \
   do { (abuf)->semantic.sem_case = (idesc)->sem_full_lab; } while (0)
-#else 
+#else
 #define SEM_SET_FULL_CODE(abuf, idesc) \
   do { (abuf)->semantic.sem_case = (idesc)->num; } while (0)
 #endif
@@ -134,7 +134,7 @@ union sem {
 #ifdef __GNUC__
 #define SEM_SET_FAST_CODE(abuf, idesc) \
   do { (abuf)->semantic.sem_case = (idesc)->sem_fast_lab; } while (0)
-#else 
+#else
 #define SEM_SET_FAST_CODE(abuf, idesc) \
   do { (abuf)->semantic.sem_case = (idesc)->num; } while (0)
 #endif
