@@ -26,7 +26,8 @@
 #include "hw-base.h"
 
 
-struct hw_handle_mapping {
+struct hw_handle_mapping
+{
   cell_word external;
   struct hw *phandle;
   struct hw_instance *ihandle;
@@ -34,7 +35,8 @@ struct hw_handle_mapping {
 };
 
 
-struct hw_handle_data {
+struct hw_handle_data
+{
   int nr_mappings;
   struct hw_handle_mapping *mappings;
 };

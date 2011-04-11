@@ -24,7 +24,8 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 
 /* Initialize a port */
 
-struct hw_port_descriptor {
+struct hw_port_descriptor
+{
   const char *name;
   int number;
   int nr_ports;

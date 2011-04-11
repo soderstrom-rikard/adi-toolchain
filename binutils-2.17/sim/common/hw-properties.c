@@ -37,7 +37,8 @@
 
 /* property entries */
 
-struct hw_property_data {
+struct hw_property_data
+{
   struct hw_property_data *next;
   struct hw_property *property;
   const void *init_array;

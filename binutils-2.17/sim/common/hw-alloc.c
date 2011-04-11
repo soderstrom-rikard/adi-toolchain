@@ -27,7 +27,8 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #include <stdlib.h>
 #endif
 
-struct hw_alloc_data {
+struct hw_alloc_data
+{
   void *alloc;
   int zalloc_p;
   struct hw_alloc_data *next;
