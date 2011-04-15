@@ -844,6 +844,15 @@ simulator_command (char *args, int from_tty)
   registers_changed ();
 }
 
+static char **
+sim_command_completer (char *text, char *word)
+{
+  if (gdbsim_desc == NULL)
+    return NULL;
+
+  return sim_complete_command (gdbsim_desc, text, word);
+}
+
 /* Define the target subroutine names */
 
 struct target_ops gdbsim_ops;
@@ -887,9 +896,12 @@ init_gdbsim_ops (void)
 void
 _initialize_remote_sim (void)
 {
+  struct cmd_list_element *c;
+
   init_gdbsim_ops ();
   add_target (&gdbsim_ops);
 
-  add_com ("sim", class_obscure, simulator_command,
-	   _("Send a command to the simulator."));
+  c = add_com ("sim", class_obscure, simulator_command,
+	       _("Send a command to the simulator."));
+  set_cmd_completer (c, sim_command_completer);
 }
