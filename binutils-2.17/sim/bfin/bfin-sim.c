@@ -4235,7 +4235,7 @@ decode_dsp32alu_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1)
 	       ((s0 >>  8) & 0xff) + ((s0 >>  0) & 0xff) + i) >> 2) & 0xff;
       tmp1 = ((((s1 >> 24) & 0xff) + ((s1 >> 16) & 0xff) +
 	       ((s0 >> 24) & 0xff) + ((s0 >> 16) & 0xff) + i) >> 2) & 0xff;
-      SET_DREG (dst0, (tmp1 << (16 + (HL * 8))) | (tmp0 << (HL * 8)));
+      STORE (DREG (dst0), (tmp1 << (16 + (HL * 8))) | (tmp0 << (HL * 8)));
 
       /* Implicit DISALGNEXCPT in parallel.  */
       DIS_ALGN_EXPT |= 1;
@@ -4353,8 +4353,8 @@ decode_dsp32alu_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1)
 
       tmp0 = (bs32)(bs16)(s0 >>  0) + ((s1 >> ( 0 + (8 * !HL))) & 0xff);
       tmp1 = (bs32)(bs16)(s0 >> 16) + ((s1 >> (16 + (8 * !HL))) & 0xff);
-      SET_DREG (dst0, (CLAMP (tmp0, 0, 255) << ( 0 + (8 * HL))) |
-		      (CLAMP (tmp1, 0, 255) << (16 + (8 * HL))));
+      STORE (DREG (dst0), (CLAMP (tmp0, 0, 255) << ( 0 + (8 * HL))) |
+			  (CLAMP (tmp1, 0, 255) << (16 + (8 * HL))));
 
       /* Implicit DISALGNEXCPT in parallel.  */
       DIS_ALGN_EXPT |= 1;
@@ -4839,7 +4839,7 @@ decode_dsp32alu_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1)
 	  s1 = algn (s1L, s1H, IREG (1) & 3);
 	}
 
-      SET_DREG (dst0,
+      STORE (DREG (dst0),
 		(((((s0 >>  0) & 0xff) + ((s1 >>  0) & 0xff) + !aop) >> 1) <<  0) |
 		(((((s0 >>  8) & 0xff) + ((s1 >>  8) & 0xff) + !aop) >> 1) <<  8) |
 		(((((s0 >> 16) & 0xff) + ((s1 >> 16) & 0xff) + !aop) >> 1) << 16) |
@@ -4873,10 +4873,10 @@ decode_dsp32alu_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1)
 	  s1 = algn (s1L, s1H, IREG (1) & 3);
 	}
 
-      SET_DREG (dst0,
+      STORE (DREG (dst0),
 		((((s0 >>  0) & 0xff) + ((s1 >>  0) & 0xff)) <<  0) |
 		((((s0 >>  8) & 0xff) + ((s1 >>  8) & 0xff)) << 16));
-      SET_DREG (dst1,
+      STORE (DREG (dst1),
 		((((s0 >> 16) & 0xff) + ((s1 >> 16) & 0xff)) <<  0) |
 		((((s0 >> 24) & 0xff) + ((s1 >> 24) & 0xff)) << 16));
 
@@ -4908,10 +4908,10 @@ decode_dsp32alu_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1)
 	  s1 = algn (s1L, s1H, IREG (1) & 3);
 	}
 
-      SET_DREG (dst0,
+      STORE (DREG (dst0),
 		(((((s0 >>  0) & 0xff) - ((s1 >>  0) & 0xff)) <<  0) & 0xffff) |
 		(((((s0 >>  8) & 0xff) - ((s1 >>  8) & 0xff)) << 16)));
-      SET_DREG (dst1,
+      STORE (DREG (dst1),
 		(((((s0 >> 16) & 0xff) - ((s1 >> 16) & 0xff)) <<  0) & 0xffff) |
 		(((((s0 >> 24) & 0xff) - ((s1 >> 24) & 0xff)) << 16)));
 
@@ -5008,7 +5008,7 @@ decode_dsp32alu_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1)
   else if (aop == 0 && aopcde == 24)
     {
       TRACE_INSN (cpu, "R%i = BYTEPACK (R%i, R%i);", dst0, src0, src1);
-      SET_DREG (dst0,
+      STORE (DREG (dst0),
 	(((DREG (src0) >>  0) & 0xff) <<  0) |
 	(((DREG (src0) >> 16) & 0xff) <<  8) |
 	(((DREG (src1) >>  0) & 0xff) << 16) |
@@ -5039,8 +5039,8 @@ decode_dsp32alu_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1)
       byteb = (comb_src >> (8 + 8 * order));
       bytec = (comb_src >> (16 + 8 * order));
       byted = (comb_src >> (24 + 8 * order));
-      SET_DREG (dst0, bytea | ((bu32)byteb << 16));
-      SET_DREG (dst1, bytec | ((bu32)byted << 16));
+      STORE (DREG (dst0), bytea | ((bu32)byteb << 16));
+      STORE (DREG (dst1), bytec | ((bu32)byted << 16));
 
       /* Implicit DISALGNEXCPT in parallel.  */
       DIS_ALGN_EXPT |= 1;
@@ -5327,7 +5327,7 @@ decode_dsp32shift_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1)
 	sv0 >>= 16;
       if (sop & 2)
 	sv1 >>= 16;
-      SET_DREG (dst0, (sv1 << 16) | (sv0 & 0xFFFF));
+      STORE (DREG (dst0), (sv1 << 16) | (sv0 & 0xFFFF));
     }
   else if (sop == 0 && sopcde == 5)
     {
@@ -5445,8 +5445,8 @@ decode_dsp32shift_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1)
       acc = (acc >> 2) |
 	(((bu64)s0 & 1) << 38) |
 	(((bu64)s1 & 1) << 39);
-      SET_DREG (src0, s0 >> 1);
-      SET_DREG (src1, s1 >> 1);
+      STORE (DREG (src0), s0 >> 1);
+      STORE (DREG (src1), s1 >> 1);
 
       SET_AREG (0, acc);
     }
@@ -5465,8 +5465,8 @@ decode_dsp32shift_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1)
       acc = (acc << 2) |
 	((s0 >> 31) & 1) |
 	((s1 >> 30) & 2);
-      SET_DREG (src0, s0 << 1);
-      SET_DREG (src1, s1 << 1);
+      STORE (DREG (src0), s0 << 1);
+      STORE (DREG (src1), s1 << 1);
 
       SET_AREG (0, acc);
     }
@@ -5539,10 +5539,13 @@ decode_dsp32shift_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1)
       bu32 v = DREG (src0);
       bu32 x = DREG (src1);
       bu32 mask = (1 << (v & 0x1f)) - 1;
+
       TRACE_INSN (cpu, "R%i = EXTRACT (R%i, R%i.L) (Z);", dst0, src1, src0);
+
       x >>= ((v >> 8) & 0x1f);
-      SET_DREG (dst0, x & mask);
-      setflags_logical (cpu, DREG (dst0));
+      x &= mask;
+      STORE (DREG (dst0), x);
+      setflags_logical (cpu, x);
     }
   else if (sop == 1 && sopcde == 10)
     {
@@ -5550,13 +5553,15 @@ decode_dsp32shift_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1)
       bu32 x = DREG (src1);
       bu32 sgn = (1 << (v & 0x1f)) >> 1;
       bu32 mask = (1 << (v & 0x1f)) - 1;
+
       TRACE_INSN (cpu, "R%i = EXTRACT (R%i, R%i.L) (X);", dst0, src1, src0);
+
       x >>= ((v >> 8) & 0x1f);
       x &= mask;
       if (x & sgn)
 	x |= ~mask;
-      SET_DREG (dst0, x);
-      setflags_logical (cpu, DREG (dst0));
+      STORE (DREG (dst0), x);
+      setflags_logical (cpu, x);
     }
   else if ((sop == 2 || sop == 3) && sopcde == 10)
     {
@@ -5587,8 +5592,9 @@ decode_dsp32shift_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1)
       mask <<= shft;
       bg &= ~mask;
 
-      SET_DREG (dst0, bg | fgnd);
-      setflags_logical (cpu, DREG (dst0));
+      bg |= fgnd;
+      STORE (DREG (dst0), bg);
+      setflags_logical (cpu, bg);
     }
   else if (sop == 0 && sopcde == 11)
     {
@@ -5635,7 +5641,7 @@ decode_dsp32shift_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1)
     {
       int shift = (sop + 1) * 8;
       TRACE_INSN (cpu, "R%i = ALIGN%i (R%i, R%i);", dst0, shift, src1, src0);
-      SET_DREG (dst0, (DREG (src1) << (32 - shift)) | (DREG (src0) >> shift));
+      STORE (DREG (dst0), (DREG (src1) << (32 - shift)) | (DREG (src0) >> shift));
     }
   else
     illegal_instruction (cpu);
