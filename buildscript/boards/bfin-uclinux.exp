@@ -3,8 +3,3 @@
 load_generic_config "bfin-fmt-flat"
 load_generic_config "bfin-target-linux"
 
-# Advertise slightly less than we actually have (80000) since a few testcases
-# really push the limit.  If you change this value, remember to consider the
-# matching linker flag in bfin-fmt-flat
-set_board_info gcc,stack_size 75000
-

@@ -2,3 +2,7 @@
 
 # Common Blackfin format settings
 load_generic_config "bfin-fmt"
+
+# Advertise slightly less than we actually have since a few testcases
+# really push the limit.
+set_board_info gcc,stack_size 0x1f000
