@@ -18,9 +18,6 @@ set_board_info gdb_serial /dev/ttyUSB0
 set_board_info gdb_server_prog "gdbserver"
 
 set_board_info gcc,no_trampolines 1
-# Advertise slightly less than we actually have since a few testcases
-# really push the limit.
-set_board_info gcc,stack_size 0x1f000
 
 # set_board_info gdb,socketport "2345"
 set_board_info gdb,do_reload_on_run 1
