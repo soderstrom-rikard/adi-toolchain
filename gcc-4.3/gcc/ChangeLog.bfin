@@ -1,3 +1,7 @@
+2011-04-26  Stuart Henderson  <stuart.henderson@analog.com>
+
+	* config/bfin/linux.h (LINK_SPEC): [#6087] Fault use of -mglibc.
+
 2011-02-17  Mike Frysinger  <michael.frysinger@analog.com>
 
 	* config/bfin/bfin.c (bfin_cpus[]): Add 0.4 for

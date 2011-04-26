@@ -1,0 +1,3 @@
+2011-04-26  Stuart Henderson  <stuart.henderson@analog.com>
+
+	* config/bfin/linux.h (LINK_SPEC): [#6087] Fault use of -mglibc.

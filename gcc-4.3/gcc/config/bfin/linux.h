@@ -15,6 +15,9 @@
   "%{static:--start-group} %{mfast-fp:-lbffastfp} %G %L %{static:--end-group} \
    %{!static:%{mfast-fp:-lbffastfp} %G}"
 
+#undef LINUX_DYNAMIC_LINKER
+#define LINUX_DYNAMIC_LINKER "%{mglibc:%{muclibc:%e-mglibc and -muclibc used together;:%e-mglibc not supported for this target};:/lib/ld-uClibc.so.0 }"
+
 #undef LINK_SPEC
 #define LINK_SPEC "\
   %{mfdpic: -m elf32bfinfd -z text} %{shared} %{pie} \
@@ -22,7 +25,7 @@
   %{shared:-G -Bdynamic} \
   %{!shared: %{!static: \
    %{rdynamic:-export-dynamic} \
-   %{!dynamic-linker:-dynamic-linker /lib/ld-uClibc.so.0}} \
+   %{!dynamic-linker:-dynamic-linker " LINUX_DYNAMIC_LINKER "}} \
    %{static}} -init __init -fini __fini"
 
 #define MD_UNWIND_SUPPORT "config/bfin/linux-unwind.h"
