@@ -273,7 +273,7 @@ shift $((OPTIND - 1))
 pkgs_queue "$@"
 
 # binutils-2.20 and later don't include insight
-if [ "${BINUTILS_VERSION}" != "2.17" ] ; then
+if [ "${GDB_VERSION}" != "2.17" ] ; then
 	WITHOUT_X=true
 fi
 
