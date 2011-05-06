@@ -4,6 +4,13 @@ anomaly = $1
 if (anomaly == "")
 	next;
 sub(/^[[:digit:]]* /, "");
-print "/* " $0 " */"
-print "#define ANOMALY_" anomaly " ()"
+
+if (NF == 1) {
+	getline
+	print "/* " $0 " */"
+	print "#define ANOMALY_" anomaly " ()"
+} else {
+	print "/* " $0 " */"
+	print "#define ANOMALY_" anomaly " ()"
+}
 }
