@@ -11,6 +11,7 @@
  */
 
 /* This file should be up to date with:
+ *  - Revision A, 02/18/2011; ADSP-BF504/BF504F/BF506F Blackfin Processor Anomaly List
  */
 
 #if __SILICON_REVISION__ < 0
@@ -36,8 +37,6 @@
 #define ANOMALY_05000310 (1)
 /* PPI Underflow Error Goes Undetected in ITU-R 656 Mode */
 #define ANOMALY_05000366 (1)
-/* Speculative Fetches Can Cause Undesired External FIFO Operations */
-#define ANOMALY_05000416 (1)
 /* Speculative Fetches of Indirect-Pointer Instructions Can Cause False Hardware Errors */
 #define ANOMALY_05000426 (1)
 /* IFLUSH Instruction at End of Hardware Loop Causes Infinite Stall */
@@ -52,12 +51,28 @@
 #define ANOMALY_05000472 (1)
 /* Interrupted SPORT Receive Data Register Read Results In Underflow when SLEN > 15 */
 #define ANOMALY_05000473 (1)
+/* SPORT0 Data Transmit Error in Multi-Channel Mode with Internal Clock */
+#define ANOMALY_05000476 (1)
 /* TESTSET Instruction Cannot Be Interrupted */
 #define ANOMALY_05000477 (1)
+/* Disabling ACM During an Ongoing Transfer Can Lead to Undefined ACM Behavior */
+#define ANOMALY_05000478 (1)
 /* Reads of ITEST_COMMAND and ITEST_DATA Registers Cause Cache Corruption */
 #define ANOMALY_05000481 (1)
-/* IFLUSH sucks at life */
+/* TWI Vbus Minimum Specification Can Be Violated under Certain Conditions */
+#define ANOMALY_05000486 (1)
+/* SPI Master Boot Can Fail Under Certain Conditions */
+#define ANOMALY_05000490 (1)
+/* Instruction Memory Stalls Can Cause IFLUSH to Fail */
 #define ANOMALY_05000491 (1)
+/* EXCPT Instruction May Be Lost If NMI Happens Simultaneously */
+#define ANOMALY_05000494 (1)
+/* Maximum Idd-deepsleep Specifications Can Be Exceeded under Certain Conditions */
+#define ANOMALY_05000495 (1)
+/* CNT_COMMAND Functionality Depends on CNT_IMASK Configuration */
+#define ANOMALY_05000498 (1)
+/* RXS Bit in SPI_STAT May Become Stuck In RX DMA Modes */
+#define ANOMALY_05000501 (1)
 
 /* Anomalies that don't exist on this proc */
 #define ANOMALY_05000099 (0)
