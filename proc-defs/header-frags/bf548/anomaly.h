@@ -112,6 +112,8 @@
 #define ANOMALY_05000379 (1)
 /* 8-Bit NAND Flash Boot Mode Not Functional */
 #define ANOMALY_05000382 (__SILICON_REVISION__ < 1)
+/* Some ATAPI Modes Are Not Functional */
+#define ANOMALY_05000383 (1)
 /* Boot from OTP Memory Not Functional */
 #define ANOMALY_05000385 (__SILICON_REVISION__ < 1)
 /* bfrom_SysControl() Firmware Routine Not Functional */
