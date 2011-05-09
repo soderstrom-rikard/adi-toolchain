@@ -1,6 +1,5 @@
 /* Test that the GP gets properly restored, either by the nonlocal
    receiver or the nested function.  */
-/* { dg-skip-if "Mark as unsupported until Bug 5827 is fixed." { bfin-*-* } } */
 
 #ifndef NO_TRAMPOLINES
 

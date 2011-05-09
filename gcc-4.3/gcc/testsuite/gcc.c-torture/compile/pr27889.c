@@ -1,4 +1,3 @@
-/* { dg-skip-if "Mark as unsupported until Bug 5827 is fixed." { bfin-*-* } } */
 void h(void (*)(void));
 _Complex int g (void)
 {

@@ -1,4 +1,3 @@
-/* { dg-skip-if "Mark as unsupported until Bug 5827 is fixed." { bfin-*-* } } */
 
 void f1 (void *);
 void f3 (void *, void (*)(void *));

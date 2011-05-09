@@ -1,3 +1,14 @@
+2011-05-09  Stuart Henderson  <stuart.henderson@analog.com>
+
+	* gcc.dg/trampoline-1.c: Enable now that [#5827] is fixed.
+	* gcc.c-torture/execute/nestfunc-5.c gcc.c-torture/execute/nestfunc-6.c
+	gcc.c-torture/execute/nestfunc-3.c gcc.c-torture/execute/20000822-1.c
+	gcc.c-torture/compile/20050122-2.c gcc.c-torture/compile/nested-1.c
+	gcc.c-torture/compile/930506-2.c gcc.c-torture/compile/pr27889.c
+	gcc.c-torture/compile/20010226-1.c gcc.dg/20050607-1.c gcc.dg/pr34457-1.c
+	gcc.dg/nested-func-5.c gcc.dg/debug/debug-3.c gcc.dg/debug/debug-5.c
+	gcc.dg/torture/nested-fn-1.c: Likewise.
+
 2011-02-17  Mike Frysinger  <michael.frysinger@analog.com>
 
 	* gcc.target/bfin/mcpu-bf542.c: Check SILICON_REVISION is 0x0004.

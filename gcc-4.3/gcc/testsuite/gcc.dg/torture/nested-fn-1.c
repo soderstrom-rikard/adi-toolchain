@@ -2,7 +2,6 @@
 /* Test whether unused nested functions aren't emitted into the assembly.  */
 /* { dg-do compile } */
 /* { dg-options "-g0" } */
-/* { dg-skip-if "Mark as unsupported until Bug 5827 is fixed." { bfin-*-* } } */
 
 int
 fn1 (int x)
