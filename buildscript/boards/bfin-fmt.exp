@@ -1,7 +1,5 @@
 # Board definition fragment for all Blackfin test targets
 
-#load_generic_config "gdb-comm"
-
 # No linker script needed.
 set_board_info ldscript "";
 

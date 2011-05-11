@@ -1,7 +1,7 @@
 # Board definition fragment for testing a FDPIC toolchain
 
 # Common Blackfin format settings
-load_generic_config "bfin-fmt"
+load_adi "bfin-fmt"
 
 # Advertise slightly less than we actually have since a few testcases
 # really push the limit.

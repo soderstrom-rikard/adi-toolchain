@@ -3,5 +3,5 @@
 # Override the cpu setting
 set adi_mcpu_flags "-msim"
 
-load_generic_config "bfin-fmt-elf"
-load_generic_config "bfin-target-qemu"
+load_adi "bfin-fmt-elf"
+load_adi "bfin-target-qemu"

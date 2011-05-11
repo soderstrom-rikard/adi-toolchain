@@ -1,7 +1,7 @@
 # Board definition fragment for testing a FLAT toolchain
 
 # Common Blackfin format settings
-load_generic_config "bfin-fmt"
+load_adi "bfin-fmt"
 
 # -s80000 is for gcc.dg/dg.exp/trampoline-1.c
 # if you change this value, also change gcc,stack_size below

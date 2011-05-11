@@ -1,4 +1,4 @@
 # Testing bfin-linux-uclibc toolchain via QEMU
 
-load_generic_config "bfin-fmt-fdpic"
-load_generic_config "bfin-target-qemu"
+load_adi "bfin-fmt-fdpic"
+load_adi "bfin-target-qemu"

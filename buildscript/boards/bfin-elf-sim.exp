@@ -3,8 +3,5 @@
 # Override the cpu setting
 set adi_mcpu_flags "-msim"
 
-# Dejagnu parses this incorrectly from "bfin-elf-sim"
-set target_os "sim"
-
-load_generic_config "bfin-fmt-elf"
-load_generic_config "bfin-target-sim"
+load_adi "bfin-fmt-elf"
+load_adi "bfin-target-sim"

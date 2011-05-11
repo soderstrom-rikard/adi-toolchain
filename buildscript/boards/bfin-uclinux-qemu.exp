@@ -1,4 +1,4 @@
 # Testing bfin-uclinux toolchain via QEMU
 
-load_generic_config "bfin-fmt-flat"
-load_generic_config "bfin-target-qemu"
+load_adi "bfin-fmt-flat"
+load_adi "bfin-target-qemu"

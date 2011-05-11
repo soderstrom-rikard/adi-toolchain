@@ -1,4 +1,4 @@
 # Testing bfin-elf toolchain via JTAG
 
-load_generic_config "bfin-fmt-elf"
-load_generic_config "bfin-target-jtag"
+load_adi "bfin-fmt-elf"
+load_adi "bfin-target-jtag"
