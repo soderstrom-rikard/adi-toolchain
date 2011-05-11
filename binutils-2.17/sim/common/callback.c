@@ -1137,3 +1137,21 @@ sim_cb_eprintf (host_callback *p, const char *fmt, ...)
   p->evprintf_filtered (p, fmt, ap);
   va_end (ap);
 }
+
+int
+cb_is_stdin (host_callback *cb, int fd)
+{
+  return fdbad (cb, fd) ? 0 : fdmap (cb, fd) == 0;
+}
+
+int
+cb_is_stdout (host_callback *cb, int fd)
+{
+  return fdbad (cb, fd) ? 0 : fdmap (cb, fd) == 1;
+}
+
+int
+cb_is_stderr (host_callback *cb, int fd)
+{
+  return fdbad (cb, fd) ? 0 : fdmap (cb, fd) == 2;
+}

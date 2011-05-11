@@ -321,6 +321,11 @@ int cb_host_to_target_stat PARAMS ((host_callback *, const struct stat *, PTR));
 /* Translate a value to target endian.  */
 void cb_store_target_endian PARAMS ((host_callback *, char *, int, long));
 
+/* Tests for special fds.  */
+int cb_is_stdin (host_callback *, int);
+int cb_is_stdout (host_callback *, int);
+int cb_is_stderr (host_callback *, int);
+
 /* Perform a system call.  */
 CB_RC cb_syscall PARAMS ((host_callback *, CB_SYSCALL *));
 
