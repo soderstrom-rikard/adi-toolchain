@@ -35,9 +35,6 @@ PREREQ_FILE=""
 PREREQ_TESTS="bc kill killall pstree"
 PREREQ_HW_TESTS="ping rsh rcp"
 RUNTEST=runtest
-# The default binutils version is for gdb since there is no way to
-# detect binutils version with GDB.
-DEFAULT_BINUTILS_VERSION=2.17
 BINUTILS_VERSION=
 GDB_VERSION=
 GCC_VERSION=
@@ -676,8 +673,6 @@ test_common_binutils()
 test_binutils() { test_common_binutils "$@" "ar nm objcopy objdump readelf size" ; }
 test_gas()      { test_common_binutils "$@" "as" ; }
 test_ld()       { test_common_binutils "$@" "ld" ; }
-# would be better to detect `run`, but it doesn't have proper version output
-test_sim()      { test_common_binutils "$@" "ld" ; }
 
 # Detect GDB version and path
 # $1 is the name of gdb tool
@@ -687,9 +682,23 @@ detect_gdb()
 	detect gdb $1 "$GDB_VERSION" "$GDB_PATH" || return 1
 	: ${GDB_VERSION:=${VERSION}}
 	: ${GDB_PATH:=${TOOL_PATH}}
+
+	# figure out which binutils dir this gdb ver is coming from
+	if [ "${DIR_GDB_SOURCE:+set}" != "set" ] ; then
+		for d in "$DIR_SOURCE"/binutils-*/gdb ; do
+			if [ "$(cat "${d}"/version.in)" = "${GDB_VERSION}" ] ; then
+				DIR_GDB_SOURCE=${d%/gdb}
+				break
+			fi
+		done
+	fi
+	if ! is_abs_dir "$DIR_GDB_SOURCE" ; then
+		echo "Can't find GDB source at $DIR_GDB_SOURCE"
+		return 1
+	fi
 }
 
-test_gdb()
+test_common_gdb()
 {
 	detect_gdb gdb || return 1
 	test_hook()
@@ -703,9 +712,16 @@ test_gdb()
 		)
 	}
 
-	# we keep gdb and binutils together, so use that common function
-	test_common_binutils "$@" "as"
+	test_common $1 \
+		"$DIR_GDB_SOURCE/$3/testsuite" \
+		"${GDB_VERSION}" \
+		"$2"
 }
+
+test_gdb() { test_common_gdb "$@" "gdb" ; }
+# would be better to detect `run`, but it doesn't have proper version output.
+# while the sim isn't strictly tied to gdb, it's how upstream organizes.
+test_sim() { test_common_gdb "$@" "sim" ; }
 
 # Detect version and path for objc
 
