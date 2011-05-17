@@ -1,5 +1,11 @@
 2011-05-17  Stuart Henderson  <stuart.henderson@analog.com>
 
+	From Jie Zhang:
+	* config/bfin/uclinux.h (LINK_GCC_C_SEQUENCE_SPEC): Make sure
+	libbffastfp overrides libgcc when -mfast-fp.
+
+2011-05-17  Stuart Henderson  <stuart.henderson@analog.com>
+
 	Originally from Bernd Schmidt
 	* config/bfin/uclinux.h (SUBTARGET_FDPIC_NOT_SUPPORTED): New macro.
 	* config/bfin/bfin.c (override_options): Test it and error if TARGET_FDPIC.
