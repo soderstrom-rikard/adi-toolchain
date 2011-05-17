@@ -1,6 +1,15 @@
 2011-05-17  Stuart Henderson  <stuart.henderson@analog.com>
 
 	From Bernd Schmidt
+	* config/bfin/t-bfin (LIB1ASMFUNCS): Add muldi3 and umulsi3_highpart.
+	* config/bfin/t-bfin-elf (LIB1ASMFUNCS): Add muldi3.
+	* config/bfin/t-bfin-linux (LIB1ASMFUNCS): Add muldi3.
+	* config/bfin/t-bfin-uclinux (LIB1ASMFUNCS): Add muldi3.
+	* config/bfin/lib1funcs.asm (___muldi3): New function.
+
+2011-05-17  Stuart Henderson  <stuart.henderson@analog.com>
+
+	From Bernd Schmidt
 	* config/bfin/bfin.md (rotrsi, rotlsi): Don't take INTVAL of anything
 	that's not CONST_INT.  Seemingly redundant check is due to PR39768.
 
