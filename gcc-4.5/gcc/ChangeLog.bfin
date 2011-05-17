@@ -1,3 +1,9 @@
+2011-05-17  Stuart Henderson  <stuart.henderson@analog.com>
+
+	PR target/47951
+	* config/bfin/bfin.md (loop_end): Use matching constraints to ensure
+	inputs match the output.
+
 2011-04-26  Stuart Henderson  <stuart.henderson@analog.com>
 
 	* config/bfin/linux.h (LINK_SPEC): [#6087] Fault use of -mglibc.
