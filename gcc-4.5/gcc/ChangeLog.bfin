@@ -1,5 +1,11 @@
 2011-05-17  Stuart Henderson  <stuart.henderson@analog.com>
 
+	From Mike Frysinger:
+	* config/bfin/bfin.c (bfin_cpus[]): Add 0.4 for
+	bf542/bf544/bf547/bf548/bf549.
+
+2011-05-17  Stuart Henderson  <stuart.henderson@analog.com>
+
 	From Bernd Schmidt:
 	* config/bfin/bfin.md (MOVCC): New mode_macro.
 	(mov<mode>cc_insn1, mov<mode>cc_insn2, mov<mode>cc): Renamed from
