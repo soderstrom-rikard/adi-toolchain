@@ -1,5 +1,10 @@
 2011-05-17  Stuart Henderson  <stuart.henderson@analog.com>
 
+	Originally From Bernd Schmidt
+	* config/bfin/bfin.c (override_options): Disable -fstack-limit for FD-PIC.
+
+2011-05-17  Stuart Henderson  <stuart.henderson@analog.com>
+
 	PR target/47951
 	* config/bfin/bfin.md (loop_end): Use matching constraints to ensure
 	inputs match the output.
