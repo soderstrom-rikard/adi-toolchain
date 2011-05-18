@@ -1,3 +1,11 @@
+2011-05-18  Stuart Henderson  <stuart.henderson@analog.com>
+
+	* gcc.target/bfin/mcpu-bf512.c: Update to latest silicon revision and
+	remove duplication.
+	* gcc.target/bfin/mcpu-bf514.c: Likewise.
+	* gcc.target/bfin/mcpu-bf516.c: Likewise.
+	* gcc.target/bfin/mcpu-bf518.c: Likewise.
+
 2011-05-17  Stuart Henderson  <stuart.henderson@analog.com>
 
 	From Mike Frysinger
