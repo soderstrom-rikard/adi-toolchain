@@ -1,3 +1,8 @@
+2011-05-18  Stuart Henderson  <stuart.henderson@analog.com>
+
+	From Jie Zhang
+	* config/bfin/bfin.c (bfin_expand_prologue): Don't clobber P2.
+
 2011-05-17  Stuart Henderson  <stuart.henderson@analog.com>
 
 	From Mike Frysinger:
