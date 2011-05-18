@@ -1,5 +1,10 @@
 2011-05-18  Stuart Henderson  <stuart.henderson@analog.com>
 
+	From Bernd Schmidt
+	* config/bfin/bfin.md (addsi3): Add an alternative for IREGS.
+
+2011-05-18  Stuart Henderson  <stuart.henderson@analog.com>
+
 	From Jie Zhang
 	*config/bfin/bfin.c (bfin_extra_live_on_entry): New.
 	(TARGET_EXTRA_LIVE_ON_ENTRY): Define.
