@@ -14,17 +14,18 @@
 %define x_support 1
 %define extra_buildtoolchain_opts %{nil}
 %endif
+%define skip_qemu 1
 
-%define optional_gcc 0
+%define optional_gcc 1
 %define gcc_main_ver 4.3
 %define gcc_main_fullver %{gcc_main_ver}.5
 %define gcc_addon_ver 4.5
-%define gcc_addon_fullver %{gcc_addon_ver}.0
+%define gcc_addon_fullver %{gcc_addon_ver}.2
 
 Name:         blackfin-toolchain
 URL:          http://blackfin.uclinux.org
-Version:      10r1
-Release:      1
+Version:      2011R1
+Release:      BETA1
 Obsoletes:    bfin-gcc
 Summary:      The GNU toolchain for the Blackfin processor
 License:      GPL
@@ -47,11 +48,12 @@ Source12:     libftdi.tar.bz2
 Source13:     libusb.tar.bz2
 Source14:     urjtag.tar.bz2
 Source15:     gdbproxy.tar.bz2
+Source16:     qemu.tar.bz2
 %if %{windows_build}
-Source16:     libusb-winusb.tar.bz2
-Source17:     expat-2.0.1.tar.gz
-Source18:     PDCurses-3.4.tar.gz
-Source19:     pthreads-windows.tar.bz2
+Source17:     libusb-winusb.tar.bz2
+Source18:     expat-2.0.1.tar.gz
+Source19:     PDCurses-3.4.tar.gz
+Source20:     pthreads-windows.tar.bz2
 %endif
 Patch:        jtag.diff
 prefix:       /opt/uClinux
@@ -128,16 +130,21 @@ gcc-%{gcc_addon_fullver} based toolchain.
 %define extra_setup -a 1
 %endif
 %if %{windows_build}
-%define windows_setup -a 16 -a 17 -a 18 -a 19
+%define windows_setup -a 17 -a 18 -a 19 -a 20
 %endif
-%setup -q -c %{name}-%{version} %{extra_setup} -a 2 -a 3 -a 4 -a 5 -a 6 -a 7 -a 8 -a 9 -a 10 -a 11 -a 12 -a 13 -a 14 -a 15 %{windows_setup}
+%setup -q -c %{name}-%{version} %{extra_setup} -a 2 -a 3 -a 4 -a 5 -a 6 -a 7 -a 8 -a 9 -a 10 -a 11 -a 12 -a 13 -a 14 -a 15 -a 16 %{windows_setup}
 %patch -p0
 
 %build
 %if %{optional_gcc}
-%define gcc_build_opts -c %{gcc_addon_ver} -c %{gcc_main_ver}
+%define gcc_opts -c %{gcc_addon_ver} -c %{gcc_main_ver}
 %else
-%define gcc_build_opts -c %{gcc_main_ver}
+%define gcc_opts -c %{gcc_main_ver}
+%endif
+%if %{skip_qemu}
+%define gcc_build_opts %{gcc_opts} -S qemu
+%else
+%define gcc_build_opts %{gcc_opts}
 %endif
 echo Building in $RPM_BUILD_ROOT
 ./buildscript/BuildToolChain %{extra_buildtoolchain_opts} \
@@ -195,10 +202,8 @@ rm -rf $RPM_BUILD_ROOT
 %defattr(-,root,root)
 %doc %{prefix}/bfin-uclinux/info/*
 %doc %{prefix}/bfin-uclinux/man/*
-%doc %{prefix}/bfin-uclinux/bfin-uclinux/info/*
 %doc %{prefix}/bfin-linux-uclibc/info/*
 %doc %{prefix}/bfin-linux-uclibc/man/*
-%doc %{prefix}/bfin-linux-uclibc/bfin-linux-uclibc/info/*
 %{prefix}/bfin-uclinux/share/*
 %{prefix}/bfin-uclinux/bin/bfin-bsdl2jtag%{EXEEXT}
 %{prefix}/bfin-uclinux/bin/bfin-gdbproxy%{EXEEXT}
@@ -236,6 +241,14 @@ rm -rf $RPM_BUILD_ROOT
 %{prefix}/bfin-uclinux/bin/bfin-uclinux-size%{EXEEXT}
 %{prefix}/bfin-uclinux/bin/bfin-uclinux-strings%{EXEEXT}
 %{prefix}/bfin-uclinux/bin/bfin-uclinux-strip%{EXEEXT}
+%{prefix}/bfin-uclinux/bin/bfin-ldr%{EXEEXT}
+%{prefix}/bfin-uclinux/bin/bfin-uclinux-elfedit%{EXEEXT}
+%{prefix}/bfin-uclinux/bin/bfin-uclinux-ld.bfd
+%if ! %{skip_qemu}
+%{prefix}/bfin-uclinux/bin/bfin-qemu%{EXEEXT}
+%{prefix}/bfin-uclinux/bin/bfin-uclinux-qemu%{EXEEXT}
+%{prefix}/bfin-uclinux/etc/qemu/target-x86_64.conf%{EXEEXT}
+%endif
 
 %{prefix}/bfin-uclinux/bfin-uclinux/bin/ar%{EXEEXT}
 %{prefix}/bfin-uclinux/bfin-uclinux/bin/as%{EXEEXT}
@@ -251,6 +264,10 @@ rm -rf $RPM_BUILD_ROOT
 %{prefix}/bfin-uclinux/bfin-uclinux/bin/nm%{EXEEXT}
 %{prefix}/bfin-uclinux/bfin-uclinux/bin/ranlib%{EXEEXT}
 %{prefix}/bfin-uclinux/bfin-uclinux/bin/strip%{EXEEXT}
+%{prefix}/bfin-uclinux/bfin-uclinux/bin/ld.bfd
+%{prefix}/bfin-uclinux/bfin-uclinux/bin/objcopy%{EXEEXT}
+%{prefix}/bfin-uclinux/bfin-uclinux/share/info/bfd.info%{EXEEXT}
+%{prefix}/bfin-uclinux/bfin-uclinux/share/info/dir%{EXEEXT}
 
 #%{prefix}/bfin-uclinux/lib/*.a
 %{prefix}/bfin-uclinux/libexec/gcc/bfin-uclinux/%{gcc_main_fullver}/*
@@ -297,6 +314,14 @@ rm -rf $RPM_BUILD_ROOT
 %{prefix}/bfin-linux-uclibc/bin/bfin-linux-uclibc-size%{EXEEXT}
 %{prefix}/bfin-linux-uclibc/bin/bfin-linux-uclibc-strings%{EXEEXT}
 %{prefix}/bfin-linux-uclibc/bin/bfin-linux-uclibc-strip%{EXEEXT}
+%{prefix}/bfin-linux-uclibc/bin/bfin-ldr%{EXEEXT}
+%{prefix}/bfin-linux-uclibc/bin/bfin-linux-uclibc-elfedit%{EXEEXT}
+%{prefix}/bfin-linux-uclibc/bin/bfin-linux-uclibc-ld.bfd
+%if ! %{skip_qemu}
+%{prefix}/bfin-linux-uclibc/bin/bfin-linux-uclibc-qemu%{EXEEXT}
+%{prefix}/bfin-linux-uclibc/bin/bfin-qemu%{EXEEXT}
+%{prefix}/bfin-linux-uclibc/etc/qemu/target-x86_64.conf%{EXEEXT}
+%endif
 
 %{prefix}/bfin-linux-uclibc/bfin-linux-uclibc/bin/ar%{EXEEXT}
 %{prefix}/bfin-linux-uclibc/bfin-linux-uclibc/bin/as%{EXEEXT}
@@ -309,6 +334,10 @@ rm -rf $RPM_BUILD_ROOT
 %{prefix}/bfin-linux-uclibc/bfin-linux-uclibc/bin/nm%{EXEEXT}
 %{prefix}/bfin-linux-uclibc/bfin-linux-uclibc/bin/ranlib%{EXEEXT}
 %{prefix}/bfin-linux-uclibc/bfin-linux-uclibc/bin/strip%{EXEEXT}
+%{prefix}/bfin-linux-uclibc/bfin-linux-uclibc/bin/ld.bfd
+%{prefix}/bfin-linux-uclibc/bfin-linux-uclibc/bin/objcopy%{EXEEXT}
+%{prefix}/bfin-linux-uclibc/bfin-linux-uclibc/share/info/bfd.info%{EXEEXT}
+%{prefix}/bfin-linux-uclibc/bfin-linux-uclibc/share/info/dir%{EXEEXT}
 
 #%{prefix}/bfin-linux-uclibc/lib/*.a
 %{prefix}/bfin-linux-uclibc/libexec/gcc/bfin-linux-uclibc/%{gcc_main_fullver}/*
@@ -357,6 +386,14 @@ rm -rf $RPM_BUILD_ROOT
 %{prefix}/bfin-elf/bin/bfin-elf-size%{EXEEXT}
 %{prefix}/bfin-elf/bin/bfin-elf-strings%{EXEEXT}
 %{prefix}/bfin-elf/bin/bfin-elf-strip%{EXEEXT}
+%{prefix}/bfin-elf/bin/bfin-elf-elfedit%{EXEEXT}
+%{prefix}/bfin-elf/bin/bfin-elf-ld.bfd
+%{prefix}/bfin-elf/bin/bfin-ldr%{EXEEXT}
+%if ! %{skip_qemu}
+%{prefix}/bfin-elf/bin/bfin-elf-qemu%{EXEEXT}
+%{prefix}/bfin-elf/bin/bfin-qemu%{EXEEXT}
+%{prefix}/bfin-elf/etc/qemu/target-*
+%endif
 
 %{prefix}/bfin-elf/bfin-elf/lib/*
 %{prefix}/bfin-elf/bfin-elf/include/*
@@ -373,6 +410,8 @@ rm -rf $RPM_BUILD_ROOT
 %{prefix}/bfin-elf/bfin-elf/bin/nm%{EXEEXT}
 %{prefix}/bfin-elf/bfin-elf/bin/ranlib%{EXEEXT}
 %{prefix}/bfin-elf/bfin-elf/bin/strip%{EXEEXT}
+%{prefix}/bfin-elf/bfin-elf/bin/ld.bfd
+%{prefix}/bfin-elf/bfin-elf/bin/objcopy%{EXEEXT}
 
 #%{prefix}/bfin-elf/lib/*.a
 %{prefix}/bfin-elf/lib/gcc/bfin-elf/%{gcc_main_fullver}
