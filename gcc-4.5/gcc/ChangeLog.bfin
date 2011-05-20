@@ -1,3 +1,12 @@
+2011-05-20  Stuart Henderson  <stuart.henderson@analog.com>
+
+	* config/bfin/bfin.c (bfin_gen_bundles): Don't try to bundle a jump.
+	(bfin_optimize_loops_1, move_loop_constants): New static functions.
+	(bfin_reorg): Call bfin_optimize_loops_1 if optimizing.
+	Bug[#4877]
+	(bfin_optimize_loops_1): Do nothing if the function calls setjmp.
+
+
 2011-05-18  Stuart Henderson  <stuart.henderson@analog.com>
 
 	* doc/invoke.texi (Blackfin Options): -mcpu accepts bf592.
