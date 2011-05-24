@@ -902,6 +902,7 @@ static const struct bfrom bf51x_roms[] =
 };
 static const struct bfrom bf526_roms[] =
 {
+  BFROM (526, 2, 0x1000000),
   BFROM (526, 1, 0x1000000),
   BFROM (526, 0, 0x1000000),
   BFROM_STUB,
