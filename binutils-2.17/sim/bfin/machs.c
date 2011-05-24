@@ -943,9 +943,11 @@ static const struct bfrom bf538_roms[] =
 };
 static const struct bfrom bf54x_roms[] =
 {
+  BFROM (54x, 4, 0),
   BFROM (54x, 2, 0),
   BFROM (54x, 1, 0),
   BFROM (54x, 0, 0),
+  BFROMA (0xffa14000, 54x_l1, 4, 0),
   BFROMA (0xffa14000, 54x_l1, 2, 0),
   BFROMA (0xffa14000, 54x_l1, 1, 0),
   BFROMA (0xffa14000, 54x_l1, 0, 0),
