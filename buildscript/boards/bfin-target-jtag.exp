@@ -1,6 +1,7 @@
 # Board definition fragment for testing a Blackfin processor via JTAG
 
 load_generic_config "bfin"
+load_generic_config "gdb-comm"
 
 # It uses the remote stub protocol to talk to the board.
 set_board_info use_gdb_stub 1
