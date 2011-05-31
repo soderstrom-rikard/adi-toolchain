@@ -6,7 +6,7 @@ load_generic_config "gdb-comm"
 # It uses the remote stub protocol to talk to the board.
 set_board_info use_gdb_stub 1
 set_board_info gdb_protocol "remote"
-set_board_info netport ":2000"
+set_board_info netport "${adi_hostname}:2000"
 
 # Used by gdb-comm.
 set_board_info gdb_init_command "$adi_boards_dir"
