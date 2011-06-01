@@ -76,4 +76,5 @@ main ()
   return (0);
 }
 
+/* { dg-options "-fmudflap -lmudflap -DSCALE=10000" { target bfin*-*-* } } */
 /* { dg-output "allocating.*freeing.*allocating.*freeing.*done" } */

@@ -1,3 +1,8 @@
+2011-06-01  Stuart Henderson  <Stuart.Henderson@analog.com>
+
+	* testsuite/libmudflap.c/heap-scalestress.c: [#6202] Lower SCALE for bfin
+	to reduce stack usage.
+
 2011-05-20  Stuart Henderson  <stuart.henderson@analog.com>
 
 	From Bernd Schmidt:
