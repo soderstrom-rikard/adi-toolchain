@@ -1,3 +1,7 @@
+2011-06-01  Stuart Henderson  <stuart.henderson@analog.com>
+
+	* gcc.target/bfin/bfin.exp: Remove any -mcpu switces before target tests.
+
 2011-05-09  Stuart Henderson  <stuart.henderson@analog.com>
 
 	* gcc.dg/trampoline-1.c: Enable now that [#5827] is fixed.
