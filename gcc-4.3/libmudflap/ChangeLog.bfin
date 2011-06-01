@@ -1,3 +1,8 @@
+2011-06-01  Stuart Henderson  <Stuart.Henderson@analog.com>
+
+	* testsuite/libmudflap.c/heap-scalestress.c: [#6202] Lower SCALE for bfin
+	to reduce stack usage.
+
 2010-09-13  Stuart Henderson  <Stuart.Henderson@analog.com>
 
 	* testsuite/libmudflap.c++/ctors.exp: [#5777] Add remote_setenv to exp file
