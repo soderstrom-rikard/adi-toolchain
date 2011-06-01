@@ -1,3 +1,7 @@
+2011-06-01  Stuart Henderson  <stuart.henderson@analog.com>
+
+	* gcc.target/bfin/bfin.exp: Remove any -mcpu switces before target tests.
+
 2011-05-18  Stuart Henderson  <stuart.henderson@analog.com>
 
 	* gcc.target/bfin/mcpu-bf592.c: New test.
