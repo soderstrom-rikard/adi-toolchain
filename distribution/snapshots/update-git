@@ -1,0 +1,33 @@
+#!/bin/bash
+#
+# Walk all the git trees in /usr/local/src/blackfin/git
+# and update them while logging the output into files
+#
+
+for d in /usr/local/bin /sw/bin ~/.bin ~/bin ; do
+	[[ -d ${d} ]] && PATH=${d}:${PATH}
+done
+
+[[ -z ${FLOCKER} ]] && exec env FLOCKER=true flock -en $0 -c "$0 $*" || :
+
+set -e
+
+src_dir=/usr/local/src/blackfin/git
+cd ${src_dir}
+
+for d in ${@:-*} ; do
+	log="${src_dir}/log.${d%%/*}"
+	gdir="${src_dir}/${d}"
+	[[ -d ${gdir}/.git ]] || continue
+	echo git pull $d
+	cd "${gdir}" || continue
+	(
+	date
+	git pull --no-stat
+	date
+	git gc --auto
+	date
+	git status || :
+	date
+	) >& "${log}" || :
+done

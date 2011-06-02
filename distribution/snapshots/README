@@ -7,20 +7,17 @@ the main file you're concerned with is:
 it assumes a filesystem layout like so:
 	/usr/local/src/blackfin/
 	 |- svn/
-	 |  |- linux-kernel/
+	 |  |- update -> toolchain/trunk/distribution/snapshots/update-svn
 	 |  |- toolchain/
-	 |  |- u-boot/
 	 |  \- uclinux-dist/
 	 |- git/
+	 |  |- update -> toolchain/distribution/snapshots/update-git
 	 |  |- linux-kernel/
 	 |  |- toolchain/
 	 |  \- u-boot/
-	 |- bin/
 	 |- nightly/
 	 \- toolchains/
-
-the bin dir comes from:
-	git://sources.blackfin.uclinux.org/git/users/vapier/bin.git
+	    \- build-toolchain -> ../git/toolchain/distribution/snapshots/build-toolchain
 
 the nightly dir will be automatically created and populated with log files
 as the script runs

@@ -1,0 +1,18 @@
+#!/bin/bash
+
+while [[ -n $1 ]] ; do
+
+if [[ -d $1/.svn ]] ; then
+	svn info "$1" | sed -n '/Last Changed Rev/s:.* ::p'
+else
+	(
+	cd "$1"
+	log=$(git log -n1 .)
+	[[ ${log} == *git-svn-id:* ]] \
+		&& echo "${log}" | sed -n '/git-svn-id:/s:.*@\([^ ]*\).*:\1:p' \
+		|| echo "${log}" | awk '{print $NF;exit 0}'
+	)
+fi
+
+shift
+done

@@ -1,0 +1,232 @@
+bfin_path() {
+	(
+		set -C
+		rm -f /tmp/bfin-reset-PATH.$$
+		echo "${PATH}" > /tmp/bfin-reset-PATH.$$
+	)
+	trap "rm -f /tmp/bfin-reset-PATH.$$" EXIT
+
+	eval $(
+	local p
+	local quiet=false use_ccache=true
+	[[ $1 == -q || $1 == --quiet ]] && quiet=true && shift
+	[[ $1 == -nc ]] && use_ccache=false && shift
+	if [[ -z $* ]] ; then
+		if [[ -d /usr/local/src/blackfin/toolchains/current ]] ; then
+			set -- $(eval echo /usr/local/src/blackfin/toolchains/current/{linux-uclibc,uclinux,elf})
+		else
+			for d in /opt/uClinux /opt/uClinux-svn ; do
+				[ -d "$d" ] && set -- $d
+			done
+		fi
+	fi
+	if [[ $# -eq 0 ]] ; then
+		echo "bfin_path: unable to locate a good toolchain" 1>&2
+		echo return 1
+		exit 1
+	elif [[ $# -eq 1 ]] ; then
+		p=""
+		local pp ppp
+		for pp in elf uclinux linux-uclibc ; do
+			if [[ -e $1/out-${pp}/bin ]] ; then
+				p="out-"
+			elif [[ -e $1/bfin-${pp}/bin ]] ; then
+				p="bfin-"
+			else
+				continue
+			fi
+			ppp="${ppp},${pp}"
+		done
+		set -- $(eval echo $1/${p}{${ppp:1}}/bin)
+	fi
+	echo export _BFIN_PATH=\'$*\'
+	for p in "$@" ; do
+		p=$(readlink -f ${p})
+		pushd ${p} > /dev/null || return 1
+		local ccache=$(type -P ccache)
+		${use_ccache} || ccache=""
+		if [[ -n ${ccache} ]] && [[ ! -d ccache ]] ; then
+			if ! mkdir -p ccache >& /dev/null ; then
+				(
+				echo ""
+				echo "FAIL: ccache creation with $p; please do:"
+				echo " sudo mkdir '${p}/ccache'"
+				echo " sudo chown ${USER}:users '${p}/ccache'"
+				) 1>&2
+			fi
+		fi
+		if [[ -n ${ccache} ]] && [[ -d ccache ]] ; then
+			if [[ ! -d ccache/scripts ]] ; then
+				mkdir -p ccache/{output,scripts,symlinks}
+				cd ccache
+				local x xx
+
+				cat <<-EOF > scripts/.wrapper
+					#!/bin/bash
+					x=\${0##*/}
+					p=\${0%/*}
+					p=\${p%/ccache/scripts}
+					export CCACHE_DIR=\${p}/ccache/output
+					export PATH=\${p}:\${PATH}
+					exec \${p}/ccache/symlinks/\${x} "\$@"
+				EOF
+				chmod a+rx scripts/.wrapper
+
+				x=$(find .. -maxdepth 1 -name '*-gcc' -printf '%P')
+				xx=${x%-gcc}-ccache
+				cat <<-EOF > scripts/${xx}
+					#!/bin/bash
+					p=\${0%/*}
+					p=\${p%/ccache/scripts}
+					export CCACHE_DIR=\${p}/ccache/output
+					export PATH=\${p}:\${PATH}
+					exec ccache "\$@"
+				EOF
+				chmod a+rx scripts/${xx}
+
+				for x in gcc c++ g++ ; do
+					for xx in $(find .. -maxdepth 1 '(' -name "*-${x}" -o -name "*-${x}-*" ')' -printf '%P ') ; do
+						ln scripts/.wrapper scripts/${xx}
+						ln -fs ${ccache} symlinks/${xx}
+					done
+				done
+			fi
+			echo export UCLINUX_USE_CCACHE=no # we handle it ourself
+			${quiet} || echo "Adding ${p} (w/ccache)" 1>&2
+			export PATH=${PATH}:${p}/ccache/scripts:${p}
+			echo export PATH=\"${PATH}\"
+		else
+			${quiet} || echo "Adding ${p} to PATH" 1>&2
+			export PATH=${PATH}:${p}
+			echo export PATH=\"${PATH}\"
+		fi
+		popd > /dev/null
+	done
+	)
+	unset -f bfin_path
+
+	local g
+	for g in bfin-{{linux-uclibc,uclinux,elf}-gdb{,tui},gdbproxy,jtag} ; do
+		type -P ${g} >& /dev/null && alias ${g}="${g} --quiet"
+		type -P ${g} >& /dev/null && alias ${g}="${g} --quiet"
+	done
+
+	bfin-reset() {
+		export PATH=$(</tmp/bfin-reset-PATH.$$)
+		rm -f /tmp/bfin-reset-PATH.$$
+		source /usr/local/src/blackfin/git/toolchain/distribution/snapshots/bfin-alias
+		local g
+		for g in $(alias 2>&1 | sed -n '/^alias bfin-/{s:^alias ::;s:=.*::;p}') ; do
+			unalias ${g}
+		done
+		for g in $(declare 2>&1 | awk '$0 ~ /^bfin-/ { print $1 }') ; do
+			unset -f ${g}
+		done
+	}
+
+	bfin-set-gcc-ver() {
+		local ver=$1
+		if [[ -z ${ver} || -n $2 ]] ; then
+			echo "Usage: bfin-set-gcc-ver <gcc ver>"
+			return 1
+		fi
+
+		local b bb
+		for b in ${_BFIN_PATH} ; do
+			for bb in $(echo ${b}/*-${ver}) ; do
+				b=${bb%-${ver}}
+				if [[ ! -x ${bb} ]] ; then
+					echo "Not found: ${bb}"
+					continue
+				fi
+				rm -f "${b}"
+				cp -a "${b}-${ver}" "${b}"
+				echo "${b##*/} -> ${bb##*/}"
+			done
+		done
+	}
+
+	bfin-cpu-reset() {
+		bfin-jtag <<-EOF
+		cable probe
+		detect
+		bfin emulation enter
+		bfin reset
+		bfin emulation exit
+		quit
+		EOF
+	}
+
+	bfin-cpu-uboot() {
+		local init=$1 elf=$2
+		[[ -z $elf ]] && echo "Usage: bfin-cpu-uboot <init> <elf>" && return 1
+		killall -q bfin-gdbproxy
+		bfin-gdbproxy -q bfin --reset &
+		local pid=$!
+		sleep 3s
+		bfin-elf-gdb -q -batch \
+			--ex "target remote localhost:2000" \
+			--ex "load $init" \
+			--ex c \
+			--ex load \
+			--ex "call memset(&_bss_start, 0, &_bss_end - &_bss_start)" \
+			--ex c \
+			"$elf"
+		kill ${pid}
+	}
+}
+
+switch_svn() {
+	local localserv=$(</usr/local/src/blackfin/.svn.local)
+	local remotserv="svn+ssh://${USER}@firewall-sources.blackfin.uclinux.org"
+	[[ -z ${localserv} ]] && return 1
+
+	normalize_svn_trail() {
+		local var=$1
+		local val=${!var}
+		while [[ ${val} == */svn ]] || [[ ${val} == */ ]] ; do
+			val=${val%/svn}
+			val=${val%/}
+		done
+		eval ${var}="${val}"
+	}
+	normalize_svn_lead() {
+		local var=$1
+		local val=${!var}
+		while [[ ${val} == svn/* ]] || [[ ${val} == /* ]] ; do
+			val=${val#svn/}
+			val=${val#/}
+		done
+		eval ${var}="${val}"
+	}
+
+	normalize_svn_trail localserv
+	normalize_svn_trail remotserv
+
+	local newurl url=$(svn info | grep ^URL:) oldurl
+	[[ -z ${url} ]] && return 1
+	url=${url#URL: }
+	oldurl=${url}
+	case ${url} in
+		${remotserv}*)
+			url=${url#${remotserv}}
+			normalize_svn_lead url
+			newurl=${localserv}/svn/${url}
+			;;
+		${localserv}*)
+			url=${url#${localserv}}
+			normalize_svn_lead url
+			newurl=${remotserv}/svn/${url}
+			;;
+		*)
+			echo "Unknown url: ${url}; switching to local"
+			remotserv=${url##*//}
+			remotserv=${remotserv#*/}
+			newurl="${localserv}/svn/${remotserv##svn/}"
+			;;
+	esac
+	(set -x; svn switch --relocate ${oldurl} ${newurl} "$@")
+
+	unset normalize_svn_trail
+	unset normalize_svn_lead
+}

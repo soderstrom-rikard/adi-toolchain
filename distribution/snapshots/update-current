@@ -1,0 +1,32 @@
+#!/bin/bash -e
+#
+# This updates the symlinks in:
+#    /usr/local/src/blackfin/toolchains/current/
+# Which other files use to figure out what toolchain
+# to use as the "current" one
+#
+
+[[ -z $1 ]] && echo "error: need a date" && exit 1
+
+[[ -z ${FLOCKER} ]] && exec env FLOCKER=true flock -en $0 -c "$0 $*" || :
+
+if [[ $2 == "-q" ]] ; then
+	shift
+else
+	set -x
+fi
+
+cd /usr/local/src/blackfin/toolchains/$2
+[[ ! -d current ]] && mkdir current
+cd current
+
+d=""
+[[ -d ../$1 ]] && d=../$1
+[[ -d $1 ]] && d=$1
+
+[[ -z $d ]] && echo "error: not a valid date" && exit 1
+
+for x in elf linux-uclibc uclinux ; do
+	rm -f ${x}
+	ln -s $d/*-${x}/bin ${x}
+done

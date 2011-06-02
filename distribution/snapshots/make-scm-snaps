@@ -52,7 +52,7 @@ for s in ${*:-toolchain u-boot uclinux-dist} ; do
 	rm -rf .snaps
 	mkdir -p .snaps
 
-	rev=$(${root}/bin/get-svn-rev "${src}")
+	rev=$(${root}/git/toolchain/distribution/snapshots/get-svn-rev "${src}")
 	if ${UPDATE} && [[ -e .snap.${s}.${branch} ]] ; then
 		lastrev=$(cat .snap.${s}.${branch})
 		[[ ${lastrev} == ${rev} ]] && continue

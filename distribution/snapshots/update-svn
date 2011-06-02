@@ -1,0 +1,78 @@
+#!/bin/bash
+#
+# Walk all the svn trees in /usr/local/src/blackfin/svn
+# and update them while logging the output into files.
+# Also takes care of common lock issues.
+#
+
+[[ -z ${FLOCKER} ]] && exec env FLOCKER=true flock -en $0 -c "$0 $*" || :
+
+set -e
+
+force=false
+if [[ $1 == "-f" ]] ; then
+	force=true
+	shift
+fi
+
+src_dir=/usr/local/src/blackfin/svn
+cd ${src_dir}
+
+for d in ${@:-*} ; do
+	d=${d#log.}
+	[[ -d ${src_dir}/${d} ]] || continue
+	echo svn up $d
+	cd ${src_dir}/${d}
+	if [[ -d trunk ]] ; then
+		dirs="trunk"
+		[[ -d branches ]] && dirs="${dirs} $(find branches -mindepth 1 -maxdepth 1 -type d '!' -name .svn)"
+	else
+		dirs=""
+	fi
+	echo svn up --ignore-externals ${dirs}
+	log=${src_dir}/log.${d%%/*}
+	(
+	do_svn() {
+		date
+		set -- svn "$@"
+		if type -P timeout >/dev/null ; then
+			set -- timeout 1h "$@"
+		fi
+		echo "$@" 1>&2
+		"$@"
+	}
+
+	svn_up() { do_svn up --non-interactive --ignore-externals "$@" ; }
+	# skip dirs that are up to date already (assume root svn matches tree)
+	svn_up -N ${dirs}
+
+	for d in ${dirs} ; do
+		c=$(do_svn info `find ${d} -maxdepth 2 -type d -name .svn | sed 's:/[.]svn::'` | \
+			awk '$1 == "Revision:" && $NF != "0" { print $NF }' | sort -u | wc -l)
+		if [[ ${c} != "1" ]] ; then
+			if ! svn_up ${d} ; then
+				if ${force} ; then
+					do_svn cleanup
+					svn_up ${d}
+				else
+					exit 1
+				fi
+			fi
+			do_svn st ${d}
+		fi
+	done
+
+#	if ! svn_up ${dirs} ; then
+#		if ${force} ; then
+#			do_svn cleanup
+#			svn_up ${dirs}
+#		else
+#			exit 1
+#		fi
+#	fi
+#
+#	do_svn st ${dirs}
+
+	date
+	) >& ${log} || :
+done

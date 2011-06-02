@@ -1,0 +1,163 @@
+#!/bin/bash
+#
+# Create a date-stamped toolchain in /usr/local/src/blackfin/toolchains/
+#
+
+if [[ ${USER} == root ]] ; then
+	echo "You should run this as non-root"
+fi
+for d in /usr/local/bin /sw/bin /usr/lib*/ccache /usr/lib*/ccache/*/ ; do
+	[[ -d ${d} ]] && export PATH=${d}:${PATH}
+done
+
+set -e -x
+
+FORCE=false
+RESUME=false
+WAIT=false
+NO_X=false
+CHOST=
+PKG=true
+SUBDIR=
+STRIP=false
+while [[ -n $1 ]] ; do
+	case $1 in
+		-f|--force)  FORCE=true;;
+		-R|--resume) RESUME=true;;
+		-w|--wait)   WAIT=true;;
+		-X)          NO_X=true;;
+		-H|--chost)  CHOST="-H $2"; shift;;
+		-P|--nopkg)  PKG=false;;
+		-S|--subdir) SUBDIR=/$2; shift;;
+		-s)          STRIP=true;;
+		--)          break;;
+		-*)          echo "unknown opt: $1"; exit 1;;
+		*)           break;;
+	esac
+	shift
+done
+
+BFIN_ROOT=/usr/local/src/blackfin
+
+toolchain_dir=${BFIN_ROOT}/toolchains
+output_root=${toolchain_dir}${SUBDIR}
+if [[ -e ${toolchain_dir}/.config.binutils.ver ]] ; then
+	binutils_ver="-B $(<${toolchain_dir}/.config.binutils.ver)"
+else
+	binutils_ver=""
+fi
+gcc_ver=
+if [[ -e ${toolchain_dir}/.config.gcc.ver ]] ; then
+	gcc_ver="$(sed 's:#.*::' ${toolchain_dir}/.config.gcc.ver)"
+	[[ -n ${gcc_ver} ]] && gcc_ver="-c ${gcc_ver}"
+fi
+if [[ -e ${toolchain_dir}/.config.makeflags ]] ; then
+	export MAKEFLAGS=$(<${toolchain_dir}/.config.makeflags)
+fi
+
+find_scm() {
+	local scm
+	for scm in git svn cvs ; do
+		if [[ -d ${BFIN_ROOT}/${scm}/$1 ]] ; then
+			echo ${BFIN_ROOT}/${scm}/$1$([[ ${scm} == svn ]] && echo /trunk)
+			return 0
+		fi
+	done
+	return 1
+}
+KERNEL=$(find_scm linux-kernel)
+TOOLCHAIN=$(find_scm toolchain)
+
+revs_curr=$(${BFIN_ROOT}/git/toolchain/distribution/snapshots/get-svn-rev \
+	"${TOOLCHAIN}"/{binutils-*,elf2flt,gcc-*,gdbproxy,*jtag*,ldr-utils,uClibc} \
+	"${KERNEL}"/{include,arch/blackfin/{include,mach-*/include}}
+)
+[[ -e ${output_root}/.svn.last.revs ]] && mv ${output_root}/.svn.last.revs ${output_root}/.last.revs
+revs_old=$(cat ${output_root}/.last.revs 2>/dev/null || :)
+
+! ${FORCE} && [[ "${revs_curr}" == "${revs_old}" ]] && exit 0
+
+STAMP=${1:-$(date +"%Y%m%d")}
+OUTPUT=${output_root}/${STAMP}
+${RESUME} || rm -rf "${OUTPUT}"
+mkdir -p "${OUTPUT}"
+
+#branch=${2:-trunk}
+#[[ ${branch} != "trunk" ]] && branch="branches/${branch}"
+#GCC=${BFIN_ROOT}/toolchain/${branch}
+#KERNEL=${BFIN_ROOT}/linux-kernel/${branch}
+
+UBOOT=$(find_scm u-boot)
+
+${TOOLCHAIN}/buildscript/BuildToolChain \
+	$(${RESUME} && echo "-R") \
+	$(${NO_X} && echo "-X") \
+	${CHOST} \
+	${binutils_ver} \
+	${gcc_ver} \
+	-k "${KERNEL}" \
+	-b "${OUTPUT}" \
+	-u "${UBOOT}" \
+	>> "${OUTPUT}"/script.log 2>&1 || exit 1
+
+if ${STRIP} ; then
+	strip=${CHOST:+${CHOST}-}strip
+	find \
+		"${OUTPUT}"/*/bin \
+		"${OUTPUT}"/*/*/bin \
+		"${OUTPUT}"/*/libexec \
+		-type f -perm +1 -exec ${strip} {} + || :
+fi
+
+for compress in xz lzma bzip2 gzip cat ; do
+	type -p ${compress} >/dev/null && break
+done
+case ${compress} in
+	xz)    suffix=.xz   parallel=false;;
+	lzma)  suffix=.lzma parallel=false;;
+	bzip2) suffix=.bz2  parallel=true;;
+	gzip)  suffix=.gz   parallel=true;;
+	cat)   suffix=      parallel=true;;
+esac
+
+rm -f "${OUTPUT}"/logs/config.logs.tbz2
+mv "${OUTPUT}"/script.log "${OUTPUT}"/logs/script
+${compress} "${OUTPUT}"/logs/* &
+ln -s "${TOOLCHAIN}" "${OUTPUT}"/.src.toolchain
+touch "${OUTPUT}"/OK
+
+cd "${OUTPUT}"
+rmdir * >& /dev/null || :
+mkdir pkgs
+
+if ${PKG} ; then
+wait=""
+for f in elf linux-uclibc uclinux ; do
+	dir=$(echo *-${f})
+	find ${dir} > pkgs/filelist.${f}
+	tar cf - -T pkgs/filelist.${f} --no-recursion | ${compress} > pkgs/toolchain-${STAMP}-${f}.tar${suffix} &
+	${WAIT} && wait="${wait} $!"
+	if getent passwd vapier >& /dev/null ; then
+		mkdir -p ${dir}/bin/ccache
+		group=$(getent group $(getent passwd vapier | cut -d: -f4) | cut -d: -f1)
+		chown vapier:${group} ${dir}/bin/ccache
+	fi
+	${parallel} || wait
+done
+[[ -n ${wait} ]] && wait ${wait}
+fi
+
+${FORCE} || echo "${revs_curr}" > ${output_root}/.last.revs
+echo "${revs_curr}" > "${OUTPUT}"/logs/svn.revs
+echo "${STAMP}" > ${output_root}/.last
+
+if [[ -e ${toolchain_dir}/.config.num.to.keep ]] ; then
+	keep_count=$(<${toolchain_dir}/.config.num.to.keep)
+	cd ${output_root}
+	find -maxdepth 1 -mindepth 1 -type d -name '20??????' | sort -r | sed 1,${keep_count}d | xargs rm -rf
+fi
+
+mkdir -p ${output_root}/current
+cd ${output_root}/current
+[[ ! -e update ]] && ln -sf ${BFIN_ROOT}/git/toolchain/distribution/snapshots/update-current update
+exec ./update ${STAMP} ${SUBDIR}

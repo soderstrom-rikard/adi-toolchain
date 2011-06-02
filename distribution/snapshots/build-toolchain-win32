@@ -1,0 +1,50 @@
+#!/bin/bash
+#
+# Create a date-stamped toolchain in /usr/local/src/blackfin/toolchains/win32/
+#
+
+# See if we can even generate a windows toolchain
+chost=
+for m in {,i{3,4,5,6}86-}mingw{,32}{,msvc} ; do
+	type -P ${m}-gcc > /dev/null && chost=${m}
+done
+[[ -z ${chost} ]] && echo "Unable to locate a mingw compiler" && exit 1
+export RC=${chost}-windres
+
+set -e
+
+BFIN_ROOT=/usr/local/src/blackfin
+
+cd /
+source ${BFIN_ROOT}/git/toolchain/distribution/snapshots/bfin-alias
+bfin_path -q
+
+set -x
+
+cd ${BFIN_ROOT}/toolchains/win32
+${BFIN_ROOT}/git/toolchain/distribution/snapshots/build-toolchain \
+	-S win32 \
+	-X \
+	-H ${chost} \
+	-P \
+	"$@"
+
+STAMP=$(<.last)
+cd ${STAMP}
+OUTPUT=${PWD}
+PKG_DIR=${OUTPUT}/pkgs
+LOG_DIR=${OUTPUT}/logs
+WIN_DIR=${OUTPUT}/.src.toolchain/distribution/windows
+
+for f in elf linux-uclibc uclinux ; do
+	rm -f "${WIN_DIR}"/bfin-${f}
+	ln -s "${OUTPUT}"/bfin-${f} "${WIN_DIR}"/bfin-${f}
+	zip -9qr "${PKG_DIR}"/toolchain-${STAMP}-${f}.zip *-${f}
+done
+
+if type -p makensis >& /dev/null ; then
+	make -C "${WIN_DIR}" VERSION="SVN-${STAMP}" >& "${LOG_DIR}"/nsis.log
+	bzip2 "${LOG_DIR}"/nsis.log
+	mv "${WIN_DIR}"/blackfin-toolchain-win32-SVN-${STAMP}.exe "${PKG_DIR}"/
+fi
+rm -f "${WIN_DIR}"/bfin-{elf,linux-uclibc,uclinux}

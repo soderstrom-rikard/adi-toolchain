@@ -91,9 +91,19 @@ scm_dir() {
 }
 
 bfin_mk_dir_ln() {
-	local dir=$1 src=${root}/bin/$2 dst=$1/${3:-$2}
+	local dir=$1 src dst=$1/${3:-$2}
 	mkdir -p ${dir}
-	[[ -e ${dst} ]] || ln -s ${src} ${dst}
+	if [[ -e ${dst} ]] ; then
+		return 0
+	fi
+	# try old vapier/bin.git first
+	for src in bin git/toolchain/distribution/snapshots ; do
+		src="${root}/${src}/$2"
+		if [[ -e ${src} ]] ; then
+			ln -s ${src} ${dst}
+			break
+		fi
+	done
 }
 
 ### pull svn ###
@@ -284,7 +294,7 @@ compare_revs()
 
 	touch "${revfile}"
 	local old=$(<"${revfile}")
-	svn_curr=$(${root}/bin/get-svn-rev .)
+	svn_curr=$(${root}/git/toolchain/distribution/snapshots/get-svn-rev .)
 
 	if ${force} || [[ ${old} != ${svn_curr} ]] ; then
 		return 0
