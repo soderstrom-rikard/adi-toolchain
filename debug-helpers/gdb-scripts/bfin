@@ -641,7 +641,7 @@ define _show_dma
 	else
 		printf "read "
 	end
-	set $$WDSIZE = $$CONFIG & (0x3 << 2)
+	set $$WDSIZE = ($$CONFIG & (0x3 << 2)) >> 2
 	if ($$WDSIZE == 0x3)
 		printf "WDSIZE:INVALID "
 	end
