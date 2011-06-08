@@ -51,6 +51,7 @@ test01(unsigned iter)
 
 // This can take long on simulators, timing out the test.
 // { dg-options "-DITERATIONS=10000" { target simulator } }
+// { dg-options "-DITERATIONS=10000" { target bfin*-*-* } }
 #ifndef ITERATIONS
 #define ITERATIONS 10000000
 #endif
