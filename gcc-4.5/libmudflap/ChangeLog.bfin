@@ -1,3 +1,9 @@
+2011-06-08  Stuart Henderson  <Stuart.Henderson@analog.com>
+
+	From Bernd Schmidt
+	* testsuite/libmudflap.c/hook2-allocstuff.c: Don't malloc 16MB on
+	Blackfin.
+
 2011-06-01  Stuart Henderson  <Stuart.Henderson@analog.com>
 
 	* testsuite/libmudflap.c/heap-scalestress.c: [#6202] Lower SCALE for bfin
