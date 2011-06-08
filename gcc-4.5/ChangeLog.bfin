@@ -1,0 +1,5 @@
+2011-06-08  Stuart Henderson  <Stuart.Henderson@analog.com>
+
+	* configure.ac: Improve handling of ppl/pwl in preparation of graphite
+	support.
+	* configure: Regenerate.

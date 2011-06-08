@@ -1512,8 +1512,9 @@ AC_SUBST(poststage1_ldflags)
 # Check for PPL
 ppl_major_version=0
 ppl_minor_version=10
-ppllibs=" -lppl_c -lppl -lgmpxx"
+ppllibs=
 pplinc=
+pwllib=
 
 AC_ARG_WITH(ppl, [  --with-ppl=PATH         Specify prefix directory for the installed PPL package
                           Equivalent to --with-ppl-include=PATH/include
@@ -1521,44 +1522,65 @@ AC_ARG_WITH(ppl, [  --with-ppl=PATH         Specify prefix directory for the ins
 AC_ARG_WITH(ppl_include, [  --with-ppl-include=PATH Specify directory for installed PPL include files])
 AC_ARG_WITH(ppl_lib, [  --with-ppl-lib=PATH     Specify the directory for the installed PPL library])
 
-case $with_ppl in 
-  no)
-    ppllibs=
-    ;;
-  "" | yes)
+AC_ARG_ENABLE(ppl-version-check,
+[AS_HELP_STRING([--disable-ppl-version-check],
+       [disable check for PPL version])])
+
+case $with_ppl in
+  yes | no | "")
     ;;
   *)
-    ppllibs="-L$with_ppl/lib -lppl_c -lppl -lgmpxx"
+    ppllibs="-L$with_ppl/lib"
     pplinc="-I$with_ppl/include $pplinc"
+    if test -d "$with_ppl/lib" && test -d "$with_ppl/include"; then
+      with_ppl=yes
+    else
+      AC_MSG_ERROR([cannot find directories "$with_ppl/lib" or "$with_ppl/include"])
+    fi
     ;;
 esac
-if test "x$with_ppl_include" != x; then
+
+if test x"$with_ppl_include" != x; then
   pplinc="-I$with_ppl_include $pplinc"
+  with_ppl=yes
 fi
+
 if test "x$with_ppl_lib" != x; then
-  ppllibs="-L$with_ppl_lib -lppl_c -lppl -lgmpxx"
+  ppllibs="-L$with_ppl_lib"
+  with_ppl=yes
 fi
-if test "x$with_ppl$with_ppl_include$with_ppl_lib" = x && test -d ${srcdir}/ppl; then
-  ppllibs='-L$$r/$(HOST_SUBDIR)/ppl/interfaces/C/'"$lt_cv_objdir"' -L$$r/$(HOST_SUBDIR)/ppl/src/'"$lt_cv_objdir"' -lppl_c -lppl -lgmpxx '
+
+if test x"$with_ppl$with_ppl_include$with_ppl_lib" = x && test -d ${srcdir}/ppl; then
+  if test x"$enable_watchdog" = xyes; then
+    pwllib="-lpwl"
+  fi
+  ppllibs='-L$$r/$(HOST_SUBDIR)/ppl/interfaces/C/'"$lt_cv_objdir"' -L$$r/$(HOST_SUBDIR)/ppl/src/'"$lt_cv_objdir"
   pplinc='-I$$r/$(HOST_SUBDIR)/ppl/src -I$$r/$(HOST_SUBDIR)/ppl/interfaces/C '
   enable_ppl_version_check=no
+  with_ppl=yes
 fi
 
-AC_ARG_ENABLE(ppl-version-check,
-[  --disable-ppl-version-check    disable check for PPL version],
-ENABLE_PPL_CHECK=$enableval,
-ENABLE_PPL_CHECK=yes)
+if test "x$with_ppl" != xno; then
+  if test "x$pwllib" = x; then
+    saved_LIBS="$LIBS"
+    LIBS="$LIBS $ppllibs -lstdc++ -lm"
+    AC_CHECK_LIB(pwl, PWL_handle_timeout, [pwllib="-lpwl"])
+    LIBS="$saved_LIBS"
+  fi
 
-if test "x$with_ppl" != "xno" -a "${ENABLE_PPL_CHECK}" = "yes"; then
-  saved_CFLAGS="$CFLAGS"
-  CFLAGS="$CFLAGS $pplinc $gmpinc"
-  AC_MSG_CHECKING([for version $ppl_major_version.$ppl_minor_version of PPL])
-  AC_TRY_COMPILE([#include "ppl_c.h"],[
-  #if PPL_VERSION_MAJOR != $ppl_major_version || PPL_VERSION_MINOR != $ppl_minor_version
-  choke me
-  #endif
-  ], [AC_MSG_RESULT([yes])], [AC_MSG_RESULT([no]); ppllibs= ; pplinc= ; with_ppl=no ])
-  CFLAGS="$saved_CFLAGS"
+  ppllibs="$ppllibs -lppl_c -lppl $pwllib -lgmpxx"
+
+  if test "$enable_ppl_version_check" != no; then
+    saved_CFLAGS="$CFLAGS"
+    CFLAGS="$CFLAGS $pplinc $gmpinc"
+    AC_MSG_CHECKING([for version 0.11 (revision 0 or later) of PPL])
+    AC_TRY_COMPILE([#include "ppl_c.h"],[
+    #if PPL_VERSION_MAJOR != 0 || PPL_VERSION_MINOR < 11
+    choke me
+    #endif
+    ], [AC_MSG_RESULT([yes])], [AC_MSG_RESULT([no]); ppllibs= ; pplinc= ; with_ppl=no ])
+    CFLAGS="$saved_CFLAGS"
+  fi
 fi
 
 # Flags needed for PPL
