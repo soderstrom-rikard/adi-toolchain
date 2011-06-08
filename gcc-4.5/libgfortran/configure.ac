@@ -34,6 +34,17 @@ AC_MSG_RESULT($enable_intermodule)
 AM_CONDITIONAL(onestep,[test x$onestep = x-onestep])
 AC_SUBST(onestep)
 
+AC_MSG_CHECKING([for --enable-symvers])
+AC_ARG_ENABLE(symvers,
+[  --enable-symvers        enables symbol versioning of the shared library ],
+[case "$enableval" in
+ yes) enable_symvers=yes ;;
+ no)  enable_symvers=no ;;
+ *)   AC_MSG_ERROR([Unknown argument to enable/disable symbol versioning]);;
+ esac],
+[enable_symvers=""])
+AC_MSG_RESULT($enable_symvers)
+
 # Gets build, host, target, *_vendor, *_cpu, *_os, etc.
 #
 # You will slowly go insane if you do not grok the following fact:  when
@@ -136,16 +147,20 @@ AC_SUBST(AM_CFLAGS)
 AC_SUBST(CFLAGS)
 
 # Check for symbol versioning (copied from libssp).
-AC_MSG_CHECKING([whether symbol versioning is supported])
-cat > conftest.map <<EOF
+if test "x$enable_symvers" == "xno"; then
+  gfortran_use_symver=no
+else
+  AC_MSG_CHECKING([whether symbol versioning is supported])
+  cat > conftest.map <<EOF
 FOO_1.0 {
   global: *foo*; bar; local: *;
 };
 EOF
-save_LDFLAGS="$LDFLAGS"
-LDFLAGS="$LDFLAGS -fPIC -shared -Wl,--version-script,./conftest.map"
-AC_TRY_LINK([int foo;],[],[gfortran_use_symver=yes],[gfortran_use_symver=no])
-LDFLAGS="$save_LDFLAGS"
+  save_LDFLAGS="$LDFLAGS"
+  LDFLAGS="$LDFLAGS -fPIC -shared -Wl,--version-script,./conftest.map"
+  AC_TRY_LINK([int foo;],[],[gfortran_use_symver=yes],[gfortran_use_symver=no])
+  LDFLAGS="$save_LDFLAGS"
+fi
 AC_MSG_RESULT($gfortran_use_symver)
 AM_CONDITIONAL(LIBGFOR_USE_SYMVER, [test "x$gfortran_use_symver" = xyes])
 

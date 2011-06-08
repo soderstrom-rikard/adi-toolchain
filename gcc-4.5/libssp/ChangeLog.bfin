@@ -1,0 +1,5 @@
+2011-06-08  Stuart Henderson  <Stuart.Henderson@analog.com>
+
+	Merge from 4.3
+	* configure.ac: Add --enable-symvers.
+	* configure: Regenerate.
