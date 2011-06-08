@@ -1,5 +1,12 @@
 2011-06-08  Stuart Henderson  <Stuart.Henderson@analog.com>
 
+	Merge from 4.3:
+	* testsuite/lib/libmudflap.exp (libmudflap-init): Improve
+	handling of compilers not in the build directory.
+	* testsuite/libmudflap.c++/*.exp: Likewise.
+
+2011-06-08  Stuart Henderson  <Stuart.Henderson@analog.com>
+
 	From Bernd Schmidt
 	* testsuite/libmudflap.c/hook2-allocstuff.c: Don't malloc 16MB on
 	Blackfin.
