@@ -1,0 +1,6 @@
+2011-06-08  Stuart Henderson  <Stuart.Henderson@analog.com>
+
+	Merge from 4.3
+	* testsuite/27_io/basic_stringbuf/setbuf/char/4.cc: Disable on
+	Blackfin.
+	* testsuite/27_io/basic_istream/getline/char/5.cc: Likewise.
