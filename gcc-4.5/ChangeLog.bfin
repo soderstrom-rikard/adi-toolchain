@@ -1,5 +1,12 @@
 2011-06-08  Stuart Henderson  <Stuart.Henderson@analog.com>
 
+	Merge from 4.3
+	* configure.ac (FLAGS_FOR_TARGET): Add -isystem for include-fixed in the
+	canadian cross case.
+	* configure: Regenerate.
+
+2011-06-08  Stuart Henderson  <Stuart.Henderson@analog.com>
+
 	* configure.ac: Improve handling of ppl/pwl in preparation of graphite
 	support.
 	* configure: Regenerate.
