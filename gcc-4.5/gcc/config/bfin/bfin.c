@@ -4958,6 +4958,9 @@ bfin_optimize_loops_1 (FILE *dump_file)
   if (cfun->calls_setjmp)
     return;
 
+  if (current_function_calls_setjmp)
+    return;
+
   /* Without LOOPS_MAY_HAVE_MULTIPLE_LATCHES, extra unnecessary jumps are
      created which we'd have to clean up again later.  */
   loop_optimizer_init (LOOPS_HAVE_RECORDED_EXITS
