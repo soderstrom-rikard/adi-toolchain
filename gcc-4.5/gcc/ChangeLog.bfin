@@ -1,3 +1,10 @@
+2011-06-09  Stuart Henderson  <stuart.henderson@analog.com>
+
+	Merge from 4.3
+	* simplify-rtx.c (simplify_binary_operation_1): When simplifying AND
+	with a constant, recognize that certain operations leave the lower
+	bits unchanged or set them to zero.
+
 2011-05-20  Stuart Henderson  <stuart.henderson@analog.com>
 
 	* config/bfin/bfin.c (bfin_gen_bundles): Don't try to bundle a jump.
