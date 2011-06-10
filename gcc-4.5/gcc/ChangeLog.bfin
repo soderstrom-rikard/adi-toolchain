@@ -1,5 +1,13 @@
 2011-06-09  Stuart Henderson  <stuart.henderson@analog.com>
 
+	* fold-const.c (split_address_to_core_and_offset): Do something meaningful
+	when given POINTER_PLUS_EXPR.
+	* tree-ssa-loop-ivopts.c (difference_cost): Try to compute the
+	difference between E1 and E2, and do the right thing if it turns into
+	a constant.
+
+2011-06-09  Stuart Henderson  <stuart.henderson@analog.com>
+
 	Merge from 4.3
 	* simplify-rtx.c (simplify_binary_operation_1): When simplifying AND
 	with a constant, recognize that certain operations leave the lower

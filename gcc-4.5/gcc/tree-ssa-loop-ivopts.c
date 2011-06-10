@@ -3640,10 +3640,12 @@ difference_cost (struct ivopts_data *data,
 		 tree e1, tree e2, bool *symbol_present, bool *var_present,
 		 unsigned HOST_WIDE_INT *offset, bitmap *depends_on)
 {
+  HOST_WIDE_INT diff;
   enum machine_mode mode = TYPE_MODE (TREE_TYPE (e1));
   unsigned HOST_WIDE_INT off1, off2;
   aff_tree aff_e1, aff_e2;
   tree type;
+  tree folded;
 
   e1 = strip_offset (e1, &off1);
   e2 = strip_offset (e2, &off2);
@@ -3651,6 +3653,28 @@ difference_cost (struct ivopts_data *data,
 
   STRIP_NOPS (e1);
   STRIP_NOPS (e2);
+
+  if (POINTER_TYPE_P (TREE_TYPE (e1)))
+    {
+      if (ptr_difference_const (e1, e2, &diff))
+	{
+	  *offset += diff;
+	  *symbol_present = false;
+	  *var_present = false;
+	  return zero_cost;
+	}
+    }
+  else
+    {
+      folded = fold_build2 (MINUS_EXPR, TREE_TYPE (e1), e1, e2);
+      if (cst_and_fits_in_hwi (folded))
+	{
+	  *offset += int_cst_value (folded);
+	  *symbol_present = false;
+	  *var_present = false;
+	  return zero_cost;
+	}
+    }
 
   if (TREE_CODE (e1) == ADDR_EXPR)
     return ptr_difference_cost (data, e1, e2, symbol_present, var_present,

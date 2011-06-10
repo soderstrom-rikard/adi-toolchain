@@ -16383,6 +16383,12 @@ split_address_to_core_and_offset (tree exp,
 				  false);
       core = build_fold_addr_expr_loc (loc, core);
     }
+  else if (TREE_CODE (exp) == POINTER_PLUS_EXPR)
+    {
+      core = TREE_OPERAND (exp, 0);
+      *poffset = TREE_OPERAND (exp, 1);
+      *pbitpos = 0;
+    }
   else
     {
       core = exp;
