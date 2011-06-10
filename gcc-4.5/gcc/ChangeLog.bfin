@@ -1,5 +1,13 @@
+2011-06-10  Stuart Henderson  <stuart.henderson@analog.com>
+
+	Merge from 4.3
+	* tree-ssa-loop-ivopts.c (iv_ca_recount_cost): Try to give a bonus for
+	single uses of a candidate in a memory address, where we think this
+	increases the chances of autoincrement addressing.
+
 2011-06-09  Stuart Henderson  <stuart.henderson@analog.com>
 
+	Merge from 4.3
 	* fold-const.c (split_address_to_core_and_offset): Do something meaningful
 	when given POINTER_PLUS_EXPR.
 	* tree-ssa-loop-ivopts.c (difference_cost): Try to compute the

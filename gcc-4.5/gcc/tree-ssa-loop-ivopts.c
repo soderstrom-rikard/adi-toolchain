@@ -4545,8 +4545,34 @@ static void
 iv_ca_recount_cost (struct ivopts_data *data, struct iv_ca *ivs)
 {
   comp_cost cost = ivs->cand_use_cost;
+  unsigned i, j;
+
   cost.cost += ivs->cand_cost;
   cost.cost += ivopts_global_cost_for_size (data, ivs->n_regs);
+
+  /* Try to give a bonus to single uses of a candidate in an address,
+     where we think this might lead to autoinc addressing later on.  */
+  for (i = 0; i < n_iv_cands (data); i++)
+    {
+      struct iv_cand *cand = iv_cand (data, i);
+      if (ivs->n_cand_uses[i] != 1)
+       continue;
+      for (j = 0; j < n_iv_uses (data); j++)
+       {
+         struct cost_pair *cp;
+         struct iv_use *use = iv_use (data, j);
+         cp = ivs->cand_for_use[j];
+         if (!cp)
+           continue;
+         if (cp->cand == cand && use->type == USE_ADDRESS
+             && tree_int_cst_equal (TYPE_SIZE_UNIT (TREE_TYPE (*use->op_p)),
+                                    cand->iv->step))
+           {
+             cost.cost -= cand->cost_step;
+             break;
+           }
+       }
+    }
 
   ivs->cost = cost;
 }
