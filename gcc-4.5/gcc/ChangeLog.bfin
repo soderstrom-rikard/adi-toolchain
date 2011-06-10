@@ -1,6 +1,11 @@
 2011-06-10  Stuart Henderson  <stuart.henderson@analog.com>
 
 	Merge from 4.3
+	* config/bfin/bfin.h (HAVE_PRE_DECREMENT): Don't define.
+
+2011-06-10  Stuart Henderson  <stuart.henderson@analog.com>
+
+	Merge from 4.3
 	* emutls.c (emutls_destroy): Don't fall out of the array bound.
 
 2011-06-10  Stuart Henderson  <stuart.henderson@analog.com>
