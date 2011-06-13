@@ -1,3 +1,9 @@
+2011-06-13  Stuart Henderson  <stuart.henderson@analog.com>
+
+	Merge from 4.3
+	* config/bfin/bfin.c (workaround_speculation): Sync insns also need
+	three nops.
+
 2011-06-10  Stuart Henderson  <stuart.henderson@analog.com>
 
 	Merge from 4.3
