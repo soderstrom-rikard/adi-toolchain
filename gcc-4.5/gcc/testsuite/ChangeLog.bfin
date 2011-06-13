@@ -1,5 +1,9 @@
 2011-06-13  Stuart Henderson  <stuart.henderson@analog.com>
 
+	* gcc.target/bfin/20090409-1.c: New test.
+
+2011-06-13  Stuart Henderson  <stuart.henderson@analog.com>
+
 	Merge from 4.3
 	* gcc.target/bfin/lsetup-1.c: New test.
 	* gcc.target/bfin/lsetup-2.c: New test.
