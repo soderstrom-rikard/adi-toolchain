@@ -1,3 +1,9 @@
+2011-06-13  Stuart Henderson  <Stuart.Henderson@analog.com>
+
+	Merge from 4.3
+	* testsuite/lib/libstdc++.exp (v3_target_compile_as_c): For cross
+	compiler, adjust crossbase according to the default configuration.
+
 2011-06-08  Stuart Henderson  <Stuart.Henderson@analog.com>
 
 	Merge from 4.3
