@@ -1,3 +1,11 @@
+2011-06-13  Stuart Henderson  <stuart.henderson@analog.com>
+
+	Merge from 4.3
+	* gcc.target/bfin/lsetup-1.c: New test.
+	* gcc.target/bfin/lsetup-2.c: New test.
+	* gcc.target/bfin/lsetup-3.c: New test.
+	* gcc.target/bfin/lsetup-4.c: New test.
+
 2011-06-01  Stuart Henderson  <stuart.henderson@analog.com>
 
 	* gcc.target/bfin/bfin.exp: Remove any -mcpu switces before target tests.
