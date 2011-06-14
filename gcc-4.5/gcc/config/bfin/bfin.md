@@ -1465,8 +1465,8 @@
   [(set (match_operand:HI 0 "register_operand" "=d")
 	(if_then_else:HI
 	 (lt (match_operand:SI 1 "register_operand" "d") (const_int 0))
-	 (clz:HI (not:SI (match_dup 1)))
-	 (clz:HI (match_dup 1))))]
+	 (plus:HI (clz:SI (not:SI (match_dup 1))) (const_int -1))
+	 (plus:HI (clz:SI (match_dup 1)) (const_int -1))))]
   ""
   "%h0 = signbits %1%!"
   [(set_attr "type" "dsp32")])
@@ -1522,8 +1522,8 @@
   [(set (match_operand:HI 0 "register_operand" "=d")
 	(if_then_else:HI
 	 (lt (match_operand:HI 1 "register_operand" "d") (const_int 0))
-	 (clz:HI (not:HI (match_dup 1)))
-	 (clz:HI (match_dup 1))))]
+	 (plus:HI (clz:HI (not:HI (match_dup 1))) (const_int -1))
+	 (plus:HI (clz:HI (match_dup 1)) (const_int -1))))]
   ""
   "%h0 = signbits %h1%!"
   [(set_attr "type" "dsp32")])

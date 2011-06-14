@@ -6187,6 +6187,9 @@ bfin_init_builtins (void)
   tree short_ftype_int
     = build_function_type_list (short_integer_type_node, integer_type_node,
 				NULL_TREE);
+  tree int_ftype_short
+    = build_function_type_list (integer_type_node, short_integer_type_node,
+				NULL_TREE);
   tree int_ftype_v2hi_v2hi
     = build_function_type_list (integer_type_node, V2HI_type_node,
 				V2HI_type_node, NULL_TREE);
@@ -6267,7 +6270,7 @@ bfin_init_builtins (void)
 	       BFIN_BUILTIN_NEG_1X16);
   def_builtin ("__builtin_bfin_abs_fr1x16", short_ftype_short,
 	       BFIN_BUILTIN_ABS_1X16);
-  def_builtin ("__builtin_bfin_norm_fr1x16", short_ftype_int,
+  def_builtin ("__builtin_bfin_norm_fr1x16", int_ftype_short,
 	       BFIN_BUILTIN_NORM_1X16);
 
   def_builtin ("__builtin_bfin_sum_fr2x16", short_ftype_v2hi,
@@ -6299,7 +6302,7 @@ bfin_init_builtins (void)
 	       BFIN_BUILTIN_NEG_1X32);
   def_builtin ("__builtin_bfin_abs_fr1x32", int_ftype_int,
 	       BFIN_BUILTIN_ABS_1X32);
-  def_builtin ("__builtin_bfin_norm_fr1x32", short_ftype_int,
+  def_builtin ("__builtin_bfin_norm_fr1x32", int_ftype_int,
 	       BFIN_BUILTIN_NORM_1X32);
   def_builtin ("__builtin_bfin_round_fr1x32", short_ftype_int,
 	       BFIN_BUILTIN_ROUND_1X32);

@@ -1,6 +1,14 @@
 2011-06-14  Stuart Henderson  <stuart.henderson@analog.com>
 
 	Merge from 4.3
+	* config/bfin/bfin.c (bfin_init_builtins): Correct types of
+	__builtin_bfin_norm_fr1x16 and __builtin_bfin_norm_fr1x32.
+	* config/bfin/bfin.md (signbitssi2): SIGNBITS is CLZ minus 1.
+	(signbitshi2): Likewise.
+
+2011-06-14  Stuart Henderson  <stuart.henderson@analog.com>
+
+	Merge from 4.3
 	* config/bfin/bfin.c (bfin_expand_call): Don't call gen_load_funcdescsi
 	with an address based on a virtual register.
 
