@@ -1881,7 +1881,7 @@
   return "";
 }
  [(set_attr "seq_insns" "multi")
-  (set_attr "type" "mcld")
+  (set_attr "type" "mcst")
   (set_attr "length" "12")])
 
 ;; Jump instructions
