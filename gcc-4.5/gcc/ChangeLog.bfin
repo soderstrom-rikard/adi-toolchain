@@ -1,6 +1,18 @@
 2011-06-14  Stuart Henderson  <stuart.henderson@analog.com>
 
 	Merge from 4.3
+	* config/bfin/t-bfin-elf (MULTILIB_OPTIONS): Remove
+	mleaf-id-shared-library.
+	(MULTILIB_DIRNAMES): Remove mleaf-id-shared-library.
+	(MULTILIB_EXCEPTIONS): Remove.
+	* config/bfin/t-bfin-uclinux (MULTILIB_OPTIONS): Remove
+	mleaf-id-shared-library.
+	(MULTILIB_DIRNAMES): Remove mleaf-id-shared-library.
+	(MULTILIB_EXCEPTIONS): Remove.
+
+2011-06-14  Stuart Henderson  <stuart.henderson@analog.com>
+
+	Merge from 4.3
 	* config/bfin/bfin.md (reload_out<mode>): Type is mcst.
 
 2011-06-14  Stuart Henderson  <stuart.henderson@analog.com>
