@@ -1,6 +1,12 @@
 2011-06-14  Stuart Henderson  <stuart.henderson@analog.com>
 
 	Merge from 4.3
+	* config/bfin/bfin.c (bfin_expand_call): Don't call gen_load_funcdescsi
+	with an address based on a virtual register.
+
+2011-06-14  Stuart Henderson  <stuart.henderson@analog.com>
+
+	Merge from 4.3
 	* config/bfin/t-bfin-elf (MULTILIB_OPTIONS): Remove
 	mleaf-id-shared-library.
 	(MULTILIB_DIRNAMES): Remove mleaf-id-shared-library.
