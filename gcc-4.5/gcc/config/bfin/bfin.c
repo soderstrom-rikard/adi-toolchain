@@ -4184,12 +4184,12 @@ bfin_optimize_loop (loop_info loop)
   if (!last_insn)
     {
       if (dump_file)
-	fprintf (dump_file, ";; loop %d has no last instruction\n",
+	fprintf (dump_file,
+		 ";; loop %d has no last instruction, emitting NOP\n",
 		 loop->loop_no);
-      goto bad_loop;
+      last_insn = emit_insn_before (gen_forced_nop (), loop->loop_end);
     }
-
-  if (JUMP_P (last_insn) && !any_condjump_p (last_insn))
+  else if (JUMP_P (last_insn) && !any_condjump_p (last_insn))
     {
       if (dump_file)
 	fprintf (dump_file, ";; loop %d has bad last instruction\n",

@@ -1,6 +1,12 @@
 2011-06-14  Stuart Henderson  <stuart.henderson@analog.com>
 
 	Merge from 4.3
+	* config/bfin/bfin.c (bfin_optimize_loop): If there's no valid last
+	insn, insert a nop.
+
+2011-06-14  Stuart Henderson  <stuart.henderson@analog.com>
+
+	Merge from 4.3
 	* config.gcc (bfin target triplets): Add bfin/t-fprules-softfp and
 	soft-fp/t-softfp.
 	* config/bfin/t-bfin (FPBIT, DPBIT): Remove.
