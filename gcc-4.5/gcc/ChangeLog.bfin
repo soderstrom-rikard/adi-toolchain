@@ -1,6 +1,11 @@
 2011-06-14  Stuart Henderson  <stuart.henderson@analog.com>
 
 	Merge from 4.3
+	* config/bfin/bfin.md (ssashiftsi3): Use SImode for operand 1.
+
+2011-06-14  Stuart Henderson  <stuart.henderson@analog.com>
+
+	Merge from 4.3
 	* config/bfin/bfin.c (add_sched_insns_for_speculation): Don't add
 	insns for a jump target in a hardware loop.
 
