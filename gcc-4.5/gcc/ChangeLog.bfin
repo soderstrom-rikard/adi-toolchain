@@ -1,6 +1,12 @@
 2011-06-14  Stuart Henderson  <stuart.henderson@analog.com>
 
 	Merge from 4.3
+	* config/bfin/bfin.c (add_sched_insns_for_speculation): Don't add
+	insns for a jump target in a hardware loop.
+
+2011-06-14  Stuart Henderson  <stuart.henderson@analog.com>
+
+	Merge from 4.3
 	* config/bfin/bfin.c (bfin_init_builtins): Correct types of
 	__builtin_bfin_norm_fr1x16 and __builtin_bfin_norm_fr1x32.
 	* config/bfin/bfin.md (signbitssi2): SIGNBITS is CLZ minus 1.
