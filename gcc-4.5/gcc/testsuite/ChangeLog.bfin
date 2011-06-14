@@ -1,3 +1,8 @@
+2011-06-14  Stuart Henderson  <stuart.henderson@analog.com>
+
+	Merge from 4.3
+	* gcc.c-torture/compile/20090527-1.c: New test.
+
 2011-06-13  Stuart Henderson  <stuart.henderson@analog.com>
 
 	Merge from 4.3
