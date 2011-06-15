@@ -46,3 +46,6 @@ see the files COPYING3 and COPYING.RUNTIME respectively.  If not, see
 #define TARGET_SUPPORTS_SYNC_CALLS 1
 
 #define SUBTARGET_FDPIC_NOT_SUPPORTED
+
+#undef TARGET_ASM_FILE_END
+#define TARGET_ASM_FILE_END file_end_indicate_exec_stack

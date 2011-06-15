@@ -23,8 +23,13 @@ a copy of the GCC Runtime Library Exception along with this program;
 see the files COPYING3 and COPYING.RUNTIME respectively.  If not, see
 <http://www.gnu.org/licenses/>.  */
 
-#ifdef L_divsi3
+#if defined(__ELF__) && defined(__linux__)
+.section .note.GNU-stack,"",%progbits
+#endif
+
 .text
+
+#ifdef L_divsi3
 .align 2
 .global ___divsi3;
 .type ___divsi3, STT_FUNC;

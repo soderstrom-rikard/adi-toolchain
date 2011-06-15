@@ -1,6 +1,13 @@
 2011-06-15  Stuart Henderson  <stuart.henderson@analog.com>
 
 	Merge from 4.3
+	* config/bfin/linux.h (TARGET_ASM_FILE_END): Define.
+	* config/bfin/uclinux.h (TARGET_ASM_FILE_END): Likewise.
+	* config/bfin/lib1funcs.asm: Add .section .note.GNU-stack.
+
+2011-06-15  Stuart Henderson  <stuart.henderson@analog.com>
+
+	Merge from 4.3
 	* config/bfin/bfin.md (hisi_ext): New attribute for HISI
 	mode_iterator.
 	(load<mode>_dreg, load<mode>_dreg_postinc,
