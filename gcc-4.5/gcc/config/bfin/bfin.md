@@ -1273,6 +1273,33 @@
   "%0 = %1 - %2 (S)%!"
   [(set_attr "type" "dsp32")])
 
+;; 32 bit versions of add and sub for parallel issue
+
+(define_code_iterator plus_or_minus [plus minus])
+(define_code_attr pm_optab [(plus "add")
+			    (minus "sub")])
+(define_code_attr pm_op [(plus "+")
+			 (minus "-")])
+
+(define_insn "*<pm_optab>si_insn32"
+  [(set (match_operand:SI 0 "register_operand" "=d")
+	(unspec:SI [(plus_or_minus:SI
+		     (match_operand:SI 1 "register_operand" "d")
+		     (match_operand:SI 2 "register_operand" "d"))]
+		   UNSPEC_32BIT))]
+  ""
+  "%0 = %1 <pm_op> %2 (NS)%!"
+  [(set_attr "type" "dsp32")])
+
+(define_split
+  [(set (match_operand:SI 0 "d_register_operand" "")
+	(plus_or_minus:SI (match_operand:SI 1 "d_register_operand" "")
+			  (match_operand:SI 2 "d_register_operand" "")))]
+  "splitting_for_sched && !optimize_size"
+  [(set (match_dup 0)
+	(unspec:SI [(plus_or_minus:SI (match_dup 1) (match_dup 2))]
+		   UNSPEC_32BIT))])
+
 ;; Accumulator addition
 
 (define_insn "addpdi3"
