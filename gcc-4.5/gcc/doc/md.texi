@@ -2395,9 +2395,6 @@ Unsigned 7 bit integer (in the range 0 to 127)
 @item Ku5
 Unsigned 5 bit integer (in the range 0 to 31)
 
-@item Ks4
-Signed 4 bit integer (in the range @minus{}8 to 7)
-
 @item Ks3
 Signed 3 bit integer (in the range @minus{}3 to 4)
 

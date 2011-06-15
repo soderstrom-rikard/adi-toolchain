@@ -1869,8 +1869,6 @@ print_operand (FILE *file, rtx x, char code)
 	    x = GEN_INT ((INTVAL (x) >> 16) & 0xffff);
 	  else if (code == 'h')
 	    x = GEN_INT (INTVAL (x) & 0xffff);
-	  else if (code == 'N')
-	    x = GEN_INT (-INTVAL (x));
 	  else if (code == 'X')
 	    x = GEN_INT (exact_log2 (0xffffffff & INTVAL (x)));
 	  else if (code == 'Y')
@@ -6147,9 +6145,14 @@ enum bfin_builtins
 
   BFIN_BUILTIN_LSHIFT_1X16,
   BFIN_BUILTIN_LSHIFT_2X16,
+  BFIN_BUILTIN_LSHIFTRT_1X16,
+  BFIN_BUILTIN_LSHIFTRT_2X16,
   BFIN_BUILTIN_SSASHIFT_1X16,
   BFIN_BUILTIN_SSASHIFT_2X16,
   BFIN_BUILTIN_SSASHIFT_1X32,
+  BFIN_BUILTIN_SSASHIFTRT_1X16,
+  BFIN_BUILTIN_SSASHIFTRT_2X16,
+  BFIN_BUILTIN_SSASHIFTRT_1X32,
 
   BFIN_BUILTIN_CPLX_MUL_16,
   BFIN_BUILTIN_CPLX_MAC_16,
@@ -6326,14 +6329,24 @@ bfin_init_builtins (void)
   /* Shifts.  */
   def_builtin ("__builtin_bfin_shl_fr1x16", short_ftype_short_short,
 	       BFIN_BUILTIN_SSASHIFT_1X16);
+  def_builtin ("__builtin_bfin_shr_fr1x16", short_ftype_short_short,
+           BFIN_BUILTIN_SSASHIFTRT_1X16);
   def_builtin ("__builtin_bfin_shl_fr2x16", v2hi_ftype_v2hi_short,
 	       BFIN_BUILTIN_SSASHIFT_2X16);
+  def_builtin ("__builtin_bfin_shr_fr2x16", v2hi_ftype_v2hi_short,
+           BFIN_BUILTIN_SSASHIFTRT_2X16);
   def_builtin ("__builtin_bfin_lshl_fr1x16", short_ftype_short_short,
 	       BFIN_BUILTIN_LSHIFT_1X16);
+  def_builtin ("__builtin_bfin_shrl_fr1x16", short_ftype_short_short,
+           BFIN_BUILTIN_LSHIFTRT_1X16);
   def_builtin ("__builtin_bfin_lshl_fr2x16", v2hi_ftype_v2hi_short,
 	       BFIN_BUILTIN_LSHIFT_2X16);
+  def_builtin ("__builtin_bfin_shrl_fr2x16", v2hi_ftype_v2hi_short,
+           BFIN_BUILTIN_LSHIFTRT_2X16);
   def_builtin ("__builtin_bfin_shl_fr1x32", int_ftype_int_short,
 	       BFIN_BUILTIN_SSASHIFT_1X32);
+  def_builtin ("__builtin_bfin_shr_fr1x32", int_ftype_int_short,
+           BFIN_BUILTIN_SSASHIFTRT_1X32);
 
   /* Complex numbers.  */
   def_builtin ("__builtin_bfin_cmplx_add", v2hi_ftype_v2hi_v2hi,
@@ -6373,12 +6386,6 @@ struct builtin_description
 static const struct builtin_description bdesc_2arg[] =
 {
   { CODE_FOR_composev2hi, "__builtin_bfin_compose_2x16", BFIN_BUILTIN_COMPOSE_2X16, -1 },
-
-  { CODE_FOR_ssashiftv2hi3, "__builtin_bfin_shl_fr2x16", BFIN_BUILTIN_SSASHIFT_2X16, -1 },
-  { CODE_FOR_ssashifthi3, "__builtin_bfin_shl_fr1x16", BFIN_BUILTIN_SSASHIFT_1X16, -1 },
-  { CODE_FOR_lshiftv2hi3, "__builtin_bfin_lshl_fr2x16", BFIN_BUILTIN_LSHIFT_2X16, -1 },
-  { CODE_FOR_lshifthi3, "__builtin_bfin_lshl_fr1x16", BFIN_BUILTIN_LSHIFT_1X16, -1 },
-  { CODE_FOR_ssashiftsi3, "__builtin_bfin_shl_fr1x32", BFIN_BUILTIN_SSASHIFT_1X32, -1 },
 
   { CODE_FOR_sminhi3, "__builtin_bfin_min_fr1x16", BFIN_BUILTIN_MIN_1X16, -1 },
   { CODE_FOR_smaxhi3, "__builtin_bfin_max_fr1x16", BFIN_BUILTIN_MAX_1X16, -1 },
@@ -6449,14 +6456,10 @@ safe_vector_operand (rtx x, enum machine_mode mode)
    if this is a normal binary op, or one of the MACFLAG_xxx constants.  */
 
 static rtx
-bfin_expand_binop_builtin (enum insn_code icode, tree exp, rtx target,
-			   int macflag)
+bfin_expand_binop_builtin_1 (enum insn_code icode, rtx op0, rtx op1, rtx target,
+                int macflag)
 {
   rtx pat;
-  tree arg0 = CALL_EXPR_ARG (exp, 0);
-  tree arg1 = CALL_EXPR_ARG (exp, 1);
-  rtx op0 = expand_expr (arg0, NULL_RTX, VOIDmode, 0);
-  rtx op1 = expand_expr (arg1, NULL_RTX, VOIDmode, 0);
   enum machine_mode op0mode = GET_MODE (op0);
   enum machine_mode op1mode = GET_MODE (op1);
   enum machine_mode tmode = insn_data[icode].operand[0].mode;
@@ -6502,6 +6505,18 @@ bfin_expand_binop_builtin (enum insn_code icode, tree exp, rtx target,
 
   emit_insn (pat);
   return target;
+}
+
+static rtx
+bfin_expand_binop_builtin (enum insn_code icode, tree exp, rtx target,
+              int macflag)
+{
+  tree arg0 = CALL_EXPR_ARG (exp, 0);
+  tree arg1 = CALL_EXPR_ARG (exp, 1);
+  rtx op0 = expand_expr (arg0, NULL_RTX, VOIDmode, 0);
+  rtx op1 = expand_expr (arg1, NULL_RTX, VOIDmode, 0);
+
+  return bfin_expand_binop_builtin_1 (icode, op0, op1, target, macflag);
 }
 
 /* Subroutine of bfin_expand_builtin to take care of unop insns.  */
@@ -6778,6 +6793,108 @@ bfin_expand_builtin (tree exp, rtx target ATTRIBUTE_UNUSED,
 					 const0_rtx, const1_rtx));
 
       return target;
+
+    case BFIN_BUILTIN_SSASHIFT_1X16:
+    case BFIN_BUILTIN_SSASHIFT_2X16:
+    case BFIN_BUILTIN_SSASHIFT_1X32:
+      arg0 = CALL_EXPR_ARG (exp, 0);
+      arg1 = CALL_EXPR_ARG (exp, 1);
+      op0 = expand_expr (arg0, NULL_RTX, VOIDmode, 0);
+      op1 = expand_expr (arg1, NULL_RTX, VOIDmode, 0);
+
+      if (GET_CODE (op1) != CONST_INT)
+	icode = (fcode == BFIN_BUILTIN_SSASHIFT_1X16 ? CODE_FOR_ssashifthi3
+		 : fcode == BFIN_BUILTIN_SSASHIFT_2X16 ? CODE_FOR_ssashiftv2hi3
+		 : CODE_FOR_ssashiftsi3);
+      else if (INTVAL (op1) >= 0)
+	icode = (fcode == BFIN_BUILTIN_SSASHIFT_1X16 ? CODE_FOR_ssashifthi3_imm
+		 : fcode == BFIN_BUILTIN_SSASHIFT_2X16 ? CODE_FOR_ssashiftv2hi3_imm
+		 : CODE_FOR_ssashiftsi3_imm);
+      else
+	{
+	  op1 = GEN_INT (- INTVAL (op1));
+	  icode = (fcode == BFIN_BUILTIN_SSASHIFT_1X16 ? CODE_FOR_ssashiftrthi3
+		   : fcode == BFIN_BUILTIN_SSASHIFT_2X16 ? CODE_FOR_ssashiftrtv2hi3
+		   : CODE_FOR_ssashiftrtsi3);
+	}
+
+      return bfin_expand_binop_builtin_1 (icode, op0, op1, target, -1);
+
+    case BFIN_BUILTIN_SSASHIFTRT_1X16:
+    case BFIN_BUILTIN_SSASHIFTRT_2X16:
+    case BFIN_BUILTIN_SSASHIFTRT_1X32:
+      arg0 = CALL_EXPR_ARG (exp, 0);
+      arg1 = CALL_EXPR_ARG (exp, 1);
+      op0 = expand_expr (arg0, NULL_RTX, VOIDmode, 0);
+      op1 = expand_expr (arg1, NULL_RTX, VOIDmode, 0);
+
+      if (GET_CODE (op1) != CONST_INT)
+	{
+	  emit_move_insn (op1, gen_rtx_NEG (GET_MODE (op1), op1));
+	  icode = (fcode == BFIN_BUILTIN_SSASHIFTRT_1X16 ? CODE_FOR_ssashifthi3
+		   : fcode == BFIN_BUILTIN_SSASHIFTRT_2X16 ? CODE_FOR_ssashiftv2hi3
+		   : CODE_FOR_ssashiftsi3);
+	}
+      else if (INTVAL (op1) < 0)
+	{
+	  op1 = GEN_INT (- INTVAL (op1));
+	  icode = (fcode == BFIN_BUILTIN_SSASHIFTRT_1X16 ? CODE_FOR_ssashifthi3_imm
+		   : fcode == BFIN_BUILTIN_SSASHIFTRT_2X16 ? CODE_FOR_ssashiftv2hi3_imm
+		   : CODE_FOR_ssashiftsi3_imm);
+	}
+      else
+	icode = (fcode == BFIN_BUILTIN_SSASHIFTRT_1X16 ? CODE_FOR_ssashiftrthi3
+		 : fcode == BFIN_BUILTIN_SSASHIFTRT_2X16 ? CODE_FOR_ssashiftrtv2hi3
+		 : CODE_FOR_ssashiftrtsi3);
+
+      return bfin_expand_binop_builtin_1 (icode, op0, op1, target, -1);
+
+    case BFIN_BUILTIN_LSHIFTRT_1X16:
+    case BFIN_BUILTIN_LSHIFTRT_2X16:
+      arg0 = CALL_EXPR_ARG (exp, 0);
+      arg1 = CALL_EXPR_ARG (exp, 1);
+      op0 = expand_expr (arg0, NULL_RTX, VOIDmode, 0);
+      op1 = expand_expr (arg1, NULL_RTX, VOIDmode, 0);
+
+      if (GET_CODE (op1) != CONST_INT)
+	{
+	  emit_move_insn (op1, gen_rtx_NEG (GET_MODE (op1), op1));
+	  icode = (fcode == BFIN_BUILTIN_LSHIFTRT_1X16 ? CODE_FOR_lshifthi3
+		   : CODE_FOR_lshiftv2hi3);
+	}
+      else if (INTVAL (op1) < 0)
+	{
+	  op1 = GEN_INT (- INTVAL (op1));
+	  icode = (fcode == BFIN_BUILTIN_LSHIFTRT_1X16 ? CODE_FOR_ashifthi3_imm
+		   : CODE_FOR_ashiftv2hi3_imm);
+	}
+      else
+	icode = (fcode == BFIN_BUILTIN_LSHIFTRT_1X16 ? CODE_FOR_lshiftrthi3
+		 : CODE_FOR_lshiftrtv2hi3);
+
+      return bfin_expand_binop_builtin_1 (icode, op0, op1, target, -1);
+
+    case BFIN_BUILTIN_LSHIFT_1X16:
+    case BFIN_BUILTIN_LSHIFT_2X16:
+      arg0 = CALL_EXPR_ARG (exp, 0);
+      arg1 = CALL_EXPR_ARG (exp, 1);
+      op0 = expand_expr (arg0, NULL_RTX, VOIDmode, 0);
+      op1 = expand_expr (arg1, NULL_RTX, VOIDmode, 0);
+
+      if (GET_CODE (op1) != CONST_INT)
+	icode = (fcode == BFIN_BUILTIN_LSHIFT_1X16 ? CODE_FOR_lshifthi3
+		 : CODE_FOR_lshiftv2hi3);
+      else if (INTVAL (op1) < 0)
+	{
+	  op1 = GEN_INT (- INTVAL (op1));
+	  icode = (fcode == BFIN_BUILTIN_LSHIFT_1X16 ? CODE_FOR_lshiftrthi3
+		   : CODE_FOR_lshiftrtv2hi3);
+	}
+      else
+	icode = (fcode == BFIN_BUILTIN_LSHIFTRT_1X16 ? CODE_FOR_ashifthi3_imm
+		 : CODE_FOR_ashiftv2hi3_imm);
+
+      return bfin_expand_binop_builtin_1 (icode, op0, op1, target, -1);
 
     default:
       break;
