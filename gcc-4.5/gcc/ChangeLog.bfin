@@ -1,6 +1,11 @@
 2011-06-15  Stuart Henderson  <stuart.henderson@analog.com>
 
 	Merge from 4.3
+	* config/bfin/bfin.c (bfin_expand_builtin): Fix a typo for lshl_fr1x16.
+
+2011-06-15  Stuart Henderson  <stuart.henderson@analog.com>
+
+	Merge from 4.3
 	* config/bfin/bfin.c (bfin_expand_builtin): Copy op0 to
 	register for cmplx_mac and cmplx_msu builtins.
 

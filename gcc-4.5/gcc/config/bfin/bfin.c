@@ -6867,7 +6867,7 @@ bfin_expand_builtin (tree exp, rtx target ATTRIBUTE_UNUSED,
       else if (INTVAL (op1) < 0)
 	{
 	  op1 = GEN_INT (- INTVAL (op1));
-	  icode = (fcode == BFIN_BUILTIN_LSHIFTRT_1X16 ? CODE_FOR_ashifthi3_imm
+	  icode = (fcode == BFIN_BUILTIN_LSHIFT_1X16 ? CODE_FOR_ashifthi3_imm
 		   : CODE_FOR_ashiftv2hi3_imm);
 	}
       else
