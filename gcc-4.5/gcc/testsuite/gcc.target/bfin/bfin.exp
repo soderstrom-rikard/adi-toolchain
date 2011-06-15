@@ -50,7 +50,7 @@ proc dg-bfin-processors {args} {
     set cpu ""
 
     foreach flag [target_info multilib_flags] {
-	regexp "^-mcpu=([^-]*)" $flag dummy multilib_cpu
+	regexp "^-mcpu=(\[^-\]*)" $flag dummy multilib_cpu
     }
 
     set cpus [lindex $args 1]
