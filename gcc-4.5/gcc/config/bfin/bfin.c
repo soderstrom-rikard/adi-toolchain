@@ -6724,6 +6724,8 @@ bfin_expand_builtin (tree exp, rtx target ATTRIBUTE_UNUSED,
 	  || GET_MODE (target) != V2HImode
 	  || ! (*insn_data[icode].operand[0].predicate) (target, V2HImode))
 	target = gen_reg_rtx (tmode);
+      if (! register_operand (op0, GET_MODE (op0)))
+    op0 = copy_to_mode_reg (GET_MODE (op0), op0);
       if (! register_operand (op1, GET_MODE (op1)))
 	op1 = copy_to_mode_reg (GET_MODE (op1), op1);
       if (! register_operand (op2, GET_MODE (op2)))
