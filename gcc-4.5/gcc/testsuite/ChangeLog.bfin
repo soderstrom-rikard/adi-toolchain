@@ -1,6 +1,12 @@
 2011-06-15  Stuart Henderson  <stuart.henderson@analog.com>
 
 	Merge from 4.3
+	* gcc.target/bfin/mcpu-bf504.c: New test.
+	* gcc.target/bfin/mcpu-bf506.c: New test.
+
+2011-06-15  Stuart Henderson  <stuart.henderson@analog.com>
+
+	Merge from 4.3
 	* gcc.target/bfin/l2.c: Pass processor types as a list to
 	dg-bfin-processors.
 	* gcc.target/bfin/bfin.exp (dg-bfin-processors): Escape
