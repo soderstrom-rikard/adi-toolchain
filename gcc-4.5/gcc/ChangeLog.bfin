@@ -1,6 +1,35 @@
 2011-06-15  Stuart Henderson  <stuart.henderson@analog.com>
 
 	Merge from 4.3
+	* config/bfin/bfin.c (builtin_description): Change
+	__builtin_bfin_abs_fr1x16 to use CODE_FOR_ssabshi2.
+	(bfin_init_builtins): Change the type of
+	__builtin_bfin_compose_2x16 to v2hi_ftype_short_short.
+	Change the types of __builtin_bfin_min_fr1x16,
+	__builtin_bfin_max_fr1x16, __builtin_bfin_add_fr1x16,
+	__builtin_bfin_sub_fr1x16, __builtin_bfin_mult_fr1x16,
+	__builtin_bfin_multr_fr1x16, __builtin_bfin_shl_fr1x16
+	and __builtin_bfin_lshl_fr1x16 to short_ftype_short_short.
+	Change the types of __builtin_bfin_shl_fr2x16
+	and __builtin_bfin_lshl_fr2x16 to v2hi_ftype_v2hi_short.
+	Change the type of __builtin_bfin_shl_fr1x32 to
+	int_ftype_int_short.
+	* config/bfin/bfin.md (ssabshi2): New pattern.
+	(addsubv2hi3): Fix the order of the high part and the low part.
+	(subaddv2hi3): Likewise.
+	(ssaddsubv2hi3): Likewise.
+	(sssubaddv2hi3): Likewise.
+	(sublohiv2hi3): Likewise.
+	(sssublohiv2hi3): Likewise.
+	(sssubhilov2hi3): Likewise.
+	(addlohiv2hi3): Likewise.
+	(addhilov2hi3): Likewise.
+	(ssaddlohiv2hi3): Likewise.
+	(ssaddhilov2hi3): Likewise.
+
+2011-06-15  Stuart Henderson  <stuart.henderson@analog.com>
+
+	Merge from 4.3
 	* config/bfin/bfin.md (plus_or_minus, pm_op, pm_optab): New code macro
 	definitions.
 	(<pm_optab>si_insn32): New 32 bit reg-reg add/subtract pattern.

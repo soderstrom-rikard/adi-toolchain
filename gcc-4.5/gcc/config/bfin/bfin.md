@@ -1531,6 +1531,13 @@
   "%0 = abs %1 (V)%!"
   [(set_attr "type" "dsp32")])
 
+(define_insn "ssabshi2"
+  [(set (match_operand:HI 0 "register_operand" "=d")
+	(ss_abs:HI (match_operand:HI 1 "register_operand" "d")))]
+  ""
+  "%0 = abs %1 (V)%!"
+  [(set_attr "type" "dsp32")])
+
 (define_insn "neghi2"
   [(set (match_operand:HI 0 "register_operand" "=d")
 	(neg:HI (match_operand:HI 1 "register_operand" "d")))]
@@ -3037,11 +3044,11 @@
   [(set (match_operand:V2HI 0 "register_operand" "=d")
 	(vec_concat:V2HI
 	 (plus:HI (vec_select:HI (match_operand:V2HI 1 "register_operand" "d")
-				 (parallel [(const_int 0)]))
+				 (parallel [(const_int 1)]))
 		  (vec_select:HI (match_operand:V2HI 2 "register_operand" "d")
-				 (parallel [(const_int 0)])))
-	 (minus:HI (vec_select:HI (match_dup 1) (parallel [(const_int 1)]))
-		   (vec_select:HI (match_dup 2) (parallel [(const_int 1)])))))]
+				 (parallel [(const_int 1)])))
+	 (minus:HI (vec_select:HI (match_dup 1) (parallel [(const_int 0)]))
+		   (vec_select:HI (match_dup 2) (parallel [(const_int 0)])))))]
   ""
   "%0 = %1 +|- %2%!"
   [(set_attr "type" "dsp32")])
@@ -3050,11 +3057,11 @@
   [(set (match_operand:V2HI 0 "register_operand" "=d")
 	(vec_concat:V2HI
 	 (minus:HI (vec_select:HI (match_operand:V2HI 1 "register_operand" "d")
-				  (parallel [(const_int 0)]))
+				  (parallel [(const_int 1)]))
 		   (vec_select:HI (match_operand:V2HI 2 "register_operand" "d")
-				  (parallel [(const_int 0)])))
-	 (plus:HI (vec_select:HI (match_dup 1) (parallel [(const_int 1)]))
-		  (vec_select:HI (match_dup 2) (parallel [(const_int 1)])))))]
+				  (parallel [(const_int 1)])))
+	 (plus:HI (vec_select:HI (match_dup 1) (parallel [(const_int 0)]))
+		  (vec_select:HI (match_dup 2) (parallel [(const_int 0)])))))]
   ""
   "%0 = %1 -|+ %2%!"
   [(set_attr "type" "dsp32")])
@@ -3063,11 +3070,11 @@
   [(set (match_operand:V2HI 0 "register_operand" "=d")
 	(vec_concat:V2HI
 	 (ss_plus:HI (vec_select:HI (match_operand:V2HI 1 "register_operand" "d")
-				    (parallel [(const_int 0)]))
+				    (parallel [(const_int 1)]))
 		     (vec_select:HI (match_operand:V2HI 2 "register_operand" "d")
-				    (parallel [(const_int 0)])))
-	 (ss_minus:HI (vec_select:HI (match_dup 1) (parallel [(const_int 1)]))
-		      (vec_select:HI (match_dup 2) (parallel [(const_int 1)])))))]
+				    (parallel [(const_int 1)])))
+	 (ss_minus:HI (vec_select:HI (match_dup 1) (parallel [(const_int 0)]))
+		      (vec_select:HI (match_dup 2) (parallel [(const_int 0)])))))]
   ""
   "%0 = %1 +|- %2 (S)%!"
   [(set_attr "type" "dsp32")])
@@ -3076,26 +3083,16 @@
   [(set (match_operand:V2HI 0 "register_operand" "=d")
 	(vec_concat:V2HI
 	 (ss_minus:HI (vec_select:HI (match_operand:V2HI 1 "register_operand" "d")
-				     (parallel [(const_int 0)]))
+				     (parallel [(const_int 1)]))
 		      (vec_select:HI (match_operand:V2HI 2 "register_operand" "d")
-				     (parallel [(const_int 0)])))
-	 (ss_plus:HI (vec_select:HI (match_dup 1) (parallel [(const_int 1)]))
-		     (vec_select:HI (match_dup 2) (parallel [(const_int 1)])))))]
+				     (parallel [(const_int 1)])))
+	 (ss_plus:HI (vec_select:HI (match_dup 1) (parallel [(const_int 0)]))
+		     (vec_select:HI (match_dup 2) (parallel [(const_int 0)])))))]
   ""
   "%0 = %1 -|+ %2 (S)%!"
   [(set_attr "type" "dsp32")])
 
 (define_insn "sublohiv2hi3"
-  [(set (match_operand:HI 0 "register_operand" "=d")
-	(minus:HI (vec_select:HI (match_operand:V2HI 1 "register_operand" "d")
-				 (parallel [(const_int 1)]))
-		  (vec_select:HI (match_operand:V2HI 2 "register_operand" "d")
-				 (parallel [(const_int 0)]))))]
-  ""
-  "%h0 = %d1 - %h2%!"
-  [(set_attr "type" "dsp32")])
-
-(define_insn "subhilov2hi3"
   [(set (match_operand:HI 0 "register_operand" "=d")
 	(minus:HI (vec_select:HI (match_operand:V2HI 1 "register_operand" "d")
 				 (parallel [(const_int 0)]))
@@ -3105,17 +3102,17 @@
   "%h0 = %h1 - %d2%!"
   [(set_attr "type" "dsp32")])
 
-(define_insn "sssublohiv2hi3"
+(define_insn "subhilov2hi3"
   [(set (match_operand:HI 0 "register_operand" "=d")
-	(ss_minus:HI (vec_select:HI (match_operand:V2HI 1 "register_operand" "d")
-				    (parallel [(const_int 1)]))
-		     (vec_select:HI (match_operand:V2HI 2 "register_operand" "d")
-				    (parallel [(const_int 0)]))))]
+	(minus:HI (vec_select:HI (match_operand:V2HI 1 "register_operand" "d")
+				 (parallel [(const_int 1)]))
+		  (vec_select:HI (match_operand:V2HI 2 "register_operand" "d")
+				 (parallel [(const_int 0)]))))]
   ""
-  "%h0 = %d1 - %h2 (S)%!"
+  "%h0 = %d1 - %h2%!"
   [(set_attr "type" "dsp32")])
 
-(define_insn "sssubhilov2hi3"
+(define_insn "sssublohiv2hi3"
   [(set (match_operand:HI 0 "register_operand" "=d")
 	(ss_minus:HI (vec_select:HI (match_operand:V2HI 1 "register_operand" "d")
 				    (parallel [(const_int 0)]))
@@ -3125,17 +3122,17 @@
   "%h0 = %h1 - %d2 (S)%!"
   [(set_attr "type" "dsp32")])
 
-(define_insn "addlohiv2hi3"
+(define_insn "sssubhilov2hi3"
   [(set (match_operand:HI 0 "register_operand" "=d")
-	(plus:HI (vec_select:HI (match_operand:V2HI 1 "register_operand" "d")
-				(parallel [(const_int 1)]))
-		 (vec_select:HI (match_operand:V2HI 2 "register_operand" "d")
-				(parallel [(const_int 0)]))))]
+	(ss_minus:HI (vec_select:HI (match_operand:V2HI 1 "register_operand" "d")
+				    (parallel [(const_int 1)]))
+		     (vec_select:HI (match_operand:V2HI 2 "register_operand" "d")
+				    (parallel [(const_int 0)]))))]
   ""
-  "%h0 = %d1 + %h2%!"
+  "%h0 = %d1 - %h2 (S)%!"
   [(set_attr "type" "dsp32")])
 
-(define_insn "addhilov2hi3"
+(define_insn "addlohiv2hi3"
   [(set (match_operand:HI 0 "register_operand" "=d")
 	(plus:HI (vec_select:HI (match_operand:V2HI 1 "register_operand" "d")
 				(parallel [(const_int 0)]))
@@ -3145,17 +3142,17 @@
   "%h0 = %h1 + %d2%!"
   [(set_attr "type" "dsp32")])
 
-(define_insn "ssaddlohiv2hi3"
+(define_insn "addhilov2hi3"
   [(set (match_operand:HI 0 "register_operand" "=d")
-	(ss_plus:HI (vec_select:HI (match_operand:V2HI 1 "register_operand" "d")
-				   (parallel [(const_int 1)]))
-		    (vec_select:HI (match_operand:V2HI 2 "register_operand" "d")
-				   (parallel [(const_int 0)]))))]
+	(plus:HI (vec_select:HI (match_operand:V2HI 1 "register_operand" "d")
+				(parallel [(const_int 1)]))
+		 (vec_select:HI (match_operand:V2HI 2 "register_operand" "d")
+				(parallel [(const_int 0)]))))]
   ""
-  "%h0 = %d1 + %h2 (S)%!"
+  "%h0 = %d1 + %h2%!"
   [(set_attr "type" "dsp32")])
 
-(define_insn "ssaddhilov2hi3"
+(define_insn "ssaddlohiv2hi3"
   [(set (match_operand:HI 0 "register_operand" "=d")
 	(ss_plus:HI (vec_select:HI (match_operand:V2HI 1 "register_operand" "d")
 				   (parallel [(const_int 0)]))
@@ -3163,6 +3160,16 @@
 				   (parallel [(const_int 1)]))))]
   ""
   "%h0 = %h1 + %d2 (S)%!"
+  [(set_attr "type" "dsp32")])
+
+(define_insn "ssaddhilov2hi3"
+  [(set (match_operand:HI 0 "register_operand" "=d")
+	(ss_plus:HI (vec_select:HI (match_operand:V2HI 1 "register_operand" "d")
+				   (parallel [(const_int 1)]))
+		    (vec_select:HI (match_operand:V2HI 2 "register_operand" "d")
+				   (parallel [(const_int 0)]))))]
+  ""
+  "%h0 = %d1 + %h2 (S)%!"
   [(set_attr "type" "dsp32")])
 
 (define_insn "sminv2hi3"
