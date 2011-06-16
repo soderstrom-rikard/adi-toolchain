@@ -1,6 +1,12 @@
 2011-06-16  Stuart Henderson  <Stuart.Henderson@analog.com>
 
 	Merge from 4.3
+	* intrinsics/chmod.c: If execl fails in the child, exit rather than
+	returning to caller.
+
+2011-06-16  Stuart Henderson  <Stuart.Henderson@analog.com>
+
+	Merge from 4.3
 	* configure
 	* config.h.in
 	* configure.ac

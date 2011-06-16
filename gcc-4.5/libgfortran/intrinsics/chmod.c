@@ -77,7 +77,7 @@ chmod_func (char *name, char *mode, gfc_charlen_type name_len,
     {
       /* Child process.  */
       execl ("/bin/chmod", "chmod", m, file, (char *) NULL);
-      return errno;
+      _exit (errno);
     }
   else
     wait (&status);
