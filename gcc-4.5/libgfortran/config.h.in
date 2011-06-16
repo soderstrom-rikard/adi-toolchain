@@ -417,6 +417,9 @@
 /* Define to 1 if you have the `fork' function. */
 #undef HAVE_FORK
 
+/* Define to 1 if you have the `fork' function. */
+#undef HAVE_VFORK
+
 /* Define if you have fpsetmask. */
 #undef HAVE_FPSETMASK
 

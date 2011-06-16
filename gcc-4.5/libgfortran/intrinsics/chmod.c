@@ -38,7 +38,7 @@ see the files COPYING3 and COPYING.RUNTIME respectively.  If not, see
 /* INTEGER FUNCTION ACCESS(NAME, MODE)
    CHARACTER(len=*), INTENT(IN) :: NAME, MODE  */
 
-#if defined(HAVE_FORK) && defined(HAVE_EXECL) && defined(HAVE_WAIT)
+#if (defined(HAVE_FORK) || defined(HAVE_VFORK)) && defined(HAVE_EXECL) && defined(HAVE_WAIT)
 
 extern int chmod_func (char *, char *, gfc_charlen_type, gfc_charlen_type);
 export_proto(chmod_func);
@@ -67,7 +67,11 @@ chmod_func (char *name, char *mode, gfc_charlen_type name_len,
   m[mode_len]= '\0';
 
   /* Execute /bin/chmod.  */
+#if defined(HAVE_FORK)
   if ((pid = fork()) < 0)
+#else
+  if ((pid = vfork()) < 0)
+#endif
     return errno;
   if (pid == 0)
     {
