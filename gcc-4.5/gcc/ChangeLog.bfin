@@ -1,6 +1,11 @@
 2011-06-16  Stuart Henderson  <stuart.henderson@analog.com>
 
 	Merge from 4.3
+	* config/bfin/bfin.c (bfin_expand_builtin): Fix __builtin_bfin_cmplx_msu.
+
+2011-06-16  Stuart Henderson  <stuart.henderson@analog.com>
+
+	Merge from 4.3
 	* combine.c (can_combine_p): Disallow cases where a hard reg dies in an
 	input that isn't contiguous with the rest of the insns.
 
