@@ -109,12 +109,6 @@
 (define_register_constraint "qA" "P0REGS"
   "The register P0.")
 
-(define_register_constraint "qL" "LREGS"
-  "An L register.")
-
-(define_register_constraint "qZ" "IPREGS"
-  "An IREG or a PREG.")
-
 ;; Constant constraints.
 
 (define_constraint "J"

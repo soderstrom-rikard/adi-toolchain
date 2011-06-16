@@ -607,61 +607,6 @@
    (set_attr "addrtype" "preg,32bit")
    (set_attr "length" "2")])
 
-;; After reload, we want to recognize certain types of movsi/movhi memory load
-;; patterns here rather than as a regular move.  This allows us to make new
-;; addressing modes available that depend on the fact that the destination
-;; register is a DREG.  Also, for HImode moves, we need to output the insn
-;; differently (as a load to a half register, without extension).
-
-(define_mode_iterator HISI [HI SI])
-(define_mode_attr hisi_string [(HI "W ") (SI "")])
-(define_mode_attr hisi_part [(HI ".L") (SI "")])
-(define_mode_attr hisi_ext [(HI " (Z)") (SI "")])
-
-(define_insn "load<mode>_dreg"
-  [(set (match_operand:HISI 0 "d_register_operand" "=d,d")
-	(mem:HISI (match_operand:SI 1 "register_operand" "b,qZ")))]
-  "reload_completed"
-  "@
-   %0<hisi_part> = <hisi_string>[%1]%!
-   %0 = <hisi_string>[%1]<hisi_ext>%!"
-  [(set_attr "type" "mcld")
-   (set_attr "length" "2")
-   (set_attr "addrtype" "ireg,preg")])
-
-(define_insn "load<mode>_dreg_postinc"
-  [(set (match_operand:HISI 0 "d_register_operand" "=d,d")
-	(mem:HISI (post_inc:SI (match_operand:SI 1 "register_operand" "b,qZ"))))]
-  "reload_completed"
-  "@
-   %0<hisi_part> = <hisi_string>[%1++]%!
-   %0 = <hisi_string>[%1++]<hisi_ext>%!"
-  [(set_attr "type" "mcld")
-   (set_attr "length" "2")
-   (set_attr "addrtype" "ireg,preg")])
-
-(define_insn "load<mode>_dreg_postdec"
-  [(set (match_operand:HISI 0 "d_register_operand" "=d,d")
-	(mem:HISI (post_dec:SI (match_operand:SI 1 "register_operand" "b,qZ"))))]
-  "reload_completed"
-  "@
-   %0<hisi_part> = <hisi_string>[%1--]%!
-   %0 = <hisi_string>[%1--]<hisi_ext>%!"
-  [(set_attr "type" "mcld")
-   (set_attr "length" "2")
-   (set_attr "addrtype" "ireg,preg")])
-
-(define_insn "loadsi_dreg_postmod"
-  [(set (match_operand:SI 0 "d_register_operand" "=d,d")
-	(mem:SI (post_modify:SI (match_operand:SI 1 "register_operand" "b,a")
-				  (plus:SI (match_dup 1)
-					   (match_operand:SI 2 "register_operand" "f,a")))))]
-  "reload_completed"
-  "%0 = [%1 ++ %2]%!"
-  [(set_attr "type" "mcld")
-   (set_attr "length" "2")
-   (set_attr "addrtype" "ireg,preg")])
-
 ;; The first alternative is used to make reload choose a limited register
 ;; class when faced with a movsi_insn that had its input operand replaced
 ;; with a PLUS.  We generally require fewer secondary reloads this way.
@@ -4357,52 +4302,5 @@
   "DISALGNEXCPT || %0 = [%1];"
   [(set_attr "type" "mcld")
    (set_attr "length" "8")])
-
-
-;; The register allocator will never give us the alternative which directly
-;; uses an LREG, since those are fixed.  For the same reason, we can simply
-;; clobber that register and re-set it back to 0.  The optimize_loop_addresses
-;; pass tries to do better by moving the set of the L register outside a loop;
-;; in that case we will see the L register in operand 4.
-
-(define_insn "circptr"
-  [(set (match_operand:SI 0 "register_operand" "=b,b")
-	(if_then_else:SI (ge (plus:SI (match_operand:SI 1 "register_operand" "0,0")
-				      (match_operand:SI 2 "register_operand" "fP2P4,fP2P4"))
-			     (plus:SI (match_operand:SI 3 "register_operand" "v,v")
-				      (match_operand:SI 4 "register_operand" "qL,da")))
-			 (minus:SI (plus:SI (match_dup 1) (match_dup 2)) (match_dup 4))
-			 (plus:SI (match_dup 1) (match_dup 2))))
-   (clobber (match_scratch:SI 5 "=&x, &x"))]
-  ""
-{
-  rtx xop[8];
-  xop[0] = operands[0];
-  xop[1] = operands[1];
-  xop[2] = operands[2];
-  xop[3] = operands[3];
-  xop[4] = operands[4];
-  xop[5] = operands[5];
-  /* The B register corresponding to the I register operand 0.  */
-  xop[6] = gen_rtx_REG (Pmode, REGNO (operands[0]) + 4);
-  /* The L register corresponding to the I register operand 0.  */
-  xop[7] = gen_rtx_REG (Pmode, REGNO (operands[0]) + 8);
-
-  if (!rtx_equal_p (xop[6], xop[3]))
-    {
-      output_asm_insn ("%5 = %6;", xop);
-      output_asm_insn ("%6 = %3;", xop);
-    }
-  if (!rtx_equal_p (xop[4], xop[7]))
-    output_asm_insn ("%7 = %4;", xop);
-  output_asm_insn ("%0 += %2;", xop);
-  if (!rtx_equal_p (xop[4], xop[7]))
-    output_asm_insn ("%7 = 0;", xop);
-  if (!rtx_equal_p (xop[6], xop[3]))
-    output_asm_insn ("%6 = %5;", xop);
-  return "";
-}
-  [(set_attr "seq_insns" "multi")
-   (set_attr "length" "12")])
 
 (include "sync.md")
