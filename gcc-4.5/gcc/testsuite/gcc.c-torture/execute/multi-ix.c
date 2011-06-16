@@ -157,8 +157,8 @@ main ()
      since index variable i0 in "a[i0] = i0" equals 39.  */
   if (CHUNK < 40)
     exit (0);
-
-  f (1);
+  if (sizeof (l) >= 40 * sizeof(int))
+    f (1);
   exit (0);
 }
 
