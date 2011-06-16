@@ -539,7 +539,7 @@
 })
 
 (define_insn "movbi"
-  [(set (match_operand:BI 0 "nonimmediate_operand" "=x,x,d,md,C,d,C,P1")
+  [(set (match_operand:BI 0 "nonimmediate_operand" "=x,x,d,md,C,d,C,C")
         (match_operand:BI 1 "general_operand" "x,xKs3,md,d,d,C,P0,P1"))]
 
   ""

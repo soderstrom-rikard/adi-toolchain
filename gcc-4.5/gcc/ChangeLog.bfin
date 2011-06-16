@@ -1,6 +1,11 @@
 2011-06-16  Stuart Henderson  <stuart.henderson@analog.com>
 
 	Merge from 4.3
+	* config/bfin/bfin.c: constraint typo in movbi.
+
+2011-06-16  Stuart Henderson  <stuart.henderson@analog.com>
+
+	Merge from 4.3
 	* config/bfin/bfin.c (bfin_expand_builtin): Treat
 	BFIN_BUILTIN_MULT_1X32X32NS as same as BFIN_BUILTIN_MULT_1X32X32.
 
