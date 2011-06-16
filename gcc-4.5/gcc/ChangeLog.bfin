@@ -1,5 +1,11 @@
 2011-06-16  Stuart Henderson  <stuart.henderson@analog.com>
 
+	Merge from 4.3
+	* combine.c (can_combine_p): Disallow cases where a hard reg dies in an
+	input that isn't contiguous with the rest of the insns.
+
+2011-06-16  Stuart Henderson  <stuart.henderson@analog.com>
+
 	Revert the following merges.
 	2011-06-15  Stuart Henderson  <stuart.henderson@analog.com>
 	Merge from 4.3

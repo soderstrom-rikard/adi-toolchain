@@ -1546,13 +1546,16 @@ can_combine_p (rtx insn, rtx i3, rtx pred ATTRIBUTE_UNUSED, rtx succ,
   int i;
   const_rtx set = 0;
   rtx src, dest;
-  rtx p;
-#ifdef AUTO_INC_DEC
-  rtx link;
-#endif
+  rtx p, link;
   int all_adjacent = (succ ? (next_active_insn (insn) == succ
 			      && next_active_insn (succ) == i3)
 		      : next_active_insn (insn) == i3);
+
+  if (!all_adjacent)
+    for (link = REG_NOTES (insn); link; link = XEXP (link, 1))
+      if (REG_NOTE_KIND (link) == REG_DEAD
+	  && REGNO (XEXP (link, 0)) < FIRST_PSEUDO_REGISTER)
+	return 0;
 
   /* Can combine only if previous insn is a SET of a REG, a SUBREG or CC0.
      or a PARALLEL consisting of such a SET and CLOBBERs.
