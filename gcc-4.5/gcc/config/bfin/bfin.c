@@ -3693,9 +3693,9 @@ bfin_adjust_cost (rtx insn, rtx link, rtx dep_insn, int cost)
   enum attr_type insn_type, dep_insn_type;
   int dep_insn_code_number;
 
-  /* Anti and output dependencies have zero cost.  */
+  /* Anti and output dependencies can be resolved next cycle.  */
   if (REG_NOTE_KIND (link) != 0)
-    return 0;
+    return 1;
 
   dep_insn_code_number = recog_memoized (dep_insn);
 

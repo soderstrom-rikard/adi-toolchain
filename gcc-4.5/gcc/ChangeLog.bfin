@@ -1,6 +1,12 @@
 2011-06-16  Stuart Henderson  <stuart.henderson@analog.com>
 
 	Merge from 4.3
+	* config/bfin/bfin.md (bfin_adjust_cost): Give anti and output
+	dependencies a cost of 1.
+
+2011-06-16  Stuart Henderson  <stuart.henderson@analog.com>
+
+	Merge from 4.3
 	* config/bfin/bfin.c (bfin_expand_builtin): Fix __builtin_bfin_cmplx_msu.
 
 2011-06-16  Stuart Henderson  <stuart.henderson@analog.com>
