@@ -1,6 +1,12 @@
 2011-06-16  Stuart Henderson  <stuart.henderson@analog.com>
 
 	Merge from 4.3
+	* config/bfin/bfin.c (bfin_expand_builtin): Treat
+	BFIN_BUILTIN_MULT_1X32X32NS as same as BFIN_BUILTIN_MULT_1X32X32.
+
+2011-06-16  Stuart Henderson  <stuart.henderson@analog.com>
+
+	Merge from 4.3
 	* config/bfin/bfin.md (bfin_adjust_cost): Give anti and output
 	dependencies a cost of 1.
 
