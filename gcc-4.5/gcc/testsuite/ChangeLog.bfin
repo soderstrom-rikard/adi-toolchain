@@ -1,6 +1,11 @@
 2011-06-17  Stuart Henderson  <stuart.henderson@analog.com>
 
 	Merge from 4.3
+	* gcc.target/bfin/hdlr_intr-2.c: Update RETI test to match pop and push.
+
+2011-06-17  Stuart Henderson  <stuart.henderson@analog.com>
+
+	Merge from 4.3
 	* gcc.dg/cpp/_Pragma6.c: Disable for bfin.
 
 2011-06-17  Stuart Henderson  <stuart.henderson@analog.com>
