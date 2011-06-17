@@ -1,6 +1,11 @@
 2011-06-17  Stuart Henderson  <stuart.henderson@analog.com>
 
 	Merge from 4.3
+	* gcc.dg/tree-ssa/20040204-1.c: expect bfin to pass this test.
+
+2011-06-17  Stuart Henderson  <stuart.henderson@analog.com>
+
+	Merge from 4.3
 	* gcc.target/bfin/hdlr_intr-2.c: Update RETI test to match pop and push.
 
 2011-06-17  Stuart Henderson  <stuart.henderson@analog.com>
