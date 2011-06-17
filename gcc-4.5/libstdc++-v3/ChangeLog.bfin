@@ -1,3 +1,9 @@
+2011-06-17  Stuart Henderson  <Stuart.Henderson@analog.com>
+
+	Merge from 4.3
+	* testsuite/27_io/basic_istream/extractors_arithmetic/char/12.cc: remove
+	* lax_strtofp condition of xfail.
+
 2011-06-13  Stuart Henderson  <Stuart.Henderson@analog.com>
 
 	Merge from 4.3
