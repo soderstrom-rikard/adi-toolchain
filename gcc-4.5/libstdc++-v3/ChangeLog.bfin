@@ -2,7 +2,9 @@
 
 	Merge from 4.3
 	* testsuite/27_io/basic_istream/extractors_arithmetic/char/12.cc: remove
-	* lax_strtofp condition of xfail.
+	lax_strtofp condition of xfail.
+	* testsuite/21_strings/basic_string/capacity/char/18654.cc: reduce memory
+	use.
 
 2011-06-13  Stuart Henderson  <Stuart.Henderson@analog.com>
 
