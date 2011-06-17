@@ -2,6 +2,7 @@
 
 	Merge from 4.3
 	* g++.dg/cpp/_Pragma1.C: Disable for bfin.
+	* gcc.dg/torture/asm-subreg-1.c: Disable for bfin.
 
 2011-06-17  Stuart Henderson  <stuart.henderson@analog.com>
 
