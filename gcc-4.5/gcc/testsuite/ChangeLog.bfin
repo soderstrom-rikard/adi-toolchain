@@ -1,3 +1,11 @@
+2011-06-17  Stuart Henderson  <stuart.henderson@analog.com>
+
+	Merge from 4.3
+	* gcc.target/bfin/hdlr_except-1.c: New test.
+	* gcc.target/bfin/hdlr_intr-1.c: New test.
+	* gcc.target/bfin/hdlr_intr-2.c: New test.
+	* gcc.target/bfin/hdlr_nmi-1.c: New test.
+
 2011-06-16  Stuart Henderson  <stuart.henderson@analog.com>
 
 	Merge from 4.3
