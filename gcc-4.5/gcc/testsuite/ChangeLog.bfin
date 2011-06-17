@@ -1,6 +1,11 @@
 2011-06-17  Stuart Henderson  <stuart.henderson@analog.com>
 
 	Merge from 4.3
+	* g++.dg/cpp/_Pragma1.C: Disable for bfin.
+
+2011-06-17  Stuart Henderson  <stuart.henderson@analog.com>
+
+	Merge from 4.3
 	* gcc.dg/tree-ssa/20040204-1.c: expect bfin to pass this test.
 
 2011-06-17  Stuart Henderson  <stuart.henderson@analog.com>
