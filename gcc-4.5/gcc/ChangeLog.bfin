@@ -1,6 +1,12 @@
 2011-06-17  Stuart Henderson  <stuart.henderson@analog.com>
 
 	Merge from 4.3
+	* config/bfin/bfin.h (bfin_cpu_t): Drop trailing comma in enum to
+	avoid warnings from gcc.
+
+2011-06-17  Stuart Henderson  <stuart.henderson@analog.com>
+
+	Merge from 4.3
 	* config/lib1funcs.asm: Use a new implementation for ___divsi3 and
 	___udivsi3. Adjust ___umodsi3 to match.
 
