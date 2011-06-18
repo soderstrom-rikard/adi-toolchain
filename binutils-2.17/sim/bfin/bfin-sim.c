@@ -1534,19 +1534,8 @@ extract_mult (SIM_CPU *cpu, bu64 res, int mmod, int MM,
       {
       case 0:
       case M_W32:
-	return saturate_s16 (rnd16 (res), overflow);
       case M_IH:
-	{
-	  bu32 sgn = !!(res >> 39);
-	  bu16 val = rnd16 (saturate_s32 (res, overflow));
-	  bu32 sgn0 = (val >> 15) & 1;
-	  if (sgn == sgn0 || !val)
-	    return val;
-	  if (sgn)
-	    return 0x8000;
-	  *overflow = 1;
-	  return 0x7FFF;
-	}
+	return saturate_s16 (rnd16 (res), overflow);
       case M_IS:
 	return saturate_s16 (res, overflow);
       case M_FU:
@@ -1591,6 +1580,7 @@ decode_macfunc (SIM_CPU *cpu, int which, int op, int h0, int h1, int src0,
   if (op != 3)
     {
       bu8 sgn0 = (acc >> 31) & 1;
+      bu8 sgn40 = (acc >> 39) & 1;
       bu40 nosat_acc;
 
       /* This can't saturate, so we don't keep track of the sat flag.  */
@@ -1627,20 +1617,20 @@ decode_macfunc (SIM_CPU *cpu, int which, int op, int h0, int h1, int src0,
 	    acc = 0x7fffffffffull, sat = 1;
 	  break;
 	case M_TFU:
-	  if (!MM && acc > 0xFFFFFFFFFFull)
-	    acc = 0x0, sat = 1;
-	  if (MM && acc > 0xFFFFFFFF)
-	    acc &= 0xFFFFFFFF;
+	  if (!MM && (bs64)acc < 0)
+	    acc = 0, sat = 1;
+	  if (!MM && (bs64)acc > 0xFFFFFFFFFFull)
+	    acc = 0xFFFFFFFFFFull, sat = 1;
 	  break;
 	case M_IU:
-	  if (acc & 0x8000000000000000ull)
+	  if (!MM && acc & 0x8000000000000000ull)
 	    acc = 0x0, sat = 1;
-	  if (acc > 0xFFFFFFFFFFull)
-	    acc &= 0xFFFFFFFFFFull, sat = 1;
-	  if (MM && acc > 0xFFFFFFFF)
-	    acc &= 0xFFFFFFFF;
-	  if (acc & 0x80000000)
-	    acc |= 0xffffffff00000000ull;
+	  if (!MM && acc > 0xFFFFFFFFFFull)
+	    acc = 0xFFFFFFFFFFull, sat = 1;
+	  if (MM && acc > 0xFFFFFFFFFFull)
+	    acc &= 0xFFFFFFFFFFull;
+	  if (acc & 0x8000000000ull)
+	    acc |= 0xffffff0000000000ull;
 	  break;
 	case M_FU:
 	  if (!MM && (bs64)acc < 0)
@@ -1651,8 +1641,8 @@ decode_macfunc (SIM_CPU *cpu, int which, int op, int h0, int h1, int src0,
 	    acc = 0xFFFFFFFFFFull, sat = 1;
 	  if (MM && acc > 0xFFFFFFFFFFull)
 	    acc &= 0xFFFFFFFFFFull;
-	  if (MM && acc & 0x80000000)
-	    acc |= 0xffffffff00000000ull;
+	  if (MM && acc & 0x8000000000ull)
+	    acc |= 0xffffff0000000000ull;
 	  break;
 	case M_IH:
 	  if ((bs64)acc < -0x80000000ll)
@@ -1661,13 +1651,17 @@ decode_macfunc (SIM_CPU *cpu, int which, int op, int h0, int h1, int src0,
 	    acc = 0x7fffffffull, sat = 1;
 	  break;
 	case M_W32:
-	  if (sgn0 && (sgn0 != ((acc >> 31) & 1))
-	      && (((acc >> 32) & 0xFF) == 0xff))
+	  /* check max negative value */
+	  if (sgn40 && ((acc >> 31) != 0x1ffffffff)
+	      && ((acc >> 31) != 0x0))
 	    acc = 0x80000000, sat = 1;
+	  if (!sat && !sgn40 && ((acc >> 31) != 0x0)
+	      && ((acc >> 31) != 0x1ffffffff))
+	    acc = 0x7FFFFFFF, sat = 1;
 	  acc &= 0xffffffff;
 	  if (acc & 0x80000000)
-	    acc |= 0xffffffff00000000ull, sat = 1;
-	  if (acc == 0x7fffffff)
+	    acc |= 0xffffffff00000000ull;
+	  if (tsat)
 	    sat = 1;
 	  break;
 	default:
@@ -1683,8 +1677,14 @@ decode_macfunc (SIM_CPU *cpu, int which, int op, int h0, int h1, int src0,
       if (sat)
 	STORE (ASTATREG (avs[which]), sat);
 
-      if (sat && !(mmod == M_FU && ((nosat_acc >> 16) & 0xffffff) == 0xffffff))
-	*overflow = 1;
+      /* Figure out the overflow bit.  */
+      if (sat)
+	{
+	  if (fullword)
+	    *overflow = 1;
+	  else
+	    ret = extract_mult (cpu, nosat_acc, mmod, MM, fullword, overflow);
+	}
     }
 
   ret = extract_mult (cpu, acc, mmod, MM, fullword, overflow);
