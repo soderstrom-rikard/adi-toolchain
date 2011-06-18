@@ -5783,10 +5783,7 @@ decode_dsp32shiftimm_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1)
 	}
 
       SET_AREG (HLs, acc);
-      if (HLs)
-	SET_ASTATREG (av1, 0);
-      else
-	SET_ASTATREG (av0, 0);
+      SET_ASTATREG (av[HLs], 0);
       SET_ASTATREG (an, !!(acc & 0x8000000000ull));
       SET_ASTATREG (az, (acc & 0xFFFFFFFFFF) == 0);
     }
