@@ -223,28 +223,8 @@ proc gdb_load { arg } {
 	    }
 
 	    if [is_remote target] {
-		send_gdb "show remotetimeout\n"
-		gdb_expect {
-		    -re "Timeout limit to wait for target to respond is ($decimal).*$gdb_prompt $" {
-			set oldremotetimeout $expect_out(1,string);
-		    }
-		    timeout {
-			if { $verbose > 1 } {
-			    perror "Timed out trying to get remotetimeout."
-			}
-		    }
-		}
-		send_gdb "set remotetimeout $loadtimeout\n";
-		gdb_expect {
-		    -re "$gdb_prompt $" {
-			verbose "Set remotetimeout to $loadtimeout\n"
-		    }
-		    timeout {
-			if { $verbose > 1 } {
-			    perror "Timed out trying to set remotetimeout."
-			}
-		    }
-		}
+		set oldremotetimeout [get_remotetimeout]
+		set_remotetimeout $loadtimeout
 	    }
 
 	    verbose "Loading $farg"
@@ -274,17 +254,7 @@ proc gdb_load { arg } {
 	    }
 
 	    if [is_remote target] {
-		send_gdb "set remotetimeout $oldremotetimeout\n";
-		gdb_expect {
-		    -re "$gdb_prompt $" {
-			verbose "Set remotetimeout to $oldremotetimeout\n"
-		    }
-		    timeout {
-			if { $verbose > 1 } {
-			    perror "Timed out trying to set remotetimeout."
-			}
-		    }
-		}
+		set_remotetimeout $oldremotetimeout
 	    }
 
 	    if { $load_ok == 1 } {
