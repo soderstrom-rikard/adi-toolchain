@@ -82,7 +82,7 @@ $1 == "}" {
 }
 
 {
-  sym = prefix $1;
+  sym = $1;
   symbols[sym] = 1
   if (thislib != "%exclude")
     ver[sym, thislib] = 1;
@@ -112,7 +112,7 @@ function output(lib) {
 
   empty=1
   for (sym in symbols)
-    if ((ver[sym, lib] != 0) && (sym in def))
+    if ((ver[sym, lib] != 0) && (prefix sym in def))
       {
 	if (empty)
 	  {
