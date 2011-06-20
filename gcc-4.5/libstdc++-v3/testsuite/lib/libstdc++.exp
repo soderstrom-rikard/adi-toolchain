@@ -211,6 +211,9 @@ proc libstdc++_init { testfile } {
     # Default settings.
     set cxx [transform "g++"]
     set cxxflags "-g -O2 -D_GLIBCXX_ASSERT -fmessage-length=0"
+    if { [string match "bfin-*-elf" $target_triplet] } {
+        append cxxflags " -Wl,--gc-sections"
+    }
     set cxxpchflags ""
     set cxxldflags ""
     set cc [transform "gcc"]
@@ -375,6 +378,12 @@ proc libstdc++-dg-test { prog do_what extra_tool_flags } {
     # and-target file), but the defaults are lacking in goodness.
     set comp_output [$select_compile "$prog" "$output_file" "$compile_type" $options];
     set comp_output [ prune_g++_output $comp_output ];
+
+    # xfail if testing bfin-elf on a target board and we've run out of memory
+    # at link time.
+    if { [is_remote target] != 0 && [regexp -nocase ".*region .* is full.*" $comp_output] } {
+           setup_xfail "bfin-*-elf"
+    }
 
     return [list $comp_output $output_file]
 }
