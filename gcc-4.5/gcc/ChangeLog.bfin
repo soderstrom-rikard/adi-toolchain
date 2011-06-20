@@ -1,6 +1,11 @@
 2011-06-20  Stuart Henderson  <stuart.henderson@analog.com>
 
 	Merge from 4.3
+	* config/bfin/elf.h: link in bfinbsp for bfin-elf.
+
+2011-06-20  Stuart Henderson  <stuart.henderson@analog.com>
+
+	Merge from 4.3
 	* mkmap-symver.awk: Move prefix from main to output().
 	* config/bfin/libgcc-bfin.ver: Delete duplicated contents.
 	* config/bfin/t-bfin-linux (SHLIB_MAPFILES): Add libgcc-std.ver.

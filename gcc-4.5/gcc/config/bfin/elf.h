@@ -33,7 +33,7 @@ crti%O%s crtbegin%O%s crtlibid%O%s"
 #define ENDFILE_SPEC	"crtend%O%s crtn%O%s"
 
 #undef  LIB_SPEC
-#define LIB_SPEC "--start-group -lc %{msim:-lsim}%{!msim:-lnosys} --end-group \
+#define LIB_SPEC "--start-group -lc %{msim:-lsim}%{!msim:-lbfinbsp -lnosys} --end-group \
 %{!T*:%{!msim:%{!msdram: \
 	      %{mcpu=bf504*:-T bf504.ld%s}%{mcpu=bf506*:-T bf506.ld%s} \
 	      %{mcpu=bf512*:-T bf512.ld%s}%{mcpu=bf514*:-T bf514.ld%s} \
