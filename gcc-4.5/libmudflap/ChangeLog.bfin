@@ -1,6 +1,12 @@
 2011-06-20  Stuart Henderson  <Stuart.Henderson@analog.com>
 
 	Merge from 4.3
+	* testsuite/libmudflap.c/fail18-frag.c: [#6128] Append __USER_LABEL_PREFIX__
+	to asm reference of __mf_lc_mask.
+
+2011-06-20  Stuart Henderson  <Stuart.Henderson@analog.com>
+
+	Merge from 4.3
 	* testsuite/libmudflap.c/externs.exp: use remote_setenv when necessary.
 	* testsuite/libmudflap.c/cfrags.exp: Likewise.
 
