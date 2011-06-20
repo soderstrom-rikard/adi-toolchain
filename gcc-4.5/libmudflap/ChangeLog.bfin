@@ -1,6 +1,14 @@
 2011-06-20  Stuart Henderson  <Stuart.Henderson@analog.com>
 
 	Merge from 4.3
+	* testsuite/libmudflap.c++/ctors.exp: [#5777] Add remote_setenv to exp file
+	i missed with previous patch.
+	* testsuite/libmudflap.c++/c++frags.exp: Likewise
+	* testsuite/libmudflap.cth/cthfrags.exp: Likewise
+
+2011-06-20  Stuart Henderson  <Stuart.Henderson@analog.com>
+
+	Merge from 4.3
 	* testsuite/libmudflap.c/fail18-frag.c: [#6128] Append __USER_LABEL_PREFIX__
 	to asm reference of __mf_lc_mask.
 
