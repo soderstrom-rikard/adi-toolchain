@@ -1,3 +1,9 @@
+2011-06-20  Stuart Henderson  <Stuart.Henderson@analog.com>
+
+	Merge from 4.3
+	* testsuite/libmudflap.c/externs.exp: use remote_setenv when necessary.
+	* testsuite/libmudflap.c/cfrags.exp: Likewise.
+
 2011-06-08  Stuart Henderson  <Stuart.Henderson@analog.com>
 
 	Merge from 4.3:
