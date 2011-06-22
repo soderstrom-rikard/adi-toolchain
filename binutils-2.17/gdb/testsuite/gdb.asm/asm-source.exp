@@ -205,7 +205,7 @@ if { [istarget "*-*-openbsd*"] } then {
 # built with different defaults.  So no matter what we do, we lose.  We may as
 # well get out of this test sooner rather than later.
 set dest [target_info name]
-if [board_info $dest exists multilib_flags] {
+if { [board_info $dest exists multilib_flags] && ![istarget "bfin-*-*"] } then {
 	set multilib_flags [board_info $dest multilib_flags]
 	if { "${multilib_flags}" != "" } {
 	   untested asm-source.exp

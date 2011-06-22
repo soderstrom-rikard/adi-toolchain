@@ -1,3 +1,7 @@
+2011-06-22  Stuart Henderson <stuart.henderson@analog.com>
+
+	* gdb.asm/asm-source.exp: [#6204] Run even if multilib_flags.
+
 2010-11-22  Stuart Henderson <stuart.henderson@analog.com>
 
 	* gdb.asm/asm-source.exp: [#6204] Place code in L1 for hardware testing.
