@@ -1108,7 +1108,7 @@ build_kernel_headers()
 		ver=$(gawk '$2 == "LINUX_VERSION_CODE" { print rshift($3,16) "." and(rshift($3,8),0xff) "." and($3,0xff) }' "${DIR_KBUILD_OUTPUT}"/usr/include/linux/version.h)
 		prebuilt=true
 	else
-		ver=$(echo `sed -n '1,3{s:.*= ::p}' "${KERNEL_SOURCE}"/Makefile` | sed 's: :.:g')
+		ver=$(echo `sed -n '1,4{s:.*= *::p}' "${KERNEL_SOURCE}"/Makefile` | sed -e 's: :.:g' -e 's:[.][.]:.:g')
 		prebuilt=false
 	fi
 
