@@ -950,7 +950,7 @@ run_tests()
 	case ${test_target} in
 		elf-sim)       tt="${tt} sim" ;;
 		elf-jtag)      tt="${tt} newlib" ;;
-		uclinux*)      tt="${tt} libmudflap" ;;
+		uclinux*)      tt="${tt} libmudflap libgomp" ;;
 		linux-uclibc*) tt="${tt} libmudflap libgomp"
 		               [ -n "$CHECK_LIB" ] && prepare_target_solibs
 		               ;;
