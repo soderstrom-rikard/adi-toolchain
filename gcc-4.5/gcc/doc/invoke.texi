@@ -484,7 +484,8 @@ Objective-C and Objective-C++ Dialects}.
 -mleaf-id-shared-library  -mno-leaf-id-shared-library @gol
 -msep-data  -mno-sep-data  -mlong-calls  -mno-long-calls @gol
 -mfast-fp -minline-plt -mmulticore  -mcorea  -mcoreb  -msdram @gol
--micplb}
+-micplb @gol
+-elf2flt -no-elf2flt -static-libc}
 
 @emph{CRIS Options}
 @gccoptlist{-mcpu=@var{cpu}  -march=@var{cpu}  -mtune=@var{cpu} @gol
@@ -10276,6 +10277,20 @@ into SDRAM. This option defines @code{__BFIN_SDRAM}.
 Assume that ICPLBs are enabled at runtime.  This has an effect on certain
 anomaly workarounds.  For Linux targets, the default is to assume ICPLBs
 are enabled; for standalone applications the default is off.
+
+@item -elf2flt
+@opindex elf2flt
+@item -no-elf2flt
+@opindex no-elf2flt
+Generate or don't generate FLAT format binary. Default is @option{-elf2flt}
+unless @option{-no-elf2flt} is used. These two options are valid only for
+bfin-uclinux target.
+
+@item -static-libc
+@opindex static-libc
+Link with the static C library instead of the shared flat C library.
+This option is valid only for bfin-uclinux target with
+@option{-mid-shared-library} option.
 @end table
 
 @node CRIS Options

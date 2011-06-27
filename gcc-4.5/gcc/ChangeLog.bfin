@@ -1,3 +1,13 @@
+2011-06-27  Stuart Henderson  <stuart.henderson@analog.com>
+
+	Merge from 4.3
+	* config/bfin/uclinux.h (STARTFILE_SPEC): Add proper
+	start file for shared flat.
+	(LIB_SPEC): Define.
+	(LINK_SPEC): Define.
+	* doc/invoke.texi (Blackfin Options): Document -elf2flt,
+	-no-elf2flt, and -static-libc for Blackfin .
+
 2011-06-20  Stuart Henderson  <stuart.henderson@analog.com>
 
 	Merge from 4.3
