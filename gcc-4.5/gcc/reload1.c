@@ -1386,6 +1386,7 @@ reload (rtx first, int global)
 		continue;
 	      }
 	  }
+	INSN_CODE (insn) = -1;
       }
 
   /* If we are doing generic stack checking, give a warning if this

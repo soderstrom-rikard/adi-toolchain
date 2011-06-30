@@ -607,6 +607,61 @@
    (set_attr "addrtype" "preg,32bit")
    (set_attr "length" "2")])
 
+;; After reload, we want to recognize certain types of movsi/movhi memory load
+;; patterns here rather than as a regular move.  This allows us to make new
+;; addressing modes available that depend on the fact that the destination
+;; register is a DREG.  Also, for HImode moves, we need to output the insn
+;; differently (as a load to a half register, without extension).
+
+(define_mode_iterator HISI [HI SI])
+(define_mode_attr hisi_string [(HI "W ") (SI "")])
+(define_mode_attr hisi_part [(HI ".L") (SI "")])
+(define_mode_attr hisi_ext [(HI " (Z)") (SI "")])
+
+(define_insn "load<mode>_dreg"
+  [(set (match_operand:HISI 0 "d_register_operand" "=d,d")
+	(mem:HISI (match_operand:SI 1 "register_operand" "b,qZ")))]
+  "reload_completed"
+  "@
+   %0<hisi_part> = <hisi_string>[%1]%!
+   %0 = <hisi_string>[%1]<hisi_ext>%!"
+  [(set_attr "type" "mcld")
+   (set_attr "length" "2")
+   (set_attr "addrtype" "ireg,preg")])
+
+(define_insn "load<mode>_dreg_postinc"
+  [(set (match_operand:HISI 0 "d_register_operand" "=d,d")
+	(mem:HISI (post_inc:SI (match_operand:SI 1 "register_operand" "b,qZ"))))]
+  "reload_completed"
+  "@
+   %0<hisi_part> = <hisi_string>[%1++]%!
+   %0 = <hisi_string>[%1++]<hisi_ext>%!"
+  [(set_attr "type" "mcld")
+   (set_attr "length" "2")
+   (set_attr "addrtype" "ireg,preg")])
+
+(define_insn "load<mode>_dreg_postdec"
+  [(set (match_operand:HISI 0 "d_register_operand" "=d,d")
+	(mem:HISI (post_dec:SI (match_operand:SI 1 "register_operand" "b,qZ"))))]
+  "reload_completed"
+  "@
+   %0<hisi_part> = <hisi_string>[%1--]%!
+   %0 = <hisi_string>[%1--]<hisi_ext>%!"
+  [(set_attr "type" "mcld")
+   (set_attr "length" "2")
+   (set_attr "addrtype" "ireg,preg")])
+
+(define_insn "loadsi_dreg_postmod"
+  [(set (match_operand:SI 0 "d_register_operand" "=d,d")
+	(mem:SI (post_modify:SI (match_operand:SI 1 "register_operand" "b,a")
+				  (plus:SI (match_dup 1)
+					   (match_operand:SI 2 "register_operand" "f,a")))))]
+  "reload_completed"
+  "%0 = [%1 ++ %2]%!"
+  [(set_attr "type" "mcld")
+   (set_attr "length" "2")
+   (set_attr "addrtype" "ireg,preg")])
+
 ;; The first alternative is used to make reload choose a limited register
 ;; class when faced with a movsi_insn that had its input operand replaced
 ;; with a PLUS.  We generally require fewer secondary reloads this way.

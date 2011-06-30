@@ -1,3 +1,17 @@
+2011-06-30  Stuart Henderson  <stuart.henderson@analog.com>
+
+	Merge from 4.3
+	* config/bfin/bfin.md (HISI): New mode_iterator.
+	(hisi_string, hisi_part): Corresponding attributes.
+	(load<mode>_dreg, load<mode>_dreg_postinc,
+	load<mode>_dreg_postdec, loadsi_dreg_postmod): New patterns.
+	(hisi_ext): New attribute for HISI mode_iterator.
+	(load<mode>_dreg, load<mode>_dreg_postinc,
+	load<mode>_dreg_postdec): Use separate alternatives for IREGS
+	and PREGS and generate appropriate instructions for them.
+	* reload1.c (reload): Clear INSN_CODE for everything after reload.
+	* config/bfin/constraints.md ("qZ"): Add for class IPREGS.
+
 2011-06-27  Stuart Henderson  <stuart.henderson@analog.com>
 
 	Merge from 4.3
