@@ -2468,38 +2468,29 @@ proc test_prefix_command_help { command_list expected_initial_lines args } {
     }
 }
 
+# Get the current value for remotetimeout and return it.
 proc get_remotetimeout { } {
     global gdb_prompt
     global decimal
 
-    send_gdb "show remotetimeout\n"
-    gdb_expect {
+    gdb_test_multiple "show remotetimeout" "" {
 	-re "Timeout limit to wait for target to respond is ($decimal).*$gdb_prompt $" {
 	    return $expect_out(1,string);
-	}
-	timeout {
-	    if { $verbose > 1 } {
-		perror "Timed out trying to get remotetimeout."
-	    }
 	}
     }
 
     # Pick the default that gdb uses
+    warning "Unable to read remotetimeout"
     return 300
 }
 
+# Set the remotetimeout to the specified timeout.  Nothing is returned.
 proc set_remotetimeout { timeout } {
     global gdb_prompt
 
-    send_gdb "set remotetimeout $timeout\n";
-    gdb_expect {
+    gdb_test_multiple "set remotetimeout $timeout" "" {
 	-re "$gdb_prompt $" {
 	    verbose "Set remotetimeout to $timeout\n"
-	}
-	timeout {
-	    if { $verbose > 1 } {
-		perror "Timed out trying to set remotetimeout."
-	    }
 	}
     }
 }
