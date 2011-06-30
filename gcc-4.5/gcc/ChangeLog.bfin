@@ -1,6 +1,13 @@
 2011-06-30  Stuart Henderson  <stuart.henderson@analog.com>
 
 	Merge from 4.3
+	* final.c (insn_current_align): Delete.
+	(insn_current_reference_address): Just return insn_current_address.
+	(shorten_branches): Always assume worst case for label alignments.
+
+2011-06-30  Stuart Henderson  <stuart.henderson@analog.com>
+
+	Merge from 4.3
 	* config/bfin/bfin.md (HISI): New mode_iterator.
 	(hisi_string, hisi_part): Corresponding attributes.
 	(load<mode>_dreg, load<mode>_dreg_postinc,

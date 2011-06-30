@@ -324,9 +324,6 @@ int insn_current_address;
 /* Address of insn being processed in previous iteration.  */
 int insn_last_address;
 
-/* known invariant alignment of insn being processed.  */
-int insn_current_align;
-
 /* After shorten_branches, for any insn, uid_align[INSN_UID (insn)]
    gives the next following alignment insn that increases the known
    alignment, or NULL_RTX if there is no such insn.
@@ -652,31 +649,7 @@ insn_current_reference_address (rtx branch)
   if (! INSN_ADDRESSES_SET_P ())
     return 0;
 
-  seq = NEXT_INSN (PREV_INSN (branch));
-  seq_uid = INSN_UID (seq);
-  if (!JUMP_P (branch))
-    /* This can happen for example on the PA; the objective is to know the
-       offset to address something in front of the start of the function.
-       Thus, we can treat it like a backward branch.
-       We assume here that FUNCTION_BOUNDARY / BITS_PER_UNIT is larger than
-       any alignment we'd encounter, so we skip the call to align_fuzz.  */
-    return insn_current_address;
-  dest = JUMP_LABEL (branch);
-
-  /* BRANCH has no proper alignment chain set, so use SEQ.
-     BRANCH also has no INSN_SHUID.  */
-  if (INSN_SHUID (seq) < INSN_SHUID (dest))
-    {
-      /* Forward branch.  */
-      return (insn_last_address + insn_lengths[seq_uid]
-	      - align_fuzz (seq, dest, length_unit_log, ~0));
-    }
-  else
-    {
-      /* Backward branch.  */
-      return (insn_current_address
-	      + align_fuzz (dest, seq, length_unit_log, ~0));
-    }
+  return insn_current_address;
 }
 #endif /* HAVE_ATTR_length */
 
@@ -1074,7 +1047,9 @@ shorten_branches (rtx first ATTRIBUTE_UNUSED)
 	  if (log)
 	    {
 	      int align = 1 << log;
-	      int new_address = (insn_current_address + align - 1) & -align;
+	      int length_align = 1 << length_unit_log;
+	      int new_address = insn_current_address + align - length_align;
+	      gcc_assert (align >= length_align);
 	      insn_lengths[uid] = new_address - insn_current_address;
 	    }
 	}
@@ -1161,7 +1136,6 @@ shorten_branches (rtx first ATTRIBUTE_UNUSED)
   while (something_changed)
     {
       something_changed = 0;
-      insn_current_align = MAX_CODE_ALIGN - 1;
       for (insn_current_address = 0, insn = first;
 	   insn != 0;
 	   insn = NEXT_INSN (insn))
@@ -1170,30 +1144,15 @@ shorten_branches (rtx first ATTRIBUTE_UNUSED)
 #ifdef ADJUST_INSN_LENGTH
 	  int tmp_length;
 #endif
-	  int length_align;
 
 	  uid = INSN_UID (insn);
 
 	  if (LABEL_P (insn))
 	    {
-	      int log = LABEL_TO_ALIGNMENT (insn);
-	      if (log > insn_current_align)
-		{
-		  int align = 1 << log;
-		  int new_address= (insn_current_address + align - 1) & -align;
-		  insn_lengths[uid] = new_address - insn_current_address;
-		  insn_current_align = log;
-		  insn_current_address = new_address;
-		}
-	      else
-		insn_lengths[uid] = 0;
 	      INSN_ADDRESSES (uid) = insn_current_address;
+	      insn_current_address += insn_lengths[uid];
 	      continue;
 	    }
-
-	  length_align = INSN_LENGTH_ALIGNMENT (insn);
-	  if (length_align < insn_current_align)
-	    insn_current_align = length_align;
 
 	  insn_last_address = INSN_ADDRESSES (uid);
 	  INSN_ADDRESSES (uid) = insn_current_address;
