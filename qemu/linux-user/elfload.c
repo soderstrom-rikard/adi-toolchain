@@ -1671,7 +1671,8 @@ static void load_symbols(struct elfhdr *hdr, int fd, abi_ulong load_bias)
     new_syms = realloc(syms, nsyms * sizeof(*syms));
     if (new_syms == NULL) {
         free(s);
-        free(syms);
+        if (nsyms)
+            free(syms);
         free(strings);
         return;
     }
