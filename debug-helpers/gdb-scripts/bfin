@@ -1053,6 +1053,170 @@ define show_uart2
 	show_uart_gctl *$$UART_GCTL
 end
 
+define show_uart4
+	if $argc > 0
+		set $$UART_BASE = $arg0
+	else
+		set $$UART_BASE = 0xffc02000
+	end
+	set $$UART_REVID = (unsigned long *) ($$UART_BASE + 0x00)
+	set $$UART_CTL   = (unsigned long *) ($$UART_BASE + 0x04)
+	set $$UART_STAT  = (unsigned long *) ($$UART_BASE + 0x08)
+	set $$UART_SCR   = (unsigned long *) ($$UART_BASE + 0x0C)
+	set $$UART_CLK   = (unsigned long *) ($$UART_BASE + 0x10)
+	set $$UART_IMASK = (unsigned long *) ($$UART_BASE + 0x14)
+	set $$UART_RBR   = (unsigned long *) ($$UART_BASE + 0x20)
+	set $$UART_THR   = (unsigned long *) ($$UART_BASE + 0x24)
+	set $$UART_TAIP  = (unsigned long *) ($$UART_BASE + 0x28)
+	set $$UART_TSR   = (unsigned long *) ($$UART_BASE + 0x2C)
+	set $$UART_RSR   = (unsigned long *) ($$UART_BASE + 0x30)
+	set $$UART_TXCNT = (unsigned long *) ($$UART_BASE + 0x34)
+	set $$UART_RXCNT = (unsigned long *) ($$UART_BASE + 0x38)
+
+	printf "REVID: 0x%08x    SCR: 0x%08x\n", *$$UART_REVID, *$$UART_SCR
+	printf "  CLK: 0x%08x   TAIP: 0x%08x\n", *$$UART_CLK, *$$UART_TAIP
+
+	set $$CTL = *$$UART_CTL
+	printf "  CTL: 0x%08x ( ", $$CTL
+	if ($$CTL & (1 << 0))
+		printf "uen "
+	end
+	if ($$CTL & (1 << 1))
+		printf "loop_ena "
+	end
+	set $$UMOD = ($$CTL & (3 << 4)) >> 4
+	printf "mode:"
+	if ($$UMOD == 0)
+		printf "uart "
+	end
+	if ($$UMOD == 1)
+		printf "mdb "
+	end
+	if ($$UMOD == 2)
+		printf "irda "
+	end
+	if ($$UMOD == 3)
+		printf "reserved "
+	end
+	set $$WLS = ($$CTL & (3 << 8)) >> 8
+	printf "wls:"
+	if ($$WLS == 0)
+		printf "5"
+	end
+	if ($$WLS == 1)
+		printf "6 "
+	end
+	if ($$WLS == 2)
+		printf "7 "
+	end
+	if ($$WLS == 3)
+		printf "8 "
+	end
+	if ($$CTL & (1 << 12))
+		printf "stb "
+	end
+	if ($$CTL & (1 << 13))
+		printf "stbh "
+	end
+	if ($$CTL & (1 << 14))
+		printf "pen "
+	end
+	if ($$CTL & (1 << 15))
+		printf "eps "
+	end
+	if ($$CTL & (1 << 16))
+		printf "stp "
+	end
+	if ($$CTL & (1 << 17))
+		printf "fpe "
+	end
+	if ($$CTL & (1 << 18))
+		printf "ffe "
+	end
+	if ($$CTL & (1 << 19))
+		printf "sb "
+	end
+	if ($$CTL & (1 << 22))
+		printf "fcpol "
+	end
+	if ($$CTL & (1 << 23))
+		printf "rpolc "
+	end
+	if ($$CTL & (1 << 24))
+		printf "tpolc "
+	end
+	if ($$CTL & (1 << 25))
+		printf "mrts "
+	end
+	if ($$CTL & (1 << 26))
+		printf "xoff "
+	end
+	if ($$CTL & (1 << 27))
+		printf "arts "
+	end
+	if ($$CTL & (1 << 28))
+		printf "acts "
+	end
+	if ($$CTL & (1 << 29))
+		printf "rfit "
+	end
+	if ($$CTL & (1 << 30))
+		printf "rfrt "
+	end
+	printf ")\n"
+
+	set $$STAT = *$$UART_STAT
+	printf " STAT: 0x%08x ( ", $$STAT
+	if ($$STAT & (1 << 0))
+		printf "dr "
+	end
+	if ($$STAT & (1 << 1))
+		printf "oe "
+	end
+	if ($$STAT & (1 << 2))
+		printf "pe "
+	end
+	if ($$STAT & (1 << 3))
+		printf "fe "
+	end
+	if ($$STAT & (1 << 4))
+		printf "bi "
+	end
+	if ($$STAT & (1 << 5))
+		printf "thre "
+	end
+	if ($$STAT & (1 << 7))
+		printf "temt "
+	end
+	if ($$STAT & (1 << 8))
+		printf "tfi "
+	end
+	if ($$STAT & (1 << 9))
+		printf "astky "
+	end
+	if ($$STAT & (1 << 10))
+		printf "addr "
+	end
+	if ($$STAT & (1 << 11))
+		printf "ro "
+	end
+	if ($$STAT & (1 << 12))
+		printf "scts "
+	end
+	if ($$STAT & (1 << 16))
+		printf "cts "
+	end
+	if ($$STAT & (1 << 17))
+		printf "rfcs "
+	end
+	printf ")\n"
+
+	printf "IMASK: 0x%08x\n", *$$UART_IMASK
+	printf "  RSR: 0x%04x    TSR: 0x%04x\n", *$$UART_RSR, *$$UART_TSR
+	printf "  RBR: 0x%02x      THR: 0x%02x\n", *$$UART_RBR, *$$UART_THR
+	printf "RXCNT: 0x%02x    TXCNT: 0x%02x\n", *$$UART_RXCNT, *$$UART_TXCNT
+end
+
 define _otp_save
 	set $$s_pc = $pc
 	set $$s_r0 = $r0
