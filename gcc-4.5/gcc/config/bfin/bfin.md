@@ -4358,4 +4358,51 @@
   [(set_attr "type" "mcld")
    (set_attr "length" "8")])
 
+
+;; The register allocator will never give us the alternative which directly
+;; uses an LREG, since those are fixed.  For the same reason, we can simply
+;; clobber that register and re-set it back to 0.  The optimize_loop_addresses
+;; pass tries to do better by moving the set of the L register outside a loop;
+;; in that case we will see the L register in operand 4.
+
+(define_insn "circptr"
+  [(set (match_operand:SI 0 "register_operand" "=b,b")
+	(if_then_else:SI (ge (plus:SI (match_operand:SI 1 "register_operand" "0,0")
+				      (match_operand:SI 2 "register_operand" "fP2P4,fP2P4"))
+			     (plus:SI (match_operand:SI 3 "register_operand" "v,v")
+				      (match_operand:SI 4 "register_operand" "qL,da")))
+			 (minus:SI (plus:SI (match_dup 1) (match_dup 2)) (match_dup 4))
+			 (plus:SI (match_dup 1) (match_dup 2))))
+   (clobber (match_scratch:SI 5 "=&x, &x"))]
+  ""
+{
+  rtx xop[8];
+  xop[0] = operands[0];
+  xop[1] = operands[1];
+  xop[2] = operands[2];
+  xop[3] = operands[3];
+  xop[4] = operands[4];
+  xop[5] = operands[5];
+  /* The B register corresponding to the I register operand 0.  */
+  xop[6] = gen_rtx_REG (Pmode, REGNO (operands[0]) + 4);
+  /* The L register corresponding to the I register operand 0.  */
+  xop[7] = gen_rtx_REG (Pmode, REGNO (operands[0]) + 8);
+
+  if (!rtx_equal_p (xop[6], xop[3]))
+    {
+      output_asm_insn ("%5 = %6;", xop);
+      output_asm_insn ("%6 = %3;", xop);
+    }
+  if (!rtx_equal_p (xop[4], xop[7]))
+    output_asm_insn ("%7 = %4;", xop);
+  output_asm_insn ("%0 += %2;", xop);
+  if (!rtx_equal_p (xop[4], xop[7]))
+    output_asm_insn ("%7 = 0;", xop);
+  if (!rtx_equal_p (xop[6], xop[3]))
+    output_asm_insn ("%6 = %5;", xop);
+  return "";
+}
+  [(set_attr "seq_insns" "multi")
+   (set_attr "length" "12")])
+
 (include "sync.md")

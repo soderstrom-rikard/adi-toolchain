@@ -1,3 +1,29 @@
+2011-07-25  Stuart Henderson  <stuart.henderson@analog.com>
+
+	Merge from 4.3
+	* config/bfin/constraints.md ("qL"): Add for class LREGS.
+	* config/bfin/bfin.md (circptr): New pattern.
+	(struct preg_use): New.
+	(reg_used_otherwise, puse): New static variables.
+	(mark_regs_unavailable, mark_stored_regs, my_loop_preheader_edge,
+	optimize_loop_addresses): New functions.
+	(bfin_optimize_loops_1): call optimize_loop_addresses.
+	(enum bfin_builtins): Add BFIN_CIRCPTR.
+	(bfin_init_builtins): Create circptr builtin.
+	(bfin_expand_builtin): Handle it.
+	* config/bfin/bfin.c (reg_used_otherwise): Don't define.
+	(REG_USED_OTHERWISE): Define.
+	(mark_regs_unavailable): Set reg_used_otherwise from
+	argument `data'.
+	(optimize_loop_addresses): Don't clobber registers used
+	by outer loop.
+	(bfin_optimize_loops_1): Free reg_used_otherwise for
+	each loop.
+	(bfin_adjust_cost): Move dest & src decls up.
+	(BB_AUX_INDEX): Cast to unsigned long.
+	(bfin_reorder_loops): Change index to unsigned long.
+	(trapping_loads_p): Delete unused local pat variable.
+
 2011-06-30  Stuart Henderson  <stuart.henderson@analog.com>
 
 	Merge from 4.3

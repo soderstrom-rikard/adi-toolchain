@@ -3708,11 +3708,11 @@ bfin_adjust_cost (rtx insn, rtx link, rtx dep_insn, int cost)
 
   if (dep_insn_type == TYPE_MOVE || dep_insn_type == TYPE_MCLD)
     {
-      rtx pat = PATTERN (dep_insn);
+      rtx dest, src, pat = PATTERN (dep_insn);
       if (GET_CODE (pat) == PARALLEL)
 	pat = XVECEXP (pat, 0, 0);
-      rtx dest = SET_DEST (pat);
-      rtx src = SET_SRC (pat);
+      dest = SET_DEST (pat);
+      src = SET_SRC (pat);
       if (! ADDRESS_REGNO_P (REGNO (dest))
 	  || ! (MEM_P (src) || D_REGNO_P (REGNO (src))))
 	return cost;
@@ -3944,6 +3944,345 @@ length_for_loop (rtx insn)
     length += get_attr_length (insn);
 
   return length;
+}
+
+/* Variables used by the optimize_loop_addresses pass.  */
+
+/* Nonzero for every reg which is unavailable for renaming.  */
+#define REG_USED_OTHERWISE(LOOP) ((int *) (LOOP)->aux)
+
+/* Describes the use of a PREG inside the loop.  */
+struct preg_use
+{
+  /* The instruction where we found the register used in an
+     addressing mode.  */
+  rtx use_insn;
+  /* The address part of that insn.  */
+  rtx use_addr;
+  /* The mode of the memory reference.  */
+  enum machine_mode mem_mode;
+  /* An instruction where the register is incremented, NULL_RTX if no
+     such insn exists.  */
+  rtx add_insn;
+};
+
+struct preg_use puse[8];
+
+/* Called through for_each_rtx.  */
+static int
+mark_regs_unavailable (rtx *loc, void *data)
+{
+  rtx x = *loc;
+  int *reg_used_otherwise = (int *) data;
+
+  if (x == NULL_RTX)
+    return 0;
+
+  if (REG_P (x))
+    reg_used_otherwise[REGNO (x)] = 1;
+  return 0;
+}
+
+/* Subroutine of optimize_loop_addresses, called through note_stores.  */
+static void
+mark_stored_regs (rtx x, const_rtx pat ATTRIBUTE_UNUSED, void *data)
+{
+  int *stored = (int *)data;
+  int nregs;
+  if (!REG_P (x))
+    return;
+  nregs = HARD_REGNO_NREGS (REGNO (x), GET_MODE (x));
+  while (nregs-- > 0)
+    stored[REGNO (x) + nregs]++;
+}
+
+/* Returns preheader edge of LOOP, or NULL if no such edge exists.
+   Differs from loop_preheader_edge in that it does not abort when
+   LOOPS_HAVE_PREHEADERS isn't satisfied.  */
+static edge
+my_loop_preheader_edge (const struct loop *loop)
+{
+  edge e;
+  edge_iterator ei;
+
+  if (EDGE_COUNT (loop->header->preds) != 2)
+    return NULL;
+  FOR_EACH_EDGE (e, ei, loop->header->preds)
+    if (e->src != loop->latch)
+      break;
+
+  return e;
+}
+
+/* For a loop LOOP with basic blocks BODY, try to change PREG addressing
+   modes to IREG ones in the hope that this will lead to better scheduling.
+   If these addressing modes belong to induction variables, try to use
+   post-modify [In ++ Mm] addressing to eliminate the add instruction.  */
+static void
+optimize_loop_addresses (struct loop *loop, basic_block *body)
+{
+  int stored[FIRST_PSEUDO_REGISTER];
+  basic_block preheader;
+  edge ph_edge;
+  VEC (edge, heap) *exit_edges;
+  unsigned ix;
+  int has_circptr = 0;
+  int has_calls = 0;
+  struct loop *outer_loop;
+  int *reg_used_otherwise;
+
+  memset (puse, 0, sizeof puse);
+  memset (stored, 0, sizeof stored);
+
+  loop->aux = xcalloc (FIRST_PSEUDO_REGISTER, sizeof (int));
+  reg_used_otherwise = REG_USED_OTHERWISE (loop);
+  outer_loop = loop_outer (loop);
+  if (outer_loop && outer_loop->num > 0)
+    {
+      int *outer_reg_used_otherwise = REG_USED_OTHERWISE (outer_loop);
+      for (ix = REG_I0; ix <= REG_I3; ix++)
+	reg_used_otherwise[ix] = outer_reg_used_otherwise[ix];
+      for (ix = REG_M0; ix <= REG_M3; ix++)
+	reg_used_otherwise[ix] = outer_reg_used_otherwise[ix];
+    }
+
+  ph_edge = my_loop_preheader_edge (loop);
+  if (ph_edge == NULL)
+    return;
+
+  preheader = ph_edge->src;
+  if (preheader == ENTRY_BLOCK_PTR)
+    return;
+
+  exit_edges = get_loop_exit_edges (loop);
+
+  for (ix = 0; ix < loop->num_nodes; ix++)
+    {
+      basic_block bb = body[ix];
+      rtx insn;
+
+      for (insn = BB_HEAD (bb);
+	   insn != NEXT_INSN (BB_END (bb));
+	   insn = NEXT_INSN (insn))
+	{
+	  enum attr_type type;
+	  rtx pat, memreg, note;
+
+	  if (!NONDEBUG_INSN_P(insn) || NOTE_P (insn) || LABEL_P (insn)
+	      || BARRIER_P (insn))
+	    continue;
+
+	  note_stores (PATTERN (insn), mark_stored_regs, stored);
+	  for (note = REG_NOTES (insn); note; note = XEXP (note, 1))
+	    {
+	      if (REG_NOTE_KIND (note) == REG_INC)
+		mark_stored_regs (XEXP (note, 0), PATTERN (insn), stored);
+	    }
+
+	  if (CALL_P (insn))
+	    has_calls++;
+
+	  if (recog_memoized (insn) == CODE_FOR_circptr)
+	    has_circptr++;
+
+	  pat = PATTERN (insn);
+	  if (GET_CODE (pat) == USE
+	      || GET_CODE (pat) == CLOBBER || GET_CODE (pat) == ASM_INPUT
+	      || asm_noperands (pat) >= 0)
+	    type = TYPE_MISC;
+	  else
+	    type = get_attr_type (insn);
+
+	  /* See if this is a load insn we can modify.  */
+	  if (type == TYPE_MCLD && DREG_P (SET_DEST (pat))
+	      && GET_MODE (SET_DEST (pat)) != QImode)
+	    {
+	      rtx src = SET_SRC (pat);
+	      if (GET_CODE (src) != ZERO_EXTEND
+		  && GET_CODE (src) != SIGN_EXTEND)
+		{
+		  gcc_assert (GET_CODE (src) == MEM);
+		  memreg = XEXP (src, 0);
+		  if (GET_CODE (memreg) == POST_INC
+		      || GET_CODE (memreg) == POST_DEC)
+		    memreg = XEXP (memreg, 0);
+		  if (PREG_P (memreg))
+		    {
+		      unsigned regno = REGNO (memreg);
+		      struct preg_use *u = puse + (regno - REG_P0);
+		      if (u->use_insn == NULL_RTX)
+			{
+			  u->mem_mode = GET_MODE (src);
+			  u->use_insn = insn;
+			  u->use_addr = src;
+			  continue;
+			}
+		    }
+		}
+	    }
+	  /* Otherwise, check for an increment.  */
+	  else if (GET_CODE (pat) == SET
+		   && GET_CODE (SET_SRC (pat)) == PLUS
+		   && SET_DEST (pat) == XEXP (SET_SRC (pat), 0)
+		   && GET_CODE (XEXP (SET_SRC (pat), 1)) == CONST_INT)
+	    {
+	      unsigned regno = REGNO (SET_DEST (pat));
+	      if (P_REGNO_P (regno))
+		{
+		  struct preg_use *u = puse + (regno - REG_P0);
+		  if (!reg_used_otherwise[regno]
+		      && u->use_insn != NULL_RTX
+		      && GET_CODE (XEXP (u->use_addr, 0)) == REG
+		      && u->mem_mode == SImode
+		      && BLOCK_FOR_INSN (u->use_insn) == bb
+		      && u->add_insn == NULL_RTX)
+		    {
+		      u->add_insn = insn;
+		      continue;
+		    }
+		}
+	    }
+
+	  /* All success cases continue, so we drop through here if we can't
+	     handle the insn.  */
+	  for_each_rtx (&pat, mark_regs_unavailable, reg_used_otherwise);
+	}
+    }
+
+  if (has_calls)
+    return;
+
+  if (has_circptr)
+    {
+      for (ix = 0; ix < loop->num_nodes; ix++)
+	{
+	  basic_block bb = body[ix];
+	  rtx insn;
+
+	  for (insn = BB_HEAD (bb);
+	       insn != NEXT_INSN (BB_END (bb));
+	       insn = NEXT_INSN (insn))
+	    {
+	      rtx *op = recog_data.operand;
+	      unsigned iregno, bregno, lregno;
+
+	      if (!INSN_P (insn)
+		  || GET_CODE (PATTERN (insn)) == CLOBBER
+		  || GET_CODE (PATTERN (insn)) == USE)
+		continue;
+
+	      if (recog_memoized (insn) != CODE_FOR_circptr)
+		continue;
+
+	      extract_insn (insn);
+	      iregno = REGNO (op[0]);
+	      gcc_assert (I_REGNO_P (iregno));
+	      bregno = iregno + 4;
+	      lregno = iregno + 8;
+	      /* See if we can keep the L register set throughout the loop.  */
+	      if (!has_calls
+		  && stored[REGNO (op[4])] == 0
+		  && stored[iregno] == 1)
+		{
+		  unsigned j;
+		  rtx lreg = gen_rtx_REG (Pmode, lregno);
+		  rtx set = gen_movsi (lreg, op[4]);
+		  edge exit_edge;
+		  insert_insn_on_edge (set, ph_edge);
+		  for (j = 0; VEC_iterate (edge, exit_edges, j, exit_edge); j++)
+		    {
+		      set = gen_movsi (lreg, const0_rtx);
+		      insert_insn_on_edge (set, exit_edge);
+		    }
+		  validate_replace_rtx (op[4], lreg, insn);
+		}
+	    }
+	}
+    }
+
+  /* For every P register we could track, attempt to replace its use with a
+     suitable I register.  */
+  for (ix = REG_P0; ix < REG_P6; ix++)
+    {
+      unsigned j;
+      struct preg_use *u = puse + (ix - REG_P0);
+      rtx prev, set, ireg, mreg, preg;
+      unsigned iregno, mregno;
+      edge exit_edge;
+
+      if (reg_used_otherwise[ix] || u->use_insn == NULL_RTX)
+	continue;
+
+      for (iregno = 0; iregno < 4; iregno++)
+	if (!reg_used_otherwise[REG_I0 + iregno]
+	    && !REGNO_REG_SET_P (df_get_live_in (loop->header), REG_I0 + iregno)
+	    && !fixed_regs[REG_I0 + iregno])
+	  break;
+      if (iregno == 4)
+	goto out;
+      iregno += REG_I0;
+
+      ireg = gen_rtx_REG (Pmode, iregno);
+      preg = gen_rtx_REG (Pmode, ix);
+
+      if (u->add_insn)
+	{
+	  for (mregno = 0; mregno < 4; mregno++)
+	    if (!reg_used_otherwise[REG_M0 + mregno]
+		&& !REGNO_REG_SET_P (df_get_live_in (loop->header), REG_M0 + mregno)
+		&& !fixed_regs[REG_M0 + mregno])
+	      break;
+	  if (mregno == 4)
+	    goto out;
+	  mregno += REG_M0;
+	  mreg = gen_rtx_REG (Pmode, mregno);
+	}
+
+      for (j = 0; VEC_iterate (edge, exit_edges, j, exit_edge); j++)
+	{
+	  if (REGNO_REG_SET_P (df_get_live_in (exit_edge->dest), REGNO (preg)))
+	    {
+	      set = gen_movsi (preg, ireg);
+	      insert_insn_on_edge (set, exit_edge);
+	    }
+	}
+
+      if (u->add_insn)
+	{
+	  rtx addend = XEXP (SET_SRC (PATTERN (u->add_insn)), 1);
+	  set = gen_movsi (mreg, addend);
+	  insert_insn_on_edge (set, ph_edge);
+	}
+
+      set = gen_movsi (ireg, preg);
+      insert_insn_on_edge (set, ph_edge);
+
+      prev = u->use_addr;
+      if (!REG_P (XEXP (prev, 0)))
+	{
+	  gcc_assert (u->add_insn == NULL_RTX);
+	  prev = XEXP (prev, 0);
+	}
+      gcc_assert (rtx_equal_p (XEXP (prev, 0), preg));
+      if (u->add_insn)
+	{
+	  rtx postmod;
+
+	  delete_insn (u->add_insn);
+	  postmod
+	    = gen_rtx_POST_MODIFY (Pmode, ireg,
+				   gen_rtx_PLUS (Pmode, ireg, mreg));
+	  validate_change (u->use_insn, &XEXP (prev, 0), postmod, false);
+	}
+      else
+	validate_change (u->use_insn, &XEXP (prev, 0), ireg, false);
+
+      reg_used_otherwise[iregno] = 1;
+      if (u->add_insn)
+	reg_used_otherwise[mregno] = 1;
+    }
+ out:
+  free (exit_edges);
 }
 
 /* Optimize LOOP.  */
@@ -4397,7 +4736,6 @@ bfin_optimize_loop (loop_info loop)
   delete_insn (loop->loop_end);
   /* Insert the loop end label before the last instruction of the loop.  */
   emit_label_before (loop->end_label, loop->last_insn);
-
   return;
 
  bad_loop:
@@ -4725,7 +5063,7 @@ free_loops (loop_info loops)
     }
 }
 
-#define BB_AUX_INDEX(BB) ((unsigned)(BB)->aux)
+#define BB_AUX_INDEX(BB) ((unsigned long)(BB)->aux)
 
 /* The taken-branch edge from the loop end can actually go forward.  Since the
    Blackfin's LSETUP instruction requires that the loop end be after the loop
@@ -4742,7 +5080,7 @@ bfin_reorder_loops (loop_info loops, FILE *dump_file)
 
   for (loop = loops; loop; loop = loop->next)
     {
-      unsigned index;
+      unsigned long index;
       basic_block bb;
       edge e;
       edge_iterator ei;
@@ -4860,7 +5198,7 @@ bfin_reorg_loops (FILE *dump_file)
 
 /* Subroutine of move_loop_constants, called through note_stores.  */
 static void
-forget_known_values (rtx x, const_rtx pat, void *data)
+forget_known_values (rtx x, const_rtx pat ATTRIBUTE_UNUSED, void *data)
 {
   rtx *known_value = (rtx *)data;
   int nregs;
@@ -4967,7 +5305,7 @@ move_loop_constants (struct loop *loop, basic_block *body)
 /* First set of loop optimizations performed during the machine_reorg pass.
    This tries to move constant loads generated by reload out of loops.  */
 static void
-bfin_optimize_loops_1 (FILE *dump_file)
+bfin_optimize_loops_1 (FILE *dump_file ATTRIBUTE_UNUSED)
 {
   struct loop * loop;
   loop_iterator li;
@@ -4992,8 +5330,16 @@ bfin_optimize_loops_1 (FILE *dump_file)
       basic_block *body = get_loop_body (loop);
 
       move_loop_constants (loop, body);
+      optimize_loop_addresses (loop, body);
 
       free (body);
+    }
+
+  FOR_EACH_LOOP (li, loop, 0)
+    {
+      int *reg_used_otherwise = REG_USED_OTHERWISE (loop);
+      free (reg_used_otherwise);
+      loop->aux = NULL;
     }
 
   commit_edge_insertions ();
@@ -5325,7 +5671,6 @@ harmless_null_pointer_p (rtx mem, int np_reg)
 static bool
 trapping_loads_p (rtx insn, int np_reg, bool after_np_branch)
 {
-  rtx pat = PATTERN (insn);
   rtx mem = SET_SRC (single_set (insn));
 
   if (!after_np_branch)
@@ -5383,7 +5728,7 @@ bool np_after_branch = false;
 
 /* Subroutine of workaround_speculation, called through note_stores.  */
 static void
-note_np_check_stores (rtx x, const_rtx pat, void *data ATTRIBUTE_UNUSED)
+note_np_check_stores (rtx x, const_rtx pat ATTRIBUTE_UNUSED, void *data ATTRIBUTE_UNUSED)
 {
   if (REG_P (x) && (REGNO (x) == REG_CC || REGNO (x) == np_check_regno))
     np_check_regno = -1;
@@ -6166,6 +6511,8 @@ enum bfin_builtins
 
   BFIN_BUILTIN_LOADBYTES,
 
+  BFIN_BUILTIN_CIRCPTR,
+
   BFIN_BUILTIN_MAX
 };
 
@@ -6226,11 +6573,14 @@ bfin_init_builtins (void)
   tree short_ftype_v2hi
     = build_function_type_list (short_integer_type_node, V2HI_type_node,
 				NULL_TREE);
+  tree pint_type_node = build_pointer_type (integer_type_node);
+  tree pvoid_type_node = build_pointer_type (void_type_node);
   tree int_ftype_pint
-    = build_function_type_list (integer_type_node,
-				build_pointer_type (integer_type_node),
-				NULL_TREE);
-  
+    = build_function_type_list (integer_type_node, pint_type_node, NULL_TREE);
+  tree pvoid_ftype_pvoid_int_pvoid_int
+    = build_function_type_list (pvoid_type_node, pvoid_type_node, integer_type_node,
+				pvoid_type_node, integer_type_node, NULL_TREE);
+  def_builtin ("__builtin_bfin_circptr", pvoid_ftype_pvoid_int_pvoid_int, BFIN_BUILTIN_CIRCPTR);
   /* Add the remaining MMX insns with somewhat more complicated types.  */
   def_builtin ("__builtin_bfin_csync", void_ftype_void, BFIN_BUILTIN_CSYNC);
   def_builtin ("__builtin_bfin_ssync", void_ftype_void, BFIN_BUILTIN_SSYNC);
@@ -6574,8 +6924,8 @@ bfin_expand_builtin (tree exp, rtx target ATTRIBUTE_UNUSED,
   const struct builtin_description *d;
   tree fndecl = TREE_OPERAND (CALL_EXPR_FN (exp), 0);
   unsigned int fcode = DECL_FUNCTION_CODE (fndecl);
-  tree arg0, arg1, arg2;
-  rtx op0, op1, op2, accvec, pat, tmp1, tmp2, tmp3, a0reg, a1reg;
+  tree arg0, arg1, arg2, arg3;
+  rtx op0, op1, op2, op3, accvec, pat, tmp1, tmp2, tmp3, a0reg, a1reg;
   enum machine_mode tmode, mode0;
 
   switch (fcode)
@@ -6788,6 +7138,36 @@ bfin_expand_builtin (tree exp, rtx target ATTRIBUTE_UNUSED,
 
       return target;
 
+    case BFIN_BUILTIN_CIRCPTR:
+      arg0 = CALL_EXPR_ARG (exp, 0);
+      arg1 = CALL_EXPR_ARG (exp, 1);
+      arg2 = CALL_EXPR_ARG (exp, 2);
+      arg3 = CALL_EXPR_ARG (exp, 3);
+      op0 = expand_expr (arg0, NULL_RTX, VOIDmode, 0);
+      op1 = expand_expr (arg1, NULL_RTX, VOIDmode, 0);
+      op2 = expand_expr (arg2, NULL_RTX, VOIDmode, 0);
+      op3 = expand_expr (arg3, NULL_RTX, VOIDmode, 0);
+
+      if (! target
+	  || !register_operand (target, Pmode))
+	target = gen_reg_rtx (Pmode);
+
+      icode = CODE_FOR_circptr;
+      if (! (*insn_data[icode].operand[1].predicate) (op0, Pmode))
+	op0 = copy_to_mode_reg (Pmode, op0);
+      if (! (*insn_data[icode].operand[2].predicate) (op1, Pmode))
+	op1 = copy_to_mode_reg (Pmode, op1);
+      if (! (*insn_data[icode].operand[3].predicate) (op2, Pmode))
+	op2 = copy_to_mode_reg (Pmode, op2);
+      if (! (*insn_data[icode].operand[4].predicate) (op3, Pmode))
+	op3 = copy_to_mode_reg (Pmode, op3);
+
+      pat = GEN_FCN (icode) (target, op0, op1, op2, op3);
+      if (! pat)
+	return 0;
+      emit_insn (pat);
+      return target;
+      
     case BFIN_BUILTIN_SSASHIFT_1X16:
     case BFIN_BUILTIN_SSASHIFT_2X16:
     case BFIN_BUILTIN_SSASHIFT_1X32:
