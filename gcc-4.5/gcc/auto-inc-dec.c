@@ -1068,7 +1068,7 @@ find_inc (bool first_try)
       /* For the post_add to work, the result_reg of the inc must not be
 	 used in the mem insn since this will become the new index
 	 register.  */
-      if (count_occurrences (PATTERN (mem_insn.insn), inc_insn.reg_res, 1) != 0)
+      if (reg_overlap_mentioned_p (inc_insn.reg_res, PATTERN (mem_insn.insn)))
 	{
 	  if (dump_file)
 	    fprintf (dump_file, "base reg replacement failure.\n");
@@ -1254,6 +1254,209 @@ find_inc (bool first_try)
   return try_merge ();
 }
 
+/* Verify that each path from FROM that reaches FROM again first reaches
+   MUST_REACH.  VISITED holds a bitmap of blocks we've already visited, so
+   we need not scan them again.
+   Return false if we reached FROM without first reaching MUST_REACH, true
+   in all other cases.  */
+static bool
+verify_path_1 (basic_block curr, basic_block from, bitmap must_reach,
+	       bitmap visited)
+{
+  edge e;
+  edge_iterator ei;
+
+  if (bitmap_bit_p (visited, curr->index))
+    return true;
+
+  bitmap_set_bit (visited, curr->index);
+  FOR_EACH_EDGE (e, ei, curr->succs)
+    {
+      if (e->dest == from)
+	return false;
+      if (!bitmap_bit_p (must_reach, e->dest->index)
+	  && !verify_path_1 (e->dest, from, must_reach, visited))
+	return false;
+    }
+  return true;
+}
+
+/* Entry point for verify_path_1.  Return true if every path from FROM
+   that reaches FROM again first reaches MUST_REACH.  */
+static bool
+verify_path (basic_block from, bitmap must_reach)
+{
+  bool ret;
+  bitmap_head visited;
+  bitmap_initialize (&visited, 0);
+  ret = verify_path_1 (from, from, must_reach, &visited);
+  bitmap_clear (&visited);
+  return ret;
+}
+
+/* Try to detect situations where we have a loop, and one of the induction
+   variables can be used for autoincrement addressing.  We look for a control
+   flow graph that looks like this:
+      A
+      |
+      B <---\
+      |     |
+      ...   |
+      |     |
+      C ----/
+      |
+      ...
+   with arbitrary structure in the middle.  A must dominate B, which must
+   dominate C.
+   There must a be an initializing definition in A (D), a memory reference (U)
+   in B, and an increment (I) in C.  Both D and I must reach exactly two uses:
+   U and I, while the uses in U and I must have two reaching definitions: D
+   and I.
+   The final condition that must be satisfied is that there is no path from B
+   to B that does not go through either A or C, and likewise that there is no
+   path from C to C that does not go through A or B.  This ensures that before
+   the transformation, the increment is executed at most once after the memory
+   reference, and that the memory reference is executed at most once before the
+   increment.  */
+static bool
+find_loop_inc (void)
+{
+  df_ref use = df_find_use (mem_insn.insn, mem_insn.reg0);
+  basic_block use_bb = BLOCK_FOR_INSN (mem_insn.insn);
+  basic_block inc_bb;
+  struct df_link *adef;
+  df_ref increment = NULL;
+  bitmap_head must_reach;
+  int n_defs = 0;
+
+  /* First, try to find a suitable increment.  The necessary conditions:
+     - it must set the register found in the memory reference to itself
+       plus a constant
+     - it must be in a block dominated by the use
+     - the corresponding def must have two uses, namely itself and the
+       memory reference.
+
+     We also use this loop to count the number of reaching defs for the
+     memory reference.  These must be exactly two, an initialization before
+     the loop and the increment.  */
+  for (adef = DF_REF_CHAIN (use); adef; adef = adef->next, n_defs++)
+    {
+      df_ref def = adef->ref;
+      rtx def_insn;
+      rtx def_set;
+
+      if (DF_REF_IS_ARTIFICIAL (def))
+	return false;
+      def_insn = DF_REF_INSN (def);
+      def_set = single_set (def_insn);
+      if (def_set != NULL_RTX && GET_CODE (SET_SRC (def_set)) == PLUS
+	  && SET_DEST (def_set) == mem_insn.reg0
+	  && XEXP (SET_SRC (def_set), 0) == SET_DEST (def_set)
+	  && CONSTANT_P (XEXP (SET_SRC (def_set), 1)))
+	{
+	  struct df_link *inc_uses;
+
+	  inc_bb = BLOCK_FOR_INSN (def_insn);
+	  /* In this function, we're only interested in cases where the
+	     basic blocks differ.  */
+	  if (inc_bb == use_bb)
+	    return false;
+	  if (!dominated_by_p (CDI_DOMINATORS, inc_bb, use_bb))
+	    continue;
+
+	  inc_uses = DF_REF_CHAIN (def);
+	  if (DF_REF_INSN (inc_uses->ref) == def_insn
+	      || DF_REF_INSN (inc_uses->ref) == mem_insn.insn)
+	    inc_uses = inc_uses->next;
+	  if (inc_uses == NULL)
+	    continue;
+	  if (DF_REF_INSN (inc_uses->ref) == def_insn
+	      || DF_REF_INSN (inc_uses->ref) == mem_insn.insn)
+	    inc_uses = inc_uses->next;
+	  if (inc_uses != NULL)
+	    continue;
+
+	  increment = def;
+	  inc_insn.insn = DF_REF_INSN (increment);
+	  inc_insn.pat = def_set;
+	  inc_insn.reg_res = SET_DEST (def_set);
+	  inc_insn.reg0 = XEXP (SET_SRC (def_set), 0);
+	  inc_insn.reg1 = XEXP (SET_SRC (def_set), 1);
+	  inc_insn.reg1_val = INTVAL (inc_insn.reg1);
+	  inc_insn.reg1_is_const = true;
+	}
+    }
+  if (n_defs != 2 || increment == NULL)
+    return false;
+
+  /* Now, find the initialization and verify the rest of the necessary
+     conditions.  */
+  for (adef = DF_REF_CHAIN (use); adef; adef = adef->next)
+    {
+      df_ref init_def = adef->ref;
+      rtx init_insn = DF_REF_INSN (init_def);
+      basic_block init_bb = BLOCK_FOR_INSN (init_insn);
+      struct df_link *init_uses, *inc_use_defs;
+
+      if (init_def == increment)
+	continue;
+
+      if (!dominated_by_p (CDI_DOMINATORS, use_bb, init_bb))
+	return false;
+
+      /* There must be exactly two uses for the initialization, the
+	 memref and the increment.  */
+      init_uses = DF_REF_CHAIN (init_def);
+
+      if (DF_REF_INSN (init_uses->ref) == DF_REF_INSN (increment))
+	inc_use_defs = DF_REF_CHAIN (init_uses->ref);
+      if (DF_REF_INSN (init_uses->ref) == DF_REF_INSN (increment)
+	  || DF_REF_INSN (init_uses->ref) == mem_insn.insn)
+	init_uses = init_uses->next;
+      if (init_uses == NULL)
+	continue;
+      
+      if (DF_REF_INSN (init_uses->ref) == DF_REF_INSN (increment))
+	inc_use_defs = DF_REF_CHAIN (init_uses->ref);
+      if (DF_REF_INSN (init_uses->ref) == DF_REF_INSN (increment)
+	  || DF_REF_INSN (init_uses->ref) == mem_insn.insn)
+	init_uses = init_uses->next;
+      if (init_uses != NULL)
+	return false;
+
+      /* Verify that the increment has two reaching defs, itself and
+	 the initialization.  */
+      if (inc_use_defs->ref == init_def || inc_use_defs->ref == increment)
+	inc_use_defs = inc_use_defs->next;
+      if (inc_use_defs == NULL)
+	return false;
+      if (inc_use_defs->ref == init_def || inc_use_defs->ref == increment)
+	inc_use_defs = inc_use_defs->next;
+      if (inc_use_defs != NULL)
+	return false;
+
+      bitmap_initialize (&must_reach, 0);
+      bitmap_set_bit (&must_reach, inc_bb->index);
+      bitmap_set_bit (&must_reach, init_bb->index);
+      if (!verify_path (use_bb, &must_reach))
+	{
+	  bitmap_clear (&must_reach);
+	  return false;
+	}
+      bitmap_clear_bit (&must_reach, inc_bb->index);
+      bitmap_set_bit (&must_reach, use_bb->index);
+      if (!verify_path (inc_bb, &must_reach))
+	{
+	  bitmap_clear (&must_reach);
+	  return false;
+	}
+      bitmap_clear (&must_reach);
+
+      inc_insn.form = FORM_POST_INC;
+      return try_merge ();
+    }
+  return false;
+}
 
 /* A recursive function that walks ADDRESS_OF_X to find all of the mem
    uses in pat that could be used as an auto inc or dec.  It then
@@ -1276,6 +1479,8 @@ find_mem (rtx *address_of_x)
       mem_insn.reg1_val = 0;
       mem_insn.reg1 = GEN_INT (0);
       if (find_inc (true))
+	return true;
+      if (find_loop_inc ())
 	return true;
     }
   if (code == MEM && GET_CODE (XEXP (x, 0)) == PLUS
@@ -1474,9 +1679,12 @@ rest_of_handle_auto_inc_dec (void)
   if (!initialized)
     init_decision_table ();
 
+  calculate_dominance_info (CDI_DOMINATORS);
+
   mem_tmp = gen_rtx_MEM (Pmode, NULL_RTX);
 
   df_note_add_problem ();
+  df_chain_add_problem (DF_UD_CHAIN + DF_DU_CHAIN);
   df_analyze ();
 
   reg_next_use = XCNEWVEC (rtx, max_reg);
@@ -1485,6 +1693,7 @@ rest_of_handle_auto_inc_dec (void)
   FOR_EACH_BB (bb)
     merge_in_block (max_reg, bb);
 
+  free_dominance_info (CDI_DOMINATORS);
   free (reg_next_use);
   free (reg_next_inc_use);
   free (reg_next_def);

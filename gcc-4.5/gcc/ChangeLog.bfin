@@ -1,3 +1,12 @@
+2011-07-27  Stuart Henderson  <stuart.henderson@analog.com>
+
+	Merge from 4.3
+	* auto-inc-dec.c (verify_path_1, verify_path, find_loop_inc): New
+	functions.
+	(find_mem): Call find_loop_inc.
+	(rest_of_handle_auto_inc_dec): Calculate dominance info and DU/UD
+	chains.
+
 2011-07-25  Stuart Henderson  <stuart.henderson@analog.com>
 
 	Merge from 4.3
