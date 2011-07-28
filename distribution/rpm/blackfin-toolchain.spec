@@ -20,12 +20,12 @@
 %define gcc_main_ver 4.3
 %define gcc_main_fullver %{gcc_main_ver}.5
 %define gcc_addon_ver 4.5
-%define gcc_addon_fullver %{gcc_addon_ver}.2
+%define gcc_addon_fullver %{gcc_addon_ver}.3
 
 Name:         blackfin-toolchain
 URL:          http://blackfin.uclinux.org
 Version:      2011R1
-Release:      BETA1
+Release:      BETA2
 Obsoletes:    bfin-gcc
 Summary:      The GNU toolchain for the Blackfin processor
 License:      GPL
@@ -49,11 +49,12 @@ Source13:     libusb.tar.bz2
 Source14:     urjtag.tar.bz2
 Source15:     gdbproxy.tar.bz2
 Source16:     qemu.tar.bz2
+Source17:     mpc.tar.bz2
 %if %{windows_build}
-Source17:     libusb-winusb.tar.bz2
-Source18:     expat-2.0.1.tar.gz
-Source19:     PDCurses-3.4.tar.gz
-Source20:     pthreads-windows.tar.bz2
+Source18:     libusb-winusb.tar.bz2
+Source19:     expat-2.0.1.tar.gz
+Source20:     PDCurses-3.4.tar.gz
+Source21:     pthreads-windows.tar.bz2
 %endif
 Patch:        jtag.diff
 prefix:       /opt/uClinux
@@ -130,9 +131,9 @@ gcc-%{gcc_addon_fullver} based toolchain.
 %define extra_setup -a 1
 %endif
 %if %{windows_build}
-%define windows_setup -a 17 -a 18 -a 19 -a 20
+%define windows_setup -a 18 -a 19 -a 20 -a 21
 %endif
-%setup -q -c %{name}-%{version} %{extra_setup} -a 2 -a 3 -a 4 -a 5 -a 6 -a 7 -a 8 -a 9 -a 10 -a 11 -a 12 -a 13 -a 14 -a 15 -a 16 %{windows_setup}
+%setup -q -c %{name}-%{version} %{extra_setup} -a 2 -a 3 -a 4 -a 5 -a 6 -a 7 -a 8 -a 9 -a 10 -a 11 -a 12 -a 13 -a 14 -a 15 -a 16 -a 17 %{windows_setup}
 %patch -p0
 
 %build

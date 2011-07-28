@@ -8,12 +8,12 @@
 %define gcc_main_ver 4.3
 %define gcc_main_fullver %{gcc_main_ver}.5
 %define gcc_addon_ver 4.5
-%define gcc_addon_fullver %{gcc_addon_ver}.0
+%define gcc_addon_fullver %{gcc_addon_ver}.2
 
 Name:         blackfin-toolchain-uclibc-full
 URL:          http://blackfin.uclinux.org
-Version:      10r1
-Release:      1
+Version:      2011R1
+Release:      BETA2
 Requires:     blackfin-toolchain
 Summary:      Wide character libraries for the GNU toolchain for the Blackfin processor
 License:      GPL
@@ -30,6 +30,7 @@ Source6:      uClibc.tar.bz2
 Source7:      mpfr.tar.bz2
 Source8:      gmp.tar.bz2
 Source9:      libdsp.tar.bz2
+Source10:     mpc.tar.bz2
 prefix:       /opt/uClinux
 BuildRoot:    %{_tmppath}/%{name}-%{version}-build
 
@@ -54,7 +55,7 @@ gcc-%{gcc_addon_fullver} based Blackfin Linux toolchains.
 %if %{optional_gcc}
 %define extra_setup -a 1
 %endif
-%setup -q -c %{name}-%{version} %{extra_setup} -a 2 -a 3 -a 4 -a 5 -a 6 -a 7 -a 8 -a 9
+%setup -q -c %{name}-%{version} %{extra_setup} -a 2 -a 3 -a 4 -a 5 -a 6 -a 7 -a 8 -a 9 -a 10
 
 %build
 %if %{optional_gcc}
