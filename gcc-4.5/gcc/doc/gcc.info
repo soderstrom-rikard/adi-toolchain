@@ -1,5 +1,5 @@
 This is doc/gcc.info, produced by makeinfo version 4.12 from
-/space/rguenther/gcc-4.5.2/gcc-4.5.2/gcc/doc/gcc.texi.
+/space/rguenther/gcc-4.5.3/gcc-4.5.3/gcc/doc/gcc.texi.
 
 Copyright (C) 1988, 1989, 1992, 1993, 1994, 1995, 1996, 1997, 1998,
 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008 Free
@@ -61,7 +61,7 @@ Introduction
 
 This manual documents how to use the GNU compilers, as well as their
 features and incompatibilities, and how to report bugs.  It corresponds
-to the compilers (GCC) version 4.5.2.  The internals of the GNU
+to the compilers (GCC) version 4.5.3.  The internals of the GNU
 compilers, including how to port them to new targets and some
 information about how to write front ends for new languages, are
 documented in a separate manual.  *Note Introduction: (gccint)Top.
@@ -837,6 +837,11 @@ _Machine Dependent Options_
           -m32  -m64 -mlarge-data-threshold=NUM
           -msse2avx
 
+     _i386 and x86-64 Windows Options_
+          -mconsole -mcygwin -mno-cygwin -mdll
+          -mnop-fun-dllimport -mthread -municode -mwin32 -mwindows
+          -fno-set-stack-executable
+
      _IA-64 Options_
           -mbig-endian  -mlittle-endian  -mgnu-as  -mgnu-ld  -mno-pic
           -mvolatile-asm-stop  -mregister-names  -msdata -mno-sdata
@@ -1110,11 +1115,6 @@ _Machine Dependent Options_
           -Xbind-lazy  -Xbind-now
 
      _x86-64 Options_ See i386 and x86-64 Options.
-
-     _i386 and x86-64 Windows Options_
-          -mconsole -mcygwin -mno-cygwin -mdll
-          -mnop-fun-dllimport -mthread -municode -mwin32 -mwindows
-          -fno-set-stack-executable
 
      _Xstormy16 Options_
           -msim
@@ -2453,7 +2453,7 @@ File: gcc.info,  Node: Objective-C and Objective-C++ Dialect Options,  Next: Lan
 ==============================================================
 
 (NOTE: This manual does not describe the Objective-C and Objective-C++
-languages themselves.  See *Note Language Standards Supported by GCC:
+languages themselves.  *Note Language Standards Supported by GCC:
 Standards, for references.)
 
  This section describes the command-line options that are only
@@ -6000,7 +6000,7 @@ optimizations to be performed is desired.
 `-fipa-struct-reorg'
      Perform structure reorganization optimization, that change C-like
      structures layout in order to better utilize spatial locality.
-     This transformation is affective for programs containing arrays of
+     This transformation is effective for programs containing arrays of
      structures.  Available in two compilation modes: profile-based
      (enabled with `-fprofile-generate') or static (which uses built-in
      heuristics).  Require `-fipa-type-escape' to provide the safety of
@@ -9587,10 +9587,10 @@ These options are defined for ARC implementations:
      Compile code for big endian mode.
 
 `-mmangle-cpu'
-     Prepend the name of the cpu to all public symbol names.  In
+     Prepend the name of the CPU to all public symbol names.  In
      multiple-processor systems, there are many ARC variants with
      different instruction and register set characteristics.  This flag
-     prevents code compiled for one cpu to be linked with code compiled
+     prevents code compiled for one CPU to be linked with code compiled
      for another.  No facility exists for handling variants that are
      "almost identical".  This is an all or nothing option.
 
@@ -9716,7 +9716,7 @@ architectures:
      restricting which instructions can be used, it specifies that GCC
      should tune the performance of the code as if the target were of
      the type specified in this option, but still choosing the
-     instructions that it will generate based on the cpu specified by a
+     instructions that it will generate based on the CPU specified by a
      `-mcpu=' option.  For some ARM implementations better performance
      can be obtained by using this option.
 
@@ -11492,7 +11492,7 @@ computers:
      instructions for the 387.  Specify this option to avoid generating
      those instructions.  This option is the default on FreeBSD,
      OpenBSD and NetBSD.  This option is overridden when `-march'
-     indicates that the target cpu will always have an FPU and so the
+     indicates that the target CPU will always have an FPU and so the
      instruction will not need emulation.  As of revision 2.6.1, these
      instructions are not generated unless you also use the
      `-funsafe-math-optimizations' switch.
@@ -11920,9 +11920,85 @@ x86-64 processors in 64-bit environments.
      about addresses and sizes of sections.
 
 
+File: gcc.info,  Node: i386 and x86-64 Windows Options,  Next: IA-64 Options,  Prev: i386 and x86-64 Options,  Up: Submodel Options
+
+3.17.16 i386 and x86-64 Windows Options
+---------------------------------------
+
+These additional options are available for Windows targets:
+
+`-mconsole'
+     This option is available for Cygwin and MinGW targets.  It
+     specifies that a console application is to be generated, by
+     instructing the linker to set the PE header subsystem type
+     required for console applications.  This is the default behavior
+     for Cygwin and MinGW targets.
+
+`-mcygwin'
+     This option is available for Cygwin targets.  It specifies that
+     the Cygwin internal interface is to be used for predefined
+     preprocessor macros, C runtime libraries and related linker paths
+     and options.  For Cygwin targets this is the default behavior.
+     This option is deprecated and will be removed in a future release.
+
+`-mno-cygwin'
+     This option is available for Cygwin targets.  It specifies that
+     the MinGW internal interface is to be used instead of Cygwin's, by
+     setting MinGW-related predefined macros and linker paths and
+     default library options.  This option is deprecated and will be
+     removed in a future release.
+
+`-mdll'
+     This option is available for Cygwin and MinGW targets.  It
+     specifies that a DLL - a dynamic link library - is to be
+     generated, enabling the selection of the required runtime startup
+     object and entry point.
+
+`-mnop-fun-dllimport'
+     This option is available for Cygwin and MinGW targets.  It
+     specifies that the dllimport attribute should be ignored.
+
+`-mthread'
+     This option is available for MinGW targets. It specifies that
+     MinGW-specific thread support is to be used.
+
+`-municode'
+     This option is available for mingw-w64 targets.  It specifies that
+     the UNICODE macro is getting pre-defined and that the unicode
+     capable runtime startup code is chosen.
+
+`-mwin32'
+     This option is available for Cygwin and MinGW targets.  It
+     specifies that the typical Windows pre-defined macros are to be
+     set in the pre-processor, but does not influence the choice of
+     runtime library/startup code.
+
+`-mwindows'
+     This option is available for Cygwin and MinGW targets.  It
+     specifies that a GUI application is to be generated by instructing
+     the linker to set the PE header subsystem type appropriately.
+
+`-fno-set-stack-executable'
+     This option is available for MinGW targets. It specifies that the
+     executable flag for stack used by nested functions isn't set. This
+     is necessary for binaries running in kernel mode of Windows, as
+     there the user32 API, which is used to set executable privileges,
+     isn't available.
+
+`-mpe-aligned-commons'
+     This option is available for Cygwin and MinGW targets.  It
+     specifies that the GNU extension to the PE file format that
+     permits the correct alignment of COMMON variables should be used
+     when generating code.  It will be enabled by default if GCC
+     detects that the target assembler found during configuration
+     supports the feature.
+
+ See also under *note i386 and x86-64 Options:: for standard options.
+
+
 File: gcc.info,  Node: IA-64 Options,  Next: IA-64/VMS Options,  Prev: i386 and x86-64 Windows Options,  Up: Submodel Options
 
-3.17.16 IA-64 Options
+3.17.17 IA-64 Options
 ---------------------
 
 These are the `-m' options defined for the Intel IA-64 architecture.
@@ -12143,7 +12219,7 @@ These are the `-m' options defined for the Intel IA-64 architecture.
 
 File: gcc.info,  Node: IA-64/VMS Options,  Next: LM32 Options,  Prev: IA-64 Options,  Up: Submodel Options
 
-3.17.17 IA-64/VMS Options
+3.17.18 IA-64/VMS Options
 -------------------------
 
 These `-m' options are defined for the IA-64/VMS implementations:
@@ -12162,7 +12238,7 @@ These `-m' options are defined for the IA-64/VMS implementations:
 
 File: gcc.info,  Node: LM32 Options,  Next: M32C Options,  Prev: IA-64/VMS Options,  Up: Submodel Options
 
-3.17.18 LM32 Options
+3.17.19 LM32 Options
 --------------------
 
 These `-m' options are defined for the Lattice Mico32 architecture:
@@ -12186,7 +12262,7 @@ These `-m' options are defined for the Lattice Mico32 architecture:
 
 File: gcc.info,  Node: M32C Options,  Next: M32R/D Options,  Prev: LM32 Options,  Up: Submodel Options
 
-3.17.19 M32C Options
+3.17.20 M32C Options
 --------------------
 
 `-mcpu=NAME'
@@ -12217,7 +12293,7 @@ File: gcc.info,  Node: M32C Options,  Next: M32R/D Options,  Prev: LM32 Options,
 
 File: gcc.info,  Node: M32R/D Options,  Next: M680x0 Options,  Prev: M32C Options,  Up: Submodel Options
 
-3.17.20 M32R/D Options
+3.17.21 M32R/D Options
 ----------------------
 
 These `-m' options are defined for Renesas M32R/D architectures:
@@ -12319,7 +12395,7 @@ These `-m' options are defined for Renesas M32R/D architectures:
 
 File: gcc.info,  Node: M680x0 Options,  Next: M68hc1x Options,  Prev: M32R/D Options,  Up: Submodel Options
 
-3.17.21 M680x0 Options
+3.17.22 M680x0 Options
 ----------------------
 
 These are the `-m' options defined for M680x0 and ColdFire processors.
@@ -12664,7 +12740,7 @@ given below.
 
 File: gcc.info,  Node: M68hc1x Options,  Next: MCore Options,  Prev: M680x0 Options,  Up: Submodel Options
 
-3.17.22 M68hc1x Options
+3.17.23 M68hc1x Options
 -----------------------
 
 These are the `-m' options defined for the 68hc11 and 68hc12
@@ -12713,7 +12789,7 @@ configured; the defaults for the most common choices are given below.
 
 File: gcc.info,  Node: MCore Options,  Next: MeP Options,  Prev: M68hc1x Options,  Up: Submodel Options
 
-3.17.23 MCore Options
+3.17.24 MCore Options
 ---------------------
 
 These are the `-m' options defined for the Motorola M*Core processors.
@@ -12770,7 +12846,7 @@ These are the `-m' options defined for the Motorola M*Core processors.
 
 File: gcc.info,  Node: MeP Options,  Next: MIPS Options,  Prev: MCore Options,  Up: Submodel Options
 
-3.17.24 MeP Options
+3.17.25 MeP Options
 -------------------
 
 `-mabsdiff'
@@ -12901,7 +12977,7 @@ File: gcc.info,  Node: MeP Options,  Next: MIPS Options,  Prev: MCore Options,  
 
 File: gcc.info,  Node: MIPS Options,  Next: MMIX Options,  Prev: MeP Options,  Up: Submodel Options
 
-3.17.25 MIPS Options
+3.17.26 MIPS Options
 --------------------
 
 `-EB'
@@ -13593,7 +13669,7 @@ File: gcc.info,  Node: MIPS Options,  Next: MMIX Options,  Prev: MeP Options,  U
 
 File: gcc.info,  Node: MMIX Options,  Next: MN10300 Options,  Prev: MIPS Options,  Up: Submodel Options
 
-3.17.26 MMIX Options
+3.17.27 MMIX Options
 --------------------
 
 These options are defined for the MMIX:
@@ -13662,7 +13738,7 @@ These options are defined for the MMIX:
 
 File: gcc.info,  Node: MN10300 Options,  Next: PDP-11 Options,  Prev: MMIX Options,  Up: Submodel Options
 
-3.17.27 MN10300 Options
+3.17.28 MN10300 Options
 -----------------------
 
 These `-m' options are defined for Matsushita MN10300 architectures:
@@ -13703,7 +13779,7 @@ These `-m' options are defined for Matsushita MN10300 architectures:
 
 File: gcc.info,  Node: PDP-11 Options,  Next: picoChip Options,  Prev: MN10300 Options,  Up: Submodel Options
 
-3.17.28 PDP-11 Options
+3.17.29 PDP-11 Options
 ----------------------
 
 These options are defined for the PDP-11:
@@ -13784,7 +13860,7 @@ These options are defined for the PDP-11:
 
 File: gcc.info,  Node: picoChip Options,  Next: PowerPC Options,  Prev: PDP-11 Options,  Up: Submodel Options
 
-3.17.29 picoChip Options
+3.17.30 picoChip Options
 ------------------------
 
 These `-m' options are defined for picoChip implementations:
@@ -13832,7 +13908,7 @@ These `-m' options are defined for picoChip implementations:
 
 File: gcc.info,  Node: PowerPC Options,  Next: RS/6000 and PowerPC Options,  Prev: picoChip Options,  Up: Submodel Options
 
-3.17.30 PowerPC Options
+3.17.31 PowerPC Options
 -----------------------
 
 These are listed under *Note RS/6000 and PowerPC Options::.
@@ -13840,7 +13916,7 @@ These are listed under *Note RS/6000 and PowerPC Options::.
 
 File: gcc.info,  Node: RS/6000 and PowerPC Options,  Next: RX Options,  Prev: PowerPC Options,  Up: Submodel Options
 
-3.17.31 IBM RS/6000 and PowerPC Options
+3.17.32 IBM RS/6000 and PowerPC Options
 ---------------------------------------
 
 These `-m' options are defined for the IBM RS/6000 and PowerPC:
@@ -14580,7 +14656,7 @@ These `-m' options are defined for the IBM RS/6000 and PowerPC:
 
 File: gcc.info,  Node: RX Options,  Next: S/390 and zSeries Options,  Prev: RS/6000 and PowerPC Options,  Up: Submodel Options
 
-3.17.32 RX Options
+3.17.33 RX Options
 ------------------
 
 These command line options are defined for RX targets:
@@ -14610,7 +14686,7 @@ These command line options are defined for RX targets:
 `-patch=NAME'
      Selects the type of RX CPU to be targeted.  Currently three types
      are supported, the generic RX600 and RX200 series hardware and the
-     specific RX610 cpu.  The default is RX600.
+     specific RX610 CPU.  The default is RX600.
 
      The only difference between RX600 and RX610 is that the RX610 does
      not support the `MVTIPL' instruction.
@@ -14704,7 +14780,7 @@ of the corresponding registers have been restricted via the
 
 File: gcc.info,  Node: S/390 and zSeries Options,  Next: Score Options,  Prev: RX Options,  Up: Submodel Options
 
-3.17.33 S/390 and zSeries Options
+3.17.34 S/390 and zSeries Options
 ---------------------------------
 
 These are the `-m' options defined for the S/390 and zSeries
@@ -14876,7 +14952,7 @@ architecture.
 
 File: gcc.info,  Node: Score Options,  Next: SH Options,  Prev: S/390 and zSeries Options,  Up: Submodel Options
 
-3.17.34 Score Options
+3.17.35 Score Options
 ---------------------
 
 These options are defined for Score implementations:
@@ -14912,7 +14988,7 @@ These options are defined for Score implementations:
 
 File: gcc.info,  Node: SH Options,  Next: SPARC Options,  Prev: Score Options,  Up: Submodel Options
 
-3.17.35 SH Options
+3.17.36 SH Options
 ------------------
 
 These `-m' options are defined for the SH implementations:
@@ -15172,7 +15248,7 @@ These `-m' options are defined for the SH implementations:
 
 File: gcc.info,  Node: SPARC Options,  Next: SPU Options,  Prev: SH Options,  Up: Submodel Options
 
-3.17.36 SPARC Options
+3.17.37 SPARC Options
 ---------------------
 
 These `-m' options are supported on the SPARC:
@@ -15333,7 +15409,7 @@ These `-m' options are supported on the SPARC:
 
      The same values for `-mcpu=CPU_TYPE' can be used for
      `-mtune=CPU_TYPE', but the only useful values are those that
-     select a particular cpu implementation.  Those are `cypress',
+     select a particular CPU implementation.  Those are `cypress',
      `supersparc', `hypersparc', `f930', `f934', `sparclite86x',
      `tsc701', `ultrasparc', `ultrasparc3', `niagara', and `niagara2'.
 
@@ -15416,7 +15492,7 @@ processors in 64-bit environments:
 
 File: gcc.info,  Node: SPU Options,  Next: System V Options,  Prev: SPARC Options,  Up: Submodel Options
 
-3.17.37 SPU Options
+3.17.38 SPU Options
 -------------------
 
 These `-m' options are supported on the SPU:
@@ -15528,7 +15604,7 @@ These `-m' options are supported on the SPU:
 
 File: gcc.info,  Node: System V Options,  Next: V850 Options,  Prev: SPU Options,  Up: Submodel Options
 
-3.17.38 Options for System V
+3.17.39 Options for System V
 ----------------------------
 
 These additional options are available on System V Release 4 for
@@ -15557,7 +15633,7 @@ compatibility with other compilers on those systems:
 
 File: gcc.info,  Node: V850 Options,  Next: VAX Options,  Prev: System V Options,  Up: Submodel Options
 
-3.17.39 V850 Options
+3.17.40 V850 Options
 --------------------
 
 These `-m' options are defined for V850 implementations:
@@ -15643,7 +15719,7 @@ These `-m' options are defined for V850 implementations:
 
 File: gcc.info,  Node: VAX Options,  Next: VxWorks Options,  Prev: V850 Options,  Up: Submodel Options
 
-3.17.40 VAX Options
+3.17.41 VAX Options
 -------------------
 
 These `-m' options are defined for the VAX:
@@ -15663,7 +15739,7 @@ These `-m' options are defined for the VAX:
 
 File: gcc.info,  Node: VxWorks Options,  Next: x86-64 Options,  Prev: VAX Options,  Up: Submodel Options
 
-3.17.41 VxWorks Options
+3.17.42 VxWorks Options
 -----------------------
 
 The options in this section are defined for all VxWorks targets.
@@ -15696,86 +15772,10 @@ options for that target.
 
 File: gcc.info,  Node: x86-64 Options,  Next: Xstormy16 Options,  Prev: VxWorks Options,  Up: Submodel Options
 
-3.17.42 x86-64 Options
+3.17.43 x86-64 Options
 ----------------------
 
 These are listed under *Note i386 and x86-64 Options::.
-
-
-File: gcc.info,  Node: i386 and x86-64 Windows Options,  Next: IA-64 Options,  Prev: i386 and x86-64 Options,  Up: Submodel Options
-
-3.17.43 i386 and x86-64 Windows Options
----------------------------------------
-
-These additional options are available for Windows targets:
-
-`-mconsole'
-     This option is available for Cygwin and MinGW targets.  It
-     specifies that a console application is to be generated, by
-     instructing the linker to set the PE header subsystem type
-     required for console applications.  This is the default behavior
-     for Cygwin and MinGW targets.
-
-`-mcygwin'
-     This option is available for Cygwin targets.  It specifies that
-     the Cygwin internal interface is to be used for predefined
-     preprocessor macros, C runtime libraries and related linker paths
-     and options.  For Cygwin targets this is the default behavior.
-     This option is deprecated and will be removed in a future release.
-
-`-mno-cygwin'
-     This option is available for Cygwin targets.  It specifies that
-     the MinGW internal interface is to be used instead of Cygwin's, by
-     setting MinGW-related predefined macros and linker paths and
-     default library options.  This option is deprecated and will be
-     removed in a future release.
-
-`-mdll'
-     This option is available for Cygwin and MinGW targets.  It
-     specifies that a DLL - a dynamic link library - is to be
-     generated, enabling the selection of the required runtime startup
-     object and entry point.
-
-`-mnop-fun-dllimport'
-     This option is available for Cygwin and MinGW targets.  It
-     specifies that the dllimport attribute should be ignored.
-
-`-mthread'
-     This option is available for MinGW targets. It specifies that
-     MinGW-specific thread support is to be used.
-
-`-municode'
-     This option is available for mingw-w64 targets.  It specifies that
-     the UNICODE macro is getting pre-defined and that the unicode
-     capable runtime startup code is chosen.
-
-`-mwin32'
-     This option is available for Cygwin and MinGW targets.  It
-     specifies that the typical Windows pre-defined macros are to be
-     set in the pre-processor, but does not influence the choice of
-     runtime library/startup code.
-
-`-mwindows'
-     This option is available for Cygwin and MinGW targets.  It
-     specifies that a GUI application is to be generated by instructing
-     the linker to set the PE header subsystem type appropriately.
-
-`-fno-set-stack-executable'
-     This option is available for MinGW targets. It specifies that the
-     executable flag for stack used by nested functions isn't set. This
-     is necessary for binaries running in kernel mode of Windows, as
-     there the user32 API, which is used to set executable privileges,
-     isn't available.
-
-`-mpe-aligned-commons'
-     This option is available for Cygwin and MinGW targets.  It
-     specifies that the GNU extension to the PE file format that
-     permits the correct alignment of COMMON variables should be used
-     when generating code.  It will be enabled by default if GCC
-     detects that the target assembler found during configuration
-     supports the feature.
-
- See also under *note i386 and x86-64 Options:: for standard options.
 
 
 File: gcc.info,  Node: Xstormy16 Options,  Next: Xtensa Options,  Prev: x86-64 Options,  Up: Submodel Options
@@ -20666,41 +20666,9 @@ You can use the sequence `\e' in a string or character constant to
 stand for the ASCII character <ESC>.
 
 
-File: gcc.info,  Node: Alignment,  Next: Inline,  Prev: Type Attributes,  Up: C Extensions
-
-6.35 Inquiring on Alignment of Types or Variables
-=================================================
-
-The keyword `__alignof__' allows you to inquire about how an object is
-aligned, or the minimum alignment usually required by a type.  Its
-syntax is just like `sizeof'.
-
- For example, if the target machine requires a `double' value to be
-aligned on an 8-byte boundary, then `__alignof__ (double)' is 8.  This
-is true on many RISC machines.  On more traditional machine designs,
-`__alignof__ (double)' is 4 or even 2.
-
- Some machines never actually require alignment; they allow reference
-to any data type even at an odd address.  For these machines,
-`__alignof__' reports the smallest alignment that GCC will give the
-data type, usually as mandated by the target ABI.
-
- If the operand of `__alignof__' is an lvalue rather than a type, its
-value is the required alignment for its type, taking into account any
-minimum alignment specified with GCC's `__attribute__' extension (*note
-Variable Attributes::).  For example, after this declaration:
-
-     struct foo { int x; char y; } foo1;
-
-the value of `__alignof__ (foo1.y)' is 1, even though its actual
-alignment is probably 2 or 4, the same as `__alignof__ (int)'.
-
- It is an error to ask for the alignment of an incomplete type.
-
-
 File: gcc.info,  Node: Variable Attributes,  Next: Type Attributes,  Prev: Character Escapes,  Up: C Extensions
 
-6.36 Specifying Attributes of Variables
+6.35 Specifying Attributes of Variables
 =======================================
 
 The keyword `__attribute__' allows you to specify special attributes of
@@ -21007,7 +20975,7 @@ attributes.
      Attributes::.
 
 
-6.36.1 Blackfin Variable Attributes
+6.35.1 Blackfin Variable Attributes
 -----------------------------------
 
 Three attributes are currently defined for the Blackfin.
@@ -21027,7 +20995,7 @@ Three attributes are currently defined for the Blackfin.
      SRAM.  Variables with `l2' attribute will be put into the specific
      section named `.l2.data'.
 
-6.36.2 M32R/D Variable Attributes
+6.35.2 M32R/D Variable Attributes
 ---------------------------------
 
 One attribute is currently defined for the M32R/D.
@@ -21044,7 +21012,7 @@ One attribute is currently defined for the M32R/D.
      address space (the compiler will generate `seth/add3' instructions
      to load their addresses).
 
-6.36.3 MeP Variable Attributes
+6.35.3 MeP Variable Attributes
 ------------------------------
 
 The MeP target has a number of addressing modes and busses.  The `near'
@@ -21096,7 +21064,7 @@ specified with `cb' attributes.
           int cpu_clock __attribute__((cb(0x123)));
 
 
-6.36.4 i386 Variable Attributes
+6.35.4 i386 Variable Attributes
 -------------------------------
 
 Two attributes are currently defined for i386 configurations:
@@ -21221,7 +21189,7 @@ Two attributes are currently defined for i386 configurations:
 
           Here, `t5' will take up 2 bytes.
 
-6.36.5 PowerPC Variable Attributes
+6.35.5 PowerPC Variable Attributes
 ----------------------------------
 
 Three attributes currently are defined for PowerPC configurations:
@@ -21233,14 +21201,14 @@ documentation in *note i386 Variable Attributes::.
  For documentation of `altivec' attribute please see the documentation
 in *note PowerPC Type Attributes::.
 
-6.36.6 SPU Variable Attributes
+6.35.6 SPU Variable Attributes
 ------------------------------
 
 The SPU supports the `spu_vector' attribute for variables.  For
 documentation of this attribute please see the documentation in *note
 SPU Type Attributes::.
 
-6.36.7 Xstormy16 Variable Attributes
+6.35.7 Xstormy16 Variable Attributes
 ------------------------------------
 
 One attribute is currently defined for xstormy16 configurations:
@@ -21254,7 +21222,7 @@ One attribute is currently defined for xstormy16 configurations:
      `.data_below100' section.
 
 
-6.36.8 AVR Variable Attributes
+6.35.8 AVR Variable Attributes
 ------------------------------
 
 `progmem'
@@ -21266,7 +21234,7 @@ One attribute is currently defined for xstormy16 configurations:
 
 File: gcc.info,  Node: Type Attributes,  Next: Alignment,  Prev: Variable Attributes,  Up: C Extensions
 
-6.37 Specifying Attributes of Types
+6.36 Specifying Attributes of Types
 ===================================
 
 The keyword `__attribute__' allows you to specify special attributes of
@@ -21545,7 +21513,7 @@ attributes.
      use the same typeinfo node and exception handling will break.
 
 
-6.37.1 ARM Type Attributes
+6.36.1 ARM Type Attributes
 --------------------------
 
 On those ARM targets that support `dllimport' (such as Symbian OS), you
@@ -21566,7 +21534,7 @@ For example:
 table for `C' is not exported.  (You can use `__attribute__' instead of
 `__declspec' if you prefer, but most Symbian OS code uses `__declspec'.)
 
-6.37.2 MeP Type Attributes
+6.36.2 MeP Type Attributes
 --------------------------
 
 Many of the MeP variable attributes may be applied to types as well.
@@ -21574,7 +21542,7 @@ Specifically, the `based', `tiny', `near', and `far' attributes may be
 applied to either.  The `io' and `cb' attributes may not be applied to
 types.
 
-6.37.3 i386 Type Attributes
+6.36.3 i386 Type Attributes
 ---------------------------
 
 Two attributes are currently defined for i386 configurations:
@@ -21596,7 +21564,7 @@ Two attributes are currently defined for i386 configurations:
 double parentheses: for example, `__attribute__ ((aligned (16),
 packed))'.
 
-6.37.4 PowerPC Type Attributes
+6.36.4 PowerPC Type Attributes
 ------------------------------
 
 Three attributes currently are defined for PowerPC configurations:
@@ -21618,13 +21586,45 @@ attribute requires an argument to specify one of three vector types:
  These attributes mainly are intended to support the `__vector',
 `__pixel', and `__bool' AltiVec keywords.
 
-6.37.5 SPU Type Attributes
+6.36.5 SPU Type Attributes
 --------------------------
 
 The SPU supports the `spu_vector' attribute for types.  This attribute
 allows one to declare vector data types supported by the
 Sony/Toshiba/IBM SPU Language Extensions Specification.  It is intended
 to support the `__vector' keyword.
+
+
+File: gcc.info,  Node: Alignment,  Next: Inline,  Prev: Type Attributes,  Up: C Extensions
+
+6.37 Inquiring on Alignment of Types or Variables
+=================================================
+
+The keyword `__alignof__' allows you to inquire about how an object is
+aligned, or the minimum alignment usually required by a type.  Its
+syntax is just like `sizeof'.
+
+ For example, if the target machine requires a `double' value to be
+aligned on an 8-byte boundary, then `__alignof__ (double)' is 8.  This
+is true on many RISC machines.  On more traditional machine designs,
+`__alignof__ (double)' is 4 or even 2.
+
+ Some machines never actually require alignment; they allow reference
+to any data type even at an odd address.  For these machines,
+`__alignof__' reports the smallest alignment that GCC will give the
+data type, usually as mandated by the target ABI.
+
+ If the operand of `__alignof__' is an lvalue rather than a type, its
+value is the required alignment for its type, taking into account any
+minimum alignment specified with GCC's `__attribute__' extension (*note
+Variable Attributes::).  For example, after this declaration:
+
+     struct foo { int x; char y; } foo1;
+
+the value of `__alignof__ (foo1.y)' is 1, even though its actual
+alignment is probably 2 or 4, the same as `__alignof__ (int)'.
+
+ It is an error to ask for the alignment of an incomplete type.
 
 
 File: gcc.info,  Node: Inline,  Next: Extended Asm,  Prev: Alignment,  Up: C Extensions
@@ -35404,6 +35404,12 @@ additional functions are available:
      vector float vec_div (vector float, vector float);
      vector double vec_div (vector double, vector double);
      vector double vec_floor (vector double);
+     vector double vec_ld (int, const vector double *);
+     vector double vec_ld (int, const double *);
+     vector double vec_ldl (int, const vector double *);
+     vector double vec_ldl (int, const double *);
+     vector unsigned char vec_lvsl (int, const volatile double *);
+     vector unsigned char vec_lvsr (int, const volatile double *);
      vector double vec_madd (vector double, vector double, vector double);
      vector double vec_max (vector double, vector double);
      vector double vec_min (vector double, vector double);
@@ -35430,6 +35436,8 @@ additional functions are available:
      vector double vec_sub (vector double, vector double);
      vector float vec_sqrt (vector float);
      vector double vec_sqrt (vector double);
+     void vec_st (vector double, int, vector double *);
+     void vec_st (vector double, int, double *);
      vector double vec_trunc (vector double);
      vector double vec_xor (vector double, vector double);
      vector double vec_xor (vector double, vector bool long);
@@ -35458,6 +35466,64 @@ additional functions are available:
      int vec_any_nle (vector double, vector double);
      int vec_any_nlt (vector double, vector double);
      int vec_any_numeric (vector double);
+
+     vector double vec_vsx_ld (int, const vector double *);
+     vector double vec_vsx_ld (int, const double *);
+     vector float vec_vsx_ld (int, const vector float *);
+     vector float vec_vsx_ld (int, const float *);
+     vector bool int vec_vsx_ld (int, const vector bool int *);
+     vector signed int vec_vsx_ld (int, const vector signed int *);
+     vector signed int vec_vsx_ld (int, const int *);
+     vector signed int vec_vsx_ld (int, const long *);
+     vector unsigned int vec_vsx_ld (int, const vector unsigned int *);
+     vector unsigned int vec_vsx_ld (int, const unsigned int *);
+     vector unsigned int vec_vsx_ld (int, const unsigned long *);
+     vector bool short vec_vsx_ld (int, const vector bool short *);
+     vector pixel vec_vsx_ld (int, const vector pixel *);
+     vector signed short vec_vsx_ld (int, const vector signed short *);
+     vector signed short vec_vsx_ld (int, const short *);
+     vector unsigned short vec_vsx_ld (int, const vector unsigned short *);
+     vector unsigned short vec_vsx_ld (int, const unsigned short *);
+     vector bool char vec_vsx_ld (int, const vector bool char *);
+     vector signed char vec_vsx_ld (int, const vector signed char *);
+     vector signed char vec_vsx_ld (int, const signed char *);
+     vector unsigned char vec_vsx_ld (int, const vector unsigned char *);
+     vector unsigned char vec_vsx_ld (int, const unsigned char *);
+
+     void vec_vsx_st (vector double, int, vector double *);
+     void vec_vsx_st (vector double, int, double *);
+     void vec_vsx_st (vector float, int, vector float *);
+     void vec_vsx_st (vector float, int, float *);
+     void vec_vsx_st (vector signed int, int, vector signed int *);
+     void vec_vsx_st (vector signed int, int, int *);
+     void vec_vsx_st (vector unsigned int, int, vector unsigned int *);
+     void vec_vsx_st (vector unsigned int, int, unsigned int *);
+     void vec_vsx_st (vector bool int, int, vector bool int *);
+     void vec_vsx_st (vector bool int, int, unsigned int *);
+     void vec_vsx_st (vector bool int, int, int *);
+     void vec_vsx_st (vector signed short, int, vector signed short *);
+     void vec_vsx_st (vector signed short, int, short *);
+     void vec_vsx_st (vector unsigned short, int, vector unsigned short *);
+     void vec_vsx_st (vector unsigned short, int, unsigned short *);
+     void vec_vsx_st (vector bool short, int, vector bool short *);
+     void vec_vsx_st (vector bool short, int, unsigned short *);
+     void vec_vsx_st (vector pixel, int, vector pixel *);
+     void vec_vsx_st (vector pixel, int, unsigned short *);
+     void vec_vsx_st (vector pixel, int, short *);
+     void vec_vsx_st (vector bool short, int, short *);
+     void vec_vsx_st (vector signed char, int, vector signed char *);
+     void vec_vsx_st (vector signed char, int, signed char *);
+     void vec_vsx_st (vector unsigned char, int, vector unsigned char *);
+     void vec_vsx_st (vector unsigned char, int, unsigned char *);
+     void vec_vsx_st (vector bool char, int, vector bool char *);
+     void vec_vsx_st (vector bool char, int, unsigned char *);
+     void vec_vsx_st (vector bool char, int, signed char *);
+
+ Note that the `vec_ld' and `vec_st' builtins will always generate the
+Altivec `LVX' and `STVX' instructions even if the VSX instruction set
+is available.  The `vec_vsx_ld' and `vec_vsx_st' builtins will always
+generate the VSX `LXVD2X', `LXVW4X', `STXVD2X', and `STXVW4X'
+instructions.
 
  GCC provides a few other builtins on Powerpc to access certain
 instructions:
@@ -36240,7 +36306,7 @@ must be a CONSTANT-EXPRESSION, as defined in 5.19.2 of the ANSI/ISO C++
 standard.
 
  See ELF Handling For Thread-Local Storage
-(http://people.redhat.com/drepper/tls.pdf) for a detailed explanation of
+(http://www.akkadia.org/drepper/tls.pdf) for a detailed explanation of
 the four thread-local storage addressing models, and how the run-time
 is expected to function.
 
@@ -45852,258 +45918,258 @@ Node: Invoking G++68423
 Node: C Dialect Options69946
 Node: C++ Dialect Options83878
 Node: Objective-C and Objective-C++ Dialect Options107043
-Node: Language Independent Options118824
-Node: Warning Options121594
-Node: Debugging Options180896
-Node: Optimize Options226959
-Ref: Type-punning278441
-Node: Preprocessor Options347073
-Ref: Wtrigraphs351171
-Ref: dashMF355919
-Ref: fdollars-in-identifiers366460
-Node: Assembler Options375021
-Node: Link Options375726
-Ref: Link Options-Footnote-1386084
-Node: Directory Options386418
-Node: Spec Files392480
-Node: Target Options413290
-Node: Submodel Options414808
-Node: ARC Options416577
-Node: ARM Options418064
-Node: AVR Options430966
-Node: Blackfin Options432821
-Node: CRIS Options440769
-Node: CRX Options444510
-Node: Darwin Options444935
-Node: DEC Alpha Options452427
-Node: DEC Alpha/VMS Options464343
-Node: FR30 Options464917
-Node: FRV Options465492
-Node: GNU/Linux Options472209
-Node: H8/300 Options472667
-Node: HPPA Options473734
-Node: i386 and x86-64 Options483234
-Node: IA-64 Options512237
-Node: IA-64/VMS Options520255
-Node: LM32 Options520810
-Node: M32C Options521339
-Node: M32R/D Options522629
-Node: M680x0 Options526216
-Node: M68hc1x Options540223
-Node: MCore Options541792
-Node: MeP Options543299
-Node: MIPS Options547266
-Node: MMIX Options575165
-Node: MN10300 Options577647
-Node: PDP-11 Options579069
-Node: picoChip Options580909
-Node: PowerPC Options583108
-Node: RS/6000 and PowerPC Options583344
-Node: RX Options615143
-Node: S/390 and zSeries Options620727
-Node: Score Options628658
-Node: SH Options629486
-Node: SPARC Options640340
-Node: SPU Options651313
-Node: System V Options656317
-Node: V850 Options657140
-Node: VAX Options660280
-Node: VxWorks Options660828
-Node: x86-64 Options661983
-Node: i386 and x86-64 Windows Options662201
-Node: Xstormy16 Options665430
-Node: Xtensa Options665719
-Node: zSeries Options669866
-Node: Code Gen Options670062
-Node: Environment Variables694769
-Node: Precompiled Headers702665
-Node: C Implementation708866
-Node: Translation implementation710529
-Node: Environment implementation711103
-Node: Identifiers implementation711653
-Node: Characters implementation712707
-Node: Integers implementation715513
-Node: Floating point implementation717338
-Node: Arrays and pointers implementation720267
-Ref: Arrays and pointers implementation-Footnote-1721702
-Node: Hints implementation721826
-Node: Structures unions enumerations and bit-fields implementation723292
-Node: Qualifiers implementation725278
-Node: Declarators implementation727050
-Node: Statements implementation727392
-Node: Preprocessing directives implementation727719
-Node: Library functions implementation729824
-Node: Architecture implementation730464
-Node: Locale-specific behavior implementation731167
-Node: C++ Implementation731472
-Node: Conditionally-supported behavior732729
-Node: C Extensions733212
-Node: Statement Exprs737928
-Node: Local Labels742441
-Node: Labels as Values745420
-Ref: Labels as Values-Footnote-1747829
-Node: Nested Functions748012
-Node: Constructing Calls751945
-Node: Typeof756668
-Node: Conditionals759983
-Node: Long Long760874
-Node: Complex762375
-Node: Floating Types764945
-Node: Half-Precision766025
-Node: Decimal Float768207
-Node: Hex Floats770074
-Node: Fixed-Point771115
-Node: Named Address Spaces774409
-Node: Zero Length775443
-Node: Empty Structures778730
-Node: Variable Length779146
-Node: Variadic Macros781799
-Node: Escaped Newlines784181
-Node: Subscripting785020
-Node: Pointer Arith785743
-Node: Initializers786311
-Node: Compound Literals786807
-Node: Designated Inits788982
-Node: Case Ranges792637
-Node: Cast to Union793320
-Node: Mixed Declarations794416
-Node: Function Attributes794922
-Node: Attribute Syntax862446
-Node: Function Prototypes872881
-Node: C++ Comments874662
-Node: Dollar Signs875181
-Node: Character Escapes875646
-Node: Alignment875940
-Node: Variable Attributes877314
-Ref: MeP Variable Attributes892205
-Ref: i386 Variable Attributes894166
-Node: Type Attributes900151
-Ref: MeP Type Attributes913892
-Ref: i386 Type Attributes914166
-Ref: PowerPC Type Attributes915006
-Ref: SPU Type Attributes915868
-Node: Inline916159
-Node: Extended Asm921106
-Ref: Example of asm with clobbered asm reg927192
-Ref: Extended asm with goto936959
-Node: Constraints944694
-Node: Simple Constraints945544
-Node: Multi-Alternative952215
-Node: Modifiers953932
-Node: Machine Constraints956826
-Node: Asm Labels993179
-Node: Explicit Reg Vars994855
-Node: Global Reg Vars996463
-Node: Local Reg Vars1001013
-Node: Alternate Keywords1003454
-Node: Incomplete Enums1004882
-Node: Function Names1005639
-Node: Return Address1007801
-Node: Vector Extensions1011354
-Node: Offsetof1014859
-Node: Atomic Builtins1015673
-Node: Object Size Checking1021051
-Node: Other Builtins1026479
-Node: Target Builtins1053139
-Node: Alpha Built-in Functions1054063
-Node: ARM iWMMXt Built-in Functions1057062
-Node: ARM NEON Intrinsics1063781
-Node: Blackfin Built-in Functions1271613
-Node: FR-V Built-in Functions1272227
-Node: Argument Types1273086
-Node: Directly-mapped Integer Functions1274842
-Node: Directly-mapped Media Functions1275924
-Node: Raw read/write Functions1282956
-Node: Other Built-in Functions1283868
-Node: X86 Built-in Functions1285057
-Node: MIPS DSP Built-in Functions1328488
-Node: MIPS Paired-Single Support1340935
-Node: MIPS Loongson Built-in Functions1342436
-Node: Paired-Single Arithmetic1348954
-Node: Paired-Single Built-in Functions1349900
-Node: MIPS-3D Built-in Functions1352570
-Node: picoChip Built-in Functions1357945
-Node: Other MIPS Built-in Functions1359311
-Node: PowerPC AltiVec/VSX Built-in Functions1359835
-Node: RX Built-in Functions1465982
-Node: SPARC VIS Built-in Functions1469992
-Node: SPU Built-in Functions1471671
-Node: Target Format Checks1473453
-Node: Solaris Format Checks1473860
-Node: Pragmas1474257
-Node: ARM Pragmas1474967
-Node: M32C Pragmas1475570
-Node: MeP Pragmas1476130
-Node: RS/6000 and PowerPC Pragmas1478199
-Node: Darwin Pragmas1478940
-Node: Solaris Pragmas1480007
-Node: Symbol-Renaming Pragmas1481168
-Node: Structure-Packing Pragmas1483802
-Node: Weak Pragmas1485454
-Node: Diagnostic Pragmas1486256
-Node: Visibility Pragmas1488892
-Node: Push/Pop Macro Pragmas1489644
-Node: Function Specific Option Pragmas1490617
-Node: Unnamed Fields1492832
-Node: Thread-Local1494342
-Node: C99 Thread-Local Edits1496451
-Node: C++98 Thread-Local Edits1498463
-Node: Binary constants1501908
-Node: C++ Extensions1502579
-Node: Volatiles1504227
-Node: Restricted Pointers1506903
-Node: Vague Linkage1508497
-Node: C++ Interface1512153
-Ref: C++ Interface-Footnote-11516450
-Node: Template Instantiation1516587
-Node: Bound member functions1523599
-Node: C++ Attributes1525142
-Node: Namespace Association1526800
-Node: Type Traits1528214
-Node: Java Exceptions1533761
-Node: Deprecated Features1535158
-Node: Backwards Compatibility1538123
-Node: Objective-C1539481
-Node: Executing code before main1540062
-Node: What you can and what you cannot do in +load1542668
-Node: Type encoding1544835
-Node: Garbage Collection1548222
-Node: Constant string objects1550846
-Node: compatibility_alias1553354
-Node: Compatibility1554232
-Node: Gcov1560799
-Node: Gcov Intro1561332
-Node: Invoking Gcov1564050
-Node: Gcov and Optimization1575913
-Node: Gcov Data Files1578568
-Node: Cross-profiling1579708
-Node: Trouble1581536
-Node: Actual Bugs1583021
-Node: Cross-Compiler Problems1583477
-Node: Interoperation1583891
-Node: Incompatibilities1591028
-Node: Fixed Headers1599179
-Node: Standard Libraries1600842
-Node: Disappointments1602214
-Node: C++ Misunderstandings1606572
-Node: Static Definitions1607383
-Node: Name lookup1608436
-Ref: Name lookup-Footnote-11613214
-Node: Temporaries1613401
-Node: Copy Assignment1615377
-Node: Non-bugs1617184
-Node: Warnings and Errors1627691
-Node: Bugs1629455
-Node: Bug Criteria1630019
-Node: Bug Reporting1632229
-Node: Service1632450
-Node: Contributing1633269
-Node: Funding1634009
-Node: GNU Project1636498
-Node: Copying1637144
-Node: GNU Free Documentation License1674672
-Node: Contributors1697078
-Node: Option Index1733762
-Node: Keyword Index1903941
+Node: Language Independent Options118820
+Node: Warning Options121590
+Node: Debugging Options180892
+Node: Optimize Options226955
+Ref: Type-punning278437
+Node: Preprocessor Options347069
+Ref: Wtrigraphs351167
+Ref: dashMF355915
+Ref: fdollars-in-identifiers366456
+Node: Assembler Options375017
+Node: Link Options375722
+Ref: Link Options-Footnote-1386080
+Node: Directory Options386414
+Node: Spec Files392476
+Node: Target Options413286
+Node: Submodel Options414804
+Node: ARC Options416573
+Node: ARM Options418060
+Node: AVR Options430962
+Node: Blackfin Options432817
+Node: CRIS Options440765
+Node: CRX Options444506
+Node: Darwin Options444931
+Node: DEC Alpha Options452423
+Node: DEC Alpha/VMS Options464339
+Node: FR30 Options464913
+Node: FRV Options465488
+Node: GNU/Linux Options472205
+Node: H8/300 Options472663
+Node: HPPA Options473730
+Node: i386 and x86-64 Options483230
+Node: i386 and x86-64 Windows Options512233
+Node: IA-64 Options515462
+Node: IA-64/VMS Options523480
+Node: LM32 Options524035
+Node: M32C Options524564
+Node: M32R/D Options525854
+Node: M680x0 Options529441
+Node: M68hc1x Options543448
+Node: MCore Options545017
+Node: MeP Options546524
+Node: MIPS Options550491
+Node: MMIX Options578390
+Node: MN10300 Options580872
+Node: PDP-11 Options582294
+Node: picoChip Options584134
+Node: PowerPC Options586333
+Node: RS/6000 and PowerPC Options586569
+Node: RX Options618368
+Node: S/390 and zSeries Options623952
+Node: Score Options631883
+Node: SH Options632711
+Node: SPARC Options643565
+Node: SPU Options654538
+Node: System V Options659542
+Node: V850 Options660365
+Node: VAX Options663505
+Node: VxWorks Options664053
+Node: x86-64 Options665208
+Node: Xstormy16 Options665426
+Node: Xtensa Options665715
+Node: zSeries Options669862
+Node: Code Gen Options670058
+Node: Environment Variables694765
+Node: Precompiled Headers702661
+Node: C Implementation708862
+Node: Translation implementation710525
+Node: Environment implementation711099
+Node: Identifiers implementation711649
+Node: Characters implementation712703
+Node: Integers implementation715509
+Node: Floating point implementation717334
+Node: Arrays and pointers implementation720263
+Ref: Arrays and pointers implementation-Footnote-1721698
+Node: Hints implementation721822
+Node: Structures unions enumerations and bit-fields implementation723288
+Node: Qualifiers implementation725274
+Node: Declarators implementation727046
+Node: Statements implementation727388
+Node: Preprocessing directives implementation727715
+Node: Library functions implementation729820
+Node: Architecture implementation730460
+Node: Locale-specific behavior implementation731163
+Node: C++ Implementation731468
+Node: Conditionally-supported behavior732725
+Node: C Extensions733208
+Node: Statement Exprs737924
+Node: Local Labels742437
+Node: Labels as Values745416
+Ref: Labels as Values-Footnote-1747825
+Node: Nested Functions748008
+Node: Constructing Calls751941
+Node: Typeof756664
+Node: Conditionals759979
+Node: Long Long760870
+Node: Complex762371
+Node: Floating Types764941
+Node: Half-Precision766021
+Node: Decimal Float768203
+Node: Hex Floats770070
+Node: Fixed-Point771111
+Node: Named Address Spaces774405
+Node: Zero Length775439
+Node: Empty Structures778726
+Node: Variable Length779142
+Node: Variadic Macros781795
+Node: Escaped Newlines784177
+Node: Subscripting785016
+Node: Pointer Arith785739
+Node: Initializers786307
+Node: Compound Literals786803
+Node: Designated Inits788978
+Node: Case Ranges792633
+Node: Cast to Union793316
+Node: Mixed Declarations794412
+Node: Function Attributes794918
+Node: Attribute Syntax862442
+Node: Function Prototypes872877
+Node: C++ Comments874658
+Node: Dollar Signs875177
+Node: Character Escapes875642
+Node: Variable Attributes875936
+Ref: MeP Variable Attributes890827
+Ref: i386 Variable Attributes892788
+Node: Type Attributes898773
+Ref: MeP Type Attributes912514
+Ref: i386 Type Attributes912788
+Ref: PowerPC Type Attributes913628
+Ref: SPU Type Attributes914490
+Node: Alignment914781
+Node: Inline916155
+Node: Extended Asm921102
+Ref: Example of asm with clobbered asm reg927188
+Ref: Extended asm with goto936955
+Node: Constraints944690
+Node: Simple Constraints945540
+Node: Multi-Alternative952211
+Node: Modifiers953928
+Node: Machine Constraints956822
+Node: Asm Labels993175
+Node: Explicit Reg Vars994851
+Node: Global Reg Vars996459
+Node: Local Reg Vars1001009
+Node: Alternate Keywords1003450
+Node: Incomplete Enums1004878
+Node: Function Names1005635
+Node: Return Address1007797
+Node: Vector Extensions1011350
+Node: Offsetof1014855
+Node: Atomic Builtins1015669
+Node: Object Size Checking1021047
+Node: Other Builtins1026475
+Node: Target Builtins1053135
+Node: Alpha Built-in Functions1054059
+Node: ARM iWMMXt Built-in Functions1057058
+Node: ARM NEON Intrinsics1063777
+Node: Blackfin Built-in Functions1271609
+Node: FR-V Built-in Functions1272223
+Node: Argument Types1273082
+Node: Directly-mapped Integer Functions1274838
+Node: Directly-mapped Media Functions1275920
+Node: Raw read/write Functions1282952
+Node: Other Built-in Functions1283864
+Node: X86 Built-in Functions1285053
+Node: MIPS DSP Built-in Functions1328484
+Node: MIPS Paired-Single Support1340931
+Node: MIPS Loongson Built-in Functions1342432
+Node: Paired-Single Arithmetic1348950
+Node: Paired-Single Built-in Functions1349896
+Node: MIPS-3D Built-in Functions1352566
+Node: picoChip Built-in Functions1357941
+Node: Other MIPS Built-in Functions1359307
+Node: PowerPC AltiVec/VSX Built-in Functions1359831
+Node: RX Built-in Functions1469881
+Node: SPARC VIS Built-in Functions1473891
+Node: SPU Built-in Functions1475570
+Node: Target Format Checks1477352
+Node: Solaris Format Checks1477759
+Node: Pragmas1478156
+Node: ARM Pragmas1478866
+Node: M32C Pragmas1479469
+Node: MeP Pragmas1480029
+Node: RS/6000 and PowerPC Pragmas1482098
+Node: Darwin Pragmas1482839
+Node: Solaris Pragmas1483906
+Node: Symbol-Renaming Pragmas1485067
+Node: Structure-Packing Pragmas1487701
+Node: Weak Pragmas1489353
+Node: Diagnostic Pragmas1490155
+Node: Visibility Pragmas1492791
+Node: Push/Pop Macro Pragmas1493543
+Node: Function Specific Option Pragmas1494516
+Node: Unnamed Fields1496731
+Node: Thread-Local1498241
+Node: C99 Thread-Local Edits1500348
+Node: C++98 Thread-Local Edits1502360
+Node: Binary constants1505805
+Node: C++ Extensions1506476
+Node: Volatiles1508124
+Node: Restricted Pointers1510800
+Node: Vague Linkage1512394
+Node: C++ Interface1516050
+Ref: C++ Interface-Footnote-11520347
+Node: Template Instantiation1520484
+Node: Bound member functions1527496
+Node: C++ Attributes1529039
+Node: Namespace Association1530697
+Node: Type Traits1532111
+Node: Java Exceptions1537658
+Node: Deprecated Features1539055
+Node: Backwards Compatibility1542020
+Node: Objective-C1543378
+Node: Executing code before main1543959
+Node: What you can and what you cannot do in +load1546565
+Node: Type encoding1548732
+Node: Garbage Collection1552119
+Node: Constant string objects1554743
+Node: compatibility_alias1557251
+Node: Compatibility1558129
+Node: Gcov1564696
+Node: Gcov Intro1565229
+Node: Invoking Gcov1567947
+Node: Gcov and Optimization1579810
+Node: Gcov Data Files1582465
+Node: Cross-profiling1583605
+Node: Trouble1585433
+Node: Actual Bugs1586918
+Node: Cross-Compiler Problems1587374
+Node: Interoperation1587788
+Node: Incompatibilities1594925
+Node: Fixed Headers1603076
+Node: Standard Libraries1604739
+Node: Disappointments1606111
+Node: C++ Misunderstandings1610469
+Node: Static Definitions1611280
+Node: Name lookup1612333
+Ref: Name lookup-Footnote-11617111
+Node: Temporaries1617298
+Node: Copy Assignment1619274
+Node: Non-bugs1621081
+Node: Warnings and Errors1631588
+Node: Bugs1633352
+Node: Bug Criteria1633916
+Node: Bug Reporting1636126
+Node: Service1636347
+Node: Contributing1637166
+Node: Funding1637906
+Node: GNU Project1640395
+Node: Copying1641041
+Node: GNU Free Documentation License1678569
+Node: Contributors1700975
+Node: Option Index1737659
+Node: Keyword Index1907838
 
 End Tag Table

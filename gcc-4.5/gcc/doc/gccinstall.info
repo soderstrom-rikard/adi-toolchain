@@ -1,9 +1,9 @@
 This is doc/gccinstall.info, produced by makeinfo version 4.12 from
-/space/rguenther/gcc-4.5.2/gcc-4.5.2/gcc/doc/install.texi.
+/space/rguenther/gcc-4.5.3/gcc-4.5.3/gcc/doc/install.texi.
 
 Copyright (C) 1988, 1989, 1992, 1993, 1994, 1995, 1996, 1997, 1998,
-1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008 Free
-Software Foundation, Inc.
+1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010,
+2011 Free Software Foundation, Inc.
 
    Permission is granted to copy, distribute and/or modify this document
 under the terms of the GNU Free Documentation License, Version 1.2 or
@@ -23,8 +23,8 @@ software.  Copies published by the Free Software Foundation raise
 funds for GNU development.
 
    Copyright (C) 1988, 1989, 1992, 1993, 1994, 1995, 1996, 1997, 1998,
-1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008 Free
-Software Foundation, Inc.
+1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010,
+2011 Free Software Foundation, Inc.
 
    Permission is granted to copy, distribute and/or modify this document
 under the terms of the GNU Free Documentation License, Version 1.2 or
@@ -2420,9 +2420,6 @@ makers.
 
         * Binaries for HP-UX 11.00 at Aachen University of Technology.
 
-   * Motorola 68HC11/68HC12--GNU Development Tools for the Motorola
-     68HC11/68HC12.
-
    * SCO OpenServer/Unixware.
 
    * Solaris 2 (SPARC, Intel)--Sunfreeware.
@@ -2716,13 +2713,7 @@ hppa*-hp-hpux10
 ===============
 
 For hpux10.20, we _highly_ recommend you pick up the latest sed patch
-`PHCO_19798' from HP.  HP has two sites which provide patches free of
-charge:
-
-   * `http://us.itrc.hp.com/service/home/home.do' US, Canada,
-     Asia-Pacific, and Latin-America.
-
-   * `http://europe.itrc.hp.com/service/home/home.do' Europe.
+`PHCO_19798' from HP.
 
    The C++ ABI has changed incompatibly in GCC 4.0.  COMDAT subspaces
 are used for one-only code and data.  This resolves many of the previous
@@ -4455,88 +4446,88 @@ Concept Index
 
 
 Tag Table:
-Node: Top1953
-Node: Installing GCC2511
-Node: Prerequisites4026
-Node: Downloading the source13688
-Node: Configuration15625
-Ref: with-gnu-as29767
-Ref: with-as30665
-Ref: with-gnu-ld32078
-Node: Building75553
-Node: Testing90864
-Node: Final install98644
-Node: Binaries103874
-Node: Specific105467
-Ref: alpha-x-x105973
-Ref: alpha-dec-osf106462
-Ref: arc-x-elf108763
-Ref: arm-x-elf108863
-Ref: avr109083
-Ref: bfin109725
-Ref: cris109967
-Ref: crx110783
-Ref: dos111446
-Ref: x-x-freebsd111769
-Ref: h8300-hms113582
-Ref: hppa-hp-hpux113934
-Ref: hppa-hp-hpux10116305
-Ref: hppa-hp-hpux11116938
-Ref: x-x-linux-gnu122597
-Ref: ix86-x-linux122790
-Ref: ix86-x-solaris289123103
-Ref: ix86-x-solaris210123949
-Ref: ia64-x-linux125179
-Ref: ia64-x-hpux125949
-Ref: x-ibm-aix126504
-Ref: iq2000-x-elf132763
-Ref: lm32-x-elf132903
-Ref: lm32-x-uclinux133007
-Ref: m32c-x-elf133135
-Ref: m32r-x-elf133237
-Ref: m6811-elf133339
-Ref: m6812-elf133489
-Ref: m68k-x-x133639
-Ref: m68k-x-uclinux134611
-Ref: mep-x-elf134974
-Ref: mips-x-x135084
-Ref: mips-sgi-irix5137761
-Ref: mips-sgi-irix6139027
-Ref: moxie-x-elf142358
-Ref: powerpc-x-x142478
-Ref: powerpc-x-darwin142683
-Ref: powerpc-x-elf143230
-Ref: powerpc-x-linux-gnu143315
-Ref: powerpc-x-netbsd143410
-Ref: powerpc-x-eabisim143498
-Ref: powerpc-x-eabi143624
-Ref: powerpcle-x-elf143700
-Ref: powerpcle-x-eabisim143792
-Ref: powerpcle-x-eabi143925
-Ref: rx-x-elf144008
-Ref: s390-x-linux144207
-Ref: s390x-x-linux144279
-Ref: s390x-ibm-tpf144366
-Ref: x-x-solaris2144497
-Ref: sparc-sun-solaris2148309
-Ref: sparc-sun-solaris27151035
-Ref: sparc-sun-solaris210153593
-Ref: sparc-x-linux153969
-Ref: sparc64-x-solaris2154194
-Ref: sparcv9-x-solaris2154836
-Ref: x-x-vxworks154923
-Ref: x86-64-x-x156445
-Ref: xtensa-x-elf156773
-Ref: xtensa-x-linux157444
-Ref: windows157785
-Ref: x-x-cygwin159742
-Ref: x-x-interix160295
-Ref: x-x-mingw32160661
-Ref: older160887
-Ref: elf163004
-Node: Old163262
-Node: Configurations166399
-Node: GNU Free Documentation License170381
-Node: Concept Index192797
+Node: Top1989
+Node: Installing GCC2547
+Node: Prerequisites4062
+Node: Downloading the source13724
+Node: Configuration15661
+Ref: with-gnu-as29803
+Ref: with-as30701
+Ref: with-gnu-ld32114
+Node: Building75589
+Node: Testing90900
+Node: Final install98680
+Node: Binaries103910
+Node: Specific105414
+Ref: alpha-x-x105920
+Ref: alpha-dec-osf106409
+Ref: arc-x-elf108710
+Ref: arm-x-elf108810
+Ref: avr109030
+Ref: bfin109672
+Ref: cris109914
+Ref: crx110730
+Ref: dos111393
+Ref: x-x-freebsd111716
+Ref: h8300-hms113529
+Ref: hppa-hp-hpux113881
+Ref: hppa-hp-hpux10116252
+Ref: hppa-hp-hpux11116665
+Ref: x-x-linux-gnu122324
+Ref: ix86-x-linux122517
+Ref: ix86-x-solaris289122830
+Ref: ix86-x-solaris210123676
+Ref: ia64-x-linux124906
+Ref: ia64-x-hpux125676
+Ref: x-ibm-aix126231
+Ref: iq2000-x-elf132490
+Ref: lm32-x-elf132630
+Ref: lm32-x-uclinux132734
+Ref: m32c-x-elf132862
+Ref: m32r-x-elf132964
+Ref: m6811-elf133066
+Ref: m6812-elf133216
+Ref: m68k-x-x133366
+Ref: m68k-x-uclinux134338
+Ref: mep-x-elf134701
+Ref: mips-x-x134811
+Ref: mips-sgi-irix5137488
+Ref: mips-sgi-irix6138754
+Ref: moxie-x-elf142085
+Ref: powerpc-x-x142205
+Ref: powerpc-x-darwin142410
+Ref: powerpc-x-elf142957
+Ref: powerpc-x-linux-gnu143042
+Ref: powerpc-x-netbsd143137
+Ref: powerpc-x-eabisim143225
+Ref: powerpc-x-eabi143351
+Ref: powerpcle-x-elf143427
+Ref: powerpcle-x-eabisim143519
+Ref: powerpcle-x-eabi143652
+Ref: rx-x-elf143735
+Ref: s390-x-linux143934
+Ref: s390x-x-linux144006
+Ref: s390x-ibm-tpf144093
+Ref: x-x-solaris2144224
+Ref: sparc-sun-solaris2148036
+Ref: sparc-sun-solaris27150762
+Ref: sparc-sun-solaris210153320
+Ref: sparc-x-linux153696
+Ref: sparc64-x-solaris2153921
+Ref: sparcv9-x-solaris2154563
+Ref: x-x-vxworks154650
+Ref: x86-64-x-x156172
+Ref: xtensa-x-elf156500
+Ref: xtensa-x-linux157171
+Ref: windows157512
+Ref: x-x-cygwin159469
+Ref: x-x-interix160022
+Ref: x-x-mingw32160388
+Ref: older160614
+Ref: elf162731
+Node: Old162989
+Node: Configurations166126
+Node: GNU Free Documentation License170108
+Node: Concept Index192524
 
 End Tag Table
