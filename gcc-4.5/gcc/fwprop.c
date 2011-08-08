@@ -1373,6 +1373,130 @@ forward_propagate_into (df_ref use)
     forward_propagate_subreg (use, def_insn, def_set);
 }
 
+/* Look at all definitions of REG that reach its use in INSN, and
+   determine whether it an extension of a subreg from NARROW_MODE
+   has the same value as the full reg.  If so, return ZERO_EXTEND
+   or SIGN_EXTEND as appropriate; UNKNOWN if we are not successful.  */
+static enum rtx_code
+find_extend_code (rtx insn, rtx reg, enum machine_mode narrow_mode)
+{
+  volatile df_ref use;
+  struct df_link *adef;
+  enum rtx_code known_code = UNKNOWN;
+  df_ref *use_rec;
+
+  for (use = NULL, use_rec = DF_INSN_USES (insn); *use_rec; use_rec++)
+    {
+      df_ref t = *use_rec;
+      if (rtx_equal_p (DF_REF_REG (t), reg))
+	{
+	  use = t;
+	  break;
+	}
+    }
+
+  for (adef = DF_REF_CHAIN (use); adef; adef = adef->next)
+    {
+      df_ref def = adef->ref;
+      rtx def_set, src;
+      enum rtx_code src_code;
+
+      if (DF_REF_IS_ARTIFICIAL (def))
+	return UNKNOWN;
+
+      def_set = single_set (DF_REF_INSN (def));
+      if (def_set == NULL_RTX)
+	return UNKNOWN;
+
+      src = SET_SRC (def_set);
+      src_code = GET_CODE (src);
+
+      if (!rtx_equal_p (SET_DEST (def_set), reg))
+	return UNKNOWN;
+
+      if (src_code == ASHIFTRT
+	  && GET_CODE (XEXP (src, 1)) == CONST_INT
+	  && INTVAL (XEXP (src, 1)) == GET_MODE_BITSIZE (narrow_mode))
+	src_code = SIGN_EXTEND;
+      else if (src_code == LSHIFTRT
+	       && GET_CODE (XEXP (src, 1)) == CONST_INT
+	       && INTVAL (XEXP (src, 1)) == GET_MODE_BITSIZE (narrow_mode))
+	src_code = ZERO_EXTEND;
+      else if ((src_code == SIGN_EXTEND || src_code == ZERO_EXTEND)
+	       && GET_MODE (XEXP (src, 0)) != narrow_mode)
+	return UNKNOWN;
+
+      if ((src_code != SIGN_EXTEND && src_code != ZERO_EXTEND)
+	  || (known_code != UNKNOWN && known_code != src_code))
+	return UNKNOWN;
+
+      known_code = src_code;
+    }
+  return known_code;
+}
+
+/* Try to find opportunities to convert normal multiplication to a widening
+   versions.  */
+static void
+optimize_widening_multiply (void)
+{
+  rtx insn;
+
+  for (insn = get_insns (); insn; insn = NEXT_INSN (insn))
+    {
+      enum machine_mode mode, narrow_mode;
+      enum rtx_code op0_code, op1_code;
+      rtx set, src, op0, op1;
+
+      if (NOTE_P (insn) || BARRIER_P (insn) || LABEL_P (insn))
+	continue;
+
+      set = single_set (insn);
+      if (set == NULL_RTX)
+	continue;
+
+      src = SET_SRC (set);
+      if (GET_CODE (src) != MULT)
+	continue;
+
+      mode = GET_MODE (SET_DEST (set));
+      if (GET_MODE_SIZE (mode) <= 1
+	  || exact_log2 (GET_MODE_SIZE (mode)) < 0
+	  || GET_MODE_CLASS (mode) != MODE_INT)
+	continue;
+      narrow_mode = mode_for_size (GET_MODE_BITSIZE (mode) / 2, MODE_INT, 1);
+
+      op0 = XEXP (src, 0);
+      op1 = XEXP (src, 1);
+      if (!REG_P (op0) || !REG_P (op1)
+	  || HARD_REGISTER_P (op0) || HARD_REGISTER_P (op1))
+	continue;
+
+      op0_code = find_extend_code (insn, XEXP (src, 0), narrow_mode);
+      op1_code = find_extend_code (insn, XEXP (src, 1), narrow_mode);
+      if (op0_code == UNKNOWN || op1_code == UNKNOWN)
+	continue;
+
+      /* For mixed signed * unsigned multiplications, the canonical form has
+	 the unsigned operand first.  */
+      if (op0_code != op1_code && op0_code == SIGN_EXTEND)
+	{
+	  rtx t = op0;
+	  op0 = op1;
+	  op1 = t;
+	  op0_code = ZERO_EXTEND;
+	  op1_code = SIGN_EXTEND;
+	}
+      op0 = gen_lowpart (narrow_mode, op0);
+      op1 = gen_lowpart (narrow_mode, op1);
+      validate_change (insn, &XEXP (src, 0),
+		       gen_rtx_fmt_e (op0_code, mode, op0), 1);
+      validate_change (insn, &XEXP (src, 1),
+		       gen_rtx_fmt_e (op1_code, mode, op1), 1);
+      apply_change_group ();
+    }
+}
+
 
 static void
 fwprop_init (void)
@@ -1386,6 +1510,7 @@ fwprop_init (void)
      insns (sadly) if we are not working in cfglayout mode.  */
   loop_optimizer_init (0);
 
+  df_chain_add_problem (DF_UD_CHAIN);
   build_single_def_use_links ();
   df_set_flags (DF_DEFER_INSN_RESCAN);
 }
@@ -1438,6 +1563,8 @@ fwprop (void)
 	    || loop_outer (DF_REF_BB (use)->loop_father) == NULL)
 	  forward_propagate_into (use);
     }
+
+  optimize_widening_multiply ();
 
   fwprop_done ();
   return 0;

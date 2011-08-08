@@ -1,4 +1,10 @@
-2011-08-16  Stuart Henderson  <Stuart.Henderson@analog.com>
+2011-08-08  Stuart Henderson  <Stuart.Henderson@analog.com>
+
+	* fwprop.c (find_extend_code, optimize_widening_multiply): New
+	functions.
+	(fwprop): Call optimize_widening_multiply.
+
+2011-08-08  Stuart Henderson  <Stuart.Henderson@analog.com>
 
 	* config/bfin/bfin.opt : add -mlinux option.
 	* config/bfin/linux.h : use -mlinux option.

@@ -1,3 +1,8 @@
+2011-08-08  Stuart Henderson  <stuart.henderson@analog.com>
+
+	* gcc.target/bfin/wmul-1.c: New test.
+	* gcc.target/bfin/wmul-2.c: New test.
+
 2011-06-17  Stuart Henderson  <stuart.henderson@analog.com>
 
 	Merge from 4.3
