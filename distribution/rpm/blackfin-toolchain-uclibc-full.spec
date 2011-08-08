@@ -2,13 +2,13 @@
 %define bfin_targ_strip %{prefix}/bfin-elf/bin/bfin-elf-strip
 %define EXEEXT %{nil}
 %define x_support 0
-%define extra_buildtoolchain_opts -a UCLIBC_HAS_IPV6=y -a UCLIBC_HAS_WCHAR=y
+%define extra_buildtoolchain_opts -a UCLIBC_HAS_IPV6=y -a UCLIBC_HAS_WCHAR=y -a UCLIBC_HAS_FTW=y
 
-%define optional_gcc 0
+%define optional_gcc 1
 %define gcc_main_ver 4.3
 %define gcc_main_fullver %{gcc_main_ver}.5
 %define gcc_addon_ver 4.5
-%define gcc_addon_fullver %{gcc_addon_ver}.2
+%define gcc_addon_fullver %{gcc_addon_ver}.3
 
 Name:         blackfin-toolchain-uclibc-full
 URL:          http://blackfin.uclinux.org
@@ -70,7 +70,7 @@ echo Building in $RPM_BUILD_ROOT
 	-K `pwd`/kbuild_output \
 	%{gcc_build_opts} \
 	-o %{prefix}/bfin \
-	-S u-boot -S ldr -S jtag -X
+	-S u-boot -S ldr -S jtag -S qemu -S gdbproxy -X
 
 %install
 echo Installing in $RPM_BUILD_ROOT
