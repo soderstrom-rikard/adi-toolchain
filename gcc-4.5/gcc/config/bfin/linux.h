@@ -23,7 +23,7 @@ see the files COPYING3 and COPYING.RUNTIME respectively.  If not, see
 
 #undef SUBTARGET_DRIVER_SELF_SPECS
 #define SUBTARGET_DRIVER_SELF_SPECS \
-  "%{!mno-fdpic:-mfdpic} -micplb",
+  "%{!mno-fdpic:-mfdpic} -micplb -mlinux",
 
 #undef TARGET_OS_CPP_BUILTINS
 #define TARGET_OS_CPP_BUILTINS() LINUX_TARGET_OS_CPP_BUILTINS()

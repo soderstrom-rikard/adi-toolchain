@@ -4405,4 +4405,30 @@
   [(set_attr "seq_insns" "multi")
    (set_attr "length" "12")])
 
+; Flush the data cache then invalidate the instruction cache, so
+; that trampolines on the stack can be executed. Use the cacheflush
+; syscall on Linux targets, and the __clear_cache_range() function
+; on bare-metal targets.
+
+(define_expand "clear_cache"
+  [(match_operand 0 "register_operand")
+   (match_operand 1 "register_operand")]
+   ""
+   "
+{
+  if (TARGET_LINUX) {
+    rtx r_len = gen_reg_rtx (Pmode);
+    rtx r_start = force_reg (Pmode, operands[0]);
+    rtx r_end = force_reg (Pmode, operands[1]);
+    emit_insn (gen_sub3_insn (r_len, r_end, r_start));
+    emit_library_call (gen_rtx_SYMBOL_REF (Pmode, \"cacheflush\"),
+               0, VOIDmode, 3, r_start, Pmode, r_len, SImode,
+               GEN_INT(3), SImode);
+  } else {
+    emit_library_call (gen_rtx_SYMBOL_REF (Pmode, \"__clear_cache_range\"),
+               0, VOIDmode, 2, operands[0], Pmode, operands[1], Pmode);
+  }
+  DONE;
+}")
+
 (include "sync.md")

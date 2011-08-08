@@ -2182,6 +2182,8 @@ bfin_trampoline_init (rtx m_tramp, tree fndecl, rtx chain_value)
   rtx t2 = copy_to_reg (chain_value);
   rtx mem;
   int i = 0;
+  rtx addr = force_reg (Pmode, XEXP (m_tramp, 0));
+  rtx end_addr = gen_reg_rtx (Pmode);
 
   emit_block_move (m_tramp, assemble_trampoline_template (),
 		   GEN_INT (TRAMPOLINE_SIZE), BLOCK_OP_NORMAL);
@@ -2205,6 +2207,9 @@ bfin_trampoline_init (rtx m_tramp, tree fndecl, rtx chain_value)
   emit_insn (gen_ashrsi3 (t2, t2, GEN_INT (16)));
   mem = adjust_address (m_tramp, HImode, i + 14);
   emit_move_insn (mem, gen_lowpart (HImode, t2));
+
+  emit_insn (gen_add3_insn (end_addr, addr, GEN_INT (TRAMPOLINE_SIZE)));
+  emit_insn (gen_clear_cache (addr, end_addr));
 }
 
 /* Emit insns to move operands[1] into operands[0].  */

@@ -484,7 +484,7 @@ Objective-C and Objective-C++ Dialects}.
 -mleaf-id-shared-library  -mno-leaf-id-shared-library @gol
 -msep-data  -mno-sep-data  -mlong-calls  -mno-long-calls @gol
 -mfast-fp -minline-plt -mmulticore  -mcorea  -mcoreb  -msdram @gol
--micplb @gol
+-micplb -mlinux @gol
 -elf2flt -no-elf2flt -static-libc}
 
 @emph{CRIS Options}
@@ -10277,6 +10277,13 @@ into SDRAM. This option defines @code{__BFIN_SDRAM}.
 Assume that ICPLBs are enabled at runtime.  This has an effect on certain
 anomaly workarounds.  For Linux targets, the default is to assume ICPLBs
 are enabled; for standalone applications the default is off.
+
+@item -mlinux
+@opindex mlinux
+Build application for a Linux target. When generating stack-based
+trampolines, use syscalls to flush the instruction and data caches.
+When this option is not specified, cache flushing is done by calling
+a library function that will flush caches directly.
 
 @item -elf2flt
 @opindex elf2flt

@@ -1,3 +1,14 @@
+2011-08-16  Stuart Henderson  <Stuart.Henderson@analog.com>
+
+	* config/bfin/bfin.opt : add -mlinux option.
+	* config/bfin/linux.h : use -mlinux option.
+	* config/bfin/uclinux.h : use -mlinux option.
+	* config/bfin/bfin.c (bfin_trampoline_init) : generate
+	clear_cache insn with calculated start and end addr of trampoline
+	* config/bfin/bfin.md : Add a clear_cache pattern
+	* doc/invoke.texi: Document -mlinux option.
+
+
 2011-07-27  Stuart Henderson  <stuart.henderson@analog.com>
 
 	Merge from 4.3

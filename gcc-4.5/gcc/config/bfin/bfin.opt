@@ -99,3 +99,7 @@ Build for SDRAM
 micplb
 Target Report Mask(ICPLB)
 Assume ICPLBs are enabled at runtime.
+
+mlinux
+Target Report Mask(LINUX)
+Use system calls for cache-related operations
