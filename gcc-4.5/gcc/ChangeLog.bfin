@@ -1,3 +1,8 @@
+2011-08-11  Stuart Henderson  <Stuart.Henderson@analog.com>
+
+	* config/bfin/bfin.c (bfin_expand_builtin): Fix typo in
+	BFIN_BUILTIN_LSHIFT_1X16.
+
 2011-08-08  Stuart Henderson  <Stuart.Henderson@analog.com>
 
 	* fwprop.c (find_extend_code, optimize_widening_multiply): New

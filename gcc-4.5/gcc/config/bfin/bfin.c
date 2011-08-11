@@ -7270,7 +7270,7 @@ bfin_expand_builtin (tree exp, rtx target ATTRIBUTE_UNUSED,
 		   : CODE_FOR_lshiftrtv2hi3);
 	}
       else
-	icode = (fcode == BFIN_BUILTIN_LSHIFTRT_1X16 ? CODE_FOR_ashifthi3_imm
+	icode = (fcode == BFIN_BUILTIN_LSHIFT_1X16 ? CODE_FOR_ashifthi3_imm
 		 : CODE_FOR_ashiftv2hi3_imm);
 
       return bfin_expand_binop_builtin_1 (icode, op0, op1, target, -1);
