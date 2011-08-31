@@ -27,7 +27,7 @@ uint32_t bfin_atomic_xchg32(uint32_t *__bfin_ptr, uint32_t __bfin_newval)
 	__asm__ __volatile__(
 		"CALL (%[__bfin_func])"
 		: "=q0" (__bfin_ret), "=m" (*__bfin_ptr)
-		: [__bfin_func] "a" (ATOMIC_XCHG32), "q1" (__bfin_newval),
+		: [__bfin_func] "a" (__PHY_RAM_BASE_ADDRESS__ + ATOMIC_XCHG32), "q1" (__bfin_newval),
 		  "qA" (__bfin_ptr), "m" (*__bfin_ptr)
 		: "RETS", "memory"
 	);
@@ -46,7 +46,7 @@ uint32_t bfin_atomic_cas32(uint32_t *__bfin_ptr, uint32_t __bfin_exp, uint32_t _
 	__asm__ __volatile__(
 		"CALL (%[__bfin_func])"
 		: "=q0" (__bfin_ret), "=m" (*__bfin_ptr)
-		: [__bfin_func] "a" (ATOMIC_CAS32), "q1" (__bfin_exp), "q2" (__bfin_newval),
+		: [__bfin_func] "a" (__PHY_RAM_BASE_ADDRESS__ + ATOMIC_CAS32), "q1" (__bfin_exp), "q2" (__bfin_newval),
 		  "qA" (__bfin_ptr), "m" (*__bfin_ptr)
 		: "RETS", "memory"
 	);
@@ -65,7 +65,7 @@ uint32_t bfin_atomic_add32(uint32_t *__bfin_ptr, uint32_t __bfin_inc)
 	__asm__ __volatile__(
 		"CALL (%[__bfin_func])"
 		: "=q0" (__bfin_ret), "=m" (*__bfin_ptr)
-		: [__bfin_func] "a" (ATOMIC_ADD32), "q0" (__bfin_inc),
+		: [__bfin_func] "a" (__PHY_RAM_BASE_ADDRESS__ + ATOMIC_ADD32), "q0" (__bfin_inc),
 		  "qA" (__bfin_ptr), "m" (*__bfin_ptr)
 		: "R1", "RETS", "memory"
 	);
@@ -85,7 +85,7 @@ uint32_t bfin_atomic_sub32(uint32_t *__bfin_ptr, uint32_t __bfin_dec)
 	__asm__ __volatile__(
 		"CALL (%[__bfin_func])"
 		: "=q0" (__bfin_ret), "=m" (*__bfin_ptr)
-		: [__bfin_func] "a" (ATOMIC_SUB32), "q0" (__bfin_dec),
+		: [__bfin_func] "a" (__PHY_RAM_BASE_ADDRESS__ + ATOMIC_SUB32), "q0" (__bfin_dec),
 		  "qA" (__bfin_ptr), "m" (*__bfin_ptr)
 		: "R1", "RETS", "memory"
 	);
@@ -105,7 +105,7 @@ uint32_t bfin_atomic_ior32(uint32_t *__bfin_ptr, uint32_t __bfin_ior)
 	__asm__ __volatile__(
 		"CALL (%[__bfin_func])"
 		: "=q0" (__bfin_ret), "=m" (*__bfin_ptr)
-		: [__bfin_func] "a" (ATOMIC_IOR32), "q0" (__bfin_ior),
+		: [__bfin_func] "a" (__PHY_RAM_BASE_ADDRESS__ + ATOMIC_IOR32), "q0" (__bfin_ior),
 		  "qA" (__bfin_ptr), "m" (*__bfin_ptr)
 		: "R1", "RETS", "memory"
 	);
@@ -124,7 +124,7 @@ uint32_t bfin_atomic_and32(uint32_t *__bfin_ptr, uint32_t __bfin_and)
 	__asm__ __volatile__(
 		"CALL (%[__bfin_func])"
 		: "=q0" (__bfin_ret), "=m" (*__bfin_ptr)
-		: [__bfin_func] "a" (ATOMIC_AND32), "q0" (__bfin_and),
+		: [__bfin_func] "a" (__PHY_RAM_BASE_ADDRESS__ + ATOMIC_AND32), "q0" (__bfin_and),
 		  "qA" (__bfin_ptr), "m" (*__bfin_ptr)
 		: "R1", "RETS", "memory"
 	);
@@ -143,7 +143,7 @@ uint32_t bfin_atomic_xor32(uint32_t *__bfin_ptr, uint32_t __bfin_xor)
 	__asm__ __volatile__(
 		"CALL (%[__bfin_func])"
 		: "=q0" (__bfin_ret), "=m" (*__bfin_ptr)
-		: [__bfin_func] "a" (ATOMIC_XOR32), "q0" (__bfin_xor),
+		: [__bfin_func] "a" (__PHY_RAM_BASE_ADDRESS__ + ATOMIC_XOR32), "q0" (__bfin_xor),
 		  "qA" (__bfin_ptr), "m" (*__bfin_ptr)
 		: "R1", "RETS", "memory"
 	);

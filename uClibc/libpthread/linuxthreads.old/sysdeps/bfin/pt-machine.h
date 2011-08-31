@@ -44,7 +44,7 @@ testandset (int *spinlock)
     __asm__ __volatile__ (
 		"CALL (%4);"
 		: "=q0" (res), "=m" (*spinlock)
-		: "qA" (spinlock), "m" (*spinlock), "a" (ATOMIC_XCHG32), "q1" (1)
+		: "qA" (spinlock), "m" (*spinlock), "a" (__PHY_RAM_BASE_ADDRESS__ + ATOMIC_XCHG32), "q1" (1)
 		: "RETS", "cc", "memory");
 
     return res;
@@ -61,7 +61,7 @@ __compare_and_swap (long int *p, long int oldval, long int newval)
 		: "qA" (p),
 		  "q1" (oldval),
 		  "q2" (newval),
-		  "a" (ATOMIC_CAS32),
+		  "a" (__PHY_RAM_BASE_ADDRESS__ + ATOMIC_CAS32),
 		  "m" (*p)
 		: "RETS", "memory", "cc");
     return readval == oldval;
