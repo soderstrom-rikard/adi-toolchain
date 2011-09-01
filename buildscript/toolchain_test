@@ -47,7 +47,6 @@ fi
 HOST_IP=`/sbin/ifconfig | grep "10\.99" | awk 'BEGIN { FS="[ :]" } {print $13}'`
 HOST_CONFIG=SUSE
 
-
 #############  Do Not Edit Below This Line  ########## 
 
 if [ ! -d $CHECKOUT ] ; then
@@ -144,8 +143,8 @@ EOF
 # ./BuildToolChain  -j 1 -w -s $CHECKOUT/toolchain -b $USER/temp -K $CHECKOUT/toolchain/kbuild_output  -u $CHECKOUT/u-boot -c $TOOLCHAIN_VERSION  -D
 
 # For trunk testing, use -k $CHECKOUT/uclinux-dist/linux-2.6.x.
-  ./BuildToolChain  -j 1 -w -s $CHECKOUT/toolchain -b $USER/temp -k $CHECKOUT/uclinux-dist/linux-2.6.x  -u $CHECKOUT/u-boot -c $TOOLCHAIN_VERSION -D \ 
-  -a UCLIBC_HAS_IPV6=y  -a UCLIBC_HAS_WCHAR=y
+  ./BuildToolChain  -j 1 -w -s $CHECKOUT/toolchain -b $USER/temp -k $CHECKOUT/uclinux-dist/linux-2.6.x  -u $CHECKOUT/u-boot -c $TOOLCHAIN_VERSION -D \
+  -a UCLIBC_HAS_IPV6=y  -a UCLIBC_HAS_WCHAR=y 
 
   if [ $? != 0 ] ; then
   echo -e "\nFailed to build the toolchain in toolchain-$TIMESTAMP . exit!\n"     
