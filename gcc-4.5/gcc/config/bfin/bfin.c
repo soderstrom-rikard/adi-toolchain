@@ -5678,7 +5678,8 @@ trapping_loads_p (rtx insn, int np_reg, bool after_np_branch)
 {
   rtx mem = SET_SRC (single_set (insn));
 
-  if (!after_np_branch)
+  if (!after_np_branch || bfin_cpu_type == BFIN_CPU_BF504
+      || bfin_cpu_type == BFIN_CPU_BF506 || bfin_cpu_type == BFIN_CPU_BF592)
     np_reg = -1;
   return ((np_reg == -1 || !harmless_null_pointer_p (mem, np_reg))
 	  && may_trap_p (mem));
