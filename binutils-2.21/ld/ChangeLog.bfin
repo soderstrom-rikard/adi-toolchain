@@ -1,0 +1,8 @@
+2011-09-05  Stuart Henderson  <stuart.henderson@analog.com>
+
+	Merge from 2.17:
+	2006-08-18  Jie Zhang  <jie.zhang@analog.com>
+	* ldmain.c (main): Initialize link_info.sep_code.
+	* lexsup.c (enum option_values): Add OPTION_SEP_CODE.
+	(ld_options): Add --sep-code.
+	(parse_args): Deal with --sep-code.

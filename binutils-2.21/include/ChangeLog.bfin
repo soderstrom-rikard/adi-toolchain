@@ -1,0 +1,5 @@
+2011-09-05  Stuart Henderson  <stuart.henderson@analog.com>
+
+	Merge from 2.17:
+	2006-08-18  Jie Zhang  <jie.zhang@analog.com>
+	* bfdlink.h (struct bfd_link_info): Add sep_code.

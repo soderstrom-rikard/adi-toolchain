@@ -1,0 +1,5 @@
+2011-09-05  Stuart Henderson  <stuart.henderson@analog.com>
+
+	Merge from 2.17:
+	* elf.c (_bfd_elf_map_sections_to_segments): Not put executable sections
+	into the same segment with other readonly sections if --sep-code.
