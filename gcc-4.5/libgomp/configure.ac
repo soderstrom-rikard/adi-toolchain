@@ -193,7 +193,7 @@ AC_CHECK_FUNCS(getloadavg clock_gettime strtoull)
 # Check for broken semaphore implementation on darwin.
 # sem_init returns: sem_init error: Function not implemented.
 case "$host" in
-  *-darwin*)
+  *-darwin*|bfin-*)
     AC_DEFINE(HAVE_BROKEN_POSIX_SEMAPHORES, 1,
 	Define if the POSIX Semaphores do not work on your system.)
     ;;

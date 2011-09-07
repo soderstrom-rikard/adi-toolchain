@@ -1,0 +1,5 @@
+2011-09-07  Stuart Henderson  <Stuart.Henderson@analog.com>
+
+	* configure.ac (HAVE_BROKEN_POSIX_SEMAPHORES): Enable for bfin.
+	* configure: Regenerate.
+

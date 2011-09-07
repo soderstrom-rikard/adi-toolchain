@@ -15043,7 +15043,7 @@ done
 # Check for broken semaphore implementation on darwin.
 # sem_init returns: sem_init error: Function not implemented.
 case "$host" in
-  *-darwin*)
+  *-darwin*|bfin-*)
 
 $as_echo "#define HAVE_BROKEN_POSIX_SEMAPHORES 1" >>confdefs.h
 
