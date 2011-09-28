@@ -593,28 +593,23 @@ build_zlib()
 	fi
 
 	PN="zlib"
-	_S=$DIR_SOURCE/gcc-${PRIMARY_GCC_VER}
-	S="${_S}"/zlib
+	S=$DIR_SOURCE/gcc-${GCC_VERSIONS_DEFAULT}/zlib
 	WORKDIR=$DIR_BUILD/${PN}_build
 
 	PV=$(echo ZLIB_VERSION | gcc -include "${S}"/zlib.h -E - | tail -n 1)
-	PV="`eval echo ${PV}` from gcc-${PRIMARY_GCC_VER}"
+	PV="`eval echo ${PV}` from gcc-${GCC_VERSIONS_DEFAULT}"
 
 	echo_date "${CHOST}: ${PN}: configuring (${PV})"
 	change_clean_dir "${WORKDIR}"
-	run_cmd rm -f "${_S}"/gmp "${_S}"/mpfr
-	run_cmd ln -s ../gmp "${_S}"/gmp
-	run_cmd ln -s ../mpfr "${_S}"/mpfr
-	run_cmd "${_S}"/configure $BUILD_TARGET $HOST_TARGET
+	run_cmd "${S}"/configure $BUILD_TARGET $HOST_TARGET --prefix=/usr
 
 	echo_date "${CHOST}: ${PN}: building"
-	run_cmd $MAKE all-zlib
+	run_cmd $MAKE all
 
 	echo_date "${CHOST}: ${PN}: installing"
-	run_cmd cp zlib/libz.a "${STAGEDIR}"/usr/lib/
+	run_cmd $MAKE install DESTDIR="${STAGEDIR}"
 	run_cmd cp "${S}"/zlib.h "${S}"/zconf.h "${STAGEDIR}"/usr/include/
 
-	run_cmd rm -f "${_S}"/gmp "${_S}"/mpfr
 	clean_build_dir "${WORKDIR}"
 }
 
