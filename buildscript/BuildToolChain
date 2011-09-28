@@ -52,7 +52,7 @@ CHOST=  # the system the final compiler will run on
 
 # All the packages we build up
 PKGS_DEFAULT="bfin-elf bfin-uclinux bfin-linux-uclibc qemu u-boot ldr-utils urjtag gdbproxy target-libs"
-PKGS_ALL="${PKGS_DEFAULT} expat libusb libftdi"
+PKGS_ALL="${PKGS_DEFAULT} expat readline libusb libftdi"
 PKGS_ALIASES="
 	bfin-elf:elf
 	bfin-uclinux:uclinux:flat
@@ -466,7 +466,7 @@ if pkgs_queued gdbproxy ; then
 	check_src_pkg gdbproxy
 fi
 if pkgs_queued urjtag ; then
-	pkgs_queue libusb libftdi
+	pkgs_queue readline libusb libftdi
 	check_src_pkg urjtag
 else
 	pkgs_unqueue gdbproxy
@@ -476,6 +476,7 @@ if pkgs_queued libftdi ; then
 	check_src_pkg libftdi-1.0 LIBFTDI
 fi
 pkgs_queued libusb && check_src_pkg libusb
+pkgs_queued readline && check_src_pkg readline
 
 : ${DIR_uC_OUTPUT:=${DIR_BUILD}/bfin-uclinux}
 DIR_uC_SYSROOT=${DIR_uC_OUTPUT}/bfin-uclinux/runtime
@@ -550,6 +551,37 @@ build_curses()
 	echo_date "${CHOST}: ${PN}: installing"
 	run_cmd cp *curses.a "${STAGEDIR}"/usr/lib/libcurses.a
 	run_cmd cp "${S}"/curses.h "${STAGEDIR}"/usr/include/
+
+	clean_build_dir "${WORKDIR}"
+}
+
+build_readline()
+{
+	pkgs_queued readline || return 0
+
+	# help out mingw targets; some packages (like urjtag) like readline
+	if [ "${CBUILD}" = "${CHOST}" ] || check_lib readline ${CHOST} 2>/dev/null ; then
+		return 0
+	fi
+
+	PN="readline"
+	S="$DIR_READLINE_SOURCE"
+	WORKDIR=$DIR_BUILD/${PN}_build
+
+	[ -d "${S}" ] || return 0
+
+	PV=`"${S}"/configure --version | head -n1 | awk '{print $NF}'`
+
+	echo_date "${CHOST}: ${PN}: configuring (${PV})"
+	change_clean_dir "${WORKDIR}"
+	run_cmd "${S}"/configure $BUILD_TARGET $HOST_TARGET \
+		--target=${target} --disable-shared --prefix=/usr
+
+	echo_date "${CHOST}: ${PN}: building"
+	run_cmd $MAKE
+
+	echo_date "${CHOST}: ${PN}: installing"
+	run_cmd $MAKE install-static DESTDIR="${STAGEDIR}"
 
 	clean_build_dir "${WORKDIR}"
 }
@@ -885,12 +917,6 @@ build_binutils()
 		change_dir "$DIR_GDB_BUILD"
 		echo_date "${target}: gdb: installing"
 		run_cmd $MAKE install-sim install-gdb
-	fi
-
-	if [ "${CBUILD}" != "${CHOST}" ] && ! check_lib readline ${CHOST} 2>/dev/null ; then
-		echo_date "${CHOST}: readline: installing"
-		# cache native readline for other packages (like urjtag)
-		run_cmd $MAKE -C readline install-static DESTDIR=${STAGEDIR} prefix=/usr
 	fi
 
 	# need to leave build dir behind for elf2flt
@@ -1554,6 +1580,7 @@ if [ "${CBUILD}" != "${CHOST}" ] ; then
 	done
 fi
 build_curses
+build_readline
 build_expat
 build_zlib
 
