@@ -575,13 +575,13 @@ build_readline()
 	echo_date "${CHOST}: ${PN}: configuring (${PV})"
 	change_clean_dir "${WORKDIR}"
 	run_cmd "${S}"/configure $BUILD_TARGET $HOST_TARGET \
-		--target=${target} --disable-shared --prefix=/usr
+		--disable-shared --prefix=/usr
 
 	echo_date "${CHOST}: ${PN}: building"
 	run_cmd $MAKE
 
 	echo_date "${CHOST}: ${PN}: installing"
-	run_cmd $MAKE install-static DESTDIR="${STAGEDIR}"
+	run_cmd $MAKE install DESTDIR="${STAGEDIR}"
 
 	clean_build_dir "${WORKDIR}"
 }
