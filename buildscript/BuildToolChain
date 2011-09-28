@@ -322,7 +322,9 @@ fi
 export MAKEFLAGS="-j$NUM_JOBS $MAKEFLAGS"
 notice "Utilizing make" "$MAKE $MAKEFLAGS"
 
-scrub_path
+if pkgs_queued_any elf flat fdpic target-libs ; then
+	scrub_path
+fi
 
 ############ FIND SOME DEFAULT PATHS ############################
 # Support the "normal" layout (what we document in examples):
