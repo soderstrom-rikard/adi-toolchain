@@ -543,12 +543,12 @@ build_curses()
 
 	PV=$(awk '{v=$NF} END{print v}' "${S}"/version.mif)
 
-	echo_date "${CHOST}: ${PN}: building (${PV})"
+	echo_date "${PN}: building (${PV})"
 	change_clean_dir "${WORKDIR}"
 	run_cmd $MAKE -f "${S}"/win32/gccwin32.mak PDCURSES_SRCDIR="${S}" \
 		CC=${CHOST}-gcc LIBEXE=${CHOST}-ar libs
 
-	echo_date "${CHOST}: ${PN}: installing"
+	echo_date "${PN}: installing"
 	run_cmd cp *curses.a "${STAGEDIR}"/usr/lib/libcurses.a
 	run_cmd cp "${S}"/curses.h "${STAGEDIR}"/usr/include/
 
@@ -572,15 +572,15 @@ build_readline()
 
 	PV=`"${S}"/configure --version | head -n1 | awk '{print $NF}'`
 
-	echo_date "${CHOST}: ${PN}: configuring (${PV})"
+	echo_date "${PN}: configuring (${PV})"
 	change_clean_dir "${WORKDIR}"
 	run_cmd "${S}"/configure $BUILD_TARGET $HOST_TARGET \
 		--disable-shared --prefix=/usr
 
-	echo_date "${CHOST}: ${PN}: building"
+	echo_date "${PN}: building"
 	run_cmd $MAKE
 
-	echo_date "${CHOST}: ${PN}: installing"
+	echo_date "${PN}: installing"
 	run_cmd $MAKE install DESTDIR="${STAGEDIR}"
 
 	clean_build_dir "${WORKDIR}"
@@ -603,15 +603,15 @@ build_expat()
 
 	PV=$("${S}"/conftools/get-version.sh "${S}"/lib/expat.h)
 
-	echo_date "${CHOST}: ${PN}: configuring (${PV})"
+	echo_date "${PN}: configuring (${PV})"
 	change_clean_dir "${WORKDIR}"
 	run_cmd "${S}"/configure $BUILD_TARGET $HOST_TARGET \
 		--target=${target} --disable-shared --prefix=/usr
 
-	echo_date "${CHOST}: ${PN}: building"
+	echo_date "${PN}: building"
 	run_cmd $MAKE buildlib
 
-	echo_date "${CHOST}: ${PN}: installing"
+	echo_date "${PN}: installing"
 	run_cmd $MAKE installlib DESTDIR="${STAGEDIR}"
 
 	clean_build_dir "${WORKDIR}"
@@ -631,14 +631,14 @@ build_zlib()
 	PV=$(echo ZLIB_VERSION | gcc -include "${S}"/zlib.h -E - | tail -n 1)
 	PV="`eval echo ${PV}` from gcc-${GCC_VERSIONS_DEFAULT}"
 
-	echo_date "${CHOST}: ${PN}: configuring (${PV})"
+	echo_date "${PN}: configuring (${PV})"
 	change_clean_dir "${WORKDIR}"
 	run_cmd "${S}"/configure $BUILD_TARGET $HOST_TARGET --prefix=/usr
 
-	echo_date "${CHOST}: ${PN}: building"
+	echo_date "${PN}: building"
 	run_cmd $MAKE all
 
-	echo_date "${CHOST}: ${PN}: installing"
+	echo_date "${PN}: installing"
 	run_cmd $MAKE install DESTDIR="${STAGEDIR}"
 	run_cmd cp "${S}"/zlib.h "${S}"/zconf.h "${STAGEDIR}"/usr/include/
 
