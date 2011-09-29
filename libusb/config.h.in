@@ -18,6 +18,9 @@
 /* Define to 1 if you have the <memory.h> header file. */
 #undef HAVE_MEMORY_H
 
+/* Define to 1 if you have the <poll.h> header file. */
+#undef HAVE_POLL_H
+
 /* Define to 1 if you have the <stdint.h> header file. */
 #undef HAVE_STDINT_H
 
@@ -82,10 +85,13 @@
 /* Define to the version of this package. */
 #undef PACKAGE_VERSION
 
+/* type of second poll() argument */
+#undef POLL_NFDS_TYPE
+
 /* Define to 1 if you have the ANSI C header files. */
 #undef STDC_HEADERS
 
-/* Use Posix Threads */
+/* Use POSIX Threads */
 #undef THREADS_POSIX
 
 /* timerfd headers available */
