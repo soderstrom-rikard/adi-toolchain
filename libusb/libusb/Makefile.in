@@ -35,17 +35,17 @@ PRE_UNINSTALL = :
 POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
-@OS_WINDOWS_TRUE@@THREADS_POSIX_FALSE@am__append_1 = os/threads_windows.c
 subdir = libusb
 DIST_COMMON = $(hdr_HEADERS) $(srcdir)/Makefile.am \
-	$(srcdir)/Makefile.in $(srcdir)/libusb-1.0.rc.in
+	$(srcdir)/Makefile.in
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
-am__aclocal_m4_deps = $(top_srcdir)/configure.ac
+am__aclocal_m4_deps = $(top_srcdir)/libusb/version.h \
+	$(top_srcdir)/configure.ac
 am__configure_deps = $(am__aclocal_m4_deps) $(CONFIGURE_DEPENDENCIES) \
 	$(ACLOCAL_M4)
 mkinstalldirs = $(install_sh) -d
 CONFIG_HEADER = $(top_builddir)/config.h
-CONFIG_CLEAN_FILES = libusb-1.0.rc
+CONFIG_CLEAN_FILES =
 CONFIG_CLEAN_VPATH_FILES =
 am__vpath_adj_setup = srcdirstrip=`echo "$(srcdir)" | sed 's|.|.|g'`;
 am__vpath_adj = case $$p in \
@@ -72,24 +72,23 @@ am__installdirs = "$(DESTDIR)$(libdir)" "$(DESTDIR)$(hdrdir)"
 LTLIBRARIES = $(lib_LTLIBRARIES)
 libusb_1_0_la_LIBADD =
 am__libusb_1_0_la_SOURCES_DIST = libusbi.h core.c descriptor.c io.c \
-	sync.c os/darwin_usb.c os/threads_windows.c os/linux_usbfs.c \
-	os/poll_windows.c os/windows_usb.c libusb-1.0.rc \
-	os/linux_usbfs.h os/darwin_usb.h os/windows_usb.h \
-	os/threads_posix.h os/threads_windows.h os/poll_posix.h \
-	os/poll_windows.h
+	sync.c os/darwin_usb.c os/linux_usbfs.c os/poll_windows.c \
+	os/windows_usb.c libusb-1.0.rc os/linux_usbfs.h \
+	os/darwin_usb.h os/windows_usb.h os/threads_windows.h \
+	os/threads_windows.c os/threads_posix.h os/threads_posix.c \
+	os/poll_posix.h os/poll_windows.h
 am__objects_1 = libusb_1_0_la-darwin_usb.lo
-@OS_WINDOWS_TRUE@@THREADS_POSIX_FALSE@am__objects_2 = libusb_1_0_la-threads_windows.lo
-am__objects_3 = libusb_1_0_la-linux_usbfs.lo
-am__objects_4 = libusb_1_0_la-poll_windows.lo \
+am__objects_2 = libusb_1_0_la-linux_usbfs.lo
+am__objects_3 = libusb_1_0_la-poll_windows.lo \
 	libusb_1_0_la-windows_usb.lo libusb-1.0.lo
-@OS_DARWIN_FALSE@@OS_LINUX_FALSE@@OS_WINDOWS_TRUE@am__objects_5 = $(am__objects_4) \
-@OS_DARWIN_FALSE@@OS_LINUX_FALSE@@OS_WINDOWS_TRUE@	$(am__objects_2)
-@OS_DARWIN_FALSE@@OS_LINUX_TRUE@am__objects_5 = $(am__objects_3) \
-@OS_DARWIN_FALSE@@OS_LINUX_TRUE@	$(am__objects_2)
-@OS_DARWIN_TRUE@am__objects_5 = $(am__objects_1) $(am__objects_2)
+@OS_DARWIN_FALSE@@OS_LINUX_FALSE@@OS_WINDOWS_TRUE@am__objects_4 = $(am__objects_3)
+@OS_DARWIN_FALSE@@OS_LINUX_TRUE@am__objects_4 = $(am__objects_2)
+@OS_DARWIN_TRUE@am__objects_4 = $(am__objects_1)
+@THREADS_POSIX_FALSE@am__objects_5 = libusb_1_0_la-threads_windows.lo
+@THREADS_POSIX_TRUE@am__objects_5 = libusb_1_0_la-threads_posix.lo
 am_libusb_1_0_la_OBJECTS = libusb_1_0_la-core.lo \
 	libusb_1_0_la-descriptor.lo libusb_1_0_la-io.lo \
-	libusb_1_0_la-sync.lo $(am__objects_5)
+	libusb_1_0_la-sync.lo $(am__objects_4) $(am__objects_5)
 libusb_1_0_la_OBJECTS = $(am_libusb_1_0_la_OBJECTS)
 AM_V_lt = $(am__v_lt_$(V))
 am__v_lt_ = $(am__v_lt_$(AM_DEFAULT_VERBOSITY))
@@ -133,7 +132,6 @@ ACLOCAL = @ACLOCAL@
 AMTAR = @AMTAR@
 AM_CFLAGS = @AM_CFLAGS@
 AM_DEFAULT_VERBOSITY = @AM_DEFAULT_VERBOSITY@
-AM_LDFLAGS = @AM_LDFLAGS@
 AR = @AR@
 AUTOCONF = @AUTOCONF@
 AUTOHEADER = @AUTOHEADER@
@@ -167,11 +165,9 @@ LDFLAGS = @LDFLAGS@
 LIBOBJS = @LIBOBJS@
 LIBS = @LIBS@
 LIBTOOL = @LIBTOOL@
-LIBUSB_VERSION_MAJOR = @LIBUSB_VERSION_MAJOR@
-LIBUSB_VERSION_MICRO = @LIBUSB_VERSION_MICRO@
-LIBUSB_VERSION_MINOR = @LIBUSB_VERSION_MINOR@
 LIPO = @LIPO@
 LN_S = @LN_S@
+LTLDFLAGS = @LTLDFLAGS@
 LTLIBOBJS = @LTLIBOBJS@
 MAINT = @MAINT@
 MAKEINFO = @MAKEINFO@
@@ -241,9 +237,6 @@ libdir = @libdir@
 libexecdir = @libexecdir@
 localedir = @localedir@
 localstatedir = @localstatedir@
-lt_age = @lt_age@
-lt_current = @lt_current@
-lt_revision = @lt_revision@
 mandir = @mandir@
 mkdir_p = @mkdir_p@
 oldincludedir = @oldincludedir@
@@ -264,17 +257,19 @@ LINUX_USBFS_SRC = os/linux_usbfs.c
 DARWIN_USB_SRC = os/darwin_usb.c
 WINDOWS_USB_SRC = os/poll_windows.c os/windows_usb.c libusb-1.0.rc
 EXTRA_DIST = $(LINUX_USBFS_SRC) $(DARWIN_USB_SRC) $(WINDOWS_USB_SRC) \
-	os/threads_windows.c
+	os/threads_posix.c os/threads_windows.c
 
-@OS_DARWIN_TRUE@OS_SRC = $(DARWIN_USB_SRC) $(am__append_1)
-@OS_LINUX_TRUE@OS_SRC = $(LINUX_USBFS_SRC) $(am__append_1)
-@OS_WINDOWS_TRUE@OS_SRC = $(WINDOWS_USB_SRC) $(am__append_1)
+@OS_DARWIN_TRUE@OS_SRC = $(DARWIN_USB_SRC)
+@OS_LINUX_TRUE@OS_SRC = $(LINUX_USBFS_SRC)
+@OS_WINDOWS_TRUE@OS_SRC = $(WINDOWS_USB_SRC)
 @OS_DARWIN_TRUE@AM_CFLAGS_EXT = -no-cpp-precomp
+@THREADS_POSIX_FALSE@THREADS_SRC = os/threads_windows.h os/threads_windows.c
+@THREADS_POSIX_TRUE@THREADS_SRC = os/threads_posix.h os/threads_posix.c
 libusb_1_0_la_CFLAGS = $(VISIBILITY_CFLAGS) $(AM_CFLAGS) $(THREAD_CFLAGS)
-libusb_1_0_la_LDFLAGS = -version-info $(lt_current):$(lt_revision):$(lt_age)
+libusb_1_0_la_LDFLAGS = $(LTLDFLAGS)
 libusb_1_0_la_SOURCES = libusbi.h core.c descriptor.c io.c sync.c $(OS_SRC) \
 	os/linux_usbfs.h os/darwin_usb.h os/windows_usb.h \
-	os/threads_posix.h os/threads_windows.h \
+	$(THREADS_SRC) \
 	os/poll_posix.h os/poll_windows.h
 
 hdrdir = $(includedir)/libusb-1.0
@@ -313,8 +308,6 @@ $(top_srcdir)/configure: @MAINTAINER_MODE_TRUE@ $(am__configure_deps)
 $(ACLOCAL_M4): @MAINTAINER_MODE_TRUE@ $(am__aclocal_m4_deps)
 	cd $(top_builddir) && $(MAKE) $(AM_MAKEFLAGS) am--refresh
 $(am__aclocal_m4_deps):
-libusb-1.0.rc: $(top_builddir)/config.status $(srcdir)/libusb-1.0.rc.in
-	cd $(top_builddir) && $(SHELL) ./config.status $(subdir)/$@
 install-libLTLIBRARIES: $(lib_LTLIBRARIES)
 	@$(NORMAL_INSTALL)
 	test -z "$(libdir)" || $(MKDIR_P) "$(DESTDIR)$(libdir)"
@@ -362,6 +355,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libusb_1_0_la-linux_usbfs.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libusb_1_0_la-poll_windows.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libusb_1_0_la-sync.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libusb_1_0_la-threads_posix.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libusb_1_0_la-threads_windows.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libusb_1_0_la-windows_usb.Plo@am__quote@
 
@@ -429,14 +423,6 @@ libusb_1_0_la-darwin_usb.lo: os/darwin_usb.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libusb_1_0_la_CFLAGS) $(CFLAGS) -c -o libusb_1_0_la-darwin_usb.lo `test -f 'os/darwin_usb.c' || echo '$(srcdir)/'`os/darwin_usb.c
 
-libusb_1_0_la-threads_windows.lo: os/threads_windows.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libusb_1_0_la_CFLAGS) $(CFLAGS) -MT libusb_1_0_la-threads_windows.lo -MD -MP -MF $(DEPDIR)/libusb_1_0_la-threads_windows.Tpo -c -o libusb_1_0_la-threads_windows.lo `test -f 'os/threads_windows.c' || echo '$(srcdir)/'`os/threads_windows.c
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libusb_1_0_la-threads_windows.Tpo $(DEPDIR)/libusb_1_0_la-threads_windows.Plo
-@am__fastdepCC_FALSE@	$(AM_V_CC) @AM_BACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='os/threads_windows.c' object='libusb_1_0_la-threads_windows.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libusb_1_0_la_CFLAGS) $(CFLAGS) -c -o libusb_1_0_la-threads_windows.lo `test -f 'os/threads_windows.c' || echo '$(srcdir)/'`os/threads_windows.c
-
 libusb_1_0_la-linux_usbfs.lo: os/linux_usbfs.c
 @am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libusb_1_0_la_CFLAGS) $(CFLAGS) -MT libusb_1_0_la-linux_usbfs.lo -MD -MP -MF $(DEPDIR)/libusb_1_0_la-linux_usbfs.Tpo -c -o libusb_1_0_la-linux_usbfs.lo `test -f 'os/linux_usbfs.c' || echo '$(srcdir)/'`os/linux_usbfs.c
 @am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libusb_1_0_la-linux_usbfs.Tpo $(DEPDIR)/libusb_1_0_la-linux_usbfs.Plo
@@ -460,6 +446,22 @@ libusb_1_0_la-windows_usb.lo: os/windows_usb.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	source='os/windows_usb.c' object='libusb_1_0_la-windows_usb.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libusb_1_0_la_CFLAGS) $(CFLAGS) -c -o libusb_1_0_la-windows_usb.lo `test -f 'os/windows_usb.c' || echo '$(srcdir)/'`os/windows_usb.c
+
+libusb_1_0_la-threads_windows.lo: os/threads_windows.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libusb_1_0_la_CFLAGS) $(CFLAGS) -MT libusb_1_0_la-threads_windows.lo -MD -MP -MF $(DEPDIR)/libusb_1_0_la-threads_windows.Tpo -c -o libusb_1_0_la-threads_windows.lo `test -f 'os/threads_windows.c' || echo '$(srcdir)/'`os/threads_windows.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libusb_1_0_la-threads_windows.Tpo $(DEPDIR)/libusb_1_0_la-threads_windows.Plo
+@am__fastdepCC_FALSE@	$(AM_V_CC) @AM_BACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='os/threads_windows.c' object='libusb_1_0_la-threads_windows.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libusb_1_0_la_CFLAGS) $(CFLAGS) -c -o libusb_1_0_la-threads_windows.lo `test -f 'os/threads_windows.c' || echo '$(srcdir)/'`os/threads_windows.c
+
+libusb_1_0_la-threads_posix.lo: os/threads_posix.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libusb_1_0_la_CFLAGS) $(CFLAGS) -MT libusb_1_0_la-threads_posix.lo -MD -MP -MF $(DEPDIR)/libusb_1_0_la-threads_posix.Tpo -c -o libusb_1_0_la-threads_posix.lo `test -f 'os/threads_posix.c' || echo '$(srcdir)/'`os/threads_posix.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libusb_1_0_la-threads_posix.Tpo $(DEPDIR)/libusb_1_0_la-threads_posix.Plo
+@am__fastdepCC_FALSE@	$(AM_V_CC) @AM_BACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='os/threads_posix.c' object='libusb_1_0_la-threads_posix.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libusb_1_0_la_CFLAGS) $(CFLAGS) -c -o libusb_1_0_la-threads_posix.lo `test -f 'os/threads_posix.c' || echo '$(srcdir)/'`os/threads_posix.c
 
 mostlyclean-libtool:
 	-rm -f *.lo
