@@ -42,6 +42,9 @@ GDB_VERSION=2.17
 NEWLIB_VERSION=${BINUTILS_VERSION}
 GCC_VERSIONS=
 GCC_VERSIONS_DEFAULT=4.3
+# zlib/configure is not executable in GCC 4.3 in some branches of our SVN
+# repository or in the git mirror. So use zlib in GCC 4.5.
+GCC_VERSION_ZLIB=4.5
 NUM_JOBS=0
 SKIP_DEV_CHECKS=false
 WITHOUT_X=false
@@ -625,11 +628,11 @@ build_zlib()
 	fi
 
 	PN="zlib"
-	S=$DIR_SOURCE/gcc-${GCC_VERSIONS_DEFAULT}/zlib
+	S=$DIR_SOURCE/gcc-${GCC_VERSION_ZLIB}/zlib
 	WORKDIR=$DIR_BUILD/${PN}_build
 
 	PV=$(echo ZLIB_VERSION | gcc -include "${S}"/zlib.h -E - | tail -n 1)
-	PV="`eval echo ${PV}` from gcc-${GCC_VERSIONS_DEFAULT}"
+	PV="`eval echo ${PV}` from gcc-${GCC_VERSION_ZLIB}"
 
 	echo_date "${PN}: configuring (${PV})"
 	change_clean_dir "${WORKDIR}"
