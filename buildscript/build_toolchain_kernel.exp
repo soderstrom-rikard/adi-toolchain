@@ -192,6 +192,12 @@ while 1 {
             send "M\r"
         }
 
+        -re "USB support.*USB_SUPPORT.*\\\[.*]" {
+            sleep .05
+            send "N\r"
+            sleep .05
+        }
+
         -nocase -re " \\\(.*\\\) \\\[\[^\r]*] (\[ymn])" {
         }
 
@@ -418,12 +424,6 @@ while 1 {
                 send "\r"
             }
       }
-
-        -re "USB support.*USB_SUPPORT.*\\\[.*]" {
-            sleep .05
-            send "N\r"
-            sleep .05
-        }
 
           -re "NAND Device Support.*MTD_NAND.*\\\[.*]" {
             if { $board_type == "BF537-STAMP" } {
