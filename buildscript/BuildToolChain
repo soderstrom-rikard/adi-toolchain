@@ -1301,7 +1301,7 @@ build_uclibc()
 		echo_date "${target}: uClibc: checking CFLAGS ${UCLIBC_CFLAGS}"
 		# We test (and fail) if any of the CFLAGS for uClibc don't work on the bfin-elf compiler
 		for opt in $UCLIBC_CFLAGS ; do
-			if ! check_cc_options "$output/bin/${target}-gcc" $opt ; then
+			if ! check_cc_options "$output/bin/${target}-gcc$EXEEXT" $opt ; then
 				die_with_log "I could not make option '$opt' work on the ${target} compiler, so I can't use it for uClibc"
 			fi
 		done
@@ -1310,7 +1310,7 @@ build_uclibc()
 	change_dir "$DIR_UCLIBC_SOURCE"
 
 	local ml mdir mdir1 mdir2 mflags
-	for ml in `"${output}"/bin/${target}-gcc --print-multi-lib` ; do
+	for ml in `"${output}"/bin/${target}-gcc$EXEEXT --print-multi-lib` ; do
 		# Each multilib line takes the form:
 		# <dir>;@<flags>
 		mdir=${ml%%;*}
