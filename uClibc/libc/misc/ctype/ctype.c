@@ -284,7 +284,7 @@ libc_hidden_proto(__ctype_tolower)
 libc_hidden_proto(tolower)
 #ifdef __UCLIBC_HAS_CTYPE_TABLES__
 
-int weak_function tolower(int c)
+int tolower(int c)
 {
 #if defined(__UCLIBC_HAS_CTYPE_ENFORCED__)
 	assert(CTYPE_DOMAIN_CHECK(c));
@@ -294,7 +294,7 @@ int weak_function tolower(int c)
 
 #else  /* __UCLIBC_HAS_CTYPE_TABLES__ */
 
-int weak_function tolower(int c)
+int tolower(int c)
 {
 	return __C_tolower(c);
 }
@@ -331,7 +331,7 @@ libc_hidden_proto(__ctype_toupper)
 libc_hidden_proto(toupper)
 #ifdef __UCLIBC_HAS_CTYPE_TABLES__
 
-int weak_function toupper(int c)
+int toupper(int c)
 {
 #if defined(__UCLIBC_HAS_CTYPE_ENFORCED__)
 	assert(CTYPE_DOMAIN_CHECK(c));
@@ -341,7 +341,7 @@ int weak_function toupper(int c)
 
 #else  /* __UCLIBC_HAS_CTYPE_TABLES__ */
 
-int weak_function toupper(int c)
+int toupper(int c)
 {
 	return __C_toupper(c);
 }
