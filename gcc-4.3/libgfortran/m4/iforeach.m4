@@ -49,7 +49,7 @@ name`'rtype_qual`_'atype_code (rtype * const restrict retarray,
 	  ret_extent = retarray->dim[0].ubound + 1 - retarray->dim[0].lbound;
 	  if (ret_extent != rank)
 	    runtime_error ("Incorrect extent in return value of"
-			   " u_name intrnisic: is %ld, should be %ld",
+			   " u_name intrinsic: is %ld, should be %ld",
 			   (long int) ret_extent, (long int) rank);
 	}
     }
@@ -167,12 +167,12 @@ void
 	  ret_extent = retarray->dim[0].ubound + 1 - retarray->dim[0].lbound;
 	  if (ret_extent != rank)
 	    runtime_error ("Incorrect extent in return value of"
-			   " u_name intrnisic: is %ld, should be %ld",
+			   " u_name intrinsic: is %ld, should be %ld",
 			   (long int) ret_extent, (long int) rank);
 	
 	  mask_rank = GFC_DESCRIPTOR_RANK (mask);
 	  if (rank != mask_rank)
-	    runtime_error ("rank of MASK argument in u_name intrnisic"
+	    runtime_error ("rank of MASK argument in u_name intrinsic"
 	                   "should be %ld, is %ld", (long int) rank,
 			   (long int) mask_rank);
 

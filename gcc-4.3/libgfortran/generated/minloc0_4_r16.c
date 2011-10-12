@@ -82,7 +82,7 @@ minloc0_4_r16 (gfc_array_i4 * const restrict retarray,
 	  ret_extent = retarray->dim[0].ubound + 1 - retarray->dim[0].lbound;
 	  if (ret_extent != rank)
 	    runtime_error ("Incorrect extent in return value of"
-			   " MINLOC intrnisic: is %ld, should be %ld",
+			   " MINLOC intrinsic: is %ld, should be %ld",
 			   (long int) ret_extent, (long int) rank);
 	}
     }
@@ -208,12 +208,12 @@ mminloc0_4_r16 (gfc_array_i4 * const restrict retarray,
 	  ret_extent = retarray->dim[0].ubound + 1 - retarray->dim[0].lbound;
 	  if (ret_extent != rank)
 	    runtime_error ("Incorrect extent in return value of"
-			   " MINLOC intrnisic: is %ld, should be %ld",
+			   " MINLOC intrinsic: is %ld, should be %ld",
 			   (long int) ret_extent, (long int) rank);
 	
 	  mask_rank = GFC_DESCRIPTOR_RANK (mask);
 	  if (rank != mask_rank)
-	    runtime_error ("rank of MASK argument in MINLOC intrnisic"
+	    runtime_error ("rank of MASK argument in MINLOC intrinsic"
 	                   "should be %ld, is %ld", (long int) rank,
 			   (long int) mask_rank);
 
