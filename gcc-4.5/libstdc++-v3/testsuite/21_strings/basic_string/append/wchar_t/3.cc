@@ -37,7 +37,7 @@ test03()
     {
       wstring one(source);
       wstring two(source);
-      for (unsigned j = 0; j < 18; ++j)
+      for (unsigned j = 0; j < 12; ++j)
 	{
 	  VERIFY( one == two );
 	  one.append(one);

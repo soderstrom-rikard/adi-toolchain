@@ -28,7 +28,7 @@ void test01()
   using namespace std;
   bool test __attribute__((unused)) = true;
 
-  const unsigned max_size = 1 << 18;
+  const unsigned max_size = 1 << 16;
 
   static wchar_t ref[max_size];
   wmemset(ref, L'\0', max_size);

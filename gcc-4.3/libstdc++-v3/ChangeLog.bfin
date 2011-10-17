@@ -1,3 +1,9 @@
+2011-10-17  Stuart Henderson <stuart.henderson@analog.com>
+
+	[#6781] fragmented memory causes this to fail during testing.
+	* testsuite/21_strings/basic_string/append/wchar_t/3.cc: Reduce iterations.
+	* testsuite/27_io/basic_stringbuf/setbuf/wchar_t/4.cc: Likewise.
+
 2010-09-23  Stuart Henderson <stuart.henderson@analog.com>
 
 	[#6134] XFAIL test when bfin-elf on HW runs out of memory at link time.
