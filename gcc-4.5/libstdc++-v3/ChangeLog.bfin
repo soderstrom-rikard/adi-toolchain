@@ -1,3 +1,8 @@
+2011-10-19  Stuart Henderson <stuart.henderson@analog.com>
+
+	[#6825] missing cxxabi.h header
+	* testsuite/lib/libstdc++.exp: change expected path for c++ headers.
+
 2011-10-17  Stuart Henderson <stuart.henderson@analog.com>
 
 	[#6781] fragmented memory causes this to fail during testing.

@@ -500,7 +500,7 @@ proc v3_target_compile_as_c { source dest type options } {
 	set comp_base_dir [file dirname [file dirname [file dirname [file dirname [file dirname $comp_base_dir]]]]]
 	# For a cross compiler, the header files will be located in a
 	# machine-specific subdirectory.
-	set crossbase "${comp_base_dir}/lib/gcc/${machine}/include/c++/${version}"
+	set crossbase "${comp_base_dir}/lib/gcc/${machine}/${version}/include/c++"
 	set crosstarget "${crossbase}/${machine}"
 	set cc_final [concat $cc_final "-I$crossbase -I$crosstarget"]
 	# For a native compiler, the header files will be located at 
