@@ -25,12 +25,10 @@ if { $blddir != "" } {
     } else {
         puts "No libstdc++ library found, will not execute c++ tests"
     }
-} elseif { [info exists GXX_UNDER_TEST] } {
+} else {
     set lang_test_file_found 1
     # Needs to exist for libgomp.exp.
     set lang_test_file ""
-} else {
-    puts "GXX_UNDER_TEST not defined, will not execute c++ tests"
 }
 
 if { $lang_test_file_found } {
