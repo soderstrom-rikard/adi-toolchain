@@ -1,3 +1,8 @@
+2011-10-26  Stuart Henderson <stuart.henderson@analog.com>
+
+	[#6822] bare-metal means low memory, ignore tests that don't fit.
+	* testsuite/lib/libstdc++.exp: Detect out of memory errors and XFAIL.
+
 2011-10-19  Stuart Henderson <stuart.henderson@analog.com>
 
 	[#6825] missing cxxabi.h header
