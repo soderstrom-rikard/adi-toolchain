@@ -1,3 +1,8 @@
+2011-10-27  Stuart Henderson  <stuart.henderson@analog.com>
+
+	* gcc-4.3/gcc/testsuite/lib/g++.exp: XFAIL when baremetal memory overflows.
+	* gcc-4.3/gcc/testsuite/lib/gcc-dg.exp: Likewise.
+
 2011-10-12  Stuart Henderson  <stuart.henderson@analog.com>
 
 	* gfortran.dg/maxloc_bounds_5.f90: Fix longstanding typo in warning text.

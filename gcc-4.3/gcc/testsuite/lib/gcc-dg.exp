@@ -150,6 +150,14 @@ proc gcc-dg-test-1 { target_compile prog do_what extra_tool_flags } {
 		       "executable" $options] ]
     }
 
+    # xfail if testing bfin-elf on a target board and we've run out of memory
+    # at link time.
+    if { [is_remote target] != 0 } {
+	  if { [regexp -nocase ".*region .* is full.*" $comp_output] || [regexp -nocase ".*section .* will not fit in region.*" $comp_output] } {
+	    setup_xfail "bfin-*-elf"
+      }
+    }
+
     return [list $comp_output $output_file]
 }
 
