@@ -1,5 +1,9 @@
 2011-11-04  Stuart Henderson  <stuart.henderson@analog.com>
 
+	* gcc.target/bfin/mcpu-bf592.c: New test.
+
+2011-11-04  Stuart Henderson  <stuart.henderson@analog.com>
+
 	* lib/gcc-defs.exp: XFAIL when baremetal memory overflows.
 
 2011-10-27  Stuart Henderson  <stuart.henderson@analog.com>
