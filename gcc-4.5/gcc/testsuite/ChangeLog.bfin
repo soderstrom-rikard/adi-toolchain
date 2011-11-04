@@ -1,6 +1,11 @@
 2011-11-04  Stuart Henderson  <stuart.henderson@analog.com>
 
-	* gcc.target/bfin/mcpu-bf592.c: New test.
+	* gcc.target/bfin/mcpu-bf504.c: Update test.
+	* gcc.target/bfin/mcpu-bf506.c: Likewise.
+
+2011-11-04  Stuart Henderson  <stuart.henderson@analog.com>
+
+	* gcc.target/bfin/mcpu-bf592.c: Update test.
 
 2011-11-04  Stuart Henderson  <stuart.henderson@analog.com>
 

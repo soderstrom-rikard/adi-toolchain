@@ -1,5 +1,9 @@
 2011-11-04  Stuart Henderson  <Stuart.Henderson@analog.com>
 
+	* config/bfin/bfin.c (bfin_cpus[]): Add 0.2 for bf592.
+
+2011-11-04  Stuart Henderson  <Stuart.Henderson@analog.com>
+
 	* config/bfin/bfin.c (bfin_cpus[]): Add 0.1 for bf50x.
 
 2011-09-01  Stuart Henderson  <Stuart.Henderson@analog.com>
