@@ -569,7 +569,14 @@ fi
 if test "[$2]"; then
   hardware="[$2]"
 else
-  hardware="cfi core pal glue"
+  case $host_os in
+    *darwin*)
+      hardware="core pal glue"
+      ;;
+    *)
+      hardware="cfi core pal glue"
+      ;;
+  esac
 fi
 hardware="$hardware [$3]"
 sim_hw_cflags="-DWITH_HW=1"
