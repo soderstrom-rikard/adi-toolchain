@@ -1,7 +1,11 @@
+2011-11-04  Stuart Henderson  <stuart.henderson@analog.com>
+
+	* lib/gcc-defs.exp: XFAIL when baremetal memory overflows.
+
 2011-10-27  Stuart Henderson  <stuart.henderson@analog.com>
 
-	* gcc-4.5/gcc/testsuite/lib/g++.exp: XFAIL when baremetal memory overflows.
-	* gcc-4.5/gcc/testsuite/lib/gcc-dg.exp: Likewise.
+	* lib/g++.exp: XFAIL when baremetal memory overflows.
+	* lib/gcc-dg.exp: Likewise.
 
 2011-08-08  Stuart Henderson  <stuart.henderson@analog.com>
 
