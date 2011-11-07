@@ -25,7 +25,7 @@
 Name:         blackfin-toolchain
 URL:          http://blackfin.uclinux.org
 Version:      2011R1
-Release:      BETA2
+Release:      RC3
 Obsoletes:    bfin-gcc
 Summary:      The GNU toolchain for the Blackfin processor
 License:      GPL
@@ -51,8 +51,8 @@ Source15:     gdbproxy.tar.bz2
 Source16:     qemu.tar.bz2
 Source17:     mpc.tar.bz2
 %if %{windows_build}
-Source18:     libusb-winusb.tar.bz2
-Source19:     expat-2.0.1.tar.gz
+Source18:     readline.tar.bz2
+Source19:     expat-2.0.1.tar.bz2
 Source20:     PDCurses-3.4.tar.gz
 Source21:     pthreads-windows.tar.bz2
 %endif
@@ -244,7 +244,7 @@ rm -rf $RPM_BUILD_ROOT
 %{prefix}/bfin-uclinux/bin/bfin-uclinux-strip%{EXEEXT}
 %{prefix}/bfin-uclinux/bin/bfin-ldr%{EXEEXT}
 %{prefix}/bfin-uclinux/bin/bfin-uclinux-elfedit%{EXEEXT}
-%{prefix}/bfin-uclinux/bin/bfin-uclinux-ld.bfd
+%{prefix}/bfin-uclinux/bin/bfin-uclinux-ld.bfd%{EXEEXT}
 %if ! %{skip_qemu}
 %{prefix}/bfin-uclinux/bin/bfin-qemu%{EXEEXT}
 %{prefix}/bfin-uclinux/bin/bfin-uclinux-qemu%{EXEEXT}
@@ -265,10 +265,10 @@ rm -rf $RPM_BUILD_ROOT
 %{prefix}/bfin-uclinux/bfin-uclinux/bin/nm%{EXEEXT}
 %{prefix}/bfin-uclinux/bfin-uclinux/bin/ranlib%{EXEEXT}
 %{prefix}/bfin-uclinux/bfin-uclinux/bin/strip%{EXEEXT}
-%{prefix}/bfin-uclinux/bfin-uclinux/bin/ld.bfd
+%{prefix}/bfin-uclinux/bfin-uclinux/bin/ld.bfd%{EXEEXT}
 %{prefix}/bfin-uclinux/bfin-uclinux/bin/objcopy%{EXEEXT}
-%{prefix}/bfin-uclinux/bfin-uclinux/share/info/bfd.info%{EXEEXT}
-%{prefix}/bfin-uclinux/bfin-uclinux/share/info/dir%{EXEEXT}
+%{prefix}/bfin-uclinux/bfin-uclinux/share/info/bfd.info
+%{prefix}/bfin-uclinux/bfin-uclinux/share/info/dir
 
 #%{prefix}/bfin-uclinux/lib/*.a
 %{prefix}/bfin-uclinux/libexec/gcc/bfin-uclinux/%{gcc_main_fullver}/*
@@ -317,7 +317,7 @@ rm -rf $RPM_BUILD_ROOT
 %{prefix}/bfin-linux-uclibc/bin/bfin-linux-uclibc-strip%{EXEEXT}
 %{prefix}/bfin-linux-uclibc/bin/bfin-ldr%{EXEEXT}
 %{prefix}/bfin-linux-uclibc/bin/bfin-linux-uclibc-elfedit%{EXEEXT}
-%{prefix}/bfin-linux-uclibc/bin/bfin-linux-uclibc-ld.bfd
+%{prefix}/bfin-linux-uclibc/bin/bfin-linux-uclibc-ld.bfd%{EXEEXT}
 %if ! %{skip_qemu}
 %{prefix}/bfin-linux-uclibc/bin/bfin-linux-uclibc-qemu%{EXEEXT}
 %{prefix}/bfin-linux-uclibc/bin/bfin-qemu%{EXEEXT}
@@ -335,10 +335,10 @@ rm -rf $RPM_BUILD_ROOT
 %{prefix}/bfin-linux-uclibc/bfin-linux-uclibc/bin/nm%{EXEEXT}
 %{prefix}/bfin-linux-uclibc/bfin-linux-uclibc/bin/ranlib%{EXEEXT}
 %{prefix}/bfin-linux-uclibc/bfin-linux-uclibc/bin/strip%{EXEEXT}
-%{prefix}/bfin-linux-uclibc/bfin-linux-uclibc/bin/ld.bfd
+%{prefix}/bfin-linux-uclibc/bfin-linux-uclibc/bin/ld.bfd%{EXEEXT}
 %{prefix}/bfin-linux-uclibc/bfin-linux-uclibc/bin/objcopy%{EXEEXT}
-%{prefix}/bfin-linux-uclibc/bfin-linux-uclibc/share/info/bfd.info%{EXEEXT}
-%{prefix}/bfin-linux-uclibc/bfin-linux-uclibc/share/info/dir%{EXEEXT}
+%{prefix}/bfin-linux-uclibc/bfin-linux-uclibc/share/info/bfd.info
+%{prefix}/bfin-linux-uclibc/bfin-linux-uclibc/share/info/dir
 
 #%{prefix}/bfin-linux-uclibc/lib/*.a
 %{prefix}/bfin-linux-uclibc/libexec/gcc/bfin-linux-uclibc/%{gcc_main_fullver}/*
@@ -388,7 +388,7 @@ rm -rf $RPM_BUILD_ROOT
 %{prefix}/bfin-elf/bin/bfin-elf-strings%{EXEEXT}
 %{prefix}/bfin-elf/bin/bfin-elf-strip%{EXEEXT}
 %{prefix}/bfin-elf/bin/bfin-elf-elfedit%{EXEEXT}
-%{prefix}/bfin-elf/bin/bfin-elf-ld.bfd
+%{prefix}/bfin-elf/bin/bfin-elf-ld.bfd%{EXEEXT}
 %{prefix}/bfin-elf/bin/bfin-ldr%{EXEEXT}
 %if ! %{skip_qemu}
 %{prefix}/bfin-elf/bin/bfin-elf-qemu%{EXEEXT}
@@ -411,7 +411,7 @@ rm -rf $RPM_BUILD_ROOT
 %{prefix}/bfin-elf/bfin-elf/bin/nm%{EXEEXT}
 %{prefix}/bfin-elf/bfin-elf/bin/ranlib%{EXEEXT}
 %{prefix}/bfin-elf/bfin-elf/bin/strip%{EXEEXT}
-%{prefix}/bfin-elf/bfin-elf/bin/ld.bfd
+%{prefix}/bfin-elf/bfin-elf/bin/ld.bfd%{EXEEXT}
 %{prefix}/bfin-elf/bfin-elf/bin/objcopy%{EXEEXT}
 
 #%{prefix}/bfin-elf/lib/*.a
