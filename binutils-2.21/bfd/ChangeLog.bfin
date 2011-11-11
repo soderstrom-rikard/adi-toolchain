@@ -1,3 +1,8 @@
+2011-11-11  Stuart Henderson  <stuart.henderson@analog.com>
+
+	* elf32-bfin.c (bfinfdpic_check_relocs): Temporary workaround for [#6798].
+	Don't count relocs in non-SEC_ALLOC sections.
+
 2011-09-05  Stuart Henderson  <stuart.henderson@analog.com>
 
 	Merge from 2.17:

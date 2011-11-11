@@ -4942,7 +4942,8 @@ bfinfdpic_check_relocs (bfd *abfd, struct bfd_link_info *info,
 
 	case R_BFIN_FUNCDESC:
 	  picrel->fd++;
-	  picrel->relocsfd++;
+	  if (bfd_get_section_flags (abfd, sec) & SEC_ALLOC)
+	    picrel->relocsfd++;
 	  break;
 
         /* This relocation describes the C++ object vtable hierarchy.
