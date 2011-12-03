@@ -105,6 +105,9 @@ typedef int64_t  Elf64_Sxword;
 #define EM_H8_300H      47      /* Hitachi H8/300H */
 #define EM_H8S          48      /* Hitachi H8S     */
 #define EM_BLACKFIN	106	/* Analog Devices Blackfin */
+#define EM_LATTICEMICO32 138    /* LatticeMico32 */
+
+#define EM_UNICORE32    110     /* UniCore32 */
 
 /*
  * This is an interim value that we will use until the committee comes
@@ -122,6 +125,8 @@ typedef int64_t  Elf64_Sxword;
 
 #define EM_MICROBLAZE      189
 #define EM_MICROBLAZE_OLD  0xBAAB
+
+#define EM_XTENSA   94      /* Tensilica Xtensa */
 
 /* This is the info that is needed to parse the dynamic section of the file */
 #define DT_NULL		0

@@ -40,6 +40,8 @@ struct DisasContext;
 #define EXCP_DBGA           0x101
 #define EXCP_OUTC           0x102
 
+#define CPU_INTERRUPT_NMI   CPU_INTERRUPT_TGT_EXT_1
+
 #define BFIN_L1_CACHE_BYTES 32
 
 /* Blackfin does 1K/4K/1M/4M, but for now only support 4k */
@@ -187,7 +189,7 @@ extern const char *get_allreg_name(int grp, int reg);
 #define MMU_USER_IDX   1
 
 int cpu_bfin_handle_mmu_fault(CPUState *env, target_ulong address, int rw,
-                              int mmu_idx, int is_softmmu);
+                              int mmu_idx);
 #define cpu_handle_mmu_fault cpu_bfin_handle_mmu_fault
 
 #if defined(CONFIG_USER_ONLY)
@@ -199,6 +201,23 @@ static inline void cpu_clone_regs(CPUState *env, target_ulong newsp)
 #endif
 
 #include "cpu-all.h"
+
+static inline int cpu_has_work(CPUState *env)
+{
+    return (env->interrupt_request & (CPU_INTERRUPT_HARD | CPU_INTERRUPT_NMI));
+}
+
+static inline int cpu_halted(CPUState *env)
+{
+    if (!env->halted)
+        return 0;
+    if (env->interrupt_request & CPU_INTERRUPT_HARD) {
+        env->halted = 0;
+        return 0;
+    }
+    return EXCP_HALTED;
+}
+
 #include "exec-all.h"
 
 static inline void cpu_pc_from_tb(CPUState *env, TranslationBlock *tb)

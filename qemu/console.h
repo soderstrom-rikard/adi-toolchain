@@ -4,6 +4,8 @@
 #include "qemu-char.h"
 #include "qdict.h"
 #include "notify.h"
+#include "qerror.h"
+#include "monitor.h"
 
 /* keyboard/mouse support */
 
@@ -189,6 +191,8 @@ void register_displaystate(DisplayState *ds);
 DisplayState *get_displaystate(void);
 DisplaySurface* qemu_create_displaysurface_from(int width, int height, int bpp,
                                                 int linesize, uint8_t *data);
+void qemu_alloc_display(DisplaySurface *surface, int width, int height,
+                        int linesize, PixelFormat pf, int newflags);
 PixelFormat qemu_different_endianness_pixelformat(int bpp);
 PixelFormat qemu_default_pixelformat(int bpp);
 
@@ -324,7 +328,12 @@ static inline int ds_get_bytes_per_pixel(DisplayState *ds)
     return ds->surface->pf.bytes_per_pixel;
 }
 
+#ifdef CONFIG_CURSES
+#include <curses.h>
+typedef chtype console_ch_t;
+#else
 typedef unsigned long console_ch_t;
+#endif
 static inline void console_write_ch(console_ch_t *dest, uint32_t ch)
 {
     if (!(ch & 0xff))
@@ -350,7 +359,7 @@ void vga_hw_text_update(console_ch_t *chardata);
 
 int is_graphic_console(void);
 int is_fixedsize_console(void);
-CharDriverState *text_console_init(QemuOpts *opts);
+int text_console_init(QemuOpts *opts, CharDriverState **_chr);
 void text_consoles_set_display(DisplayState *ds);
 void console_select(unsigned int index);
 void console_color_init(DisplayState *ds);
@@ -368,12 +377,24 @@ void cocoa_display_init(DisplayState *ds, int full_screen);
 void vnc_display_init(DisplayState *ds);
 void vnc_display_close(DisplayState *ds);
 int vnc_display_open(DisplayState *ds, const char *display);
-int vnc_display_password(DisplayState *ds, const char *password);
+void vnc_display_add_client(DisplayState *ds, int csock, int skipauth);
 int vnc_display_disable_login(DisplayState *ds);
-int vnc_display_pw_expire(DisplayState *ds, time_t expires);
-void do_info_vnc_print(Monitor *mon, const QObject *data);
-void do_info_vnc(Monitor *mon, QObject **ret_data);
 char *vnc_display_local_addr(DisplayState *ds);
+#ifdef CONFIG_VNC
+int vnc_display_password(DisplayState *ds, const char *password);
+int vnc_display_pw_expire(DisplayState *ds, time_t expires);
+#else
+static inline int vnc_display_password(DisplayState *ds, const char *password)
+{
+    qerror_report(QERR_FEATURE_DISABLED, "vnc");
+    return -ENODEV;
+}
+static inline int vnc_display_pw_expire(DisplayState *ds, time_t expires)
+{
+    qerror_report(QERR_FEATURE_DISABLED, "vnc");
+    return -ENODEV;
+};
+#endif
 
 /* curses.c */
 void curses_display_init(DisplayState *ds, int full_screen);

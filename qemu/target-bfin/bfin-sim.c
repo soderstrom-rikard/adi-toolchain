@@ -14,7 +14,11 @@
 #include <string.h>
 #include <inttypes.h>
 
-#define TRACE_EXTRACT(fmt, args...) do { if (1) qemu_log_mask(CPU_LOG_TB_CPU, fmt "\n", ## args); } while (0)
+#define TRACE_EXTRACT(fmt, args...) \
+do { \
+    if (1) \
+        qemu_log_mask(CPU_LOG_TB_CPU, "%s: " fmt "\n", __func__, ## args); \
+} while (0)
 
 static void
 illegal_instruction(DisasContext *dc)
@@ -36,36 +40,6 @@ unhandled_instruction(DisasContext *dc, const char *insn)
     fprintf(stderr, "unhandled insn: %s\n", insn);
     illegal_instruction(dc);
 }
-
-#define M_S2RND 1
-#define M_T     2
-#define M_W32   3
-#define M_FU    4
-#define M_TFU   6
-#define M_IS    8
-#define M_ISS2  9
-#define M_IH    11
-#define M_IU    12
-
-/* Valid flag settings */
-#define is_macmod_pmove(x) \
-    (((x) == 0)       || \
-     ((x) == M_IS)    || \
-     ((x) == M_FU)    || \
-     ((x) == M_S2RND) || \
-     ((x) == M_ISS2)  || \
-     ((x) == M_IU))
-
-#define is_macmod_hmove(x) \
-    (((x) == 0)       || \
-     ((x) == M_IS)    || \
-     ((x) == M_FU)    || \
-     ((x) == M_IU)    || \
-     ((x) == M_T)     || \
-     ((x) == M_TFU)   || \
-     ((x) == M_S2RND) || \
-     ((x) == M_ISS2)  || \
-     ((x) == M_IH))
 
 typedef enum {
     c_0, c_1, c_4, c_2, c_uimm2, c_uimm3, c_imm3, c_pcrel4,
@@ -653,7 +627,7 @@ decode_ProgCtrl_0(DisasContext *dc, uint16_t iw0)
     int poprnd  = ((iw0 >> ProgCtrl_poprnd_bits) & ProgCtrl_poprnd_mask);
     int prgfunc = ((iw0 >> ProgCtrl_prgfunc_bits) & ProgCtrl_prgfunc_mask);
 
-    TRACE_EXTRACT("%s: poprnd:%i prgfunc:%i", __func__, poprnd, prgfunc);
+    TRACE_EXTRACT("poprnd:%i prgfunc:%i", poprnd, prgfunc);
 
     if (prgfunc == 0 && poprnd == 0) {
         /* NOP */;
@@ -744,7 +718,7 @@ decode_CaCTRL_0(DisasContext *dc, uint16_t iw0)
     int op  = ((iw0 >> CaCTRL_op_bits) & CaCTRL_op_mask);
     int reg = ((iw0 >> CaCTRL_reg_bits) & CaCTRL_reg_mask);
 
-    TRACE_EXTRACT("%s: a:%i op:%i reg:%i", __func__, a, op, reg);
+    TRACE_EXTRACT("a:%i op:%i reg:%i", a, op, reg);
 
     /*
      * PREFETCH [Preg{reg}];
@@ -777,7 +751,7 @@ decode_PushPopReg_0(DisasContext *dc, uint16_t iw0)
     TCGv treg, tmp;
     TCGv_i64 tmp64;
 
-    TRACE_EXTRACT("%s: W:%i grp:%i reg:%i", __func__, W, grp, reg);
+    TRACE_EXTRACT("W:%i grp:%i reg:%i", W, grp, reg);
 
     /* Can't push/pop reserved registers */
     /*if (reg_is_reserved(grp, reg))
@@ -882,7 +856,7 @@ decode_PushPopMultiple_0(DisasContext *dc, uint16_t iw0)
     int pr = ((iw0 >> PushPopMultiple_pr_bits) & PushPopMultiple_pr_mask);
     int i;
 
-    TRACE_EXTRACT("%s: d:%i p:%i W:%i dr:%i pr:%i", __func__, d, p, W, dr, pr);
+    TRACE_EXTRACT("d:%i p:%i W:%i dr:%i pr:%i", d, p, W, dr, pr);
 
     if ((d == 0 && p == 0) || (p && imm5(pr) > 5) ||
         (d && !p && pr) || (p && !d && dr)) {
@@ -938,8 +912,8 @@ decode_ccMV_0(DisasContext *dc, uint16_t iw0)
     int l;
     TCGv reg_src, reg_dst;
 
-    TRACE_EXTRACT("%s: T:%i d:%i s:%i dst:%i src:%i",
-                  __func__, T, d, s, dst, src);
+    TRACE_EXTRACT("T:%i d:%i s:%i dst:%i src:%i",
+                  T, d, s, dst, src);
 
     /* IF !{T} CC DPreg{d,dst} = DPreg{s,src}; */
     reg_src = get_allreg(dc, s, src);
@@ -963,8 +937,8 @@ decode_CCflag_0(DisasContext *dc, uint16_t iw0)
     int G = ((iw0 >> CCflag_G_bits) & CCflag_G_mask);
     int opc = ((iw0 >> CCflag_opc_bits) & CCflag_opc_mask);
 
-    TRACE_EXTRACT("%s: I:%i opc:%i G:%i y:%i x:%i",
-                  __func__, I, opc, G, y, x);
+    TRACE_EXTRACT("I:%i opc:%i G:%i y:%i x:%i",
+                  I, opc, G, y, x);
 
     if (opc > 4) {
         TCGv_i64 tmp64;
@@ -1051,7 +1025,7 @@ decode_CC2dreg_0(DisasContext *dc, uint16_t iw0)
     int op  = ((iw0 >> CC2dreg_op_bits) & CC2dreg_op_mask);
     int reg = ((iw0 >> CC2dreg_reg_bits) & CC2dreg_reg_mask);
 
-    TRACE_EXTRACT("%s: op:%i reg:%i", __func__, op, reg);
+    TRACE_EXTRACT("op:%i reg:%i", op, reg);
 
     if (op == 0) {
         /* Dreg{reg} = CC; */
@@ -1079,7 +1053,7 @@ decode_CC2stat_0(DisasContext *dc, uint16_t iw0)
     int cbit = ((iw0 >> CC2stat_cbit_bits) & CC2stat_cbit_mask);
     TCGv tmp;
 
-    TRACE_EXTRACT("%s: D:%i op:%i cbit:%i", __func__, D, op, cbit);
+    TRACE_EXTRACT("D:%i op:%i cbit:%i", D, op, cbit);
 
     /* CC = CC; is invalid.  */
     if (cbit == 5)
@@ -1153,7 +1127,7 @@ decode_BRCC_0(DisasContext *dc, uint16_t iw0)
     int offset = ((iw0 >> BRCC_offset_bits) & BRCC_offset_mask);
     int pcrel = pcrel10(offset);
 
-    TRACE_EXTRACT("%s: T:%i B:%i offset:%#x", __func__, T, B, offset);
+    TRACE_EXTRACT("T:%i B:%i offset:%#x", T, B, offset);
 
     /* IF !{T} CC JUMP imm{offset} (bp){B}; */
     dc->hwloop_callback = gen_hwloop_br_pcrel_cc;
@@ -1170,7 +1144,7 @@ decode_UJUMP_0(DisasContext *dc, uint16_t iw0)
     int offset = ((iw0 >> UJump_offset_bits) & UJump_offset_mask);
     int pcrel = pcrel12(offset);
 
-    TRACE_EXTRACT("%s: offset:%#x", __func__, offset);
+    TRACE_EXTRACT("offset:%#x", offset);
 
     /* JUMP.S imm{offset}; */
     dc->is_jmp = DISAS_JUMP;
@@ -1193,8 +1167,8 @@ decode_REGMV_0(DisasContext *dc, uint16_t iw0)
     TCGv_i64 tmp64;
     bool istmp;
 
-    TRACE_EXTRACT("%s: gd:%i gs:%i dst:%i src:%i",
-                  __func__, gd, gs, dst, src);
+    TRACE_EXTRACT("gd:%i gs:%i dst:%i src:%i",
+                  gd, gs, dst, src);
 
     /* genreg{gd,dst} = genreg{gs,src}; */
 
@@ -1307,7 +1281,7 @@ decode_ALU2op_0(DisasContext *dc, uint16_t iw0)
     int l;
     TCGv tmp;
 
-    TRACE_EXTRACT("%s: opc:%i src:%i dst:%i", __func__, opc, src, dst);
+    TRACE_EXTRACT("opc:%i src:%i dst:%i", opc, src, dst);
 
     if (opc == 0) {
         /* Dreg{dst} >>>= Dreg{src}; */
@@ -1412,7 +1386,7 @@ decode_PTR2op_0(DisasContext *dc, uint16_t iw0)
     int opc = ((iw0 >> PTR2op_opc_bits) & PTR2op_opc_mask);
     int dst = ((iw0 >> PTR2op_dst_bits) & PTR2op_dst_mask);
 
-    TRACE_EXTRACT("%s: opc:%i src:%i dst:%i", __func__, opc, src, dst);
+    TRACE_EXTRACT("opc:%i src:%i dst:%i", opc, src, dst);
 
     if (opc == 0) {
         /* Preg{dst} -= Preg{src}; */
@@ -1449,7 +1423,7 @@ decode_LOGI2op_0(DisasContext *dc, uint16_t iw0)
     int uimm = uimm5(src);
     TCGv tmp;
 
-    TRACE_EXTRACT("%s: opc:%i src:%i dst:%i", __func__, opc, src, dst);
+    TRACE_EXTRACT("opc:%i src:%i dst:%i", opc, src, dst);
 
     if (opc == 0) {
         /* CC = ! BITTST (Dreg{dst}, imm{uimm}); */
@@ -1505,8 +1479,8 @@ decode_COMP3op_0(DisasContext *dc, uint16_t iw0)
     int src1 = ((iw0 >> COMP3op_src1_bits) & COMP3op_src1_mask);
     TCGv tmp;
 
-    TRACE_EXTRACT("%s: opc:%i dst:%i src1:%i src0:%i",
-                  __func__, opc, dst, src1, src0);
+    TRACE_EXTRACT("opc:%i dst:%i src1:%i src0:%i",
+                  opc, dst, src1, src0);
 
     tmp = tcg_temp_local_new();
     if (opc == 0) {
@@ -1560,7 +1534,7 @@ decode_COMPI2opD_0(DisasContext *dc, uint16_t iw0)
     int imm = imm7(src);
     TCGv tmp;
 
-    TRACE_EXTRACT("%s: op:%i src:%i dst:%i", __func__, op, src, dst);
+    TRACE_EXTRACT("op:%i src:%i dst:%i", op, src, dst);
 
     if (op == 0) {
         /* Dreg{dst} = imm{src} (X); */
@@ -1587,7 +1561,7 @@ decode_COMPI2opP_0(DisasContext *dc, uint16_t iw0)
     int dst = ((iw0 >> COMPI2opP_dst_bits) & COMPI2opP_dst_mask);
     int imm = imm7(src);
 
-    TRACE_EXTRACT("%s: op:%i src:%i dst:%i", __func__, op, src, dst);
+    TRACE_EXTRACT("op:%i src:%i dst:%i", op, src, dst);
 
     if (op == 0) {
         /* Preg{dst} = imm{src}; */
@@ -1612,8 +1586,8 @@ decode_LDSTpmod_0(DisasContext *dc, uint16_t iw0)
     int reg = ((iw0 >> LDSTpmod_reg_bits) & LDSTpmod_reg_mask);
     TCGv tmp;
 
-    TRACE_EXTRACT("%s: W:%i aop:%i reg:%i idx:%i ptr:%i",
-                  __func__, W, aop, reg, idx, ptr);
+    TRACE_EXTRACT("W:%i aop:%i reg:%i idx:%i ptr:%i",
+                  W, aop, reg, idx, ptr);
 
     if (aop == 1 && W == 0 && idx == ptr) {
         /* Dreg_lo{reg} = W[Preg{ptr}]; */
@@ -1716,7 +1690,7 @@ decode_dagMODim_0(DisasContext *dc, uint16_t iw0)
     int br = ((iw0 >> DagMODim_br_bits) & DagMODim_br_mask);
     int op = ((iw0 >> DagMODim_op_bits) & DagMODim_op_mask);
 
-    TRACE_EXTRACT("%s: br:%i op:%i m:%i i:%i", __func__, br, op, m, i);
+    TRACE_EXTRACT("br:%i op:%i m:%i i:%i", br, op, m, i);
 
     if (op == 0 && br == 1) {
         /* Ireg{i} += Mreg{m} (BREV); */
@@ -1743,7 +1717,7 @@ decode_dagMODik_0(DisasContext *dc, uint16_t iw0)
     int op = ((iw0 >> DagMODik_op_bits) & DagMODik_op_mask);
     int mod = (op & 2) + 2;
 
-    TRACE_EXTRACT("%s: op:%i i:%i", __func__, op, i);
+    TRACE_EXTRACT("op:%i i:%i", op, i);
 
     if (op & 1) {
         /* Ireg{i} -= 2 or 4; */
@@ -1781,7 +1755,7 @@ decode_dspLDST_0(DisasContext *dc, uint16_t iw0)
     int reg = ((iw0 >> DspLDST_reg_bits) & DspLDST_reg_mask);
     TCGv tmp;
 
-    TRACE_EXTRACT("%s: aop:%i m:%i i:%i reg:%i", __func__, aop, m, i, reg);
+    TRACE_EXTRACT("aop:%i m:%i i:%i reg:%i", aop, m, i, reg);
 
     if (aop == 0 && W == 0 && m == 0) {
         /* Dreg{reg} = [Ireg{i}++]; */
@@ -1903,8 +1877,8 @@ decode_LDST_0(DisasContext *dc, uint16_t iw0)
     int reg = ((iw0 >> LDST_reg_bits) & LDST_reg_mask);
     int ptr = ((iw0 >> LDST_ptr_bits) & LDST_ptr_mask);
 
-    TRACE_EXTRACT("%s: sz:%i W:%i aop:%i Z:%i ptr:%i reg:%i",
-                  __func__, sz, W, aop, Z, ptr, reg);
+    TRACE_EXTRACT("sz:%i W:%i aop:%i Z:%i ptr:%i reg:%i",
+                  sz, W, aop, Z, ptr, reg);
 
     if (aop == 3) {
         illegal_instruction(dc);
@@ -1977,8 +1951,8 @@ decode_LDSTiiFP_0(DisasContext *dc, uint16_t iw0)
     TCGv treg = get_allreg(dc, grp, reg);
     TCGv ea;
 
-    TRACE_EXTRACT("%s: W:%i offset:%#x grp:%i reg:%i",
-                  __func__, W, offset, grp, reg);
+    TRACE_EXTRACT("W:%i offset:%#x grp:%i reg:%i",
+                  W, offset, grp, reg);
 
     ea = tcg_temp_local_new();
     tcg_gen_addi_tl(ea, cpu_fpreg, imm);
@@ -2008,8 +1982,8 @@ decode_LDSTii_0(DisasContext *dc, uint16_t iw0)
     uint32_t imm;
     TCGv ea;
 
-    TRACE_EXTRACT("%s: W:%i op:%i offset:%#x ptr:%i reg:%i",
-                  __func__, W, op, offset, ptr, reg);
+    TRACE_EXTRACT("W:%i op:%i offset:%#x ptr:%i reg:%i",
+                  W, op, offset, ptr, reg);
 
     if (op == 0 || op == 3) {
         imm = uimm4s4(offset);
@@ -2066,8 +2040,8 @@ decode_LoopSetup_0(DisasContext *dc, uint16_t iw0, uint16_t iw1)
     int spcrel = pcrel4(soffset);
     int epcrel = lppcrel10(eoffset);
 
-    TRACE_EXTRACT("%s: rop:%i c:%i soffset:%i reg:%i eoffset:%i",
-                  __func__, rop, c, soffset, reg, eoffset);
+    TRACE_EXTRACT("rop:%i c:%i soffset:%i reg:%i eoffset:%i",
+                  rop, c, soffset, reg, eoffset);
 
     if (rop == 0) {
         /* LSETUP (imm{soffset}, imm{eoffset}) LCreg{c}; */;
@@ -2103,8 +2077,8 @@ decode_LDIMMhalf_0(DisasContext *dc, uint16_t iw0, uint16_t iw1)
     uint32_t val;
     TCGv treg;
 
-    TRACE_EXTRACT("%s: Z:%i H:%i S:%i grp:%i reg:%i hword:%#x",
-                  __func__, Z, H, S, grp, reg, hword);
+    TRACE_EXTRACT("Z:%i H:%i S:%i grp:%i reg:%i hword:%#x",
+                  Z, H, S, grp, reg, hword);
 
     treg = get_allreg(dc, grp, reg);
     if (S == 1) {
@@ -2148,7 +2122,7 @@ decode_CALLa_0(DisasContext *dc, uint16_t iw0, uint16_t iw1)
     int msw = ((iw0 >> 0) & 0xff);
     int pcrel = pcrel24((msw << 16) | lsw);
 
-    TRACE_EXTRACT("%s: S:%i msw:%#x lsw:%#x", __func__, S, msw, lsw);
+    TRACE_EXTRACT("S:%i msw:%#x lsw:%#x", S, msw, lsw);
 
     if (S == 1) {
         /* CALL imm{pcrel}; */
@@ -2180,8 +2154,8 @@ decode_LDSTidxI_0(DisasContext *dc, uint16_t iw0, uint16_t iw1)
     uint32_t imm_16 = imm16(offset);
     TCGv ea;
 
-    TRACE_EXTRACT("%s: W:%i Z:%i sz:%i ptr:%i reg:%i offset:%#x",
-                  __func__, W, Z, sz, ptr, reg, offset);
+    TRACE_EXTRACT("W:%i Z:%i sz:%i ptr:%i reg:%i offset:%#x",
+                  W, Z, sz, ptr, reg, offset);
 
     ea = tcg_temp_local_new();
     if (sz == 0) {
@@ -2246,7 +2220,7 @@ decode_linkage_0(DisasContext *dc, uint16_t iw0, uint16_t iw1)
     int R = ((iw0 >> (Linkage_R_bits - 16)) & Linkage_R_mask);
     int framesize = ((iw1 >> Linkage_framesize_bits) & Linkage_framesize_mask);
 
-    TRACE_EXTRACT("%s: R:%i framesize:%#x", __func__, R, framesize);
+    TRACE_EXTRACT("R:%i framesize:%#x", R, framesize);
 
     /* XXX: Should do alignment checks of fp/sp */
 
@@ -2300,9 +2274,9 @@ decode_dsp32mac_0(DisasContext *dc, uint16_t iw0, uint16_t iw1)
   int v_i = 0; //, zero = 0;
   TCGv res;
 
-  TRACE_EXTRACT("%s: M:%i mmod:%i MM:%i P:%i w1:%i op1:%i h01:%i h11:%i "
+  TRACE_EXTRACT("M:%i mmod:%i MM:%i P:%i w1:%i op1:%i h01:%i h11:%i "
 		      "w0:%i op0:%i h00:%i h10:%i dst:%i src0:%i src1:%i",
-		 __func__, M, mmod, MM, P, w1, op1, h01, h11, w0, op0, h00, h10,
+		 M, mmod, MM, P, w1, op1, h01, h11, w0, op0, h00, h10,
 		 dst, src0, src1);
 
   /*
@@ -2438,9 +2412,9 @@ decode_dsp32mult_0(DisasContext *dc, uint16_t iw0, uint16_t iw1)
     TCGv res;
     TCGv sat0, sat1;
 
-    TRACE_EXTRACT("%s: M:%i mmod:%i MM:%i P:%i w1:%i op1:%i h01:%i h11:%i "
+    TRACE_EXTRACT("M:%i mmod:%i MM:%i P:%i w1:%i op1:%i h01:%i h11:%i "
                   "w0:%i op0:%i h00:%i h10:%i dst:%i src0:%i src1:%i",
-                  __func__, M, mmod, MM, P, w1, op1, h01, h11, w0, op0, h00, h10,
+                  M, mmod, MM, P, w1, op1, h01, h11, w0, op0, h00, h10,
                   dst, src0, src1);
 
     if (w1 == 0 && w0 == 0) {
@@ -2564,9 +2538,9 @@ decode_dsp32alu_0(DisasContext *dc, uint16_t iw0, uint16_t iw1)
     TCGv tmp;
     TCGv_i64 tmp64;
 
-    TRACE_EXTRACT("%s: M:%i HL:%i aopcde:%i aop:%i s:%i x:%i dst0:%i "
+    TRACE_EXTRACT("M:%i HL:%i aopcde:%i aop:%i s:%i x:%i dst0:%i "
                   "dst1:%i src0:%i src1:%i",
-                  __func__, M, HL, aopcde, aop, s, x, dst0, dst1, src0, src1);
+                  M, HL, aopcde, aop, s, x, dst0, dst1, src0, src1);
 
     if ((aop == 0 || aop == 2) && aopcde == 9 && HL == 0 && s == 0) {
         int a = aop >> 1;
@@ -3427,8 +3401,8 @@ decode_dsp32shift_0(DisasContext *dc, uint16_t iw0, uint16_t iw1)
     TCGv tmp;
     TCGv_i64 tmp64;
 
-    TRACE_EXTRACT("%s: M:%i sopcde:%i sop:%i HLs:%i dst0:%i src0:%i src1:%i",
-                  __func__, M, sopcde, sop, HLs, dst0, src0, src1);
+    TRACE_EXTRACT("M:%i sopcde:%i sop:%i HLs:%i dst0:%i src0:%i src1:%i",
+                  M, sopcde, sop, HLs, dst0, src0, src1);
 
     if ((sop == 0 || sop == 1) && sopcde == 0) {
         int l, endl;
@@ -3877,8 +3851,8 @@ decode_dsp32shiftimm_0(DisasContext *dc, uint16_t iw0, uint16_t iw1)
     int HLs      = ((iw1 >> DSP32ShiftImm_HLs_bits) & DSP32ShiftImm_HLs_mask);
     TCGv tmp;
 
-    TRACE_EXTRACT("%s: M:%i sopcde:%i sop:%i HLs:%i dst0:%i immag:%#x src1:%i",
-                  __func__, M, sopcde, sop, HLs, dst0, immag, src1);
+    TRACE_EXTRACT("M:%i sopcde:%i sop:%i HLs:%i dst0:%i immag:%#x src1:%i",
+                  M, sopcde, sop, HLs, dst0, immag, src1);
 
     if (sopcde == 0) {
         tmp = tcg_temp_new();
@@ -4052,7 +4026,7 @@ decode_psedoDEBUG_0(DisasContext *dc, uint16_t iw0)
     int grp = ((iw0 >> PseudoDbg_grp_bits) & PseudoDbg_grp_mask);
     int reg = ((iw0 >> PseudoDbg_reg_bits) & PseudoDbg_reg_mask);
 
-    TRACE_EXTRACT("%s: fn:%i grp:%i reg:%i", __func__, fn, grp, reg);
+    TRACE_EXTRACT("fn:%i grp:%i reg:%i", fn, grp, reg);
 
     if ((reg == 0 || reg == 1) && fn == 3) {
         /* DBG Areg{reg}; */
@@ -4115,7 +4089,7 @@ decode_psedoOChar_0(DisasContext *dc, uint16_t iw0)
     int ch = ((iw0 >> PseudoChr_ch_bits) & PseudoChr_ch_mask);
     TCGv tmp;
 
-    TRACE_EXTRACT("%s: ch:%#x", __func__, ch);
+    TRACE_EXTRACT("ch:%#x", ch);
 
     /* OUTC imm{ch}; */
     tmp = tcg_temp_new();
@@ -4140,8 +4114,8 @@ decode_psedodbg_assert_0(DisasContext *dc, uint16_t iw0, uint16_t iw1)
     TCGv reg, exp, pc;
     bool istmp;
 
-    TRACE_EXTRACT("%s: dbgop:%i grp:%i regtest:%i expected:%#x",
-                  __func__, dbgop, grp, regtest, expected);
+    TRACE_EXTRACT("dbgop:%i grp:%i regtest:%i expected:%#x",
+                  dbgop, grp, regtest, expected);
 
     if (dbgop == 0 || dbgop == 2) {
         /* DBGA (genreg_lo{grp,regtest}, imm{expected} */
@@ -4226,7 +4200,7 @@ _interp_insn_bfin(DisasContext *dc, target_ulong pc)
         /* 16-bit opcode */
         dc->insn_len = 2;
 
-        TRACE_EXTRACT("%s: iw0:%#x", __func__, iw0);
+        TRACE_EXTRACT("iw0:%#x", iw0);
         if ((iw0 & 0xFF00) == 0x0000) {
             decode_ProgCtrl_0(dc, iw0);
         } else if ((iw0 & 0xFFC0) == 0x0240) {
@@ -4276,7 +4250,7 @@ _interp_insn_bfin(DisasContext *dc, target_ulong pc)
         } else if ((iw0 & 0xE000) == 0xA000) {
             decode_LDSTii_0(dc, iw0);
         } else {
-            TRACE_EXTRACT("%s: no matching 16-bit pattern", __func__);
+            TRACE_EXTRACT("no matching 16-bit pattern");
             illegal_instruction(dc);
         }
         return;
@@ -4290,7 +4264,7 @@ _interp_insn_bfin(DisasContext *dc, target_ulong pc)
         dc->insn_len = 4;
     }
 
-    TRACE_EXTRACT("%s: iw0:%#x iw1:%#x insn_len:%i", __func__,
+    TRACE_EXTRACT("iw0:%#x iw1:%#x insn_len:%i",
                   iw0, iw1, dc->insn_len);
 
     if ((iw0 & 0xf7ff) == 0xc003 && iw1 == 0x1800) {
@@ -4322,7 +4296,7 @@ _interp_insn_bfin(DisasContext *dc, target_ulong pc)
     } else if (((iw0 & 0xFF00) == 0xF000) && ((iw1 & 0x0000) == 0x0000)) {
         decode_psedodbg_assert_0(dc, iw0, iw1);
     } else {
-        TRACE_EXTRACT("%s: no matching 32-bit pattern", __func__);
+        TRACE_EXTRACT("no matching 32-bit pattern");
         illegal_instruction(dc);
     }
 }

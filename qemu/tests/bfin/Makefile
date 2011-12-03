@@ -15,6 +15,7 @@ PASS   = $(GREEN)PASS$(NORMAL)
 FAIL   = $(RED)FAIL$(NORMAL)
 
 all: sim # host
+check: all
 
 sim: $(SIM)
 	@fail=0 pass=0 ; \

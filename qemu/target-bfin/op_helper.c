@@ -7,7 +7,8 @@
  * Licensed under the Lesser GPL 2 or later.
  */
 
-#include "exec.h"
+#include "cpu.h"
+#include "dyngen-exec.h"
 #include "helper.h"
 
 void helper_raise_exception(uint32_t excp, uint32_t pc)
@@ -15,7 +16,7 @@ void helper_raise_exception(uint32_t excp, uint32_t pc)
     env->exception_index = excp;
     if (pc != -1)
         env->pc = pc;
-    cpu_loop_exit();
+    cpu_loop_exit(env);
 }
 
 void helper_memalign(uint32_t excp, uint32_t pc, uint32_t addr, uint32_t len)

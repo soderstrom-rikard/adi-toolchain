@@ -142,6 +142,10 @@ hello-mipsel: hello-mips.c
 test-cris:
 	$(MAKE) -C cris check
 
+# testsuite for the LM32 port.
+test-lm32:
+	$(MAKE) -C lm32 check
+
 # testsuite for the Blackfin port.
 test-bfin:
 	$(MAKE) -C bfin check

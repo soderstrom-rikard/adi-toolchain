@@ -109,6 +109,9 @@ typedef struct TaskState {
     FPA11 fpa;
     int swi_errno;
 #endif
+#ifdef TARGET_UNICORE32
+    int swi_errno;
+#endif
 #if defined(TARGET_I386) && !defined(TARGET_X86_64)
     abi_ulong target_v86;
     struct vm86_saved_state vm86_saved_regs;
@@ -122,7 +125,7 @@ typedef struct TaskState {
 #ifdef TARGET_M68K
     int sim_syscalls;
 #endif
-#if defined(TARGET_ARM) || defined(TARGET_M68K)
+#if defined(TARGET_ARM) || defined(TARGET_M68K) || defined(TARGET_UNICORE32)
     /* Extra fields for semihosted binaries.  */
     uint32_t stack_base;
     uint32_t heap_base;
@@ -193,7 +196,8 @@ abi_long do_brk(abi_ulong new_brk);
 void syscall_init(void);
 abi_long do_syscall(void *cpu_env, int num, abi_long arg1,
                     abi_long arg2, abi_long arg3, abi_long arg4,
-                    abi_long arg5, abi_long arg6);
+                    abi_long arg5, abi_long arg6, abi_long arg7,
+                    abi_long arg8);
 void gemu_log(const char *fmt, ...) GCC_FMT_ATTR(1, 2);
 extern THREAD CPUState *thread_env;
 void cpu_loop(CPUState *env);
@@ -201,6 +205,12 @@ char *target_strerror(int err);
 int get_osversion(void);
 void fork_start(void);
 void fork_end(int child);
+
+/* Return true if the proposed guest_base is suitable for the guest.
+ * The guest code may leave a page mapped and populate it if the
+ * address is suitable.
+ */
+bool guest_validate_base(unsigned long guest_base);
 
 #include "qemu-log.h"
 
@@ -380,7 +390,7 @@ abi_long copy_from_user(void *hptr, abi_ulong gaddr, size_t len);
 abi_long copy_to_user(abi_ulong gaddr, void *hptr, size_t len);
 
 /* Functions for accessing guest memory.  The tget and tput functions
-   read/write single values, byteswapping as neccessary.  The lock_user
+   read/write single values, byteswapping as necessary.  The lock_user
    gets a pointer to a contiguous area of guest memory, but does not perform
    and byteswapping.  lock_user may return either a pointer to the guest
    memory, or a temporary buffer.  */

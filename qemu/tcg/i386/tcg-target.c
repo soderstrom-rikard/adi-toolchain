@@ -76,9 +76,11 @@ static const int tcg_target_call_iarg_regs[] = {
 #endif
 };
 
-static const int tcg_target_call_oarg_regs[2] = {
+static const int tcg_target_call_oarg_regs[] = {
     TCG_REG_EAX,
+#if TCG_TARGET_REG_BITS == 32
     TCG_REG_EDX
+#endif
 };
 
 static uint8_t *tb_ret_addr;
@@ -165,6 +167,10 @@ static int target_parse_constraint(TCGArgConstraint *ct, const char **pct_str)
         } else {
             tcg_regset_set32(ct->u.regs, 0, 0xf);
         }
+        break;
+    case 'Q':
+        ct->ct |= TCG_CT_REG;
+        tcg_regset_set32(ct->u.regs, 0, 0xf);
         break;
     case 'r':
         ct->ct |= TCG_CT_REG;
@@ -512,7 +518,8 @@ static inline void tgen_arithr(TCGContext *s, int subop, int dest, int src)
     tcg_out_modrm(s, OPC_ARITH_GvEv + (subop << 3) + ext, dest, src);
 }
 
-static inline void tcg_out_mov(TCGContext *s, TCGType type, int ret, int arg)
+static inline void tcg_out_mov(TCGContext *s, TCGType type,
+                               TCGReg ret, TCGReg arg)
 {
     if (arg != ret) {
         int opc = OPC_MOVL_GvEv + (type == TCG_TYPE_I64 ? P_REXW : 0);
@@ -521,7 +528,7 @@ static inline void tcg_out_mov(TCGContext *s, TCGType type, int ret, int arg)
 }
 
 static void tcg_out_movi(TCGContext *s, TCGType type,
-                         int ret, tcg_target_long arg)
+                         TCGReg ret, tcg_target_long arg)
 {
     if (arg == 0) {
         tgen_arithr(s, ARITH_XOR, ret, ret);
@@ -562,15 +569,15 @@ static inline void tcg_out_pop(TCGContext *s, int reg)
     tcg_out_opc(s, OPC_POP_r32 + LOWREGMASK(reg), 0, reg, 0);
 }
 
-static inline void tcg_out_ld(TCGContext *s, TCGType type, int ret,
-                              int arg1, tcg_target_long arg2)
+static inline void tcg_out_ld(TCGContext *s, TCGType type, TCGReg ret,
+                              TCGReg arg1, tcg_target_long arg2)
 {
     int opc = OPC_MOVL_GvEv + (type == TCG_TYPE_I64 ? P_REXW : 0);
     tcg_out_modrm_offset(s, opc, ret, arg1, arg2);
 }
 
-static inline void tcg_out_st(TCGContext *s, TCGType type, int arg,
-                              int arg1, tcg_target_long arg2)
+static inline void tcg_out_st(TCGContext *s, TCGType type, TCGReg arg,
+                              TCGReg arg1, tcg_target_long arg2)
 {
     int opc = OPC_MOVL_EvGv + (type == TCG_TYPE_I64 ? P_REXW : 0);
     tcg_out_modrm_offset(s, opc, arg, arg1, arg2);
@@ -1398,7 +1405,7 @@ static void tcg_out_qemu_st(TCGContext *s, const TCGArg *args,
         /* Pop and discard.  This is 2 bytes smaller than the add.  */
         tcg_out_pop(s, TCG_REG_ECX);
     } else if (stack_adjust != 0) {
-        tcg_out_addi(s, TCG_REG_ESP, stack_adjust);
+        tcg_out_addi(s, TCG_REG_CALL_STACK, stack_adjust);
     }
 
     /* label2: */
@@ -1745,6 +1752,22 @@ static inline void tcg_out_op(TCGContext *s, TCGOpcode opc,
         break;
 #endif
 
+    OP_32_64(deposit):
+        if (args[3] == 0 && args[4] == 8) {
+            /* load bits 0..7 */
+            tcg_out_modrm(s, OPC_MOVB_EvGv | P_REXB_R | P_REXB_RM,
+                          args[2], args[0]);
+        } else if (args[3] == 8 && args[4] == 8) {
+            /* load bits 8..15 */
+            tcg_out_modrm(s, OPC_MOVB_EvGv, args[2], args[0] + 4);
+        } else if (args[3] == 0 && args[4] == 16) {
+            /* load bits 0..15 */
+            tcg_out_modrm(s, OPC_MOVL_EvGv | P_DATA16, args[2], args[0]);
+        } else {
+            tcg_abort();
+        }
+        break;
+
     default:
         tcg_abort();
     }
@@ -1800,6 +1823,8 @@ static const TCGTargetOpDef x86_op_defs[] = {
 
     { INDEX_op_setcond_i32, { "q", "r", "ri" } },
 
+    { INDEX_op_deposit_i32, { "Q", "0", "Q" } },
+
 #if TCG_TARGET_REG_BITS == 32
     { INDEX_op_mulu2_i32, { "a", "d", "a", "r" } },
     { INDEX_op_add2_i32, { "r", "r", "0", "1", "ri", "ri" } },
@@ -1851,6 +1876,8 @@ static const TCGTargetOpDef x86_op_defs[] = {
     { INDEX_op_ext8u_i64, { "r", "r" } },
     { INDEX_op_ext16u_i64, { "r", "r" } },
     { INDEX_op_ext32u_i64, { "r", "r" } },
+
+    { INDEX_op_deposit_i64, { "Q", "0", "Q" } },
 #endif
 
 #if TCG_TARGET_REG_BITS == 64
@@ -1901,10 +1928,10 @@ static int tcg_target_callee_save_regs[] = {
     TCG_REG_RBX,
     TCG_REG_R12,
     TCG_REG_R13,
-    /* TCG_REG_R14, */ /* Currently used for the global env. */
+    TCG_REG_R14, /* Currently used for the global env. */
     TCG_REG_R15,
 #else
-    /* TCG_REG_EBP, */ /* Currently used for the global env. */
+    TCG_REG_EBP, /* Currently used for the global env. */
     TCG_REG_EBX,
     TCG_REG_ESI,
     TCG_REG_EDI,
@@ -1918,28 +1945,34 @@ static void tcg_target_qemu_prologue(TCGContext *s)
 
     /* TB prologue */
 
+    /* Reserve some stack space, also for TCG temps.  */
+    push_size = 1 + ARRAY_SIZE(tcg_target_callee_save_regs);
+    push_size *= TCG_TARGET_REG_BITS / 8;
+
+    frame_size = push_size + TCG_STATIC_CALL_ARGS_SIZE +
+        CPU_TEMP_BUF_NLONGS * sizeof(long);
+    frame_size = (frame_size + TCG_TARGET_STACK_ALIGN - 1) &
+        ~(TCG_TARGET_STACK_ALIGN - 1);
+    stack_addend = frame_size - push_size;
+    tcg_set_frame(s, TCG_REG_CALL_STACK, TCG_STATIC_CALL_ARGS_SIZE,
+                  CPU_TEMP_BUF_NLONGS * sizeof(long));
+
     /* Save all callee saved registers.  */
     for (i = 0; i < ARRAY_SIZE(tcg_target_callee_save_regs); i++) {
         tcg_out_push(s, tcg_target_callee_save_regs[i]);
     }
 
-    /* Reserve some stack space.  */
-    push_size = 1 + ARRAY_SIZE(tcg_target_callee_save_regs);
-    push_size *= TCG_TARGET_REG_BITS / 8;
-
-    frame_size = push_size + TCG_STATIC_CALL_ARGS_SIZE;
-    frame_size = (frame_size + TCG_TARGET_STACK_ALIGN - 1) &
-        ~(TCG_TARGET_STACK_ALIGN - 1);
-    stack_addend = frame_size - push_size;
     tcg_out_addi(s, TCG_REG_ESP, -stack_addend);
 
+    tcg_out_mov(s, TCG_TYPE_PTR, TCG_AREG0, tcg_target_call_iarg_regs[0]);
+
     /* jmp *tb.  */
-    tcg_out_modrm(s, OPC_GRP5, EXT5_JMPN_Ev, tcg_target_call_iarg_regs[0]);
+    tcg_out_modrm(s, OPC_GRP5, EXT5_JMPN_Ev, tcg_target_call_iarg_regs[1]);
 
     /* TB epilogue */
     tb_ret_addr = s->code_ptr;
 
-    tcg_out_addi(s, TCG_REG_ESP, stack_addend);
+    tcg_out_addi(s, TCG_REG_CALL_STACK, stack_addend);
 
     for (i = ARRAY_SIZE(tcg_target_callee_save_regs) - 1; i >= 0; i--) {
         tcg_out_pop(s, tcg_target_callee_save_regs[i]);
@@ -1976,7 +2009,7 @@ static void tcg_target_init(TCGContext *s)
     }
 
     tcg_regset_clear(s->reserved_regs);
-    tcg_regset_set_reg(s->reserved_regs, TCG_REG_ESP);
+    tcg_regset_set_reg(s->reserved_regs, TCG_REG_CALL_STACK);
 
     tcg_add_target_add_op_defs(x86_op_defs);
 }

@@ -80,7 +80,7 @@ CPUState *cpu_init(const char *cpu_model)
     CPUState *env;
     static int tcg_initialized = 0;
 
-    env = qemu_mallocz(sizeof(*env));
+    env = g_malloc0(sizeof(*env));
     if (!env)
         return NULL;
 
@@ -1350,8 +1350,7 @@ void gen_intermediate_code_pc(CPUState *env, struct TranslationBlock *tb)
     gen_intermediate_code_internal(env, tb, 1);
 }
 
-void gen_pc_load(CPUState *env, TranslationBlock *tb,
-                 unsigned long searched_pc, int pc_pos, void *puc)
+void restore_state_to_opc(CPUState *env, TranslationBlock *tb, int pc_pos)
 {
     env->pc = gen_opc_pc[pc_pos];
 }
