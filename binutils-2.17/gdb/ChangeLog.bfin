@@ -1,3 +1,8 @@
+2011-06-01  Mike Frysinger  <vapier@gentoo.org>
+
+	* remote-sim.c (gdbsim_open): Add the strlen of " --sysroot=" and
+	gdb_sysroot to the "len" variable.  Append both to "arg_buf".
+
 2010-02-08  Mike Frysinger  <michael.frysinger@analog.com>
 
 	* bfin-tdep.c (bfin_sim_regno): Delete.
