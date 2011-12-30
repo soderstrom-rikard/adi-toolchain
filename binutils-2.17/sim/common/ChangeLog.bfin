@@ -1,3 +1,8 @@
+2011-12-03  Mike Frysinger  <vapier@gentoo.org>
+
+	* syscall.c (cb_get_string): Rename from "get_string".
+	(get_path): Rename get_string call to cb_get_string.
+
 2006-11-07  Thiemo Seufer  <ths@mips.com>
 
 	* gentmap.c: Fix compile time warning.
