@@ -35,20 +35,16 @@
 #define UNASSIGNED_FILL 0
 // just IVG15
 #define INTERRUPT_BITS 0x400
-#if defined(_ADI_THREADS) || \
-    !defined(__ADSPLPBLACKFIN__) || defined(__ADSPBF561__) || defined(__ADSPBF566__)
+
 #define SET_CLOCK_SPEED 0
-#else
-#define SET_CLOCK_SPEED 1
-#endif
 
 #if SET_CLOCK_SPEED == 1
 #include <sys/pll.h>
-#define SET_CLK_MSEL 0x16
+#define SET_CLK_MSEL 0x5
 #define SET_CLK_DF 0
-#define SET_CLK_LOCK_COUNT 0x300
+#define SET_CLK_LOCK_COUNT 0x200
 #define SET_CLK_CSEL 0
-#define SET_CLK_SSEL 5
+#define SET_CLK_SSEL 4
 
 /*
 ** CLKIN == 27MHz on the EZ-Kits.
