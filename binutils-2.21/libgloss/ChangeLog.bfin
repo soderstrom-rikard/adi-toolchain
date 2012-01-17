@@ -1,0 +1,3 @@
+2012-01-17  Stuart Henderson  <stuart.henderson@analog.com>
+
+	* bfin/_exit.c : Add license header.
