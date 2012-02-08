@@ -380,7 +380,7 @@ if test_targets_has LINUX ; then
 	fi
 
 	# See if the board is running FDPIC or FLAT
-	run_rcp /usr/bin/gdbserver "${DIR_TEST_RESULTS}"/gdbserver
+	run_rcp /bin/gdbserver "${DIR_TEST_RESULTS}"/gdbserver
 	FDPIC_TARGET=0
 	if file "${DIR_TEST_RESULTS}"/gdbserver | grep -q ELF ; then
 		FDPIC_TARGET=1
