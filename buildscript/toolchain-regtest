@@ -380,15 +380,18 @@ if test_targets_has LINUX ; then
 	fi
 
 	# See if the board is running FDPIC or FLAT
-	run_rcp /bin/gdbserver "${DIR_TEST_RESULTS}"/gdbserver
-	FDPIC_TARGET=0
-	if file "${DIR_TEST_RESULTS}"/gdbserver | grep -q ELF ; then
-		FDPIC_TARGET=1
-	elif run_rsh_nodie_stdout cat /proc/maps | grep -q /lib/ ; then
-		FDPIC_TARGET=1
+	if ! RUN=`run_rsh_nodie_stdout find / -name gdbserver | head -1` ; then
+		error "unable to find gdbserver!"
+	else 
+		run_rcp $RUN "${DIR_TEST_RESULTS}"/gdbserver
+		FDPIC_TARGET=0
+		if file "${DIR_TEST_RESULTS}"/gdbserver | grep -q ELF ; then
+			FDPIC_TARGET=1
+		elif run_rsh_nodie_stdout cat /proc/maps | grep -q /lib/ ; then
+			FDPIC_TARGET=1
+		fi
+		run_cmd rm "${DIR_TEST_RESULTS}"/gdbserver
 	fi
-	run_cmd rm "${DIR_TEST_RESULTS}"/gdbserver
-
 	# Check if the tcp connections are recycled on both target
 	# and host, which is needed to prevent the rsh and rcp
 	# connection failures when doing many many connections.
@@ -416,8 +419,8 @@ if test_targets_has LINUX ; then
 	if ! RUN=`run_rsh_nodie_stdout cat /proc/cpuinfo` ; then
 		error "unable to read Blackfin /proc/cpuinfo"
 	fi
-	if ! echo "${RUN}" | grep -q '^vendor_id.*Analog Devices' ; then
-		error "board doesn't appear to be a Blackfin"
+	if ! echo "${RUN}" | grep -q 'ADI' ; then
+		error "board doesn't appear to be an ADI chip "
 	fi
 	CPU_TYPE=`echo "${RUN}" | awk '$1 == "model" { print $4; exit }' | tr '[:upper:]' '[:lower:]' | sed 's:adsp-::'`
 	CPU_REV=`echo "${RUN}" | awk '$1 == "stepping" { print $3; exit }'`
