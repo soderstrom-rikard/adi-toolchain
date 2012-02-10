@@ -2,3 +2,15 @@
 
 load_adi "bfin-fmt-fdpic"
 load_adi "bfin-target-linux"
+
+proc bfin-linux-uclibc_load { dest prog args } {
+
+	set outp [standard_load $dest $prog $args]
+    set res [lindex $outp 0]
+    set text [lindex $outp 1]
+	if { [string match "*SEGV*" $text] == 1 } {
+		regsub -all "SEGV\n" $text "" text
+		append text "\nSEGV"
+	}
+    return [list $res $text]
+}
