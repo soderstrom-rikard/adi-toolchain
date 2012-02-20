@@ -45,6 +45,7 @@ echo "Converting _LANGUAGE_C to __ASSEMBLER__ ..."
 find "$dir" -name '*.h' -exec \
 sed -i \
 	-e 's:#ifdef _LANGUAGE_C:#ifndef __ASSEMBLER__:' \
+	-e 's:#if defined(_LANGUAGE_C):#ifndef __ASSEMBLER__:' \
 	-e 's:\(/\*[[:space:]]*\)_LANGUAGE_C\([[:space:]]*\*/\):\1__ASSEMBLER__\2:' \
 	{} +
 
