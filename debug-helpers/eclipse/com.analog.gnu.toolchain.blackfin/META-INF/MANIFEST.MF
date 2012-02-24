@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Blackfin GNU Toolchain
 Bundle-SymbolicName: com.analog.gnu.toolchain.blackfin;singleton:=true
-Bundle-Version: 1.0.2.vqualifier
+Bundle-Version: 1.0.4
 Bundle-Vendor: Analog Devices, Inc.
 Bundle-Localization: plugin
 Bundle-RequiredExecutionEnvironment: J2SE-1.5

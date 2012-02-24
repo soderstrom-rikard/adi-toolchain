@@ -15,7 +15,7 @@ import java.io.IOException;
 import org.eclipse.cdt.managedbuilder.core.IManagedIsToolChainSupported;
 import org.eclipse.cdt.managedbuilder.core.ITool;
 import org.eclipse.cdt.managedbuilder.core.IToolChain;
-import org.eclipse.core.runtime.PluginVersionIdentifier;
+import org.osgi.framework.Version;
 
 /**
  * Only display toolchains that installed in user's PATH
@@ -36,7 +36,7 @@ public class CheckToolchain implements IManagedIsToolChainSupported {
 	}
 
 	public boolean isSupported(IToolChain toolChain,
-			PluginVersionIdentifier version, String instance) {
+			Version version, String instance) {
 
 		// Make sure each tool in the chain is installed and executable
 		for (ITool t : toolChain.getTools()) {

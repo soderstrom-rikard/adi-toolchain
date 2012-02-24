@@ -3,12 +3,12 @@
    <description name="Blackfin GNU Components" url="http://docs.blackfin.uclinux.org/doku.php?id=toolchain:eclipse">
       Eclipse Install/Update site for Blackfin GNU Open Source components
    </description>
-   <feature url="features/com.analog.gnu.debug.mmr_1.0.3.v201012100936.jar" id="com.analog.gnu.debug.mmr" version="1.0.3.v201012100936" os="All" ws="All" nl="en" arch="All">
+   <feature url="features/com.analog.gnu.debug.mmr_1.0.4.jar" id="com.analog.gnu.debug.mmr" version="1.0.4">
       <category name="debug"/>
    </feature>
-   <feature url="features/com.analog.gnu.toolchain.blackfin_1.0.3.v201012100936.jar" id="com.analog.gnu.toolchain.blackfin" version="1.0.3.v201012100936" os="All" ws="All" nl="en" arch="All">
+   <feature url="features/com.analog.gnu.toolchain.blackfin_1.0.4.jar" id="com.analog.gnu.toolchain.blackfin" version="1.0.4">
       <category name="toolchain"/>
    </feature>
-   <category-def name="debug" label="Blackfin Debug"/>
+   <category-def name="debug" label="Blackfin GNU Debug"/>
    <category-def name="toolchain" label="Blackfin GNU Toolchain"/>
 </site>
