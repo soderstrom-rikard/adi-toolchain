@@ -35,7 +35,7 @@ void test01()
   // and shrink-to-fit (in the future, maybe this will change
   // for short strings).
   const size_type minsize = 2 << 0;
-  const size_type maxsize = 2 << 20;
+  const size_type maxsize = 2 << 16;
   for (size_type i = minsize; i <= maxsize; i *= 2)
     {
       wstring str(i, L'x');
