@@ -1,3 +1,10 @@
+2012-03-12  Stuart Henderson <stuart.henderson@analog.com>
+
+	Merge from 4.3
+	[#5828] low memory on string capacity test
+	* testsuite/21_strings/basic_string/capacity/wchar_t/18654.cc: Reduce memory
+	usage.
+
 2011-10-26  Stuart Henderson <stuart.henderson@analog.com>
 
 	[#6822] bare-metal means low memory, ignore tests that don't fit.
