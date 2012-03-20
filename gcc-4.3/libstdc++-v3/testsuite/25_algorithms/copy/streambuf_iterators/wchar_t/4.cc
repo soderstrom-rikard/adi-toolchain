@@ -23,6 +23,8 @@
 #include <algorithm>
 #include <testsuite_hooks.h>
 
+#define len 5500
+
 // In the occasion of libstdc++/25482
 void test01()
 {
@@ -31,13 +33,13 @@ void test01()
   
   typedef istreambuf_iterator<wchar_t> in_iterator_type;
 
-  wifstream fbuf_ref("istream_unformatted-1.txt"),
-            fbuf("istream_unformatted-1.txt");
+  wifstream fbuf_ref("istream_unformatted-1-small.txt"),
+            fbuf("istream_unformatted-1-small.txt");
 
-  wchar_t buffer_ref[16500],
-          buffer[16500];
+  wchar_t buffer_ref[len],
+          buffer[len];
 
-  fbuf_ref.read(buffer_ref, 16500);
+  fbuf_ref.read(buffer_ref, len);
 
   in_iterator_type beg(fbuf);
   in_iterator_type end;
@@ -46,7 +48,7 @@ void test01()
   VERIFY( fbuf_ref.good() );
   VERIFY( fbuf.good() );
 
-  VERIFY( !wmemcmp(buffer, buffer_ref, 16500) );
+  VERIFY( !wmemcmp(buffer, buffer_ref, len) );
 }
 
 int main()
