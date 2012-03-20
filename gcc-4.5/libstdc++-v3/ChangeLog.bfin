@@ -1,3 +1,11 @@
+2012-03-20  Stuart Henderson <stuart.henderson@analog.com>
+
+	[#6261] reduce stack usage for wchar streambuf iterator test
+	* testsuite/25_algorithms/copy/streambuf_iterators/wchar_t/4.cc: Use smaller
+	input file.
+	* testsuite/data/istream_unformatted-1-small.txt: Add smaller
+	input file.
+
 2012-03-12  Stuart Henderson <stuart.henderson@analog.com>
 
 	Merge from 4.3
