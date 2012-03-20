@@ -1,3 +1,8 @@
+2012-03-20  Stuart Henderson  <Stuart.Henderson@analog.com>
+
+	* testsuite/libmudflap.c/heap-scalestress.c: [#6202] Further reduce SCALE
+	for bfin to catch all failures.
+
 2011-06-20  Stuart Henderson  <Stuart.Henderson@analog.com>
 
 	Merge from 4.3
