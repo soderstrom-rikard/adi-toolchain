@@ -1,3 +1,12 @@
+2011-03-20  Stuart Henderson  <Stuart.Henderson@analog.com>
+
+	* gcc/config/bfin/bfin-protos.h: define various UNSAFE_NULL_ADDR macros.
+	* gcc/config/bfin/bfin.c (bfin_cpus): Enable WA_UNSAFE_NULL_ADDR when
+	appropriate.
+	(trapping_loads_p): Spec null load is unsafe for ENABLE_WA_UNSAFE_NULL_ADDR.
+	* gcc/config/bfin/bfin.h (TARGET_CPU_CPP_BUILTINS): Define
+	 __WORKAROUND_UNSAFE_NULL_ADDR
+
 2011-11-04  Stuart Henderson  <Stuart.Henderson@analog.com>
 
 	* config/bfin/bfin.c (bfin_cpus[]): Add 0.2 for bf592.
