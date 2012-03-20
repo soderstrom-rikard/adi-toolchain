@@ -123,14 +123,14 @@ struct bfin_cpu
 struct bfin_cpu bfin_cpus[] =
 {
   {"bf504", BFIN_CPU_BF504, 0x0001,
-   WA_SPECULATIVE_LOADS | WA_05000074},
+   WA_SPECULATIVE_LOADS | WA_05000074 | WA_UNSAFE_NULL_ADDR},
   {"bf504", BFIN_CPU_BF504, 0x0000,
-   WA_SPECULATIVE_LOADS | WA_05000074},
+   WA_SPECULATIVE_LOADS | WA_05000074 | WA_UNSAFE_NULL_ADDR},
 
   {"bf506", BFIN_CPU_BF506, 0x0001,
-   WA_SPECULATIVE_LOADS | WA_05000074},
+   WA_SPECULATIVE_LOADS | WA_05000074 | WA_UNSAFE_NULL_ADDR},
   {"bf506", BFIN_CPU_BF506, 0x0000,
-   WA_SPECULATIVE_LOADS | WA_05000074},
+   WA_SPECULATIVE_LOADS | WA_05000074 | WA_UNSAFE_NULL_ADDR},
 
   {"bf512", BFIN_CPU_BF512, 0x0002,
    WA_SPECULATIVE_LOADS | WA_05000074},
@@ -378,11 +378,11 @@ struct bfin_cpu bfin_cpus[] =
    | WA_05000074},
 
   {"bf592", BFIN_CPU_BF592, 0x0002,
-   WA_SPECULATIVE_LOADS | WA_05000074},
+   WA_SPECULATIVE_LOADS | WA_05000074 | WA_UNSAFE_NULL_ADDR},
   {"bf592", BFIN_CPU_BF592, 0x0001,
-   WA_SPECULATIVE_LOADS | WA_05000074},
+   WA_SPECULATIVE_LOADS | WA_05000074 | WA_UNSAFE_NULL_ADDR},
   {"bf592", BFIN_CPU_BF592, 0x0000,
-   WA_SPECULATIVE_LOADS | WA_05000074},
+   WA_SPECULATIVE_LOADS | WA_05000074 | WA_UNSAFE_NULL_ADDR},
 
   {NULL, 0, 0, 0}
 };
@@ -5628,8 +5628,7 @@ trapping_loads_p (rtx insn, int np_reg, bool after_np_branch)
 {
   rtx mem = SET_SRC (single_set (insn));
 
-  if (!after_np_branch || bfin_cpu_type == BFIN_CPU_BF504
-      || bfin_cpu_type == BFIN_CPU_BF506 || bfin_cpu_type == BFIN_CPU_BF592)
+  if (!after_np_branch || ENABLE_WA_UNSAFE_NULL_ADDR)
     np_reg = -1;
   return ((np_reg == -1 || !harmless_null_pointer_p (mem, np_reg))
 	  && may_trap_p (mem));

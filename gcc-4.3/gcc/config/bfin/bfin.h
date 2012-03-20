@@ -221,6 +221,8 @@ extern int target_flags;
 	builtin_define ("__WORKAROUND_INDIRECT_CALLS");			\
       if (ENABLE_WA_RETS)						\
 	builtin_define ("__WORKAROUND_RETS");				\
+      if (ENABLE_WA_UNSAFE_NULL_ADDR)						\
+	builtin_define ("__WORKAROUND_UNSAFE_NULL_ADDR");				\
 						\
       if (TARGET_FDPIC)				\
 	{					\

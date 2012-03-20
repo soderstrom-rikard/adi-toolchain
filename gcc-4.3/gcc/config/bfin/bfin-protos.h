@@ -63,6 +63,10 @@
 #define ENABLE_WA_05000074 \
   (bfin_workarounds & WA_05000074)
 
+#define WA_UNSAFE_NULL_ADDR 0x00000200
+#define ENABLE_WA_UNSAFE_NULL_ADDR \
+  (bfin_workarounds & WA_UNSAFE_NULL_ADDR)
+
 #define Mmode enum machine_mode
 
 extern rtx function_arg (CUMULATIVE_ARGS *, Mmode, tree, int);

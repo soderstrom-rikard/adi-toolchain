@@ -1,3 +1,46 @@
+2012-03-20  Stuart Henderson  <stuart.henderson@analog.com>
+
+	* gcc.target/bfin/workarounds-any.c: add test for 
+	__WORKAROUND_UNSAFE_NULL_ADDR
+	* gcc.target/bfin/mcpu-bf547m.c: Likewise
+	* gcc.target/bfin/mcpu-bf522.c: Likewise
+	* gcc.target/bfin/mcpu-bf524.c: Likewise
+	* gcc.target/bfin/mcpu-default.c: Likewise
+	* gcc.target/bfin/mcpu-bf526.c: Likewise
+	* gcc.target/bfin/mcpu-bf547.c: Likewise
+	* gcc.target/bfin/mcpu-bf549.c: Likewise
+	* gcc.target/bfin/mcpu-bf542m.c: Likewise
+	* gcc.target/bfin/workarounds-none.c: Likewise
+	* gcc.target/bfin/workarounds-1.c: Likewise
+	* gcc.target/bfin/workarounds-3.c: Likewise
+	* gcc.target/bfin/mcpu-bf512.c: Likewise
+	* gcc.target/bfin/mcpu-bf531.c: Likewise
+	* gcc.target/bfin/mcpu-bf514.c: Likewise
+	* gcc.target/bfin/mcpu-bf533.c: Likewise
+	* gcc.target/bfin/mcpu-bf516.c: Likewise
+	* gcc.target/bfin/mcpu-bf518.c: Likewise
+	* gcc.target/bfin/mcpu-bf537.c: Likewise
+	* gcc.target/bfin/mcpu-bf592.c: Likewise
+	* gcc.target/bfin/mcpu-bf539.c: Likewise
+	* gcc.target/bfin/mcpu-bf549m.c: Likewise
+	* gcc.target/bfin/mcpu-bf504.c: Likewise
+	* gcc.target/bfin/mcpu-bf523.c: Likewise
+	* gcc.target/bfin/mcpu-bf542.c: Likewise
+	* gcc.target/bfin/mcpu-bf506.c: Likewise
+	* gcc.target/bfin/mcpu-bf525.c: Likewise
+	* gcc.target/bfin/mcpu-bf561.c: Likewise
+	* gcc.target/bfin/mcpu-bf544.c: Likewise
+	* gcc.target/bfin/mcpu-bf527.c: Likewise
+	* gcc.target/bfin/mcpu-bf548.c: Likewise
+	* gcc.target/bfin/mcpu-bf544m.c: Likewise
+	* gcc.target/bfin/mcpu-bf548m.c: Likewise
+	* gcc.target/bfin/workarounds-2.c: Likewise
+	* gcc.target/bfin/workarounds-4.c: Likewise
+	* gcc.target/bfin/mcpu-bf532.c: Likewise
+	* gcc.target/bfin/mcpu-bf534.c: Likewise
+	* gcc.target/bfin/mcpu-bf536.c: Likewise
+	* gcc.target/bfin/mcpu-bf538.c: Likewise
+
 2011-11-04  Stuart Henderson  <stuart.henderson@analog.com>
 
 	* gcc.target/bfin/mcpu-bf504.c: Update test.

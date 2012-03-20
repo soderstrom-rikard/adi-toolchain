@@ -88,6 +88,10 @@
 #error "__WORKAROUND_SPECULATIVE_LOADS is not defined"
 #endif
 
+#ifndef __WORKAROUND_UNSAFE_NULL_ADDR
+#error "__WORKAROUND_UNSAFE_NULL_ADDR is not defined"
+#endif
+
 #ifndef __WORKAROUND_SPECULATIVE_SYNCS
 #error "__WORKAROUND_SPECULATIVE_SYNCS is not defined"
 #endif
