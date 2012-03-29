@@ -50,6 +50,10 @@ MULTILIB_MATCHES+=mcpu?bf532-none=mcpu?bf549-none
 MULTILIB_MATCHES+=mcpu?bf532-none=mcpu?bf549m-none
 MULTILIB_MATCHES+=mcpu?bf532-none=mcpu?bf561-none
 MULTILIB_MATCHES+=mcpu?bf532-none=mcpu?bf592-none
+MULTILIB_MATCHES+=mcpu?bf532-none=mcpu?bf606-none
+MULTILIB_MATCHES+=mcpu?bf532-none=mcpu?bf607-none
+MULTILIB_MATCHES+=mcpu?bf532-none=mcpu?bf608-none
+MULTILIB_MATCHES+=mcpu?bf532-none=mcpu?bf609-none
 
 SHLIB_MKMAP_OPTS = -v leading_underscore=1
 SHLIB_MAPFILES = $(srcdir)/libgcc-std.ver \

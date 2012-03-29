@@ -100,7 +100,7 @@ if type -P bfin-elf-gcc >/dev/null ; then
 				echo "#include <$inc>" | \
 				bfin-elf-gcc \
 					-mcpu=${cpu}${si} \
-					-nostdinc -isystem "$dir" \
+					-isystem "$dir" \
 					-x c -c -o /dev/null -
 			done
 		done

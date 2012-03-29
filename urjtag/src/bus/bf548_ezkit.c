@@ -27,27 +27,7 @@
 typedef struct
 {
     bfin_bus_params_t params; /* needs to be first */
-    urj_part_signal_t *dcs0;  /* DDR */
-    urj_part_signal_t *nce;   /* NAND */
 } bus_params_t;
-
-#define DCS0    ((bus_params_t *) bus->params)->dcs0
-#define NCE     ((bus_params_t *) bus->params)->nce
-
-static void
-bf548_ezkit_unselect_flash (urj_bus_t *bus)
-{
-    urj_part_t *part = bus->part;
-
-    urj_part_set_signal (part, DCS0, 1, 1);
-    urj_part_set_signal (part, NCE, 1, 1);
-}
-
-static void
-bf548_ezkit_select_flash (urj_bus_t *bus, uint32_t addr)
-{
-    bf548_ezkit_unselect_flash (bus);
-}
 
 static urj_bus_t *
 bf548_ezkit_bus_new (urj_chain_t *chain, const urj_bus_driver_t *driver,
@@ -69,12 +49,10 @@ bf548_ezkit_bus_new (urj_chain_t *chain, const urj_bus_driver_t *driver,
     params->abe_cnt = 2;
     params->addr_cnt = 24;
     params->data_cnt = 16;
-    params->select_flash = bf548_ezkit_select_flash;
-    params->unselect_flash = bf548_ezkit_unselect_flash;
-    failed |= bfin_bus_new (bus, cmd_params, NULL);
+    failed |= urj_bus_generic_attach_sig (part, &params->dcs0, "CS0_B");
+    failed |= urj_bus_generic_attach_sig (part, &params->nce, "PJ1");
 
-    failed |= urj_bus_generic_attach_sig (part, &DCS0, "CS0_B");
-    failed |= urj_bus_generic_attach_sig (part, &NCE, "PJ1");
+    failed |= bfin_bus_new (bus, cmd_params, NULL);
 
     if (failed)
     {

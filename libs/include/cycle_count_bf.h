@@ -2,13 +2,8 @@
  *
  * cycle_count_bf.h
  *
- * Copyright (C) 2004-2006 Analog Devices, Inc.
- * This file is subject to the terms and conditions of the GNU Lesser
- * General Public License. See the file COPYING.LIB for more details.
- *
- * Non-LGPL License is also available as part of VisualDSP++
- * from Analog Devices, Inc.
- *
+ * (c) Copyright 2004-2011 Analog Devices, Inc.  All rights reserved.
+ * $Revision: 2575 $
  ************************************************************************/
 
 /*
@@ -40,10 +35,7 @@
 /* #define  __PROCESSOR_SPEED__    500000000      ADSP-BF533SBBC500  */
 /* #define  __PROCESSOR_SPEED__    500000000      ADSP-BF533SBBZ500  */
 /* #define  __PROCESSOR_SPEED__    600000000      ADSP-BF533SKBC600  */
-/* #define  __PROCESSOR_SPEED__    750000000      ADSP-BF533SKBC750  */
-
-#elif defined(__ADSPBF534__)
-#define  __PROCESSOR_SPEED__       500000000      /* 500 MHz */
+/* #define  __PROCESSOR_SPEED__    750000000      ADSP-BF533SKBC750  */a
 
 #elif defined(__ADSPBF535__)
 #define  __PROCESSOR_SPEED__       300000000      /* EZ-Kit Rev 1.8  */
@@ -51,6 +43,9 @@
 /* #define __PROCESSOR_SPEED__     300000000      ADSP-BF535PBB-300  */
 /* #define __PROCESSOR_SPEED__     300000000      ADSP-BF535PKB-300  */
 /* #define __PROCESSOR_SPEED__     350000000      ADSP-BF535PKB-350  */
+
+#elif defined(__ADSPBF534__)
+#define  __PROCESSOR_SPEED__       500000000      /* 500 MHz */
 
 #elif defined(__ADSPBF536__)
 #define  __PROCESSOR_SPEED__       400000000      /* 400 MHz */
@@ -73,26 +68,30 @@
 /* #define  __PROCESSOR_SPEED__    600000000      ADSP-BF561SBB600   */
 /* #define  __PROCESSOR_SPEED__    750000000      ADSP-BF561SKB750   */ 
 
-#elif defined(__AD6531__)
-#define  __PROCESSOR_SPEED__       234000000      /* 234 MHz */
-#elif defined(__AD6532__)
-#define  __PROCESSOR_SPEED__       234000000      /* 234 MHz */
-#elif defined(__AD6900__)
-#define  __PROCESSOR_SPEED__       260000000      /* 260 MHz */
-#elif defined(__AD6901__)
-#define  __PROCESSOR_SPEED__       299000000      /* 299 MHz */
-#elif defined(__AD6902__)
-#define  __PROCESSOR_SPEED__       260000000      /* 260 MHz */
+#elif defined(__ADSPBF50x__) 
+#define  __PROCESSOR_SPEED__       400000000      /* 400 MHz */
+
+#elif defined(__ADSPBF51x__) 
+#define  __PROCESSOR_SPEED__       400000000      /* 400 MHz */
 
 #elif defined(__ADSPBF52x__) 
 #define  __PROCESSOR_SPEED__       400000000      /* 400 MHz */
 
-#elif defined(__ADSPBF541__) || defined(__ADSPBF542__) || \
-      defined(__ADSPBF548__) || defined(__ADSPBF549__)
+#elif defined(__ADSPBF542__) || defined(__ADSPBF547__) || \
+      defined(__ADSPBF548__) || defined(__ADSPBF549__) || \
+      defined(__ADSPBF542M__) || defined(__ADSPBF547M__) || \
+      defined(__ADSPBF548M__) || defined(__ADSPBF549M__)
 #define  __PROCESSOR_SPEED__       600000000      /* 600 MHz */
 
-#elif defined(__ADSPBF544__) 
+#elif defined(__ADSPBF544__) || defined(__ADSPBF544M__) 
 #define  __PROCESSOR_SPEED__       500000000      /* 500 MHz */
+
+#elif defined(__ADSPBF592A__) 
+#define  __PROCESSOR_SPEED__       400000000      /* 400 MHz */
+
+#elif defined(__ADSPBF606__) || defined(__ADSPBF607__) || \
+      defined(__ADSPBF608__) || defined(__ADSPBF609__)
+#define  __PROCESSOR_SPEED__       400000000      /* 400 MHz */
 
 #else
 #error  PROCESSOR NOT SUPPORTED
@@ -109,16 +108,29 @@
    half of the cycle count register at the time CYCLES has been read
    until CYCLES is read again.
  */
+#if defined(_ADI_THREADS)
 #define _GET_CYCLE_COUNT( _CURR_COUNT )          \
                              do {                \
-                                  asm volatile ("r2 = CYCLES;  \n"  \
+                                  __asm volatile ("CLI r0;       \n"  \
+                                                "r2 = CYCLES;  \n"  \
+                                                "r1 = CYCLES2; \n"  \
+                                                "STI r0;       \n"  \
+                                                "[%0]   = r2;  \n"  \
+                                                "[%0+4] = r1;  \n"  \
+                                                : : "p" (&(_CURR_COUNT)) \
+                                                : "r0", "r1", "r2" );     \
+                             } while (0)
+#else
+#define _GET_CYCLE_COUNT( _CURR_COUNT )          \
+                             do {                \
+                                  __asm volatile ("r2 = CYCLES;  \n"  \
                                                 "r1 = CYCLES2; \n"  \
                                                 "[%0]   = r2;  \n"  \
                                                 "[%0+4] = r1;  \n"  \
-                                                : : "a" (&(_CURR_COUNT)) \
-                                                : "R1", "R2" );     \
+                                                : : "p" (&(_CURR_COUNT)) \
+                                                : "r1", "r2" );     \
                              } while (0)
-
+#endif  /* _ADI_THREADS */
 #if defined( DO_CYCLE_COUNTS )
 
 /* Return current value in cycle count register */
@@ -128,18 +140,35 @@
    If measuring cycle counts for an application built non-optimsed,
    the overhead increases to 6.
  */
+#if defined(_ADI_THREADS)
 #define _STOP_CYCLE_COUNT( _CURR_COUNT, _START_COUNT ) \
                              do {                      \
-                                  asm volatile ("r2 = CYCLES;  \n"  \
+                                  __asm volatile ("CLI r0;       \n"  \
+                                                "r2 = CYCLES;  \n"  \
+                                                "r1 = CYCLES2; \n"  \
+                                                "STI r0;       \n"  \
+                                                "[%0]   = r2;  \n"  \
+                                                "[%0+4] = r1;  \n"  \
+                                                : : "p" (&(_CURR_COUNT))  \
+                                                : "r0", "r1", "r2" );     \
+                               (_CURR_COUNT) = (_CURR_COUNT) - (_START_COUNT); \
+                               (_CURR_COUNT) -= (_cycle_t) 8;                  \
+                             } while (0)                        
+
+#else
+#define _STOP_CYCLE_COUNT( _CURR_COUNT, _START_COUNT ) \
+                             do {                      \
+                                  __asm volatile ("r2 = CYCLES;  \n"  \
                                                 "r1 = CYCLES2; \n"  \
                                                 "[%0]   = r2;  \n"  \
                                                 "[%0+4] = r1;  \n"  \
-                                                : : "a" (&(_CURR_COUNT))  \
-                                                : "R1", "R2" );           \
+                                                : : "p" (&(_CURR_COUNT))  \
+                                                : "r1", "r2" );           \
                                   (_CURR_COUNT) = (_CURR_COUNT) - (_START_COUNT); \
                                   (_CURR_COUNT) -= (_cycle_t) 4;                  \
                              } while (0)                        
 
+#endif  /* _ADI_THREADS */
 #else   /* DO_CYCLE_COUNTS */
 
 /* Replace macros with empty statements if no cycle count facility required */

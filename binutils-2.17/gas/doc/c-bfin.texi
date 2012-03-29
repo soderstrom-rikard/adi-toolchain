@@ -66,8 +66,12 @@ recognized:
 @code{bf549},
 @code{bf549m},
 @code{bf561},
+@code{bf592},
+@code{bf606},
+@code{bf607},
+@code{bf608},
 and
-@code{bf592}.
+@code{bf609}.
 
 @cindex @code{-mfdpic} command line option, Blackfin
 @item -mfdpic

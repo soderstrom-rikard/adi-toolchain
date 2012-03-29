@@ -1,3 +1,19 @@
+2012-03-28  Stuart Henderson  <Stuart.Henderson@analog.com>
+
+    * config/bfin/bfin.c (bfin_cpus): Add BF60x support.
+    (override_options): Likewise.
+    * config/bfin/bfin.h (bfin_cpu_type): Likewise.
+    (TARGET_CPU_CPP_BUILTINS): Define part macros, generic BF60x macro,
+    TARGET_CORE0 and TARGET_CORE1.
+    * config/bfin/bfin.opt: Add mcore0/1 options.
+    * gcc/config/bfin/elf.h (STARTFILE_SPEC): Add mcore0/1 logic.
+    (LIB_SPEC): Add BF60x variants.
+    * gcc/config/bfin/t-bfin-elf (MULTILIB_MATCHES): Likewise.
+    * gcc/config/bfin/t-bfin-linux (MULTILIB_MATCHES): Likewise.
+    * gcc/config/bfin/t-bfin-uclinux (MULTILIB_MATCHES): Likewise.
+    * gcc/doc/invoke.texi: Likewise and additional multicore text.
+    * gcc/testsuite/gcc.target/bfin/mcpu-default.c: Tests for BF60x macros
+
 2011-03-20  Stuart Henderson  <Stuart.Henderson@analog.com>
 
 	* gcc/config/bfin/bfin-protos.h: define various UNSAFE_NULL_ADDR macros.

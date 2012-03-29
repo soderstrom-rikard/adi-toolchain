@@ -1,3 +1,35 @@
+2012-03-28  Stuart Henderson  <stuart.henderson@analog.com>
+
+	* bfin/Makefile.in: Add BF60x support.
+	* bfin/basiccrt.S: Add core1 support.
+	* bfin/bf606.ld: New file.
+	* bfin/bf606c0.ld: New file.
+	* bfin/bf606c1.ld: New file.
+	* bfin/bf606m.ld: New file.
+	* bfin/bf607.ld: New file.
+	* bfin/bf607c0.ld: New file.
+	* bfin/bf607c1.ld: New file.
+	* bfin/bf607m.ld: New file.
+	* bfin/bf608.ld: New file.
+	* bfin/bf608c0.ld: New file.
+	* bfin/bf608c1.ld: New file.
+	* bfin/bf608m.ld: New file.
+	* bfin/bf609.ld: New file.
+	* bfin/bf609c0.ld: New file.
+	* bfin/bf609c1.ld: New file.
+	* bfin/bf609m.ld: New file.
+	* bfin/bfin-common-mc0.ld: New file.
+	* bfin/include/cdefBF606.h : New file.
+	* bfin/include/cdefBF607.h : New file.
+	* bfin/include/cdefBF608.h : New file.
+	* bfin/include/cdefBF609.h : New file.
+	* bfin/include/defBF606.h : New file.
+	* bfin/include/defBF607.h : New file.
+	* bfin/include/defBF608.h : New file.
+	* bfin/include/defBF609.h : New file.
+	* bfin/include/sys/_adi_platform.h: Add BF60x support.
+	* bfin/include/sys/anomaly_macros_rtl.h : Clean up character returns.
+
 2010-10-01  Stuart Henderson  <stuart.henderson@analog.com>
 
 	* binutils-2.17/libgloss/bfin/bfin-common-sc.ld : Merge new .l1.X output

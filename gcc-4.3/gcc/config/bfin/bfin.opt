@@ -92,6 +92,14 @@ mcoreb
 Target Report Mask(COREB)
 Build for Core B
 
+mcore0
+Target Report Mask(CORE0)
+Build for Core 0
+
+mcore1
+Target Report Mask(CORE1)
+Build for Core 1
+
 msdram
 Target Report Mask(SDRAM)
 Build for SDRAM

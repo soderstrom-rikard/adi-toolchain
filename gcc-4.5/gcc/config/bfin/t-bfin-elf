@@ -51,6 +51,10 @@ MULTILIB_MATCHES+=mcpu?bf532-none=mcpu?bf549-none
 MULTILIB_MATCHES+=mcpu?bf532-none=mcpu?bf549m-none
 MULTILIB_MATCHES+=mcpu?bf532-none=mcpu?bf561-none
 MULTILIB_MATCHES+=mcpu?bf532-none=mcpu?bf592-none
+MULTILIB_MATCHES+=mcpu?bf532-none=mcpu?bf606-none
+MULTILIB_MATCHES+=mcpu?bf532-none=mcpu?bf607-none
+MULTILIB_MATCHES+=mcpu?bf532-none=mcpu?bf608-none
+MULTILIB_MATCHES+=mcpu?bf532-none=mcpu?bf609-none
 
 # Assemble startup files.
 $(T)crti.o: $(srcdir)/config/bfin/crti.s $(GCC_PASSES)

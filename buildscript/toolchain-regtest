@@ -431,11 +431,8 @@ if test_targets_has LINUX ; then
 		echo "    Hardware tests will be compiled with optional stack overflow checking"
 	fi
 	if test_targets_has linux-uclibc ; then
-		if [ $FDPIC_TARGET -eq 0 ] ; then
-			echo  "    Looks like flat userspace - I'll check /lib/*.so are the same when testing"
-		else
-			error "    Your Target looks like it is running FDPIC userspace - I can't test on fdpic targets. Stopping"
-		fi
+        	CHECK_LIB=true
+		echo "    For both flat and fdpic userspace - I'll check /lib/*.so are the same when testing"
 	fi
 
 	# Make sure syslog doesnt grab debug messages (kernel dumps)
@@ -895,8 +892,6 @@ prepare_target_solibs()
 	# when safe. That means only a flat image can be used for testing
 	# linux-uclibc.
 
-	[ $FDPIC_TARGET -ne 0 ] && return 0
-
 	detect_gcc gcc || return 1
 
 	echo_date "Checking shared libraries on target"
@@ -906,22 +901,18 @@ prepare_target_solibs()
 	run_cmd rm -f $GCC_BUILD/libs_for_target/*
 	t=`$target_alias-gcc -mcpu=${CPU_TYPE_REV} -print-file-name=libc.a`
 	t=`dirname $t`/../..
-	for FILE in $t/lib/*so* ; do
-		if [ -e $FILE ] && [ -h $FILE ] ; then
-			# don't check sym links
-			LIB=`readlink $FILE`
-			FILE=`basename $FILE`
-			LIB=`basename $LIB`
-			run_rsh_nodie "ln -s $LIB /lib/$FILE"
-		else
-			if [ -f $FILE ] ; then
-				LIB=`basename ${FILE}`
-				run_cmd $target_alias-strip $FILE -o $GCC_BUILD/libs_for_target/${LIB}
-				BOARD_LIB=`run_rsh_nodie_stdout md5sum /lib/${LIB} | awk '{print $1}'`
-				TEST_LIB=`md5sum $GCC_BUILD/libs_for_target/${LIB} | awk '{print $1}'`
-				if [ "$BOARD_LIB" != "$TEST_LIB" ] ; then
-					error "Libs on board are different (${LIB} and ${FILE}), aborting tests"
-				fi
+	for FILE in `find $t/lib -type l '!' -name 'libthread_db*.so*'`; do
+		if [ -h $FILE ] ; then
+			LIB=`basename ${FILE}`
+			run_cmd $target_alias-strip --remove-section=.comment --remove-section=.note $FILE -o $GCC_BUILD/libs_for_target/${LIB}
+			BOARD_LIB=`run_rsh_nodie_stdout md5sum /lib/${LIB} | awk '{print $1}'`
+			TEST_LIB=`md5sum $GCC_BUILD/libs_for_target/${LIB} | awk '{print $1}'`
+			TEST_ORG_LIB=`md5sum ${FILE} | awk '{print $1}'`
+		#	echo "Lib (${LIB}) on board md5sum is: $BOARD_LIB "
+			if [ "$BOARD_LIB" != "$TEST_LIB" ] &&  [ "$BOARD_LIB" != "$TEST_ORG_LIB" ] ; then
+				echo "Libs (${LIB}) on board are different from tested toolchain libs: "
+				echo "On-board vs tested lib : $BOARD_LIB  vs  $TEST_LIB"
+				error "Aborting tests"
 			fi
 		fi
 	done

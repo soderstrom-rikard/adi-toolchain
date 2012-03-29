@@ -67,6 +67,21 @@
 #error "__ADSPBF561__ is defined"
 #endif
 
+#ifdef __ADSPBF606__
+#error "__ADSPBF606__ is defined"
+#endif
+
+#ifdef __ADSPBF607__
+#error "__ADSPBF607__ is defined"
+#endif
+
+#ifdef __ADSPBF608__
+#error "__ADSPBF608__ is defined"
+#endif
+
+#ifdef __ADSPBF609__
+#error "__ADSPBF609__ is defined"
+#endif
 
 #ifndef __SILICON_REVISION__
 #error "__SILICON_REVISION__ is not defined"

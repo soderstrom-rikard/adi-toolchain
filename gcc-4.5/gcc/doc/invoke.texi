@@ -10095,7 +10095,8 @@ can be one of @samp{bf504}, @samp{bf506},
 @samp{bf534}, @samp{bf536}, @samp{bf537}, @samp{bf538}, @samp{bf539},
 @samp{bf542}, @samp{bf544}, @samp{bf547}, @samp{bf548}, @samp{bf549},
 @samp{bf542m}, @samp{bf544m}, @samp{bf547m}, @samp{bf548m}, @samp{bf549m},
-@samp{bf561}, @samp{bf592}.
+@samp{bf561}, @samp{bf592}, @samp{bf606}, @samp{bf607}, @samp{bf608},
+@samp{bf609}.
 The optional @var{sirevision} specifies the silicon revision of the target
 Blackfin processor.  Any workarounds available for the targeted silicon revision
 will be enabled.  If @var{sirevision} is @samp{none}, no workarounds are enabled.
@@ -10240,7 +10241,11 @@ not known to bind locally.  It has no effect without @option{-mfdpic}.
 Build standalone application for multicore Blackfin processor. Proper
 start files and link scripts will be used to support multicore.
 This option defines @code{__BFIN_MULTICORE}. It can only be used with
-@option{-mcpu=bf561@r{[}-@var{sirevision}@r{]}}. It can be used with
+@option{-mcpu=bf561@r{[}-@var{sirevision}@r{]}}, 
+@option{-mcpu=bf606@r{[}-@var{sirevision}@r{]}}, 
+@option{-mcpu=bf607@r{[}-@var{sirevision}@r{]}}, 
+@option{-mcpu=bf608@r{[}-@var{sirevision}@r{]}}, 
+@option{-mcpu=bf609@r{[}-@var{sirevision}@r{]}}. It can be used with
 @option{-mcorea} or @option{-mcoreb}. If it's used without
 @option{-mcorea} or @option{-mcoreb}, single application/dual core
 programming model is used. In this model, the main function of Core B

@@ -384,6 +384,18 @@ struct bfin_cpu bfin_cpus[] =
   {"bf592", BFIN_CPU_BF592, 0x0000,
    WA_SPECULATIVE_LOADS | WA_05000074 | WA_UNSAFE_NULL_ADDR},
 
+  {"bf606", BFIN_CPU_BF606, 0x0000,
+   WA_INDIRECT_CALLS | WA_SPECULATIVE_LOADS | WA_05000074},
+
+  {"bf607", BFIN_CPU_BF607, 0x0000,
+   WA_INDIRECT_CALLS | WA_SPECULATIVE_LOADS | WA_05000074},
+
+  {"bf608", BFIN_CPU_BF608, 0x0000,
+   WA_INDIRECT_CALLS | WA_SPECULATIVE_LOADS | WA_05000074},
+
+  {"bf609", BFIN_CPU_BF609, 0x0000,
+   WA_INDIRECT_CALLS | WA_SPECULATIVE_LOADS | WA_05000074},
+
   {NULL, 0, 0, 0}
 };
 
@@ -2765,8 +2777,30 @@ override_options (void)
   if (flag_pic && !TARGET_FDPIC && !TARGET_ID_SHARED_LIBRARY)
     flag_pic = 0;
 
-  if (TARGET_MULTICORE && bfin_cpu_type != BFIN_CPU_BF561)
-    error ("-mmulticore can only be used with BF561");
+  if (TARGET_MULTICORE && (bfin_cpu_type != BFIN_CPU_BF561 &&
+                           bfin_cpu_type != BFIN_CPU_BF606 &&
+                           bfin_cpu_type != BFIN_CPU_BF607 &&
+                           bfin_cpu_type != BFIN_CPU_BF608 &&
+                           bfin_cpu_type != BFIN_CPU_BF609 ) )
+    error ("-mmulticore can only be used with BF561 or BF60x");
+
+  if (TARGET_COREA && bfin_cpu_type != BFIN_CPU_BF561)
+    error ("-mcorea can only be used with BF561");
+
+  if (TARGET_COREB && bfin_cpu_type != BFIN_CPU_BF561)
+    error ("-mcoreb can only be used with BF561");
+
+  if (TARGET_CORE0 && (bfin_cpu_type != BFIN_CPU_BF606 &&
+                       bfin_cpu_type != BFIN_CPU_BF607 &&
+                       bfin_cpu_type != BFIN_CPU_BF608 &&
+                       bfin_cpu_type != BFIN_CPU_BF609 ) )
+    error ("-mcore0 can only be used with BF60x");
+
+  if (TARGET_CORE1 && (bfin_cpu_type != BFIN_CPU_BF606 &&
+                       bfin_cpu_type != BFIN_CPU_BF607 &&
+                       bfin_cpu_type != BFIN_CPU_BF608 &&
+                       bfin_cpu_type != BFIN_CPU_BF609 ) )
+    error ("-mcore1 can only be used with BF60x");
 
   if (TARGET_COREA && !TARGET_MULTICORE)
     error ("-mcorea should be used with -mmulticore");
@@ -2776,6 +2810,15 @@ override_options (void)
 
   if (TARGET_COREA && TARGET_COREB)
     error ("-mcorea and -mcoreb can't be used together");
+
+  if (TARGET_CORE0 && !TARGET_MULTICORE)
+    error ("-mcore0 should be used with -mmulticore");
+
+  if (TARGET_CORE1 && !TARGET_MULTICORE)
+    error ("-mcore1 should be used with -mmulticore");
+
+  if (TARGET_CORE0 && TARGET_CORE1)
+    error ("-mcore0 and -mcore1 can't be used together");
 
   flag_schedule_insns = 0;
 

@@ -7593,7 +7593,8 @@ File: as.info,  Node: Blackfin Options,  Next: Blackfin Syntax,  Up: Blackfin-De
      `bf527', `bf531', `bf532', `bf533', `bf534', `bf535' (not
      implemented yet), `bf536', `bf537', `bf538', `bf539', `bf542',
      `bf542m', `bf544', `bf544m', `bf547', `bf547m', `bf548', `bf548m',
-     `bf549', `bf549m', `bf561', and `bf592'.
+     `bf549', `bf549m', `bf561', `bf592', `bf606', `bf607', `bf608', and
+     `bf609'.
 
 `-mfdpic'
      Assemble for the FDPIC ABI.

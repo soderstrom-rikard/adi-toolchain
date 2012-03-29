@@ -1,3 +1,9 @@
+2012-03-28  Stuart Henderson  <Stuart.Henderson@analog.com>
+
+	* config/tc-bfin.c (bfin_cpu_type): Add BF60x parts.
+	(bfin_cpus): Likewise.
+	* doc/c-bfin.texi: Likewise.
+
 2010-06-17  Steve Kilbane  <Stephen.kilbane@analog.com>
 
 	* config/bfin-lex.l: Restrict tokens Z, X, S, M and T to FLAGS

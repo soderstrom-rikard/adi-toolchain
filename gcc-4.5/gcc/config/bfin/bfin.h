@@ -61,7 +61,11 @@ typedef enum bfin_cpu_type
   BFIN_CPU_BF549,
   BFIN_CPU_BF549M,
   BFIN_CPU_BF561,
-  BFIN_CPU_BF592
+  BFIN_CPU_BF592,
+  BFIN_CPU_BF606,
+  BFIN_CPU_BF607,
+  BFIN_CPU_BF608,
+  BFIN_CPU_BF609
 } bfin_cpu_t;
 
 /* Value of -mcpu= */
@@ -200,6 +204,22 @@ extern int target_flags;
 	  builtin_define ("__ADSPBF592__");	\
 	  builtin_define ("__ADSPBF59x__");	\
 	  break;				\
+	case BFIN_CPU_BF606:			\
+	  builtin_define ("__ADSPBF606__");	\
+	  builtin_define ("__ADSPBF60x__");	\
+	  break;				\
+	case BFIN_CPU_BF607:			\
+	  builtin_define ("__ADSPBF607__");	\
+	  builtin_define ("__ADSPBF60x__");	\
+	  break;				\
+	case BFIN_CPU_BF608:			\
+	  builtin_define ("__ADSPBF608__");	\
+	  builtin_define ("__ADSPBF60x__");	\
+	  break;				\
+	case BFIN_CPU_BF609:			\
+	  builtin_define ("__ADSPBF609__");	\
+	  builtin_define ("__ADSPBF60x__");	\
+	  break;				\
 	}					\
 						\
       if (bfin_si_revision != -1)		\
@@ -240,6 +260,10 @@ extern int target_flags;
 	builtin_define ("__BFIN_COREA");	\
       if (TARGET_COREB)				\
 	builtin_define ("__BFIN_COREB");	\
+      if (TARGET_CORE0)				\
+	builtin_define ("__BFIN_CORE0");	\
+      if (TARGET_CORE1)				\
+	builtin_define ("__BFIN_CORE1");	\
       if (TARGET_SDRAM)				\
 	builtin_define ("__BFIN_SDRAM");	\
     }						\
