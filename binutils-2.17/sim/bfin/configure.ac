@@ -35,6 +35,7 @@ SIM_AC_OPTION_HARDWARE(yes,,\
 	bfin_nfc \
 	bfin_otp \
 	bfin_pfmon \
+	bfin_pint \
 	bfin_pll \
 	bfin_ppi \
 	bfin_rtc \
