@@ -1,3 +1,9 @@
+2012-04-18  Stuart Henderson  <stuart.henderson@analog.com>
+
+	* g++.dg/compat/struct-layout-1_generate.c (vector_types): Remove
+	vectors larger than 8 bytes.
+	* gcc.dg/compat/struct-layout-1_generate.c (vector_types): Likewise.
+
 2012-04-09  Stuart Henderson  <stuart.henderson@analog.com>
 
 	* gcc.target/bfin/builtins/hisilh.c: Revive lost builtin test.

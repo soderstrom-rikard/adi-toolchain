@@ -148,33 +148,17 @@ struct types base_types[] = {
 struct types vector_types[] = {
 /* vector-defs.h typedefs */
 { "v8qi", TYPE_OTHER, 0, 0 },
-{ "v16qi", TYPE_OTHER, 0, 0 },
 { "v2hi", TYPE_OTHER, 0, 0 },
 { "v4hi", TYPE_OTHER, 0, 0 },
-{ "v8hi", TYPE_OTHER, 0, 0 },
 { "v2si", TYPE_OTHER, 0, 0 },
-{ "v4si", TYPE_OTHER, 0, 0 },
 { "v1di", TYPE_OTHER, 0, 0 },
-{ "v2di", TYPE_OTHER, 0, 0 },
 { "v2sf", TYPE_OTHER, 0, 0 },
-{ "v4sf", TYPE_OTHER, 0, 0 },
-{ "v16sf", TYPE_OTHER, 0, 0 },
-{ "v2df", TYPE_OTHER, 0, 0 },
 { "u8qi", TYPE_OTHER, 0, 0 },
-{ "u16qi", TYPE_OTHER, 0, 0 },
 { "u2hi", TYPE_OTHER, 0, 0 },
 { "u4hi", TYPE_OTHER, 0, 0 },
-{ "u8hi", TYPE_OTHER, 0, 0 },
 { "u2si", TYPE_OTHER, 0, 0 },
-{ "u4si", TYPE_OTHER, 0, 0 },
 { "u1di", TYPE_OTHER, 0, 0 },
-{ "u2di", TYPE_OTHER, 0, 0 },
-{ "u2sf", TYPE_OTHER, 0, 0 },
-{ "u4sf", TYPE_OTHER, 0, 0 },
-{ "u16sf", TYPE_OTHER, 0, 0 },
-{ "u2df", TYPE_OTHER, 0, 0 },
-{ "__m64", TYPE_OTHER, 0, 0 },
-{ "__m128", TYPE_OTHER, 0, 0 }
+{ "u2sf", TYPE_OTHER, 0, 0 }
 #define NVTYPES2 (sizeof (vector_types) / sizeof (vector_types[0]))
 };
 struct types attrib_types[] = {
