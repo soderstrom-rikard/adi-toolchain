@@ -1,10 +1,23 @@
 #!/bin/sh 
 
+if [ -d /home/test/work/cruise ] ; then
 USER=/home/test/work/cruise
 CHECKOUT=$USER/checkouts
 TOOLCHAIN_BUILDSCRIPT=$CHECKOUT/toolchain/buildscript
 TOOLCHAIN_SCRIPTS=$USER/test_scripts/toolchain
 TOOLCHAINBUILD=$TOOLCHAIN_SCRIPTS/toolchain-build
+LINUX_PATH=$CHECKOUT/uclinux-dist/linux-2.6.x
+HOST_CONFIG=SUSE
+else
+USER=/home/test
+SRC_ROOT=$USER/workspace/src
+CHECKOUT=$SRC_ROOT
+TOOLCHAIN_BUILDSCRIPT=$CHECKOUT/toolchain/buildscript
+TOOLCHAIN_SCRIPTS=$TOOLCHAIN_BUILDSCRIPT
+TOOLCHAINBUILD=$USER/workspace/logs
+LINUX_PATH=$CHECKOUT/kernel/linux/linux-kernel
+HOST_CONFIG=UBUNTU
+fi
 BASELINE=standard
 LASTRUN=lastrun
 THISRUN=thisrun
@@ -29,7 +42,11 @@ if [ $# -gt 0 ] ; then
  fi
 fi
 
+$TOOLCHAIN_BUILDSCRIPT/set_tw_recycle.exp
+ 
+if [ -d /home/test/work/cruise ] ; then
 cp $TOOLCHAIN_BUILDSCRIPT/reset_board.exp $TOOLCHAIN_SCRIPTS
+fi
 rm $TOOLCHAIN_SCRIPTS/reset_board_log  >/dev/null  2>&1
 $TOOLCHAIN_SCRIPTS/reset_board.exp uImage.$TARGET_KERNEL_CONFIG  >/dev/null  2>&1
 
@@ -40,12 +57,18 @@ if [ $RUN -lt 5 ] ; then
   TOOLCHAIN_VERSION=4.3
 else       
   BOARD_CONFIG=`rsh -l root $TARGET_IP cat /proc/cpuinfo | grep 'board name' | awk  'BEGIN { FS="[ :-]" } {print $5"-"$6}'`
+
+  if [ -d /home/test/work/cruise ] ; then
   TOOLCHAIN_VERSION=`rsh -l root $TARGET_IP version | grep 'toolchain' | awk 'BEGIN { FS="[ :.]" } {print $7"."$8}'`
+  else
+
+  TOOLCHAIN_VERSION=`rsh -l root $TARGET_IP version | grep 'toolchain' | awk 'BEGIN { FS="[ :.]" } {print $8"."$9}'`
+  fi
+
 fi
 
 #####  host machine configs  #######
 HOST_IP=`/sbin/ifconfig | grep "10\.99" | awk 'BEGIN { FS="[ :]" } {print $13}'`
-HOST_CONFIG=SUSE
 
 #############  Do Not Edit Below This Line  ########## 
 
@@ -116,6 +139,7 @@ log_test_results ()
 
 ######## Do svn update and show svn info for each project.
 cd $CHECKOUT
+if [ `ls -a toolchain | grep -c .svn` -eq 1 ] ; then
 cat  <<EOF
 ************** Testing is done on target with kernel config ($TARGET_KERNEL_CONFIG). *************
 ************** Testing $TOOLCHAIN_VERSION toolchain on $BOARD_CONFIG. ************
@@ -135,7 +159,27 @@ cat  <<EOF
 `cd uclinux-dist/linux-2.6.x ; svn info`
 
 EOF
+elif  [ `ls -a toolchain | grep -c .git` -eq 1 ] ; then
 
+cat  <<EOF
+************** Testing is done on target with kernel config ($TARGET_KERNEL_CONFIG). *************
+************** Testing $TOOLCHAIN_VERSION toolchain on $BOARD_CONFIG. ************
+************** Host $HOST_CONFIG $HOST_IP. ***********
+
+************** Tested toolchain git info ***************
+`cd $SRC_ROOT/toolchain ; echo -n "Toolchain "; git fetch; git log -1`
+************** Tested U-Boot git info ******************
+`cd $SRC_ROOT/u-boot; echo -n "U-Boot "; git fetch ;git log -1`
+************* Tested uclinux-dist git info *************
+`cd $SRC_ROOT/kernel; echo -n "Uclinux-dist "; git fetch;  git log -1`
+************* Tested linux git info ********************
+`cd $SRC_ROOT/kernel/linux/linux*; echo -n "Kernel "; git fetch;  git log -1`
+
+EOF
+else
+echo "It can't recognize the repositary system! Neither svn nor git! \n"
+exit
+fi
 ######## Start building an up-to-date Toolchain here.
   cd $TOOLCHAIN_BUILDSCRIPT 
 
@@ -143,7 +187,7 @@ EOF
 # ./BuildToolChain  -j 1 -w -s $CHECKOUT/toolchain -b $USER/temp -K $CHECKOUT/toolchain/kbuild_output  -u $CHECKOUT/u-boot -c $TOOLCHAIN_VERSION  -D
 
 # For trunk testing, use -k $CHECKOUT/uclinux-dist/linux-2.6.x.
-  ./BuildToolChain  -j 1 -w -s $CHECKOUT/toolchain -b $USER/temp -k $CHECKOUT/uclinux-dist/linux-2.6.x  -u $CHECKOUT/u-boot -c $TOOLCHAIN_VERSION -D \
+  ./BuildToolChain  -j 1 -w -s $CHECKOUT/toolchain -b $USER/temp -k $LINUX_PATH  -u $CHECKOUT/u-boot -c $TOOLCHAIN_VERSION -D \
   -a UCLIBC_HAS_IPV6=y  -a UCLIBC_HAS_WCHAR=y 
 
   if [ $? != 0 ] ; then

@@ -1,0 +1,73 @@
+#!/usr/bin/expect
+log_file -noappend set_tw_recycle_log
+send_user "Starting set_tw_recycle.exp\n"
+
+set send_slow {1 0.1}
+set password "blackfin"
+set timeout 10
+
+spawn su 
+sleep .5
+while 1 {
+   expect {
+      "Password:" {
+         send -s "$password\r"
+         break
+      }
+
+      timeout {
+            puts "Fail . " 
+            break
+         }
+     }
+}
+ 
+while 1 {
+   expect {
+      "#" {
+         puts "su success.\n"
+         break
+      }
+
+      timeout {
+            puts "Fail su as root. "
+            break
+         }
+     }
+}
+set su_id $spawn_id
+  
+
+send -s "echo 1 > /proc/sys/net/ipv4/tcp_tw_recycle \r"
+while 1 {
+   expect {
+      "#" { 
+     break
+      }
+
+      timeout {
+            puts "Failed set value." 
+            break
+         }
+     }
+}
+
+send -s "cat /proc/sys/net/ipv4/tcp_tw_recycle\r"
+while 1 {
+   expect {
+      "1" {
+     break
+      }
+
+      timeout {
+            puts "Failed set tcp_tw_recycle value."
+            break
+         }
+     }
+}
+
+log_file
+ 
+send_user "Ending.\n"
+
+
