@@ -698,6 +698,8 @@ build_gcc()
 		$DIR_GCC_SOURCE/mpfr \
 		$DIR_GCC_SOURCE/gmp \
 		$DIR_GCC_SOURCE/mpc \
+		$DIR_GCC_SOURCE/ppl \
+		$DIR_GCC_SOURCE/cloog \
 		${prefix}/${target}/sys-include
 	run_cmd ln -s runtime/usr/include ${prefix}/${target}/sys-include
 
@@ -720,6 +722,20 @@ build_gcc()
 		epver=`"${epdir}"/configure --version | head -n1 | awk '{print $NF}'`
 		echo_date "${target}: gcc: linking mpc (${epver})"
 		run_cmd ln -snf ../mpc $DIR_GCC_SOURCE/
+	fi
+
+	epdir="$DIR_GCC_SOURCE/../ppl"
+	if [ -e "${epdir}" ] ; then
+		epver=`"${epdir}"/configure --version | head -n1 | awk '{print $NF}'`
+		echo_date "${target}: gcc: linking ppl (${epver})"
+		run_cmd ln -snf ../ppl $DIR_GCC_SOURCE/
+	fi
+
+	epdir="$DIR_GCC_SOURCE/../cloog"
+	if [ -e "${epdir}" ] ; then
+		epver=`"${epdir}"/configure --version | head -n1 | awk '{print $NF}'`
+		echo_date "${target}: gcc: linking cloog (${epver})"
+		run_cmd ln -snf ../cloog $DIR_GCC_SOURCE/
 	fi
 
 	case ${target} in
@@ -838,6 +854,8 @@ build_gcc()
 		$DIR_GCC_SOURCE/mpfr \
 		$DIR_GCC_SOURCE/gmp \
 		$DIR_GCC_SOURCE/mpc \
+		$DIR_GCC_SOURCE/ppl \
+		$DIR_GCC_SOURCE/cloog \
 		${prefix}/${target}/sys-include
 	clean_build_dir "$DIR_GCC_BUILD"
 

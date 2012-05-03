@@ -1,10 +1,11 @@
+%define _unpackaged_files_terminate_build 0
 %define bfin_host_strip strip
 %define bfin_targ_strip %{prefix}/bfin-elf/bin/bfin-elf-strip
 %define EXEEXT %{nil}
 %define x_support 0
 %define extra_buildtoolchain_opts -a UCLIBC_HAS_IPV6=y -a UCLIBC_HAS_WCHAR=y -a UCLIBC_HAS_FTW=y
 
-%define optional_gcc 1
+%define optional_gcc 0
 %define gcc_main_ver 4.3
 %define gcc_main_fullver %{gcc_main_ver}.5
 %define gcc_addon_ver 4.5
@@ -12,8 +13,8 @@
 
 Name:         blackfin-toolchain-uclibc-full
 URL:          http://blackfin.uclinux.org
-Version:      2011R1
-Release:      BETA2
+Version:      2012R1
+Release:      BETA1
 Requires:     blackfin-toolchain
 Summary:      Wide character libraries for the GNU toolchain for the Blackfin processor
 License:      GPL
@@ -29,8 +30,10 @@ Source5:      elf2flt.tar.bz2
 Source6:      uClibc.tar.bz2
 Source7:      mpfr.tar.bz2
 Source8:      gmp.tar.bz2
-Source9:      libdsp.tar.bz2
-Source10:     mpc.tar.bz2
+Source9:      cloog.tar.bz2
+Source10:     ppl.tar.bz2
+Source11:     libdsp.tar.bz2
+Source12:     mpc.tar.bz2
 prefix:       /opt/uClinux
 BuildRoot:    %{_tmppath}/%{name}-%{version}-build
 
@@ -55,7 +58,7 @@ gcc-%{gcc_addon_fullver} based Blackfin Linux toolchains.
 %if %{optional_gcc}
 %define extra_setup -a 1
 %endif
-%setup -q -c %{name}-%{version} %{extra_setup} -a 2 -a 3 -a 4 -a 5 -a 6 -a 7 -a 8 -a 9 -a 10
+%setup -q -c %{name}-%{version} %{extra_setup} -a 2 -a 3 -a 4 -a 5 -a 6 -a 7 -a 8 -a 9 -a 10 -a 11 -a 12
 
 %build
 %if %{optional_gcc}
