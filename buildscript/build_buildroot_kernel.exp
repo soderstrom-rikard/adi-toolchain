@@ -1,0 +1,181 @@
+#!/usr/bin/expect
+log_file build_toolchain_kernel_log
+send_user "Starting build_toolchain_kernel.exp\n"
+
+set user /home/test/
+set src_root $user/workspace/src/kernel
+#set src_root $user/checkouts/uclinux-dist
+set ttydev /dev/ttyS0
+set send_slow {1 0.1}
+set kernel_config normal
+set allocator ""  
+set arch "blackfin"
+set anomalous_option "USB Gadget Drivers|Platform Glue Layer|USB Peripheral Controller"
+
+send_user "The Env Path is: $env(PATH) "
+
+set board_type [lindex $argv 0]
+send_log "\n#### board_type is $board_type\n"
+
+if { $argc < 1} {
+    puts "Please input: board_type."
+    exit
+}
+
+if { $argc >= 2} {
+    set kernel_config      [lindex $argv 1]
+    send_log "\n#### kernel_config is $kernel_config\n"
+}
+
+if { $argc >= 3} {
+    set src_root       [lindex $argv 2]
+    send_log "\n#### src_root is $src_root\n"
+}
+
+if { $board_type == "BF561-EZKIT" } {
+    set revision 0.5
+} elseif { $board_type == "BF527-EZKIT" } {
+    set revision 0.2
+} else {
+    set revision default
+}
+
+proc step { message } {
+    global step_sequence_number
+
+    puts "\n*******************************************************************"
+    puts "STEP $step_sequence_number: $message\n\n"
+    send_log "\n************** STEP $step_sequence_number: $message\n\n"
+    incr step_sequence_number
+}
+
+set step_sequence_number 1
+
+step "Make user space config"
+cd $src_root
+set timeout 300
+spawn make config
+while 1 {
+    expect {
+        -nocase -re "\\\[\[^\r]*] (\\\(new\\\) )?(\[ymn])|choice\\\[.*]: \[0-9]+\r" {
+            continue
+        }
+
+        -re "Target Architecture\r\n.*(\[0-9]+). $arch .*\\\[.*]" {
+            send "$expect_out(1,string)\r"
+        }
+
+        -re "Target Architecture Variant.*\\\[.*]" {
+            send "\r"
+        }
+
+        -re "Toolchain has IPv6 support.*BR2_TOOLCHAIN_EXTERNAL_INET_IPV6.*\\\[.*]" {
+            send "Y\r"
+        }
+
+        -re "Toolchain has WCHAR support.*BR2_TOOLCHAIN_EXTERNAL_WCHAR.*\\\[.*]" {
+            send "Y\r"
+        }
+
+        "\\\(*) \\\[*]" {
+            sleep .05
+            send "\r"
+        }
+
+        -re "\[cC]hoice\\\[.*]:" {
+            send "\r"
+        }
+
+        eof {
+            send_user "End of configuration"
+            break
+        }
+
+        timeout {
+            send_user "\n\nFATAL ERROR: config prompt timeout in make config"
+            exit
+        }
+    }
+}
+
+step "Make kernel config for the first time"
+cd $src_root
+set timeout 300
+spawn make ARCH=$arch linux-config
+while 1 {
+    expect {
+        -nocase -re "\\\[\[^\r]*] (\\\(new\\\) )?(\[ymn])|choice\\\[.*]: \[0-9]+\r" {
+            continue
+        }
+
+        -re "($anomalous_option) \\\[\[^\]]+/.]" {
+            send "\r"
+        }
+
+        "\\\(*) \\\[*]" {
+            sleep .05
+            send "\r"
+        }
+
+        -re "\[cC]hoice\\\[.*]:" {
+            send "\r"
+        }
+
+        eof {
+            send_user "End of configuration"
+            break
+        }
+
+        timeout {
+            send_user "\n\nFATAL ERROR: config prompt timeout in make config"
+            exit
+        }
+    }
+}
+
+step "Make clean"
+
+cd $src_root
+spawn make clean
+set timeout 1200
+set bfin_make_clean_status failure
+while 1 {
+    expect {
+        "Entering directory" { }
+        "Leaving directory" { set bfin_make_clean_status success }
+        "Error" {set bfin_make_clean_status failure }
+        "/bin/sh" { }
+        eof { break }
+        timeout { exit }
+    }
+}
+
+if { $bfin_make_clean_status == "failure" } {
+    send_user "ERROR: Error somewhere during make"
+}
+
+step "Make"
+
+cd $src_root
+spawn make NON_SMP_BUILD=1
+set timeout 10800
+set bfin_make_status failure
+while 1 {
+    expect {
+        "Entering directory" { }
+        "Leaving directory" { set bfin_make_status success }
+        "Error" {set bfin_make_status failure }
+        "/bin/sh" { }
+        eof { break }
+        timeout { exit }
+    }
+}
+
+if { $bfin_make_status == "failure" } {
+    send_user "ERROR: Error somewhere during make"
+}
+
+
+log_file
+
+send_user "Ending build_toolchain_kernel.exp\n"

@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 ### If there are no detailed logs under test folder, then compare the test_results directly.
 
