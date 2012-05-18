@@ -16,9 +16,8 @@
      File         :   cdefBF608.h
      Description  :   C register and bitfield definitions
 
-     Date         :   02-10-2012
-     Tag          :   BF60X_TOOLS_CCES_1_0_0
-                      USB (version 2971) / PWM (version 2970)
+     Date         :   05-17-2012
+
 
      Copyright (c) 2011-2012 Analog Devices, Inc.  All Rights Reserved.
      This software is proprietary and confidential to Analog Devices, Inc. and
@@ -94,40 +93,40 @@
 /* =========================================================================
        CAN0
    ========================================================================= */
-#define pREG_CAN0_MC1                    ((volatile uint16_t *)REG_CAN0_MC1)                     /* CAN0 Mailbox Configuration Register 1 */
-#define pREG_CAN0_MD1                    ((volatile uint16_t *)REG_CAN0_MD1)                     /* CAN0 Mailbox Direction Register 1 */
-#define pREG_CAN0_TRS1                   ((volatile uint16_t *)REG_CAN0_TRS1)                    /* CAN0 Transmission Request Set Register 1 */
-#define pREG_CAN0_TRR1                   ((volatile uint16_t *)REG_CAN0_TRR1)                    /* CAN0 Transmission Request Reset Register 1 */
-#define pREG_CAN0_TA1                    ((volatile uint16_t *)REG_CAN0_TA1)                     /* CAN0 Transmission Acknowledge Register 1 */
-#define pREG_CAN0_AA1                    ((volatile uint16_t *)REG_CAN0_AA1)                     /* CAN0 Abort Acknowledge Register 1 */
-#define pREG_CAN0_RMP1                   ((volatile uint16_t *)REG_CAN0_RMP1)                    /* CAN0 Receive Message Pending Register 1 */
-#define pREG_CAN0_RML1                   ((volatile uint16_t *)REG_CAN0_RML1)                    /* CAN0 Receive Message Lost Register 1 */
-#define pREG_CAN0_MBTIF1                 ((volatile uint16_t *)REG_CAN0_MBTIF1)                  /* CAN0 Mailbox Transmit Interrupt Flag Register 1 */
-#define pREG_CAN0_MBRIF1                 ((volatile uint16_t *)REG_CAN0_MBRIF1)                  /* CAN0 Mailbox Receive Interrupt Flag Register 1 */
-#define pREG_CAN0_MBIM1                  ((volatile uint16_t *)REG_CAN0_MBIM1)                   /* CAN0 Mailbox Interrupt Mask Register 1 */
-#define pREG_CAN0_RFH1                   ((volatile uint16_t *)REG_CAN0_RFH1)                    /* CAN0 Remote Frame Handling Register 1 */
-#define pREG_CAN0_OPSS1                  ((volatile uint16_t *)REG_CAN0_OPSS1)                   /* CAN0 Overwrite Protection/Single Shot Transmission Register 1 */
-#define pREG_CAN0_MC2                    ((volatile uint16_t *)REG_CAN0_MC2)                     /* CAN0 Mailbox Configuration Register 2 */
-#define pREG_CAN0_MD2                    ((volatile uint16_t *)REG_CAN0_MD2)                     /* CAN0 Mailbox Direction Register 2 */
-#define pREG_CAN0_TRS2                   ((volatile uint16_t *)REG_CAN0_TRS2)                    /* CAN0 Transmission Request Set Register 2 */
-#define pREG_CAN0_TRR2                   ((volatile uint16_t *)REG_CAN0_TRR2)                    /* CAN0 Transmission Request Reset Register 2 */
-#define pREG_CAN0_TA2                    ((volatile uint16_t *)REG_CAN0_TA2)                     /* CAN0 Transmission Acknowledge Register 2 */
-#define pREG_CAN0_AA2                    ((volatile uint16_t *)REG_CAN0_AA2)                     /* CAN0 Abort Acknowledge Register 2 */
-#define pREG_CAN0_RMP2                   ((volatile uint16_t *)REG_CAN0_RMP2)                    /* CAN0 Receive Message Pending Register 2 */
-#define pREG_CAN0_RML2                   ((volatile uint16_t *)REG_CAN0_RML2)                    /* CAN0 Receive Message Lost Register 2 */
-#define pREG_CAN0_MBTIF2                 ((volatile uint16_t *)REG_CAN0_MBTIF2)                  /* CAN0 Mailbox Transmit Interrupt Flag Register 2 */
-#define pREG_CAN0_MBRIF2                 ((volatile uint16_t *)REG_CAN0_MBRIF2)                  /* CAN0 Mailbox Receive Interrupt Flag Register 2 */
-#define pREG_CAN0_MBIM2                  ((volatile uint16_t *)REG_CAN0_MBIM2)                   /* CAN0 Mailbox Interrupt Mask Register 2 */
-#define pREG_CAN0_RFH2                   ((volatile uint16_t *)REG_CAN0_RFH2)                    /* CAN0 Remote Frame Handling Register 2 */
-#define pREG_CAN0_OPSS2                  ((volatile uint16_t *)REG_CAN0_OPSS2)                   /* CAN0 Overwrite Protection/Single Shot Transmission Register 2 */
+#define pREG_CAN0_MC1                    ((volatile uint16_t *)REG_CAN0_MC1)                     /* CAN0 Mailbox Configuration 1 Register */
+#define pREG_CAN0_MD1                    ((volatile uint16_t *)REG_CAN0_MD1)                     /* CAN0 Mailbox Direction 1 Register */
+#define pREG_CAN0_TRS1                   ((volatile uint16_t *)REG_CAN0_TRS1)                    /* CAN0 Transmission Request Set 1 Register */
+#define pREG_CAN0_TRR1                   ((volatile uint16_t *)REG_CAN0_TRR1)                    /* CAN0 Transmission Request Reset 1 Register */
+#define pREG_CAN0_TA1                    ((volatile uint16_t *)REG_CAN0_TA1)                     /* CAN0 Transmission Acknowledge 1 Register */
+#define pREG_CAN0_AA1                    ((volatile uint16_t *)REG_CAN0_AA1)                     /* CAN0 Abort Acknowledge 1 Register */
+#define pREG_CAN0_RMP1                   ((volatile uint16_t *)REG_CAN0_RMP1)                    /* CAN0 Receive Message Pending 1 Register */
+#define pREG_CAN0_RML1                   ((volatile uint16_t *)REG_CAN0_RML1)                    /* CAN0 Receive Message Lost 1 Register */
+#define pREG_CAN0_MBTIF1                 ((volatile uint16_t *)REG_CAN0_MBTIF1)                  /* CAN0 Mailbox Transmit Interrupt Flag 1 Register */
+#define pREG_CAN0_MBRIF1                 ((volatile uint16_t *)REG_CAN0_MBRIF1)                  /* CAN0 Mailbox Receive Interrupt Flag 1 Register */
+#define pREG_CAN0_MBIM1                  ((volatile uint16_t *)REG_CAN0_MBIM1)                   /* CAN0 Mailbox Interrupt Mask 1 Register */
+#define pREG_CAN0_RFH1                   ((volatile uint16_t *)REG_CAN0_RFH1)                    /* CAN0 Remote Frame Handling 1 Register */
+#define pREG_CAN0_OPSS1                  ((volatile uint16_t *)REG_CAN0_OPSS1)                   /* CAN0 Overwrite Protection/Single Shot Transmission 1 Register */
+#define pREG_CAN0_MC2                    ((volatile uint16_t *)REG_CAN0_MC2)                     /* CAN0 Mailbox Configuration 2 Register */
+#define pREG_CAN0_MD2                    ((volatile uint16_t *)REG_CAN0_MD2)                     /* CAN0 Mailbox Direction 2 Register */
+#define pREG_CAN0_TRS2                   ((volatile uint16_t *)REG_CAN0_TRS2)                    /* CAN0 Transmission Request Set 2 Register */
+#define pREG_CAN0_TRR2                   ((volatile uint16_t *)REG_CAN0_TRR2)                    /* CAN0 Transmission Request Reset 2 Register */
+#define pREG_CAN0_TA2                    ((volatile uint16_t *)REG_CAN0_TA2)                     /* CAN0 Transmission Acknowledge 2 Register */
+#define pREG_CAN0_AA2                    ((volatile uint16_t *)REG_CAN0_AA2)                     /* CAN0 Abort Acknowledge 2 Register */
+#define pREG_CAN0_RMP2                   ((volatile uint16_t *)REG_CAN0_RMP2)                    /* CAN0 Receive Message Pending 2 Register */
+#define pREG_CAN0_RML2                   ((volatile uint16_t *)REG_CAN0_RML2)                    /* CAN0 Receive Message Lost 2 Register */
+#define pREG_CAN0_MBTIF2                 ((volatile uint16_t *)REG_CAN0_MBTIF2)                  /* CAN0 Mailbox Transmit Interrupt Flag 2 Register */
+#define pREG_CAN0_MBRIF2                 ((volatile uint16_t *)REG_CAN0_MBRIF2)                  /* CAN0 Mailbox Receive Interrupt Flag 2 Register */
+#define pREG_CAN0_MBIM2                  ((volatile uint16_t *)REG_CAN0_MBIM2)                   /* CAN0 Mailbox Interrupt Mask 2 Register */
+#define pREG_CAN0_RFH2                   ((volatile uint16_t *)REG_CAN0_RFH2)                    /* CAN0 Remote Frame Handling 2 Register */
+#define pREG_CAN0_OPSS2                  ((volatile uint16_t *)REG_CAN0_OPSS2)                   /* CAN0 Overwrite Protection/Single Shot Transmission 2 Register */
 #define pREG_CAN0_CLK                    ((volatile uint16_t *)REG_CAN0_CLK)                     /* CAN0 Clock Register */
 #define pREG_CAN0_TIMING                 ((volatile uint16_t *)REG_CAN0_TIMING)                  /* CAN0 Timing Register */
 #define pREG_CAN0_DBG                    ((volatile uint16_t *)REG_CAN0_DBG)                     /* CAN0 Debug Register */
 #define pREG_CAN0_STAT                   ((volatile uint16_t *)REG_CAN0_STAT)                    /* CAN0 Status Register */
 #define pREG_CAN0_CEC                    ((volatile uint16_t *)REG_CAN0_CEC)                     /* CAN0 Error Counter Register */
-#define pREG_CAN0_GIS                    ((volatile uint16_t *)REG_CAN0_GIS)                     /* CAN0 Global CAN Interrupt Status */
-#define pREG_CAN0_GIM                    ((volatile uint16_t *)REG_CAN0_GIM)                     /* CAN0 Global CAN Interrupt Mask */
-#define pREG_CAN0_GIF                    ((volatile uint16_t *)REG_CAN0_GIF)                     /* CAN0 Global CAN Interrupt Flag */
+#define pREG_CAN0_GIS                    ((volatile uint16_t *)REG_CAN0_GIS)                     /* CAN0 Global CAN Interrupt Status Register */
+#define pREG_CAN0_GIM                    ((volatile uint16_t *)REG_CAN0_GIM)                     /* CAN0 Global CAN Interrupt Mask Register */
+#define pREG_CAN0_GIF                    ((volatile uint16_t *)REG_CAN0_GIF)                     /* CAN0 Global CAN Interrupt Flag Register */
 #define pREG_CAN0_CTL                    ((volatile uint16_t *)REG_CAN0_CTL)                     /* CAN0 CAN Master Control Register */
 #define pREG_CAN0_INT                    ((volatile uint16_t *)REG_CAN0_INT)                     /* CAN0 Interrupt Pending Register */
 #define pREG_CAN0_MBTD                   ((volatile uint16_t *)REG_CAN0_MBTD)                    /* CAN0 Temporary Mailbox Disable Register */
@@ -136,70 +135,70 @@
 #define pREG_CAN0_UCCNT                  ((volatile uint16_t *)REG_CAN0_UCCNT)                   /* CAN0 Universal Counter Register */
 #define pREG_CAN0_UCRC                   ((volatile uint16_t *)REG_CAN0_UCRC)                    /* CAN0 Universal Counter Reload/Capture Register */
 #define pREG_CAN0_UCCNF                  ((volatile uint16_t *)REG_CAN0_UCCNF)                   /* CAN0 Universal Counter Configuration Mode Register */
-#define pREG_CAN0_AM00L                  ((volatile uint16_t *)REG_CAN0_AM00L)                   /* CAN0 Acceptance Mask Register (L) */
-#define pREG_CAN0_AM01L                  ((volatile uint16_t *)REG_CAN0_AM01L)                   /* CAN0 Acceptance Mask Register (L) */
-#define pREG_CAN0_AM02L                  ((volatile uint16_t *)REG_CAN0_AM02L)                   /* CAN0 Acceptance Mask Register (L) */
-#define pREG_CAN0_AM03L                  ((volatile uint16_t *)REG_CAN0_AM03L)                   /* CAN0 Acceptance Mask Register (L) */
-#define pREG_CAN0_AM04L                  ((volatile uint16_t *)REG_CAN0_AM04L)                   /* CAN0 Acceptance Mask Register (L) */
-#define pREG_CAN0_AM05L                  ((volatile uint16_t *)REG_CAN0_AM05L)                   /* CAN0 Acceptance Mask Register (L) */
-#define pREG_CAN0_AM06L                  ((volatile uint16_t *)REG_CAN0_AM06L)                   /* CAN0 Acceptance Mask Register (L) */
-#define pREG_CAN0_AM07L                  ((volatile uint16_t *)REG_CAN0_AM07L)                   /* CAN0 Acceptance Mask Register (L) */
-#define pREG_CAN0_AM08L                  ((volatile uint16_t *)REG_CAN0_AM08L)                   /* CAN0 Acceptance Mask Register (L) */
-#define pREG_CAN0_AM09L                  ((volatile uint16_t *)REG_CAN0_AM09L)                   /* CAN0 Acceptance Mask Register (L) */
-#define pREG_CAN0_AM10L                  ((volatile uint16_t *)REG_CAN0_AM10L)                   /* CAN0 Acceptance Mask Register (L) */
-#define pREG_CAN0_AM11L                  ((volatile uint16_t *)REG_CAN0_AM11L)                   /* CAN0 Acceptance Mask Register (L) */
-#define pREG_CAN0_AM12L                  ((volatile uint16_t *)REG_CAN0_AM12L)                   /* CAN0 Acceptance Mask Register (L) */
-#define pREG_CAN0_AM13L                  ((volatile uint16_t *)REG_CAN0_AM13L)                   /* CAN0 Acceptance Mask Register (L) */
-#define pREG_CAN0_AM14L                  ((volatile uint16_t *)REG_CAN0_AM14L)                   /* CAN0 Acceptance Mask Register (L) */
-#define pREG_CAN0_AM15L                  ((volatile uint16_t *)REG_CAN0_AM15L)                   /* CAN0 Acceptance Mask Register (L) */
-#define pREG_CAN0_AM16L                  ((volatile uint16_t *)REG_CAN0_AM16L)                   /* CAN0 Acceptance Mask Register (L) */
-#define pREG_CAN0_AM17L                  ((volatile uint16_t *)REG_CAN0_AM17L)                   /* CAN0 Acceptance Mask Register (L) */
-#define pREG_CAN0_AM18L                  ((volatile uint16_t *)REG_CAN0_AM18L)                   /* CAN0 Acceptance Mask Register (L) */
-#define pREG_CAN0_AM19L                  ((volatile uint16_t *)REG_CAN0_AM19L)                   /* CAN0 Acceptance Mask Register (L) */
-#define pREG_CAN0_AM20L                  ((volatile uint16_t *)REG_CAN0_AM20L)                   /* CAN0 Acceptance Mask Register (L) */
-#define pREG_CAN0_AM21L                  ((volatile uint16_t *)REG_CAN0_AM21L)                   /* CAN0 Acceptance Mask Register (L) */
-#define pREG_CAN0_AM22L                  ((volatile uint16_t *)REG_CAN0_AM22L)                   /* CAN0 Acceptance Mask Register (L) */
-#define pREG_CAN0_AM23L                  ((volatile uint16_t *)REG_CAN0_AM23L)                   /* CAN0 Acceptance Mask Register (L) */
-#define pREG_CAN0_AM24L                  ((volatile uint16_t *)REG_CAN0_AM24L)                   /* CAN0 Acceptance Mask Register (L) */
-#define pREG_CAN0_AM25L                  ((volatile uint16_t *)REG_CAN0_AM25L)                   /* CAN0 Acceptance Mask Register (L) */
-#define pREG_CAN0_AM26L                  ((volatile uint16_t *)REG_CAN0_AM26L)                   /* CAN0 Acceptance Mask Register (L) */
-#define pREG_CAN0_AM27L                  ((volatile uint16_t *)REG_CAN0_AM27L)                   /* CAN0 Acceptance Mask Register (L) */
-#define pREG_CAN0_AM28L                  ((volatile uint16_t *)REG_CAN0_AM28L)                   /* CAN0 Acceptance Mask Register (L) */
-#define pREG_CAN0_AM29L                  ((volatile uint16_t *)REG_CAN0_AM29L)                   /* CAN0 Acceptance Mask Register (L) */
-#define pREG_CAN0_AM30L                  ((volatile uint16_t *)REG_CAN0_AM30L)                   /* CAN0 Acceptance Mask Register (L) */
-#define pREG_CAN0_AM31L                  ((volatile uint16_t *)REG_CAN0_AM31L)                   /* CAN0 Acceptance Mask Register (L) */
-#define pREG_CAN0_AM00H                  ((volatile uint16_t *)REG_CAN0_AM00H)                   /* CAN0 Acceptance Mask Register (H) */
-#define pREG_CAN0_AM01H                  ((volatile uint16_t *)REG_CAN0_AM01H)                   /* CAN0 Acceptance Mask Register (H) */
-#define pREG_CAN0_AM02H                  ((volatile uint16_t *)REG_CAN0_AM02H)                   /* CAN0 Acceptance Mask Register (H) */
-#define pREG_CAN0_AM03H                  ((volatile uint16_t *)REG_CAN0_AM03H)                   /* CAN0 Acceptance Mask Register (H) */
-#define pREG_CAN0_AM04H                  ((volatile uint16_t *)REG_CAN0_AM04H)                   /* CAN0 Acceptance Mask Register (H) */
-#define pREG_CAN0_AM05H                  ((volatile uint16_t *)REG_CAN0_AM05H)                   /* CAN0 Acceptance Mask Register (H) */
-#define pREG_CAN0_AM06H                  ((volatile uint16_t *)REG_CAN0_AM06H)                   /* CAN0 Acceptance Mask Register (H) */
-#define pREG_CAN0_AM07H                  ((volatile uint16_t *)REG_CAN0_AM07H)                   /* CAN0 Acceptance Mask Register (H) */
-#define pREG_CAN0_AM08H                  ((volatile uint16_t *)REG_CAN0_AM08H)                   /* CAN0 Acceptance Mask Register (H) */
-#define pREG_CAN0_AM09H                  ((volatile uint16_t *)REG_CAN0_AM09H)                   /* CAN0 Acceptance Mask Register (H) */
-#define pREG_CAN0_AM10H                  ((volatile uint16_t *)REG_CAN0_AM10H)                   /* CAN0 Acceptance Mask Register (H) */
-#define pREG_CAN0_AM11H                  ((volatile uint16_t *)REG_CAN0_AM11H)                   /* CAN0 Acceptance Mask Register (H) */
-#define pREG_CAN0_AM12H                  ((volatile uint16_t *)REG_CAN0_AM12H)                   /* CAN0 Acceptance Mask Register (H) */
-#define pREG_CAN0_AM13H                  ((volatile uint16_t *)REG_CAN0_AM13H)                   /* CAN0 Acceptance Mask Register (H) */
-#define pREG_CAN0_AM14H                  ((volatile uint16_t *)REG_CAN0_AM14H)                   /* CAN0 Acceptance Mask Register (H) */
-#define pREG_CAN0_AM15H                  ((volatile uint16_t *)REG_CAN0_AM15H)                   /* CAN0 Acceptance Mask Register (H) */
-#define pREG_CAN0_AM16H                  ((volatile uint16_t *)REG_CAN0_AM16H)                   /* CAN0 Acceptance Mask Register (H) */
-#define pREG_CAN0_AM17H                  ((volatile uint16_t *)REG_CAN0_AM17H)                   /* CAN0 Acceptance Mask Register (H) */
-#define pREG_CAN0_AM18H                  ((volatile uint16_t *)REG_CAN0_AM18H)                   /* CAN0 Acceptance Mask Register (H) */
-#define pREG_CAN0_AM19H                  ((volatile uint16_t *)REG_CAN0_AM19H)                   /* CAN0 Acceptance Mask Register (H) */
-#define pREG_CAN0_AM20H                  ((volatile uint16_t *)REG_CAN0_AM20H)                   /* CAN0 Acceptance Mask Register (H) */
-#define pREG_CAN0_AM21H                  ((volatile uint16_t *)REG_CAN0_AM21H)                   /* CAN0 Acceptance Mask Register (H) */
-#define pREG_CAN0_AM22H                  ((volatile uint16_t *)REG_CAN0_AM22H)                   /* CAN0 Acceptance Mask Register (H) */
-#define pREG_CAN0_AM23H                  ((volatile uint16_t *)REG_CAN0_AM23H)                   /* CAN0 Acceptance Mask Register (H) */
-#define pREG_CAN0_AM24H                  ((volatile uint16_t *)REG_CAN0_AM24H)                   /* CAN0 Acceptance Mask Register (H) */
-#define pREG_CAN0_AM25H                  ((volatile uint16_t *)REG_CAN0_AM25H)                   /* CAN0 Acceptance Mask Register (H) */
-#define pREG_CAN0_AM26H                  ((volatile uint16_t *)REG_CAN0_AM26H)                   /* CAN0 Acceptance Mask Register (H) */
-#define pREG_CAN0_AM27H                  ((volatile uint16_t *)REG_CAN0_AM27H)                   /* CAN0 Acceptance Mask Register (H) */
-#define pREG_CAN0_AM28H                  ((volatile uint16_t *)REG_CAN0_AM28H)                   /* CAN0 Acceptance Mask Register (H) */
-#define pREG_CAN0_AM29H                  ((volatile uint16_t *)REG_CAN0_AM29H)                   /* CAN0 Acceptance Mask Register (H) */
-#define pREG_CAN0_AM30H                  ((volatile uint16_t *)REG_CAN0_AM30H)                   /* CAN0 Acceptance Mask Register (H) */
-#define pREG_CAN0_AM31H                  ((volatile uint16_t *)REG_CAN0_AM31H)                   /* CAN0 Acceptance Mask Register (H) */
+#define pREG_CAN0_AM00L                  ((volatile uint16_t *)REG_CAN0_AM00L)                   /* CAN0 Acceptance Mask (L) Register */
+#define pREG_CAN0_AM01L                  ((volatile uint16_t *)REG_CAN0_AM01L)                   /* CAN0 Acceptance Mask (L) Register */
+#define pREG_CAN0_AM02L                  ((volatile uint16_t *)REG_CAN0_AM02L)                   /* CAN0 Acceptance Mask (L) Register */
+#define pREG_CAN0_AM03L                  ((volatile uint16_t *)REG_CAN0_AM03L)                   /* CAN0 Acceptance Mask (L) Register */
+#define pREG_CAN0_AM04L                  ((volatile uint16_t *)REG_CAN0_AM04L)                   /* CAN0 Acceptance Mask (L) Register */
+#define pREG_CAN0_AM05L                  ((volatile uint16_t *)REG_CAN0_AM05L)                   /* CAN0 Acceptance Mask (L) Register */
+#define pREG_CAN0_AM06L                  ((volatile uint16_t *)REG_CAN0_AM06L)                   /* CAN0 Acceptance Mask (L) Register */
+#define pREG_CAN0_AM07L                  ((volatile uint16_t *)REG_CAN0_AM07L)                   /* CAN0 Acceptance Mask (L) Register */
+#define pREG_CAN0_AM08L                  ((volatile uint16_t *)REG_CAN0_AM08L)                   /* CAN0 Acceptance Mask (L) Register */
+#define pREG_CAN0_AM09L                  ((volatile uint16_t *)REG_CAN0_AM09L)                   /* CAN0 Acceptance Mask (L) Register */
+#define pREG_CAN0_AM10L                  ((volatile uint16_t *)REG_CAN0_AM10L)                   /* CAN0 Acceptance Mask (L) Register */
+#define pREG_CAN0_AM11L                  ((volatile uint16_t *)REG_CAN0_AM11L)                   /* CAN0 Acceptance Mask (L) Register */
+#define pREG_CAN0_AM12L                  ((volatile uint16_t *)REG_CAN0_AM12L)                   /* CAN0 Acceptance Mask (L) Register */
+#define pREG_CAN0_AM13L                  ((volatile uint16_t *)REG_CAN0_AM13L)                   /* CAN0 Acceptance Mask (L) Register */
+#define pREG_CAN0_AM14L                  ((volatile uint16_t *)REG_CAN0_AM14L)                   /* CAN0 Acceptance Mask (L) Register */
+#define pREG_CAN0_AM15L                  ((volatile uint16_t *)REG_CAN0_AM15L)                   /* CAN0 Acceptance Mask (L) Register */
+#define pREG_CAN0_AM16L                  ((volatile uint16_t *)REG_CAN0_AM16L)                   /* CAN0 Acceptance Mask (L) Register */
+#define pREG_CAN0_AM17L                  ((volatile uint16_t *)REG_CAN0_AM17L)                   /* CAN0 Acceptance Mask (L) Register */
+#define pREG_CAN0_AM18L                  ((volatile uint16_t *)REG_CAN0_AM18L)                   /* CAN0 Acceptance Mask (L) Register */
+#define pREG_CAN0_AM19L                  ((volatile uint16_t *)REG_CAN0_AM19L)                   /* CAN0 Acceptance Mask (L) Register */
+#define pREG_CAN0_AM20L                  ((volatile uint16_t *)REG_CAN0_AM20L)                   /* CAN0 Acceptance Mask (L) Register */
+#define pREG_CAN0_AM21L                  ((volatile uint16_t *)REG_CAN0_AM21L)                   /* CAN0 Acceptance Mask (L) Register */
+#define pREG_CAN0_AM22L                  ((volatile uint16_t *)REG_CAN0_AM22L)                   /* CAN0 Acceptance Mask (L) Register */
+#define pREG_CAN0_AM23L                  ((volatile uint16_t *)REG_CAN0_AM23L)                   /* CAN0 Acceptance Mask (L) Register */
+#define pREG_CAN0_AM24L                  ((volatile uint16_t *)REG_CAN0_AM24L)                   /* CAN0 Acceptance Mask (L) Register */
+#define pREG_CAN0_AM25L                  ((volatile uint16_t *)REG_CAN0_AM25L)                   /* CAN0 Acceptance Mask (L) Register */
+#define pREG_CAN0_AM26L                  ((volatile uint16_t *)REG_CAN0_AM26L)                   /* CAN0 Acceptance Mask (L) Register */
+#define pREG_CAN0_AM27L                  ((volatile uint16_t *)REG_CAN0_AM27L)                   /* CAN0 Acceptance Mask (L) Register */
+#define pREG_CAN0_AM28L                  ((volatile uint16_t *)REG_CAN0_AM28L)                   /* CAN0 Acceptance Mask (L) Register */
+#define pREG_CAN0_AM29L                  ((volatile uint16_t *)REG_CAN0_AM29L)                   /* CAN0 Acceptance Mask (L) Register */
+#define pREG_CAN0_AM30L                  ((volatile uint16_t *)REG_CAN0_AM30L)                   /* CAN0 Acceptance Mask (L) Register */
+#define pREG_CAN0_AM31L                  ((volatile uint16_t *)REG_CAN0_AM31L)                   /* CAN0 Acceptance Mask (L) Register */
+#define pREG_CAN0_AM00H                  ((volatile uint16_t *)REG_CAN0_AM00H)                   /* CAN0 Acceptance Mask (H) Register */
+#define pREG_CAN0_AM01H                  ((volatile uint16_t *)REG_CAN0_AM01H)                   /* CAN0 Acceptance Mask (H) Register */
+#define pREG_CAN0_AM02H                  ((volatile uint16_t *)REG_CAN0_AM02H)                   /* CAN0 Acceptance Mask (H) Register */
+#define pREG_CAN0_AM03H                  ((volatile uint16_t *)REG_CAN0_AM03H)                   /* CAN0 Acceptance Mask (H) Register */
+#define pREG_CAN0_AM04H                  ((volatile uint16_t *)REG_CAN0_AM04H)                   /* CAN0 Acceptance Mask (H) Register */
+#define pREG_CAN0_AM05H                  ((volatile uint16_t *)REG_CAN0_AM05H)                   /* CAN0 Acceptance Mask (H) Register */
+#define pREG_CAN0_AM06H                  ((volatile uint16_t *)REG_CAN0_AM06H)                   /* CAN0 Acceptance Mask (H) Register */
+#define pREG_CAN0_AM07H                  ((volatile uint16_t *)REG_CAN0_AM07H)                   /* CAN0 Acceptance Mask (H) Register */
+#define pREG_CAN0_AM08H                  ((volatile uint16_t *)REG_CAN0_AM08H)                   /* CAN0 Acceptance Mask (H) Register */
+#define pREG_CAN0_AM09H                  ((volatile uint16_t *)REG_CAN0_AM09H)                   /* CAN0 Acceptance Mask (H) Register */
+#define pREG_CAN0_AM10H                  ((volatile uint16_t *)REG_CAN0_AM10H)                   /* CAN0 Acceptance Mask (H) Register */
+#define pREG_CAN0_AM11H                  ((volatile uint16_t *)REG_CAN0_AM11H)                   /* CAN0 Acceptance Mask (H) Register */
+#define pREG_CAN0_AM12H                  ((volatile uint16_t *)REG_CAN0_AM12H)                   /* CAN0 Acceptance Mask (H) Register */
+#define pREG_CAN0_AM13H                  ((volatile uint16_t *)REG_CAN0_AM13H)                   /* CAN0 Acceptance Mask (H) Register */
+#define pREG_CAN0_AM14H                  ((volatile uint16_t *)REG_CAN0_AM14H)                   /* CAN0 Acceptance Mask (H) Register */
+#define pREG_CAN0_AM15H                  ((volatile uint16_t *)REG_CAN0_AM15H)                   /* CAN0 Acceptance Mask (H) Register */
+#define pREG_CAN0_AM16H                  ((volatile uint16_t *)REG_CAN0_AM16H)                   /* CAN0 Acceptance Mask (H) Register */
+#define pREG_CAN0_AM17H                  ((volatile uint16_t *)REG_CAN0_AM17H)                   /* CAN0 Acceptance Mask (H) Register */
+#define pREG_CAN0_AM18H                  ((volatile uint16_t *)REG_CAN0_AM18H)                   /* CAN0 Acceptance Mask (H) Register */
+#define pREG_CAN0_AM19H                  ((volatile uint16_t *)REG_CAN0_AM19H)                   /* CAN0 Acceptance Mask (H) Register */
+#define pREG_CAN0_AM20H                  ((volatile uint16_t *)REG_CAN0_AM20H)                   /* CAN0 Acceptance Mask (H) Register */
+#define pREG_CAN0_AM21H                  ((volatile uint16_t *)REG_CAN0_AM21H)                   /* CAN0 Acceptance Mask (H) Register */
+#define pREG_CAN0_AM22H                  ((volatile uint16_t *)REG_CAN0_AM22H)                   /* CAN0 Acceptance Mask (H) Register */
+#define pREG_CAN0_AM23H                  ((volatile uint16_t *)REG_CAN0_AM23H)                   /* CAN0 Acceptance Mask (H) Register */
+#define pREG_CAN0_AM24H                  ((volatile uint16_t *)REG_CAN0_AM24H)                   /* CAN0 Acceptance Mask (H) Register */
+#define pREG_CAN0_AM25H                  ((volatile uint16_t *)REG_CAN0_AM25H)                   /* CAN0 Acceptance Mask (H) Register */
+#define pREG_CAN0_AM26H                  ((volatile uint16_t *)REG_CAN0_AM26H)                   /* CAN0 Acceptance Mask (H) Register */
+#define pREG_CAN0_AM27H                  ((volatile uint16_t *)REG_CAN0_AM27H)                   /* CAN0 Acceptance Mask (H) Register */
+#define pREG_CAN0_AM28H                  ((volatile uint16_t *)REG_CAN0_AM28H)                   /* CAN0 Acceptance Mask (H) Register */
+#define pREG_CAN0_AM29H                  ((volatile uint16_t *)REG_CAN0_AM29H)                   /* CAN0 Acceptance Mask (H) Register */
+#define pREG_CAN0_AM30H                  ((volatile uint16_t *)REG_CAN0_AM30H)                   /* CAN0 Acceptance Mask (H) Register */
+#define pREG_CAN0_AM31H                  ((volatile uint16_t *)REG_CAN0_AM31H)                   /* CAN0 Acceptance Mask (H) Register */
 #define pREG_CAN0_MB00_DATA0             ((volatile uint16_t *)REG_CAN0_MB00_DATA0)              /* CAN0 Mailbox Word 0 Register */
 #define pREG_CAN0_MB01_DATA0             ((volatile uint16_t *)REG_CAN0_MB01_DATA0)              /* CAN0 Mailbox Word 0 Register */
 #define pREG_CAN0_MB02_DATA0             ((volatile uint16_t *)REG_CAN0_MB02_DATA0)              /* CAN0 Mailbox Word 0 Register */
@@ -328,134 +327,134 @@
 #define pREG_CAN0_MB29_DATA3             ((volatile uint16_t *)REG_CAN0_MB29_DATA3)              /* CAN0 Mailbox Word 3 Register */
 #define pREG_CAN0_MB30_DATA3             ((volatile uint16_t *)REG_CAN0_MB30_DATA3)              /* CAN0 Mailbox Word 3 Register */
 #define pREG_CAN0_MB31_DATA3             ((volatile uint16_t *)REG_CAN0_MB31_DATA3)              /* CAN0 Mailbox Word 3 Register */
-#define pREG_CAN0_MB00_LENGTH            ((volatile uint16_t *)REG_CAN0_MB00_LENGTH)             /* CAN0 Mailbox Word 4 Register */
-#define pREG_CAN0_MB01_LENGTH            ((volatile uint16_t *)REG_CAN0_MB01_LENGTH)             /* CAN0 Mailbox Word 4 Register */
-#define pREG_CAN0_MB02_LENGTH            ((volatile uint16_t *)REG_CAN0_MB02_LENGTH)             /* CAN0 Mailbox Word 4 Register */
-#define pREG_CAN0_MB03_LENGTH            ((volatile uint16_t *)REG_CAN0_MB03_LENGTH)             /* CAN0 Mailbox Word 4 Register */
-#define pREG_CAN0_MB04_LENGTH            ((volatile uint16_t *)REG_CAN0_MB04_LENGTH)             /* CAN0 Mailbox Word 4 Register */
-#define pREG_CAN0_MB05_LENGTH            ((volatile uint16_t *)REG_CAN0_MB05_LENGTH)             /* CAN0 Mailbox Word 4 Register */
-#define pREG_CAN0_MB06_LENGTH            ((volatile uint16_t *)REG_CAN0_MB06_LENGTH)             /* CAN0 Mailbox Word 4 Register */
-#define pREG_CAN0_MB07_LENGTH            ((volatile uint16_t *)REG_CAN0_MB07_LENGTH)             /* CAN0 Mailbox Word 4 Register */
-#define pREG_CAN0_MB08_LENGTH            ((volatile uint16_t *)REG_CAN0_MB08_LENGTH)             /* CAN0 Mailbox Word 4 Register */
-#define pREG_CAN0_MB09_LENGTH            ((volatile uint16_t *)REG_CAN0_MB09_LENGTH)             /* CAN0 Mailbox Word 4 Register */
-#define pREG_CAN0_MB10_LENGTH            ((volatile uint16_t *)REG_CAN0_MB10_LENGTH)             /* CAN0 Mailbox Word 4 Register */
-#define pREG_CAN0_MB11_LENGTH            ((volatile uint16_t *)REG_CAN0_MB11_LENGTH)             /* CAN0 Mailbox Word 4 Register */
-#define pREG_CAN0_MB12_LENGTH            ((volatile uint16_t *)REG_CAN0_MB12_LENGTH)             /* CAN0 Mailbox Word 4 Register */
-#define pREG_CAN0_MB13_LENGTH            ((volatile uint16_t *)REG_CAN0_MB13_LENGTH)             /* CAN0 Mailbox Word 4 Register */
-#define pREG_CAN0_MB14_LENGTH            ((volatile uint16_t *)REG_CAN0_MB14_LENGTH)             /* CAN0 Mailbox Word 4 Register */
-#define pREG_CAN0_MB15_LENGTH            ((volatile uint16_t *)REG_CAN0_MB15_LENGTH)             /* CAN0 Mailbox Word 4 Register */
-#define pREG_CAN0_MB16_LENGTH            ((volatile uint16_t *)REG_CAN0_MB16_LENGTH)             /* CAN0 Mailbox Word 4 Register */
-#define pREG_CAN0_MB17_LENGTH            ((volatile uint16_t *)REG_CAN0_MB17_LENGTH)             /* CAN0 Mailbox Word 4 Register */
-#define pREG_CAN0_MB18_LENGTH            ((volatile uint16_t *)REG_CAN0_MB18_LENGTH)             /* CAN0 Mailbox Word 4 Register */
-#define pREG_CAN0_MB19_LENGTH            ((volatile uint16_t *)REG_CAN0_MB19_LENGTH)             /* CAN0 Mailbox Word 4 Register */
-#define pREG_CAN0_MB20_LENGTH            ((volatile uint16_t *)REG_CAN0_MB20_LENGTH)             /* CAN0 Mailbox Word 4 Register */
-#define pREG_CAN0_MB21_LENGTH            ((volatile uint16_t *)REG_CAN0_MB21_LENGTH)             /* CAN0 Mailbox Word 4 Register */
-#define pREG_CAN0_MB22_LENGTH            ((volatile uint16_t *)REG_CAN0_MB22_LENGTH)             /* CAN0 Mailbox Word 4 Register */
-#define pREG_CAN0_MB23_LENGTH            ((volatile uint16_t *)REG_CAN0_MB23_LENGTH)             /* CAN0 Mailbox Word 4 Register */
-#define pREG_CAN0_MB24_LENGTH            ((volatile uint16_t *)REG_CAN0_MB24_LENGTH)             /* CAN0 Mailbox Word 4 Register */
-#define pREG_CAN0_MB25_LENGTH            ((volatile uint16_t *)REG_CAN0_MB25_LENGTH)             /* CAN0 Mailbox Word 4 Register */
-#define pREG_CAN0_MB26_LENGTH            ((volatile uint16_t *)REG_CAN0_MB26_LENGTH)             /* CAN0 Mailbox Word 4 Register */
-#define pREG_CAN0_MB27_LENGTH            ((volatile uint16_t *)REG_CAN0_MB27_LENGTH)             /* CAN0 Mailbox Word 4 Register */
-#define pREG_CAN0_MB28_LENGTH            ((volatile uint16_t *)REG_CAN0_MB28_LENGTH)             /* CAN0 Mailbox Word 4 Register */
-#define pREG_CAN0_MB29_LENGTH            ((volatile uint16_t *)REG_CAN0_MB29_LENGTH)             /* CAN0 Mailbox Word 4 Register */
-#define pREG_CAN0_MB30_LENGTH            ((volatile uint16_t *)REG_CAN0_MB30_LENGTH)             /* CAN0 Mailbox Word 4 Register */
-#define pREG_CAN0_MB31_LENGTH            ((volatile uint16_t *)REG_CAN0_MB31_LENGTH)             /* CAN0 Mailbox Word 4 Register */
-#define pREG_CAN0_MB00_TIMESTAMP         ((volatile uint16_t *)REG_CAN0_MB00_TIMESTAMP)          /* CAN0 Mailbox Word 5 Register */
-#define pREG_CAN0_MB01_TIMESTAMP         ((volatile uint16_t *)REG_CAN0_MB01_TIMESTAMP)          /* CAN0 Mailbox Word 5 Register */
-#define pREG_CAN0_MB02_TIMESTAMP         ((volatile uint16_t *)REG_CAN0_MB02_TIMESTAMP)          /* CAN0 Mailbox Word 5 Register */
-#define pREG_CAN0_MB03_TIMESTAMP         ((volatile uint16_t *)REG_CAN0_MB03_TIMESTAMP)          /* CAN0 Mailbox Word 5 Register */
-#define pREG_CAN0_MB04_TIMESTAMP         ((volatile uint16_t *)REG_CAN0_MB04_TIMESTAMP)          /* CAN0 Mailbox Word 5 Register */
-#define pREG_CAN0_MB05_TIMESTAMP         ((volatile uint16_t *)REG_CAN0_MB05_TIMESTAMP)          /* CAN0 Mailbox Word 5 Register */
-#define pREG_CAN0_MB06_TIMESTAMP         ((volatile uint16_t *)REG_CAN0_MB06_TIMESTAMP)          /* CAN0 Mailbox Word 5 Register */
-#define pREG_CAN0_MB07_TIMESTAMP         ((volatile uint16_t *)REG_CAN0_MB07_TIMESTAMP)          /* CAN0 Mailbox Word 5 Register */
-#define pREG_CAN0_MB08_TIMESTAMP         ((volatile uint16_t *)REG_CAN0_MB08_TIMESTAMP)          /* CAN0 Mailbox Word 5 Register */
-#define pREG_CAN0_MB09_TIMESTAMP         ((volatile uint16_t *)REG_CAN0_MB09_TIMESTAMP)          /* CAN0 Mailbox Word 5 Register */
-#define pREG_CAN0_MB10_TIMESTAMP         ((volatile uint16_t *)REG_CAN0_MB10_TIMESTAMP)          /* CAN0 Mailbox Word 5 Register */
-#define pREG_CAN0_MB11_TIMESTAMP         ((volatile uint16_t *)REG_CAN0_MB11_TIMESTAMP)          /* CAN0 Mailbox Word 5 Register */
-#define pREG_CAN0_MB12_TIMESTAMP         ((volatile uint16_t *)REG_CAN0_MB12_TIMESTAMP)          /* CAN0 Mailbox Word 5 Register */
-#define pREG_CAN0_MB13_TIMESTAMP         ((volatile uint16_t *)REG_CAN0_MB13_TIMESTAMP)          /* CAN0 Mailbox Word 5 Register */
-#define pREG_CAN0_MB14_TIMESTAMP         ((volatile uint16_t *)REG_CAN0_MB14_TIMESTAMP)          /* CAN0 Mailbox Word 5 Register */
-#define pREG_CAN0_MB15_TIMESTAMP         ((volatile uint16_t *)REG_CAN0_MB15_TIMESTAMP)          /* CAN0 Mailbox Word 5 Register */
-#define pREG_CAN0_MB16_TIMESTAMP         ((volatile uint16_t *)REG_CAN0_MB16_TIMESTAMP)          /* CAN0 Mailbox Word 5 Register */
-#define pREG_CAN0_MB17_TIMESTAMP         ((volatile uint16_t *)REG_CAN0_MB17_TIMESTAMP)          /* CAN0 Mailbox Word 5 Register */
-#define pREG_CAN0_MB18_TIMESTAMP         ((volatile uint16_t *)REG_CAN0_MB18_TIMESTAMP)          /* CAN0 Mailbox Word 5 Register */
-#define pREG_CAN0_MB19_TIMESTAMP         ((volatile uint16_t *)REG_CAN0_MB19_TIMESTAMP)          /* CAN0 Mailbox Word 5 Register */
-#define pREG_CAN0_MB20_TIMESTAMP         ((volatile uint16_t *)REG_CAN0_MB20_TIMESTAMP)          /* CAN0 Mailbox Word 5 Register */
-#define pREG_CAN0_MB21_TIMESTAMP         ((volatile uint16_t *)REG_CAN0_MB21_TIMESTAMP)          /* CAN0 Mailbox Word 5 Register */
-#define pREG_CAN0_MB22_TIMESTAMP         ((volatile uint16_t *)REG_CAN0_MB22_TIMESTAMP)          /* CAN0 Mailbox Word 5 Register */
-#define pREG_CAN0_MB23_TIMESTAMP         ((volatile uint16_t *)REG_CAN0_MB23_TIMESTAMP)          /* CAN0 Mailbox Word 5 Register */
-#define pREG_CAN0_MB24_TIMESTAMP         ((volatile uint16_t *)REG_CAN0_MB24_TIMESTAMP)          /* CAN0 Mailbox Word 5 Register */
-#define pREG_CAN0_MB25_TIMESTAMP         ((volatile uint16_t *)REG_CAN0_MB25_TIMESTAMP)          /* CAN0 Mailbox Word 5 Register */
-#define pREG_CAN0_MB26_TIMESTAMP         ((volatile uint16_t *)REG_CAN0_MB26_TIMESTAMP)          /* CAN0 Mailbox Word 5 Register */
-#define pREG_CAN0_MB27_TIMESTAMP         ((volatile uint16_t *)REG_CAN0_MB27_TIMESTAMP)          /* CAN0 Mailbox Word 5 Register */
-#define pREG_CAN0_MB28_TIMESTAMP         ((volatile uint16_t *)REG_CAN0_MB28_TIMESTAMP)          /* CAN0 Mailbox Word 5 Register */
-#define pREG_CAN0_MB29_TIMESTAMP         ((volatile uint16_t *)REG_CAN0_MB29_TIMESTAMP)          /* CAN0 Mailbox Word 5 Register */
-#define pREG_CAN0_MB30_TIMESTAMP         ((volatile uint16_t *)REG_CAN0_MB30_TIMESTAMP)          /* CAN0 Mailbox Word 5 Register */
-#define pREG_CAN0_MB31_TIMESTAMP         ((volatile uint16_t *)REG_CAN0_MB31_TIMESTAMP)          /* CAN0 Mailbox Word 5 Register */
-#define pREG_CAN0_MB00_ID0               ((volatile uint16_t *)REG_CAN0_MB00_ID0)                /* CAN0 Mailbox Word 6 Register */
-#define pREG_CAN0_MB01_ID0               ((volatile uint16_t *)REG_CAN0_MB01_ID0)                /* CAN0 Mailbox Word 6 Register */
-#define pREG_CAN0_MB02_ID0               ((volatile uint16_t *)REG_CAN0_MB02_ID0)                /* CAN0 Mailbox Word 6 Register */
-#define pREG_CAN0_MB03_ID0               ((volatile uint16_t *)REG_CAN0_MB03_ID0)                /* CAN0 Mailbox Word 6 Register */
-#define pREG_CAN0_MB04_ID0               ((volatile uint16_t *)REG_CAN0_MB04_ID0)                /* CAN0 Mailbox Word 6 Register */
-#define pREG_CAN0_MB05_ID0               ((volatile uint16_t *)REG_CAN0_MB05_ID0)                /* CAN0 Mailbox Word 6 Register */
-#define pREG_CAN0_MB06_ID0               ((volatile uint16_t *)REG_CAN0_MB06_ID0)                /* CAN0 Mailbox Word 6 Register */
-#define pREG_CAN0_MB07_ID0               ((volatile uint16_t *)REG_CAN0_MB07_ID0)                /* CAN0 Mailbox Word 6 Register */
-#define pREG_CAN0_MB08_ID0               ((volatile uint16_t *)REG_CAN0_MB08_ID0)                /* CAN0 Mailbox Word 6 Register */
-#define pREG_CAN0_MB09_ID0               ((volatile uint16_t *)REG_CAN0_MB09_ID0)                /* CAN0 Mailbox Word 6 Register */
-#define pREG_CAN0_MB10_ID0               ((volatile uint16_t *)REG_CAN0_MB10_ID0)                /* CAN0 Mailbox Word 6 Register */
-#define pREG_CAN0_MB11_ID0               ((volatile uint16_t *)REG_CAN0_MB11_ID0)                /* CAN0 Mailbox Word 6 Register */
-#define pREG_CAN0_MB12_ID0               ((volatile uint16_t *)REG_CAN0_MB12_ID0)                /* CAN0 Mailbox Word 6 Register */
-#define pREG_CAN0_MB13_ID0               ((volatile uint16_t *)REG_CAN0_MB13_ID0)                /* CAN0 Mailbox Word 6 Register */
-#define pREG_CAN0_MB14_ID0               ((volatile uint16_t *)REG_CAN0_MB14_ID0)                /* CAN0 Mailbox Word 6 Register */
-#define pREG_CAN0_MB15_ID0               ((volatile uint16_t *)REG_CAN0_MB15_ID0)                /* CAN0 Mailbox Word 6 Register */
-#define pREG_CAN0_MB16_ID0               ((volatile uint16_t *)REG_CAN0_MB16_ID0)                /* CAN0 Mailbox Word 6 Register */
-#define pREG_CAN0_MB17_ID0               ((volatile uint16_t *)REG_CAN0_MB17_ID0)                /* CAN0 Mailbox Word 6 Register */
-#define pREG_CAN0_MB18_ID0               ((volatile uint16_t *)REG_CAN0_MB18_ID0)                /* CAN0 Mailbox Word 6 Register */
-#define pREG_CAN0_MB19_ID0               ((volatile uint16_t *)REG_CAN0_MB19_ID0)                /* CAN0 Mailbox Word 6 Register */
-#define pREG_CAN0_MB20_ID0               ((volatile uint16_t *)REG_CAN0_MB20_ID0)                /* CAN0 Mailbox Word 6 Register */
-#define pREG_CAN0_MB21_ID0               ((volatile uint16_t *)REG_CAN0_MB21_ID0)                /* CAN0 Mailbox Word 6 Register */
-#define pREG_CAN0_MB22_ID0               ((volatile uint16_t *)REG_CAN0_MB22_ID0)                /* CAN0 Mailbox Word 6 Register */
-#define pREG_CAN0_MB23_ID0               ((volatile uint16_t *)REG_CAN0_MB23_ID0)                /* CAN0 Mailbox Word 6 Register */
-#define pREG_CAN0_MB24_ID0               ((volatile uint16_t *)REG_CAN0_MB24_ID0)                /* CAN0 Mailbox Word 6 Register */
-#define pREG_CAN0_MB25_ID0               ((volatile uint16_t *)REG_CAN0_MB25_ID0)                /* CAN0 Mailbox Word 6 Register */
-#define pREG_CAN0_MB26_ID0               ((volatile uint16_t *)REG_CAN0_MB26_ID0)                /* CAN0 Mailbox Word 6 Register */
-#define pREG_CAN0_MB27_ID0               ((volatile uint16_t *)REG_CAN0_MB27_ID0)                /* CAN0 Mailbox Word 6 Register */
-#define pREG_CAN0_MB28_ID0               ((volatile uint16_t *)REG_CAN0_MB28_ID0)                /* CAN0 Mailbox Word 6 Register */
-#define pREG_CAN0_MB29_ID0               ((volatile uint16_t *)REG_CAN0_MB29_ID0)                /* CAN0 Mailbox Word 6 Register */
-#define pREG_CAN0_MB30_ID0               ((volatile uint16_t *)REG_CAN0_MB30_ID0)                /* CAN0 Mailbox Word 6 Register */
-#define pREG_CAN0_MB31_ID0               ((volatile uint16_t *)REG_CAN0_MB31_ID0)                /* CAN0 Mailbox Word 6 Register */
-#define pREG_CAN0_MB00_ID1               ((volatile uint16_t *)REG_CAN0_MB00_ID1)                /* CAN0 Mailbox Word 7 Register */
-#define pREG_CAN0_MB01_ID1               ((volatile uint16_t *)REG_CAN0_MB01_ID1)                /* CAN0 Mailbox Word 7 Register */
-#define pREG_CAN0_MB02_ID1               ((volatile uint16_t *)REG_CAN0_MB02_ID1)                /* CAN0 Mailbox Word 7 Register */
-#define pREG_CAN0_MB03_ID1               ((volatile uint16_t *)REG_CAN0_MB03_ID1)                /* CAN0 Mailbox Word 7 Register */
-#define pREG_CAN0_MB04_ID1               ((volatile uint16_t *)REG_CAN0_MB04_ID1)                /* CAN0 Mailbox Word 7 Register */
-#define pREG_CAN0_MB05_ID1               ((volatile uint16_t *)REG_CAN0_MB05_ID1)                /* CAN0 Mailbox Word 7 Register */
-#define pREG_CAN0_MB06_ID1               ((volatile uint16_t *)REG_CAN0_MB06_ID1)                /* CAN0 Mailbox Word 7 Register */
-#define pREG_CAN0_MB07_ID1               ((volatile uint16_t *)REG_CAN0_MB07_ID1)                /* CAN0 Mailbox Word 7 Register */
-#define pREG_CAN0_MB08_ID1               ((volatile uint16_t *)REG_CAN0_MB08_ID1)                /* CAN0 Mailbox Word 7 Register */
-#define pREG_CAN0_MB09_ID1               ((volatile uint16_t *)REG_CAN0_MB09_ID1)                /* CAN0 Mailbox Word 7 Register */
-#define pREG_CAN0_MB10_ID1               ((volatile uint16_t *)REG_CAN0_MB10_ID1)                /* CAN0 Mailbox Word 7 Register */
-#define pREG_CAN0_MB11_ID1               ((volatile uint16_t *)REG_CAN0_MB11_ID1)                /* CAN0 Mailbox Word 7 Register */
-#define pREG_CAN0_MB12_ID1               ((volatile uint16_t *)REG_CAN0_MB12_ID1)                /* CAN0 Mailbox Word 7 Register */
-#define pREG_CAN0_MB13_ID1               ((volatile uint16_t *)REG_CAN0_MB13_ID1)                /* CAN0 Mailbox Word 7 Register */
-#define pREG_CAN0_MB14_ID1               ((volatile uint16_t *)REG_CAN0_MB14_ID1)                /* CAN0 Mailbox Word 7 Register */
-#define pREG_CAN0_MB15_ID1               ((volatile uint16_t *)REG_CAN0_MB15_ID1)                /* CAN0 Mailbox Word 7 Register */
-#define pREG_CAN0_MB16_ID1               ((volatile uint16_t *)REG_CAN0_MB16_ID1)                /* CAN0 Mailbox Word 7 Register */
-#define pREG_CAN0_MB17_ID1               ((volatile uint16_t *)REG_CAN0_MB17_ID1)                /* CAN0 Mailbox Word 7 Register */
-#define pREG_CAN0_MB18_ID1               ((volatile uint16_t *)REG_CAN0_MB18_ID1)                /* CAN0 Mailbox Word 7 Register */
-#define pREG_CAN0_MB19_ID1               ((volatile uint16_t *)REG_CAN0_MB19_ID1)                /* CAN0 Mailbox Word 7 Register */
-#define pREG_CAN0_MB20_ID1               ((volatile uint16_t *)REG_CAN0_MB20_ID1)                /* CAN0 Mailbox Word 7 Register */
-#define pREG_CAN0_MB21_ID1               ((volatile uint16_t *)REG_CAN0_MB21_ID1)                /* CAN0 Mailbox Word 7 Register */
-#define pREG_CAN0_MB22_ID1               ((volatile uint16_t *)REG_CAN0_MB22_ID1)                /* CAN0 Mailbox Word 7 Register */
-#define pREG_CAN0_MB23_ID1               ((volatile uint16_t *)REG_CAN0_MB23_ID1)                /* CAN0 Mailbox Word 7 Register */
-#define pREG_CAN0_MB24_ID1               ((volatile uint16_t *)REG_CAN0_MB24_ID1)                /* CAN0 Mailbox Word 7 Register */
-#define pREG_CAN0_MB25_ID1               ((volatile uint16_t *)REG_CAN0_MB25_ID1)                /* CAN0 Mailbox Word 7 Register */
-#define pREG_CAN0_MB26_ID1               ((volatile uint16_t *)REG_CAN0_MB26_ID1)                /* CAN0 Mailbox Word 7 Register */
-#define pREG_CAN0_MB27_ID1               ((volatile uint16_t *)REG_CAN0_MB27_ID1)                /* CAN0 Mailbox Word 7 Register */
-#define pREG_CAN0_MB28_ID1               ((volatile uint16_t *)REG_CAN0_MB28_ID1)                /* CAN0 Mailbox Word 7 Register */
-#define pREG_CAN0_MB29_ID1               ((volatile uint16_t *)REG_CAN0_MB29_ID1)                /* CAN0 Mailbox Word 7 Register */
-#define pREG_CAN0_MB30_ID1               ((volatile uint16_t *)REG_CAN0_MB30_ID1)                /* CAN0 Mailbox Word 7 Register */
-#define pREG_CAN0_MB31_ID1               ((volatile uint16_t *)REG_CAN0_MB31_ID1)                /* CAN0 Mailbox Word 7 Register */
+#define pREG_CAN0_MB00_LENGTH            ((volatile uint16_t *)REG_CAN0_MB00_LENGTH)             /* CAN0 Mailbox Length Register */
+#define pREG_CAN0_MB01_LENGTH            ((volatile uint16_t *)REG_CAN0_MB01_LENGTH)             /* CAN0 Mailbox Length Register */
+#define pREG_CAN0_MB02_LENGTH            ((volatile uint16_t *)REG_CAN0_MB02_LENGTH)             /* CAN0 Mailbox Length Register */
+#define pREG_CAN0_MB03_LENGTH            ((volatile uint16_t *)REG_CAN0_MB03_LENGTH)             /* CAN0 Mailbox Length Register */
+#define pREG_CAN0_MB04_LENGTH            ((volatile uint16_t *)REG_CAN0_MB04_LENGTH)             /* CAN0 Mailbox Length Register */
+#define pREG_CAN0_MB05_LENGTH            ((volatile uint16_t *)REG_CAN0_MB05_LENGTH)             /* CAN0 Mailbox Length Register */
+#define pREG_CAN0_MB06_LENGTH            ((volatile uint16_t *)REG_CAN0_MB06_LENGTH)             /* CAN0 Mailbox Length Register */
+#define pREG_CAN0_MB07_LENGTH            ((volatile uint16_t *)REG_CAN0_MB07_LENGTH)             /* CAN0 Mailbox Length Register */
+#define pREG_CAN0_MB08_LENGTH            ((volatile uint16_t *)REG_CAN0_MB08_LENGTH)             /* CAN0 Mailbox Length Register */
+#define pREG_CAN0_MB09_LENGTH            ((volatile uint16_t *)REG_CAN0_MB09_LENGTH)             /* CAN0 Mailbox Length Register */
+#define pREG_CAN0_MB10_LENGTH            ((volatile uint16_t *)REG_CAN0_MB10_LENGTH)             /* CAN0 Mailbox Length Register */
+#define pREG_CAN0_MB11_LENGTH            ((volatile uint16_t *)REG_CAN0_MB11_LENGTH)             /* CAN0 Mailbox Length Register */
+#define pREG_CAN0_MB12_LENGTH            ((volatile uint16_t *)REG_CAN0_MB12_LENGTH)             /* CAN0 Mailbox Length Register */
+#define pREG_CAN0_MB13_LENGTH            ((volatile uint16_t *)REG_CAN0_MB13_LENGTH)             /* CAN0 Mailbox Length Register */
+#define pREG_CAN0_MB14_LENGTH            ((volatile uint16_t *)REG_CAN0_MB14_LENGTH)             /* CAN0 Mailbox Length Register */
+#define pREG_CAN0_MB15_LENGTH            ((volatile uint16_t *)REG_CAN0_MB15_LENGTH)             /* CAN0 Mailbox Length Register */
+#define pREG_CAN0_MB16_LENGTH            ((volatile uint16_t *)REG_CAN0_MB16_LENGTH)             /* CAN0 Mailbox Length Register */
+#define pREG_CAN0_MB17_LENGTH            ((volatile uint16_t *)REG_CAN0_MB17_LENGTH)             /* CAN0 Mailbox Length Register */
+#define pREG_CAN0_MB18_LENGTH            ((volatile uint16_t *)REG_CAN0_MB18_LENGTH)             /* CAN0 Mailbox Length Register */
+#define pREG_CAN0_MB19_LENGTH            ((volatile uint16_t *)REG_CAN0_MB19_LENGTH)             /* CAN0 Mailbox Length Register */
+#define pREG_CAN0_MB20_LENGTH            ((volatile uint16_t *)REG_CAN0_MB20_LENGTH)             /* CAN0 Mailbox Length Register */
+#define pREG_CAN0_MB21_LENGTH            ((volatile uint16_t *)REG_CAN0_MB21_LENGTH)             /* CAN0 Mailbox Length Register */
+#define pREG_CAN0_MB22_LENGTH            ((volatile uint16_t *)REG_CAN0_MB22_LENGTH)             /* CAN0 Mailbox Length Register */
+#define pREG_CAN0_MB23_LENGTH            ((volatile uint16_t *)REG_CAN0_MB23_LENGTH)             /* CAN0 Mailbox Length Register */
+#define pREG_CAN0_MB24_LENGTH            ((volatile uint16_t *)REG_CAN0_MB24_LENGTH)             /* CAN0 Mailbox Length Register */
+#define pREG_CAN0_MB25_LENGTH            ((volatile uint16_t *)REG_CAN0_MB25_LENGTH)             /* CAN0 Mailbox Length Register */
+#define pREG_CAN0_MB26_LENGTH            ((volatile uint16_t *)REG_CAN0_MB26_LENGTH)             /* CAN0 Mailbox Length Register */
+#define pREG_CAN0_MB27_LENGTH            ((volatile uint16_t *)REG_CAN0_MB27_LENGTH)             /* CAN0 Mailbox Length Register */
+#define pREG_CAN0_MB28_LENGTH            ((volatile uint16_t *)REG_CAN0_MB28_LENGTH)             /* CAN0 Mailbox Length Register */
+#define pREG_CAN0_MB29_LENGTH            ((volatile uint16_t *)REG_CAN0_MB29_LENGTH)             /* CAN0 Mailbox Length Register */
+#define pREG_CAN0_MB30_LENGTH            ((volatile uint16_t *)REG_CAN0_MB30_LENGTH)             /* CAN0 Mailbox Length Register */
+#define pREG_CAN0_MB31_LENGTH            ((volatile uint16_t *)REG_CAN0_MB31_LENGTH)             /* CAN0 Mailbox Length Register */
+#define pREG_CAN0_MB00_TIMESTAMP         ((volatile uint16_t *)REG_CAN0_MB00_TIMESTAMP)          /* CAN0 Mailbox Timestamp Register */
+#define pREG_CAN0_MB01_TIMESTAMP         ((volatile uint16_t *)REG_CAN0_MB01_TIMESTAMP)          /* CAN0 Mailbox Timestamp Register */
+#define pREG_CAN0_MB02_TIMESTAMP         ((volatile uint16_t *)REG_CAN0_MB02_TIMESTAMP)          /* CAN0 Mailbox Timestamp Register */
+#define pREG_CAN0_MB03_TIMESTAMP         ((volatile uint16_t *)REG_CAN0_MB03_TIMESTAMP)          /* CAN0 Mailbox Timestamp Register */
+#define pREG_CAN0_MB04_TIMESTAMP         ((volatile uint16_t *)REG_CAN0_MB04_TIMESTAMP)          /* CAN0 Mailbox Timestamp Register */
+#define pREG_CAN0_MB05_TIMESTAMP         ((volatile uint16_t *)REG_CAN0_MB05_TIMESTAMP)          /* CAN0 Mailbox Timestamp Register */
+#define pREG_CAN0_MB06_TIMESTAMP         ((volatile uint16_t *)REG_CAN0_MB06_TIMESTAMP)          /* CAN0 Mailbox Timestamp Register */
+#define pREG_CAN0_MB07_TIMESTAMP         ((volatile uint16_t *)REG_CAN0_MB07_TIMESTAMP)          /* CAN0 Mailbox Timestamp Register */
+#define pREG_CAN0_MB08_TIMESTAMP         ((volatile uint16_t *)REG_CAN0_MB08_TIMESTAMP)          /* CAN0 Mailbox Timestamp Register */
+#define pREG_CAN0_MB09_TIMESTAMP         ((volatile uint16_t *)REG_CAN0_MB09_TIMESTAMP)          /* CAN0 Mailbox Timestamp Register */
+#define pREG_CAN0_MB10_TIMESTAMP         ((volatile uint16_t *)REG_CAN0_MB10_TIMESTAMP)          /* CAN0 Mailbox Timestamp Register */
+#define pREG_CAN0_MB11_TIMESTAMP         ((volatile uint16_t *)REG_CAN0_MB11_TIMESTAMP)          /* CAN0 Mailbox Timestamp Register */
+#define pREG_CAN0_MB12_TIMESTAMP         ((volatile uint16_t *)REG_CAN0_MB12_TIMESTAMP)          /* CAN0 Mailbox Timestamp Register */
+#define pREG_CAN0_MB13_TIMESTAMP         ((volatile uint16_t *)REG_CAN0_MB13_TIMESTAMP)          /* CAN0 Mailbox Timestamp Register */
+#define pREG_CAN0_MB14_TIMESTAMP         ((volatile uint16_t *)REG_CAN0_MB14_TIMESTAMP)          /* CAN0 Mailbox Timestamp Register */
+#define pREG_CAN0_MB15_TIMESTAMP         ((volatile uint16_t *)REG_CAN0_MB15_TIMESTAMP)          /* CAN0 Mailbox Timestamp Register */
+#define pREG_CAN0_MB16_TIMESTAMP         ((volatile uint16_t *)REG_CAN0_MB16_TIMESTAMP)          /* CAN0 Mailbox Timestamp Register */
+#define pREG_CAN0_MB17_TIMESTAMP         ((volatile uint16_t *)REG_CAN0_MB17_TIMESTAMP)          /* CAN0 Mailbox Timestamp Register */
+#define pREG_CAN0_MB18_TIMESTAMP         ((volatile uint16_t *)REG_CAN0_MB18_TIMESTAMP)          /* CAN0 Mailbox Timestamp Register */
+#define pREG_CAN0_MB19_TIMESTAMP         ((volatile uint16_t *)REG_CAN0_MB19_TIMESTAMP)          /* CAN0 Mailbox Timestamp Register */
+#define pREG_CAN0_MB20_TIMESTAMP         ((volatile uint16_t *)REG_CAN0_MB20_TIMESTAMP)          /* CAN0 Mailbox Timestamp Register */
+#define pREG_CAN0_MB21_TIMESTAMP         ((volatile uint16_t *)REG_CAN0_MB21_TIMESTAMP)          /* CAN0 Mailbox Timestamp Register */
+#define pREG_CAN0_MB22_TIMESTAMP         ((volatile uint16_t *)REG_CAN0_MB22_TIMESTAMP)          /* CAN0 Mailbox Timestamp Register */
+#define pREG_CAN0_MB23_TIMESTAMP         ((volatile uint16_t *)REG_CAN0_MB23_TIMESTAMP)          /* CAN0 Mailbox Timestamp Register */
+#define pREG_CAN0_MB24_TIMESTAMP         ((volatile uint16_t *)REG_CAN0_MB24_TIMESTAMP)          /* CAN0 Mailbox Timestamp Register */
+#define pREG_CAN0_MB25_TIMESTAMP         ((volatile uint16_t *)REG_CAN0_MB25_TIMESTAMP)          /* CAN0 Mailbox Timestamp Register */
+#define pREG_CAN0_MB26_TIMESTAMP         ((volatile uint16_t *)REG_CAN0_MB26_TIMESTAMP)          /* CAN0 Mailbox Timestamp Register */
+#define pREG_CAN0_MB27_TIMESTAMP         ((volatile uint16_t *)REG_CAN0_MB27_TIMESTAMP)          /* CAN0 Mailbox Timestamp Register */
+#define pREG_CAN0_MB28_TIMESTAMP         ((volatile uint16_t *)REG_CAN0_MB28_TIMESTAMP)          /* CAN0 Mailbox Timestamp Register */
+#define pREG_CAN0_MB29_TIMESTAMP         ((volatile uint16_t *)REG_CAN0_MB29_TIMESTAMP)          /* CAN0 Mailbox Timestamp Register */
+#define pREG_CAN0_MB30_TIMESTAMP         ((volatile uint16_t *)REG_CAN0_MB30_TIMESTAMP)          /* CAN0 Mailbox Timestamp Register */
+#define pREG_CAN0_MB31_TIMESTAMP         ((volatile uint16_t *)REG_CAN0_MB31_TIMESTAMP)          /* CAN0 Mailbox Timestamp Register */
+#define pREG_CAN0_MB00_ID0               ((volatile uint16_t *)REG_CAN0_MB00_ID0)                /* CAN0 Mailbox ID 0 Register */
+#define pREG_CAN0_MB01_ID0               ((volatile uint16_t *)REG_CAN0_MB01_ID0)                /* CAN0 Mailbox ID 0 Register */
+#define pREG_CAN0_MB02_ID0               ((volatile uint16_t *)REG_CAN0_MB02_ID0)                /* CAN0 Mailbox ID 0 Register */
+#define pREG_CAN0_MB03_ID0               ((volatile uint16_t *)REG_CAN0_MB03_ID0)                /* CAN0 Mailbox ID 0 Register */
+#define pREG_CAN0_MB04_ID0               ((volatile uint16_t *)REG_CAN0_MB04_ID0)                /* CAN0 Mailbox ID 0 Register */
+#define pREG_CAN0_MB05_ID0               ((volatile uint16_t *)REG_CAN0_MB05_ID0)                /* CAN0 Mailbox ID 0 Register */
+#define pREG_CAN0_MB06_ID0               ((volatile uint16_t *)REG_CAN0_MB06_ID0)                /* CAN0 Mailbox ID 0 Register */
+#define pREG_CAN0_MB07_ID0               ((volatile uint16_t *)REG_CAN0_MB07_ID0)                /* CAN0 Mailbox ID 0 Register */
+#define pREG_CAN0_MB08_ID0               ((volatile uint16_t *)REG_CAN0_MB08_ID0)                /* CAN0 Mailbox ID 0 Register */
+#define pREG_CAN0_MB09_ID0               ((volatile uint16_t *)REG_CAN0_MB09_ID0)                /* CAN0 Mailbox ID 0 Register */
+#define pREG_CAN0_MB10_ID0               ((volatile uint16_t *)REG_CAN0_MB10_ID0)                /* CAN0 Mailbox ID 0 Register */
+#define pREG_CAN0_MB11_ID0               ((volatile uint16_t *)REG_CAN0_MB11_ID0)                /* CAN0 Mailbox ID 0 Register */
+#define pREG_CAN0_MB12_ID0               ((volatile uint16_t *)REG_CAN0_MB12_ID0)                /* CAN0 Mailbox ID 0 Register */
+#define pREG_CAN0_MB13_ID0               ((volatile uint16_t *)REG_CAN0_MB13_ID0)                /* CAN0 Mailbox ID 0 Register */
+#define pREG_CAN0_MB14_ID0               ((volatile uint16_t *)REG_CAN0_MB14_ID0)                /* CAN0 Mailbox ID 0 Register */
+#define pREG_CAN0_MB15_ID0               ((volatile uint16_t *)REG_CAN0_MB15_ID0)                /* CAN0 Mailbox ID 0 Register */
+#define pREG_CAN0_MB16_ID0               ((volatile uint16_t *)REG_CAN0_MB16_ID0)                /* CAN0 Mailbox ID 0 Register */
+#define pREG_CAN0_MB17_ID0               ((volatile uint16_t *)REG_CAN0_MB17_ID0)                /* CAN0 Mailbox ID 0 Register */
+#define pREG_CAN0_MB18_ID0               ((volatile uint16_t *)REG_CAN0_MB18_ID0)                /* CAN0 Mailbox ID 0 Register */
+#define pREG_CAN0_MB19_ID0               ((volatile uint16_t *)REG_CAN0_MB19_ID0)                /* CAN0 Mailbox ID 0 Register */
+#define pREG_CAN0_MB20_ID0               ((volatile uint16_t *)REG_CAN0_MB20_ID0)                /* CAN0 Mailbox ID 0 Register */
+#define pREG_CAN0_MB21_ID0               ((volatile uint16_t *)REG_CAN0_MB21_ID0)                /* CAN0 Mailbox ID 0 Register */
+#define pREG_CAN0_MB22_ID0               ((volatile uint16_t *)REG_CAN0_MB22_ID0)                /* CAN0 Mailbox ID 0 Register */
+#define pREG_CAN0_MB23_ID0               ((volatile uint16_t *)REG_CAN0_MB23_ID0)                /* CAN0 Mailbox ID 0 Register */
+#define pREG_CAN0_MB24_ID0               ((volatile uint16_t *)REG_CAN0_MB24_ID0)                /* CAN0 Mailbox ID 0 Register */
+#define pREG_CAN0_MB25_ID0               ((volatile uint16_t *)REG_CAN0_MB25_ID0)                /* CAN0 Mailbox ID 0 Register */
+#define pREG_CAN0_MB26_ID0               ((volatile uint16_t *)REG_CAN0_MB26_ID0)                /* CAN0 Mailbox ID 0 Register */
+#define pREG_CAN0_MB27_ID0               ((volatile uint16_t *)REG_CAN0_MB27_ID0)                /* CAN0 Mailbox ID 0 Register */
+#define pREG_CAN0_MB28_ID0               ((volatile uint16_t *)REG_CAN0_MB28_ID0)                /* CAN0 Mailbox ID 0 Register */
+#define pREG_CAN0_MB29_ID0               ((volatile uint16_t *)REG_CAN0_MB29_ID0)                /* CAN0 Mailbox ID 0 Register */
+#define pREG_CAN0_MB30_ID0               ((volatile uint16_t *)REG_CAN0_MB30_ID0)                /* CAN0 Mailbox ID 0 Register */
+#define pREG_CAN0_MB31_ID0               ((volatile uint16_t *)REG_CAN0_MB31_ID0)                /* CAN0 Mailbox ID 0 Register */
+#define pREG_CAN0_MB00_ID1               ((volatile uint16_t *)REG_CAN0_MB00_ID1)                /* CAN0 Mailbox ID 1 Register */
+#define pREG_CAN0_MB01_ID1               ((volatile uint16_t *)REG_CAN0_MB01_ID1)                /* CAN0 Mailbox ID 1 Register */
+#define pREG_CAN0_MB02_ID1               ((volatile uint16_t *)REG_CAN0_MB02_ID1)                /* CAN0 Mailbox ID 1 Register */
+#define pREG_CAN0_MB03_ID1               ((volatile uint16_t *)REG_CAN0_MB03_ID1)                /* CAN0 Mailbox ID 1 Register */
+#define pREG_CAN0_MB04_ID1               ((volatile uint16_t *)REG_CAN0_MB04_ID1)                /* CAN0 Mailbox ID 1 Register */
+#define pREG_CAN0_MB05_ID1               ((volatile uint16_t *)REG_CAN0_MB05_ID1)                /* CAN0 Mailbox ID 1 Register */
+#define pREG_CAN0_MB06_ID1               ((volatile uint16_t *)REG_CAN0_MB06_ID1)                /* CAN0 Mailbox ID 1 Register */
+#define pREG_CAN0_MB07_ID1               ((volatile uint16_t *)REG_CAN0_MB07_ID1)                /* CAN0 Mailbox ID 1 Register */
+#define pREG_CAN0_MB08_ID1               ((volatile uint16_t *)REG_CAN0_MB08_ID1)                /* CAN0 Mailbox ID 1 Register */
+#define pREG_CAN0_MB09_ID1               ((volatile uint16_t *)REG_CAN0_MB09_ID1)                /* CAN0 Mailbox ID 1 Register */
+#define pREG_CAN0_MB10_ID1               ((volatile uint16_t *)REG_CAN0_MB10_ID1)                /* CAN0 Mailbox ID 1 Register */
+#define pREG_CAN0_MB11_ID1               ((volatile uint16_t *)REG_CAN0_MB11_ID1)                /* CAN0 Mailbox ID 1 Register */
+#define pREG_CAN0_MB12_ID1               ((volatile uint16_t *)REG_CAN0_MB12_ID1)                /* CAN0 Mailbox ID 1 Register */
+#define pREG_CAN0_MB13_ID1               ((volatile uint16_t *)REG_CAN0_MB13_ID1)                /* CAN0 Mailbox ID 1 Register */
+#define pREG_CAN0_MB14_ID1               ((volatile uint16_t *)REG_CAN0_MB14_ID1)                /* CAN0 Mailbox ID 1 Register */
+#define pREG_CAN0_MB15_ID1               ((volatile uint16_t *)REG_CAN0_MB15_ID1)                /* CAN0 Mailbox ID 1 Register */
+#define pREG_CAN0_MB16_ID1               ((volatile uint16_t *)REG_CAN0_MB16_ID1)                /* CAN0 Mailbox ID 1 Register */
+#define pREG_CAN0_MB17_ID1               ((volatile uint16_t *)REG_CAN0_MB17_ID1)                /* CAN0 Mailbox ID 1 Register */
+#define pREG_CAN0_MB18_ID1               ((volatile uint16_t *)REG_CAN0_MB18_ID1)                /* CAN0 Mailbox ID 1 Register */
+#define pREG_CAN0_MB19_ID1               ((volatile uint16_t *)REG_CAN0_MB19_ID1)                /* CAN0 Mailbox ID 1 Register */
+#define pREG_CAN0_MB20_ID1               ((volatile uint16_t *)REG_CAN0_MB20_ID1)                /* CAN0 Mailbox ID 1 Register */
+#define pREG_CAN0_MB21_ID1               ((volatile uint16_t *)REG_CAN0_MB21_ID1)                /* CAN0 Mailbox ID 1 Register */
+#define pREG_CAN0_MB22_ID1               ((volatile uint16_t *)REG_CAN0_MB22_ID1)                /* CAN0 Mailbox ID 1 Register */
+#define pREG_CAN0_MB23_ID1               ((volatile uint16_t *)REG_CAN0_MB23_ID1)                /* CAN0 Mailbox ID 1 Register */
+#define pREG_CAN0_MB24_ID1               ((volatile uint16_t *)REG_CAN0_MB24_ID1)                /* CAN0 Mailbox ID 1 Register */
+#define pREG_CAN0_MB25_ID1               ((volatile uint16_t *)REG_CAN0_MB25_ID1)                /* CAN0 Mailbox ID 1 Register */
+#define pREG_CAN0_MB26_ID1               ((volatile uint16_t *)REG_CAN0_MB26_ID1)                /* CAN0 Mailbox ID 1 Register */
+#define pREG_CAN0_MB27_ID1               ((volatile uint16_t *)REG_CAN0_MB27_ID1)                /* CAN0 Mailbox ID 1 Register */
+#define pREG_CAN0_MB28_ID1               ((volatile uint16_t *)REG_CAN0_MB28_ID1)                /* CAN0 Mailbox ID 1 Register */
+#define pREG_CAN0_MB29_ID1               ((volatile uint16_t *)REG_CAN0_MB29_ID1)                /* CAN0 Mailbox ID 1 Register */
+#define pREG_CAN0_MB30_ID1               ((volatile uint16_t *)REG_CAN0_MB30_ID1)                /* CAN0 Mailbox ID 1 Register */
+#define pREG_CAN0_MB31_ID1               ((volatile uint16_t *)REG_CAN0_MB31_ID1)                /* CAN0 Mailbox ID 1 Register */
 
 
 /* =========================================================================
@@ -1312,88 +1311,86 @@
 /* =========================================================================
        PWM0
    ========================================================================= */
-#define pREG_PWM0_CTL                    ((volatile uint32_t *)REG_PWM0_CTL)                     /* PWM0 PWM Control Register */
-#define pREG_PWM0_CHANCFG                ((volatile uint32_t *)REG_PWM0_CHANCFG)                 /* PWM0 PWM Channel Config Register */
-#define pREG_PWM0_TRIPCFG                ((volatile uint32_t *)REG_PWM0_TRIPCFG)                 /* PWM0 PWM Trip Config Register */
-#define pREG_PWM0_STAT                   ((volatile uint32_t *)REG_PWM0_STAT)                    /* PWM0 PWM Status Register */
-#define pREG_PWM0_IMSK                   ((volatile uint32_t *)REG_PWM0_IMSK)                    /* PWM0 PWM Interrupt Mask Register */
-#define pREG_PWM0_ILAT                   ((volatile uint32_t *)REG_PWM0_ILAT)                    /* PWM0 PWM Interrupt Latch Register */
-#define pREG_PWM0_CHOPCFG                ((volatile uint32_t *)REG_PWM0_CHOPCFG)                 /* PWM0 PWM Chop Configuration Register */
-#define pREG_PWM0_DT                     ((volatile uint32_t *)REG_PWM0_DT)                      /* PWM0 PWM Dead Time Register */
+#define pREG_PWM0_CTL                    ((volatile uint32_t *)REG_PWM0_CTL)                     /* PWM0 Control Register */
+#define pREG_PWM0_CHANCFG                ((volatile uint32_t *)REG_PWM0_CHANCFG)                 /* PWM0 Channel Config Register */
+#define pREG_PWM0_TRIPCFG                ((volatile uint32_t *)REG_PWM0_TRIPCFG)                 /* PWM0 Trip Config Register */
+#define pREG_PWM0_STAT                   ((volatile uint32_t *)REG_PWM0_STAT)                    /* PWM0 Status Register */
+#define pREG_PWM0_IMSK                   ((volatile uint32_t *)REG_PWM0_IMSK)                    /* PWM0 Interrupt Mask Register */
+#define pREG_PWM0_ILAT                   ((volatile uint32_t *)REG_PWM0_ILAT)                    /* PWM0 Interrupt Latch Register */
+#define pREG_PWM0_CHOPCFG                ((volatile uint32_t *)REG_PWM0_CHOPCFG)                 /* PWM0 Chop Configuration Register */
+#define pREG_PWM0_DT                     ((volatile uint32_t *)REG_PWM0_DT)                      /* PWM0 Dead Time Register */
 #define pREG_PWM0_SYNC_WID               ((volatile uint32_t *)REG_PWM0_SYNC_WID)                /* PWM0 Sync Pulse Width Register */
-#define pREG_PWM0_TM0                    ((volatile uint32_t *)REG_PWM0_TM0)                     /* PWM0 Timer0 Period register */
-#define pREG_PWM0_TM1                    ((volatile uint32_t *)REG_PWM0_TM1)                     /* PWM0 Timer1 Period register */
-#define pREG_PWM0_TM2                    ((volatile uint32_t *)REG_PWM0_TM2)                     /* PWM0 Timer2 Period register */
-#define pREG_PWM0_TM3                    ((volatile uint32_t *)REG_PWM0_TM3)                     /* PWM0 Timer3 Period register */
-#define pREG_PWM0_TM4                    ((volatile uint32_t *)REG_PWM0_TM4)                     /* PWM0 Timer4 Period register */
-#define pREG_PWM0_DLYA                   ((volatile uint32_t *)REG_PWM0_DLYA)                    /* PWM0 Channel A Delay register */
-#define pREG_PWM0_DLYB                   ((volatile uint32_t *)REG_PWM0_DLYB)                    /* PWM0 Channel B Delay register */
-#define pREG_PWM0_DLYC                   ((volatile uint32_t *)REG_PWM0_DLYC)                    /* PWM0 Channel C Delay register */
-#define pREG_PWM0_DLYD                   ((volatile uint32_t *)REG_PWM0_DLYD)                    /* PWM0 Channel D Delay register */
-#define pREG_PWM0_ACTL                   ((volatile uint32_t *)REG_PWM0_ACTL)                    /* PWM0 Channel A Control register */
-#define pREG_PWM0_AH0                    ((volatile uint32_t *)REG_PWM0_AH0)                     /* PWM0 Channel A High Duty-0 register */
-#define pREG_PWM0_AH1                    ((volatile uint32_t *)REG_PWM0_AH1)                     /* PWM0 Channel A High Duty-1 register */
-#define pREG_PWM0_AL0                    ((volatile uint32_t *)REG_PWM0_AL0)                     /* PWM0 Channel A Low Duty-0 register */
-#define pREG_PWM0_AL1                    ((volatile uint32_t *)REG_PWM0_AL1)                     /* PWM0 Channel A Low Duty-1 register */
-#define pREG_PWM0_BCTL                   ((volatile uint32_t *)REG_PWM0_BCTL)                    /* PWM0 Channel B Control register */
-#define pREG_PWM0_BH0                    ((volatile uint32_t *)REG_PWM0_BH0)                     /* PWM0 Channel B High Duty-0 register */
-#define pREG_PWM0_BH1                    ((volatile uint32_t *)REG_PWM0_BH1)                     /* PWM0 Channel B High Duty-1 register */
-#define pREG_PWM0_BL0                    ((volatile uint32_t *)REG_PWM0_BL0)                     /* PWM0 Channel B Low Duty-0 register */
-#define pREG_PWM0_BL1                    ((volatile uint32_t *)REG_PWM0_BL1)                     /* PWM0 Channel B Low Duty-1 register */
-#define pREG_PWM0_CCTL                   ((volatile uint32_t *)REG_PWM0_CCTL)                    /* PWM0 Channel C Control register */
-#define pREG_PWM0_CH0                    ((volatile uint32_t *)REG_PWM0_CH0)                     /* PWM0 Channel C High Duty-0 register */
-#define pREG_PWM0_CH1                    ((volatile uint32_t *)REG_PWM0_CH1)                     /* PWM0 Channel C High Duty-1 register */
-#define pREG_PWM0_CL0                    ((volatile uint32_t *)REG_PWM0_CL0)                     /* PWM0 Channel C Low Duty-0 register */
-#define pREG_PWM0_CL1                    ((volatile uint32_t *)REG_PWM0_CL1)                     /* PWM0 Channel C Low Duty-1 register */
-#define pREG_PWM0_DCTL                   ((volatile uint32_t *)REG_PWM0_DCTL)                    /* PWM0 Channel D Control register */
-#define pREG_PWM0_DH0                    ((volatile uint32_t *)REG_PWM0_DH0)                     /* PWM0 Channel D High Duty-0 register */
-#define pREG_PWM0_DH1                    ((volatile uint32_t *)REG_PWM0_DH1)                     /* PWM0 Channel D High Duty-1 register */
-#define pREG_PWM0_DL0                    ((volatile uint32_t *)REG_PWM0_DL0)                     /* PWM0 Channel D Low Duty-0 register */
-#define pREG_PWM0_DL1                    ((volatile uint32_t *)REG_PWM0_DL1)                     /* PWM0 Channel D Low Duty-1 register */
-#define pREG_PWM0_REVID                  ((volatile uint32_t *)REG_PWM0_REVID)                   /* PWM0 PWM Revision ID Register */
+#define pREG_PWM0_TM0                    ((volatile uint32_t *)REG_PWM0_TM0)                     /* PWM0 Timer 0 Period Register */
+#define pREG_PWM0_TM1                    ((volatile uint32_t *)REG_PWM0_TM1)                     /* PWM0 Timer 1 Period Register */
+#define pREG_PWM0_TM2                    ((volatile uint32_t *)REG_PWM0_TM2)                     /* PWM0 Timer 2 Period Register */
+#define pREG_PWM0_TM3                    ((volatile uint32_t *)REG_PWM0_TM3)                     /* PWM0 Timer 3 Period Register */
+#define pREG_PWM0_TM4                    ((volatile uint32_t *)REG_PWM0_TM4)                     /* PWM0 Timer 4 Period Register */
+#define pREG_PWM0_DLYA                   ((volatile uint32_t *)REG_PWM0_DLYA)                    /* PWM0 Channel A Delay Register */
+#define pREG_PWM0_DLYB                   ((volatile uint32_t *)REG_PWM0_DLYB)                    /* PWM0 Channel B Delay Register */
+#define pREG_PWM0_DLYC                   ((volatile uint32_t *)REG_PWM0_DLYC)                    /* PWM0 Channel C Delay Register */
+#define pREG_PWM0_DLYD                   ((volatile uint32_t *)REG_PWM0_DLYD)                    /* PWM0 Channel D Delay Register */
+#define pREG_PWM0_ACTL                   ((volatile uint32_t *)REG_PWM0_ACTL)                    /* PWM0 Channel A Control Register */
+#define pREG_PWM0_AH0                    ((volatile uint32_t *)REG_PWM0_AH0)                     /* PWM0 Channel A-High Duty-0 Register */
+#define pREG_PWM0_AH1                    ((volatile uint32_t *)REG_PWM0_AH1)                     /* PWM0 Channel A-High Duty-1 Register */
+#define pREG_PWM0_AL0                    ((volatile uint32_t *)REG_PWM0_AL0)                     /* PWM0 Channel A-Low Duty-0 Register */
+#define pREG_PWM0_AL1                    ((volatile uint32_t *)REG_PWM0_AL1)                     /* PWM0 Channel A-Low Duty-1 Register */
+#define pREG_PWM0_BCTL                   ((volatile uint32_t *)REG_PWM0_BCTL)                    /* PWM0 Channel B Control Register */
+#define pREG_PWM0_BH0                    ((volatile uint32_t *)REG_PWM0_BH0)                     /* PWM0 Channel B-High Duty-0 Register */
+#define pREG_PWM0_BH1                    ((volatile uint32_t *)REG_PWM0_BH1)                     /* PWM0 Channel B-High Duty-1 Register */
+#define pREG_PWM0_BL0                    ((volatile uint32_t *)REG_PWM0_BL0)                     /* PWM0 Channel B-Low Duty-0 Register */
+#define pREG_PWM0_BL1                    ((volatile uint32_t *)REG_PWM0_BL1)                     /* PWM0 Channel B-Low Duty-1 Register */
+#define pREG_PWM0_CCTL                   ((volatile uint32_t *)REG_PWM0_CCTL)                    /* PWM0 Channel C Control Register */
+#define pREG_PWM0_CH0                    ((volatile uint32_t *)REG_PWM0_CH0)                     /* PWM0 Channel C-High Pulse Duty Register 0 */
+#define pREG_PWM0_CH1                    ((volatile uint32_t *)REG_PWM0_CH1)                     /* PWM0 Channel C-High Pulse Duty Register 1 */
+#define pREG_PWM0_CL0                    ((volatile uint32_t *)REG_PWM0_CL0)                     /* PWM0 Channel C-Low Pulse Duty Register 0 */
+#define pREG_PWM0_CL1                    ((volatile uint32_t *)REG_PWM0_CL1)                     /* PWM0 Channel C-Low Duty-1 Register */
+#define pREG_PWM0_DCTL                   ((volatile uint32_t *)REG_PWM0_DCTL)                    /* PWM0 Channel D Control Register */
+#define pREG_PWM0_DH0                    ((volatile uint32_t *)REG_PWM0_DH0)                     /* PWM0 Channel D-High Duty-0 Register */
+#define pREG_PWM0_DH1                    ((volatile uint32_t *)REG_PWM0_DH1)                     /* PWM0 Channel D-High Pulse Duty Register 1 */
+#define pREG_PWM0_DL0                    ((volatile uint32_t *)REG_PWM0_DL0)                     /* PWM0 Channel D-Low Pulse Duty Register 0 */
+#define pREG_PWM0_DL1                    ((volatile uint32_t *)REG_PWM0_DL1)                     /* PWM0 Channel D-Low Pulse Duty Register 1 */
 
 /* =========================================================================
        PWM1
    ========================================================================= */
-#define pREG_PWM1_CTL                    ((volatile uint32_t *)REG_PWM1_CTL)                     /* PWM1 PWM Control Register */
-#define pREG_PWM1_CHANCFG                ((volatile uint32_t *)REG_PWM1_CHANCFG)                 /* PWM1 PWM Channel Config Register */
-#define pREG_PWM1_TRIPCFG                ((volatile uint32_t *)REG_PWM1_TRIPCFG)                 /* PWM1 PWM Trip Config Register */
-#define pREG_PWM1_STAT                   ((volatile uint32_t *)REG_PWM1_STAT)                    /* PWM1 PWM Status Register */
-#define pREG_PWM1_IMSK                   ((volatile uint32_t *)REG_PWM1_IMSK)                    /* PWM1 PWM Interrupt Mask Register */
-#define pREG_PWM1_ILAT                   ((volatile uint32_t *)REG_PWM1_ILAT)                    /* PWM1 PWM Interrupt Latch Register */
-#define pREG_PWM1_CHOPCFG                ((volatile uint32_t *)REG_PWM1_CHOPCFG)                 /* PWM1 PWM Chop Configuration Register */
-#define pREG_PWM1_DT                     ((volatile uint32_t *)REG_PWM1_DT)                      /* PWM1 PWM Dead Time Register */
+#define pREG_PWM1_CTL                    ((volatile uint32_t *)REG_PWM1_CTL)                     /* PWM1 Control Register */
+#define pREG_PWM1_CHANCFG                ((volatile uint32_t *)REG_PWM1_CHANCFG)                 /* PWM1 Channel Config Register */
+#define pREG_PWM1_TRIPCFG                ((volatile uint32_t *)REG_PWM1_TRIPCFG)                 /* PWM1 Trip Config Register */
+#define pREG_PWM1_STAT                   ((volatile uint32_t *)REG_PWM1_STAT)                    /* PWM1 Status Register */
+#define pREG_PWM1_IMSK                   ((volatile uint32_t *)REG_PWM1_IMSK)                    /* PWM1 Interrupt Mask Register */
+#define pREG_PWM1_ILAT                   ((volatile uint32_t *)REG_PWM1_ILAT)                    /* PWM1 Interrupt Latch Register */
+#define pREG_PWM1_CHOPCFG                ((volatile uint32_t *)REG_PWM1_CHOPCFG)                 /* PWM1 Chop Configuration Register */
+#define pREG_PWM1_DT                     ((volatile uint32_t *)REG_PWM1_DT)                      /* PWM1 Dead Time Register */
 #define pREG_PWM1_SYNC_WID               ((volatile uint32_t *)REG_PWM1_SYNC_WID)                /* PWM1 Sync Pulse Width Register */
-#define pREG_PWM1_TM0                    ((volatile uint32_t *)REG_PWM1_TM0)                     /* PWM1 Timer0 Period register */
-#define pREG_PWM1_TM1                    ((volatile uint32_t *)REG_PWM1_TM1)                     /* PWM1 Timer1 Period register */
-#define pREG_PWM1_TM2                    ((volatile uint32_t *)REG_PWM1_TM2)                     /* PWM1 Timer2 Period register */
-#define pREG_PWM1_TM3                    ((volatile uint32_t *)REG_PWM1_TM3)                     /* PWM1 Timer3 Period register */
-#define pREG_PWM1_TM4                    ((volatile uint32_t *)REG_PWM1_TM4)                     /* PWM1 Timer4 Period register */
-#define pREG_PWM1_DLYA                   ((volatile uint32_t *)REG_PWM1_DLYA)                    /* PWM1 Channel A Delay register */
-#define pREG_PWM1_DLYB                   ((volatile uint32_t *)REG_PWM1_DLYB)                    /* PWM1 Channel B Delay register */
-#define pREG_PWM1_DLYC                   ((volatile uint32_t *)REG_PWM1_DLYC)                    /* PWM1 Channel C Delay register */
-#define pREG_PWM1_DLYD                   ((volatile uint32_t *)REG_PWM1_DLYD)                    /* PWM1 Channel D Delay register */
-#define pREG_PWM1_ACTL                   ((volatile uint32_t *)REG_PWM1_ACTL)                    /* PWM1 Channel A Control register */
-#define pREG_PWM1_AH0                    ((volatile uint32_t *)REG_PWM1_AH0)                     /* PWM1 Channel A High Duty-0 register */
-#define pREG_PWM1_AH1                    ((volatile uint32_t *)REG_PWM1_AH1)                     /* PWM1 Channel A High Duty-1 register */
-#define pREG_PWM1_AL0                    ((volatile uint32_t *)REG_PWM1_AL0)                     /* PWM1 Channel A Low Duty-0 register */
-#define pREG_PWM1_AL1                    ((volatile uint32_t *)REG_PWM1_AL1)                     /* PWM1 Channel A Low Duty-1 register */
-#define pREG_PWM1_BCTL                   ((volatile uint32_t *)REG_PWM1_BCTL)                    /* PWM1 Channel B Control register */
-#define pREG_PWM1_BH0                    ((volatile uint32_t *)REG_PWM1_BH0)                     /* PWM1 Channel B High Duty-0 register */
-#define pREG_PWM1_BH1                    ((volatile uint32_t *)REG_PWM1_BH1)                     /* PWM1 Channel B High Duty-1 register */
-#define pREG_PWM1_BL0                    ((volatile uint32_t *)REG_PWM1_BL0)                     /* PWM1 Channel B Low Duty-0 register */
-#define pREG_PWM1_BL1                    ((volatile uint32_t *)REG_PWM1_BL1)                     /* PWM1 Channel B Low Duty-1 register */
-#define pREG_PWM1_CCTL                   ((volatile uint32_t *)REG_PWM1_CCTL)                    /* PWM1 Channel C Control register */
-#define pREG_PWM1_CH0                    ((volatile uint32_t *)REG_PWM1_CH0)                     /* PWM1 Channel C High Duty-0 register */
-#define pREG_PWM1_CH1                    ((volatile uint32_t *)REG_PWM1_CH1)                     /* PWM1 Channel C High Duty-1 register */
-#define pREG_PWM1_CL0                    ((volatile uint32_t *)REG_PWM1_CL0)                     /* PWM1 Channel C Low Duty-0 register */
-#define pREG_PWM1_CL1                    ((volatile uint32_t *)REG_PWM1_CL1)                     /* PWM1 Channel C Low Duty-1 register */
-#define pREG_PWM1_DCTL                   ((volatile uint32_t *)REG_PWM1_DCTL)                    /* PWM1 Channel D Control register */
-#define pREG_PWM1_DH0                    ((volatile uint32_t *)REG_PWM1_DH0)                     /* PWM1 Channel D High Duty-0 register */
-#define pREG_PWM1_DH1                    ((volatile uint32_t *)REG_PWM1_DH1)                     /* PWM1 Channel D High Duty-1 register */
-#define pREG_PWM1_DL0                    ((volatile uint32_t *)REG_PWM1_DL0)                     /* PWM1 Channel D Low Duty-0 register */
-#define pREG_PWM1_DL1                    ((volatile uint32_t *)REG_PWM1_DL1)                     /* PWM1 Channel D Low Duty-1 register */
-#define pREG_PWM1_REVID                  ((volatile uint32_t *)REG_PWM1_REVID)                   /* PWM1 PWM Revision ID Register */
+#define pREG_PWM1_TM0                    ((volatile uint32_t *)REG_PWM1_TM0)                     /* PWM1 Timer 0 Period Register */
+#define pREG_PWM1_TM1                    ((volatile uint32_t *)REG_PWM1_TM1)                     /* PWM1 Timer 1 Period Register */
+#define pREG_PWM1_TM2                    ((volatile uint32_t *)REG_PWM1_TM2)                     /* PWM1 Timer 2 Period Register */
+#define pREG_PWM1_TM3                    ((volatile uint32_t *)REG_PWM1_TM3)                     /* PWM1 Timer 3 Period Register */
+#define pREG_PWM1_TM4                    ((volatile uint32_t *)REG_PWM1_TM4)                     /* PWM1 Timer 4 Period Register */
+#define pREG_PWM1_DLYA                   ((volatile uint32_t *)REG_PWM1_DLYA)                    /* PWM1 Channel A Delay Register */
+#define pREG_PWM1_DLYB                   ((volatile uint32_t *)REG_PWM1_DLYB)                    /* PWM1 Channel B Delay Register */
+#define pREG_PWM1_DLYC                   ((volatile uint32_t *)REG_PWM1_DLYC)                    /* PWM1 Channel C Delay Register */
+#define pREG_PWM1_DLYD                   ((volatile uint32_t *)REG_PWM1_DLYD)                    /* PWM1 Channel D Delay Register */
+#define pREG_PWM1_ACTL                   ((volatile uint32_t *)REG_PWM1_ACTL)                    /* PWM1 Channel A Control Register */
+#define pREG_PWM1_AH0                    ((volatile uint32_t *)REG_PWM1_AH0)                     /* PWM1 Channel A-High Duty-0 Register */
+#define pREG_PWM1_AH1                    ((volatile uint32_t *)REG_PWM1_AH1)                     /* PWM1 Channel A-High Duty-1 Register */
+#define pREG_PWM1_AL0                    ((volatile uint32_t *)REG_PWM1_AL0)                     /* PWM1 Channel A-Low Duty-0 Register */
+#define pREG_PWM1_AL1                    ((volatile uint32_t *)REG_PWM1_AL1)                     /* PWM1 Channel A-Low Duty-1 Register */
+#define pREG_PWM1_BCTL                   ((volatile uint32_t *)REG_PWM1_BCTL)                    /* PWM1 Channel B Control Register */
+#define pREG_PWM1_BH0                    ((volatile uint32_t *)REG_PWM1_BH0)                     /* PWM1 Channel B-High Duty-0 Register */
+#define pREG_PWM1_BH1                    ((volatile uint32_t *)REG_PWM1_BH1)                     /* PWM1 Channel B-High Duty-1 Register */
+#define pREG_PWM1_BL0                    ((volatile uint32_t *)REG_PWM1_BL0)                     /* PWM1 Channel B-Low Duty-0 Register */
+#define pREG_PWM1_BL1                    ((volatile uint32_t *)REG_PWM1_BL1)                     /* PWM1 Channel B-Low Duty-1 Register */
+#define pREG_PWM1_CCTL                   ((volatile uint32_t *)REG_PWM1_CCTL)                    /* PWM1 Channel C Control Register */
+#define pREG_PWM1_CH0                    ((volatile uint32_t *)REG_PWM1_CH0)                     /* PWM1 Channel C-High Pulse Duty Register 0 */
+#define pREG_PWM1_CH1                    ((volatile uint32_t *)REG_PWM1_CH1)                     /* PWM1 Channel C-High Pulse Duty Register 1 */
+#define pREG_PWM1_CL0                    ((volatile uint32_t *)REG_PWM1_CL0)                     /* PWM1 Channel C-Low Pulse Duty Register 0 */
+#define pREG_PWM1_CL1                    ((volatile uint32_t *)REG_PWM1_CL1)                     /* PWM1 Channel C-Low Duty-1 Register */
+#define pREG_PWM1_DCTL                   ((volatile uint32_t *)REG_PWM1_DCTL)                    /* PWM1 Channel D Control Register */
+#define pREG_PWM1_DH0                    ((volatile uint32_t *)REG_PWM1_DH0)                     /* PWM1 Channel D-High Duty-0 Register */
+#define pREG_PWM1_DH1                    ((volatile uint32_t *)REG_PWM1_DH1)                     /* PWM1 Channel D-High Pulse Duty Register 1 */
+#define pREG_PWM1_DL0                    ((volatile uint32_t *)REG_PWM1_DL0)                     /* PWM1 Channel D-Low Pulse Duty Register 0 */
+#define pREG_PWM1_DL1                    ((volatile uint32_t *)REG_PWM1_DL1)                     /* PWM1 Channel D-Low Pulse Duty Register 1 */
 
 
 /* =========================================================================
@@ -1690,271 +1687,267 @@
        EMAC0
    ========================================================================= */
 #define pREG_EMAC0_MACCFG                ((volatile uint32_t *)REG_EMAC0_MACCFG)                 /* EMAC0 MAC Configuration Register */
-#define pREG_EMAC0_MACFRMFILT            ((volatile uint32_t *)REG_EMAC0_MACFRMFILT)             /* EMAC0 Filter Register for filtering Received Frames */
-#define pREG_EMAC0_HASHTBL_HI            ((volatile uint32_t *)REG_EMAC0_HASHTBL_HI)             /* EMAC0 Contains the Upper 32 bits of the hash table */
-#define pREG_EMAC0_HASHTBL_LO            ((volatile uint32_t *)REG_EMAC0_HASHTBL_LO)             /* EMAC0 Contains the lower 32 bits of the hash table */
-#define pREG_EMAC0_GMII_ADDR             ((volatile uint32_t *)REG_EMAC0_GMII_ADDR)              /* EMAC0 Management Address Register */
-#define pREG_EMAC0_GMII_DATA             ((volatile uint32_t *)REG_EMAC0_GMII_DATA)              /* EMAC0 Management Data Register */
-#define pREG_EMAC0_FLOWCTL               ((volatile uint32_t *)REG_EMAC0_FLOWCTL)                /* EMAC0 MAC FLow Control Register */
+#define pREG_EMAC0_MACFRMFILT            ((volatile uint32_t *)REG_EMAC0_MACFRMFILT)             /* EMAC0 MAC Rx Frame Filter Register */
+#define pREG_EMAC0_HASHTBL_HI            ((volatile uint32_t *)REG_EMAC0_HASHTBL_HI)             /* EMAC0 Hash Table High Register */
+#define pREG_EMAC0_HASHTBL_LO            ((volatile uint32_t *)REG_EMAC0_HASHTBL_LO)             /* EMAC0 Hash Table Low Register */
+#define pREG_EMAC0_SMI_ADDR              ((volatile uint32_t *)REG_EMAC0_SMI_ADDR)               /* EMAC0 SMI Address Register */
+#define pREG_EMAC0_SMI_DATA              ((volatile uint32_t *)REG_EMAC0_SMI_DATA)               /* EMAC0 SMI Data Register */
+#define pREG_EMAC0_FLOWCTL               ((volatile uint32_t *)REG_EMAC0_FLOWCTL)                /* EMAC0 FLow Control Register */
 #define pREG_EMAC0_VLANTAG               ((volatile uint32_t *)REG_EMAC0_VLANTAG)                /* EMAC0 VLAN Tag Register */
-#define pREG_EMAC0_VER                   ((volatile uint32_t *)REG_EMAC0_VER)                    /* EMAC0 EMAC Version Register */
-#define pREG_EMAC0_DBG                   ((volatile uint32_t *)REG_EMAC0_DBG)                    /* EMAC0 EMAC Debug Register */
-#define pREG_EMAC0_RMTWKUP               ((volatile uint32_t *)REG_EMAC0_RMTWKUP)                /* EMAC0 Remote wake up frame register */
-#define pREG_EMAC0_PMT_CTLSTAT           ((volatile uint32_t *)REG_EMAC0_PMT_CTLSTAT)            /* EMAC0 PMT Control and Status Register */
-#define pREG_EMAC0_ISTAT                 ((volatile uint32_t *)REG_EMAC0_ISTAT)                  /* EMAC0 EMAC Interrupt Status Register */
-#define pREG_EMAC0_IMSK                  ((volatile uint32_t *)REG_EMAC0_IMSK)                   /* EMAC0 EMAC Interrupt Mask Register */
-#define pREG_EMAC0_ADDR0_HI              ((volatile uint32_t *)REG_EMAC0_ADDR0_HI)               /* EMAC0 EMAC Address0 High Register */
-#define pREG_EMAC0_ADDR0_LO              ((volatile uint32_t *)REG_EMAC0_ADDR0_LO)               /* EMAC0 EMAC Address0 Low Register */
+#define pREG_EMAC0_DBG                   ((volatile uint32_t *)REG_EMAC0_DBG)                    /* EMAC0 Debug Register */
+#define pREG_EMAC0_ISTAT                 ((volatile uint32_t *)REG_EMAC0_ISTAT)                  /* EMAC0 Interrupt Status Register */
+#define pREG_EMAC0_IMSK                  ((volatile uint32_t *)REG_EMAC0_IMSK)                   /* EMAC0 Interrupt Mask Register */
+#define pREG_EMAC0_ADDR0_HI              ((volatile uint32_t *)REG_EMAC0_ADDR0_HI)               /* EMAC0 MAC Address 0 High Register */
+#define pREG_EMAC0_ADDR0_LO              ((volatile uint32_t *)REG_EMAC0_ADDR0_LO)               /* EMAC0 MAC Address 0 Low Register */
 #define pREG_EMAC0_MMC_CTL               ((volatile uint32_t *)REG_EMAC0_MMC_CTL)                /* EMAC0 MMC Control Register */
-#define pREG_EMAC0_MMC_RXINT             ((volatile uint32_t *)REG_EMAC0_MMC_RXINT)              /* EMAC0 MMC RX Interrupt Register */
-#define pREG_EMAC0_MMC_TXINT             ((volatile uint32_t *)REG_EMAC0_MMC_TXINT)              /* EMAC0 MMC TX Interrupt Register */
-#define pREG_EMAC0_MMC_RXIMSK            ((volatile uint32_t *)REG_EMAC0_MMC_RXIMSK)             /* EMAC0 MMC RX Interrupt Mask Register */
+#define pREG_EMAC0_MMC_RXINT             ((volatile uint32_t *)REG_EMAC0_MMC_RXINT)              /* EMAC0 MMC Rx Interrupt Register */
+#define pREG_EMAC0_MMC_TXINT             ((volatile uint32_t *)REG_EMAC0_MMC_TXINT)              /* EMAC0 MMC Tx Interrupt Register */
+#define pREG_EMAC0_MMC_RXIMSK            ((volatile uint32_t *)REG_EMAC0_MMC_RXIMSK)             /* EMAC0 MMC Rx Interrupt Mask Register */
 #define pREG_EMAC0_MMC_TXIMSK            ((volatile uint32_t *)REG_EMAC0_MMC_TXIMSK)             /* EMAC0 MMC TX Interrupt Mask Register */
-#define pREG_EMAC0_TXOCTCNT_GB           ((volatile uint32_t *)REG_EMAC0_TXOCTCNT_GB)            /* EMAC0 Num bytes transmitted exclusive of preamble */
-#define pREG_EMAC0_TXFRMCNT_GB           ((volatile uint32_t *)REG_EMAC0_TXFRMCNT_GB)            /* EMAC0 Num frames transmitted exclusive of retired */
-#define pREG_EMAC0_TXBCASTFRM_G          ((volatile uint32_t *)REG_EMAC0_TXBCASTFRM_G)           /* EMAC0 Number of good broadcast frames transmitted. */
-#define pREG_EMAC0_TXMCASTFRM_G          ((volatile uint32_t *)REG_EMAC0_TXMCASTFRM_G)           /* EMAC0 Number of good multicast frames transmitted. */
-#define pREG_EMAC0_TX64_GB               ((volatile uint32_t *)REG_EMAC0_TX64_GB)                /* EMAC0 Number of 64 byte length frames */
-#define pREG_EMAC0_TX65TO127_GB          ((volatile uint32_t *)REG_EMAC0_TX65TO127_GB)           /* EMAC0 Number of frames of length b/w 65-127 (inclusive) bytes */
-#define pREG_EMAC0_TX128TO255_GB         ((volatile uint32_t *)REG_EMAC0_TX128TO255_GB)          /* EMAC0 Number of frames of length b/w 128-255 (inclusive) bytes */
-#define pREG_EMAC0_TX256TO511_GB         ((volatile uint32_t *)REG_EMAC0_TX256TO511_GB)          /* EMAC0 Number of frames of length b/w 256-511 (inclusive) bytes */
-#define pREG_EMAC0_TX512TO1023_GB        ((volatile uint32_t *)REG_EMAC0_TX512TO1023_GB)         /* EMAC0 Number of frames of length b/w 512-1023 (inclusive) bytes */
-#define pREG_EMAC0_TX1024TOMAX_GB        ((volatile uint32_t *)REG_EMAC0_TX1024TOMAX_GB)         /* EMAC0 Number of frames of length b/w 1024-max (inclusive) bytes */
-#define pREG_EMAC0_TXUCASTFRM_GB         ((volatile uint32_t *)REG_EMAC0_TXUCASTFRM_GB)          /* EMAC0 Number of good and bad unicast frames transmitted */
-#define pREG_EMAC0_TXMCASTFRM_GB         ((volatile uint32_t *)REG_EMAC0_TXMCASTFRM_GB)          /* EMAC0 Number of good and bad multicast frames transmitted */
-#define pREG_EMAC0_TXBCASTFRM_GB         ((volatile uint32_t *)REG_EMAC0_TXBCASTFRM_GB)          /* EMAC0 Number of good and bad broadcast frames transmitted */
-#define pREG_EMAC0_TXUNDR_ERR            ((volatile uint32_t *)REG_EMAC0_TXUNDR_ERR)             /* EMAC0 Number of frames aborted due to frame underflow error */
-#define pREG_EMAC0_TXSNGCOL_G            ((volatile uint32_t *)REG_EMAC0_TXSNGCOL_G)             /* EMAC0 Number of transmitted frames after single collision */
-#define pREG_EMAC0_TXMULTCOL_G           ((volatile uint32_t *)REG_EMAC0_TXMULTCOL_G)            /* EMAC0 Number of transmitted frames with more than one collision */
-#define pREG_EMAC0_TXDEFERRED            ((volatile uint32_t *)REG_EMAC0_TXDEFERRED)             /* EMAC0 Number of transmitted frames after deferral */
-#define pREG_EMAC0_TXLATECOL             ((volatile uint32_t *)REG_EMAC0_TXLATECOL)              /* EMAC0 Number of frames aborted due to late collision error */
-#define pREG_EMAC0_TXEXCESSCOL           ((volatile uint32_t *)REG_EMAC0_TXEXCESSCOL)            /* EMAC0 Number of aborted frames due to excessive collisions */
-#define pREG_EMAC0_TXCARR_ERR            ((volatile uint32_t *)REG_EMAC0_TXCARR_ERR)             /* EMAC0 Number of aborted frames due to carrier sense error */
-#define pREG_EMAC0_TXOCTCNT_G            ((volatile uint32_t *)REG_EMAC0_TXOCTCNT_G)             /* EMAC0 Number of bytes transmitted in good frames only */
-#define pREG_EMAC0_TXFRMCNT_G            ((volatile uint32_t *)REG_EMAC0_TXFRMCNT_G)             /* EMAC0 Number of good frames transmitted. */
-#define pREG_EMAC0_TXEXCESSDEF           ((volatile uint32_t *)REG_EMAC0_TXEXCESSDEF)            /* EMAC0 Number of frames aborted due to excessive deferral */
-#define pREG_EMAC0_TXPAUSEFRM            ((volatile uint32_t *)REG_EMAC0_TXPAUSEFRM)             /* EMAC0 Number of good PAUSE frames transmitted. */
-#define pREG_EMAC0_TXVLANFRM_G           ((volatile uint32_t *)REG_EMAC0_TXVLANFRM_G)            /* EMAC0 Number of VLAN frames transmitted */
-#define pREG_EMAC0_RXFRMCNT_GB           ((volatile uint32_t *)REG_EMAC0_RXFRMCNT_GB)            /* EMAC0 Number of good and bad frames received. */
-#define pREG_EMAC0_RXOCTCNT_GB           ((volatile uint32_t *)REG_EMAC0_RXOCTCNT_GB)            /* EMAC0 Number of bytes received in good and bad frames */
-#define pREG_EMAC0_RXOCTCNT_G            ((volatile uint32_t *)REG_EMAC0_RXOCTCNT_G)             /* EMAC0 Number of bytes received only in good frames */
-#define pREG_EMAC0_RXBCASTFRM_G          ((volatile uint32_t *)REG_EMAC0_RXBCASTFRM_G)           /* EMAC0 Number of good broadcast frames received. */
-#define pREG_EMAC0_RXMCASTFRM_G          ((volatile uint32_t *)REG_EMAC0_RXMCASTFRM_G)           /* EMAC0 Number of good multicast frames received */
-#define pREG_EMAC0_RXCRC_ERR             ((volatile uint32_t *)REG_EMAC0_RXCRC_ERR)              /* EMAC0 Number of frames received with CRC error */
-#define pREG_EMAC0_RXALIGN_ERR           ((volatile uint32_t *)REG_EMAC0_RXALIGN_ERR)            /* EMAC0 Number of frames with alignment error */
-#define pREG_EMAC0_RXRUNT_ERR            ((volatile uint32_t *)REG_EMAC0_RXRUNT_ERR)             /* EMAC0 Number of frames received with runt error. */
-#define pREG_EMAC0_RXJAB_ERR             ((volatile uint32_t *)REG_EMAC0_RXJAB_ERR)              /* EMAC0 Number of frames received with length greater than 1518 */
-#define pREG_EMAC0_RXUSIZE_G             ((volatile uint32_t *)REG_EMAC0_RXUSIZE_G)              /* EMAC0 Number of frames received with length 64 */
-#define pREG_EMAC0_RXOSIZE_G             ((volatile uint32_t *)REG_EMAC0_RXOSIZE_G)              /* EMAC0 Number of frames received with length greater than maxium */
-#define pREG_EMAC0_RX64_GB               ((volatile uint32_t *)REG_EMAC0_RX64_GB)                /* EMAC0 Number of good and bad frames of lengh 64 bytes */
-#define pREG_EMAC0_RX65TO127_GB          ((volatile uint32_t *)REG_EMAC0_RX65TO127_GB)           /* EMAC0 Number of good and bad frame between 64-127(inclusive) */
-#define pREG_EMAC0_RX128TO255_GB         ((volatile uint32_t *)REG_EMAC0_RX128TO255_GB)          /* EMAC0 Number of good and bad frames received with length between 128 and 255 (inclusive) bytes, exclusive of preamble. */
-#define pREG_EMAC0_RX256TO511_GB         ((volatile uint32_t *)REG_EMAC0_RX256TO511_GB)          /* EMAC0 Number of good and bad frames between 256-511(inclusive) */
-#define pREG_EMAC0_RX512TO1023_GB        ((volatile uint32_t *)REG_EMAC0_RX512TO1023_GB)         /* EMAC0 Number of good and bad frames received between 512-1023 */
-#define pREG_EMAC0_RX1024TOMAX_GB        ((volatile uint32_t *)REG_EMAC0_RX1024TOMAX_GB)         /* EMAC0 Number of frames received between 1024 and maxsize */
-#define pREG_EMAC0_RXUCASTFRM_G          ((volatile uint32_t *)REG_EMAC0_RXUCASTFRM_G)           /* EMAC0 Number of good unicast frames received. */
-#define pREG_EMAC0_RXLEN_ERR             ((volatile uint32_t *)REG_EMAC0_RXLEN_ERR)              /* EMAC0 Number of frames received with length error */
-#define pREG_EMAC0_RXOORTYPE             ((volatile uint32_t *)REG_EMAC0_RXOORTYPE)              /* EMAC0 Number of frames with length not equal to valid frame size */
-#define pREG_EMAC0_RXPAUSEFRM            ((volatile uint32_t *)REG_EMAC0_RXPAUSEFRM)             /* EMAC0 Number of good and valid PAUSE frames received. */
-#define pREG_EMAC0_RXFIFO_OVF            ((volatile uint32_t *)REG_EMAC0_RXFIFO_OVF)             /* EMAC0 Number of missed received frames due to FIFO overflow. This counter is not present in the GMAC-CORE configuration. */
-#define pREG_EMAC0_RXVLANFRM_GB          ((volatile uint32_t *)REG_EMAC0_RXVLANFRM_GB)           /* EMAC0 Number of good and bad VLAN frames received. */
-#define pREG_EMAC0_RXWDOG_ERR            ((volatile uint32_t *)REG_EMAC0_RXWDOG_ERR)             /* EMAC0 Frames received with error due to watchdog timeout */
-#define pREG_EMAC0_IPC_RXIMSK            ((volatile uint32_t *)REG_EMAC0_IPC_RXIMSK)             /* EMAC0 MMC IPC RX Interrupt Mask Register */
-#define pREG_EMAC0_IPC_RXINT             ((volatile uint32_t *)REG_EMAC0_IPC_RXINT)              /* EMAC0 MMC IPC RX Interrupt Register */
-#define pREG_EMAC0_RXIPV4_GD_FRM         ((volatile uint32_t *)REG_EMAC0_RXIPV4_GD_FRM)          /* EMAC0 Number of good IPv4 datagrams */
-#define pREG_EMAC0_RXIPV4_HDR_ERR_FRM    ((volatile uint32_t *)REG_EMAC0_RXIPV4_HDR_ERR_FRM)     /* EMAC0 Number of IPv4 datagrams with header errors */
-#define pREG_EMAC0_RXIPV4_NOPAY_FRM      ((volatile uint32_t *)REG_EMAC0_RXIPV4_NOPAY_FRM)       /* EMAC0 Number of IPv4 datagrams without checksum */
-#define pREG_EMAC0_RXIPV4_FRAG_FRM       ((volatile uint32_t *)REG_EMAC0_RXIPV4_FRAG_FRM)        /* EMAC0 Number of good IPv4 datagrams with fragmentation */
-#define pREG_EMAC0_RXIPV4_UDSBL_FRM      ((volatile uint32_t *)REG_EMAC0_RXIPV4_UDSBL_FRM)       /* EMAC0 Number of IPv4 UDP datagrams with disabled checksum */
-#define pREG_EMAC0_RXIPV6_GD_FRM         ((volatile uint32_t *)REG_EMAC0_RXIPV6_GD_FRM)          /* EMAC0 Number of IPv4 datagrams with TCP/UDP/ICMP payloads */
-#define pREG_EMAC0_RXIPV6_HDR_ERR_FRM    ((volatile uint32_t *)REG_EMAC0_RXIPV6_HDR_ERR_FRM)     /* EMAC0 Number of IPv6 datagrams with header errors */
-#define pREG_EMAC0_RXIPV6_NOPAY_FRM      ((volatile uint32_t *)REG_EMAC0_RXIPV6_NOPAY_FRM)       /* EMAC0 Number of IPv6 datagrams with no TCP/UDP/ICMP payload */
-#define pREG_EMAC0_RXUDP_GD_FRM          ((volatile uint32_t *)REG_EMAC0_RXUDP_GD_FRM)           /* EMAC0 Number of good IP datagrames with good UDP payload */
-#define pREG_EMAC0_RXUDP_ERR_FRM         ((volatile uint32_t *)REG_EMAC0_RXUDP_ERR_FRM)          /* EMAC0 Number of good IP datagrams with UDP checksum errors */
-#define pREG_EMAC0_RXTCP_GD_FRM          ((volatile uint32_t *)REG_EMAC0_RXTCP_GD_FRM)           /* EMAC0 Number of good IP datagrams with a good TCP payload */
-#define pREG_EMAC0_RXTCP_ERR_FRM         ((volatile uint32_t *)REG_EMAC0_RXTCP_ERR_FRM)          /* EMAC0 Number of good IP datagrams with TCP checksum errors */
-#define pREG_EMAC0_RXICMP_GD_FRM         ((volatile uint32_t *)REG_EMAC0_RXICMP_GD_FRM)          /* EMAC0 Number of good IP datagrams with a good ICMP payload */
-#define pREG_EMAC0_RXICMP_ERR_FRM        ((volatile uint32_t *)REG_EMAC0_RXICMP_ERR_FRM)         /* EMAC0 Number of good IP datagrams with ICMP checksum errors */
-#define pREG_EMAC0_RXIPV4_GD_OCT         ((volatile uint32_t *)REG_EMAC0_RXIPV4_GD_OCT)          /* EMAC0 Bytes received in IPv4 datagrams including tcp,udp or icmp */
-#define pREG_EMAC0_RXIPV4_HDR_ERR_OCT    ((volatile uint32_t *)REG_EMAC0_RXIPV4_HDR_ERR_OCT)     /* EMAC0 Bytes received in IPv4 datagrams with header errors */
-#define pREG_EMAC0_RXIPV4_NOPAY_OCT      ((volatile uint32_t *)REG_EMAC0_RXIPV4_NOPAY_OCT)       /* EMAC0 Bytes received in IPv4 datagrams without tcp,udp,icmp load */
-#define pREG_EMAC0_RXIPV4_FRAG_OCT       ((volatile uint32_t *)REG_EMAC0_RXIPV4_FRAG_OCT)        /* EMAC0 Bytes received in fragmented IPv4 datagrams */
-#define pREG_EMAC0_RXIPV4_UDSBL_OCT      ((volatile uint32_t *)REG_EMAC0_RXIPV4_UDSBL_OCT)       /* EMAC0 Bytes received in UDP segment with checksum disabled */
-#define pREG_EMAC0_RXIPV6_GD_OCT         ((volatile uint32_t *)REG_EMAC0_RXIPV6_GD_OCT)          /* EMAC0 Bytes received in good IPv6  including tcp,udp or icmp load */
-#define pREG_EMAC0_RXIPV6_HDR_ERR_OCT    ((volatile uint32_t *)REG_EMAC0_RXIPV6_HDR_ERR_OCT)     /* EMAC0 Number of bytes received in IPv6 with header errors */
-#define pREG_EMAC0_RXIPV6_NOPAY_OCT      ((volatile uint32_t *)REG_EMAC0_RXIPV6_NOPAY_OCT)       /* EMAC0 Bytes received in IPv6 without tcp,udp or icmp load */
-#define pREG_EMAC0_RXUDP_GD_OCT          ((volatile uint32_t *)REG_EMAC0_RXUDP_GD_OCT)           /* EMAC0 Number of bytes received in good UDP segments */
-#define pREG_EMAC0_RXUDP_ERR_OCT         ((volatile uint32_t *)REG_EMAC0_RXUDP_ERR_OCT)          /* EMAC0 Number of bytes received in UDP segment with checksum err */
-#define pREG_EMAC0_RXTCP_GD_OCT          ((volatile uint32_t *)REG_EMAC0_RXTCP_GD_OCT)           /* EMAC0 Number of bytes received in a good TCP segment */
-#define pREG_EMAC0_RXTCP_ERR_OCT         ((volatile uint32_t *)REG_EMAC0_RXTCP_ERR_OCT)          /* EMAC0 Number of bytes received in TCP segment with checksum err */
-#define pREG_EMAC0_RXICMP_GD_OCT         ((volatile uint32_t *)REG_EMAC0_RXICMP_GD_OCT)          /* EMAC0 Number of bytes received in a good ICMP segment */
-#define pREG_EMAC0_RXICMP_ERR_OCT        ((volatile uint32_t *)REG_EMAC0_RXICMP_ERR_OCT)         /* EMAC0 Bytes received in an ICMP segment with checksum errors */
-#define pREG_EMAC0_TM_CTL                ((volatile uint32_t *)REG_EMAC0_TM_CTL)                 /* EMAC0 EMAC Time Stamp Control Register */
-#define pREG_EMAC0_TM_SUBSEC             ((volatile uint32_t *)REG_EMAC0_TM_SUBSEC)              /* EMAC0 EMAC Time Stamp Sub Second Increment */
-#define pREG_EMAC0_TM_SEC                ((volatile uint32_t *)REG_EMAC0_TM_SEC)                 /* EMAC0 EMAC Time Stamp Second Register */
-#define pREG_EMAC0_TM_NSEC               ((volatile uint32_t *)REG_EMAC0_TM_NSEC)                /* EMAC0 EMAC Time Stamp Nano Second Register */
-#define pREG_EMAC0_TM_SECUPDT            ((volatile uint32_t *)REG_EMAC0_TM_SECUPDT)             /* EMAC0 EMAC Time Stamp Seconds Update */
-#define pREG_EMAC0_TM_NSECUPDT           ((volatile uint32_t *)REG_EMAC0_TM_NSECUPDT)            /* EMAC0 EMAC Time Stamp Nano Seconds Update */
-#define pREG_EMAC0_TM_ADDEND             ((volatile uint32_t *)REG_EMAC0_TM_ADDEND)              /* EMAC0 EMAC Time Stamp Addend Register */
-#define pREG_EMAC0_TM_TGTM               ((volatile uint32_t *)REG_EMAC0_TM_TGTM)                /* EMAC0 EMAC Time Stamp Target Time Sec. */
-#define pREG_EMAC0_TM_NTGTM              ((volatile uint32_t *)REG_EMAC0_TM_NTGTM)               /* EMAC0 EMAC Time Stamp Target Time Nanosec. */
-#define pREG_EMAC0_TM_HISEC              ((volatile uint32_t *)REG_EMAC0_TM_HISEC)               /* EMAC0 EMAC Time Stamp High Second Register */
-#define pREG_EMAC0_TM_STMPSTAT           ((volatile uint32_t *)REG_EMAC0_TM_STMPSTAT)            /* EMAC0 EMAC Time Stamp Status Register */
-#define pREG_EMAC0_TM_PPSCTL             ((volatile uint32_t *)REG_EMAC0_TM_PPSCTL)              /* EMAC0 EMAC PPS Control Register */
-#define pREG_EMAC0_TM_AUXSTMP_NSEC       ((volatile uint32_t *)REG_EMAC0_TM_AUXSTMP_NSEC)        /* EMAC0 EMAC Auxillary Time Stamp Nano Register */
-#define pREG_EMAC0_TM_AUXSTMP_SEC        ((volatile uint32_t *)REG_EMAC0_TM_AUXSTMP_SEC)         /* EMAC0 EMAC Auxillary Time Stamp Sec Register */
-#define pREG_EMAC0_DMA_BUSMODE           ((volatile uint32_t *)REG_EMAC0_DMA_BUSMODE)            /* EMAC0 Bus Operating Modes for EMAC DMA */
-#define pREG_EMAC0_DMA_TXPOLL            ((volatile uint32_t *)REG_EMAC0_DMA_TXPOLL)             /* EMAC0 TX DMA Poll demand register */
-#define pREG_EMAC0_DMA_RXPOLL            ((volatile uint32_t *)REG_EMAC0_DMA_RXPOLL)             /* EMAC0 RX DMA Poll demand register */
-#define pREG_EMAC0_DMA_RXDSC_ADDR        ((void * volatile *)REG_EMAC0_DMA_RXDSC_ADDR)           /* EMAC0 RX Descriptor List Address */
-#define pREG_EMAC0_DMA_TXDSC_ADDR        ((void * volatile *)REG_EMAC0_DMA_TXDSC_ADDR)           /* EMAC0 TX Descriptor List Address */
+#define pREG_EMAC0_TXOCTCNT_GB           ((volatile uint32_t *)REG_EMAC0_TXOCTCNT_GB)            /* EMAC0 Tx OCT Count (Good/Bad) Register */
+#define pREG_EMAC0_TXFRMCNT_GB           ((volatile uint32_t *)REG_EMAC0_TXFRMCNT_GB)            /* EMAC0 Tx Frame Count (Good/Bad) Register */
+#define pREG_EMAC0_TXBCASTFRM_G          ((volatile uint32_t *)REG_EMAC0_TXBCASTFRM_G)           /* EMAC0 Tx Broadcast Frames (Good) Register */
+#define pREG_EMAC0_TXMCASTFRM_G          ((volatile uint32_t *)REG_EMAC0_TXMCASTFRM_G)           /* EMAC0 Tx Multicast Frames (Good) Register */
+#define pREG_EMAC0_TX64_GB               ((volatile uint32_t *)REG_EMAC0_TX64_GB)                /* EMAC0 Tx 64-Byte Frames (Good/Bad) Register */
+#define pREG_EMAC0_TX65TO127_GB          ((volatile uint32_t *)REG_EMAC0_TX65TO127_GB)           /* EMAC0 Tx 65- to 127-Byte Frames (Good/Bad) Register */
+#define pREG_EMAC0_TX128TO255_GB         ((volatile uint32_t *)REG_EMAC0_TX128TO255_GB)          /* EMAC0 Tx 128- to 255-Byte Frames (Good/Bad) Register */
+#define pREG_EMAC0_TX256TO511_GB         ((volatile uint32_t *)REG_EMAC0_TX256TO511_GB)          /* EMAC0 Tx 256- to 511-Byte Frames (Good/Bad) Register */
+#define pREG_EMAC0_TX512TO1023_GB        ((volatile uint32_t *)REG_EMAC0_TX512TO1023_GB)         /* EMAC0 Tx 512- to 1023-Byte Frames (Good/Bad) Register */
+#define pREG_EMAC0_TX1024TOMAX_GB        ((volatile uint32_t *)REG_EMAC0_TX1024TOMAX_GB)         /* EMAC0 Tx 1024- to Max-Byte Frames (Good/Bad) Register */
+#define pREG_EMAC0_TXUCASTFRM_GB         ((volatile uint32_t *)REG_EMAC0_TXUCASTFRM_GB)          /* EMAC0 Tx Unicast Frames (Good/Bad) Register */
+#define pREG_EMAC0_TXMCASTFRM_GB         ((volatile uint32_t *)REG_EMAC0_TXMCASTFRM_GB)          /* EMAC0 Tx Multicast Frames (Good/Bad) Register */
+#define pREG_EMAC0_TXBCASTFRM_GB         ((volatile uint32_t *)REG_EMAC0_TXBCASTFRM_GB)          /* EMAC0 Tx Broadcast Frames (Good/Bad) Register */
+#define pREG_EMAC0_TXUNDR_ERR            ((volatile uint32_t *)REG_EMAC0_TXUNDR_ERR)             /* EMAC0 Tx Underflow Error Register */
+#define pREG_EMAC0_TXSNGCOL_G            ((volatile uint32_t *)REG_EMAC0_TXSNGCOL_G)             /* EMAC0 Tx Single Collision (Good) Register */
+#define pREG_EMAC0_TXMULTCOL_G           ((volatile uint32_t *)REG_EMAC0_TXMULTCOL_G)            /* EMAC0 Tx Multiple Collision (Good) Register */
+#define pREG_EMAC0_TXDEFERRED            ((volatile uint32_t *)REG_EMAC0_TXDEFERRED)             /* EMAC0 Tx Deferred Register */
+#define pREG_EMAC0_TXLATECOL             ((volatile uint32_t *)REG_EMAC0_TXLATECOL)              /* EMAC0 Tx Late Collision Register */
+#define pREG_EMAC0_TXEXCESSCOL           ((volatile uint32_t *)REG_EMAC0_TXEXCESSCOL)            /* EMAC0 Tx Excess Collision Register */
+#define pREG_EMAC0_TXCARR_ERR            ((volatile uint32_t *)REG_EMAC0_TXCARR_ERR)             /* EMAC0 Tx Carrier Error Register */
+#define pREG_EMAC0_TXOCTCNT_G            ((volatile uint32_t *)REG_EMAC0_TXOCTCNT_G)             /* EMAC0 Tx Octet Count (Good) Register */
+#define pREG_EMAC0_TXFRMCNT_G            ((volatile uint32_t *)REG_EMAC0_TXFRMCNT_G)             /* EMAC0 Tx Frame Count (Good) Register */
+#define pREG_EMAC0_TXEXCESSDEF           ((volatile uint32_t *)REG_EMAC0_TXEXCESSDEF)            /* EMAC0 Tx Excess Deferral Register */
+#define pREG_EMAC0_TXPAUSEFRM            ((volatile uint32_t *)REG_EMAC0_TXPAUSEFRM)             /* EMAC0 Tx Pause Frame Register */
+#define pREG_EMAC0_TXVLANFRM_G           ((volatile uint32_t *)REG_EMAC0_TXVLANFRM_G)            /* EMAC0 Tx VLAN Frames (Good) Register */
+#define pREG_EMAC0_RXFRMCNT_GB           ((volatile uint32_t *)REG_EMAC0_RXFRMCNT_GB)            /* EMAC0 Rx Frame Count (Good/Bad) Register */
+#define pREG_EMAC0_RXOCTCNT_GB           ((volatile uint32_t *)REG_EMAC0_RXOCTCNT_GB)            /* EMAC0 Rx Octet Count (Good/Bad) Register */
+#define pREG_EMAC0_RXOCTCNT_G            ((volatile uint32_t *)REG_EMAC0_RXOCTCNT_G)             /* EMAC0 Rx Octet Count (Good) Register */
+#define pREG_EMAC0_RXBCASTFRM_G          ((volatile uint32_t *)REG_EMAC0_RXBCASTFRM_G)           /* EMAC0 Rx Broadcast Frames (Good) Register */
+#define pREG_EMAC0_RXMCASTFRM_G          ((volatile uint32_t *)REG_EMAC0_RXMCASTFRM_G)           /* EMAC0 Rx Multicast Frames (Good) Register */
+#define pREG_EMAC0_RXCRC_ERR             ((volatile uint32_t *)REG_EMAC0_RXCRC_ERR)              /* EMAC0 Rx CRC Error Register */
+#define pREG_EMAC0_RXALIGN_ERR           ((volatile uint32_t *)REG_EMAC0_RXALIGN_ERR)            /* EMAC0 Rx alignment Error Register */
+#define pREG_EMAC0_RXRUNT_ERR            ((volatile uint32_t *)REG_EMAC0_RXRUNT_ERR)             /* EMAC0 Rx Runt Error Register */
+#define pREG_EMAC0_RXJAB_ERR             ((volatile uint32_t *)REG_EMAC0_RXJAB_ERR)              /* EMAC0 Rx Jab Error Register */
+#define pREG_EMAC0_RXUSIZE_G             ((volatile uint32_t *)REG_EMAC0_RXUSIZE_G)              /* EMAC0 Rx Undersize (Good) Register */
+#define pREG_EMAC0_RXOSIZE_G             ((volatile uint32_t *)REG_EMAC0_RXOSIZE_G)              /* EMAC0 Rx Oversize (Good) Register */
+#define pREG_EMAC0_RX64_GB               ((volatile uint32_t *)REG_EMAC0_RX64_GB)                /* EMAC0 Rx 64-Byte Frames (Good/Bad) Register */
+#define pREG_EMAC0_RX65TO127_GB          ((volatile uint32_t *)REG_EMAC0_RX65TO127_GB)           /* EMAC0 Rx 65- to 127-Byte Frames (Good/Bad) Register */
+#define pREG_EMAC0_RX128TO255_GB         ((volatile uint32_t *)REG_EMAC0_RX128TO255_GB)          /* EMAC0 Rx 128- to 255-Byte Frames (Good/Bad) Register */
+#define pREG_EMAC0_RX256TO511_GB         ((volatile uint32_t *)REG_EMAC0_RX256TO511_GB)          /* EMAC0 Rx 256- to 511-Byte Frames (Good/Bad) Register */
+#define pREG_EMAC0_RX512TO1023_GB        ((volatile uint32_t *)REG_EMAC0_RX512TO1023_GB)         /* EMAC0 Rx 512- to 1023-Byte Frames (Good/Bad) Register */
+#define pREG_EMAC0_RX1024TOMAX_GB        ((volatile uint32_t *)REG_EMAC0_RX1024TOMAX_GB)         /* EMAC0 Rx 1024- to Max-Byte Frames (Good/Bad) Register */
+#define pREG_EMAC0_RXUCASTFRM_G          ((volatile uint32_t *)REG_EMAC0_RXUCASTFRM_G)           /* EMAC0 Rx Unicast Frames (Good) Register */
+#define pREG_EMAC0_RXLEN_ERR             ((volatile uint32_t *)REG_EMAC0_RXLEN_ERR)              /* EMAC0 Rx Length Error Register */
+#define pREG_EMAC0_RXOORTYPE             ((volatile uint32_t *)REG_EMAC0_RXOORTYPE)              /* EMAC0 Rx Out Of Range Type Register */
+#define pREG_EMAC0_RXPAUSEFRM            ((volatile uint32_t *)REG_EMAC0_RXPAUSEFRM)             /* EMAC0 Rx Pause Frames Register */
+#define pREG_EMAC0_RXFIFO_OVF            ((volatile uint32_t *)REG_EMAC0_RXFIFO_OVF)             /* EMAC0 Rx FIFO Overflow Register */
+#define pREG_EMAC0_RXVLANFRM_GB          ((volatile uint32_t *)REG_EMAC0_RXVLANFRM_GB)           /* EMAC0 Rx VLAN Frames (Good/Bad) Register */
+#define pREG_EMAC0_RXWDOG_ERR            ((volatile uint32_t *)REG_EMAC0_RXWDOG_ERR)             /* EMAC0 Rx Watch Dog Error Register */
+#define pREG_EMAC0_IPC_RXIMSK            ((volatile uint32_t *)REG_EMAC0_IPC_RXIMSK)             /* EMAC0 MMC IPC Rx Interrupt Mask Register */
+#define pREG_EMAC0_IPC_RXINT             ((volatile uint32_t *)REG_EMAC0_IPC_RXINT)              /* EMAC0 MMC IPC Rx Interrupt Register */
+#define pREG_EMAC0_RXIPV4_GD_FRM         ((volatile uint32_t *)REG_EMAC0_RXIPV4_GD_FRM)          /* EMAC0 Rx IPv4 Datagrams (Good) Register */
+#define pREG_EMAC0_RXIPV4_HDR_ERR_FRM    ((volatile uint32_t *)REG_EMAC0_RXIPV4_HDR_ERR_FRM)     /* EMAC0 Rx IPv4 Datagrams Header Errors Register */
+#define pREG_EMAC0_RXIPV4_NOPAY_FRM      ((volatile uint32_t *)REG_EMAC0_RXIPV4_NOPAY_FRM)       /* EMAC0 Rx IPv4 Datagrams No Payload Frame Register */
+#define pREG_EMAC0_RXIPV4_FRAG_FRM       ((volatile uint32_t *)REG_EMAC0_RXIPV4_FRAG_FRM)        /* EMAC0 Rx IPv4 Datagrams Fragmented Frames Register */
+#define pREG_EMAC0_RXIPV4_UDSBL_FRM      ((volatile uint32_t *)REG_EMAC0_RXIPV4_UDSBL_FRM)       /* EMAC0 Rx IPv4 UDP Disabled Frames Register */
+#define pREG_EMAC0_RXIPV6_GD_FRM         ((volatile uint32_t *)REG_EMAC0_RXIPV6_GD_FRM)          /* EMAC0 Rx IPv6 Datagrams Good Frames Register */
+#define pREG_EMAC0_RXIPV6_HDR_ERR_FRM    ((volatile uint32_t *)REG_EMAC0_RXIPV6_HDR_ERR_FRM)     /* EMAC0 Rx IPv6 Datagrams Header Error Frames Register */
+#define pREG_EMAC0_RXIPV6_NOPAY_FRM      ((volatile uint32_t *)REG_EMAC0_RXIPV6_NOPAY_FRM)       /* EMAC0 Rx IPv6 Datagrams No Payload Frames Register */
+#define pREG_EMAC0_RXUDP_GD_FRM          ((volatile uint32_t *)REG_EMAC0_RXUDP_GD_FRM)           /* EMAC0 Rx UDP Good Frames Register */
+#define pREG_EMAC0_RXUDP_ERR_FRM         ((volatile uint32_t *)REG_EMAC0_RXUDP_ERR_FRM)          /* EMAC0 Rx UDP Error Frames Register */
+#define pREG_EMAC0_RXTCP_GD_FRM          ((volatile uint32_t *)REG_EMAC0_RXTCP_GD_FRM)           /* EMAC0 Rx TCP Good Frames Register */
+#define pREG_EMAC0_RXTCP_ERR_FRM         ((volatile uint32_t *)REG_EMAC0_RXTCP_ERR_FRM)          /* EMAC0 Rx TCP Error Frames Register */
+#define pREG_EMAC0_RXICMP_GD_FRM         ((volatile uint32_t *)REG_EMAC0_RXICMP_GD_FRM)          /* EMAC0 Rx ICMP Good Frames Register */
+#define pREG_EMAC0_RXICMP_ERR_FRM        ((volatile uint32_t *)REG_EMAC0_RXICMP_ERR_FRM)         /* EMAC0 Rx ICMP Error Frames Register */
+#define pREG_EMAC0_RXIPV4_GD_OCT         ((volatile uint32_t *)REG_EMAC0_RXIPV4_GD_OCT)          /* EMAC0 Rx IPv4 Datagrams Good Octets Register */
+#define pREG_EMAC0_RXIPV4_HDR_ERR_OCT    ((volatile uint32_t *)REG_EMAC0_RXIPV4_HDR_ERR_OCT)     /* EMAC0 Rx IPv4 Datagrams Header Errors Register */
+#define pREG_EMAC0_RXIPV4_NOPAY_OCT      ((volatile uint32_t *)REG_EMAC0_RXIPV4_NOPAY_OCT)       /* EMAC0 Rx IPv4 Datagrams No Payload Octets Register */
+#define pREG_EMAC0_RXIPV4_FRAG_OCT       ((volatile uint32_t *)REG_EMAC0_RXIPV4_FRAG_OCT)        /* EMAC0 Rx IPv4 Datagrams Fragmented Octets Register */
+#define pREG_EMAC0_RXIPV4_UDSBL_OCT      ((volatile uint32_t *)REG_EMAC0_RXIPV4_UDSBL_OCT)       /* EMAC0 Rx IPv4 UDP Disabled Octets Register */
+#define pREG_EMAC0_RXIPV6_GD_OCT         ((volatile uint32_t *)REG_EMAC0_RXIPV6_GD_OCT)          /* EMAC0 Rx IPv6 Good Octets Register */
+#define pREG_EMAC0_RXIPV6_HDR_ERR_OCT    ((volatile uint32_t *)REG_EMAC0_RXIPV6_HDR_ERR_OCT)     /* EMAC0 Rx IPv6 Header Errors Register */
+#define pREG_EMAC0_RXIPV6_NOPAY_OCT      ((volatile uint32_t *)REG_EMAC0_RXIPV6_NOPAY_OCT)       /* EMAC0 Rx IPv6 No Payload Octets Register */
+#define pREG_EMAC0_RXUDP_GD_OCT          ((volatile uint32_t *)REG_EMAC0_RXUDP_GD_OCT)           /* EMAC0 Rx UDP Good Octets Register */
+#define pREG_EMAC0_RXUDP_ERR_OCT         ((volatile uint32_t *)REG_EMAC0_RXUDP_ERR_OCT)          /* EMAC0 Rx UDP Error Octets Register */
+#define pREG_EMAC0_RXTCP_GD_OCT          ((volatile uint32_t *)REG_EMAC0_RXTCP_GD_OCT)           /* EMAC0 Rx TCP Good Octets Register */
+#define pREG_EMAC0_RXTCP_ERR_OCT         ((volatile uint32_t *)REG_EMAC0_RXTCP_ERR_OCT)          /* EMAC0 Rx TCP Error Octets Register */
+#define pREG_EMAC0_RXICMP_GD_OCT         ((volatile uint32_t *)REG_EMAC0_RXICMP_GD_OCT)          /* EMAC0 Rx ICMP Good Octets Register */
+#define pREG_EMAC0_RXICMP_ERR_OCT        ((volatile uint32_t *)REG_EMAC0_RXICMP_ERR_OCT)         /* EMAC0 Rx ICMP Error Octets Register */
+#define pREG_EMAC0_TM_CTL                ((volatile uint32_t *)REG_EMAC0_TM_CTL)                 /* EMAC0 Time Stamp Control Register */
+#define pREG_EMAC0_TM_SUBSEC             ((volatile uint32_t *)REG_EMAC0_TM_SUBSEC)              /* EMAC0 Time Stamp Sub Second Increment Register */
+#define pREG_EMAC0_TM_SEC                ((volatile uint32_t *)REG_EMAC0_TM_SEC)                 /* EMAC0 Time Stamp Low Seconds Register */
+#define pREG_EMAC0_TM_NSEC               ((volatile uint32_t *)REG_EMAC0_TM_NSEC)                /* EMAC0 Time Stamp Nano Seconds Register */
+#define pREG_EMAC0_TM_SECUPDT            ((volatile uint32_t *)REG_EMAC0_TM_SECUPDT)             /* EMAC0 Time Stamp Seconds Update Register */
+#define pREG_EMAC0_TM_NSECUPDT           ((volatile uint32_t *)REG_EMAC0_TM_NSECUPDT)            /* EMAC0 Time Stamp Nano Seconds Update Register */
+#define pREG_EMAC0_TM_ADDEND             ((volatile uint32_t *)REG_EMAC0_TM_ADDEND)              /* EMAC0 Time Stamp Addend Register */
+#define pREG_EMAC0_TM_TGTM               ((volatile uint32_t *)REG_EMAC0_TM_TGTM)                /* EMAC0 Time Stamp Target Time Seconds Register */
+#define pREG_EMAC0_TM_NTGTM              ((volatile uint32_t *)REG_EMAC0_TM_NTGTM)               /* EMAC0 Time Stamp Target Time Nano Seconds Register */
+#define pREG_EMAC0_TM_HISEC              ((volatile uint32_t *)REG_EMAC0_TM_HISEC)               /* EMAC0 Time Stamp High Second Register */
+#define pREG_EMAC0_TM_STMPSTAT           ((volatile uint32_t *)REG_EMAC0_TM_STMPSTAT)            /* EMAC0 Time Stamp Status Register */
+#define pREG_EMAC0_TM_PPSCTL             ((volatile uint32_t *)REG_EMAC0_TM_PPSCTL)              /* EMAC0 PPS Control Register */
+#define pREG_EMAC0_TM_AUXSTMP_NSEC       ((volatile uint32_t *)REG_EMAC0_TM_AUXSTMP_NSEC)        /* EMAC0 Time Stamp Auxilary TS Nano Seconds Register */
+#define pREG_EMAC0_TM_AUXSTMP_SEC        ((volatile uint32_t *)REG_EMAC0_TM_AUXSTMP_SEC)         /* EMAC0 Time Stamp Auxilary TM Seconds Register */
+#define pREG_EMAC0_TM_PPSINTVL           ((volatile uint32_t *)REG_EMAC0_TM_PPSINTVL)            /* EMAC0 Time Stamp PPS Interval Register */
+#define pREG_EMAC0_TM_PPSWIDTH           ((volatile uint32_t *)REG_EMAC0_TM_PPSWIDTH)            /* EMAC0 PPS Width Register */
+#define pREG_EMAC0_DMA_BUSMODE           ((volatile uint32_t *)REG_EMAC0_DMA_BUSMODE)            /* EMAC0 DMA Bus Mode Register */
+#define pREG_EMAC0_DMA_TXPOLL            ((volatile uint32_t *)REG_EMAC0_DMA_TXPOLL)             /* EMAC0 DMA Tx Poll Demand Register */
+#define pREG_EMAC0_DMA_RXPOLL            ((volatile uint32_t *)REG_EMAC0_DMA_RXPOLL)             /* EMAC0 DMA Rx Poll Demand register */
+#define pREG_EMAC0_DMA_RXDSC_ADDR        ((void * volatile *)REG_EMAC0_DMA_RXDSC_ADDR)           /* EMAC0 DMA Rx Descriptor List Address Register */
+#define pREG_EMAC0_DMA_TXDSC_ADDR        ((void * volatile *)REG_EMAC0_DMA_TXDSC_ADDR)           /* EMAC0 DMA Tx Descriptor List Address Register */
 #define pREG_EMAC0_DMA_STAT              ((volatile uint32_t *)REG_EMAC0_DMA_STAT)               /* EMAC0 DMA Status Register */
 #define pREG_EMAC0_DMA_OPMODE            ((volatile uint32_t *)REG_EMAC0_DMA_OPMODE)             /* EMAC0 DMA Operation Mode Register */
 #define pREG_EMAC0_DMA_IEN               ((volatile uint32_t *)REG_EMAC0_DMA_IEN)                /* EMAC0 DMA Interrupt Enable Register */
-#define pREG_EMAC0_DMA_MISS_FRM          ((volatile uint32_t *)REG_EMAC0_DMA_MISS_FRM)           /* EMAC0 DMA missed frame and buffer overflow counter */
-#define pREG_EMAC0_DMA_RXIWDOG           ((volatile uint32_t *)REG_EMAC0_DMA_RXIWDOG)            /* EMAC0 DMA RX Interrupt Watch Dog timer */
-#define pREG_EMAC0_DMA_BMMODE            ((volatile uint32_t *)REG_EMAC0_DMA_BMMODE)             /* EMAC0 AXI Bus Mode Register */
-#define pREG_EMAC0_DMA_BMSTAT            ((volatile uint32_t *)REG_EMAC0_DMA_BMSTAT)             /* EMAC0 AXI Status Register */
-#define pREG_EMAC0_DMA_TXDSC_CUR         ((void * volatile *)REG_EMAC0_DMA_TXDSC_CUR)            /* EMAC0 TX current descriptor register */
-#define pREG_EMAC0_DMA_RXDSC_CUR         ((void * volatile *)REG_EMAC0_DMA_RXDSC_CUR)            /* EMAC0 RX current descriptor register */
-#define pREG_EMAC0_DMA_TXBUF_CUR         ((void * volatile *)REG_EMAC0_DMA_TXBUF_CUR)            /* EMAC0 TX current buffer pointer register */
-#define pREG_EMAC0_DMA_RXBUF_CUR         ((void * volatile *)REG_EMAC0_DMA_RXBUF_CUR)            /* EMAC0 RX current buffer pointer register */
-#define pREG_EMAC0_HWFEAT                ((volatile uint32_t *)REG_EMAC0_HWFEAT)                 /* EMAC0 Hardware Feature Register */
+#define pREG_EMAC0_DMA_MISS_FRM          ((volatile uint32_t *)REG_EMAC0_DMA_MISS_FRM)           /* EMAC0 DMA Missed Frame Register */
+#define pREG_EMAC0_DMA_RXIWDOG           ((volatile uint32_t *)REG_EMAC0_DMA_RXIWDOG)            /* EMAC0 DMA Rx Interrupt Watch Dog Register */
+#define pREG_EMAC0_DMA_BMMODE            ((volatile uint32_t *)REG_EMAC0_DMA_BMMODE)             /* EMAC0 DMA SCB Bus Mode Register */
+#define pREG_EMAC0_DMA_BMSTAT            ((volatile uint32_t *)REG_EMAC0_DMA_BMSTAT)             /* EMAC0 DMA SCB Status Register */
+#define pREG_EMAC0_DMA_TXDSC_CUR         ((void * volatile *)REG_EMAC0_DMA_TXDSC_CUR)            /* EMAC0 DMA Tx Descriptor Current Register */
+#define pREG_EMAC0_DMA_RXDSC_CUR         ((void * volatile *)REG_EMAC0_DMA_RXDSC_CUR)            /* EMAC0 DMA Rx Descriptor Current Register */
+#define pREG_EMAC0_DMA_TXBUF_CUR         ((void * volatile *)REG_EMAC0_DMA_TXBUF_CUR)            /* EMAC0 DMA Tx Buffer Current Register */
+#define pREG_EMAC0_DMA_RXBUF_CUR         ((void * volatile *)REG_EMAC0_DMA_RXBUF_CUR)            /* EMAC0 DMA Rx Buffer Current Register */
 
 /* =========================================================================
        EMAC1
    ========================================================================= */
 #define pREG_EMAC1_MACCFG                ((volatile uint32_t *)REG_EMAC1_MACCFG)                 /* EMAC1 MAC Configuration Register */
-#define pREG_EMAC1_MACFRMFILT            ((volatile uint32_t *)REG_EMAC1_MACFRMFILT)             /* EMAC1 Filter Register for filtering Received Frames */
-#define pREG_EMAC1_HASHTBL_HI            ((volatile uint32_t *)REG_EMAC1_HASHTBL_HI)             /* EMAC1 Contains the Upper 32 bits of the hash table */
-#define pREG_EMAC1_HASHTBL_LO            ((volatile uint32_t *)REG_EMAC1_HASHTBL_LO)             /* EMAC1 Contains the lower 32 bits of the hash table */
-#define pREG_EMAC1_GMII_ADDR             ((volatile uint32_t *)REG_EMAC1_GMII_ADDR)              /* EMAC1 Management Address Register */
-#define pREG_EMAC1_GMII_DATA             ((volatile uint32_t *)REG_EMAC1_GMII_DATA)              /* EMAC1 Management Data Register */
-#define pREG_EMAC1_FLOWCTL               ((volatile uint32_t *)REG_EMAC1_FLOWCTL)                /* EMAC1 MAC FLow Control Register */
+#define pREG_EMAC1_MACFRMFILT            ((volatile uint32_t *)REG_EMAC1_MACFRMFILT)             /* EMAC1 MAC Rx Frame Filter Register */
+#define pREG_EMAC1_HASHTBL_HI            ((volatile uint32_t *)REG_EMAC1_HASHTBL_HI)             /* EMAC1 Hash Table High Register */
+#define pREG_EMAC1_HASHTBL_LO            ((volatile uint32_t *)REG_EMAC1_HASHTBL_LO)             /* EMAC1 Hash Table Low Register */
+#define pREG_EMAC1_SMI_ADDR              ((volatile uint32_t *)REG_EMAC1_SMI_ADDR)               /* EMAC1 SMI Address Register */
+#define pREG_EMAC1_SMI_DATA              ((volatile uint32_t *)REG_EMAC1_SMI_DATA)               /* EMAC1 SMI Data Register */
+#define pREG_EMAC1_FLOWCTL               ((volatile uint32_t *)REG_EMAC1_FLOWCTL)                /* EMAC1 FLow Control Register */
 #define pREG_EMAC1_VLANTAG               ((volatile uint32_t *)REG_EMAC1_VLANTAG)                /* EMAC1 VLAN Tag Register */
-#define pREG_EMAC1_VER                   ((volatile uint32_t *)REG_EMAC1_VER)                    /* EMAC1 EMAC Version Register */
-#define pREG_EMAC1_DBG                   ((volatile uint32_t *)REG_EMAC1_DBG)                    /* EMAC1 EMAC Debug Register */
-#define pREG_EMAC1_RMTWKUP               ((volatile uint32_t *)REG_EMAC1_RMTWKUP)                /* EMAC1 Remote wake up frame register */
-#define pREG_EMAC1_PMT_CTLSTAT           ((volatile uint32_t *)REG_EMAC1_PMT_CTLSTAT)            /* EMAC1 PMT Control and Status Register */
-#define pREG_EMAC1_ISTAT                 ((volatile uint32_t *)REG_EMAC1_ISTAT)                  /* EMAC1 EMAC Interrupt Status Register */
-#define pREG_EMAC1_IMSK                  ((volatile uint32_t *)REG_EMAC1_IMSK)                   /* EMAC1 EMAC Interrupt Mask Register */
-#define pREG_EMAC1_ADDR0_HI              ((volatile uint32_t *)REG_EMAC1_ADDR0_HI)               /* EMAC1 EMAC Address0 High Register */
-#define pREG_EMAC1_ADDR0_LO              ((volatile uint32_t *)REG_EMAC1_ADDR0_LO)               /* EMAC1 EMAC Address0 Low Register */
+#define pREG_EMAC1_DBG                   ((volatile uint32_t *)REG_EMAC1_DBG)                    /* EMAC1 Debug Register */
+#define pREG_EMAC1_ISTAT                 ((volatile uint32_t *)REG_EMAC1_ISTAT)                  /* EMAC1 Interrupt Status Register */
+#define pREG_EMAC1_IMSK                  ((volatile uint32_t *)REG_EMAC1_IMSK)                   /* EMAC1 Interrupt Mask Register */
+#define pREG_EMAC1_ADDR0_HI              ((volatile uint32_t *)REG_EMAC1_ADDR0_HI)               /* EMAC1 MAC Address 0 High Register */
+#define pREG_EMAC1_ADDR0_LO              ((volatile uint32_t *)REG_EMAC1_ADDR0_LO)               /* EMAC1 MAC Address 0 Low Register */
 #define pREG_EMAC1_MMC_CTL               ((volatile uint32_t *)REG_EMAC1_MMC_CTL)                /* EMAC1 MMC Control Register */
-#define pREG_EMAC1_MMC_RXINT             ((volatile uint32_t *)REG_EMAC1_MMC_RXINT)              /* EMAC1 MMC RX Interrupt Register */
-#define pREG_EMAC1_MMC_TXINT             ((volatile uint32_t *)REG_EMAC1_MMC_TXINT)              /* EMAC1 MMC TX Interrupt Register */
-#define pREG_EMAC1_MMC_RXIMSK            ((volatile uint32_t *)REG_EMAC1_MMC_RXIMSK)             /* EMAC1 MMC RX Interrupt Mask Register */
+#define pREG_EMAC1_MMC_RXINT             ((volatile uint32_t *)REG_EMAC1_MMC_RXINT)              /* EMAC1 MMC Rx Interrupt Register */
+#define pREG_EMAC1_MMC_TXINT             ((volatile uint32_t *)REG_EMAC1_MMC_TXINT)              /* EMAC1 MMC Tx Interrupt Register */
+#define pREG_EMAC1_MMC_RXIMSK            ((volatile uint32_t *)REG_EMAC1_MMC_RXIMSK)             /* EMAC1 MMC Rx Interrupt Mask Register */
 #define pREG_EMAC1_MMC_TXIMSK            ((volatile uint32_t *)REG_EMAC1_MMC_TXIMSK)             /* EMAC1 MMC TX Interrupt Mask Register */
-#define pREG_EMAC1_TXOCTCNT_GB           ((volatile uint32_t *)REG_EMAC1_TXOCTCNT_GB)            /* EMAC1 Num bytes transmitted exclusive of preamble */
-#define pREG_EMAC1_TXFRMCNT_GB           ((volatile uint32_t *)REG_EMAC1_TXFRMCNT_GB)            /* EMAC1 Num frames transmitted exclusive of retired */
-#define pREG_EMAC1_TXBCASTFRM_G          ((volatile uint32_t *)REG_EMAC1_TXBCASTFRM_G)           /* EMAC1 Number of good broadcast frames transmitted. */
-#define pREG_EMAC1_TXMCASTFRM_G          ((volatile uint32_t *)REG_EMAC1_TXMCASTFRM_G)           /* EMAC1 Number of good multicast frames transmitted. */
-#define pREG_EMAC1_TX64_GB               ((volatile uint32_t *)REG_EMAC1_TX64_GB)                /* EMAC1 Number of 64 byte length frames */
-#define pREG_EMAC1_TX65TO127_GB          ((volatile uint32_t *)REG_EMAC1_TX65TO127_GB)           /* EMAC1 Number of frames of length b/w 65-127 (inclusive) bytes */
-#define pREG_EMAC1_TX128TO255_GB         ((volatile uint32_t *)REG_EMAC1_TX128TO255_GB)          /* EMAC1 Number of frames of length b/w 128-255 (inclusive) bytes */
-#define pREG_EMAC1_TX256TO511_GB         ((volatile uint32_t *)REG_EMAC1_TX256TO511_GB)          /* EMAC1 Number of frames of length b/w 256-511 (inclusive) bytes */
-#define pREG_EMAC1_TX512TO1023_GB        ((volatile uint32_t *)REG_EMAC1_TX512TO1023_GB)         /* EMAC1 Number of frames of length b/w 512-1023 (inclusive) bytes */
-#define pREG_EMAC1_TX1024TOMAX_GB        ((volatile uint32_t *)REG_EMAC1_TX1024TOMAX_GB)         /* EMAC1 Number of frames of length b/w 1024-max (inclusive) bytes */
-#define pREG_EMAC1_TXUCASTFRM_GB         ((volatile uint32_t *)REG_EMAC1_TXUCASTFRM_GB)          /* EMAC1 Number of good and bad unicast frames transmitted */
-#define pREG_EMAC1_TXMCASTFRM_GB         ((volatile uint32_t *)REG_EMAC1_TXMCASTFRM_GB)          /* EMAC1 Number of good and bad multicast frames transmitted */
-#define pREG_EMAC1_TXBCASTFRM_GB         ((volatile uint32_t *)REG_EMAC1_TXBCASTFRM_GB)          /* EMAC1 Number of good and bad broadcast frames transmitted */
-#define pREG_EMAC1_TXUNDR_ERR            ((volatile uint32_t *)REG_EMAC1_TXUNDR_ERR)             /* EMAC1 Number of frames aborted due to frame underflow error */
-#define pREG_EMAC1_TXSNGCOL_G            ((volatile uint32_t *)REG_EMAC1_TXSNGCOL_G)             /* EMAC1 Number of transmitted frames after single collision */
-#define pREG_EMAC1_TXMULTCOL_G           ((volatile uint32_t *)REG_EMAC1_TXMULTCOL_G)            /* EMAC1 Number of transmitted frames with more than one collision */
-#define pREG_EMAC1_TXDEFERRED            ((volatile uint32_t *)REG_EMAC1_TXDEFERRED)             /* EMAC1 Number of transmitted frames after deferral */
-#define pREG_EMAC1_TXLATECOL             ((volatile uint32_t *)REG_EMAC1_TXLATECOL)              /* EMAC1 Number of frames aborted due to late collision error */
-#define pREG_EMAC1_TXEXCESSCOL           ((volatile uint32_t *)REG_EMAC1_TXEXCESSCOL)            /* EMAC1 Number of aborted frames due to excessive collisions */
-#define pREG_EMAC1_TXCARR_ERR            ((volatile uint32_t *)REG_EMAC1_TXCARR_ERR)             /* EMAC1 Number of aborted frames due to carrier sense error */
-#define pREG_EMAC1_TXOCTCNT_G            ((volatile uint32_t *)REG_EMAC1_TXOCTCNT_G)             /* EMAC1 Number of bytes transmitted in good frames only */
-#define pREG_EMAC1_TXFRMCNT_G            ((volatile uint32_t *)REG_EMAC1_TXFRMCNT_G)             /* EMAC1 Number of good frames transmitted. */
-#define pREG_EMAC1_TXEXCESSDEF           ((volatile uint32_t *)REG_EMAC1_TXEXCESSDEF)            /* EMAC1 Number of frames aborted due to excessive deferral */
-#define pREG_EMAC1_TXPAUSEFRM            ((volatile uint32_t *)REG_EMAC1_TXPAUSEFRM)             /* EMAC1 Number of good PAUSE frames transmitted. */
-#define pREG_EMAC1_TXVLANFRM_G           ((volatile uint32_t *)REG_EMAC1_TXVLANFRM_G)            /* EMAC1 Number of VLAN frames transmitted */
-#define pREG_EMAC1_RXFRMCNT_GB           ((volatile uint32_t *)REG_EMAC1_RXFRMCNT_GB)            /* EMAC1 Number of good and bad frames received. */
-#define pREG_EMAC1_RXOCTCNT_GB           ((volatile uint32_t *)REG_EMAC1_RXOCTCNT_GB)            /* EMAC1 Number of bytes received in good and bad frames */
-#define pREG_EMAC1_RXOCTCNT_G            ((volatile uint32_t *)REG_EMAC1_RXOCTCNT_G)             /* EMAC1 Number of bytes received only in good frames */
-#define pREG_EMAC1_RXBCASTFRM_G          ((volatile uint32_t *)REG_EMAC1_RXBCASTFRM_G)           /* EMAC1 Number of good broadcast frames received. */
-#define pREG_EMAC1_RXMCASTFRM_G          ((volatile uint32_t *)REG_EMAC1_RXMCASTFRM_G)           /* EMAC1 Number of good multicast frames received */
-#define pREG_EMAC1_RXCRC_ERR             ((volatile uint32_t *)REG_EMAC1_RXCRC_ERR)              /* EMAC1 Number of frames received with CRC error */
-#define pREG_EMAC1_RXALIGN_ERR           ((volatile uint32_t *)REG_EMAC1_RXALIGN_ERR)            /* EMAC1 Number of frames with alignment error */
-#define pREG_EMAC1_RXRUNT_ERR            ((volatile uint32_t *)REG_EMAC1_RXRUNT_ERR)             /* EMAC1 Number of frames received with runt error. */
-#define pREG_EMAC1_RXJAB_ERR             ((volatile uint32_t *)REG_EMAC1_RXJAB_ERR)              /* EMAC1 Number of frames received with length greater than 1518 */
-#define pREG_EMAC1_RXUSIZE_G             ((volatile uint32_t *)REG_EMAC1_RXUSIZE_G)              /* EMAC1 Number of frames received with length 64 */
-#define pREG_EMAC1_RXOSIZE_G             ((volatile uint32_t *)REG_EMAC1_RXOSIZE_G)              /* EMAC1 Number of frames received with length greater than maxium */
-#define pREG_EMAC1_RX64_GB               ((volatile uint32_t *)REG_EMAC1_RX64_GB)                /* EMAC1 Number of good and bad frames of lengh 64 bytes */
-#define pREG_EMAC1_RX65TO127_GB          ((volatile uint32_t *)REG_EMAC1_RX65TO127_GB)           /* EMAC1 Number of good and bad frame between 64-127(inclusive) */
-#define pREG_EMAC1_RX128TO255_GB         ((volatile uint32_t *)REG_EMAC1_RX128TO255_GB)          /* EMAC1 Number of good and bad frames received with length between 128 and 255 (inclusive) bytes, exclusive of preamble. */
-#define pREG_EMAC1_RX256TO511_GB         ((volatile uint32_t *)REG_EMAC1_RX256TO511_GB)          /* EMAC1 Number of good and bad frames between 256-511(inclusive) */
-#define pREG_EMAC1_RX512TO1023_GB        ((volatile uint32_t *)REG_EMAC1_RX512TO1023_GB)         /* EMAC1 Number of good and bad frames received between 512-1023 */
-#define pREG_EMAC1_RX1024TOMAX_GB        ((volatile uint32_t *)REG_EMAC1_RX1024TOMAX_GB)         /* EMAC1 Number of frames received between 1024 and maxsize */
-#define pREG_EMAC1_RXUCASTFRM_G          ((volatile uint32_t *)REG_EMAC1_RXUCASTFRM_G)           /* EMAC1 Number of good unicast frames received. */
-#define pREG_EMAC1_RXLEN_ERR             ((volatile uint32_t *)REG_EMAC1_RXLEN_ERR)              /* EMAC1 Number of frames received with length error */
-#define pREG_EMAC1_RXOORTYPE             ((volatile uint32_t *)REG_EMAC1_RXOORTYPE)              /* EMAC1 Number of frames with length not equal to valid frame size */
-#define pREG_EMAC1_RXPAUSEFRM            ((volatile uint32_t *)REG_EMAC1_RXPAUSEFRM)             /* EMAC1 Number of good and valid PAUSE frames received. */
-#define pREG_EMAC1_RXFIFO_OVF            ((volatile uint32_t *)REG_EMAC1_RXFIFO_OVF)             /* EMAC1 Number of missed received frames due to FIFO overflow. This counter is not present in the GMAC-CORE configuration. */
-#define pREG_EMAC1_RXVLANFRM_GB          ((volatile uint32_t *)REG_EMAC1_RXVLANFRM_GB)           /* EMAC1 Number of good and bad VLAN frames received. */
-#define pREG_EMAC1_RXWDOG_ERR            ((volatile uint32_t *)REG_EMAC1_RXWDOG_ERR)             /* EMAC1 Frames received with error due to watchdog timeout */
-#define pREG_EMAC1_IPC_RXIMSK            ((volatile uint32_t *)REG_EMAC1_IPC_RXIMSK)             /* EMAC1 MMC IPC RX Interrupt Mask Register */
-#define pREG_EMAC1_IPC_RXINT             ((volatile uint32_t *)REG_EMAC1_IPC_RXINT)              /* EMAC1 MMC IPC RX Interrupt Register */
-#define pREG_EMAC1_RXIPV4_GD_FRM         ((volatile uint32_t *)REG_EMAC1_RXIPV4_GD_FRM)          /* EMAC1 Number of good IPv4 datagrams */
-#define pREG_EMAC1_RXIPV4_HDR_ERR_FRM    ((volatile uint32_t *)REG_EMAC1_RXIPV4_HDR_ERR_FRM)     /* EMAC1 Number of IPv4 datagrams with header errors */
-#define pREG_EMAC1_RXIPV4_NOPAY_FRM      ((volatile uint32_t *)REG_EMAC1_RXIPV4_NOPAY_FRM)       /* EMAC1 Number of IPv4 datagrams without checksum */
-#define pREG_EMAC1_RXIPV4_FRAG_FRM       ((volatile uint32_t *)REG_EMAC1_RXIPV4_FRAG_FRM)        /* EMAC1 Number of good IPv4 datagrams with fragmentation */
-#define pREG_EMAC1_RXIPV4_UDSBL_FRM      ((volatile uint32_t *)REG_EMAC1_RXIPV4_UDSBL_FRM)       /* EMAC1 Number of IPv4 UDP datagrams with disabled checksum */
-#define pREG_EMAC1_RXIPV6_GD_FRM         ((volatile uint32_t *)REG_EMAC1_RXIPV6_GD_FRM)          /* EMAC1 Number of IPv4 datagrams with TCP/UDP/ICMP payloads */
-#define pREG_EMAC1_RXIPV6_HDR_ERR_FRM    ((volatile uint32_t *)REG_EMAC1_RXIPV6_HDR_ERR_FRM)     /* EMAC1 Number of IPv6 datagrams with header errors */
-#define pREG_EMAC1_RXIPV6_NOPAY_FRM      ((volatile uint32_t *)REG_EMAC1_RXIPV6_NOPAY_FRM)       /* EMAC1 Number of IPv6 datagrams with no TCP/UDP/ICMP payload */
-#define pREG_EMAC1_RXUDP_GD_FRM          ((volatile uint32_t *)REG_EMAC1_RXUDP_GD_FRM)           /* EMAC1 Number of good IP datagrames with good UDP payload */
-#define pREG_EMAC1_RXUDP_ERR_FRM         ((volatile uint32_t *)REG_EMAC1_RXUDP_ERR_FRM)          /* EMAC1 Number of good IP datagrams with UDP checksum errors */
-#define pREG_EMAC1_RXTCP_GD_FRM          ((volatile uint32_t *)REG_EMAC1_RXTCP_GD_FRM)           /* EMAC1 Number of good IP datagrams with a good TCP payload */
-#define pREG_EMAC1_RXTCP_ERR_FRM         ((volatile uint32_t *)REG_EMAC1_RXTCP_ERR_FRM)          /* EMAC1 Number of good IP datagrams with TCP checksum errors */
-#define pREG_EMAC1_RXICMP_GD_FRM         ((volatile uint32_t *)REG_EMAC1_RXICMP_GD_FRM)          /* EMAC1 Number of good IP datagrams with a good ICMP payload */
-#define pREG_EMAC1_RXICMP_ERR_FRM        ((volatile uint32_t *)REG_EMAC1_RXICMP_ERR_FRM)         /* EMAC1 Number of good IP datagrams with ICMP checksum errors */
-#define pREG_EMAC1_RXIPV4_GD_OCT         ((volatile uint32_t *)REG_EMAC1_RXIPV4_GD_OCT)          /* EMAC1 Bytes received in IPv4 datagrams including tcp,udp or icmp */
-#define pREG_EMAC1_RXIPV4_HDR_ERR_OCT    ((volatile uint32_t *)REG_EMAC1_RXIPV4_HDR_ERR_OCT)     /* EMAC1 Bytes received in IPv4 datagrams with header errors */
-#define pREG_EMAC1_RXIPV4_NOPAY_OCT      ((volatile uint32_t *)REG_EMAC1_RXIPV4_NOPAY_OCT)       /* EMAC1 Bytes received in IPv4 datagrams without tcp,udp,icmp load */
-#define pREG_EMAC1_RXIPV4_FRAG_OCT       ((volatile uint32_t *)REG_EMAC1_RXIPV4_FRAG_OCT)        /* EMAC1 Bytes received in fragmented IPv4 datagrams */
-#define pREG_EMAC1_RXIPV4_UDSBL_OCT      ((volatile uint32_t *)REG_EMAC1_RXIPV4_UDSBL_OCT)       /* EMAC1 Bytes received in UDP segment with checksum disabled */
-#define pREG_EMAC1_RXIPV6_GD_OCT         ((volatile uint32_t *)REG_EMAC1_RXIPV6_GD_OCT)          /* EMAC1 Bytes received in good IPv6  including tcp,udp or icmp load */
-#define pREG_EMAC1_RXIPV6_HDR_ERR_OCT    ((volatile uint32_t *)REG_EMAC1_RXIPV6_HDR_ERR_OCT)     /* EMAC1 Number of bytes received in IPv6 with header errors */
-#define pREG_EMAC1_RXIPV6_NOPAY_OCT      ((volatile uint32_t *)REG_EMAC1_RXIPV6_NOPAY_OCT)       /* EMAC1 Bytes received in IPv6 without tcp,udp or icmp load */
-#define pREG_EMAC1_RXUDP_GD_OCT          ((volatile uint32_t *)REG_EMAC1_RXUDP_GD_OCT)           /* EMAC1 Number of bytes received in good UDP segments */
-#define pREG_EMAC1_RXUDP_ERR_OCT         ((volatile uint32_t *)REG_EMAC1_RXUDP_ERR_OCT)          /* EMAC1 Number of bytes received in UDP segment with checksum err */
-#define pREG_EMAC1_RXTCP_GD_OCT          ((volatile uint32_t *)REG_EMAC1_RXTCP_GD_OCT)           /* EMAC1 Number of bytes received in a good TCP segment */
-#define pREG_EMAC1_RXTCP_ERR_OCT         ((volatile uint32_t *)REG_EMAC1_RXTCP_ERR_OCT)          /* EMAC1 Number of bytes received in TCP segment with checksum err */
-#define pREG_EMAC1_RXICMP_GD_OCT         ((volatile uint32_t *)REG_EMAC1_RXICMP_GD_OCT)          /* EMAC1 Number of bytes received in a good ICMP segment */
-#define pREG_EMAC1_RXICMP_ERR_OCT        ((volatile uint32_t *)REG_EMAC1_RXICMP_ERR_OCT)         /* EMAC1 Bytes received in an ICMP segment with checksum errors */
-#define pREG_EMAC1_TM_CTL                ((volatile uint32_t *)REG_EMAC1_TM_CTL)                 /* EMAC1 EMAC Time Stamp Control Register */
-#define pREG_EMAC1_TM_SUBSEC             ((volatile uint32_t *)REG_EMAC1_TM_SUBSEC)              /* EMAC1 EMAC Time Stamp Sub Second Increment */
-#define pREG_EMAC1_TM_SEC                ((volatile uint32_t *)REG_EMAC1_TM_SEC)                 /* EMAC1 EMAC Time Stamp Second Register */
-#define pREG_EMAC1_TM_NSEC               ((volatile uint32_t *)REG_EMAC1_TM_NSEC)                /* EMAC1 EMAC Time Stamp Nano Second Register */
-#define pREG_EMAC1_TM_SECUPDT            ((volatile uint32_t *)REG_EMAC1_TM_SECUPDT)             /* EMAC1 EMAC Time Stamp Seconds Update */
-#define pREG_EMAC1_TM_NSECUPDT           ((volatile uint32_t *)REG_EMAC1_TM_NSECUPDT)            /* EMAC1 EMAC Time Stamp Nano Seconds Update */
-#define pREG_EMAC1_TM_ADDEND             ((volatile uint32_t *)REG_EMAC1_TM_ADDEND)              /* EMAC1 EMAC Time Stamp Addend Register */
-#define pREG_EMAC1_TM_TGTM               ((volatile uint32_t *)REG_EMAC1_TM_TGTM)                /* EMAC1 EMAC Time Stamp Target Time Sec. */
-#define pREG_EMAC1_TM_NTGTM              ((volatile uint32_t *)REG_EMAC1_TM_NTGTM)               /* EMAC1 EMAC Time Stamp Target Time Nanosec. */
-#define pREG_EMAC1_TM_HISEC              ((volatile uint32_t *)REG_EMAC1_TM_HISEC)               /* EMAC1 EMAC Time Stamp High Second Register */
-#define pREG_EMAC1_TM_STMPSTAT           ((volatile uint32_t *)REG_EMAC1_TM_STMPSTAT)            /* EMAC1 EMAC Time Stamp Status Register */
-#define pREG_EMAC1_TM_PPSCTL             ((volatile uint32_t *)REG_EMAC1_TM_PPSCTL)              /* EMAC1 EMAC PPS Control Register */
-#define pREG_EMAC1_TM_AUXSTMP_NSEC       ((volatile uint32_t *)REG_EMAC1_TM_AUXSTMP_NSEC)        /* EMAC1 EMAC Auxillary Time Stamp Nano Register */
-#define pREG_EMAC1_TM_AUXSTMP_SEC        ((volatile uint32_t *)REG_EMAC1_TM_AUXSTMP_SEC)         /* EMAC1 EMAC Auxillary Time Stamp Sec Register */
-#define pREG_EMAC1_DMA_BUSMODE           ((volatile uint32_t *)REG_EMAC1_DMA_BUSMODE)            /* EMAC1 Bus Operating Modes for EMAC DMA */
-#define pREG_EMAC1_DMA_TXPOLL            ((volatile uint32_t *)REG_EMAC1_DMA_TXPOLL)             /* EMAC1 TX DMA Poll demand register */
-#define pREG_EMAC1_DMA_RXPOLL            ((volatile uint32_t *)REG_EMAC1_DMA_RXPOLL)             /* EMAC1 RX DMA Poll demand register */
-#define pREG_EMAC1_DMA_RXDSC_ADDR        ((void * volatile *)REG_EMAC1_DMA_RXDSC_ADDR)           /* EMAC1 RX Descriptor List Address */
-#define pREG_EMAC1_DMA_TXDSC_ADDR        ((void * volatile *)REG_EMAC1_DMA_TXDSC_ADDR)           /* EMAC1 TX Descriptor List Address */
+#define pREG_EMAC1_TXOCTCNT_GB           ((volatile uint32_t *)REG_EMAC1_TXOCTCNT_GB)            /* EMAC1 Tx OCT Count (Good/Bad) Register */
+#define pREG_EMAC1_TXFRMCNT_GB           ((volatile uint32_t *)REG_EMAC1_TXFRMCNT_GB)            /* EMAC1 Tx Frame Count (Good/Bad) Register */
+#define pREG_EMAC1_TXBCASTFRM_G          ((volatile uint32_t *)REG_EMAC1_TXBCASTFRM_G)           /* EMAC1 Tx Broadcast Frames (Good) Register */
+#define pREG_EMAC1_TXMCASTFRM_G          ((volatile uint32_t *)REG_EMAC1_TXMCASTFRM_G)           /* EMAC1 Tx Multicast Frames (Good) Register */
+#define pREG_EMAC1_TX64_GB               ((volatile uint32_t *)REG_EMAC1_TX64_GB)                /* EMAC1 Tx 64-Byte Frames (Good/Bad) Register */
+#define pREG_EMAC1_TX65TO127_GB          ((volatile uint32_t *)REG_EMAC1_TX65TO127_GB)           /* EMAC1 Tx 65- to 127-Byte Frames (Good/Bad) Register */
+#define pREG_EMAC1_TX128TO255_GB         ((volatile uint32_t *)REG_EMAC1_TX128TO255_GB)          /* EMAC1 Tx 128- to 255-Byte Frames (Good/Bad) Register */
+#define pREG_EMAC1_TX256TO511_GB         ((volatile uint32_t *)REG_EMAC1_TX256TO511_GB)          /* EMAC1 Tx 256- to 511-Byte Frames (Good/Bad) Register */
+#define pREG_EMAC1_TX512TO1023_GB        ((volatile uint32_t *)REG_EMAC1_TX512TO1023_GB)         /* EMAC1 Tx 512- to 1023-Byte Frames (Good/Bad) Register */
+#define pREG_EMAC1_TX1024TOMAX_GB        ((volatile uint32_t *)REG_EMAC1_TX1024TOMAX_GB)         /* EMAC1 Tx 1024- to Max-Byte Frames (Good/Bad) Register */
+#define pREG_EMAC1_TXUCASTFRM_GB         ((volatile uint32_t *)REG_EMAC1_TXUCASTFRM_GB)          /* EMAC1 Tx Unicast Frames (Good/Bad) Register */
+#define pREG_EMAC1_TXMCASTFRM_GB         ((volatile uint32_t *)REG_EMAC1_TXMCASTFRM_GB)          /* EMAC1 Tx Multicast Frames (Good/Bad) Register */
+#define pREG_EMAC1_TXBCASTFRM_GB         ((volatile uint32_t *)REG_EMAC1_TXBCASTFRM_GB)          /* EMAC1 Tx Broadcast Frames (Good/Bad) Register */
+#define pREG_EMAC1_TXUNDR_ERR            ((volatile uint32_t *)REG_EMAC1_TXUNDR_ERR)             /* EMAC1 Tx Underflow Error Register */
+#define pREG_EMAC1_TXSNGCOL_G            ((volatile uint32_t *)REG_EMAC1_TXSNGCOL_G)             /* EMAC1 Tx Single Collision (Good) Register */
+#define pREG_EMAC1_TXMULTCOL_G           ((volatile uint32_t *)REG_EMAC1_TXMULTCOL_G)            /* EMAC1 Tx Multiple Collision (Good) Register */
+#define pREG_EMAC1_TXDEFERRED            ((volatile uint32_t *)REG_EMAC1_TXDEFERRED)             /* EMAC1 Tx Deferred Register */
+#define pREG_EMAC1_TXLATECOL             ((volatile uint32_t *)REG_EMAC1_TXLATECOL)              /* EMAC1 Tx Late Collision Register */
+#define pREG_EMAC1_TXEXCESSCOL           ((volatile uint32_t *)REG_EMAC1_TXEXCESSCOL)            /* EMAC1 Tx Excess Collision Register */
+#define pREG_EMAC1_TXCARR_ERR            ((volatile uint32_t *)REG_EMAC1_TXCARR_ERR)             /* EMAC1 Tx Carrier Error Register */
+#define pREG_EMAC1_TXOCTCNT_G            ((volatile uint32_t *)REG_EMAC1_TXOCTCNT_G)             /* EMAC1 Tx Octet Count (Good) Register */
+#define pREG_EMAC1_TXFRMCNT_G            ((volatile uint32_t *)REG_EMAC1_TXFRMCNT_G)             /* EMAC1 Tx Frame Count (Good) Register */
+#define pREG_EMAC1_TXEXCESSDEF           ((volatile uint32_t *)REG_EMAC1_TXEXCESSDEF)            /* EMAC1 Tx Excess Deferral Register */
+#define pREG_EMAC1_TXPAUSEFRM            ((volatile uint32_t *)REG_EMAC1_TXPAUSEFRM)             /* EMAC1 Tx Pause Frame Register */
+#define pREG_EMAC1_TXVLANFRM_G           ((volatile uint32_t *)REG_EMAC1_TXVLANFRM_G)            /* EMAC1 Tx VLAN Frames (Good) Register */
+#define pREG_EMAC1_RXFRMCNT_GB           ((volatile uint32_t *)REG_EMAC1_RXFRMCNT_GB)            /* EMAC1 Rx Frame Count (Good/Bad) Register */
+#define pREG_EMAC1_RXOCTCNT_GB           ((volatile uint32_t *)REG_EMAC1_RXOCTCNT_GB)            /* EMAC1 Rx Octet Count (Good/Bad) Register */
+#define pREG_EMAC1_RXOCTCNT_G            ((volatile uint32_t *)REG_EMAC1_RXOCTCNT_G)             /* EMAC1 Rx Octet Count (Good) Register */
+#define pREG_EMAC1_RXBCASTFRM_G          ((volatile uint32_t *)REG_EMAC1_RXBCASTFRM_G)           /* EMAC1 Rx Broadcast Frames (Good) Register */
+#define pREG_EMAC1_RXMCASTFRM_G          ((volatile uint32_t *)REG_EMAC1_RXMCASTFRM_G)           /* EMAC1 Rx Multicast Frames (Good) Register */
+#define pREG_EMAC1_RXCRC_ERR             ((volatile uint32_t *)REG_EMAC1_RXCRC_ERR)              /* EMAC1 Rx CRC Error Register */
+#define pREG_EMAC1_RXALIGN_ERR           ((volatile uint32_t *)REG_EMAC1_RXALIGN_ERR)            /* EMAC1 Rx alignment Error Register */
+#define pREG_EMAC1_RXRUNT_ERR            ((volatile uint32_t *)REG_EMAC1_RXRUNT_ERR)             /* EMAC1 Rx Runt Error Register */
+#define pREG_EMAC1_RXJAB_ERR             ((volatile uint32_t *)REG_EMAC1_RXJAB_ERR)              /* EMAC1 Rx Jab Error Register */
+#define pREG_EMAC1_RXUSIZE_G             ((volatile uint32_t *)REG_EMAC1_RXUSIZE_G)              /* EMAC1 Rx Undersize (Good) Register */
+#define pREG_EMAC1_RXOSIZE_G             ((volatile uint32_t *)REG_EMAC1_RXOSIZE_G)              /* EMAC1 Rx Oversize (Good) Register */
+#define pREG_EMAC1_RX64_GB               ((volatile uint32_t *)REG_EMAC1_RX64_GB)                /* EMAC1 Rx 64-Byte Frames (Good/Bad) Register */
+#define pREG_EMAC1_RX65TO127_GB          ((volatile uint32_t *)REG_EMAC1_RX65TO127_GB)           /* EMAC1 Rx 65- to 127-Byte Frames (Good/Bad) Register */
+#define pREG_EMAC1_RX128TO255_GB         ((volatile uint32_t *)REG_EMAC1_RX128TO255_GB)          /* EMAC1 Rx 128- to 255-Byte Frames (Good/Bad) Register */
+#define pREG_EMAC1_RX256TO511_GB         ((volatile uint32_t *)REG_EMAC1_RX256TO511_GB)          /* EMAC1 Rx 256- to 511-Byte Frames (Good/Bad) Register */
+#define pREG_EMAC1_RX512TO1023_GB        ((volatile uint32_t *)REG_EMAC1_RX512TO1023_GB)         /* EMAC1 Rx 512- to 1023-Byte Frames (Good/Bad) Register */
+#define pREG_EMAC1_RX1024TOMAX_GB        ((volatile uint32_t *)REG_EMAC1_RX1024TOMAX_GB)         /* EMAC1 Rx 1024- to Max-Byte Frames (Good/Bad) Register */
+#define pREG_EMAC1_RXUCASTFRM_G          ((volatile uint32_t *)REG_EMAC1_RXUCASTFRM_G)           /* EMAC1 Rx Unicast Frames (Good) Register */
+#define pREG_EMAC1_RXLEN_ERR             ((volatile uint32_t *)REG_EMAC1_RXLEN_ERR)              /* EMAC1 Rx Length Error Register */
+#define pREG_EMAC1_RXOORTYPE             ((volatile uint32_t *)REG_EMAC1_RXOORTYPE)              /* EMAC1 Rx Out Of Range Type Register */
+#define pREG_EMAC1_RXPAUSEFRM            ((volatile uint32_t *)REG_EMAC1_RXPAUSEFRM)             /* EMAC1 Rx Pause Frames Register */
+#define pREG_EMAC1_RXFIFO_OVF            ((volatile uint32_t *)REG_EMAC1_RXFIFO_OVF)             /* EMAC1 Rx FIFO Overflow Register */
+#define pREG_EMAC1_RXVLANFRM_GB          ((volatile uint32_t *)REG_EMAC1_RXVLANFRM_GB)           /* EMAC1 Rx VLAN Frames (Good/Bad) Register */
+#define pREG_EMAC1_RXWDOG_ERR            ((volatile uint32_t *)REG_EMAC1_RXWDOG_ERR)             /* EMAC1 Rx Watch Dog Error Register */
+#define pREG_EMAC1_IPC_RXIMSK            ((volatile uint32_t *)REG_EMAC1_IPC_RXIMSK)             /* EMAC1 MMC IPC Rx Interrupt Mask Register */
+#define pREG_EMAC1_IPC_RXINT             ((volatile uint32_t *)REG_EMAC1_IPC_RXINT)              /* EMAC1 MMC IPC Rx Interrupt Register */
+#define pREG_EMAC1_RXIPV4_GD_FRM         ((volatile uint32_t *)REG_EMAC1_RXIPV4_GD_FRM)          /* EMAC1 Rx IPv4 Datagrams (Good) Register */
+#define pREG_EMAC1_RXIPV4_HDR_ERR_FRM    ((volatile uint32_t *)REG_EMAC1_RXIPV4_HDR_ERR_FRM)     /* EMAC1 Rx IPv4 Datagrams Header Errors Register */
+#define pREG_EMAC1_RXIPV4_NOPAY_FRM      ((volatile uint32_t *)REG_EMAC1_RXIPV4_NOPAY_FRM)       /* EMAC1 Rx IPv4 Datagrams No Payload Frame Register */
+#define pREG_EMAC1_RXIPV4_FRAG_FRM       ((volatile uint32_t *)REG_EMAC1_RXIPV4_FRAG_FRM)        /* EMAC1 Rx IPv4 Datagrams Fragmented Frames Register */
+#define pREG_EMAC1_RXIPV4_UDSBL_FRM      ((volatile uint32_t *)REG_EMAC1_RXIPV4_UDSBL_FRM)       /* EMAC1 Rx IPv4 UDP Disabled Frames Register */
+#define pREG_EMAC1_RXIPV6_GD_FRM         ((volatile uint32_t *)REG_EMAC1_RXIPV6_GD_FRM)          /* EMAC1 Rx IPv6 Datagrams Good Frames Register */
+#define pREG_EMAC1_RXIPV6_HDR_ERR_FRM    ((volatile uint32_t *)REG_EMAC1_RXIPV6_HDR_ERR_FRM)     /* EMAC1 Rx IPv6 Datagrams Header Error Frames Register */
+#define pREG_EMAC1_RXIPV6_NOPAY_FRM      ((volatile uint32_t *)REG_EMAC1_RXIPV6_NOPAY_FRM)       /* EMAC1 Rx IPv6 Datagrams No Payload Frames Register */
+#define pREG_EMAC1_RXUDP_GD_FRM          ((volatile uint32_t *)REG_EMAC1_RXUDP_GD_FRM)           /* EMAC1 Rx UDP Good Frames Register */
+#define pREG_EMAC1_RXUDP_ERR_FRM         ((volatile uint32_t *)REG_EMAC1_RXUDP_ERR_FRM)          /* EMAC1 Rx UDP Error Frames Register */
+#define pREG_EMAC1_RXTCP_GD_FRM          ((volatile uint32_t *)REG_EMAC1_RXTCP_GD_FRM)           /* EMAC1 Rx TCP Good Frames Register */
+#define pREG_EMAC1_RXTCP_ERR_FRM         ((volatile uint32_t *)REG_EMAC1_RXTCP_ERR_FRM)          /* EMAC1 Rx TCP Error Frames Register */
+#define pREG_EMAC1_RXICMP_GD_FRM         ((volatile uint32_t *)REG_EMAC1_RXICMP_GD_FRM)          /* EMAC1 Rx ICMP Good Frames Register */
+#define pREG_EMAC1_RXICMP_ERR_FRM        ((volatile uint32_t *)REG_EMAC1_RXICMP_ERR_FRM)         /* EMAC1 Rx ICMP Error Frames Register */
+#define pREG_EMAC1_RXIPV4_GD_OCT         ((volatile uint32_t *)REG_EMAC1_RXIPV4_GD_OCT)          /* EMAC1 Rx IPv4 Datagrams Good Octets Register */
+#define pREG_EMAC1_RXIPV4_HDR_ERR_OCT    ((volatile uint32_t *)REG_EMAC1_RXIPV4_HDR_ERR_OCT)     /* EMAC1 Rx IPv4 Datagrams Header Errors Register */
+#define pREG_EMAC1_RXIPV4_NOPAY_OCT      ((volatile uint32_t *)REG_EMAC1_RXIPV4_NOPAY_OCT)       /* EMAC1 Rx IPv4 Datagrams No Payload Octets Register */
+#define pREG_EMAC1_RXIPV4_FRAG_OCT       ((volatile uint32_t *)REG_EMAC1_RXIPV4_FRAG_OCT)        /* EMAC1 Rx IPv4 Datagrams Fragmented Octets Register */
+#define pREG_EMAC1_RXIPV4_UDSBL_OCT      ((volatile uint32_t *)REG_EMAC1_RXIPV4_UDSBL_OCT)       /* EMAC1 Rx IPv4 UDP Disabled Octets Register */
+#define pREG_EMAC1_RXIPV6_GD_OCT         ((volatile uint32_t *)REG_EMAC1_RXIPV6_GD_OCT)          /* EMAC1 Rx IPv6 Good Octets Register */
+#define pREG_EMAC1_RXIPV6_HDR_ERR_OCT    ((volatile uint32_t *)REG_EMAC1_RXIPV6_HDR_ERR_OCT)     /* EMAC1 Rx IPv6 Header Errors Register */
+#define pREG_EMAC1_RXIPV6_NOPAY_OCT      ((volatile uint32_t *)REG_EMAC1_RXIPV6_NOPAY_OCT)       /* EMAC1 Rx IPv6 No Payload Octets Register */
+#define pREG_EMAC1_RXUDP_GD_OCT          ((volatile uint32_t *)REG_EMAC1_RXUDP_GD_OCT)           /* EMAC1 Rx UDP Good Octets Register */
+#define pREG_EMAC1_RXUDP_ERR_OCT         ((volatile uint32_t *)REG_EMAC1_RXUDP_ERR_OCT)          /* EMAC1 Rx UDP Error Octets Register */
+#define pREG_EMAC1_RXTCP_GD_OCT          ((volatile uint32_t *)REG_EMAC1_RXTCP_GD_OCT)           /* EMAC1 Rx TCP Good Octets Register */
+#define pREG_EMAC1_RXTCP_ERR_OCT         ((volatile uint32_t *)REG_EMAC1_RXTCP_ERR_OCT)          /* EMAC1 Rx TCP Error Octets Register */
+#define pREG_EMAC1_RXICMP_GD_OCT         ((volatile uint32_t *)REG_EMAC1_RXICMP_GD_OCT)          /* EMAC1 Rx ICMP Good Octets Register */
+#define pREG_EMAC1_RXICMP_ERR_OCT        ((volatile uint32_t *)REG_EMAC1_RXICMP_ERR_OCT)         /* EMAC1 Rx ICMP Error Octets Register */
+#define pREG_EMAC1_TM_CTL                ((volatile uint32_t *)REG_EMAC1_TM_CTL)                 /* EMAC1 Time Stamp Control Register */
+#define pREG_EMAC1_TM_SUBSEC             ((volatile uint32_t *)REG_EMAC1_TM_SUBSEC)              /* EMAC1 Time Stamp Sub Second Increment Register */
+#define pREG_EMAC1_TM_SEC                ((volatile uint32_t *)REG_EMAC1_TM_SEC)                 /* EMAC1 Time Stamp Low Seconds Register */
+#define pREG_EMAC1_TM_NSEC               ((volatile uint32_t *)REG_EMAC1_TM_NSEC)                /* EMAC1 Time Stamp Nano Seconds Register */
+#define pREG_EMAC1_TM_SECUPDT            ((volatile uint32_t *)REG_EMAC1_TM_SECUPDT)             /* EMAC1 Time Stamp Seconds Update Register */
+#define pREG_EMAC1_TM_NSECUPDT           ((volatile uint32_t *)REG_EMAC1_TM_NSECUPDT)            /* EMAC1 Time Stamp Nano Seconds Update Register */
+#define pREG_EMAC1_TM_ADDEND             ((volatile uint32_t *)REG_EMAC1_TM_ADDEND)              /* EMAC1 Time Stamp Addend Register */
+#define pREG_EMAC1_TM_TGTM               ((volatile uint32_t *)REG_EMAC1_TM_TGTM)                /* EMAC1 Time Stamp Target Time Seconds Register */
+#define pREG_EMAC1_TM_NTGTM              ((volatile uint32_t *)REG_EMAC1_TM_NTGTM)               /* EMAC1 Time Stamp Target Time Nano Seconds Register */
+#define pREG_EMAC1_TM_HISEC              ((volatile uint32_t *)REG_EMAC1_TM_HISEC)               /* EMAC1 Time Stamp High Second Register */
+#define pREG_EMAC1_TM_STMPSTAT           ((volatile uint32_t *)REG_EMAC1_TM_STMPSTAT)            /* EMAC1 Time Stamp Status Register */
+#define pREG_EMAC1_TM_PPSCTL             ((volatile uint32_t *)REG_EMAC1_TM_PPSCTL)              /* EMAC1 PPS Control Register */
+#define pREG_EMAC1_TM_AUXSTMP_NSEC       ((volatile uint32_t *)REG_EMAC1_TM_AUXSTMP_NSEC)        /* EMAC1 Time Stamp Auxilary TS Nano Seconds Register */
+#define pREG_EMAC1_TM_AUXSTMP_SEC        ((volatile uint32_t *)REG_EMAC1_TM_AUXSTMP_SEC)         /* EMAC1 Time Stamp Auxilary TM Seconds Register */
+#define pREG_EMAC1_TM_PPSINTVL           ((volatile uint32_t *)REG_EMAC1_TM_PPSINTVL)            /* EMAC1 Time Stamp PPS Interval Register */
+#define pREG_EMAC1_TM_PPSWIDTH           ((volatile uint32_t *)REG_EMAC1_TM_PPSWIDTH)            /* EMAC1 PPS Width Register */
+#define pREG_EMAC1_DMA_BUSMODE           ((volatile uint32_t *)REG_EMAC1_DMA_BUSMODE)            /* EMAC1 DMA Bus Mode Register */
+#define pREG_EMAC1_DMA_TXPOLL            ((volatile uint32_t *)REG_EMAC1_DMA_TXPOLL)             /* EMAC1 DMA Tx Poll Demand Register */
+#define pREG_EMAC1_DMA_RXPOLL            ((volatile uint32_t *)REG_EMAC1_DMA_RXPOLL)             /* EMAC1 DMA Rx Poll Demand register */
+#define pREG_EMAC1_DMA_RXDSC_ADDR        ((void * volatile *)REG_EMAC1_DMA_RXDSC_ADDR)           /* EMAC1 DMA Rx Descriptor List Address Register */
+#define pREG_EMAC1_DMA_TXDSC_ADDR        ((void * volatile *)REG_EMAC1_DMA_TXDSC_ADDR)           /* EMAC1 DMA Tx Descriptor List Address Register */
 #define pREG_EMAC1_DMA_STAT              ((volatile uint32_t *)REG_EMAC1_DMA_STAT)               /* EMAC1 DMA Status Register */
 #define pREG_EMAC1_DMA_OPMODE            ((volatile uint32_t *)REG_EMAC1_DMA_OPMODE)             /* EMAC1 DMA Operation Mode Register */
 #define pREG_EMAC1_DMA_IEN               ((volatile uint32_t *)REG_EMAC1_DMA_IEN)                /* EMAC1 DMA Interrupt Enable Register */
-#define pREG_EMAC1_DMA_MISS_FRM          ((volatile uint32_t *)REG_EMAC1_DMA_MISS_FRM)           /* EMAC1 DMA missed frame and buffer overflow counter */
-#define pREG_EMAC1_DMA_RXIWDOG           ((volatile uint32_t *)REG_EMAC1_DMA_RXIWDOG)            /* EMAC1 DMA RX Interrupt Watch Dog timer */
-#define pREG_EMAC1_DMA_BMMODE            ((volatile uint32_t *)REG_EMAC1_DMA_BMMODE)             /* EMAC1 AXI Bus Mode Register */
-#define pREG_EMAC1_DMA_BMSTAT            ((volatile uint32_t *)REG_EMAC1_DMA_BMSTAT)             /* EMAC1 AXI Status Register */
-#define pREG_EMAC1_DMA_TXDSC_CUR         ((void * volatile *)REG_EMAC1_DMA_TXDSC_CUR)            /* EMAC1 TX current descriptor register */
-#define pREG_EMAC1_DMA_RXDSC_CUR         ((void * volatile *)REG_EMAC1_DMA_RXDSC_CUR)            /* EMAC1 RX current descriptor register */
-#define pREG_EMAC1_DMA_TXBUF_CUR         ((void * volatile *)REG_EMAC1_DMA_TXBUF_CUR)            /* EMAC1 TX current buffer pointer register */
-#define pREG_EMAC1_DMA_RXBUF_CUR         ((void * volatile *)REG_EMAC1_DMA_RXBUF_CUR)            /* EMAC1 RX current buffer pointer register */
-#define pREG_EMAC1_HWFEAT                ((volatile uint32_t *)REG_EMAC1_HWFEAT)                 /* EMAC1 Hardware Feature Register */
+#define pREG_EMAC1_DMA_MISS_FRM          ((volatile uint32_t *)REG_EMAC1_DMA_MISS_FRM)           /* EMAC1 DMA Missed Frame Register */
+#define pREG_EMAC1_DMA_RXIWDOG           ((volatile uint32_t *)REG_EMAC1_DMA_RXIWDOG)            /* EMAC1 DMA Rx Interrupt Watch Dog Register */
+#define pREG_EMAC1_DMA_BMMODE            ((volatile uint32_t *)REG_EMAC1_DMA_BMMODE)             /* EMAC1 DMA SCB Bus Mode Register */
+#define pREG_EMAC1_DMA_BMSTAT            ((volatile uint32_t *)REG_EMAC1_DMA_BMSTAT)             /* EMAC1 DMA SCB Status Register */
+#define pREG_EMAC1_DMA_TXDSC_CUR         ((void * volatile *)REG_EMAC1_DMA_TXDSC_CUR)            /* EMAC1 DMA Tx Descriptor Current Register */
+#define pREG_EMAC1_DMA_RXDSC_CUR         ((void * volatile *)REG_EMAC1_DMA_RXDSC_CUR)            /* EMAC1 DMA Rx Descriptor Current Register */
+#define pREG_EMAC1_DMA_TXBUF_CUR         ((void * volatile *)REG_EMAC1_DMA_TXBUF_CUR)            /* EMAC1 DMA Tx Buffer Current Register */
+#define pREG_EMAC1_DMA_RXBUF_CUR         ((void * volatile *)REG_EMAC1_DMA_RXBUF_CUR)            /* EMAC1 DMA Rx Buffer Current Register */
 
 
 /* =========================================================================
@@ -2063,16 +2056,16 @@
 #define pREG_SPI0_CLK                    ((volatile uint32_t *)REG_SPI0_CLK)                     /* SPI0 Clock Rate Register */
 #define pREG_SPI0_DLY                    ((volatile uint32_t *)REG_SPI0_DLY)                     /* SPI0 Delay Register */
 #define pREG_SPI0_SLVSEL                 ((volatile uint32_t *)REG_SPI0_SLVSEL)                  /* SPI0 Slave Select Register */
-#define pREG_SPI0_RWC                    ((volatile uint32_t *)REG_SPI0_RWC)                     /* SPI0 Receive Word Count Register */
-#define pREG_SPI0_RWCR                   ((volatile uint32_t *)REG_SPI0_RWCR)                    /* SPI0 Receive Word Count Reload Register */
-#define pREG_SPI0_TWC                    ((volatile uint32_t *)REG_SPI0_TWC)                     /* SPI0 Transmit Word Count Register */
-#define pREG_SPI0_TWCR                   ((volatile uint32_t *)REG_SPI0_TWCR)                    /* SPI0 Transmit Word Count Reload Register */
+#define pREG_SPI0_RWC                    ((volatile uint32_t *)REG_SPI0_RWC)                     /* SPI0 Received Word Count Register */
+#define pREG_SPI0_RWCR                   ((volatile uint32_t *)REG_SPI0_RWCR)                    /* SPI0 Received Word Count Reload Register */
+#define pREG_SPI0_TWC                    ((volatile uint32_t *)REG_SPI0_TWC)                     /* SPI0 Transmitted Word Count Register */
+#define pREG_SPI0_TWCR                   ((volatile uint32_t *)REG_SPI0_TWCR)                    /* SPI0 Transmitted Word Count Reload Register */
 #define pREG_SPI0_IMSK                   ((volatile uint32_t *)REG_SPI0_IMSK)                    /* SPI0 Interrupt Mask Register */
 #define pREG_SPI0_IMSK_CLR               ((volatile uint32_t *)REG_SPI0_IMSK_CLR)                /* SPI0 Interrupt Mask Clear Register */
 #define pREG_SPI0_IMSK_SET               ((volatile uint32_t *)REG_SPI0_IMSK_SET)                /* SPI0 Interrupt Mask Set Register */
 #define pREG_SPI0_STAT                   ((volatile uint32_t *)REG_SPI0_STAT)                    /* SPI0 Status Register */
-#define pREG_SPI0_ILAT                   ((volatile uint32_t *)REG_SPI0_ILAT)                    /* SPI0 Interrupt Latch Register */
-#define pREG_SPI0_ILAT_CLR               ((volatile uint32_t *)REG_SPI0_ILAT_CLR)                /* SPI0 Interrupt Latch Clear Register */
+#define pREG_SPI0_ILAT                   ((volatile uint32_t *)REG_SPI0_ILAT)                    /* SPI0 Masked Interrupt Condition Register */
+#define pREG_SPI0_ILAT_CLR               ((volatile uint32_t *)REG_SPI0_ILAT_CLR)                /* SPI0 Masked Interrupt Clear Register */
 #define pREG_SPI0_RFIFO                  ((volatile uint32_t *)REG_SPI0_RFIFO)                   /* SPI0 Receive FIFO Data Register */
 #define pREG_SPI0_TFIFO                  ((volatile uint32_t *)REG_SPI0_TFIFO)                   /* SPI0 Transmit FIFO Data Register */
 
@@ -2085,16 +2078,16 @@
 #define pREG_SPI1_CLK                    ((volatile uint32_t *)REG_SPI1_CLK)                     /* SPI1 Clock Rate Register */
 #define pREG_SPI1_DLY                    ((volatile uint32_t *)REG_SPI1_DLY)                     /* SPI1 Delay Register */
 #define pREG_SPI1_SLVSEL                 ((volatile uint32_t *)REG_SPI1_SLVSEL)                  /* SPI1 Slave Select Register */
-#define pREG_SPI1_RWC                    ((volatile uint32_t *)REG_SPI1_RWC)                     /* SPI1 Receive Word Count Register */
-#define pREG_SPI1_RWCR                   ((volatile uint32_t *)REG_SPI1_RWCR)                    /* SPI1 Receive Word Count Reload Register */
-#define pREG_SPI1_TWC                    ((volatile uint32_t *)REG_SPI1_TWC)                     /* SPI1 Transmit Word Count Register */
-#define pREG_SPI1_TWCR                   ((volatile uint32_t *)REG_SPI1_TWCR)                    /* SPI1 Transmit Word Count Reload Register */
+#define pREG_SPI1_RWC                    ((volatile uint32_t *)REG_SPI1_RWC)                     /* SPI1 Received Word Count Register */
+#define pREG_SPI1_RWCR                   ((volatile uint32_t *)REG_SPI1_RWCR)                    /* SPI1 Received Word Count Reload Register */
+#define pREG_SPI1_TWC                    ((volatile uint32_t *)REG_SPI1_TWC)                     /* SPI1 Transmitted Word Count Register */
+#define pREG_SPI1_TWCR                   ((volatile uint32_t *)REG_SPI1_TWCR)                    /* SPI1 Transmitted Word Count Reload Register */
 #define pREG_SPI1_IMSK                   ((volatile uint32_t *)REG_SPI1_IMSK)                    /* SPI1 Interrupt Mask Register */
 #define pREG_SPI1_IMSK_CLR               ((volatile uint32_t *)REG_SPI1_IMSK_CLR)                /* SPI1 Interrupt Mask Clear Register */
 #define pREG_SPI1_IMSK_SET               ((volatile uint32_t *)REG_SPI1_IMSK_SET)                /* SPI1 Interrupt Mask Set Register */
 #define pREG_SPI1_STAT                   ((volatile uint32_t *)REG_SPI1_STAT)                    /* SPI1 Status Register */
-#define pREG_SPI1_ILAT                   ((volatile uint32_t *)REG_SPI1_ILAT)                    /* SPI1 Interrupt Latch Register */
-#define pREG_SPI1_ILAT_CLR               ((volatile uint32_t *)REG_SPI1_ILAT_CLR)                /* SPI1 Interrupt Latch Clear Register */
+#define pREG_SPI1_ILAT                   ((volatile uint32_t *)REG_SPI1_ILAT)                    /* SPI1 Masked Interrupt Condition Register */
+#define pREG_SPI1_ILAT_CLR               ((volatile uint32_t *)REG_SPI1_ILAT_CLR)                /* SPI1 Masked Interrupt Clear Register */
 #define pREG_SPI1_RFIFO                  ((volatile uint32_t *)REG_SPI1_RFIFO)                   /* SPI1 Receive FIFO Data Register */
 #define pREG_SPI1_TFIFO                  ((volatile uint32_t *)REG_SPI1_TFIFO)                   /* SPI1 Transmit FIFO Data Register */
 
@@ -3917,332 +3910,341 @@
 /* =========================================================================
        USB0
    ========================================================================= */
-#define pREG_USB0_FADDR                  ((volatile  uint8_t *)REG_USB0_FADDR)                   /* USB0 Device Address in Peripheral Mode */
-#define pREG_USB0_POWER                  ((volatile  uint8_t *)REG_USB0_POWER)                   /* USB0 Power and Device Control */
-#define pREG_USB0_INTRTX                 ((volatile uint16_t *)REG_USB0_INTRTX)                  /* USB0 Transmit Interrupt */
-#define pREG_USB0_INTRRX                 ((volatile uint16_t *)REG_USB0_INTRRX)                  /* USB0 Receive Interrupts */
-#define pREG_USB0_INTRTXE                ((volatile uint16_t *)REG_USB0_INTRTXE)                 /* USB0 Transmit Interrupt Enable */
-#define pREG_USB0_INTRRXE                ((volatile uint16_t *)REG_USB0_INTRRXE)                 /* USB0 Receive Interrupt Enable */
-#define pREG_USB0_IRQ                    ((volatile  uint8_t *)REG_USB0_IRQ)                     /* USB0 USB Interrupts */
-#define pREG_USB0_IEN                    ((volatile  uint8_t *)REG_USB0_IEN)                     /* USB0 USB Interrupt Enable */
-#define pREG_USB0_FRAME                  ((volatile uint16_t *)REG_USB0_FRAME)                   /* USB0 Frame Number */
-#define pREG_USB0_INDEX                  ((volatile  uint8_t *)REG_USB0_INDEX)                   /* USB0 Index */
-#define pREG_USB0_TESTMODE               ((volatile  uint8_t *)REG_USB0_TESTMODE)                /* USB0 Testmodes */
-#define pREG_USB0_EPI_TXMAXP0            ((volatile uint16_t *)REG_USB0_EPI_TXMAXP0)             /* USB0 Transmit Maximum Packet Length */
-#define pREG_USB0_EPI_TXCSR0_P           ((volatile uint16_t *)REG_USB0_EPI_TXCSR0_P)            /* USB0 Transmit Configuration and Status */
-#define pREG_USB0_EPI_TXCSR0_H           ((volatile uint16_t *)REG_USB0_EPI_TXCSR0_H)            /* USB0 Transmit Configuration and Status */
-#define pREG_USB0_EP0I_CSR0_P            ((volatile uint16_t *)REG_USB0_EP0I_CSR0_P)             /* USB0 Config and Status EP0 */
-#define pREG_USB0_EP0I_CSR0_H            ((volatile uint16_t *)REG_USB0_EP0I_CSR0_H)             /* USB0 Config and Status EP0 */
-#define pREG_USB0_EPI_RXMAXP0            ((volatile uint16_t *)REG_USB0_EPI_RXMAXP0)             /* USB0 Receive Maximum Packet Length */
-#define pREG_USB0_EPI_RXCSR0_H           ((volatile uint16_t *)REG_USB0_EPI_RXCSR0_H)            /* USB0 Receive Configuration and Status Register */
-#define pREG_USB0_EPI_RXCSR0_P           ((volatile uint16_t *)REG_USB0_EPI_RXCSR0_P)            /* USB0 Receive Configuration and Status Register */
-#define pREG_USB0_EP0I_CNT0              ((volatile uint16_t *)REG_USB0_EP0I_CNT0)               /* USB0 Number of Received Bytes for Endpoint 0 */
-#define pREG_USB0_EPI_RXCNT0             ((volatile uint16_t *)REG_USB0_EPI_RXCNT0)              /* USB0 Number of Byte Received */
-#define pREG_USB0_EPI_TXTYPE0            ((volatile  uint8_t *)REG_USB0_EPI_TXTYPE0)             /* USB0 Transmit Type */
-#define pREG_USB0_EP0I_TYPE0             ((volatile  uint8_t *)REG_USB0_EP0I_TYPE0)              /* USB0 Speed for Endpoint 0 */
-#define pREG_USB0_EPI_TXINTERVAL0        ((volatile  uint8_t *)REG_USB0_EPI_TXINTERVAL0)         /* USB0 Transmit Polling Interval */
-#define pREG_USB0_EP0I_NAKLIMIT0         ((volatile  uint8_t *)REG_USB0_EP0I_NAKLIMIT0)          /* USB0 NAK Response Timeout for Endpoint 0 */
-#define pREG_USB0_EPI_RXTYPE0            ((volatile  uint8_t *)REG_USB0_EPI_RXTYPE0)             /* USB0 Receive Type */
-#define pREG_USB0_EPI_RXINTERVAL0        ((volatile  uint8_t *)REG_USB0_EPI_RXINTERVAL0)         /* USB0 Receive Polling Interval */
-#define pREG_USB0_EP0I_CFGDATA0          ((volatile  uint8_t *)REG_USB0_EP0I_CFGDATA0)           /* USB0 Configuration Information */
-#define pREG_USB0_FIFOB0                 ((volatile  uint8_t *)REG_USB0_FIFOB0)                  /* USB0 FIFO Data */
-#define pREG_USB0_FIFOB1                 ((volatile  uint8_t *)REG_USB0_FIFOB1)                  /* USB0 FIFO Data */
-#define pREG_USB0_FIFOB2                 ((volatile  uint8_t *)REG_USB0_FIFOB2)                  /* USB0 FIFO Data */
-#define pREG_USB0_FIFOB3                 ((volatile  uint8_t *)REG_USB0_FIFOB3)                  /* USB0 FIFO Data */
-#define pREG_USB0_FIFOB4                 ((volatile  uint8_t *)REG_USB0_FIFOB4)                  /* USB0 FIFO Data */
-#define pREG_USB0_FIFOB5                 ((volatile  uint8_t *)REG_USB0_FIFOB5)                  /* USB0 FIFO Data */
-#define pREG_USB0_FIFOB6                 ((volatile  uint8_t *)REG_USB0_FIFOB6)                  /* USB0 FIFO Data */
-#define pREG_USB0_FIFOB7                 ((volatile  uint8_t *)REG_USB0_FIFOB7)                  /* USB0 FIFO Data */
-#define pREG_USB0_FIFOB8                 ((volatile  uint8_t *)REG_USB0_FIFOB8)                  /* USB0 FIFO Data */
-#define pREG_USB0_FIFOB9                 ((volatile  uint8_t *)REG_USB0_FIFOB9)                  /* USB0 FIFO Data */
-#define pREG_USB0_FIFOB10                ((volatile  uint8_t *)REG_USB0_FIFOB10)                 /* USB0 FIFO Data */
-#define pREG_USB0_FIFOB11                ((volatile  uint8_t *)REG_USB0_FIFOB11)                 /* USB0 FIFO Data */
-#define pREG_USB0_FIFOH0                 ((volatile uint16_t *)REG_USB0_FIFOH0)                  /* USB0 FIFO Data */
-#define pREG_USB0_FIFOH1                 ((volatile uint16_t *)REG_USB0_FIFOH1)                  /* USB0 FIFO Data */
-#define pREG_USB0_FIFOH2                 ((volatile uint16_t *)REG_USB0_FIFOH2)                  /* USB0 FIFO Data */
-#define pREG_USB0_FIFOH3                 ((volatile uint16_t *)REG_USB0_FIFOH3)                  /* USB0 FIFO Data */
-#define pREG_USB0_FIFOH4                 ((volatile uint16_t *)REG_USB0_FIFOH4)                  /* USB0 FIFO Data */
-#define pREG_USB0_FIFOH5                 ((volatile uint16_t *)REG_USB0_FIFOH5)                  /* USB0 FIFO Data */
-#define pREG_USB0_FIFOH6                 ((volatile uint16_t *)REG_USB0_FIFOH6)                  /* USB0 FIFO Data */
-#define pREG_USB0_FIFOH7                 ((volatile uint16_t *)REG_USB0_FIFOH7)                  /* USB0 FIFO Data */
-#define pREG_USB0_FIFOH8                 ((volatile uint16_t *)REG_USB0_FIFOH8)                  /* USB0 FIFO Data */
-#define pREG_USB0_FIFOH9                 ((volatile uint16_t *)REG_USB0_FIFOH9)                  /* USB0 FIFO Data */
-#define pREG_USB0_FIFOH10                ((volatile uint16_t *)REG_USB0_FIFOH10)                 /* USB0 FIFO Data */
-#define pREG_USB0_FIFOH11                ((volatile uint16_t *)REG_USB0_FIFOH11)                 /* USB0 FIFO Data */
-#define pREG_USB0_FIFO0                  ((volatile uint32_t *)REG_USB0_FIFO0)                   /* USB0 FIFO Data */
-#define pREG_USB0_FIFO1                  ((volatile uint32_t *)REG_USB0_FIFO1)                   /* USB0 FIFO Data */
-#define pREG_USB0_FIFO2                  ((volatile uint32_t *)REG_USB0_FIFO2)                   /* USB0 FIFO Data */
-#define pREG_USB0_FIFO3                  ((volatile uint32_t *)REG_USB0_FIFO3)                   /* USB0 FIFO Data */
-#define pREG_USB0_FIFO4                  ((volatile uint32_t *)REG_USB0_FIFO4)                   /* USB0 FIFO Data */
-#define pREG_USB0_FIFO5                  ((volatile uint32_t *)REG_USB0_FIFO5)                   /* USB0 FIFO Data */
-#define pREG_USB0_FIFO6                  ((volatile uint32_t *)REG_USB0_FIFO6)                   /* USB0 FIFO Data */
-#define pREG_USB0_FIFO7                  ((volatile uint32_t *)REG_USB0_FIFO7)                   /* USB0 FIFO Data */
-#define pREG_USB0_FIFO8                  ((volatile uint32_t *)REG_USB0_FIFO8)                   /* USB0 FIFO Data */
-#define pREG_USB0_FIFO9                  ((volatile uint32_t *)REG_USB0_FIFO9)                   /* USB0 FIFO Data */
-#define pREG_USB0_FIFO10                 ((volatile uint32_t *)REG_USB0_FIFO10)                  /* USB0 FIFO Data */
-#define pREG_USB0_FIFO11                 ((volatile uint32_t *)REG_USB0_FIFO11)                  /* USB0 FIFO Data */
-#define pREG_USB0_DEV_CTL                ((volatile  uint8_t *)REG_USB0_DEV_CTL)                 /* USB0 Device Control */
-#define pREG_USB0_TXFIFOSZ               ((volatile  uint8_t *)REG_USB0_TXFIFOSZ)                /* USB0 Transmit FIFO Size */
-#define pREG_USB0_RXFIFOSZ               ((volatile  uint8_t *)REG_USB0_RXFIFOSZ)                /* USB0 Receive FIFO Size */
-#define pREG_USB0_TXFIFOADDR             ((volatile uint16_t *)REG_USB0_TXFIFOADDR)              /* USB0 Transmit FIFO Address */
-#define pREG_USB0_RXFIFOADDR             ((volatile uint16_t *)REG_USB0_RXFIFOADDR)              /* USB0 Receive FIFO Address */
-#define pREG_USB0_VENDSTAT               ((volatile uint32_t *)REG_USB0_VENDSTAT)                /* USB0 Vendor Status */
-#define pREG_USB0_HWVERS                 ((volatile uint16_t *)REG_USB0_HWVERS)                  /* USB0 Hardware Version */
-#define pREG_USB0_EPINFO                 ((volatile  uint8_t *)REG_USB0_EPINFO)                  /* USB0 Endpoint Info */
-#define pREG_USB0_RAMINFO                ((volatile  uint8_t *)REG_USB0_RAMINFO)                 /* USB0 Ram Information */
-#define pREG_USB0_LINKINFO               ((volatile  uint8_t *)REG_USB0_LINKINFO)                /* USB0 Programmable Delay Values */
-#define pREG_USB0_VPLEN                  ((volatile  uint8_t *)REG_USB0_VPLEN)                   /* USB0 VBus Pulse Duration */
-#define pREG_USB0_HS_EOF1                ((volatile  uint8_t *)REG_USB0_HS_EOF1)                 /* USB0 High Speed End of Frame Remaining */
-#define pREG_USB0_FS_EOF1                ((volatile  uint8_t *)REG_USB0_FS_EOF1)                 /* USB0 Full Speed End of Frame Remaining */
-#define pREG_USB0_LS_EOF1                ((volatile  uint8_t *)REG_USB0_LS_EOF1)                 /* USB0 Low Speed End of Frame Remaining */
-#define pREG_USB0_SOFT_RST               ((volatile  uint8_t *)REG_USB0_SOFT_RST)                /* USB0 Software Reset */
-#define pREG_USB0_TXFUNCADDR0            ((volatile  uint8_t *)REG_USB0_TXFUNCADDR0)             /* USB0 Transmit Function Address */
-#define pREG_USB0_TXFUNCADDR1            ((volatile  uint8_t *)REG_USB0_TXFUNCADDR1)             /* USB0 Transmit Function Address */
-#define pREG_USB0_TXFUNCADDR2            ((volatile  uint8_t *)REG_USB0_TXFUNCADDR2)             /* USB0 Transmit Function Address */
-#define pREG_USB0_TXFUNCADDR3            ((volatile  uint8_t *)REG_USB0_TXFUNCADDR3)             /* USB0 Transmit Function Address */
-#define pREG_USB0_TXFUNCADDR4            ((volatile  uint8_t *)REG_USB0_TXFUNCADDR4)             /* USB0 Transmit Function Address */
-#define pREG_USB0_TXFUNCADDR5            ((volatile  uint8_t *)REG_USB0_TXFUNCADDR5)             /* USB0 Transmit Function Address */
-#define pREG_USB0_TXFUNCADDR6            ((volatile  uint8_t *)REG_USB0_TXFUNCADDR6)             /* USB0 Transmit Function Address */
-#define pREG_USB0_TXFUNCADDR7            ((volatile  uint8_t *)REG_USB0_TXFUNCADDR7)             /* USB0 Transmit Function Address */
-#define pREG_USB0_TXFUNCADDR8            ((volatile  uint8_t *)REG_USB0_TXFUNCADDR8)             /* USB0 Transmit Function Address */
-#define pREG_USB0_TXFUNCADDR9            ((volatile  uint8_t *)REG_USB0_TXFUNCADDR9)             /* USB0 Transmit Function Address */
-#define pREG_USB0_TXFUNCADDR10           ((volatile  uint8_t *)REG_USB0_TXFUNCADDR10)            /* USB0 Transmit Function Address */
-#define pREG_USB0_TXFUNCADDR11           ((volatile  uint8_t *)REG_USB0_TXFUNCADDR11)            /* USB0 Transmit Function Address */
-#define pREG_USB0_TXHUBADDR0             ((volatile  uint8_t *)REG_USB0_TXHUBADDR0)              /* USB0 Transmit Hub Address */
-#define pREG_USB0_TXHUBADDR1             ((volatile  uint8_t *)REG_USB0_TXHUBADDR1)              /* USB0 Transmit Hub Address */
-#define pREG_USB0_TXHUBADDR2             ((volatile  uint8_t *)REG_USB0_TXHUBADDR2)              /* USB0 Transmit Hub Address */
-#define pREG_USB0_TXHUBADDR3             ((volatile  uint8_t *)REG_USB0_TXHUBADDR3)              /* USB0 Transmit Hub Address */
-#define pREG_USB0_TXHUBADDR4             ((volatile  uint8_t *)REG_USB0_TXHUBADDR4)              /* USB0 Transmit Hub Address */
-#define pREG_USB0_TXHUBADDR5             ((volatile  uint8_t *)REG_USB0_TXHUBADDR5)              /* USB0 Transmit Hub Address */
-#define pREG_USB0_TXHUBADDR6             ((volatile  uint8_t *)REG_USB0_TXHUBADDR6)              /* USB0 Transmit Hub Address */
-#define pREG_USB0_TXHUBADDR7             ((volatile  uint8_t *)REG_USB0_TXHUBADDR7)              /* USB0 Transmit Hub Address */
-#define pREG_USB0_TXHUBADDR8             ((volatile  uint8_t *)REG_USB0_TXHUBADDR8)              /* USB0 Transmit Hub Address */
-#define pREG_USB0_TXHUBADDR9             ((volatile  uint8_t *)REG_USB0_TXHUBADDR9)              /* USB0 Transmit Hub Address */
-#define pREG_USB0_TXHUBADDR10            ((volatile  uint8_t *)REG_USB0_TXHUBADDR10)             /* USB0 Transmit Hub Address */
-#define pREG_USB0_TXHUBADDR11            ((volatile  uint8_t *)REG_USB0_TXHUBADDR11)             /* USB0 Transmit Hub Address */
-#define pREG_USB0_TXHUBPORT0             ((volatile  uint8_t *)REG_USB0_TXHUBPORT0)              /* USB0 Transmit Hub Port */
-#define pREG_USB0_TXHUBPORT1             ((volatile  uint8_t *)REG_USB0_TXHUBPORT1)              /* USB0 Transmit Hub Port */
-#define pREG_USB0_TXHUBPORT2             ((volatile  uint8_t *)REG_USB0_TXHUBPORT2)              /* USB0 Transmit Hub Port */
-#define pREG_USB0_TXHUBPORT3             ((volatile  uint8_t *)REG_USB0_TXHUBPORT3)              /* USB0 Transmit Hub Port */
-#define pREG_USB0_TXHUBPORT4             ((volatile  uint8_t *)REG_USB0_TXHUBPORT4)              /* USB0 Transmit Hub Port */
-#define pREG_USB0_TXHUBPORT5             ((volatile  uint8_t *)REG_USB0_TXHUBPORT5)              /* USB0 Transmit Hub Port */
-#define pREG_USB0_TXHUBPORT6             ((volatile  uint8_t *)REG_USB0_TXHUBPORT6)              /* USB0 Transmit Hub Port */
-#define pREG_USB0_TXHUBPORT7             ((volatile  uint8_t *)REG_USB0_TXHUBPORT7)              /* USB0 Transmit Hub Port */
-#define pREG_USB0_TXHUBPORT8             ((volatile  uint8_t *)REG_USB0_TXHUBPORT8)              /* USB0 Transmit Hub Port */
-#define pREG_USB0_TXHUBPORT9             ((volatile  uint8_t *)REG_USB0_TXHUBPORT9)              /* USB0 Transmit Hub Port */
-#define pREG_USB0_TXHUBPORT10            ((volatile  uint8_t *)REG_USB0_TXHUBPORT10)             /* USB0 Transmit Hub Port */
-#define pREG_USB0_TXHUBPORT11            ((volatile  uint8_t *)REG_USB0_TXHUBPORT11)             /* USB0 Transmit Hub Port */
-#define pREG_USB0_RXFUNCADDR0            ((volatile  uint8_t *)REG_USB0_RXFUNCADDR0)             /* USB0 Receive Function Address */
-#define pREG_USB0_RXFUNCADDR1            ((volatile  uint8_t *)REG_USB0_RXFUNCADDR1)             /* USB0 Receive Function Address */
-#define pREG_USB0_RXFUNCADDR2            ((volatile  uint8_t *)REG_USB0_RXFUNCADDR2)             /* USB0 Receive Function Address */
-#define pREG_USB0_RXFUNCADDR3            ((volatile  uint8_t *)REG_USB0_RXFUNCADDR3)             /* USB0 Receive Function Address */
-#define pREG_USB0_RXFUNCADDR4            ((volatile  uint8_t *)REG_USB0_RXFUNCADDR4)             /* USB0 Receive Function Address */
-#define pREG_USB0_RXFUNCADDR5            ((volatile  uint8_t *)REG_USB0_RXFUNCADDR5)             /* USB0 Receive Function Address */
-#define pREG_USB0_RXFUNCADDR6            ((volatile  uint8_t *)REG_USB0_RXFUNCADDR6)             /* USB0 Receive Function Address */
-#define pREG_USB0_RXFUNCADDR7            ((volatile  uint8_t *)REG_USB0_RXFUNCADDR7)             /* USB0 Receive Function Address */
-#define pREG_USB0_RXFUNCADDR8            ((volatile  uint8_t *)REG_USB0_RXFUNCADDR8)             /* USB0 Receive Function Address */
-#define pREG_USB0_RXFUNCADDR9            ((volatile  uint8_t *)REG_USB0_RXFUNCADDR9)             /* USB0 Receive Function Address */
-#define pREG_USB0_RXFUNCADDR10           ((volatile  uint8_t *)REG_USB0_RXFUNCADDR10)            /* USB0 Receive Function Address */
-#define pREG_USB0_RXFUNCADDR11           ((volatile  uint8_t *)REG_USB0_RXFUNCADDR11)            /* USB0 Receive Function Address */
-#define pREG_USB0_RXHUBADDR0             ((volatile  uint8_t *)REG_USB0_RXHUBADDR0)              /* USB0 Receive Hub Address */
-#define pREG_USB0_RXHUBADDR1             ((volatile  uint8_t *)REG_USB0_RXHUBADDR1)              /* USB0 Receive Hub Address */
-#define pREG_USB0_RXHUBADDR2             ((volatile  uint8_t *)REG_USB0_RXHUBADDR2)              /* USB0 Receive Hub Address */
-#define pREG_USB0_RXHUBADDR3             ((volatile  uint8_t *)REG_USB0_RXHUBADDR3)              /* USB0 Receive Hub Address */
-#define pREG_USB0_RXHUBADDR4             ((volatile  uint8_t *)REG_USB0_RXHUBADDR4)              /* USB0 Receive Hub Address */
-#define pREG_USB0_RXHUBADDR5             ((volatile  uint8_t *)REG_USB0_RXHUBADDR5)              /* USB0 Receive Hub Address */
-#define pREG_USB0_RXHUBADDR6             ((volatile  uint8_t *)REG_USB0_RXHUBADDR6)              /* USB0 Receive Hub Address */
-#define pREG_USB0_RXHUBADDR7             ((volatile  uint8_t *)REG_USB0_RXHUBADDR7)              /* USB0 Receive Hub Address */
-#define pREG_USB0_RXHUBADDR8             ((volatile  uint8_t *)REG_USB0_RXHUBADDR8)              /* USB0 Receive Hub Address */
-#define pREG_USB0_RXHUBADDR9             ((volatile  uint8_t *)REG_USB0_RXHUBADDR9)              /* USB0 Receive Hub Address */
-#define pREG_USB0_RXHUBADDR10            ((volatile  uint8_t *)REG_USB0_RXHUBADDR10)             /* USB0 Receive Hub Address */
-#define pREG_USB0_RXHUBADDR11            ((volatile  uint8_t *)REG_USB0_RXHUBADDR11)             /* USB0 Receive Hub Address */
-#define pREG_USB0_RXHUBPORT0             ((volatile  uint8_t *)REG_USB0_RXHUBPORT0)              /* USB0 Receive Hub Port */
-#define pREG_USB0_RXHUBPORT1             ((volatile  uint8_t *)REG_USB0_RXHUBPORT1)              /* USB0 Receive Hub Port */
-#define pREG_USB0_RXHUBPORT2             ((volatile  uint8_t *)REG_USB0_RXHUBPORT2)              /* USB0 Receive Hub Port */
-#define pREG_USB0_RXHUBPORT3             ((volatile  uint8_t *)REG_USB0_RXHUBPORT3)              /* USB0 Receive Hub Port */
-#define pREG_USB0_RXHUBPORT4             ((volatile  uint8_t *)REG_USB0_RXHUBPORT4)              /* USB0 Receive Hub Port */
-#define pREG_USB0_RXHUBPORT5             ((volatile  uint8_t *)REG_USB0_RXHUBPORT5)              /* USB0 Receive Hub Port */
-#define pREG_USB0_RXHUBPORT6             ((volatile  uint8_t *)REG_USB0_RXHUBPORT6)              /* USB0 Receive Hub Port */
-#define pREG_USB0_RXHUBPORT7             ((volatile  uint8_t *)REG_USB0_RXHUBPORT7)              /* USB0 Receive Hub Port */
-#define pREG_USB0_RXHUBPORT8             ((volatile  uint8_t *)REG_USB0_RXHUBPORT8)              /* USB0 Receive Hub Port */
-#define pREG_USB0_RXHUBPORT9             ((volatile  uint8_t *)REG_USB0_RXHUBPORT9)              /* USB0 Receive Hub Port */
-#define pREG_USB0_RXHUBPORT10            ((volatile  uint8_t *)REG_USB0_RXHUBPORT10)             /* USB0 Receive Hub Port */
-#define pREG_USB0_RXHUBPORT11            ((volatile  uint8_t *)REG_USB0_RXHUBPORT11)             /* USB0 Receive Hub Port */
-#define pREG_USB0_EP0_CSR0_H             ((volatile uint16_t *)REG_USB0_EP0_CSR0_H)              /* USB0 Config and Status EP0 */
-#define pREG_USB0_EP0_CSR0_P             ((volatile uint16_t *)REG_USB0_EP0_CSR0_P)              /* USB0 Config and Status EP0 */
-#define pREG_USB0_EP0_CNT0               ((volatile uint16_t *)REG_USB0_EP0_CNT0)                /* USB0 Number of Received Bytes for Endpoint 0 */
-#define pREG_USB0_EP0_TYPE0              ((volatile  uint8_t *)REG_USB0_EP0_TYPE0)               /* USB0 Speed for Endpoint 0 */
-#define pREG_USB0_EP0_NAKLIMIT0          ((volatile  uint8_t *)REG_USB0_EP0_NAKLIMIT0)           /* USB0 NAK Response Timeout for Endpoint 0 */
-#define pREG_USB0_EP0_CFGDATA0           ((volatile  uint8_t *)REG_USB0_EP0_CFGDATA0)            /* USB0 Configuration Information */
-#define pREG_USB0_EP_TXMAXP0             ((volatile uint16_t *)REG_USB0_EP_TXMAXP0)              /* USB0 Transmit Maximum Packet Length */
-#define pREG_USB0_EP_TXMAXP1             ((volatile uint16_t *)REG_USB0_EP_TXMAXP1)              /* USB0 Transmit Maximum Packet Length */
-#define pREG_USB0_EP_TXMAXP2             ((volatile uint16_t *)REG_USB0_EP_TXMAXP2)              /* USB0 Transmit Maximum Packet Length */
-#define pREG_USB0_EP_TXMAXP3             ((volatile uint16_t *)REG_USB0_EP_TXMAXP3)              /* USB0 Transmit Maximum Packet Length */
-#define pREG_USB0_EP_TXMAXP4             ((volatile uint16_t *)REG_USB0_EP_TXMAXP4)              /* USB0 Transmit Maximum Packet Length */
-#define pREG_USB0_EP_TXMAXP5             ((volatile uint16_t *)REG_USB0_EP_TXMAXP5)              /* USB0 Transmit Maximum Packet Length */
-#define pREG_USB0_EP_TXMAXP6             ((volatile uint16_t *)REG_USB0_EP_TXMAXP6)              /* USB0 Transmit Maximum Packet Length */
-#define pREG_USB0_EP_TXMAXP7             ((volatile uint16_t *)REG_USB0_EP_TXMAXP7)              /* USB0 Transmit Maximum Packet Length */
-#define pREG_USB0_EP_TXMAXP8             ((volatile uint16_t *)REG_USB0_EP_TXMAXP8)              /* USB0 Transmit Maximum Packet Length */
-#define pREG_USB0_EP_TXMAXP9             ((volatile uint16_t *)REG_USB0_EP_TXMAXP9)              /* USB0 Transmit Maximum Packet Length */
-#define pREG_USB0_EP_TXMAXP10            ((volatile uint16_t *)REG_USB0_EP_TXMAXP10)             /* USB0 Transmit Maximum Packet Length */
-#define pREG_USB0_EP_TXCSR0_H            ((volatile uint16_t *)REG_USB0_EP_TXCSR0_H)             /* USB0 Transmit Configuration and Status */
-#define pREG_USB0_EP_TXCSR1_H            ((volatile uint16_t *)REG_USB0_EP_TXCSR1_H)             /* USB0 Transmit Configuration and Status */
-#define pREG_USB0_EP_TXCSR2_H            ((volatile uint16_t *)REG_USB0_EP_TXCSR2_H)             /* USB0 Transmit Configuration and Status */
-#define pREG_USB0_EP_TXCSR3_H            ((volatile uint16_t *)REG_USB0_EP_TXCSR3_H)             /* USB0 Transmit Configuration and Status */
-#define pREG_USB0_EP_TXCSR4_H            ((volatile uint16_t *)REG_USB0_EP_TXCSR4_H)             /* USB0 Transmit Configuration and Status */
-#define pREG_USB0_EP_TXCSR5_H            ((volatile uint16_t *)REG_USB0_EP_TXCSR5_H)             /* USB0 Transmit Configuration and Status */
-#define pREG_USB0_EP_TXCSR6_H            ((volatile uint16_t *)REG_USB0_EP_TXCSR6_H)             /* USB0 Transmit Configuration and Status */
-#define pREG_USB0_EP_TXCSR7_H            ((volatile uint16_t *)REG_USB0_EP_TXCSR7_H)             /* USB0 Transmit Configuration and Status */
-#define pREG_USB0_EP_TXCSR8_H            ((volatile uint16_t *)REG_USB0_EP_TXCSR8_H)             /* USB0 Transmit Configuration and Status */
-#define pREG_USB0_EP_TXCSR9_H            ((volatile uint16_t *)REG_USB0_EP_TXCSR9_H)             /* USB0 Transmit Configuration and Status */
-#define pREG_USB0_EP_TXCSR10_H           ((volatile uint16_t *)REG_USB0_EP_TXCSR10_H)            /* USB0 Transmit Configuration and Status */
-#define pREG_USB0_EP_TXCSR0_P            ((volatile uint16_t *)REG_USB0_EP_TXCSR0_P)             /* USB0 Transmit Configuration and Status */
-#define pREG_USB0_EP_TXCSR1_P            ((volatile uint16_t *)REG_USB0_EP_TXCSR1_P)             /* USB0 Transmit Configuration and Status */
-#define pREG_USB0_EP_TXCSR2_P            ((volatile uint16_t *)REG_USB0_EP_TXCSR2_P)             /* USB0 Transmit Configuration and Status */
-#define pREG_USB0_EP_TXCSR3_P            ((volatile uint16_t *)REG_USB0_EP_TXCSR3_P)             /* USB0 Transmit Configuration and Status */
-#define pREG_USB0_EP_TXCSR4_P            ((volatile uint16_t *)REG_USB0_EP_TXCSR4_P)             /* USB0 Transmit Configuration and Status */
-#define pREG_USB0_EP_TXCSR5_P            ((volatile uint16_t *)REG_USB0_EP_TXCSR5_P)             /* USB0 Transmit Configuration and Status */
-#define pREG_USB0_EP_TXCSR6_P            ((volatile uint16_t *)REG_USB0_EP_TXCSR6_P)             /* USB0 Transmit Configuration and Status */
-#define pREG_USB0_EP_TXCSR7_P            ((volatile uint16_t *)REG_USB0_EP_TXCSR7_P)             /* USB0 Transmit Configuration and Status */
-#define pREG_USB0_EP_TXCSR8_P            ((volatile uint16_t *)REG_USB0_EP_TXCSR8_P)             /* USB0 Transmit Configuration and Status */
-#define pREG_USB0_EP_TXCSR9_P            ((volatile uint16_t *)REG_USB0_EP_TXCSR9_P)             /* USB0 Transmit Configuration and Status */
-#define pREG_USB0_EP_TXCSR10_P           ((volatile uint16_t *)REG_USB0_EP_TXCSR10_P)            /* USB0 Transmit Configuration and Status */
-#define pREG_USB0_EP_RXMAXP0             ((volatile uint16_t *)REG_USB0_EP_RXMAXP0)              /* USB0 Receive Maximum Packet Length */
-#define pREG_USB0_EP_RXMAXP1             ((volatile uint16_t *)REG_USB0_EP_RXMAXP1)              /* USB0 Receive Maximum Packet Length */
-#define pREG_USB0_EP_RXMAXP2             ((volatile uint16_t *)REG_USB0_EP_RXMAXP2)              /* USB0 Receive Maximum Packet Length */
-#define pREG_USB0_EP_RXMAXP3             ((volatile uint16_t *)REG_USB0_EP_RXMAXP3)              /* USB0 Receive Maximum Packet Length */
-#define pREG_USB0_EP_RXMAXP4             ((volatile uint16_t *)REG_USB0_EP_RXMAXP4)              /* USB0 Receive Maximum Packet Length */
-#define pREG_USB0_EP_RXMAXP5             ((volatile uint16_t *)REG_USB0_EP_RXMAXP5)              /* USB0 Receive Maximum Packet Length */
-#define pREG_USB0_EP_RXMAXP6             ((volatile uint16_t *)REG_USB0_EP_RXMAXP6)              /* USB0 Receive Maximum Packet Length */
-#define pREG_USB0_EP_RXMAXP7             ((volatile uint16_t *)REG_USB0_EP_RXMAXP7)              /* USB0 Receive Maximum Packet Length */
-#define pREG_USB0_EP_RXMAXP8             ((volatile uint16_t *)REG_USB0_EP_RXMAXP8)              /* USB0 Receive Maximum Packet Length */
-#define pREG_USB0_EP_RXMAXP9             ((volatile uint16_t *)REG_USB0_EP_RXMAXP9)              /* USB0 Receive Maximum Packet Length */
-#define pREG_USB0_EP_RXMAXP10            ((volatile uint16_t *)REG_USB0_EP_RXMAXP10)             /* USB0 Receive Maximum Packet Length */
-#define pREG_USB0_EP_RXCSR0_H            ((volatile uint16_t *)REG_USB0_EP_RXCSR0_H)             /* USB0 Receive Configuration and Status Register */
-#define pREG_USB0_EP_RXCSR1_H            ((volatile uint16_t *)REG_USB0_EP_RXCSR1_H)             /* USB0 Receive Configuration and Status Register */
-#define pREG_USB0_EP_RXCSR2_H            ((volatile uint16_t *)REG_USB0_EP_RXCSR2_H)             /* USB0 Receive Configuration and Status Register */
-#define pREG_USB0_EP_RXCSR3_H            ((volatile uint16_t *)REG_USB0_EP_RXCSR3_H)             /* USB0 Receive Configuration and Status Register */
-#define pREG_USB0_EP_RXCSR4_H            ((volatile uint16_t *)REG_USB0_EP_RXCSR4_H)             /* USB0 Receive Configuration and Status Register */
-#define pREG_USB0_EP_RXCSR5_H            ((volatile uint16_t *)REG_USB0_EP_RXCSR5_H)             /* USB0 Receive Configuration and Status Register */
-#define pREG_USB0_EP_RXCSR6_H            ((volatile uint16_t *)REG_USB0_EP_RXCSR6_H)             /* USB0 Receive Configuration and Status Register */
-#define pREG_USB0_EP_RXCSR7_H            ((volatile uint16_t *)REG_USB0_EP_RXCSR7_H)             /* USB0 Receive Configuration and Status Register */
-#define pREG_USB0_EP_RXCSR8_H            ((volatile uint16_t *)REG_USB0_EP_RXCSR8_H)             /* USB0 Receive Configuration and Status Register */
-#define pREG_USB0_EP_RXCSR9_H            ((volatile uint16_t *)REG_USB0_EP_RXCSR9_H)             /* USB0 Receive Configuration and Status Register */
-#define pREG_USB0_EP_RXCSR10_H           ((volatile uint16_t *)REG_USB0_EP_RXCSR10_H)            /* USB0 Receive Configuration and Status Register */
-#define pREG_USB0_EP_RXCSR0_P            ((volatile uint16_t *)REG_USB0_EP_RXCSR0_P)             /* USB0 Receive Configuration and Status Register */
-#define pREG_USB0_EP_RXCSR1_P            ((volatile uint16_t *)REG_USB0_EP_RXCSR1_P)             /* USB0 Receive Configuration and Status Register */
-#define pREG_USB0_EP_RXCSR2_P            ((volatile uint16_t *)REG_USB0_EP_RXCSR2_P)             /* USB0 Receive Configuration and Status Register */
-#define pREG_USB0_EP_RXCSR3_P            ((volatile uint16_t *)REG_USB0_EP_RXCSR3_P)             /* USB0 Receive Configuration and Status Register */
-#define pREG_USB0_EP_RXCSR4_P            ((volatile uint16_t *)REG_USB0_EP_RXCSR4_P)             /* USB0 Receive Configuration and Status Register */
-#define pREG_USB0_EP_RXCSR5_P            ((volatile uint16_t *)REG_USB0_EP_RXCSR5_P)             /* USB0 Receive Configuration and Status Register */
-#define pREG_USB0_EP_RXCSR6_P            ((volatile uint16_t *)REG_USB0_EP_RXCSR6_P)             /* USB0 Receive Configuration and Status Register */
-#define pREG_USB0_EP_RXCSR7_P            ((volatile uint16_t *)REG_USB0_EP_RXCSR7_P)             /* USB0 Receive Configuration and Status Register */
-#define pREG_USB0_EP_RXCSR8_P            ((volatile uint16_t *)REG_USB0_EP_RXCSR8_P)             /* USB0 Receive Configuration and Status Register */
-#define pREG_USB0_EP_RXCSR9_P            ((volatile uint16_t *)REG_USB0_EP_RXCSR9_P)             /* USB0 Receive Configuration and Status Register */
-#define pREG_USB0_EP_RXCSR10_P           ((volatile uint16_t *)REG_USB0_EP_RXCSR10_P)            /* USB0 Receive Configuration and Status Register */
-#define pREG_USB0_EP_RXCNT0              ((volatile uint16_t *)REG_USB0_EP_RXCNT0)               /* USB0 Number of Byte Received */
-#define pREG_USB0_EP_RXCNT1              ((volatile uint16_t *)REG_USB0_EP_RXCNT1)               /* USB0 Number of Byte Received */
-#define pREG_USB0_EP_RXCNT2              ((volatile uint16_t *)REG_USB0_EP_RXCNT2)               /* USB0 Number of Byte Received */
-#define pREG_USB0_EP_RXCNT3              ((volatile uint16_t *)REG_USB0_EP_RXCNT3)               /* USB0 Number of Byte Received */
-#define pREG_USB0_EP_RXCNT4              ((volatile uint16_t *)REG_USB0_EP_RXCNT4)               /* USB0 Number of Byte Received */
-#define pREG_USB0_EP_RXCNT5              ((volatile uint16_t *)REG_USB0_EP_RXCNT5)               /* USB0 Number of Byte Received */
-#define pREG_USB0_EP_RXCNT6              ((volatile uint16_t *)REG_USB0_EP_RXCNT6)               /* USB0 Number of Byte Received */
-#define pREG_USB0_EP_RXCNT7              ((volatile uint16_t *)REG_USB0_EP_RXCNT7)               /* USB0 Number of Byte Received */
-#define pREG_USB0_EP_RXCNT8              ((volatile uint16_t *)REG_USB0_EP_RXCNT8)               /* USB0 Number of Byte Received */
-#define pREG_USB0_EP_RXCNT9              ((volatile uint16_t *)REG_USB0_EP_RXCNT9)               /* USB0 Number of Byte Received */
-#define pREG_USB0_EP_RXCNT10             ((volatile uint16_t *)REG_USB0_EP_RXCNT10)              /* USB0 Number of Byte Received */
-#define pREG_USB0_EP_TXTYPE0             ((volatile  uint8_t *)REG_USB0_EP_TXTYPE0)              /* USB0 Transmit Type */
-#define pREG_USB0_EP_TXTYPE1             ((volatile  uint8_t *)REG_USB0_EP_TXTYPE1)              /* USB0 Transmit Type */
-#define pREG_USB0_EP_TXTYPE2             ((volatile  uint8_t *)REG_USB0_EP_TXTYPE2)              /* USB0 Transmit Type */
-#define pREG_USB0_EP_TXTYPE3             ((volatile  uint8_t *)REG_USB0_EP_TXTYPE3)              /* USB0 Transmit Type */
-#define pREG_USB0_EP_TXTYPE4             ((volatile  uint8_t *)REG_USB0_EP_TXTYPE4)              /* USB0 Transmit Type */
-#define pREG_USB0_EP_TXTYPE5             ((volatile  uint8_t *)REG_USB0_EP_TXTYPE5)              /* USB0 Transmit Type */
-#define pREG_USB0_EP_TXTYPE6             ((volatile  uint8_t *)REG_USB0_EP_TXTYPE6)              /* USB0 Transmit Type */
-#define pREG_USB0_EP_TXTYPE7             ((volatile  uint8_t *)REG_USB0_EP_TXTYPE7)              /* USB0 Transmit Type */
-#define pREG_USB0_EP_TXTYPE8             ((volatile  uint8_t *)REG_USB0_EP_TXTYPE8)              /* USB0 Transmit Type */
-#define pREG_USB0_EP_TXTYPE9             ((volatile  uint8_t *)REG_USB0_EP_TXTYPE9)              /* USB0 Transmit Type */
-#define pREG_USB0_EP_TXTYPE10            ((volatile  uint8_t *)REG_USB0_EP_TXTYPE10)             /* USB0 Transmit Type */
-#define pREG_USB0_EP_TXINTERVAL0         ((volatile  uint8_t *)REG_USB0_EP_TXINTERVAL0)          /* USB0 Transmit Polling Interval */
-#define pREG_USB0_EP_TXINTERVAL1         ((volatile  uint8_t *)REG_USB0_EP_TXINTERVAL1)          /* USB0 Transmit Polling Interval */
-#define pREG_USB0_EP_TXINTERVAL2         ((volatile  uint8_t *)REG_USB0_EP_TXINTERVAL2)          /* USB0 Transmit Polling Interval */
-#define pREG_USB0_EP_TXINTERVAL3         ((volatile  uint8_t *)REG_USB0_EP_TXINTERVAL3)          /* USB0 Transmit Polling Interval */
-#define pREG_USB0_EP_TXINTERVAL4         ((volatile  uint8_t *)REG_USB0_EP_TXINTERVAL4)          /* USB0 Transmit Polling Interval */
-#define pREG_USB0_EP_TXINTERVAL5         ((volatile  uint8_t *)REG_USB0_EP_TXINTERVAL5)          /* USB0 Transmit Polling Interval */
-#define pREG_USB0_EP_TXINTERVAL6         ((volatile  uint8_t *)REG_USB0_EP_TXINTERVAL6)          /* USB0 Transmit Polling Interval */
-#define pREG_USB0_EP_TXINTERVAL7         ((volatile  uint8_t *)REG_USB0_EP_TXINTERVAL7)          /* USB0 Transmit Polling Interval */
-#define pREG_USB0_EP_TXINTERVAL8         ((volatile  uint8_t *)REG_USB0_EP_TXINTERVAL8)          /* USB0 Transmit Polling Interval */
-#define pREG_USB0_EP_TXINTERVAL9         ((volatile  uint8_t *)REG_USB0_EP_TXINTERVAL9)          /* USB0 Transmit Polling Interval */
-#define pREG_USB0_EP_TXINTERVAL10        ((volatile  uint8_t *)REG_USB0_EP_TXINTERVAL10)         /* USB0 Transmit Polling Interval */
-#define pREG_USB0_EP_RXTYPE0             ((volatile  uint8_t *)REG_USB0_EP_RXTYPE0)              /* USB0 Receive Type */
-#define pREG_USB0_EP_RXTYPE1             ((volatile  uint8_t *)REG_USB0_EP_RXTYPE1)              /* USB0 Receive Type */
-#define pREG_USB0_EP_RXTYPE2             ((volatile  uint8_t *)REG_USB0_EP_RXTYPE2)              /* USB0 Receive Type */
-#define pREG_USB0_EP_RXTYPE3             ((volatile  uint8_t *)REG_USB0_EP_RXTYPE3)              /* USB0 Receive Type */
-#define pREG_USB0_EP_RXTYPE4             ((volatile  uint8_t *)REG_USB0_EP_RXTYPE4)              /* USB0 Receive Type */
-#define pREG_USB0_EP_RXTYPE5             ((volatile  uint8_t *)REG_USB0_EP_RXTYPE5)              /* USB0 Receive Type */
-#define pREG_USB0_EP_RXTYPE6             ((volatile  uint8_t *)REG_USB0_EP_RXTYPE6)              /* USB0 Receive Type */
-#define pREG_USB0_EP_RXTYPE7             ((volatile  uint8_t *)REG_USB0_EP_RXTYPE7)              /* USB0 Receive Type */
-#define pREG_USB0_EP_RXTYPE8             ((volatile  uint8_t *)REG_USB0_EP_RXTYPE8)              /* USB0 Receive Type */
-#define pREG_USB0_EP_RXTYPE9             ((volatile  uint8_t *)REG_USB0_EP_RXTYPE9)              /* USB0 Receive Type */
-#define pREG_USB0_EP_RXTYPE10            ((volatile  uint8_t *)REG_USB0_EP_RXTYPE10)             /* USB0 Receive Type */
-#define pREG_USB0_EP_RXINTERVAL0         ((volatile  uint8_t *)REG_USB0_EP_RXINTERVAL0)          /* USB0 Receive Polling Interval */
-#define pREG_USB0_EP_RXINTERVAL1         ((volatile  uint8_t *)REG_USB0_EP_RXINTERVAL1)          /* USB0 Receive Polling Interval */
-#define pREG_USB0_EP_RXINTERVAL2         ((volatile  uint8_t *)REG_USB0_EP_RXINTERVAL2)          /* USB0 Receive Polling Interval */
-#define pREG_USB0_EP_RXINTERVAL3         ((volatile  uint8_t *)REG_USB0_EP_RXINTERVAL3)          /* USB0 Receive Polling Interval */
-#define pREG_USB0_EP_RXINTERVAL4         ((volatile  uint8_t *)REG_USB0_EP_RXINTERVAL4)          /* USB0 Receive Polling Interval */
-#define pREG_USB0_EP_RXINTERVAL5         ((volatile  uint8_t *)REG_USB0_EP_RXINTERVAL5)          /* USB0 Receive Polling Interval */
-#define pREG_USB0_EP_RXINTERVAL6         ((volatile  uint8_t *)REG_USB0_EP_RXINTERVAL6)          /* USB0 Receive Polling Interval */
-#define pREG_USB0_EP_RXINTERVAL7         ((volatile  uint8_t *)REG_USB0_EP_RXINTERVAL7)          /* USB0 Receive Polling Interval */
-#define pREG_USB0_EP_RXINTERVAL8         ((volatile  uint8_t *)REG_USB0_EP_RXINTERVAL8)          /* USB0 Receive Polling Interval */
-#define pREG_USB0_EP_RXINTERVAL9         ((volatile  uint8_t *)REG_USB0_EP_RXINTERVAL9)          /* USB0 Receive Polling Interval */
-#define pREG_USB0_EP_RXINTERVAL10        ((volatile  uint8_t *)REG_USB0_EP_RXINTERVAL10)         /* USB0 Receive Polling Interval */
-#define pREG_USB0_DMA_IRQ                ((volatile  uint8_t *)REG_USB0_DMA_IRQ)                 /* USB0 Interrupt Register */
-#define pREG_USB0_DMA_CTL0               ((volatile uint16_t *)REG_USB0_DMA_CTL0)                /* USB0 DMA Control */
-#define pREG_USB0_DMA_CTL1               ((volatile uint16_t *)REG_USB0_DMA_CTL1)                /* USB0 DMA Control */
-#define pREG_USB0_DMA_CTL2               ((volatile uint16_t *)REG_USB0_DMA_CTL2)                /* USB0 DMA Control */
-#define pREG_USB0_DMA_CTL3               ((volatile uint16_t *)REG_USB0_DMA_CTL3)                /* USB0 DMA Control */
-#define pREG_USB0_DMA_CTL4               ((volatile uint16_t *)REG_USB0_DMA_CTL4)                /* USB0 DMA Control */
-#define pREG_USB0_DMA_CTL5               ((volatile uint16_t *)REG_USB0_DMA_CTL5)                /* USB0 DMA Control */
-#define pREG_USB0_DMA_CTL6               ((volatile uint16_t *)REG_USB0_DMA_CTL6)                /* USB0 DMA Control */
-#define pREG_USB0_DMA_CTL7               ((volatile uint16_t *)REG_USB0_DMA_CTL7)                /* USB0 DMA Control */
-#define pREG_USB0_DMA_ADDR0              ((void * volatile *)REG_USB0_DMA_ADDR0)                 /* USB0 DMA Address */
-#define pREG_USB0_DMA_ADDR1              ((void * volatile *)REG_USB0_DMA_ADDR1)                 /* USB0 DMA Address */
-#define pREG_USB0_DMA_ADDR2              ((void * volatile *)REG_USB0_DMA_ADDR2)                 /* USB0 DMA Address */
-#define pREG_USB0_DMA_ADDR3              ((void * volatile *)REG_USB0_DMA_ADDR3)                 /* USB0 DMA Address */
-#define pREG_USB0_DMA_ADDR4              ((void * volatile *)REG_USB0_DMA_ADDR4)                 /* USB0 DMA Address */
-#define pREG_USB0_DMA_ADDR5              ((void * volatile *)REG_USB0_DMA_ADDR5)                 /* USB0 DMA Address */
-#define pREG_USB0_DMA_ADDR6              ((void * volatile *)REG_USB0_DMA_ADDR6)                 /* USB0 DMA Address */
-#define pREG_USB0_DMA_ADDR7              ((void * volatile *)REG_USB0_DMA_ADDR7)                 /* USB0 DMA Address */
-#define pREG_USB0_DMA_CNT0               ((volatile uint32_t *)REG_USB0_DMA_CNT0)                /* USB0 DMA Count */
-#define pREG_USB0_DMA_CNT1               ((volatile uint32_t *)REG_USB0_DMA_CNT1)                /* USB0 DMA Count */
-#define pREG_USB0_DMA_CNT2               ((volatile uint32_t *)REG_USB0_DMA_CNT2)                /* USB0 DMA Count */
-#define pREG_USB0_DMA_CNT3               ((volatile uint32_t *)REG_USB0_DMA_CNT3)                /* USB0 DMA Count */
-#define pREG_USB0_DMA_CNT4               ((volatile uint32_t *)REG_USB0_DMA_CNT4)                /* USB0 DMA Count */
-#define pREG_USB0_DMA_CNT5               ((volatile uint32_t *)REG_USB0_DMA_CNT5)                /* USB0 DMA Count */
-#define pREG_USB0_DMA_CNT6               ((volatile uint32_t *)REG_USB0_DMA_CNT6)                /* USB0 DMA Count */
-#define pREG_USB0_DMA_CNT7               ((volatile uint32_t *)REG_USB0_DMA_CNT7)                /* USB0 DMA Count */
-#define pREG_USB0_RQPKTCNT0              ((volatile uint16_t *)REG_USB0_RQPKTCNT0)               /* USB0 Request Packet Count */
-#define pREG_USB0_RQPKTCNT1              ((volatile uint16_t *)REG_USB0_RQPKTCNT1)               /* USB0 Request Packet Count */
-#define pREG_USB0_RQPKTCNT2              ((volatile uint16_t *)REG_USB0_RQPKTCNT2)               /* USB0 Request Packet Count */
-#define pREG_USB0_RQPKTCNT3              ((volatile uint16_t *)REG_USB0_RQPKTCNT3)               /* USB0 Request Packet Count */
-#define pREG_USB0_RQPKTCNT4              ((volatile uint16_t *)REG_USB0_RQPKTCNT4)               /* USB0 Request Packet Count */
-#define pREG_USB0_RQPKTCNT5              ((volatile uint16_t *)REG_USB0_RQPKTCNT5)               /* USB0 Request Packet Count */
-#define pREG_USB0_RQPKTCNT6              ((volatile uint16_t *)REG_USB0_RQPKTCNT6)               /* USB0 Request Packet Count */
-#define pREG_USB0_RQPKTCNT7              ((volatile uint16_t *)REG_USB0_RQPKTCNT7)               /* USB0 Request Packet Count */
-#define pREG_USB0_RQPKTCNT8              ((volatile uint16_t *)REG_USB0_RQPKTCNT8)               /* USB0 Request Packet Count */
-#define pREG_USB0_RQPKTCNT9              ((volatile uint16_t *)REG_USB0_RQPKTCNT9)               /* USB0 Request Packet Count */
-#define pREG_USB0_RQPKTCNT10             ((volatile uint16_t *)REG_USB0_RQPKTCNT10)              /* USB0 Request Packet Count */
-#define pREG_USB0_CT_UCH                 ((volatile uint16_t *)REG_USB0_CT_UCH)                  /* USB0 Chirp Timeout */
-#define pREG_USB0_CT_HHSRTN              ((volatile uint16_t *)REG_USB0_CT_HHSRTN)               /* USB0 High Speed Resume Return to Normal */
-#define pREG_USB0_CT_HSBT                ((volatile uint16_t *)REG_USB0_CT_HSBT)                 /* USB0 High Speed Timeout */
-#define pREG_USB0_LPM_ATTR               ((volatile uint16_t *)REG_USB0_LPM_ATTR)                /* USB0 LPM Attribute */
-#define pREG_USB0_LPM_CTL                ((volatile  uint8_t *)REG_USB0_LPM_CTL)                 /* USB0 LPM Control */
-#define pREG_USB0_LPM_IEN                ((volatile  uint8_t *)REG_USB0_LPM_IEN)                 /* USB0 LPM Interrupt Enable */
-#define pREG_USB0_LPM_IRQ                ((volatile  uint8_t *)REG_USB0_LPM_IRQ)                 /* USB0 LPM Interrupt */
-#define pREG_USB0_LPM_FADDR              ((volatile  uint8_t *)REG_USB0_LPM_FADDR)               /* USB0 LPM Function Address */
-#define pREG_USB0_VBUS_CTL               ((volatile  uint8_t *)REG_USB0_VBUS_CTL)                /* USB0 VBus Control */
-#define pREG_USB0_BAT_CHG                ((volatile  uint8_t *)REG_USB0_BAT_CHG)                 /* USB0 Battery Charging */
-#define pREG_USB0_PHY_CTL                ((volatile  uint8_t *)REG_USB0_PHY_CTL)                 /* USB0 PHY Control */
-#define pREG_USB0_PLL_OSC                ((volatile uint16_t *)REG_USB0_PLL_OSC)                 /* USB0 PLL and Oscillator Control */
+#define pREG_USB0_FADDR                  ((volatile  uint8_t *)REG_USB0_FADDR)                   /* USB0 Function Address Register */
+#define pREG_USB0_POWER                  ((volatile  uint8_t *)REG_USB0_POWER)                   /* USB0 Power and Device Control Register */
+#define pREG_USB0_INTRTX                 ((volatile uint16_t *)REG_USB0_INTRTX)                  /* USB0 Transmit Interrupt Register */
+#define pREG_USB0_INTRRX                 ((volatile uint16_t *)REG_USB0_INTRRX)                  /* USB0 Receive Interrupt Register */
+#define pREG_USB0_INTRTXE                ((volatile uint16_t *)REG_USB0_INTRTXE)                 /* USB0 Transmit Interrupt Enable Register */
+#define pREG_USB0_INTRRXE                ((volatile uint16_t *)REG_USB0_INTRRXE)                 /* USB0 Receive Interrupt Enable Register */
+#define pREG_USB0_IRQ                    ((volatile  uint8_t *)REG_USB0_IRQ)                     /* USB0 Common Interrupts Register */
+#define pREG_USB0_IEN                    ((volatile  uint8_t *)REG_USB0_IEN)                     /* USB0 Common Interrupts Enable Register */
+#define pREG_USB0_FRAME                  ((volatile uint16_t *)REG_USB0_FRAME)                   /* USB0 Frame Number Register */
+#define pREG_USB0_INDEX                  ((volatile  uint8_t *)REG_USB0_INDEX)                   /* USB0 Index Register */
+#define pREG_USB0_TESTMODE               ((volatile  uint8_t *)REG_USB0_TESTMODE)                /* USB0 Testmode Register */
+#define pREG_USB0_EPI_TXMAXP0            ((volatile uint16_t *)REG_USB0_EPI_TXMAXP0)             /* USB0 EPn Transmit Maximum Packet Length Register */
+#define pREG_USB0_EPI_TXCSR_P0           ((volatile uint16_t *)REG_USB0_EPI_TXCSR_P0)            /* USB0 EPn Transmit Configuration and Status (Peripheral) Register */
+#define pREG_USB0_EPI_TXCSR_H0           ((volatile uint16_t *)REG_USB0_EPI_TXCSR_H0)            /* USB0 EPn Transmit Configuration and Status (Host) Register */
+#define pREG_USB0_EP0I_CSR0_P            ((volatile uint16_t *)REG_USB0_EP0I_CSR0_P)             /* USB0 EP0 Configuration and Status (Peripheral) Register */
+#define pREG_USB0_EP0I_CSR0_H            ((volatile uint16_t *)REG_USB0_EP0I_CSR0_H)             /* USB0 EP0 Configuration and Status (Host) Register */
+#define pREG_USB0_EPI_RXMAXP0            ((volatile uint16_t *)REG_USB0_EPI_RXMAXP0)             /* USB0 EPn Receive Maximum Packet Length Register */
+#define pREG_USB0_EPI_RXCSR_H0           ((volatile uint16_t *)REG_USB0_EPI_RXCSR_H0)            /* USB0 EPn Receive Configuration and Status (Host) Register */
+#define pREG_USB0_EPI_RXCSR_P0           ((volatile uint16_t *)REG_USB0_EPI_RXCSR_P0)            /* USB0 EPn Receive Configuration and Status (Peripheral) Register */
+#define pREG_USB0_EP0I_CNT0              ((volatile uint16_t *)REG_USB0_EP0I_CNT0)               /* USB0 EP0 Number of Received Bytes Register */
+#define pREG_USB0_EPI_RXCNT0             ((volatile uint16_t *)REG_USB0_EPI_RXCNT0)              /* USB0 EPn Number of Bytes Received Register */
+#define pREG_USB0_EPI_TXTYPE0            ((volatile  uint8_t *)REG_USB0_EPI_TXTYPE0)             /* USB0 EPn Transmit Type Register */
+#define pREG_USB0_EP0I_TYPE0             ((volatile  uint8_t *)REG_USB0_EP0I_TYPE0)              /* USB0 EP0 Connection Type Register */
+#define pREG_USB0_EPI_TXINTERVAL0        ((volatile  uint8_t *)REG_USB0_EPI_TXINTERVAL0)         /* USB0 EPn Transmit Polling Interval Register */
+#define pREG_USB0_EP0I_NAKLIMIT0         ((volatile  uint8_t *)REG_USB0_EP0I_NAKLIMIT0)          /* USB0 EP0 NAK Limit Register */
+#define pREG_USB0_EPI_RXTYPE0            ((volatile  uint8_t *)REG_USB0_EPI_RXTYPE0)             /* USB0 EPn Receive Type Register */
+#define pREG_USB0_EPI_RXINTERVAL0        ((volatile  uint8_t *)REG_USB0_EPI_RXINTERVAL0)         /* USB0 EPn Receive Polling Interval Register */
+#define pREG_USB0_EP0I_CFGDATA0          ((volatile  uint8_t *)REG_USB0_EP0I_CFGDATA0)           /* USB0 EP0 Configuration Information Register */
+#define pREG_USB0_FIFOB0                 ((volatile  uint8_t *)REG_USB0_FIFOB0)                  /* USB0 FIFO Byte (8-Bit) Register */
+#define pREG_USB0_FIFOB1                 ((volatile  uint8_t *)REG_USB0_FIFOB1)                  /* USB0 FIFO Byte (8-Bit) Register */
+#define pREG_USB0_FIFOB2                 ((volatile  uint8_t *)REG_USB0_FIFOB2)                  /* USB0 FIFO Byte (8-Bit) Register */
+#define pREG_USB0_FIFOB3                 ((volatile  uint8_t *)REG_USB0_FIFOB3)                  /* USB0 FIFO Byte (8-Bit) Register */
+#define pREG_USB0_FIFOB4                 ((volatile  uint8_t *)REG_USB0_FIFOB4)                  /* USB0 FIFO Byte (8-Bit) Register */
+#define pREG_USB0_FIFOB5                 ((volatile  uint8_t *)REG_USB0_FIFOB5)                  /* USB0 FIFO Byte (8-Bit) Register */
+#define pREG_USB0_FIFOB6                 ((volatile  uint8_t *)REG_USB0_FIFOB6)                  /* USB0 FIFO Byte (8-Bit) Register */
+#define pREG_USB0_FIFOB7                 ((volatile  uint8_t *)REG_USB0_FIFOB7)                  /* USB0 FIFO Byte (8-Bit) Register */
+#define pREG_USB0_FIFOB8                 ((volatile  uint8_t *)REG_USB0_FIFOB8)                  /* USB0 FIFO Byte (8-Bit) Register */
+#define pREG_USB0_FIFOB9                 ((volatile  uint8_t *)REG_USB0_FIFOB9)                  /* USB0 FIFO Byte (8-Bit) Register */
+#define pREG_USB0_FIFOB10                ((volatile  uint8_t *)REG_USB0_FIFOB10)                 /* USB0 FIFO Byte (8-Bit) Register */
+#define pREG_USB0_FIFOB11                ((volatile  uint8_t *)REG_USB0_FIFOB11)                 /* USB0 FIFO Byte (8-Bit) Register */
+#define pREG_USB0_FIFOH0                 ((volatile uint16_t *)REG_USB0_FIFOH0)                  /* USB0 FIFO Half-Word (16-Bit) Register */
+#define pREG_USB0_FIFOH1                 ((volatile uint16_t *)REG_USB0_FIFOH1)                  /* USB0 FIFO Half-Word (16-Bit) Register */
+#define pREG_USB0_FIFOH2                 ((volatile uint16_t *)REG_USB0_FIFOH2)                  /* USB0 FIFO Half-Word (16-Bit) Register */
+#define pREG_USB0_FIFOH3                 ((volatile uint16_t *)REG_USB0_FIFOH3)                  /* USB0 FIFO Half-Word (16-Bit) Register */
+#define pREG_USB0_FIFOH4                 ((volatile uint16_t *)REG_USB0_FIFOH4)                  /* USB0 FIFO Half-Word (16-Bit) Register */
+#define pREG_USB0_FIFOH5                 ((volatile uint16_t *)REG_USB0_FIFOH5)                  /* USB0 FIFO Half-Word (16-Bit) Register */
+#define pREG_USB0_FIFOH6                 ((volatile uint16_t *)REG_USB0_FIFOH6)                  /* USB0 FIFO Half-Word (16-Bit) Register */
+#define pREG_USB0_FIFOH7                 ((volatile uint16_t *)REG_USB0_FIFOH7)                  /* USB0 FIFO Half-Word (16-Bit) Register */
+#define pREG_USB0_FIFOH8                 ((volatile uint16_t *)REG_USB0_FIFOH8)                  /* USB0 FIFO Half-Word (16-Bit) Register */
+#define pREG_USB0_FIFOH9                 ((volatile uint16_t *)REG_USB0_FIFOH9)                  /* USB0 FIFO Half-Word (16-Bit) Register */
+#define pREG_USB0_FIFOH10                ((volatile uint16_t *)REG_USB0_FIFOH10)                 /* USB0 FIFO Half-Word (16-Bit) Register */
+#define pREG_USB0_FIFOH11                ((volatile uint16_t *)REG_USB0_FIFOH11)                 /* USB0 FIFO Half-Word (16-Bit) Register */
+#define pREG_USB0_FIFO0                  ((volatile uint32_t *)REG_USB0_FIFO0)                   /* USB0 FIFO Word (32-Bit) Register */
+#define pREG_USB0_FIFO1                  ((volatile uint32_t *)REG_USB0_FIFO1)                   /* USB0 FIFO Word (32-Bit) Register */
+#define pREG_USB0_FIFO2                  ((volatile uint32_t *)REG_USB0_FIFO2)                   /* USB0 FIFO Word (32-Bit) Register */
+#define pREG_USB0_FIFO3                  ((volatile uint32_t *)REG_USB0_FIFO3)                   /* USB0 FIFO Word (32-Bit) Register */
+#define pREG_USB0_FIFO4                  ((volatile uint32_t *)REG_USB0_FIFO4)                   /* USB0 FIFO Word (32-Bit) Register */
+#define pREG_USB0_FIFO5                  ((volatile uint32_t *)REG_USB0_FIFO5)                   /* USB0 FIFO Word (32-Bit) Register */
+#define pREG_USB0_FIFO6                  ((volatile uint32_t *)REG_USB0_FIFO6)                   /* USB0 FIFO Word (32-Bit) Register */
+#define pREG_USB0_FIFO7                  ((volatile uint32_t *)REG_USB0_FIFO7)                   /* USB0 FIFO Word (32-Bit) Register */
+#define pREG_USB0_FIFO8                  ((volatile uint32_t *)REG_USB0_FIFO8)                   /* USB0 FIFO Word (32-Bit) Register */
+#define pREG_USB0_FIFO9                  ((volatile uint32_t *)REG_USB0_FIFO9)                   /* USB0 FIFO Word (32-Bit) Register */
+#define pREG_USB0_FIFO10                 ((volatile uint32_t *)REG_USB0_FIFO10)                  /* USB0 FIFO Word (32-Bit) Register */
+#define pREG_USB0_FIFO11                 ((volatile uint32_t *)REG_USB0_FIFO11)                  /* USB0 FIFO Word (32-Bit) Register */
+#define pREG_USB0_DEV_CTL                ((volatile  uint8_t *)REG_USB0_DEV_CTL)                 /* USB0 Device Control Register */
+#define pREG_USB0_TXFIFOSZ               ((volatile  uint8_t *)REG_USB0_TXFIFOSZ)                /* USB0 Transmit FIFO Size Register */
+#define pREG_USB0_RXFIFOSZ               ((volatile  uint8_t *)REG_USB0_RXFIFOSZ)                /* USB0 Receive FIFO Size Register */
+#define pREG_USB0_TXFIFOADDR             ((volatile uint16_t *)REG_USB0_TXFIFOADDR)              /* USB0 Transmit FIFO Address Register */
+#define pREG_USB0_RXFIFOADDR             ((volatile uint16_t *)REG_USB0_RXFIFOADDR)              /* USB0 Receive FIFO Address Register */
+#define pREG_USB0_EPINFO                 ((volatile  uint8_t *)REG_USB0_EPINFO)                  /* USB0 Endpoint Information Register */
+#define pREG_USB0_RAMINFO                ((volatile  uint8_t *)REG_USB0_RAMINFO)                 /* USB0 RAM Information Register */
+#define pREG_USB0_LINKINFO               ((volatile  uint8_t *)REG_USB0_LINKINFO)                /* USB0 Link Information Register */
+#define pREG_USB0_VPLEN                  ((volatile  uint8_t *)REG_USB0_VPLEN)                   /* USB0 VBUS Pulse Length Register */
+#define pREG_USB0_HS_EOF1                ((volatile  uint8_t *)REG_USB0_HS_EOF1)                 /* USB0 High-Speed EOF 1 Register */
+#define pREG_USB0_FS_EOF1                ((volatile  uint8_t *)REG_USB0_FS_EOF1)                 /* USB0 Full-Speed EOF 1 Register */
+#define pREG_USB0_LS_EOF1                ((volatile  uint8_t *)REG_USB0_LS_EOF1)                 /* USB0 Low-Speed EOF 1 Register */
+#define pREG_USB0_SOFT_RST               ((volatile  uint8_t *)REG_USB0_SOFT_RST)                /* USB0 Software Reset Register */
+#define pREG_USB0_MP0_TXFUNCADDR         ((volatile  uint8_t *)REG_USB0_MP0_TXFUNCADDR)          /* USB0 EPn Transmit Function Address Register */
+#define pREG_USB0_MP1_TXFUNCADDR         ((volatile  uint8_t *)REG_USB0_MP1_TXFUNCADDR)          /* USB0 EPn Transmit Function Address Register */
+#define pREG_USB0_MP2_TXFUNCADDR         ((volatile  uint8_t *)REG_USB0_MP2_TXFUNCADDR)          /* USB0 EPn Transmit Function Address Register */
+#define pREG_USB0_MP3_TXFUNCADDR         ((volatile  uint8_t *)REG_USB0_MP3_TXFUNCADDR)          /* USB0 EPn Transmit Function Address Register */
+#define pREG_USB0_MP4_TXFUNCADDR         ((volatile  uint8_t *)REG_USB0_MP4_TXFUNCADDR)          /* USB0 EPn Transmit Function Address Register */
+#define pREG_USB0_MP5_TXFUNCADDR         ((volatile  uint8_t *)REG_USB0_MP5_TXFUNCADDR)          /* USB0 EPn Transmit Function Address Register */
+#define pREG_USB0_MP6_TXFUNCADDR         ((volatile  uint8_t *)REG_USB0_MP6_TXFUNCADDR)          /* USB0 EPn Transmit Function Address Register */
+#define pREG_USB0_MP7_TXFUNCADDR         ((volatile  uint8_t *)REG_USB0_MP7_TXFUNCADDR)          /* USB0 EPn Transmit Function Address Register */
+#define pREG_USB0_MP8_TXFUNCADDR         ((volatile  uint8_t *)REG_USB0_MP8_TXFUNCADDR)          /* USB0 EPn Transmit Function Address Register */
+#define pREG_USB0_MP9_TXFUNCADDR         ((volatile  uint8_t *)REG_USB0_MP9_TXFUNCADDR)          /* USB0 EPn Transmit Function Address Register */
+#define pREG_USB0_MP10_TXFUNCADDR        ((volatile  uint8_t *)REG_USB0_MP10_TXFUNCADDR)         /* USB0 EPn Transmit Function Address Register */
+#define pREG_USB0_MP11_TXFUNCADDR        ((volatile  uint8_t *)REG_USB0_MP11_TXFUNCADDR)         /* USB0 EPn Transmit Function Address Register */
+#define pREG_USB0_MP0_TXHUBADDR          ((volatile  uint8_t *)REG_USB0_MP0_TXHUBADDR)           /* USB0 EPn Transmit Hub Address Register */
+#define pREG_USB0_MP1_TXHUBADDR          ((volatile  uint8_t *)REG_USB0_MP1_TXHUBADDR)           /* USB0 EPn Transmit Hub Address Register */
+#define pREG_USB0_MP2_TXHUBADDR          ((volatile  uint8_t *)REG_USB0_MP2_TXHUBADDR)           /* USB0 EPn Transmit Hub Address Register */
+#define pREG_USB0_MP3_TXHUBADDR          ((volatile  uint8_t *)REG_USB0_MP3_TXHUBADDR)           /* USB0 EPn Transmit Hub Address Register */
+#define pREG_USB0_MP4_TXHUBADDR          ((volatile  uint8_t *)REG_USB0_MP4_TXHUBADDR)           /* USB0 EPn Transmit Hub Address Register */
+#define pREG_USB0_MP5_TXHUBADDR          ((volatile  uint8_t *)REG_USB0_MP5_TXHUBADDR)           /* USB0 EPn Transmit Hub Address Register */
+#define pREG_USB0_MP6_TXHUBADDR          ((volatile  uint8_t *)REG_USB0_MP6_TXHUBADDR)           /* USB0 EPn Transmit Hub Address Register */
+#define pREG_USB0_MP7_TXHUBADDR          ((volatile  uint8_t *)REG_USB0_MP7_TXHUBADDR)           /* USB0 EPn Transmit Hub Address Register */
+#define pREG_USB0_MP8_TXHUBADDR          ((volatile  uint8_t *)REG_USB0_MP8_TXHUBADDR)           /* USB0 EPn Transmit Hub Address Register */
+#define pREG_USB0_MP9_TXHUBADDR          ((volatile  uint8_t *)REG_USB0_MP9_TXHUBADDR)           /* USB0 EPn Transmit Hub Address Register */
+#define pREG_USB0_MP10_TXHUBADDR         ((volatile  uint8_t *)REG_USB0_MP10_TXHUBADDR)          /* USB0 EPn Transmit Hub Address Register */
+#define pREG_USB0_MP11_TXHUBADDR         ((volatile  uint8_t *)REG_USB0_MP11_TXHUBADDR)          /* USB0 EPn Transmit Hub Address Register */
+#define pREG_USB0_MP0_TXHUBPORT          ((volatile  uint8_t *)REG_USB0_MP0_TXHUBPORT)           /* USB0 EPn Transmit Hub Port Register */
+#define pREG_USB0_MP1_TXHUBPORT          ((volatile  uint8_t *)REG_USB0_MP1_TXHUBPORT)           /* USB0 EPn Transmit Hub Port Register */
+#define pREG_USB0_MP2_TXHUBPORT          ((volatile  uint8_t *)REG_USB0_MP2_TXHUBPORT)           /* USB0 EPn Transmit Hub Port Register */
+#define pREG_USB0_MP3_TXHUBPORT          ((volatile  uint8_t *)REG_USB0_MP3_TXHUBPORT)           /* USB0 EPn Transmit Hub Port Register */
+#define pREG_USB0_MP4_TXHUBPORT          ((volatile  uint8_t *)REG_USB0_MP4_TXHUBPORT)           /* USB0 EPn Transmit Hub Port Register */
+#define pREG_USB0_MP5_TXHUBPORT          ((volatile  uint8_t *)REG_USB0_MP5_TXHUBPORT)           /* USB0 EPn Transmit Hub Port Register */
+#define pREG_USB0_MP6_TXHUBPORT          ((volatile  uint8_t *)REG_USB0_MP6_TXHUBPORT)           /* USB0 EPn Transmit Hub Port Register */
+#define pREG_USB0_MP7_TXHUBPORT          ((volatile  uint8_t *)REG_USB0_MP7_TXHUBPORT)           /* USB0 EPn Transmit Hub Port Register */
+#define pREG_USB0_MP8_TXHUBPORT          ((volatile  uint8_t *)REG_USB0_MP8_TXHUBPORT)           /* USB0 EPn Transmit Hub Port Register */
+#define pREG_USB0_MP9_TXHUBPORT          ((volatile  uint8_t *)REG_USB0_MP9_TXHUBPORT)           /* USB0 EPn Transmit Hub Port Register */
+#define pREG_USB0_MP10_TXHUBPORT         ((volatile  uint8_t *)REG_USB0_MP10_TXHUBPORT)          /* USB0 EPn Transmit Hub Port Register */
+#define pREG_USB0_MP11_TXHUBPORT         ((volatile  uint8_t *)REG_USB0_MP11_TXHUBPORT)          /* USB0 EPn Transmit Hub Port Register */
+#define pREG_USB0_MP0_RXFUNCADDR         ((volatile  uint8_t *)REG_USB0_MP0_RXFUNCADDR)          /* USB0 EPn Receive Function Address Register */
+#define pREG_USB0_MP1_RXFUNCADDR         ((volatile  uint8_t *)REG_USB0_MP1_RXFUNCADDR)          /* USB0 EPn Receive Function Address Register */
+#define pREG_USB0_MP2_RXFUNCADDR         ((volatile  uint8_t *)REG_USB0_MP2_RXFUNCADDR)          /* USB0 EPn Receive Function Address Register */
+#define pREG_USB0_MP3_RXFUNCADDR         ((volatile  uint8_t *)REG_USB0_MP3_RXFUNCADDR)          /* USB0 EPn Receive Function Address Register */
+#define pREG_USB0_MP4_RXFUNCADDR         ((volatile  uint8_t *)REG_USB0_MP4_RXFUNCADDR)          /* USB0 EPn Receive Function Address Register */
+#define pREG_USB0_MP5_RXFUNCADDR         ((volatile  uint8_t *)REG_USB0_MP5_RXFUNCADDR)          /* USB0 EPn Receive Function Address Register */
+#define pREG_USB0_MP6_RXFUNCADDR         ((volatile  uint8_t *)REG_USB0_MP6_RXFUNCADDR)          /* USB0 EPn Receive Function Address Register */
+#define pREG_USB0_MP7_RXFUNCADDR         ((volatile  uint8_t *)REG_USB0_MP7_RXFUNCADDR)          /* USB0 EPn Receive Function Address Register */
+#define pREG_USB0_MP8_RXFUNCADDR         ((volatile  uint8_t *)REG_USB0_MP8_RXFUNCADDR)          /* USB0 EPn Receive Function Address Register */
+#define pREG_USB0_MP9_RXFUNCADDR         ((volatile  uint8_t *)REG_USB0_MP9_RXFUNCADDR)          /* USB0 EPn Receive Function Address Register */
+#define pREG_USB0_MP10_RXFUNCADDR        ((volatile  uint8_t *)REG_USB0_MP10_RXFUNCADDR)         /* USB0 EPn Receive Function Address Register */
+#define pREG_USB0_MP11_RXFUNCADDR        ((volatile  uint8_t *)REG_USB0_MP11_RXFUNCADDR)         /* USB0 EPn Receive Function Address Register */
+#define pREG_USB0_MP0_RXHUBADDR          ((volatile  uint8_t *)REG_USB0_MP0_RXHUBADDR)           /* USB0 EPn Receive Hub Address Register */
+#define pREG_USB0_MP1_RXHUBADDR          ((volatile  uint8_t *)REG_USB0_MP1_RXHUBADDR)           /* USB0 EPn Receive Hub Address Register */
+#define pREG_USB0_MP2_RXHUBADDR          ((volatile  uint8_t *)REG_USB0_MP2_RXHUBADDR)           /* USB0 EPn Receive Hub Address Register */
+#define pREG_USB0_MP3_RXHUBADDR          ((volatile  uint8_t *)REG_USB0_MP3_RXHUBADDR)           /* USB0 EPn Receive Hub Address Register */
+#define pREG_USB0_MP4_RXHUBADDR          ((volatile  uint8_t *)REG_USB0_MP4_RXHUBADDR)           /* USB0 EPn Receive Hub Address Register */
+#define pREG_USB0_MP5_RXHUBADDR          ((volatile  uint8_t *)REG_USB0_MP5_RXHUBADDR)           /* USB0 EPn Receive Hub Address Register */
+#define pREG_USB0_MP6_RXHUBADDR          ((volatile  uint8_t *)REG_USB0_MP6_RXHUBADDR)           /* USB0 EPn Receive Hub Address Register */
+#define pREG_USB0_MP7_RXHUBADDR          ((volatile  uint8_t *)REG_USB0_MP7_RXHUBADDR)           /* USB0 EPn Receive Hub Address Register */
+#define pREG_USB0_MP8_RXHUBADDR          ((volatile  uint8_t *)REG_USB0_MP8_RXHUBADDR)           /* USB0 EPn Receive Hub Address Register */
+#define pREG_USB0_MP9_RXHUBADDR          ((volatile  uint8_t *)REG_USB0_MP9_RXHUBADDR)           /* USB0 EPn Receive Hub Address Register */
+#define pREG_USB0_MP10_RXHUBADDR         ((volatile  uint8_t *)REG_USB0_MP10_RXHUBADDR)          /* USB0 EPn Receive Hub Address Register */
+#define pREG_USB0_MP11_RXHUBADDR         ((volatile  uint8_t *)REG_USB0_MP11_RXHUBADDR)          /* USB0 EPn Receive Hub Address Register */
+#define pREG_USB0_MP0_RXHUBPORT          ((volatile  uint8_t *)REG_USB0_MP0_RXHUBPORT)           /* USB0 EPn Receive Hub Port Register */
+#define pREG_USB0_MP1_RXHUBPORT          ((volatile  uint8_t *)REG_USB0_MP1_RXHUBPORT)           /* USB0 EPn Receive Hub Port Register */
+#define pREG_USB0_MP2_RXHUBPORT          ((volatile  uint8_t *)REG_USB0_MP2_RXHUBPORT)           /* USB0 EPn Receive Hub Port Register */
+#define pREG_USB0_MP3_RXHUBPORT          ((volatile  uint8_t *)REG_USB0_MP3_RXHUBPORT)           /* USB0 EPn Receive Hub Port Register */
+#define pREG_USB0_MP4_RXHUBPORT          ((volatile  uint8_t *)REG_USB0_MP4_RXHUBPORT)           /* USB0 EPn Receive Hub Port Register */
+#define pREG_USB0_MP5_RXHUBPORT          ((volatile  uint8_t *)REG_USB0_MP5_RXHUBPORT)           /* USB0 EPn Receive Hub Port Register */
+#define pREG_USB0_MP6_RXHUBPORT          ((volatile  uint8_t *)REG_USB0_MP6_RXHUBPORT)           /* USB0 EPn Receive Hub Port Register */
+#define pREG_USB0_MP7_RXHUBPORT          ((volatile  uint8_t *)REG_USB0_MP7_RXHUBPORT)           /* USB0 EPn Receive Hub Port Register */
+#define pREG_USB0_MP8_RXHUBPORT          ((volatile  uint8_t *)REG_USB0_MP8_RXHUBPORT)           /* USB0 EPn Receive Hub Port Register */
+#define pREG_USB0_MP9_RXHUBPORT          ((volatile  uint8_t *)REG_USB0_MP9_RXHUBPORT)           /* USB0 EPn Receive Hub Port Register */
+#define pREG_USB0_MP10_RXHUBPORT         ((volatile  uint8_t *)REG_USB0_MP10_RXHUBPORT)          /* USB0 EPn Receive Hub Port Register */
+#define pREG_USB0_MP11_RXHUBPORT         ((volatile  uint8_t *)REG_USB0_MP11_RXHUBPORT)          /* USB0 EPn Receive Hub Port Register */
+#define pREG_USB0_EP0_TXMAXP             ((volatile uint16_t *)REG_USB0_EP0_TXMAXP)              /* USB0 EPn Transmit Maximum Packet Length Register */
+#define pREG_USB0_EP1_TXMAXP             ((volatile uint16_t *)REG_USB0_EP1_TXMAXP)              /* USB0 EPn Transmit Maximum Packet Length Register */
+#define pREG_USB0_EP2_TXMAXP             ((volatile uint16_t *)REG_USB0_EP2_TXMAXP)              /* USB0 EPn Transmit Maximum Packet Length Register */
+#define pREG_USB0_EP3_TXMAXP             ((volatile uint16_t *)REG_USB0_EP3_TXMAXP)              /* USB0 EPn Transmit Maximum Packet Length Register */
+#define pREG_USB0_EP4_TXMAXP             ((volatile uint16_t *)REG_USB0_EP4_TXMAXP)              /* USB0 EPn Transmit Maximum Packet Length Register */
+#define pREG_USB0_EP5_TXMAXP             ((volatile uint16_t *)REG_USB0_EP5_TXMAXP)              /* USB0 EPn Transmit Maximum Packet Length Register */
+#define pREG_USB0_EP6_TXMAXP             ((volatile uint16_t *)REG_USB0_EP6_TXMAXP)              /* USB0 EPn Transmit Maximum Packet Length Register */
+#define pREG_USB0_EP7_TXMAXP             ((volatile uint16_t *)REG_USB0_EP7_TXMAXP)              /* USB0 EPn Transmit Maximum Packet Length Register */
+#define pREG_USB0_EP8_TXMAXP             ((volatile uint16_t *)REG_USB0_EP8_TXMAXP)              /* USB0 EPn Transmit Maximum Packet Length Register */
+#define pREG_USB0_EP9_TXMAXP             ((volatile uint16_t *)REG_USB0_EP9_TXMAXP)              /* USB0 EPn Transmit Maximum Packet Length Register */
+#define pREG_USB0_EP10_TXMAXP            ((volatile uint16_t *)REG_USB0_EP10_TXMAXP)             /* USB0 EPn Transmit Maximum Packet Length Register */
+#define pREG_USB0_EP11_TXMAXP            ((volatile uint16_t *)REG_USB0_EP11_TXMAXP)             /* USB0 EPn Transmit Maximum Packet Length Register */
+#define pREG_USB0_EP0_CSR0_H             ((volatile uint16_t *)REG_USB0_EP0_CSR0_H)              /* USB0 EP0 Configuration and Status (Host) Register */
+#define pREG_USB0_EP0_TXCSR_H            ((volatile uint16_t *)REG_USB0_EP0_TXCSR_H)             /* USB0 EPn Transmit Configuration and Status (Host) Register */
+#define pREG_USB0_EP1_TXCSR_H            ((volatile uint16_t *)REG_USB0_EP1_TXCSR_H)             /* USB0 EPn Transmit Configuration and Status (Host) Register */
+#define pREG_USB0_EP2_TXCSR_H            ((volatile uint16_t *)REG_USB0_EP2_TXCSR_H)             /* USB0 EPn Transmit Configuration and Status (Host) Register */
+#define pREG_USB0_EP3_TXCSR_H            ((volatile uint16_t *)REG_USB0_EP3_TXCSR_H)             /* USB0 EPn Transmit Configuration and Status (Host) Register */
+#define pREG_USB0_EP4_TXCSR_H            ((volatile uint16_t *)REG_USB0_EP4_TXCSR_H)             /* USB0 EPn Transmit Configuration and Status (Host) Register */
+#define pREG_USB0_EP5_TXCSR_H            ((volatile uint16_t *)REG_USB0_EP5_TXCSR_H)             /* USB0 EPn Transmit Configuration and Status (Host) Register */
+#define pREG_USB0_EP6_TXCSR_H            ((volatile uint16_t *)REG_USB0_EP6_TXCSR_H)             /* USB0 EPn Transmit Configuration and Status (Host) Register */
+#define pREG_USB0_EP7_TXCSR_H            ((volatile uint16_t *)REG_USB0_EP7_TXCSR_H)             /* USB0 EPn Transmit Configuration and Status (Host) Register */
+#define pREG_USB0_EP8_TXCSR_H            ((volatile uint16_t *)REG_USB0_EP8_TXCSR_H)             /* USB0 EPn Transmit Configuration and Status (Host) Register */
+#define pREG_USB0_EP9_TXCSR_H            ((volatile uint16_t *)REG_USB0_EP9_TXCSR_H)             /* USB0 EPn Transmit Configuration and Status (Host) Register */
+#define pREG_USB0_EP10_TXCSR_H           ((volatile uint16_t *)REG_USB0_EP10_TXCSR_H)            /* USB0 EPn Transmit Configuration and Status (Host) Register */
+#define pREG_USB0_EP11_TXCSR_H           ((volatile uint16_t *)REG_USB0_EP11_TXCSR_H)            /* USB0 EPn Transmit Configuration and Status (Host) Register */
+#define pREG_USB0_EP0_CSR0_P             ((volatile uint16_t *)REG_USB0_EP0_CSR0_P)              /* USB0 EP0 Configuration and Status (Peripheral) Register */
+#define pREG_USB0_EP0_TXCSR_P            ((volatile uint16_t *)REG_USB0_EP0_TXCSR_P)             /* USB0 EPn Transmit Configuration and Status (Peripheral) Register */
+#define pREG_USB0_EP1_TXCSR_P            ((volatile uint16_t *)REG_USB0_EP1_TXCSR_P)             /* USB0 EPn Transmit Configuration and Status (Peripheral) Register */
+#define pREG_USB0_EP2_TXCSR_P            ((volatile uint16_t *)REG_USB0_EP2_TXCSR_P)             /* USB0 EPn Transmit Configuration and Status (Peripheral) Register */
+#define pREG_USB0_EP3_TXCSR_P            ((volatile uint16_t *)REG_USB0_EP3_TXCSR_P)             /* USB0 EPn Transmit Configuration and Status (Peripheral) Register */
+#define pREG_USB0_EP4_TXCSR_P            ((volatile uint16_t *)REG_USB0_EP4_TXCSR_P)             /* USB0 EPn Transmit Configuration and Status (Peripheral) Register */
+#define pREG_USB0_EP5_TXCSR_P            ((volatile uint16_t *)REG_USB0_EP5_TXCSR_P)             /* USB0 EPn Transmit Configuration and Status (Peripheral) Register */
+#define pREG_USB0_EP6_TXCSR_P            ((volatile uint16_t *)REG_USB0_EP6_TXCSR_P)             /* USB0 EPn Transmit Configuration and Status (Peripheral) Register */
+#define pREG_USB0_EP7_TXCSR_P            ((volatile uint16_t *)REG_USB0_EP7_TXCSR_P)             /* USB0 EPn Transmit Configuration and Status (Peripheral) Register */
+#define pREG_USB0_EP8_TXCSR_P            ((volatile uint16_t *)REG_USB0_EP8_TXCSR_P)             /* USB0 EPn Transmit Configuration and Status (Peripheral) Register */
+#define pREG_USB0_EP9_TXCSR_P            ((volatile uint16_t *)REG_USB0_EP9_TXCSR_P)             /* USB0 EPn Transmit Configuration and Status (Peripheral) Register */
+#define pREG_USB0_EP10_TXCSR_P           ((volatile uint16_t *)REG_USB0_EP10_TXCSR_P)            /* USB0 EPn Transmit Configuration and Status (Peripheral) Register */
+#define pREG_USB0_EP11_TXCSR_P           ((volatile uint16_t *)REG_USB0_EP11_TXCSR_P)            /* USB0 EPn Transmit Configuration and Status (Peripheral) Register */
+#define pREG_USB0_EP0_RXMAXP             ((volatile uint16_t *)REG_USB0_EP0_RXMAXP)              /* USB0 EPn Receive Maximum Packet Length Register */
+#define pREG_USB0_EP1_RXMAXP             ((volatile uint16_t *)REG_USB0_EP1_RXMAXP)              /* USB0 EPn Receive Maximum Packet Length Register */
+#define pREG_USB0_EP2_RXMAXP             ((volatile uint16_t *)REG_USB0_EP2_RXMAXP)              /* USB0 EPn Receive Maximum Packet Length Register */
+#define pREG_USB0_EP3_RXMAXP             ((volatile uint16_t *)REG_USB0_EP3_RXMAXP)              /* USB0 EPn Receive Maximum Packet Length Register */
+#define pREG_USB0_EP4_RXMAXP             ((volatile uint16_t *)REG_USB0_EP4_RXMAXP)              /* USB0 EPn Receive Maximum Packet Length Register */
+#define pREG_USB0_EP5_RXMAXP             ((volatile uint16_t *)REG_USB0_EP5_RXMAXP)              /* USB0 EPn Receive Maximum Packet Length Register */
+#define pREG_USB0_EP6_RXMAXP             ((volatile uint16_t *)REG_USB0_EP6_RXMAXP)              /* USB0 EPn Receive Maximum Packet Length Register */
+#define pREG_USB0_EP7_RXMAXP             ((volatile uint16_t *)REG_USB0_EP7_RXMAXP)              /* USB0 EPn Receive Maximum Packet Length Register */
+#define pREG_USB0_EP8_RXMAXP             ((volatile uint16_t *)REG_USB0_EP8_RXMAXP)              /* USB0 EPn Receive Maximum Packet Length Register */
+#define pREG_USB0_EP9_RXMAXP             ((volatile uint16_t *)REG_USB0_EP9_RXMAXP)              /* USB0 EPn Receive Maximum Packet Length Register */
+#define pREG_USB0_EP10_RXMAXP            ((volatile uint16_t *)REG_USB0_EP10_RXMAXP)             /* USB0 EPn Receive Maximum Packet Length Register */
+#define pREG_USB0_EP11_RXMAXP            ((volatile uint16_t *)REG_USB0_EP11_RXMAXP)             /* USB0 EPn Receive Maximum Packet Length Register */
+#define pREG_USB0_EP0_RXCSR_H            ((volatile uint16_t *)REG_USB0_EP0_RXCSR_H)             /* USB0 EPn Receive Configuration and Status (Host) Register */
+#define pREG_USB0_EP1_RXCSR_H            ((volatile uint16_t *)REG_USB0_EP1_RXCSR_H)             /* USB0 EPn Receive Configuration and Status (Host) Register */
+#define pREG_USB0_EP2_RXCSR_H            ((volatile uint16_t *)REG_USB0_EP2_RXCSR_H)             /* USB0 EPn Receive Configuration and Status (Host) Register */
+#define pREG_USB0_EP3_RXCSR_H            ((volatile uint16_t *)REG_USB0_EP3_RXCSR_H)             /* USB0 EPn Receive Configuration and Status (Host) Register */
+#define pREG_USB0_EP4_RXCSR_H            ((volatile uint16_t *)REG_USB0_EP4_RXCSR_H)             /* USB0 EPn Receive Configuration and Status (Host) Register */
+#define pREG_USB0_EP5_RXCSR_H            ((volatile uint16_t *)REG_USB0_EP5_RXCSR_H)             /* USB0 EPn Receive Configuration and Status (Host) Register */
+#define pREG_USB0_EP6_RXCSR_H            ((volatile uint16_t *)REG_USB0_EP6_RXCSR_H)             /* USB0 EPn Receive Configuration and Status (Host) Register */
+#define pREG_USB0_EP7_RXCSR_H            ((volatile uint16_t *)REG_USB0_EP7_RXCSR_H)             /* USB0 EPn Receive Configuration and Status (Host) Register */
+#define pREG_USB0_EP8_RXCSR_H            ((volatile uint16_t *)REG_USB0_EP8_RXCSR_H)             /* USB0 EPn Receive Configuration and Status (Host) Register */
+#define pREG_USB0_EP9_RXCSR_H            ((volatile uint16_t *)REG_USB0_EP9_RXCSR_H)             /* USB0 EPn Receive Configuration and Status (Host) Register */
+#define pREG_USB0_EP10_RXCSR_H           ((volatile uint16_t *)REG_USB0_EP10_RXCSR_H)            /* USB0 EPn Receive Configuration and Status (Host) Register */
+#define pREG_USB0_EP11_RXCSR_H           ((volatile uint16_t *)REG_USB0_EP11_RXCSR_H)            /* USB0 EPn Receive Configuration and Status (Host) Register */
+#define pREG_USB0_EP0_RXCSR_P            ((volatile uint16_t *)REG_USB0_EP0_RXCSR_P)             /* USB0 EPn Receive Configuration and Status (Peripheral) Register */
+#define pREG_USB0_EP1_RXCSR_P            ((volatile uint16_t *)REG_USB0_EP1_RXCSR_P)             /* USB0 EPn Receive Configuration and Status (Peripheral) Register */
+#define pREG_USB0_EP2_RXCSR_P            ((volatile uint16_t *)REG_USB0_EP2_RXCSR_P)             /* USB0 EPn Receive Configuration and Status (Peripheral) Register */
+#define pREG_USB0_EP3_RXCSR_P            ((volatile uint16_t *)REG_USB0_EP3_RXCSR_P)             /* USB0 EPn Receive Configuration and Status (Peripheral) Register */
+#define pREG_USB0_EP4_RXCSR_P            ((volatile uint16_t *)REG_USB0_EP4_RXCSR_P)             /* USB0 EPn Receive Configuration and Status (Peripheral) Register */
+#define pREG_USB0_EP5_RXCSR_P            ((volatile uint16_t *)REG_USB0_EP5_RXCSR_P)             /* USB0 EPn Receive Configuration and Status (Peripheral) Register */
+#define pREG_USB0_EP6_RXCSR_P            ((volatile uint16_t *)REG_USB0_EP6_RXCSR_P)             /* USB0 EPn Receive Configuration and Status (Peripheral) Register */
+#define pREG_USB0_EP7_RXCSR_P            ((volatile uint16_t *)REG_USB0_EP7_RXCSR_P)             /* USB0 EPn Receive Configuration and Status (Peripheral) Register */
+#define pREG_USB0_EP8_RXCSR_P            ((volatile uint16_t *)REG_USB0_EP8_RXCSR_P)             /* USB0 EPn Receive Configuration and Status (Peripheral) Register */
+#define pREG_USB0_EP9_RXCSR_P            ((volatile uint16_t *)REG_USB0_EP9_RXCSR_P)             /* USB0 EPn Receive Configuration and Status (Peripheral) Register */
+#define pREG_USB0_EP10_RXCSR_P           ((volatile uint16_t *)REG_USB0_EP10_RXCSR_P)            /* USB0 EPn Receive Configuration and Status (Peripheral) Register */
+#define pREG_USB0_EP11_RXCSR_P           ((volatile uint16_t *)REG_USB0_EP11_RXCSR_P)            /* USB0 EPn Receive Configuration and Status (Peripheral) Register */
+#define pREG_USB0_EP0_CNT0               ((volatile uint16_t *)REG_USB0_EP0_CNT0)                /* USB0 EP0 Number of Received Bytes Register */
+#define pREG_USB0_EP0_RXCNT              ((volatile uint16_t *)REG_USB0_EP0_RXCNT)               /* USB0 EPn Number of Bytes Received Register */
+#define pREG_USB0_EP1_RXCNT              ((volatile uint16_t *)REG_USB0_EP1_RXCNT)               /* USB0 EPn Number of Bytes Received Register */
+#define pREG_USB0_EP2_RXCNT              ((volatile uint16_t *)REG_USB0_EP2_RXCNT)               /* USB0 EPn Number of Bytes Received Register */
+#define pREG_USB0_EP3_RXCNT              ((volatile uint16_t *)REG_USB0_EP3_RXCNT)               /* USB0 EPn Number of Bytes Received Register */
+#define pREG_USB0_EP4_RXCNT              ((volatile uint16_t *)REG_USB0_EP4_RXCNT)               /* USB0 EPn Number of Bytes Received Register */
+#define pREG_USB0_EP5_RXCNT              ((volatile uint16_t *)REG_USB0_EP5_RXCNT)               /* USB0 EPn Number of Bytes Received Register */
+#define pREG_USB0_EP6_RXCNT              ((volatile uint16_t *)REG_USB0_EP6_RXCNT)               /* USB0 EPn Number of Bytes Received Register */
+#define pREG_USB0_EP7_RXCNT              ((volatile uint16_t *)REG_USB0_EP7_RXCNT)               /* USB0 EPn Number of Bytes Received Register */
+#define pREG_USB0_EP8_RXCNT              ((volatile uint16_t *)REG_USB0_EP8_RXCNT)               /* USB0 EPn Number of Bytes Received Register */
+#define pREG_USB0_EP9_RXCNT              ((volatile uint16_t *)REG_USB0_EP9_RXCNT)               /* USB0 EPn Number of Bytes Received Register */
+#define pREG_USB0_EP10_RXCNT             ((volatile uint16_t *)REG_USB0_EP10_RXCNT)              /* USB0 EPn Number of Bytes Received Register */
+#define pREG_USB0_EP11_RXCNT             ((volatile uint16_t *)REG_USB0_EP11_RXCNT)              /* USB0 EPn Number of Bytes Received Register */
+#define pREG_USB0_EP0_TYPE0              ((volatile  uint8_t *)REG_USB0_EP0_TYPE0)               /* USB0 EP0 Connection Type Register */
+#define pREG_USB0_EP0_TXTYPE             ((volatile  uint8_t *)REG_USB0_EP0_TXTYPE)              /* USB0 EPn Transmit Type Register */
+#define pREG_USB0_EP1_TXTYPE             ((volatile  uint8_t *)REG_USB0_EP1_TXTYPE)              /* USB0 EPn Transmit Type Register */
+#define pREG_USB0_EP2_TXTYPE             ((volatile  uint8_t *)REG_USB0_EP2_TXTYPE)              /* USB0 EPn Transmit Type Register */
+#define pREG_USB0_EP3_TXTYPE             ((volatile  uint8_t *)REG_USB0_EP3_TXTYPE)              /* USB0 EPn Transmit Type Register */
+#define pREG_USB0_EP4_TXTYPE             ((volatile  uint8_t *)REG_USB0_EP4_TXTYPE)              /* USB0 EPn Transmit Type Register */
+#define pREG_USB0_EP5_TXTYPE             ((volatile  uint8_t *)REG_USB0_EP5_TXTYPE)              /* USB0 EPn Transmit Type Register */
+#define pREG_USB0_EP6_TXTYPE             ((volatile  uint8_t *)REG_USB0_EP6_TXTYPE)              /* USB0 EPn Transmit Type Register */
+#define pREG_USB0_EP7_TXTYPE             ((volatile  uint8_t *)REG_USB0_EP7_TXTYPE)              /* USB0 EPn Transmit Type Register */
+#define pREG_USB0_EP8_TXTYPE             ((volatile  uint8_t *)REG_USB0_EP8_TXTYPE)              /* USB0 EPn Transmit Type Register */
+#define pREG_USB0_EP9_TXTYPE             ((volatile  uint8_t *)REG_USB0_EP9_TXTYPE)              /* USB0 EPn Transmit Type Register */
+#define pREG_USB0_EP10_TXTYPE            ((volatile  uint8_t *)REG_USB0_EP10_TXTYPE)             /* USB0 EPn Transmit Type Register */
+#define pREG_USB0_EP11_TXTYPE            ((volatile  uint8_t *)REG_USB0_EP11_TXTYPE)             /* USB0 EPn Transmit Type Register */
+#define pREG_USB0_EP0_NAKLIMIT0          ((volatile  uint8_t *)REG_USB0_EP0_NAKLIMIT0)           /* USB0 EP0 NAK Limit Register */
+#define pREG_USB0_EP0_TXINTERVAL         ((volatile  uint8_t *)REG_USB0_EP0_TXINTERVAL)          /* USB0 EPn Transmit Polling Interval Register */
+#define pREG_USB0_EP1_TXINTERVAL         ((volatile  uint8_t *)REG_USB0_EP1_TXINTERVAL)          /* USB0 EPn Transmit Polling Interval Register */
+#define pREG_USB0_EP2_TXINTERVAL         ((volatile  uint8_t *)REG_USB0_EP2_TXINTERVAL)          /* USB0 EPn Transmit Polling Interval Register */
+#define pREG_USB0_EP3_TXINTERVAL         ((volatile  uint8_t *)REG_USB0_EP3_TXINTERVAL)          /* USB0 EPn Transmit Polling Interval Register */
+#define pREG_USB0_EP4_TXINTERVAL         ((volatile  uint8_t *)REG_USB0_EP4_TXINTERVAL)          /* USB0 EPn Transmit Polling Interval Register */
+#define pREG_USB0_EP5_TXINTERVAL         ((volatile  uint8_t *)REG_USB0_EP5_TXINTERVAL)          /* USB0 EPn Transmit Polling Interval Register */
+#define pREG_USB0_EP6_TXINTERVAL         ((volatile  uint8_t *)REG_USB0_EP6_TXINTERVAL)          /* USB0 EPn Transmit Polling Interval Register */
+#define pREG_USB0_EP7_TXINTERVAL         ((volatile  uint8_t *)REG_USB0_EP7_TXINTERVAL)          /* USB0 EPn Transmit Polling Interval Register */
+#define pREG_USB0_EP8_TXINTERVAL         ((volatile  uint8_t *)REG_USB0_EP8_TXINTERVAL)          /* USB0 EPn Transmit Polling Interval Register */
+#define pREG_USB0_EP9_TXINTERVAL         ((volatile  uint8_t *)REG_USB0_EP9_TXINTERVAL)          /* USB0 EPn Transmit Polling Interval Register */
+#define pREG_USB0_EP10_TXINTERVAL        ((volatile  uint8_t *)REG_USB0_EP10_TXINTERVAL)         /* USB0 EPn Transmit Polling Interval Register */
+#define pREG_USB0_EP11_TXINTERVAL        ((volatile  uint8_t *)REG_USB0_EP11_TXINTERVAL)         /* USB0 EPn Transmit Polling Interval Register */
+#define pREG_USB0_EP0_RXTYPE             ((volatile  uint8_t *)REG_USB0_EP0_RXTYPE)              /* USB0 EPn Receive Type Register */
+#define pREG_USB0_EP1_RXTYPE             ((volatile  uint8_t *)REG_USB0_EP1_RXTYPE)              /* USB0 EPn Receive Type Register */
+#define pREG_USB0_EP2_RXTYPE             ((volatile  uint8_t *)REG_USB0_EP2_RXTYPE)              /* USB0 EPn Receive Type Register */
+#define pREG_USB0_EP3_RXTYPE             ((volatile  uint8_t *)REG_USB0_EP3_RXTYPE)              /* USB0 EPn Receive Type Register */
+#define pREG_USB0_EP4_RXTYPE             ((volatile  uint8_t *)REG_USB0_EP4_RXTYPE)              /* USB0 EPn Receive Type Register */
+#define pREG_USB0_EP5_RXTYPE             ((volatile  uint8_t *)REG_USB0_EP5_RXTYPE)              /* USB0 EPn Receive Type Register */
+#define pREG_USB0_EP6_RXTYPE             ((volatile  uint8_t *)REG_USB0_EP6_RXTYPE)              /* USB0 EPn Receive Type Register */
+#define pREG_USB0_EP7_RXTYPE             ((volatile  uint8_t *)REG_USB0_EP7_RXTYPE)              /* USB0 EPn Receive Type Register */
+#define pREG_USB0_EP8_RXTYPE             ((volatile  uint8_t *)REG_USB0_EP8_RXTYPE)              /* USB0 EPn Receive Type Register */
+#define pREG_USB0_EP9_RXTYPE             ((volatile  uint8_t *)REG_USB0_EP9_RXTYPE)              /* USB0 EPn Receive Type Register */
+#define pREG_USB0_EP10_RXTYPE            ((volatile  uint8_t *)REG_USB0_EP10_RXTYPE)             /* USB0 EPn Receive Type Register */
+#define pREG_USB0_EP11_RXTYPE            ((volatile  uint8_t *)REG_USB0_EP11_RXTYPE)             /* USB0 EPn Receive Type Register */
+#define pREG_USB0_EP0_RXINTERVAL         ((volatile  uint8_t *)REG_USB0_EP0_RXINTERVAL)          /* USB0 EPn Receive Polling Interval Register */
+#define pREG_USB0_EP1_RXINTERVAL         ((volatile  uint8_t *)REG_USB0_EP1_RXINTERVAL)          /* USB0 EPn Receive Polling Interval Register */
+#define pREG_USB0_EP2_RXINTERVAL         ((volatile  uint8_t *)REG_USB0_EP2_RXINTERVAL)          /* USB0 EPn Receive Polling Interval Register */
+#define pREG_USB0_EP3_RXINTERVAL         ((volatile  uint8_t *)REG_USB0_EP3_RXINTERVAL)          /* USB0 EPn Receive Polling Interval Register */
+#define pREG_USB0_EP4_RXINTERVAL         ((volatile  uint8_t *)REG_USB0_EP4_RXINTERVAL)          /* USB0 EPn Receive Polling Interval Register */
+#define pREG_USB0_EP5_RXINTERVAL         ((volatile  uint8_t *)REG_USB0_EP5_RXINTERVAL)          /* USB0 EPn Receive Polling Interval Register */
+#define pREG_USB0_EP6_RXINTERVAL         ((volatile  uint8_t *)REG_USB0_EP6_RXINTERVAL)          /* USB0 EPn Receive Polling Interval Register */
+#define pREG_USB0_EP7_RXINTERVAL         ((volatile  uint8_t *)REG_USB0_EP7_RXINTERVAL)          /* USB0 EPn Receive Polling Interval Register */
+#define pREG_USB0_EP8_RXINTERVAL         ((volatile  uint8_t *)REG_USB0_EP8_RXINTERVAL)          /* USB0 EPn Receive Polling Interval Register */
+#define pREG_USB0_EP9_RXINTERVAL         ((volatile  uint8_t *)REG_USB0_EP9_RXINTERVAL)          /* USB0 EPn Receive Polling Interval Register */
+#define pREG_USB0_EP10_RXINTERVAL        ((volatile  uint8_t *)REG_USB0_EP10_RXINTERVAL)         /* USB0 EPn Receive Polling Interval Register */
+#define pREG_USB0_EP11_RXINTERVAL        ((volatile  uint8_t *)REG_USB0_EP11_RXINTERVAL)         /* USB0 EPn Receive Polling Interval Register */
+#define pREG_USB0_EP0_CFGDATA0           ((volatile  uint8_t *)REG_USB0_EP0_CFGDATA0)            /* USB0 EP0 Configuration Information Register */
+#define pREG_USB0_DMA_IRQ                ((volatile  uint8_t *)REG_USB0_DMA_IRQ)                 /* USB0 DMA Interrupt Register */
+#define pREG_USB0_DMA0_CTL               ((volatile uint16_t *)REG_USB0_DMA0_CTL)                /* USB0 DMA Channel n Control Register */
+#define pREG_USB0_DMA1_CTL               ((volatile uint16_t *)REG_USB0_DMA1_CTL)                /* USB0 DMA Channel n Control Register */
+#define pREG_USB0_DMA2_CTL               ((volatile uint16_t *)REG_USB0_DMA2_CTL)                /* USB0 DMA Channel n Control Register */
+#define pREG_USB0_DMA3_CTL               ((volatile uint16_t *)REG_USB0_DMA3_CTL)                /* USB0 DMA Channel n Control Register */
+#define pREG_USB0_DMA4_CTL               ((volatile uint16_t *)REG_USB0_DMA4_CTL)                /* USB0 DMA Channel n Control Register */
+#define pREG_USB0_DMA5_CTL               ((volatile uint16_t *)REG_USB0_DMA5_CTL)                /* USB0 DMA Channel n Control Register */
+#define pREG_USB0_DMA6_CTL               ((volatile uint16_t *)REG_USB0_DMA6_CTL)                /* USB0 DMA Channel n Control Register */
+#define pREG_USB0_DMA7_CTL               ((volatile uint16_t *)REG_USB0_DMA7_CTL)                /* USB0 DMA Channel n Control Register */
+#define pREG_USB0_DMA0_ADDR              ((void * volatile *)REG_USB0_DMA0_ADDR)                 /* USB0 DMA Channel n Address Register */
+#define pREG_USB0_DMA1_ADDR              ((void * volatile *)REG_USB0_DMA1_ADDR)                 /* USB0 DMA Channel n Address Register */
+#define pREG_USB0_DMA2_ADDR              ((void * volatile *)REG_USB0_DMA2_ADDR)                 /* USB0 DMA Channel n Address Register */
+#define pREG_USB0_DMA3_ADDR              ((void * volatile *)REG_USB0_DMA3_ADDR)                 /* USB0 DMA Channel n Address Register */
+#define pREG_USB0_DMA4_ADDR              ((void * volatile *)REG_USB0_DMA4_ADDR)                 /* USB0 DMA Channel n Address Register */
+#define pREG_USB0_DMA5_ADDR              ((void * volatile *)REG_USB0_DMA5_ADDR)                 /* USB0 DMA Channel n Address Register */
+#define pREG_USB0_DMA6_ADDR              ((void * volatile *)REG_USB0_DMA6_ADDR)                 /* USB0 DMA Channel n Address Register */
+#define pREG_USB0_DMA7_ADDR              ((void * volatile *)REG_USB0_DMA7_ADDR)                 /* USB0 DMA Channel n Address Register */
+#define pREG_USB0_DMA0_CNT               ((volatile uint32_t *)REG_USB0_DMA0_CNT)                /* USB0 DMA Channel n Count Register */
+#define pREG_USB0_DMA1_CNT               ((volatile uint32_t *)REG_USB0_DMA1_CNT)                /* USB0 DMA Channel n Count Register */
+#define pREG_USB0_DMA2_CNT               ((volatile uint32_t *)REG_USB0_DMA2_CNT)                /* USB0 DMA Channel n Count Register */
+#define pREG_USB0_DMA3_CNT               ((volatile uint32_t *)REG_USB0_DMA3_CNT)                /* USB0 DMA Channel n Count Register */
+#define pREG_USB0_DMA4_CNT               ((volatile uint32_t *)REG_USB0_DMA4_CNT)                /* USB0 DMA Channel n Count Register */
+#define pREG_USB0_DMA5_CNT               ((volatile uint32_t *)REG_USB0_DMA5_CNT)                /* USB0 DMA Channel n Count Register */
+#define pREG_USB0_DMA6_CNT               ((volatile uint32_t *)REG_USB0_DMA6_CNT)                /* USB0 DMA Channel n Count Register */
+#define pREG_USB0_DMA7_CNT               ((volatile uint32_t *)REG_USB0_DMA7_CNT)                /* USB0 DMA Channel n Count Register */
+#define pREG_USB0_RQPKTCNT0              ((volatile uint16_t *)REG_USB0_RQPKTCNT0)               /* USB0 EPn Request Packet Count Register */
+#define pREG_USB0_RQPKTCNT1              ((volatile uint16_t *)REG_USB0_RQPKTCNT1)               /* USB0 EPn Request Packet Count Register */
+#define pREG_USB0_RQPKTCNT2              ((volatile uint16_t *)REG_USB0_RQPKTCNT2)               /* USB0 EPn Request Packet Count Register */
+#define pREG_USB0_RQPKTCNT3              ((volatile uint16_t *)REG_USB0_RQPKTCNT3)               /* USB0 EPn Request Packet Count Register */
+#define pREG_USB0_RQPKTCNT4              ((volatile uint16_t *)REG_USB0_RQPKTCNT4)               /* USB0 EPn Request Packet Count Register */
+#define pREG_USB0_RQPKTCNT5              ((volatile uint16_t *)REG_USB0_RQPKTCNT5)               /* USB0 EPn Request Packet Count Register */
+#define pREG_USB0_RQPKTCNT6              ((volatile uint16_t *)REG_USB0_RQPKTCNT6)               /* USB0 EPn Request Packet Count Register */
+#define pREG_USB0_RQPKTCNT7              ((volatile uint16_t *)REG_USB0_RQPKTCNT7)               /* USB0 EPn Request Packet Count Register */
+#define pREG_USB0_RQPKTCNT8              ((volatile uint16_t *)REG_USB0_RQPKTCNT8)               /* USB0 EPn Request Packet Count Register */
+#define pREG_USB0_RQPKTCNT9              ((volatile uint16_t *)REG_USB0_RQPKTCNT9)               /* USB0 EPn Request Packet Count Register */
+#define pREG_USB0_RQPKTCNT10             ((volatile uint16_t *)REG_USB0_RQPKTCNT10)              /* USB0 EPn Request Packet Count Register */
+#define pREG_USB0_CT_UCH                 ((volatile uint16_t *)REG_USB0_CT_UCH)                  /* USB0 Chirp Timeout Register */
+#define pREG_USB0_CT_HHSRTN              ((volatile uint16_t *)REG_USB0_CT_HHSRTN)               /* USB0 Host High Speed Return to Normal Register */
+#define pREG_USB0_CT_HSBT                ((volatile uint16_t *)REG_USB0_CT_HSBT)                 /* USB0 High Speed Timeout Register */
+#define pREG_USB0_LPM_ATTR               ((volatile uint16_t *)REG_USB0_LPM_ATTR)                /* USB0 LPM Attribute Register */
+#define pREG_USB0_LPM_CTL                ((volatile  uint8_t *)REG_USB0_LPM_CTL)                 /* USB0 LPM Control Register */
+#define pREG_USB0_LPM_IEN                ((volatile  uint8_t *)REG_USB0_LPM_IEN)                 /* USB0 LPM Interrupt Enable Register */
+#define pREG_USB0_LPM_IRQ                ((volatile  uint8_t *)REG_USB0_LPM_IRQ)                 /* USB0 LPM Interrupt Status Register */
+#define pREG_USB0_LPM_FADDR              ((volatile  uint8_t *)REG_USB0_LPM_FADDR)               /* USB0 LPM Function Address Register */
+#define pREG_USB0_VBUS_CTL               ((volatile  uint8_t *)REG_USB0_VBUS_CTL)                /* USB0 VBUS Control Register */
+#define pREG_USB0_BAT_CHG                ((volatile  uint8_t *)REG_USB0_BAT_CHG)                 /* USB0 Battery Charging Control Register */
+#define pREG_USB0_PHY_CTL                ((volatile  uint8_t *)REG_USB0_PHY_CTL)                 /* USB0 PHY Control Register */
+#define pREG_USB0_PLL_OSC                ((volatile uint16_t *)REG_USB0_PLL_OSC)                 /* USB0 PLL and Oscillator Control Register */
 
 
 /* =========================================================================

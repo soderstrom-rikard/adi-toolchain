@@ -16,9 +16,8 @@
      File         :   defBF607.h
      Description  :   Register Definitions
 
-     Date         :   02-28-2012
-     Tag          :   BF60X_TOOLS_CCES_1_0_0
-                      USB (version 2971) / PWM (version 2970)
+     Date         :   05-17-2012
+
 
      Copyright (c) 2011-2012 Analog Devices, Inc.  All Rights Reserved.
      This software is proprietary and confidential to Analog Devices, Inc. and
@@ -434,14 +433,14 @@
 #define BITP_RSI_CTL_BUSWID                  11                               /* Wide Bus Mode Enable */
 #define BITP_RSI_CTL_BYPASS                  10                               /* Bypass clock divisor */
 #define BITP_RSI_CTL_PWRSAVE                  9                               /* Power Save Enable */
-#define BITP_RSI_CTL_CLKEN                    8                               /* SD_CLK Bus Clock Enable */
-#define BITP_RSI_CTL_CLKDIV                   0                               /* SD_CLK Divisor */
+#define BITP_RSI_CTL_CLKEN                    8                               /* RSI_CLK Bus Clock Enable */
+#define BITP_RSI_CTL_CLKDIV                   0                               /* RSI_CLK Divisor */
 #define BITM_RSI_CTL_CARDTYPE                (_ADI_MSK(0x0000E000,uint16_t))  /* Type of Card */
 #define BITM_RSI_CTL_BUSWID                  (_ADI_MSK(0x00001800,uint16_t))  /* Wide Bus Mode Enable */
 #define BITM_RSI_CTL_BYPASS                  (_ADI_MSK(0x00000400,uint16_t))  /* Bypass clock divisor */
 #define BITM_RSI_CTL_PWRSAVE                 (_ADI_MSK(0x00000200,uint16_t))  /* Power Save Enable */
-#define BITM_RSI_CTL_CLKEN                   (_ADI_MSK(0x00000100,uint16_t))  /* SD_CLK Bus Clock Enable */
-#define BITM_RSI_CTL_CLKDIV                  (_ADI_MSK(0x000000FF,uint16_t))  /* SD_CLK Divisor */
+#define BITM_RSI_CTL_CLKEN                   (_ADI_MSK(0x00000100,uint16_t))  /* RSI_CLK Bus Clock Enable */
+#define BITM_RSI_CTL_CLKDIV                  (_ADI_MSK(0x000000FF,uint16_t))  /* RSI_CLK Divisor */
 
 /* ------------------------------------------------------------------------------------------------------------------------
         RSI_CMD                              Pos/Masks                        Description
@@ -810,40 +809,40 @@
 /* =========================
         CAN0
    ========================= */
-#define REG_CAN0_MC1                    0xFFC00A00         /* CAN0 Mailbox Configuration Register 1 */
-#define REG_CAN0_MD1                    0xFFC00A04         /* CAN0 Mailbox Direction Register 1 */
-#define REG_CAN0_TRS1                   0xFFC00A08         /* CAN0 Transmission Request Set Register 1 */
-#define REG_CAN0_TRR1                   0xFFC00A0C         /* CAN0 Transmission Request Reset Register 1 */
-#define REG_CAN0_TA1                    0xFFC00A10         /* CAN0 Transmission Acknowledge Register 1 */
-#define REG_CAN0_AA1                    0xFFC00A14         /* CAN0 Abort Acknowledge Register 1 */
-#define REG_CAN0_RMP1                   0xFFC00A18         /* CAN0 Receive Message Pending Register 1 */
-#define REG_CAN0_RML1                   0xFFC00A1C         /* CAN0 Receive Message Lost Register 1 */
-#define REG_CAN0_MBTIF1                 0xFFC00A20         /* CAN0 Mailbox Transmit Interrupt Flag Register 1 */
-#define REG_CAN0_MBRIF1                 0xFFC00A24         /* CAN0 Mailbox Receive Interrupt Flag Register 1 */
-#define REG_CAN0_MBIM1                  0xFFC00A28         /* CAN0 Mailbox Interrupt Mask Register 1 */
-#define REG_CAN0_RFH1                   0xFFC00A2C         /* CAN0 Remote Frame Handling Register 1 */
-#define REG_CAN0_OPSS1                  0xFFC00A30         /* CAN0 Overwrite Protection/Single Shot Transmission Register 1 */
-#define REG_CAN0_MC2                    0xFFC00A40         /* CAN0 Mailbox Configuration Register 2 */
-#define REG_CAN0_MD2                    0xFFC00A44         /* CAN0 Mailbox Direction Register 2 */
-#define REG_CAN0_TRS2                   0xFFC00A48         /* CAN0 Transmission Request Set Register 2 */
-#define REG_CAN0_TRR2                   0xFFC00A4C         /* CAN0 Transmission Request Reset Register 2 */
-#define REG_CAN0_TA2                    0xFFC00A50         /* CAN0 Transmission Acknowledge Register 2 */
-#define REG_CAN0_AA2                    0xFFC00A54         /* CAN0 Abort Acknowledge Register 2 */
-#define REG_CAN0_RMP2                   0xFFC00A58         /* CAN0 Receive Message Pending Register 2 */
-#define REG_CAN0_RML2                   0xFFC00A5C         /* CAN0 Receive Message Lost Register 2 */
-#define REG_CAN0_MBTIF2                 0xFFC00A60         /* CAN0 Mailbox Transmit Interrupt Flag Register 2 */
-#define REG_CAN0_MBRIF2                 0xFFC00A64         /* CAN0 Mailbox Receive Interrupt Flag Register 2 */
-#define REG_CAN0_MBIM2                  0xFFC00A68         /* CAN0 Mailbox Interrupt Mask Register 2 */
-#define REG_CAN0_RFH2                   0xFFC00A6C         /* CAN0 Remote Frame Handling Register 2 */
-#define REG_CAN0_OPSS2                  0xFFC00A70         /* CAN0 Overwrite Protection/Single Shot Transmission Register 2 */
+#define REG_CAN0_MC1                    0xFFC00A00         /* CAN0 Mailbox Configuration 1 Register */
+#define REG_CAN0_MD1                    0xFFC00A04         /* CAN0 Mailbox Direction 1 Register */
+#define REG_CAN0_TRS1                   0xFFC00A08         /* CAN0 Transmission Request Set 1 Register */
+#define REG_CAN0_TRR1                   0xFFC00A0C         /* CAN0 Transmission Request Reset 1 Register */
+#define REG_CAN0_TA1                    0xFFC00A10         /* CAN0 Transmission Acknowledge 1 Register */
+#define REG_CAN0_AA1                    0xFFC00A14         /* CAN0 Abort Acknowledge 1 Register */
+#define REG_CAN0_RMP1                   0xFFC00A18         /* CAN0 Receive Message Pending 1 Register */
+#define REG_CAN0_RML1                   0xFFC00A1C         /* CAN0 Receive Message Lost 1 Register */
+#define REG_CAN0_MBTIF1                 0xFFC00A20         /* CAN0 Mailbox Transmit Interrupt Flag 1 Register */
+#define REG_CAN0_MBRIF1                 0xFFC00A24         /* CAN0 Mailbox Receive Interrupt Flag 1 Register */
+#define REG_CAN0_MBIM1                  0xFFC00A28         /* CAN0 Mailbox Interrupt Mask 1 Register */
+#define REG_CAN0_RFH1                   0xFFC00A2C         /* CAN0 Remote Frame Handling 1 Register */
+#define REG_CAN0_OPSS1                  0xFFC00A30         /* CAN0 Overwrite Protection/Single Shot Transmission 1 Register */
+#define REG_CAN0_MC2                    0xFFC00A40         /* CAN0 Mailbox Configuration 2 Register */
+#define REG_CAN0_MD2                    0xFFC00A44         /* CAN0 Mailbox Direction 2 Register */
+#define REG_CAN0_TRS2                   0xFFC00A48         /* CAN0 Transmission Request Set 2 Register */
+#define REG_CAN0_TRR2                   0xFFC00A4C         /* CAN0 Transmission Request Reset 2 Register */
+#define REG_CAN0_TA2                    0xFFC00A50         /* CAN0 Transmission Acknowledge 2 Register */
+#define REG_CAN0_AA2                    0xFFC00A54         /* CAN0 Abort Acknowledge 2 Register */
+#define REG_CAN0_RMP2                   0xFFC00A58         /* CAN0 Receive Message Pending 2 Register */
+#define REG_CAN0_RML2                   0xFFC00A5C         /* CAN0 Receive Message Lost 2 Register */
+#define REG_CAN0_MBTIF2                 0xFFC00A60         /* CAN0 Mailbox Transmit Interrupt Flag 2 Register */
+#define REG_CAN0_MBRIF2                 0xFFC00A64         /* CAN0 Mailbox Receive Interrupt Flag 2 Register */
+#define REG_CAN0_MBIM2                  0xFFC00A68         /* CAN0 Mailbox Interrupt Mask 2 Register */
+#define REG_CAN0_RFH2                   0xFFC00A6C         /* CAN0 Remote Frame Handling 2 Register */
+#define REG_CAN0_OPSS2                  0xFFC00A70         /* CAN0 Overwrite Protection/Single Shot Transmission 2 Register */
 #define REG_CAN0_CLK                    0xFFC00A80         /* CAN0 Clock Register */
 #define REG_CAN0_TIMING                 0xFFC00A84         /* CAN0 Timing Register */
 #define REG_CAN0_DBG                    0xFFC00A88         /* CAN0 Debug Register */
 #define REG_CAN0_STAT                   0xFFC00A8C         /* CAN0 Status Register */
 #define REG_CAN0_CEC                    0xFFC00A90         /* CAN0 Error Counter Register */
-#define REG_CAN0_GIS                    0xFFC00A94         /* CAN0 Global CAN Interrupt Status */
-#define REG_CAN0_GIM                    0xFFC00A98         /* CAN0 Global CAN Interrupt Mask */
-#define REG_CAN0_GIF                    0xFFC00A9C         /* CAN0 Global CAN Interrupt Flag */
+#define REG_CAN0_GIS                    0xFFC00A94         /* CAN0 Global CAN Interrupt Status Register */
+#define REG_CAN0_GIM                    0xFFC00A98         /* CAN0 Global CAN Interrupt Mask Register */
+#define REG_CAN0_GIF                    0xFFC00A9C         /* CAN0 Global CAN Interrupt Flag Register */
 #define REG_CAN0_CTL                    0xFFC00AA0         /* CAN0 CAN Master Control Register */
 #define REG_CAN0_INT                    0xFFC00AA4         /* CAN0 Interrupt Pending Register */
 #define REG_CAN0_MBTD                   0xFFC00AAC         /* CAN0 Temporary Mailbox Disable Register */
@@ -852,70 +851,70 @@
 #define REG_CAN0_UCCNT                  0xFFC00AC4         /* CAN0 Universal Counter Register */
 #define REG_CAN0_UCRC                   0xFFC00AC8         /* CAN0 Universal Counter Reload/Capture Register */
 #define REG_CAN0_UCCNF                  0xFFC00ACC         /* CAN0 Universal Counter Configuration Mode Register */
-#define REG_CAN0_AM00L                  0xFFC00B00         /* CAN0 Acceptance Mask Register (L) */
-#define REG_CAN0_AM01L                  0xFFC00B08         /* CAN0 Acceptance Mask Register (L) */
-#define REG_CAN0_AM02L                  0xFFC00B10         /* CAN0 Acceptance Mask Register (L) */
-#define REG_CAN0_AM03L                  0xFFC00B18         /* CAN0 Acceptance Mask Register (L) */
-#define REG_CAN0_AM04L                  0xFFC00B20         /* CAN0 Acceptance Mask Register (L) */
-#define REG_CAN0_AM05L                  0xFFC00B28         /* CAN0 Acceptance Mask Register (L) */
-#define REG_CAN0_AM06L                  0xFFC00B30         /* CAN0 Acceptance Mask Register (L) */
-#define REG_CAN0_AM07L                  0xFFC00B38         /* CAN0 Acceptance Mask Register (L) */
-#define REG_CAN0_AM08L                  0xFFC00B40         /* CAN0 Acceptance Mask Register (L) */
-#define REG_CAN0_AM09L                  0xFFC00B48         /* CAN0 Acceptance Mask Register (L) */
-#define REG_CAN0_AM10L                  0xFFC00B50         /* CAN0 Acceptance Mask Register (L) */
-#define REG_CAN0_AM11L                  0xFFC00B58         /* CAN0 Acceptance Mask Register (L) */
-#define REG_CAN0_AM12L                  0xFFC00B60         /* CAN0 Acceptance Mask Register (L) */
-#define REG_CAN0_AM13L                  0xFFC00B68         /* CAN0 Acceptance Mask Register (L) */
-#define REG_CAN0_AM14L                  0xFFC00B70         /* CAN0 Acceptance Mask Register (L) */
-#define REG_CAN0_AM15L                  0xFFC00B78         /* CAN0 Acceptance Mask Register (L) */
-#define REG_CAN0_AM16L                  0xFFC00B80         /* CAN0 Acceptance Mask Register (L) */
-#define REG_CAN0_AM17L                  0xFFC00B88         /* CAN0 Acceptance Mask Register (L) */
-#define REG_CAN0_AM18L                  0xFFC00B90         /* CAN0 Acceptance Mask Register (L) */
-#define REG_CAN0_AM19L                  0xFFC00B98         /* CAN0 Acceptance Mask Register (L) */
-#define REG_CAN0_AM20L                  0xFFC00BA0         /* CAN0 Acceptance Mask Register (L) */
-#define REG_CAN0_AM21L                  0xFFC00BA8         /* CAN0 Acceptance Mask Register (L) */
-#define REG_CAN0_AM22L                  0xFFC00BB0         /* CAN0 Acceptance Mask Register (L) */
-#define REG_CAN0_AM23L                  0xFFC00BB8         /* CAN0 Acceptance Mask Register (L) */
-#define REG_CAN0_AM24L                  0xFFC00BC0         /* CAN0 Acceptance Mask Register (L) */
-#define REG_CAN0_AM25L                  0xFFC00BC8         /* CAN0 Acceptance Mask Register (L) */
-#define REG_CAN0_AM26L                  0xFFC00BD0         /* CAN0 Acceptance Mask Register (L) */
-#define REG_CAN0_AM27L                  0xFFC00BD8         /* CAN0 Acceptance Mask Register (L) */
-#define REG_CAN0_AM28L                  0xFFC00BE0         /* CAN0 Acceptance Mask Register (L) */
-#define REG_CAN0_AM29L                  0xFFC00BE8         /* CAN0 Acceptance Mask Register (L) */
-#define REG_CAN0_AM30L                  0xFFC00BF0         /* CAN0 Acceptance Mask Register (L) */
-#define REG_CAN0_AM31L                  0xFFC00BF8         /* CAN0 Acceptance Mask Register (L) */
-#define REG_CAN0_AM00H                  0xFFC00B04         /* CAN0 Acceptance Mask Register (H) */
-#define REG_CAN0_AM01H                  0xFFC00B0C         /* CAN0 Acceptance Mask Register (H) */
-#define REG_CAN0_AM02H                  0xFFC00B14         /* CAN0 Acceptance Mask Register (H) */
-#define REG_CAN0_AM03H                  0xFFC00B1C         /* CAN0 Acceptance Mask Register (H) */
-#define REG_CAN0_AM04H                  0xFFC00B24         /* CAN0 Acceptance Mask Register (H) */
-#define REG_CAN0_AM05H                  0xFFC00B2C         /* CAN0 Acceptance Mask Register (H) */
-#define REG_CAN0_AM06H                  0xFFC00B34         /* CAN0 Acceptance Mask Register (H) */
-#define REG_CAN0_AM07H                  0xFFC00B3C         /* CAN0 Acceptance Mask Register (H) */
-#define REG_CAN0_AM08H                  0xFFC00B44         /* CAN0 Acceptance Mask Register (H) */
-#define REG_CAN0_AM09H                  0xFFC00B4C         /* CAN0 Acceptance Mask Register (H) */
-#define REG_CAN0_AM10H                  0xFFC00B54         /* CAN0 Acceptance Mask Register (H) */
-#define REG_CAN0_AM11H                  0xFFC00B5C         /* CAN0 Acceptance Mask Register (H) */
-#define REG_CAN0_AM12H                  0xFFC00B64         /* CAN0 Acceptance Mask Register (H) */
-#define REG_CAN0_AM13H                  0xFFC00B6C         /* CAN0 Acceptance Mask Register (H) */
-#define REG_CAN0_AM14H                  0xFFC00B74         /* CAN0 Acceptance Mask Register (H) */
-#define REG_CAN0_AM15H                  0xFFC00B7C         /* CAN0 Acceptance Mask Register (H) */
-#define REG_CAN0_AM16H                  0xFFC00B84         /* CAN0 Acceptance Mask Register (H) */
-#define REG_CAN0_AM17H                  0xFFC00B8C         /* CAN0 Acceptance Mask Register (H) */
-#define REG_CAN0_AM18H                  0xFFC00B94         /* CAN0 Acceptance Mask Register (H) */
-#define REG_CAN0_AM19H                  0xFFC00B9C         /* CAN0 Acceptance Mask Register (H) */
-#define REG_CAN0_AM20H                  0xFFC00BA4         /* CAN0 Acceptance Mask Register (H) */
-#define REG_CAN0_AM21H                  0xFFC00BAC         /* CAN0 Acceptance Mask Register (H) */
-#define REG_CAN0_AM22H                  0xFFC00BB4         /* CAN0 Acceptance Mask Register (H) */
-#define REG_CAN0_AM23H                  0xFFC00BBC         /* CAN0 Acceptance Mask Register (H) */
-#define REG_CAN0_AM24H                  0xFFC00BC4         /* CAN0 Acceptance Mask Register (H) */
-#define REG_CAN0_AM25H                  0xFFC00BCC         /* CAN0 Acceptance Mask Register (H) */
-#define REG_CAN0_AM26H                  0xFFC00BD4         /* CAN0 Acceptance Mask Register (H) */
-#define REG_CAN0_AM27H                  0xFFC00BDC         /* CAN0 Acceptance Mask Register (H) */
-#define REG_CAN0_AM28H                  0xFFC00BE4         /* CAN0 Acceptance Mask Register (H) */
-#define REG_CAN0_AM29H                  0xFFC00BEC         /* CAN0 Acceptance Mask Register (H) */
-#define REG_CAN0_AM30H                  0xFFC00BF4         /* CAN0 Acceptance Mask Register (H) */
-#define REG_CAN0_AM31H                  0xFFC00BFC         /* CAN0 Acceptance Mask Register (H) */
+#define REG_CAN0_AM00L                  0xFFC00B00         /* CAN0 Acceptance Mask (L) Register */
+#define REG_CAN0_AM01L                  0xFFC00B08         /* CAN0 Acceptance Mask (L) Register */
+#define REG_CAN0_AM02L                  0xFFC00B10         /* CAN0 Acceptance Mask (L) Register */
+#define REG_CAN0_AM03L                  0xFFC00B18         /* CAN0 Acceptance Mask (L) Register */
+#define REG_CAN0_AM04L                  0xFFC00B20         /* CAN0 Acceptance Mask (L) Register */
+#define REG_CAN0_AM05L                  0xFFC00B28         /* CAN0 Acceptance Mask (L) Register */
+#define REG_CAN0_AM06L                  0xFFC00B30         /* CAN0 Acceptance Mask (L) Register */
+#define REG_CAN0_AM07L                  0xFFC00B38         /* CAN0 Acceptance Mask (L) Register */
+#define REG_CAN0_AM08L                  0xFFC00B40         /* CAN0 Acceptance Mask (L) Register */
+#define REG_CAN0_AM09L                  0xFFC00B48         /* CAN0 Acceptance Mask (L) Register */
+#define REG_CAN0_AM10L                  0xFFC00B50         /* CAN0 Acceptance Mask (L) Register */
+#define REG_CAN0_AM11L                  0xFFC00B58         /* CAN0 Acceptance Mask (L) Register */
+#define REG_CAN0_AM12L                  0xFFC00B60         /* CAN0 Acceptance Mask (L) Register */
+#define REG_CAN0_AM13L                  0xFFC00B68         /* CAN0 Acceptance Mask (L) Register */
+#define REG_CAN0_AM14L                  0xFFC00B70         /* CAN0 Acceptance Mask (L) Register */
+#define REG_CAN0_AM15L                  0xFFC00B78         /* CAN0 Acceptance Mask (L) Register */
+#define REG_CAN0_AM16L                  0xFFC00B80         /* CAN0 Acceptance Mask (L) Register */
+#define REG_CAN0_AM17L                  0xFFC00B88         /* CAN0 Acceptance Mask (L) Register */
+#define REG_CAN0_AM18L                  0xFFC00B90         /* CAN0 Acceptance Mask (L) Register */
+#define REG_CAN0_AM19L                  0xFFC00B98         /* CAN0 Acceptance Mask (L) Register */
+#define REG_CAN0_AM20L                  0xFFC00BA0         /* CAN0 Acceptance Mask (L) Register */
+#define REG_CAN0_AM21L                  0xFFC00BA8         /* CAN0 Acceptance Mask (L) Register */
+#define REG_CAN0_AM22L                  0xFFC00BB0         /* CAN0 Acceptance Mask (L) Register */
+#define REG_CAN0_AM23L                  0xFFC00BB8         /* CAN0 Acceptance Mask (L) Register */
+#define REG_CAN0_AM24L                  0xFFC00BC0         /* CAN0 Acceptance Mask (L) Register */
+#define REG_CAN0_AM25L                  0xFFC00BC8         /* CAN0 Acceptance Mask (L) Register */
+#define REG_CAN0_AM26L                  0xFFC00BD0         /* CAN0 Acceptance Mask (L) Register */
+#define REG_CAN0_AM27L                  0xFFC00BD8         /* CAN0 Acceptance Mask (L) Register */
+#define REG_CAN0_AM28L                  0xFFC00BE0         /* CAN0 Acceptance Mask (L) Register */
+#define REG_CAN0_AM29L                  0xFFC00BE8         /* CAN0 Acceptance Mask (L) Register */
+#define REG_CAN0_AM30L                  0xFFC00BF0         /* CAN0 Acceptance Mask (L) Register */
+#define REG_CAN0_AM31L                  0xFFC00BF8         /* CAN0 Acceptance Mask (L) Register */
+#define REG_CAN0_AM00H                  0xFFC00B04         /* CAN0 Acceptance Mask (H) Register */
+#define REG_CAN0_AM01H                  0xFFC00B0C         /* CAN0 Acceptance Mask (H) Register */
+#define REG_CAN0_AM02H                  0xFFC00B14         /* CAN0 Acceptance Mask (H) Register */
+#define REG_CAN0_AM03H                  0xFFC00B1C         /* CAN0 Acceptance Mask (H) Register */
+#define REG_CAN0_AM04H                  0xFFC00B24         /* CAN0 Acceptance Mask (H) Register */
+#define REG_CAN0_AM05H                  0xFFC00B2C         /* CAN0 Acceptance Mask (H) Register */
+#define REG_CAN0_AM06H                  0xFFC00B34         /* CAN0 Acceptance Mask (H) Register */
+#define REG_CAN0_AM07H                  0xFFC00B3C         /* CAN0 Acceptance Mask (H) Register */
+#define REG_CAN0_AM08H                  0xFFC00B44         /* CAN0 Acceptance Mask (H) Register */
+#define REG_CAN0_AM09H                  0xFFC00B4C         /* CAN0 Acceptance Mask (H) Register */
+#define REG_CAN0_AM10H                  0xFFC00B54         /* CAN0 Acceptance Mask (H) Register */
+#define REG_CAN0_AM11H                  0xFFC00B5C         /* CAN0 Acceptance Mask (H) Register */
+#define REG_CAN0_AM12H                  0xFFC00B64         /* CAN0 Acceptance Mask (H) Register */
+#define REG_CAN0_AM13H                  0xFFC00B6C         /* CAN0 Acceptance Mask (H) Register */
+#define REG_CAN0_AM14H                  0xFFC00B74         /* CAN0 Acceptance Mask (H) Register */
+#define REG_CAN0_AM15H                  0xFFC00B7C         /* CAN0 Acceptance Mask (H) Register */
+#define REG_CAN0_AM16H                  0xFFC00B84         /* CAN0 Acceptance Mask (H) Register */
+#define REG_CAN0_AM17H                  0xFFC00B8C         /* CAN0 Acceptance Mask (H) Register */
+#define REG_CAN0_AM18H                  0xFFC00B94         /* CAN0 Acceptance Mask (H) Register */
+#define REG_CAN0_AM19H                  0xFFC00B9C         /* CAN0 Acceptance Mask (H) Register */
+#define REG_CAN0_AM20H                  0xFFC00BA4         /* CAN0 Acceptance Mask (H) Register */
+#define REG_CAN0_AM21H                  0xFFC00BAC         /* CAN0 Acceptance Mask (H) Register */
+#define REG_CAN0_AM22H                  0xFFC00BB4         /* CAN0 Acceptance Mask (H) Register */
+#define REG_CAN0_AM23H                  0xFFC00BBC         /* CAN0 Acceptance Mask (H) Register */
+#define REG_CAN0_AM24H                  0xFFC00BC4         /* CAN0 Acceptance Mask (H) Register */
+#define REG_CAN0_AM25H                  0xFFC00BCC         /* CAN0 Acceptance Mask (H) Register */
+#define REG_CAN0_AM26H                  0xFFC00BD4         /* CAN0 Acceptance Mask (H) Register */
+#define REG_CAN0_AM27H                  0xFFC00BDC         /* CAN0 Acceptance Mask (H) Register */
+#define REG_CAN0_AM28H                  0xFFC00BE4         /* CAN0 Acceptance Mask (H) Register */
+#define REG_CAN0_AM29H                  0xFFC00BEC         /* CAN0 Acceptance Mask (H) Register */
+#define REG_CAN0_AM30H                  0xFFC00BF4         /* CAN0 Acceptance Mask (H) Register */
+#define REG_CAN0_AM31H                  0xFFC00BFC         /* CAN0 Acceptance Mask (H) Register */
 #define REG_CAN0_MB00_DATA0             0xFFC00C00         /* CAN0 Mailbox Word 0 Register */
 #define REG_CAN0_MB01_DATA0             0xFFC00C20         /* CAN0 Mailbox Word 0 Register */
 #define REG_CAN0_MB02_DATA0             0xFFC00C40         /* CAN0 Mailbox Word 0 Register */
@@ -1044,134 +1043,134 @@
 #define REG_CAN0_MB29_DATA3             0xFFC00FAC         /* CAN0 Mailbox Word 3 Register */
 #define REG_CAN0_MB30_DATA3             0xFFC00FCC         /* CAN0 Mailbox Word 3 Register */
 #define REG_CAN0_MB31_DATA3             0xFFC00FEC         /* CAN0 Mailbox Word 3 Register */
-#define REG_CAN0_MB00_LENGTH            0xFFC00C10         /* CAN0 Mailbox Word 4 Register */
-#define REG_CAN0_MB01_LENGTH            0xFFC00C30         /* CAN0 Mailbox Word 4 Register */
-#define REG_CAN0_MB02_LENGTH            0xFFC00C50         /* CAN0 Mailbox Word 4 Register */
-#define REG_CAN0_MB03_LENGTH            0xFFC00C70         /* CAN0 Mailbox Word 4 Register */
-#define REG_CAN0_MB04_LENGTH            0xFFC00C90         /* CAN0 Mailbox Word 4 Register */
-#define REG_CAN0_MB05_LENGTH            0xFFC00CB0         /* CAN0 Mailbox Word 4 Register */
-#define REG_CAN0_MB06_LENGTH            0xFFC00CD0         /* CAN0 Mailbox Word 4 Register */
-#define REG_CAN0_MB07_LENGTH            0xFFC00CF0         /* CAN0 Mailbox Word 4 Register */
-#define REG_CAN0_MB08_LENGTH            0xFFC00D10         /* CAN0 Mailbox Word 4 Register */
-#define REG_CAN0_MB09_LENGTH            0xFFC00D30         /* CAN0 Mailbox Word 4 Register */
-#define REG_CAN0_MB10_LENGTH            0xFFC00D50         /* CAN0 Mailbox Word 4 Register */
-#define REG_CAN0_MB11_LENGTH            0xFFC00D70         /* CAN0 Mailbox Word 4 Register */
-#define REG_CAN0_MB12_LENGTH            0xFFC00D90         /* CAN0 Mailbox Word 4 Register */
-#define REG_CAN0_MB13_LENGTH            0xFFC00DB0         /* CAN0 Mailbox Word 4 Register */
-#define REG_CAN0_MB14_LENGTH            0xFFC00DD0         /* CAN0 Mailbox Word 4 Register */
-#define REG_CAN0_MB15_LENGTH            0xFFC00DF0         /* CAN0 Mailbox Word 4 Register */
-#define REG_CAN0_MB16_LENGTH            0xFFC00E10         /* CAN0 Mailbox Word 4 Register */
-#define REG_CAN0_MB17_LENGTH            0xFFC00E30         /* CAN0 Mailbox Word 4 Register */
-#define REG_CAN0_MB18_LENGTH            0xFFC00E50         /* CAN0 Mailbox Word 4 Register */
-#define REG_CAN0_MB19_LENGTH            0xFFC00E70         /* CAN0 Mailbox Word 4 Register */
-#define REG_CAN0_MB20_LENGTH            0xFFC00E90         /* CAN0 Mailbox Word 4 Register */
-#define REG_CAN0_MB21_LENGTH            0xFFC00EB0         /* CAN0 Mailbox Word 4 Register */
-#define REG_CAN0_MB22_LENGTH            0xFFC00ED0         /* CAN0 Mailbox Word 4 Register */
-#define REG_CAN0_MB23_LENGTH            0xFFC00EF0         /* CAN0 Mailbox Word 4 Register */
-#define REG_CAN0_MB24_LENGTH            0xFFC00F10         /* CAN0 Mailbox Word 4 Register */
-#define REG_CAN0_MB25_LENGTH            0xFFC00F30         /* CAN0 Mailbox Word 4 Register */
-#define REG_CAN0_MB26_LENGTH            0xFFC00F50         /* CAN0 Mailbox Word 4 Register */
-#define REG_CAN0_MB27_LENGTH            0xFFC00F70         /* CAN0 Mailbox Word 4 Register */
-#define REG_CAN0_MB28_LENGTH            0xFFC00F90         /* CAN0 Mailbox Word 4 Register */
-#define REG_CAN0_MB29_LENGTH            0xFFC00FB0         /* CAN0 Mailbox Word 4 Register */
-#define REG_CAN0_MB30_LENGTH            0xFFC00FD0         /* CAN0 Mailbox Word 4 Register */
-#define REG_CAN0_MB31_LENGTH            0xFFC00FF0         /* CAN0 Mailbox Word 4 Register */
-#define REG_CAN0_MB00_TIMESTAMP         0xFFC00C14         /* CAN0 Mailbox Word 5 Register */
-#define REG_CAN0_MB01_TIMESTAMP         0xFFC00C34         /* CAN0 Mailbox Word 5 Register */
-#define REG_CAN0_MB02_TIMESTAMP         0xFFC00C54         /* CAN0 Mailbox Word 5 Register */
-#define REG_CAN0_MB03_TIMESTAMP         0xFFC00C74         /* CAN0 Mailbox Word 5 Register */
-#define REG_CAN0_MB04_TIMESTAMP         0xFFC00C94         /* CAN0 Mailbox Word 5 Register */
-#define REG_CAN0_MB05_TIMESTAMP         0xFFC00CB4         /* CAN0 Mailbox Word 5 Register */
-#define REG_CAN0_MB06_TIMESTAMP         0xFFC00CD4         /* CAN0 Mailbox Word 5 Register */
-#define REG_CAN0_MB07_TIMESTAMP         0xFFC00CF4         /* CAN0 Mailbox Word 5 Register */
-#define REG_CAN0_MB08_TIMESTAMP         0xFFC00D14         /* CAN0 Mailbox Word 5 Register */
-#define REG_CAN0_MB09_TIMESTAMP         0xFFC00D34         /* CAN0 Mailbox Word 5 Register */
-#define REG_CAN0_MB10_TIMESTAMP         0xFFC00D54         /* CAN0 Mailbox Word 5 Register */
-#define REG_CAN0_MB11_TIMESTAMP         0xFFC00D74         /* CAN0 Mailbox Word 5 Register */
-#define REG_CAN0_MB12_TIMESTAMP         0xFFC00D94         /* CAN0 Mailbox Word 5 Register */
-#define REG_CAN0_MB13_TIMESTAMP         0xFFC00DB4         /* CAN0 Mailbox Word 5 Register */
-#define REG_CAN0_MB14_TIMESTAMP         0xFFC00DD4         /* CAN0 Mailbox Word 5 Register */
-#define REG_CAN0_MB15_TIMESTAMP         0xFFC00DF4         /* CAN0 Mailbox Word 5 Register */
-#define REG_CAN0_MB16_TIMESTAMP         0xFFC00E14         /* CAN0 Mailbox Word 5 Register */
-#define REG_CAN0_MB17_TIMESTAMP         0xFFC00E34         /* CAN0 Mailbox Word 5 Register */
-#define REG_CAN0_MB18_TIMESTAMP         0xFFC00E54         /* CAN0 Mailbox Word 5 Register */
-#define REG_CAN0_MB19_TIMESTAMP         0xFFC00E74         /* CAN0 Mailbox Word 5 Register */
-#define REG_CAN0_MB20_TIMESTAMP         0xFFC00E94         /* CAN0 Mailbox Word 5 Register */
-#define REG_CAN0_MB21_TIMESTAMP         0xFFC00EB4         /* CAN0 Mailbox Word 5 Register */
-#define REG_CAN0_MB22_TIMESTAMP         0xFFC00ED4         /* CAN0 Mailbox Word 5 Register */
-#define REG_CAN0_MB23_TIMESTAMP         0xFFC00EF4         /* CAN0 Mailbox Word 5 Register */
-#define REG_CAN0_MB24_TIMESTAMP         0xFFC00F14         /* CAN0 Mailbox Word 5 Register */
-#define REG_CAN0_MB25_TIMESTAMP         0xFFC00F34         /* CAN0 Mailbox Word 5 Register */
-#define REG_CAN0_MB26_TIMESTAMP         0xFFC00F54         /* CAN0 Mailbox Word 5 Register */
-#define REG_CAN0_MB27_TIMESTAMP         0xFFC00F74         /* CAN0 Mailbox Word 5 Register */
-#define REG_CAN0_MB28_TIMESTAMP         0xFFC00F94         /* CAN0 Mailbox Word 5 Register */
-#define REG_CAN0_MB29_TIMESTAMP         0xFFC00FB4         /* CAN0 Mailbox Word 5 Register */
-#define REG_CAN0_MB30_TIMESTAMP         0xFFC00FD4         /* CAN0 Mailbox Word 5 Register */
-#define REG_CAN0_MB31_TIMESTAMP         0xFFC00FF4         /* CAN0 Mailbox Word 5 Register */
-#define REG_CAN0_MB00_ID0               0xFFC00C18         /* CAN0 Mailbox Word 6 Register */
-#define REG_CAN0_MB01_ID0               0xFFC00C38         /* CAN0 Mailbox Word 6 Register */
-#define REG_CAN0_MB02_ID0               0xFFC00C58         /* CAN0 Mailbox Word 6 Register */
-#define REG_CAN0_MB03_ID0               0xFFC00C78         /* CAN0 Mailbox Word 6 Register */
-#define REG_CAN0_MB04_ID0               0xFFC00C98         /* CAN0 Mailbox Word 6 Register */
-#define REG_CAN0_MB05_ID0               0xFFC00CB8         /* CAN0 Mailbox Word 6 Register */
-#define REG_CAN0_MB06_ID0               0xFFC00CD8         /* CAN0 Mailbox Word 6 Register */
-#define REG_CAN0_MB07_ID0               0xFFC00CF8         /* CAN0 Mailbox Word 6 Register */
-#define REG_CAN0_MB08_ID0               0xFFC00D18         /* CAN0 Mailbox Word 6 Register */
-#define REG_CAN0_MB09_ID0               0xFFC00D38         /* CAN0 Mailbox Word 6 Register */
-#define REG_CAN0_MB10_ID0               0xFFC00D58         /* CAN0 Mailbox Word 6 Register */
-#define REG_CAN0_MB11_ID0               0xFFC00D78         /* CAN0 Mailbox Word 6 Register */
-#define REG_CAN0_MB12_ID0               0xFFC00D98         /* CAN0 Mailbox Word 6 Register */
-#define REG_CAN0_MB13_ID0               0xFFC00DB8         /* CAN0 Mailbox Word 6 Register */
-#define REG_CAN0_MB14_ID0               0xFFC00DD8         /* CAN0 Mailbox Word 6 Register */
-#define REG_CAN0_MB15_ID0               0xFFC00DF8         /* CAN0 Mailbox Word 6 Register */
-#define REG_CAN0_MB16_ID0               0xFFC00E18         /* CAN0 Mailbox Word 6 Register */
-#define REG_CAN0_MB17_ID0               0xFFC00E38         /* CAN0 Mailbox Word 6 Register */
-#define REG_CAN0_MB18_ID0               0xFFC00E58         /* CAN0 Mailbox Word 6 Register */
-#define REG_CAN0_MB19_ID0               0xFFC00E78         /* CAN0 Mailbox Word 6 Register */
-#define REG_CAN0_MB20_ID0               0xFFC00E98         /* CAN0 Mailbox Word 6 Register */
-#define REG_CAN0_MB21_ID0               0xFFC00EB8         /* CAN0 Mailbox Word 6 Register */
-#define REG_CAN0_MB22_ID0               0xFFC00ED8         /* CAN0 Mailbox Word 6 Register */
-#define REG_CAN0_MB23_ID0               0xFFC00EF8         /* CAN0 Mailbox Word 6 Register */
-#define REG_CAN0_MB24_ID0               0xFFC00F18         /* CAN0 Mailbox Word 6 Register */
-#define REG_CAN0_MB25_ID0               0xFFC00F38         /* CAN0 Mailbox Word 6 Register */
-#define REG_CAN0_MB26_ID0               0xFFC00F58         /* CAN0 Mailbox Word 6 Register */
-#define REG_CAN0_MB27_ID0               0xFFC00F78         /* CAN0 Mailbox Word 6 Register */
-#define REG_CAN0_MB28_ID0               0xFFC00F98         /* CAN0 Mailbox Word 6 Register */
-#define REG_CAN0_MB29_ID0               0xFFC00FB8         /* CAN0 Mailbox Word 6 Register */
-#define REG_CAN0_MB30_ID0               0xFFC00FD8         /* CAN0 Mailbox Word 6 Register */
-#define REG_CAN0_MB31_ID0               0xFFC00FF8         /* CAN0 Mailbox Word 6 Register */
-#define REG_CAN0_MB00_ID1               0xFFC00C1C         /* CAN0 Mailbox Word 7 Register */
-#define REG_CAN0_MB01_ID1               0xFFC00C3C         /* CAN0 Mailbox Word 7 Register */
-#define REG_CAN0_MB02_ID1               0xFFC00C5C         /* CAN0 Mailbox Word 7 Register */
-#define REG_CAN0_MB03_ID1               0xFFC00C7C         /* CAN0 Mailbox Word 7 Register */
-#define REG_CAN0_MB04_ID1               0xFFC00C9C         /* CAN0 Mailbox Word 7 Register */
-#define REG_CAN0_MB05_ID1               0xFFC00CBC         /* CAN0 Mailbox Word 7 Register */
-#define REG_CAN0_MB06_ID1               0xFFC00CDC         /* CAN0 Mailbox Word 7 Register */
-#define REG_CAN0_MB07_ID1               0xFFC00CFC         /* CAN0 Mailbox Word 7 Register */
-#define REG_CAN0_MB08_ID1               0xFFC00D1C         /* CAN0 Mailbox Word 7 Register */
-#define REG_CAN0_MB09_ID1               0xFFC00D3C         /* CAN0 Mailbox Word 7 Register */
-#define REG_CAN0_MB10_ID1               0xFFC00D5C         /* CAN0 Mailbox Word 7 Register */
-#define REG_CAN0_MB11_ID1               0xFFC00D7C         /* CAN0 Mailbox Word 7 Register */
-#define REG_CAN0_MB12_ID1               0xFFC00D9C         /* CAN0 Mailbox Word 7 Register */
-#define REG_CAN0_MB13_ID1               0xFFC00DBC         /* CAN0 Mailbox Word 7 Register */
-#define REG_CAN0_MB14_ID1               0xFFC00DDC         /* CAN0 Mailbox Word 7 Register */
-#define REG_CAN0_MB15_ID1               0xFFC00DFC         /* CAN0 Mailbox Word 7 Register */
-#define REG_CAN0_MB16_ID1               0xFFC00E1C         /* CAN0 Mailbox Word 7 Register */
-#define REG_CAN0_MB17_ID1               0xFFC00E3C         /* CAN0 Mailbox Word 7 Register */
-#define REG_CAN0_MB18_ID1               0xFFC00E5C         /* CAN0 Mailbox Word 7 Register */
-#define REG_CAN0_MB19_ID1               0xFFC00E7C         /* CAN0 Mailbox Word 7 Register */
-#define REG_CAN0_MB20_ID1               0xFFC00E9C         /* CAN0 Mailbox Word 7 Register */
-#define REG_CAN0_MB21_ID1               0xFFC00EBC         /* CAN0 Mailbox Word 7 Register */
-#define REG_CAN0_MB22_ID1               0xFFC00EDC         /* CAN0 Mailbox Word 7 Register */
-#define REG_CAN0_MB23_ID1               0xFFC00EFC         /* CAN0 Mailbox Word 7 Register */
-#define REG_CAN0_MB24_ID1               0xFFC00F1C         /* CAN0 Mailbox Word 7 Register */
-#define REG_CAN0_MB25_ID1               0xFFC00F3C         /* CAN0 Mailbox Word 7 Register */
-#define REG_CAN0_MB26_ID1               0xFFC00F5C         /* CAN0 Mailbox Word 7 Register */
-#define REG_CAN0_MB27_ID1               0xFFC00F7C         /* CAN0 Mailbox Word 7 Register */
-#define REG_CAN0_MB28_ID1               0xFFC00F9C         /* CAN0 Mailbox Word 7 Register */
-#define REG_CAN0_MB29_ID1               0xFFC00FBC         /* CAN0 Mailbox Word 7 Register */
-#define REG_CAN0_MB30_ID1               0xFFC00FDC         /* CAN0 Mailbox Word 7 Register */
-#define REG_CAN0_MB31_ID1               0xFFC00FFC         /* CAN0 Mailbox Word 7 Register */
+#define REG_CAN0_MB00_LENGTH            0xFFC00C10         /* CAN0 Mailbox Length Register */
+#define REG_CAN0_MB01_LENGTH            0xFFC00C30         /* CAN0 Mailbox Length Register */
+#define REG_CAN0_MB02_LENGTH            0xFFC00C50         /* CAN0 Mailbox Length Register */
+#define REG_CAN0_MB03_LENGTH            0xFFC00C70         /* CAN0 Mailbox Length Register */
+#define REG_CAN0_MB04_LENGTH            0xFFC00C90         /* CAN0 Mailbox Length Register */
+#define REG_CAN0_MB05_LENGTH            0xFFC00CB0         /* CAN0 Mailbox Length Register */
+#define REG_CAN0_MB06_LENGTH            0xFFC00CD0         /* CAN0 Mailbox Length Register */
+#define REG_CAN0_MB07_LENGTH            0xFFC00CF0         /* CAN0 Mailbox Length Register */
+#define REG_CAN0_MB08_LENGTH            0xFFC00D10         /* CAN0 Mailbox Length Register */
+#define REG_CAN0_MB09_LENGTH            0xFFC00D30         /* CAN0 Mailbox Length Register */
+#define REG_CAN0_MB10_LENGTH            0xFFC00D50         /* CAN0 Mailbox Length Register */
+#define REG_CAN0_MB11_LENGTH            0xFFC00D70         /* CAN0 Mailbox Length Register */
+#define REG_CAN0_MB12_LENGTH            0xFFC00D90         /* CAN0 Mailbox Length Register */
+#define REG_CAN0_MB13_LENGTH            0xFFC00DB0         /* CAN0 Mailbox Length Register */
+#define REG_CAN0_MB14_LENGTH            0xFFC00DD0         /* CAN0 Mailbox Length Register */
+#define REG_CAN0_MB15_LENGTH            0xFFC00DF0         /* CAN0 Mailbox Length Register */
+#define REG_CAN0_MB16_LENGTH            0xFFC00E10         /* CAN0 Mailbox Length Register */
+#define REG_CAN0_MB17_LENGTH            0xFFC00E30         /* CAN0 Mailbox Length Register */
+#define REG_CAN0_MB18_LENGTH            0xFFC00E50         /* CAN0 Mailbox Length Register */
+#define REG_CAN0_MB19_LENGTH            0xFFC00E70         /* CAN0 Mailbox Length Register */
+#define REG_CAN0_MB20_LENGTH            0xFFC00E90         /* CAN0 Mailbox Length Register */
+#define REG_CAN0_MB21_LENGTH            0xFFC00EB0         /* CAN0 Mailbox Length Register */
+#define REG_CAN0_MB22_LENGTH            0xFFC00ED0         /* CAN0 Mailbox Length Register */
+#define REG_CAN0_MB23_LENGTH            0xFFC00EF0         /* CAN0 Mailbox Length Register */
+#define REG_CAN0_MB24_LENGTH            0xFFC00F10         /* CAN0 Mailbox Length Register */
+#define REG_CAN0_MB25_LENGTH            0xFFC00F30         /* CAN0 Mailbox Length Register */
+#define REG_CAN0_MB26_LENGTH            0xFFC00F50         /* CAN0 Mailbox Length Register */
+#define REG_CAN0_MB27_LENGTH            0xFFC00F70         /* CAN0 Mailbox Length Register */
+#define REG_CAN0_MB28_LENGTH            0xFFC00F90         /* CAN0 Mailbox Length Register */
+#define REG_CAN0_MB29_LENGTH            0xFFC00FB0         /* CAN0 Mailbox Length Register */
+#define REG_CAN0_MB30_LENGTH            0xFFC00FD0         /* CAN0 Mailbox Length Register */
+#define REG_CAN0_MB31_LENGTH            0xFFC00FF0         /* CAN0 Mailbox Length Register */
+#define REG_CAN0_MB00_TIMESTAMP         0xFFC00C14         /* CAN0 Mailbox Timestamp Register */
+#define REG_CAN0_MB01_TIMESTAMP         0xFFC00C34         /* CAN0 Mailbox Timestamp Register */
+#define REG_CAN0_MB02_TIMESTAMP         0xFFC00C54         /* CAN0 Mailbox Timestamp Register */
+#define REG_CAN0_MB03_TIMESTAMP         0xFFC00C74         /* CAN0 Mailbox Timestamp Register */
+#define REG_CAN0_MB04_TIMESTAMP         0xFFC00C94         /* CAN0 Mailbox Timestamp Register */
+#define REG_CAN0_MB05_TIMESTAMP         0xFFC00CB4         /* CAN0 Mailbox Timestamp Register */
+#define REG_CAN0_MB06_TIMESTAMP         0xFFC00CD4         /* CAN0 Mailbox Timestamp Register */
+#define REG_CAN0_MB07_TIMESTAMP         0xFFC00CF4         /* CAN0 Mailbox Timestamp Register */
+#define REG_CAN0_MB08_TIMESTAMP         0xFFC00D14         /* CAN0 Mailbox Timestamp Register */
+#define REG_CAN0_MB09_TIMESTAMP         0xFFC00D34         /* CAN0 Mailbox Timestamp Register */
+#define REG_CAN0_MB10_TIMESTAMP         0xFFC00D54         /* CAN0 Mailbox Timestamp Register */
+#define REG_CAN0_MB11_TIMESTAMP         0xFFC00D74         /* CAN0 Mailbox Timestamp Register */
+#define REG_CAN0_MB12_TIMESTAMP         0xFFC00D94         /* CAN0 Mailbox Timestamp Register */
+#define REG_CAN0_MB13_TIMESTAMP         0xFFC00DB4         /* CAN0 Mailbox Timestamp Register */
+#define REG_CAN0_MB14_TIMESTAMP         0xFFC00DD4         /* CAN0 Mailbox Timestamp Register */
+#define REG_CAN0_MB15_TIMESTAMP         0xFFC00DF4         /* CAN0 Mailbox Timestamp Register */
+#define REG_CAN0_MB16_TIMESTAMP         0xFFC00E14         /* CAN0 Mailbox Timestamp Register */
+#define REG_CAN0_MB17_TIMESTAMP         0xFFC00E34         /* CAN0 Mailbox Timestamp Register */
+#define REG_CAN0_MB18_TIMESTAMP         0xFFC00E54         /* CAN0 Mailbox Timestamp Register */
+#define REG_CAN0_MB19_TIMESTAMP         0xFFC00E74         /* CAN0 Mailbox Timestamp Register */
+#define REG_CAN0_MB20_TIMESTAMP         0xFFC00E94         /* CAN0 Mailbox Timestamp Register */
+#define REG_CAN0_MB21_TIMESTAMP         0xFFC00EB4         /* CAN0 Mailbox Timestamp Register */
+#define REG_CAN0_MB22_TIMESTAMP         0xFFC00ED4         /* CAN0 Mailbox Timestamp Register */
+#define REG_CAN0_MB23_TIMESTAMP         0xFFC00EF4         /* CAN0 Mailbox Timestamp Register */
+#define REG_CAN0_MB24_TIMESTAMP         0xFFC00F14         /* CAN0 Mailbox Timestamp Register */
+#define REG_CAN0_MB25_TIMESTAMP         0xFFC00F34         /* CAN0 Mailbox Timestamp Register */
+#define REG_CAN0_MB26_TIMESTAMP         0xFFC00F54         /* CAN0 Mailbox Timestamp Register */
+#define REG_CAN0_MB27_TIMESTAMP         0xFFC00F74         /* CAN0 Mailbox Timestamp Register */
+#define REG_CAN0_MB28_TIMESTAMP         0xFFC00F94         /* CAN0 Mailbox Timestamp Register */
+#define REG_CAN0_MB29_TIMESTAMP         0xFFC00FB4         /* CAN0 Mailbox Timestamp Register */
+#define REG_CAN0_MB30_TIMESTAMP         0xFFC00FD4         /* CAN0 Mailbox Timestamp Register */
+#define REG_CAN0_MB31_TIMESTAMP         0xFFC00FF4         /* CAN0 Mailbox Timestamp Register */
+#define REG_CAN0_MB00_ID0               0xFFC00C18         /* CAN0 Mailbox ID 0 Register */
+#define REG_CAN0_MB01_ID0               0xFFC00C38         /* CAN0 Mailbox ID 0 Register */
+#define REG_CAN0_MB02_ID0               0xFFC00C58         /* CAN0 Mailbox ID 0 Register */
+#define REG_CAN0_MB03_ID0               0xFFC00C78         /* CAN0 Mailbox ID 0 Register */
+#define REG_CAN0_MB04_ID0               0xFFC00C98         /* CAN0 Mailbox ID 0 Register */
+#define REG_CAN0_MB05_ID0               0xFFC00CB8         /* CAN0 Mailbox ID 0 Register */
+#define REG_CAN0_MB06_ID0               0xFFC00CD8         /* CAN0 Mailbox ID 0 Register */
+#define REG_CAN0_MB07_ID0               0xFFC00CF8         /* CAN0 Mailbox ID 0 Register */
+#define REG_CAN0_MB08_ID0               0xFFC00D18         /* CAN0 Mailbox ID 0 Register */
+#define REG_CAN0_MB09_ID0               0xFFC00D38         /* CAN0 Mailbox ID 0 Register */
+#define REG_CAN0_MB10_ID0               0xFFC00D58         /* CAN0 Mailbox ID 0 Register */
+#define REG_CAN0_MB11_ID0               0xFFC00D78         /* CAN0 Mailbox ID 0 Register */
+#define REG_CAN0_MB12_ID0               0xFFC00D98         /* CAN0 Mailbox ID 0 Register */
+#define REG_CAN0_MB13_ID0               0xFFC00DB8         /* CAN0 Mailbox ID 0 Register */
+#define REG_CAN0_MB14_ID0               0xFFC00DD8         /* CAN0 Mailbox ID 0 Register */
+#define REG_CAN0_MB15_ID0               0xFFC00DF8         /* CAN0 Mailbox ID 0 Register */
+#define REG_CAN0_MB16_ID0               0xFFC00E18         /* CAN0 Mailbox ID 0 Register */
+#define REG_CAN0_MB17_ID0               0xFFC00E38         /* CAN0 Mailbox ID 0 Register */
+#define REG_CAN0_MB18_ID0               0xFFC00E58         /* CAN0 Mailbox ID 0 Register */
+#define REG_CAN0_MB19_ID0               0xFFC00E78         /* CAN0 Mailbox ID 0 Register */
+#define REG_CAN0_MB20_ID0               0xFFC00E98         /* CAN0 Mailbox ID 0 Register */
+#define REG_CAN0_MB21_ID0               0xFFC00EB8         /* CAN0 Mailbox ID 0 Register */
+#define REG_CAN0_MB22_ID0               0xFFC00ED8         /* CAN0 Mailbox ID 0 Register */
+#define REG_CAN0_MB23_ID0               0xFFC00EF8         /* CAN0 Mailbox ID 0 Register */
+#define REG_CAN0_MB24_ID0               0xFFC00F18         /* CAN0 Mailbox ID 0 Register */
+#define REG_CAN0_MB25_ID0               0xFFC00F38         /* CAN0 Mailbox ID 0 Register */
+#define REG_CAN0_MB26_ID0               0xFFC00F58         /* CAN0 Mailbox ID 0 Register */
+#define REG_CAN0_MB27_ID0               0xFFC00F78         /* CAN0 Mailbox ID 0 Register */
+#define REG_CAN0_MB28_ID0               0xFFC00F98         /* CAN0 Mailbox ID 0 Register */
+#define REG_CAN0_MB29_ID0               0xFFC00FB8         /* CAN0 Mailbox ID 0 Register */
+#define REG_CAN0_MB30_ID0               0xFFC00FD8         /* CAN0 Mailbox ID 0 Register */
+#define REG_CAN0_MB31_ID0               0xFFC00FF8         /* CAN0 Mailbox ID 0 Register */
+#define REG_CAN0_MB00_ID1               0xFFC00C1C         /* CAN0 Mailbox ID 1 Register */
+#define REG_CAN0_MB01_ID1               0xFFC00C3C         /* CAN0 Mailbox ID 1 Register */
+#define REG_CAN0_MB02_ID1               0xFFC00C5C         /* CAN0 Mailbox ID 1 Register */
+#define REG_CAN0_MB03_ID1               0xFFC00C7C         /* CAN0 Mailbox ID 1 Register */
+#define REG_CAN0_MB04_ID1               0xFFC00C9C         /* CAN0 Mailbox ID 1 Register */
+#define REG_CAN0_MB05_ID1               0xFFC00CBC         /* CAN0 Mailbox ID 1 Register */
+#define REG_CAN0_MB06_ID1               0xFFC00CDC         /* CAN0 Mailbox ID 1 Register */
+#define REG_CAN0_MB07_ID1               0xFFC00CFC         /* CAN0 Mailbox ID 1 Register */
+#define REG_CAN0_MB08_ID1               0xFFC00D1C         /* CAN0 Mailbox ID 1 Register */
+#define REG_CAN0_MB09_ID1               0xFFC00D3C         /* CAN0 Mailbox ID 1 Register */
+#define REG_CAN0_MB10_ID1               0xFFC00D5C         /* CAN0 Mailbox ID 1 Register */
+#define REG_CAN0_MB11_ID1               0xFFC00D7C         /* CAN0 Mailbox ID 1 Register */
+#define REG_CAN0_MB12_ID1               0xFFC00D9C         /* CAN0 Mailbox ID 1 Register */
+#define REG_CAN0_MB13_ID1               0xFFC00DBC         /* CAN0 Mailbox ID 1 Register */
+#define REG_CAN0_MB14_ID1               0xFFC00DDC         /* CAN0 Mailbox ID 1 Register */
+#define REG_CAN0_MB15_ID1               0xFFC00DFC         /* CAN0 Mailbox ID 1 Register */
+#define REG_CAN0_MB16_ID1               0xFFC00E1C         /* CAN0 Mailbox ID 1 Register */
+#define REG_CAN0_MB17_ID1               0xFFC00E3C         /* CAN0 Mailbox ID 1 Register */
+#define REG_CAN0_MB18_ID1               0xFFC00E5C         /* CAN0 Mailbox ID 1 Register */
+#define REG_CAN0_MB19_ID1               0xFFC00E7C         /* CAN0 Mailbox ID 1 Register */
+#define REG_CAN0_MB20_ID1               0xFFC00E9C         /* CAN0 Mailbox ID 1 Register */
+#define REG_CAN0_MB21_ID1               0xFFC00EBC         /* CAN0 Mailbox ID 1 Register */
+#define REG_CAN0_MB22_ID1               0xFFC00EDC         /* CAN0 Mailbox ID 1 Register */
+#define REG_CAN0_MB23_ID1               0xFFC00EFC         /* CAN0 Mailbox ID 1 Register */
+#define REG_CAN0_MB24_ID1               0xFFC00F1C         /* CAN0 Mailbox ID 1 Register */
+#define REG_CAN0_MB25_ID1               0xFFC00F3C         /* CAN0 Mailbox ID 1 Register */
+#define REG_CAN0_MB26_ID1               0xFFC00F5C         /* CAN0 Mailbox ID 1 Register */
+#define REG_CAN0_MB27_ID1               0xFFC00F7C         /* CAN0 Mailbox ID 1 Register */
+#define REG_CAN0_MB28_ID1               0xFFC00F9C         /* CAN0 Mailbox ID 1 Register */
+#define REG_CAN0_MB29_ID1               0xFFC00FBC         /* CAN0 Mailbox ID 1 Register */
+#define REG_CAN0_MB30_ID1               0xFFC00FDC         /* CAN0 Mailbox ID 1 Register */
+#define REG_CAN0_MB31_ID1               0xFFC00FFC         /* CAN0 Mailbox ID 1 Register */
 
 /* =========================
         CAN
@@ -1179,938 +1178,938 @@
 /* ------------------------------------------------------------------------------------------------------------------------
         CAN_MC1                              Pos/Masks                        Description
    ------------------------------------------------------------------------------------------------------------------------ */
-#define BITP_CAN_MC1_MB00                     0
-#define BITP_CAN_MC1_MB01                     1
-#define BITP_CAN_MC1_MB02                     2
-#define BITP_CAN_MC1_MB03                     3
-#define BITP_CAN_MC1_MB04                     4
-#define BITP_CAN_MC1_MB05                     5
-#define BITP_CAN_MC1_MB06                     6
-#define BITP_CAN_MC1_MB07                     7
-#define BITP_CAN_MC1_MB08                     8
-#define BITP_CAN_MC1_MB09                     9
-#define BITP_CAN_MC1_MB10                    10
-#define BITP_CAN_MC1_MB11                    11
-#define BITP_CAN_MC1_MB12                    12
-#define BITP_CAN_MC1_MB13                    13
-#define BITP_CAN_MC1_MB14                    14
-#define BITP_CAN_MC1_MB15                    15
-#define BITM_CAN_MC1_MB00                    (_ADI_MSK(0x00000001,uint16_t))
-#define BITM_CAN_MC1_MB01                    (_ADI_MSK(0x00000002,uint16_t))
-#define BITM_CAN_MC1_MB02                    (_ADI_MSK(0x00000004,uint16_t))
-#define BITM_CAN_MC1_MB03                    (_ADI_MSK(0x00000008,uint16_t))
-#define BITM_CAN_MC1_MB04                    (_ADI_MSK(0x00000010,uint16_t))
-#define BITM_CAN_MC1_MB05                    (_ADI_MSK(0x00000020,uint16_t))
-#define BITM_CAN_MC1_MB06                    (_ADI_MSK(0x00000040,uint16_t))
-#define BITM_CAN_MC1_MB07                    (_ADI_MSK(0x00000080,uint16_t))
-#define BITM_CAN_MC1_MB08                    (_ADI_MSK(0x00000100,uint16_t))
-#define BITM_CAN_MC1_MB09                    (_ADI_MSK(0x00000200,uint16_t))
-#define BITM_CAN_MC1_MB10                    (_ADI_MSK(0x00000400,uint16_t))
-#define BITM_CAN_MC1_MB11                    (_ADI_MSK(0x00000800,uint16_t))
-#define BITM_CAN_MC1_MB12                    (_ADI_MSK(0x00001000,uint16_t))
-#define BITM_CAN_MC1_MB13                    (_ADI_MSK(0x00002000,uint16_t))
-#define BITM_CAN_MC1_MB14                    (_ADI_MSK(0x00004000,uint16_t))
-#define BITM_CAN_MC1_MB15                    (_ADI_MSK(0x00008000,uint16_t))
+#define BITP_CAN_MC1_MB00                     0                               /* Mailbox n Enable/Disable */
+#define BITP_CAN_MC1_MB01                     1                               /* Mailbox n Enable/Disable */
+#define BITP_CAN_MC1_MB02                     2                               /* Mailbox n Enable/Disable */
+#define BITP_CAN_MC1_MB03                     3                               /* Mailbox n Enable/Disable */
+#define BITP_CAN_MC1_MB04                     4                               /* Mailbox n Enable/Disable */
+#define BITP_CAN_MC1_MB05                     5                               /* Mailbox n Enable/Disable */
+#define BITP_CAN_MC1_MB06                     6                               /* Mailbox n Enable/Disable */
+#define BITP_CAN_MC1_MB07                     7                               /* Mailbox n Enable/Disable */
+#define BITP_CAN_MC1_MB08                     8                               /* Mailbox n Enable/Disable */
+#define BITP_CAN_MC1_MB09                     9                               /* Mailbox n Enable/Disable */
+#define BITP_CAN_MC1_MB10                    10                               /* Mailbox n Enable/Disable */
+#define BITP_CAN_MC1_MB11                    11                               /* Mailbox n Enable/Disable */
+#define BITP_CAN_MC1_MB12                    12                               /* Mailbox n Enable/Disable */
+#define BITP_CAN_MC1_MB13                    13                               /* Mailbox n Enable/Disable */
+#define BITP_CAN_MC1_MB14                    14                               /* Mailbox n Enable/Disable */
+#define BITP_CAN_MC1_MB15                    15                               /* Mailbox n Enable/Disable */
+#define BITM_CAN_MC1_MB00                    (_ADI_MSK(0x00000001,uint16_t))  /* Mailbox n Enable/Disable */
+#define BITM_CAN_MC1_MB01                    (_ADI_MSK(0x00000002,uint16_t))  /* Mailbox n Enable/Disable */
+#define BITM_CAN_MC1_MB02                    (_ADI_MSK(0x00000004,uint16_t))  /* Mailbox n Enable/Disable */
+#define BITM_CAN_MC1_MB03                    (_ADI_MSK(0x00000008,uint16_t))  /* Mailbox n Enable/Disable */
+#define BITM_CAN_MC1_MB04                    (_ADI_MSK(0x00000010,uint16_t))  /* Mailbox n Enable/Disable */
+#define BITM_CAN_MC1_MB05                    (_ADI_MSK(0x00000020,uint16_t))  /* Mailbox n Enable/Disable */
+#define BITM_CAN_MC1_MB06                    (_ADI_MSK(0x00000040,uint16_t))  /* Mailbox n Enable/Disable */
+#define BITM_CAN_MC1_MB07                    (_ADI_MSK(0x00000080,uint16_t))  /* Mailbox n Enable/Disable */
+#define BITM_CAN_MC1_MB08                    (_ADI_MSK(0x00000100,uint16_t))  /* Mailbox n Enable/Disable */
+#define BITM_CAN_MC1_MB09                    (_ADI_MSK(0x00000200,uint16_t))  /* Mailbox n Enable/Disable */
+#define BITM_CAN_MC1_MB10                    (_ADI_MSK(0x00000400,uint16_t))  /* Mailbox n Enable/Disable */
+#define BITM_CAN_MC1_MB11                    (_ADI_MSK(0x00000800,uint16_t))  /* Mailbox n Enable/Disable */
+#define BITM_CAN_MC1_MB12                    (_ADI_MSK(0x00001000,uint16_t))  /* Mailbox n Enable/Disable */
+#define BITM_CAN_MC1_MB13                    (_ADI_MSK(0x00002000,uint16_t))  /* Mailbox n Enable/Disable */
+#define BITM_CAN_MC1_MB14                    (_ADI_MSK(0x00004000,uint16_t))  /* Mailbox n Enable/Disable */
+#define BITM_CAN_MC1_MB15                    (_ADI_MSK(0x00008000,uint16_t))  /* Mailbox n Enable/Disable */
 
 /* ------------------------------------------------------------------------------------------------------------------------
         CAN_MD1                              Pos/Masks                        Description
    ------------------------------------------------------------------------------------------------------------------------ */
-#define BITP_CAN_MD1_MB00                     0
-#define BITP_CAN_MD1_MB01                     1
-#define BITP_CAN_MD1_MB02                     2
-#define BITP_CAN_MD1_MB03                     3
-#define BITP_CAN_MD1_MB04                     4
-#define BITP_CAN_MD1_MB05                     5
-#define BITP_CAN_MD1_MB06                     6
-#define BITP_CAN_MD1_MB07                     7
-#define BITP_CAN_MD1_MB08                     8
-#define BITP_CAN_MD1_MB09                     9
-#define BITP_CAN_MD1_MB10                    10
-#define BITP_CAN_MD1_MB11                    11
-#define BITP_CAN_MD1_MB12                    12
-#define BITP_CAN_MD1_MB13                    13
-#define BITP_CAN_MD1_MB14                    14
-#define BITP_CAN_MD1_MB15                    15
-#define BITM_CAN_MD1_MB00                    (_ADI_MSK(0x00000001,uint16_t))
-#define BITM_CAN_MD1_MB01                    (_ADI_MSK(0x00000002,uint16_t))
-#define BITM_CAN_MD1_MB02                    (_ADI_MSK(0x00000004,uint16_t))
-#define BITM_CAN_MD1_MB03                    (_ADI_MSK(0x00000008,uint16_t))
-#define BITM_CAN_MD1_MB04                    (_ADI_MSK(0x00000010,uint16_t))
-#define BITM_CAN_MD1_MB05                    (_ADI_MSK(0x00000020,uint16_t))
-#define BITM_CAN_MD1_MB06                    (_ADI_MSK(0x00000040,uint16_t))
-#define BITM_CAN_MD1_MB07                    (_ADI_MSK(0x00000080,uint16_t))
-#define BITM_CAN_MD1_MB08                    (_ADI_MSK(0x00000100,uint16_t))
-#define BITM_CAN_MD1_MB09                    (_ADI_MSK(0x00000200,uint16_t))
-#define BITM_CAN_MD1_MB10                    (_ADI_MSK(0x00000400,uint16_t))
-#define BITM_CAN_MD1_MB11                    (_ADI_MSK(0x00000800,uint16_t))
-#define BITM_CAN_MD1_MB12                    (_ADI_MSK(0x00001000,uint16_t))
-#define BITM_CAN_MD1_MB13                    (_ADI_MSK(0x00002000,uint16_t))
-#define BITM_CAN_MD1_MB14                    (_ADI_MSK(0x00004000,uint16_t))
-#define BITM_CAN_MD1_MB15                    (_ADI_MSK(0x00008000,uint16_t))
+#define BITP_CAN_MD1_MB00                     0                               /* Mailbox n Transmit/Receive */
+#define BITP_CAN_MD1_MB01                     1                               /* Mailbox n Transmit/Receive */
+#define BITP_CAN_MD1_MB02                     2                               /* Mailbox n Transmit/Receive */
+#define BITP_CAN_MD1_MB03                     3                               /* Mailbox n Transmit/Receive */
+#define BITP_CAN_MD1_MB04                     4                               /* Mailbox n Transmit/Receive */
+#define BITP_CAN_MD1_MB05                     5                               /* Mailbox n Transmit/Receive */
+#define BITP_CAN_MD1_MB06                     6                               /* Mailbox n Transmit/Receive */
+#define BITP_CAN_MD1_MB07                     7                               /* Mailbox n Transmit/Receive */
+#define BITP_CAN_MD1_MB08                     8                               /* Mailbox n Transmit/Receive */
+#define BITP_CAN_MD1_MB09                     9                               /* Mailbox n Transmit/Receive */
+#define BITP_CAN_MD1_MB10                    10                               /* Mailbox n Transmit/Receive */
+#define BITP_CAN_MD1_MB11                    11                               /* Mailbox n Transmit/Receive */
+#define BITP_CAN_MD1_MB12                    12                               /* Mailbox n Transmit/Receive */
+#define BITP_CAN_MD1_MB13                    13                               /* Mailbox n Transmit/Receive */
+#define BITP_CAN_MD1_MB14                    14                               /* Mailbox n Transmit/Receive */
+#define BITP_CAN_MD1_MB15                    15                               /* Mailbox n Transmit/Receive */
+#define BITM_CAN_MD1_MB00                    (_ADI_MSK(0x00000001,uint16_t))  /* Mailbox n Transmit/Receive */
+#define BITM_CAN_MD1_MB01                    (_ADI_MSK(0x00000002,uint16_t))  /* Mailbox n Transmit/Receive */
+#define BITM_CAN_MD1_MB02                    (_ADI_MSK(0x00000004,uint16_t))  /* Mailbox n Transmit/Receive */
+#define BITM_CAN_MD1_MB03                    (_ADI_MSK(0x00000008,uint16_t))  /* Mailbox n Transmit/Receive */
+#define BITM_CAN_MD1_MB04                    (_ADI_MSK(0x00000010,uint16_t))  /* Mailbox n Transmit/Receive */
+#define BITM_CAN_MD1_MB05                    (_ADI_MSK(0x00000020,uint16_t))  /* Mailbox n Transmit/Receive */
+#define BITM_CAN_MD1_MB06                    (_ADI_MSK(0x00000040,uint16_t))  /* Mailbox n Transmit/Receive */
+#define BITM_CAN_MD1_MB07                    (_ADI_MSK(0x00000080,uint16_t))  /* Mailbox n Transmit/Receive */
+#define BITM_CAN_MD1_MB08                    (_ADI_MSK(0x00000100,uint16_t))  /* Mailbox n Transmit/Receive */
+#define BITM_CAN_MD1_MB09                    (_ADI_MSK(0x00000200,uint16_t))  /* Mailbox n Transmit/Receive */
+#define BITM_CAN_MD1_MB10                    (_ADI_MSK(0x00000400,uint16_t))  /* Mailbox n Transmit/Receive */
+#define BITM_CAN_MD1_MB11                    (_ADI_MSK(0x00000800,uint16_t))  /* Mailbox n Transmit/Receive */
+#define BITM_CAN_MD1_MB12                    (_ADI_MSK(0x00001000,uint16_t))  /* Mailbox n Transmit/Receive */
+#define BITM_CAN_MD1_MB13                    (_ADI_MSK(0x00002000,uint16_t))  /* Mailbox n Transmit/Receive */
+#define BITM_CAN_MD1_MB14                    (_ADI_MSK(0x00004000,uint16_t))  /* Mailbox n Transmit/Receive */
+#define BITM_CAN_MD1_MB15                    (_ADI_MSK(0x00008000,uint16_t))  /* Mailbox n Transmit/Receive */
 
 /* ------------------------------------------------------------------------------------------------------------------------
         CAN_TRS1                             Pos/Masks                        Description
    ------------------------------------------------------------------------------------------------------------------------ */
-#define BITP_CAN_TRS1_MB00                    0
-#define BITP_CAN_TRS1_MB01                    1
-#define BITP_CAN_TRS1_MB02                    2
-#define BITP_CAN_TRS1_MB03                    3
-#define BITP_CAN_TRS1_MB04                    4
-#define BITP_CAN_TRS1_MB05                    5
-#define BITP_CAN_TRS1_MB06                    6
-#define BITP_CAN_TRS1_MB07                    7
-#define BITP_CAN_TRS1_MB08                    8
-#define BITP_CAN_TRS1_MB09                    9
-#define BITP_CAN_TRS1_MB10                   10
-#define BITP_CAN_TRS1_MB11                   11
-#define BITP_CAN_TRS1_MB12                   12
-#define BITP_CAN_TRS1_MB13                   13
-#define BITP_CAN_TRS1_MB14                   14
-#define BITP_CAN_TRS1_MB15                   15
-#define BITM_CAN_TRS1_MB00                   (_ADI_MSK(0x00000001,uint16_t))
-#define BITM_CAN_TRS1_MB01                   (_ADI_MSK(0x00000002,uint16_t))
-#define BITM_CAN_TRS1_MB02                   (_ADI_MSK(0x00000004,uint16_t))
-#define BITM_CAN_TRS1_MB03                   (_ADI_MSK(0x00000008,uint16_t))
-#define BITM_CAN_TRS1_MB04                   (_ADI_MSK(0x00000010,uint16_t))
-#define BITM_CAN_TRS1_MB05                   (_ADI_MSK(0x00000020,uint16_t))
-#define BITM_CAN_TRS1_MB06                   (_ADI_MSK(0x00000040,uint16_t))
-#define BITM_CAN_TRS1_MB07                   (_ADI_MSK(0x00000080,uint16_t))
-#define BITM_CAN_TRS1_MB08                   (_ADI_MSK(0x00000100,uint16_t))
-#define BITM_CAN_TRS1_MB09                   (_ADI_MSK(0x00000200,uint16_t))
-#define BITM_CAN_TRS1_MB10                   (_ADI_MSK(0x00000400,uint16_t))
-#define BITM_CAN_TRS1_MB11                   (_ADI_MSK(0x00000800,uint16_t))
-#define BITM_CAN_TRS1_MB12                   (_ADI_MSK(0x00001000,uint16_t))
-#define BITM_CAN_TRS1_MB13                   (_ADI_MSK(0x00002000,uint16_t))
-#define BITM_CAN_TRS1_MB14                   (_ADI_MSK(0x00004000,uint16_t))
-#define BITM_CAN_TRS1_MB15                   (_ADI_MSK(0x00008000,uint16_t))
+#define BITP_CAN_TRS1_MB00                    0                               /* Mailbox n Transmit Request */
+#define BITP_CAN_TRS1_MB01                    1                               /* Mailbox n Transmit Request */
+#define BITP_CAN_TRS1_MB02                    2                               /* Mailbox n Transmit Request */
+#define BITP_CAN_TRS1_MB03                    3                               /* Mailbox n Transmit Request */
+#define BITP_CAN_TRS1_MB04                    4                               /* Mailbox n Transmit Request */
+#define BITP_CAN_TRS1_MB05                    5                               /* Mailbox n Transmit Request */
+#define BITP_CAN_TRS1_MB06                    6                               /* Mailbox n Transmit Request */
+#define BITP_CAN_TRS1_MB07                    7                               /* Mailbox n Transmit Request */
+#define BITP_CAN_TRS1_MB08                    8                               /* Mailbox n Transmit Request */
+#define BITP_CAN_TRS1_MB09                    9                               /* Mailbox n Transmit Request */
+#define BITP_CAN_TRS1_MB10                   10                               /* Mailbox n Transmit Request */
+#define BITP_CAN_TRS1_MB11                   11                               /* Mailbox n Transmit Request */
+#define BITP_CAN_TRS1_MB12                   12                               /* Mailbox n Transmit Request */
+#define BITP_CAN_TRS1_MB13                   13                               /* Mailbox n Transmit Request */
+#define BITP_CAN_TRS1_MB14                   14                               /* Mailbox n Transmit Request */
+#define BITP_CAN_TRS1_MB15                   15                               /* Mailbox n Transmit Request */
+#define BITM_CAN_TRS1_MB00                   (_ADI_MSK(0x00000001,uint16_t))  /* Mailbox n Transmit Request */
+#define BITM_CAN_TRS1_MB01                   (_ADI_MSK(0x00000002,uint16_t))  /* Mailbox n Transmit Request */
+#define BITM_CAN_TRS1_MB02                   (_ADI_MSK(0x00000004,uint16_t))  /* Mailbox n Transmit Request */
+#define BITM_CAN_TRS1_MB03                   (_ADI_MSK(0x00000008,uint16_t))  /* Mailbox n Transmit Request */
+#define BITM_CAN_TRS1_MB04                   (_ADI_MSK(0x00000010,uint16_t))  /* Mailbox n Transmit Request */
+#define BITM_CAN_TRS1_MB05                   (_ADI_MSK(0x00000020,uint16_t))  /* Mailbox n Transmit Request */
+#define BITM_CAN_TRS1_MB06                   (_ADI_MSK(0x00000040,uint16_t))  /* Mailbox n Transmit Request */
+#define BITM_CAN_TRS1_MB07                   (_ADI_MSK(0x00000080,uint16_t))  /* Mailbox n Transmit Request */
+#define BITM_CAN_TRS1_MB08                   (_ADI_MSK(0x00000100,uint16_t))  /* Mailbox n Transmit Request */
+#define BITM_CAN_TRS1_MB09                   (_ADI_MSK(0x00000200,uint16_t))  /* Mailbox n Transmit Request */
+#define BITM_CAN_TRS1_MB10                   (_ADI_MSK(0x00000400,uint16_t))  /* Mailbox n Transmit Request */
+#define BITM_CAN_TRS1_MB11                   (_ADI_MSK(0x00000800,uint16_t))  /* Mailbox n Transmit Request */
+#define BITM_CAN_TRS1_MB12                   (_ADI_MSK(0x00001000,uint16_t))  /* Mailbox n Transmit Request */
+#define BITM_CAN_TRS1_MB13                   (_ADI_MSK(0x00002000,uint16_t))  /* Mailbox n Transmit Request */
+#define BITM_CAN_TRS1_MB14                   (_ADI_MSK(0x00004000,uint16_t))  /* Mailbox n Transmit Request */
+#define BITM_CAN_TRS1_MB15                   (_ADI_MSK(0x00008000,uint16_t))  /* Mailbox n Transmit Request */
 
 /* ------------------------------------------------------------------------------------------------------------------------
         CAN_TRR1                             Pos/Masks                        Description
    ------------------------------------------------------------------------------------------------------------------------ */
-#define BITP_CAN_TRR1_MB00                    0
-#define BITP_CAN_TRR1_MB01                    1
-#define BITP_CAN_TRR1_MB02                    2
-#define BITP_CAN_TRR1_MB03                    3
-#define BITP_CAN_TRR1_MB04                    4
-#define BITP_CAN_TRR1_MB05                    5
-#define BITP_CAN_TRR1_MB06                    6
-#define BITP_CAN_TRR1_MB07                    7
-#define BITP_CAN_TRR1_MB08                    8
-#define BITP_CAN_TRR1_MB09                    9
-#define BITP_CAN_TRR1_MB10                   10
-#define BITP_CAN_TRR1_MB11                   11
-#define BITP_CAN_TRR1_MB12                   12
-#define BITP_CAN_TRR1_MB13                   13
-#define BITP_CAN_TRR1_MB14                   14
-#define BITP_CAN_TRR1_MB15                   15
-#define BITM_CAN_TRR1_MB00                   (_ADI_MSK(0x00000001,uint16_t))
-#define BITM_CAN_TRR1_MB01                   (_ADI_MSK(0x00000002,uint16_t))
-#define BITM_CAN_TRR1_MB02                   (_ADI_MSK(0x00000004,uint16_t))
-#define BITM_CAN_TRR1_MB03                   (_ADI_MSK(0x00000008,uint16_t))
-#define BITM_CAN_TRR1_MB04                   (_ADI_MSK(0x00000010,uint16_t))
-#define BITM_CAN_TRR1_MB05                   (_ADI_MSK(0x00000020,uint16_t))
-#define BITM_CAN_TRR1_MB06                   (_ADI_MSK(0x00000040,uint16_t))
-#define BITM_CAN_TRR1_MB07                   (_ADI_MSK(0x00000080,uint16_t))
-#define BITM_CAN_TRR1_MB08                   (_ADI_MSK(0x00000100,uint16_t))
-#define BITM_CAN_TRR1_MB09                   (_ADI_MSK(0x00000200,uint16_t))
-#define BITM_CAN_TRR1_MB10                   (_ADI_MSK(0x00000400,uint16_t))
-#define BITM_CAN_TRR1_MB11                   (_ADI_MSK(0x00000800,uint16_t))
-#define BITM_CAN_TRR1_MB12                   (_ADI_MSK(0x00001000,uint16_t))
-#define BITM_CAN_TRR1_MB13                   (_ADI_MSK(0x00002000,uint16_t))
-#define BITM_CAN_TRR1_MB14                   (_ADI_MSK(0x00004000,uint16_t))
-#define BITM_CAN_TRR1_MB15                   (_ADI_MSK(0x00008000,uint16_t))
+#define BITP_CAN_TRR1_MB00                    0                               /* Mailbox n Transmit Abort */
+#define BITP_CAN_TRR1_MB01                    1                               /* Mailbox n Transmit Abort */
+#define BITP_CAN_TRR1_MB02                    2                               /* Mailbox n Transmit Abort */
+#define BITP_CAN_TRR1_MB03                    3                               /* Mailbox n Transmit Abort */
+#define BITP_CAN_TRR1_MB04                    4                               /* Mailbox n Transmit Abort */
+#define BITP_CAN_TRR1_MB05                    5                               /* Mailbox n Transmit Abort */
+#define BITP_CAN_TRR1_MB06                    6                               /* Mailbox n Transmit Abort */
+#define BITP_CAN_TRR1_MB07                    7                               /* Mailbox n Transmit Abort */
+#define BITP_CAN_TRR1_MB08                    8                               /* Mailbox n Transmit Abort */
+#define BITP_CAN_TRR1_MB09                    9                               /* Mailbox n Transmit Abort */
+#define BITP_CAN_TRR1_MB10                   10                               /* Mailbox n Transmit Abort */
+#define BITP_CAN_TRR1_MB11                   11                               /* Mailbox n Transmit Abort */
+#define BITP_CAN_TRR1_MB12                   12                               /* Mailbox n Transmit Abort */
+#define BITP_CAN_TRR1_MB13                   13                               /* Mailbox n Transmit Abort */
+#define BITP_CAN_TRR1_MB14                   14                               /* Mailbox n Transmit Abort */
+#define BITP_CAN_TRR1_MB15                   15                               /* Mailbox n Transmit Abort */
+#define BITM_CAN_TRR1_MB00                   (_ADI_MSK(0x00000001,uint16_t))  /* Mailbox n Transmit Abort */
+#define BITM_CAN_TRR1_MB01                   (_ADI_MSK(0x00000002,uint16_t))  /* Mailbox n Transmit Abort */
+#define BITM_CAN_TRR1_MB02                   (_ADI_MSK(0x00000004,uint16_t))  /* Mailbox n Transmit Abort */
+#define BITM_CAN_TRR1_MB03                   (_ADI_MSK(0x00000008,uint16_t))  /* Mailbox n Transmit Abort */
+#define BITM_CAN_TRR1_MB04                   (_ADI_MSK(0x00000010,uint16_t))  /* Mailbox n Transmit Abort */
+#define BITM_CAN_TRR1_MB05                   (_ADI_MSK(0x00000020,uint16_t))  /* Mailbox n Transmit Abort */
+#define BITM_CAN_TRR1_MB06                   (_ADI_MSK(0x00000040,uint16_t))  /* Mailbox n Transmit Abort */
+#define BITM_CAN_TRR1_MB07                   (_ADI_MSK(0x00000080,uint16_t))  /* Mailbox n Transmit Abort */
+#define BITM_CAN_TRR1_MB08                   (_ADI_MSK(0x00000100,uint16_t))  /* Mailbox n Transmit Abort */
+#define BITM_CAN_TRR1_MB09                   (_ADI_MSK(0x00000200,uint16_t))  /* Mailbox n Transmit Abort */
+#define BITM_CAN_TRR1_MB10                   (_ADI_MSK(0x00000400,uint16_t))  /* Mailbox n Transmit Abort */
+#define BITM_CAN_TRR1_MB11                   (_ADI_MSK(0x00000800,uint16_t))  /* Mailbox n Transmit Abort */
+#define BITM_CAN_TRR1_MB12                   (_ADI_MSK(0x00001000,uint16_t))  /* Mailbox n Transmit Abort */
+#define BITM_CAN_TRR1_MB13                   (_ADI_MSK(0x00002000,uint16_t))  /* Mailbox n Transmit Abort */
+#define BITM_CAN_TRR1_MB14                   (_ADI_MSK(0x00004000,uint16_t))  /* Mailbox n Transmit Abort */
+#define BITM_CAN_TRR1_MB15                   (_ADI_MSK(0x00008000,uint16_t))  /* Mailbox n Transmit Abort */
 
 /* ------------------------------------------------------------------------------------------------------------------------
         CAN_TA1                              Pos/Masks                        Description
    ------------------------------------------------------------------------------------------------------------------------ */
-#define BITP_CAN_TA1_MB00                     0
-#define BITP_CAN_TA1_MB01                     1
-#define BITP_CAN_TA1_MB02                     2
-#define BITP_CAN_TA1_MB03                     3
-#define BITP_CAN_TA1_MB04                     4
-#define BITP_CAN_TA1_MB05                     5
-#define BITP_CAN_TA1_MB06                     6
-#define BITP_CAN_TA1_MB07                     7
-#define BITP_CAN_TA1_MB08                     8
-#define BITP_CAN_TA1_MB09                     9
-#define BITP_CAN_TA1_MB10                    10
-#define BITP_CAN_TA1_MB11                    11
-#define BITP_CAN_TA1_MB12                    12
-#define BITP_CAN_TA1_MB13                    13
-#define BITP_CAN_TA1_MB14                    14
-#define BITP_CAN_TA1_MB15                    15
-#define BITM_CAN_TA1_MB00                    (_ADI_MSK(0x00000001,uint16_t))
-#define BITM_CAN_TA1_MB01                    (_ADI_MSK(0x00000002,uint16_t))
-#define BITM_CAN_TA1_MB02                    (_ADI_MSK(0x00000004,uint16_t))
-#define BITM_CAN_TA1_MB03                    (_ADI_MSK(0x00000008,uint16_t))
-#define BITM_CAN_TA1_MB04                    (_ADI_MSK(0x00000010,uint16_t))
-#define BITM_CAN_TA1_MB05                    (_ADI_MSK(0x00000020,uint16_t))
-#define BITM_CAN_TA1_MB06                    (_ADI_MSK(0x00000040,uint16_t))
-#define BITM_CAN_TA1_MB07                    (_ADI_MSK(0x00000080,uint16_t))
-#define BITM_CAN_TA1_MB08                    (_ADI_MSK(0x00000100,uint16_t))
-#define BITM_CAN_TA1_MB09                    (_ADI_MSK(0x00000200,uint16_t))
-#define BITM_CAN_TA1_MB10                    (_ADI_MSK(0x00000400,uint16_t))
-#define BITM_CAN_TA1_MB11                    (_ADI_MSK(0x00000800,uint16_t))
-#define BITM_CAN_TA1_MB12                    (_ADI_MSK(0x00001000,uint16_t))
-#define BITM_CAN_TA1_MB13                    (_ADI_MSK(0x00002000,uint16_t))
-#define BITM_CAN_TA1_MB14                    (_ADI_MSK(0x00004000,uint16_t))
-#define BITM_CAN_TA1_MB15                    (_ADI_MSK(0x00008000,uint16_t))
+#define BITP_CAN_TA1_MB00                     0                               /* Mailbox n Transmit Acknowledge */
+#define BITP_CAN_TA1_MB01                     1                               /* Mailbox n Transmit Acknowledge */
+#define BITP_CAN_TA1_MB02                     2                               /* Mailbox n Transmit Acknowledge */
+#define BITP_CAN_TA1_MB03                     3                               /* Mailbox n Transmit Acknowledge */
+#define BITP_CAN_TA1_MB04                     4                               /* Mailbox n Transmit Acknowledge */
+#define BITP_CAN_TA1_MB05                     5                               /* Mailbox n Transmit Acknowledge */
+#define BITP_CAN_TA1_MB06                     6                               /* Mailbox n Transmit Acknowledge */
+#define BITP_CAN_TA1_MB07                     7                               /* Mailbox n Transmit Acknowledge */
+#define BITP_CAN_TA1_MB08                     8                               /* Mailbox n Transmit Acknowledge */
+#define BITP_CAN_TA1_MB09                     9                               /* Mailbox n Transmit Acknowledge */
+#define BITP_CAN_TA1_MB10                    10                               /* Mailbox n Transmit Acknowledge */
+#define BITP_CAN_TA1_MB11                    11                               /* Mailbox n Transmit Acknowledge */
+#define BITP_CAN_TA1_MB12                    12                               /* Mailbox n Transmit Acknowledge */
+#define BITP_CAN_TA1_MB13                    13                               /* Mailbox n Transmit Acknowledge */
+#define BITP_CAN_TA1_MB14                    14                               /* Mailbox n Transmit Acknowledge */
+#define BITP_CAN_TA1_MB15                    15                               /* Mailbox n Transmit Acknowledge */
+#define BITM_CAN_TA1_MB00                    (_ADI_MSK(0x00000001,uint16_t))  /* Mailbox n Transmit Acknowledge */
+#define BITM_CAN_TA1_MB01                    (_ADI_MSK(0x00000002,uint16_t))  /* Mailbox n Transmit Acknowledge */
+#define BITM_CAN_TA1_MB02                    (_ADI_MSK(0x00000004,uint16_t))  /* Mailbox n Transmit Acknowledge */
+#define BITM_CAN_TA1_MB03                    (_ADI_MSK(0x00000008,uint16_t))  /* Mailbox n Transmit Acknowledge */
+#define BITM_CAN_TA1_MB04                    (_ADI_MSK(0x00000010,uint16_t))  /* Mailbox n Transmit Acknowledge */
+#define BITM_CAN_TA1_MB05                    (_ADI_MSK(0x00000020,uint16_t))  /* Mailbox n Transmit Acknowledge */
+#define BITM_CAN_TA1_MB06                    (_ADI_MSK(0x00000040,uint16_t))  /* Mailbox n Transmit Acknowledge */
+#define BITM_CAN_TA1_MB07                    (_ADI_MSK(0x00000080,uint16_t))  /* Mailbox n Transmit Acknowledge */
+#define BITM_CAN_TA1_MB08                    (_ADI_MSK(0x00000100,uint16_t))  /* Mailbox n Transmit Acknowledge */
+#define BITM_CAN_TA1_MB09                    (_ADI_MSK(0x00000200,uint16_t))  /* Mailbox n Transmit Acknowledge */
+#define BITM_CAN_TA1_MB10                    (_ADI_MSK(0x00000400,uint16_t))  /* Mailbox n Transmit Acknowledge */
+#define BITM_CAN_TA1_MB11                    (_ADI_MSK(0x00000800,uint16_t))  /* Mailbox n Transmit Acknowledge */
+#define BITM_CAN_TA1_MB12                    (_ADI_MSK(0x00001000,uint16_t))  /* Mailbox n Transmit Acknowledge */
+#define BITM_CAN_TA1_MB13                    (_ADI_MSK(0x00002000,uint16_t))  /* Mailbox n Transmit Acknowledge */
+#define BITM_CAN_TA1_MB14                    (_ADI_MSK(0x00004000,uint16_t))  /* Mailbox n Transmit Acknowledge */
+#define BITM_CAN_TA1_MB15                    (_ADI_MSK(0x00008000,uint16_t))  /* Mailbox n Transmit Acknowledge */
 
 /* ------------------------------------------------------------------------------------------------------------------------
         CAN_AA1                              Pos/Masks                        Description
    ------------------------------------------------------------------------------------------------------------------------ */
-#define BITP_CAN_AA1_MB00                     0
-#define BITP_CAN_AA1_MB01                     1
-#define BITP_CAN_AA1_MB02                     2
-#define BITP_CAN_AA1_MB03                     3
-#define BITP_CAN_AA1_MB04                     4
-#define BITP_CAN_AA1_MB05                     5
-#define BITP_CAN_AA1_MB06                     6
-#define BITP_CAN_AA1_MB07                     7
-#define BITP_CAN_AA1_MB08                     8
-#define BITP_CAN_AA1_MB09                     9
-#define BITP_CAN_AA1_MB10                    10
-#define BITP_CAN_AA1_MB11                    11
-#define BITP_CAN_AA1_MB12                    12
-#define BITP_CAN_AA1_MB13                    13
-#define BITP_CAN_AA1_MB14                    14
-#define BITP_CAN_AA1_MB15                    15
-#define BITM_CAN_AA1_MB00                    (_ADI_MSK(0x00000001,uint16_t))
-#define BITM_CAN_AA1_MB01                    (_ADI_MSK(0x00000002,uint16_t))
-#define BITM_CAN_AA1_MB02                    (_ADI_MSK(0x00000004,uint16_t))
-#define BITM_CAN_AA1_MB03                    (_ADI_MSK(0x00000008,uint16_t))
-#define BITM_CAN_AA1_MB04                    (_ADI_MSK(0x00000010,uint16_t))
-#define BITM_CAN_AA1_MB05                    (_ADI_MSK(0x00000020,uint16_t))
-#define BITM_CAN_AA1_MB06                    (_ADI_MSK(0x00000040,uint16_t))
-#define BITM_CAN_AA1_MB07                    (_ADI_MSK(0x00000080,uint16_t))
-#define BITM_CAN_AA1_MB08                    (_ADI_MSK(0x00000100,uint16_t))
-#define BITM_CAN_AA1_MB09                    (_ADI_MSK(0x00000200,uint16_t))
-#define BITM_CAN_AA1_MB10                    (_ADI_MSK(0x00000400,uint16_t))
-#define BITM_CAN_AA1_MB11                    (_ADI_MSK(0x00000800,uint16_t))
-#define BITM_CAN_AA1_MB12                    (_ADI_MSK(0x00001000,uint16_t))
-#define BITM_CAN_AA1_MB13                    (_ADI_MSK(0x00002000,uint16_t))
-#define BITM_CAN_AA1_MB14                    (_ADI_MSK(0x00004000,uint16_t))
-#define BITM_CAN_AA1_MB15                    (_ADI_MSK(0x00008000,uint16_t))
+#define BITP_CAN_AA1_MB00                     0                               /* Mailbox n Abort Acknowledge */
+#define BITP_CAN_AA1_MB01                     1                               /* Mailbox n Abort Acknowledge */
+#define BITP_CAN_AA1_MB02                     2                               /* Mailbox n Abort Acknowledge */
+#define BITP_CAN_AA1_MB03                     3                               /* Mailbox n Abort Acknowledge */
+#define BITP_CAN_AA1_MB04                     4                               /* Mailbox n Abort Acknowledge */
+#define BITP_CAN_AA1_MB05                     5                               /* Mailbox n Abort Acknowledge */
+#define BITP_CAN_AA1_MB06                     6                               /* Mailbox n Abort Acknowledge */
+#define BITP_CAN_AA1_MB07                     7                               /* Mailbox n Abort Acknowledge */
+#define BITP_CAN_AA1_MB08                     8                               /* Mailbox n Abort Acknowledge */
+#define BITP_CAN_AA1_MB09                     9                               /* Mailbox n Abort Acknowledge */
+#define BITP_CAN_AA1_MB10                    10                               /* Mailbox n Abort Acknowledge */
+#define BITP_CAN_AA1_MB11                    11                               /* Mailbox n Abort Acknowledge */
+#define BITP_CAN_AA1_MB12                    12                               /* Mailbox n Abort Acknowledge */
+#define BITP_CAN_AA1_MB13                    13                               /* Mailbox n Abort Acknowledge */
+#define BITP_CAN_AA1_MB14                    14                               /* Mailbox n Abort Acknowledge */
+#define BITP_CAN_AA1_MB15                    15                               /* Mailbox n Abort Acknowledge */
+#define BITM_CAN_AA1_MB00                    (_ADI_MSK(0x00000001,uint16_t))  /* Mailbox n Abort Acknowledge */
+#define BITM_CAN_AA1_MB01                    (_ADI_MSK(0x00000002,uint16_t))  /* Mailbox n Abort Acknowledge */
+#define BITM_CAN_AA1_MB02                    (_ADI_MSK(0x00000004,uint16_t))  /* Mailbox n Abort Acknowledge */
+#define BITM_CAN_AA1_MB03                    (_ADI_MSK(0x00000008,uint16_t))  /* Mailbox n Abort Acknowledge */
+#define BITM_CAN_AA1_MB04                    (_ADI_MSK(0x00000010,uint16_t))  /* Mailbox n Abort Acknowledge */
+#define BITM_CAN_AA1_MB05                    (_ADI_MSK(0x00000020,uint16_t))  /* Mailbox n Abort Acknowledge */
+#define BITM_CAN_AA1_MB06                    (_ADI_MSK(0x00000040,uint16_t))  /* Mailbox n Abort Acknowledge */
+#define BITM_CAN_AA1_MB07                    (_ADI_MSK(0x00000080,uint16_t))  /* Mailbox n Abort Acknowledge */
+#define BITM_CAN_AA1_MB08                    (_ADI_MSK(0x00000100,uint16_t))  /* Mailbox n Abort Acknowledge */
+#define BITM_CAN_AA1_MB09                    (_ADI_MSK(0x00000200,uint16_t))  /* Mailbox n Abort Acknowledge */
+#define BITM_CAN_AA1_MB10                    (_ADI_MSK(0x00000400,uint16_t))  /* Mailbox n Abort Acknowledge */
+#define BITM_CAN_AA1_MB11                    (_ADI_MSK(0x00000800,uint16_t))  /* Mailbox n Abort Acknowledge */
+#define BITM_CAN_AA1_MB12                    (_ADI_MSK(0x00001000,uint16_t))  /* Mailbox n Abort Acknowledge */
+#define BITM_CAN_AA1_MB13                    (_ADI_MSK(0x00002000,uint16_t))  /* Mailbox n Abort Acknowledge */
+#define BITM_CAN_AA1_MB14                    (_ADI_MSK(0x00004000,uint16_t))  /* Mailbox n Abort Acknowledge */
+#define BITM_CAN_AA1_MB15                    (_ADI_MSK(0x00008000,uint16_t))  /* Mailbox n Abort Acknowledge */
 
 /* ------------------------------------------------------------------------------------------------------------------------
         CAN_RMP1                             Pos/Masks                        Description
    ------------------------------------------------------------------------------------------------------------------------ */
-#define BITP_CAN_RMP1_MB00                    0
-#define BITP_CAN_RMP1_MB01                    1
-#define BITP_CAN_RMP1_MB02                    2
-#define BITP_CAN_RMP1_MB03                    3
-#define BITP_CAN_RMP1_MB04                    4
-#define BITP_CAN_RMP1_MB05                    5
-#define BITP_CAN_RMP1_MB06                    6
-#define BITP_CAN_RMP1_MB07                    7
-#define BITP_CAN_RMP1_MB08                    8
-#define BITP_CAN_RMP1_MB09                    9
-#define BITP_CAN_RMP1_MB10                   10
-#define BITP_CAN_RMP1_MB11                   11
-#define BITP_CAN_RMP1_MB12                   12
-#define BITP_CAN_RMP1_MB13                   13
-#define BITP_CAN_RMP1_MB14                   14
-#define BITP_CAN_RMP1_MB15                   15
-#define BITM_CAN_RMP1_MB00                   (_ADI_MSK(0x00000001,uint16_t))
-#define BITM_CAN_RMP1_MB01                   (_ADI_MSK(0x00000002,uint16_t))
-#define BITM_CAN_RMP1_MB02                   (_ADI_MSK(0x00000004,uint16_t))
-#define BITM_CAN_RMP1_MB03                   (_ADI_MSK(0x00000008,uint16_t))
-#define BITM_CAN_RMP1_MB04                   (_ADI_MSK(0x00000010,uint16_t))
-#define BITM_CAN_RMP1_MB05                   (_ADI_MSK(0x00000020,uint16_t))
-#define BITM_CAN_RMP1_MB06                   (_ADI_MSK(0x00000040,uint16_t))
-#define BITM_CAN_RMP1_MB07                   (_ADI_MSK(0x00000080,uint16_t))
-#define BITM_CAN_RMP1_MB08                   (_ADI_MSK(0x00000100,uint16_t))
-#define BITM_CAN_RMP1_MB09                   (_ADI_MSK(0x00000200,uint16_t))
-#define BITM_CAN_RMP1_MB10                   (_ADI_MSK(0x00000400,uint16_t))
-#define BITM_CAN_RMP1_MB11                   (_ADI_MSK(0x00000800,uint16_t))
-#define BITM_CAN_RMP1_MB12                   (_ADI_MSK(0x00001000,uint16_t))
-#define BITM_CAN_RMP1_MB13                   (_ADI_MSK(0x00002000,uint16_t))
-#define BITM_CAN_RMP1_MB14                   (_ADI_MSK(0x00004000,uint16_t))
-#define BITM_CAN_RMP1_MB15                   (_ADI_MSK(0x00008000,uint16_t))
+#define BITP_CAN_RMP1_MB00                    0                               /* Mailbox n Message Pending */
+#define BITP_CAN_RMP1_MB01                    1                               /* Mailbox n Message Pending */
+#define BITP_CAN_RMP1_MB02                    2                               /* Mailbox n Message Pending */
+#define BITP_CAN_RMP1_MB03                    3                               /* Mailbox n Message Pending */
+#define BITP_CAN_RMP1_MB04                    4                               /* Mailbox n Message Pending */
+#define BITP_CAN_RMP1_MB05                    5                               /* Mailbox n Message Pending */
+#define BITP_CAN_RMP1_MB06                    6                               /* Mailbox n Message Pending */
+#define BITP_CAN_RMP1_MB07                    7                               /* Mailbox n Message Pending */
+#define BITP_CAN_RMP1_MB08                    8                               /* Mailbox n Message Pending */
+#define BITP_CAN_RMP1_MB09                    9                               /* Mailbox n Message Pending */
+#define BITP_CAN_RMP1_MB10                   10                               /* Mailbox n Message Pending */
+#define BITP_CAN_RMP1_MB11                   11                               /* Mailbox n Message Pending */
+#define BITP_CAN_RMP1_MB12                   12                               /* Mailbox n Message Pending */
+#define BITP_CAN_RMP1_MB13                   13                               /* Mailbox n Message Pending */
+#define BITP_CAN_RMP1_MB14                   14                               /* Mailbox n Message Pending */
+#define BITP_CAN_RMP1_MB15                   15                               /* Mailbox n Message Pending */
+#define BITM_CAN_RMP1_MB00                   (_ADI_MSK(0x00000001,uint16_t))  /* Mailbox n Message Pending */
+#define BITM_CAN_RMP1_MB01                   (_ADI_MSK(0x00000002,uint16_t))  /* Mailbox n Message Pending */
+#define BITM_CAN_RMP1_MB02                   (_ADI_MSK(0x00000004,uint16_t))  /* Mailbox n Message Pending */
+#define BITM_CAN_RMP1_MB03                   (_ADI_MSK(0x00000008,uint16_t))  /* Mailbox n Message Pending */
+#define BITM_CAN_RMP1_MB04                   (_ADI_MSK(0x00000010,uint16_t))  /* Mailbox n Message Pending */
+#define BITM_CAN_RMP1_MB05                   (_ADI_MSK(0x00000020,uint16_t))  /* Mailbox n Message Pending */
+#define BITM_CAN_RMP1_MB06                   (_ADI_MSK(0x00000040,uint16_t))  /* Mailbox n Message Pending */
+#define BITM_CAN_RMP1_MB07                   (_ADI_MSK(0x00000080,uint16_t))  /* Mailbox n Message Pending */
+#define BITM_CAN_RMP1_MB08                   (_ADI_MSK(0x00000100,uint16_t))  /* Mailbox n Message Pending */
+#define BITM_CAN_RMP1_MB09                   (_ADI_MSK(0x00000200,uint16_t))  /* Mailbox n Message Pending */
+#define BITM_CAN_RMP1_MB10                   (_ADI_MSK(0x00000400,uint16_t))  /* Mailbox n Message Pending */
+#define BITM_CAN_RMP1_MB11                   (_ADI_MSK(0x00000800,uint16_t))  /* Mailbox n Message Pending */
+#define BITM_CAN_RMP1_MB12                   (_ADI_MSK(0x00001000,uint16_t))  /* Mailbox n Message Pending */
+#define BITM_CAN_RMP1_MB13                   (_ADI_MSK(0x00002000,uint16_t))  /* Mailbox n Message Pending */
+#define BITM_CAN_RMP1_MB14                   (_ADI_MSK(0x00004000,uint16_t))  /* Mailbox n Message Pending */
+#define BITM_CAN_RMP1_MB15                   (_ADI_MSK(0x00008000,uint16_t))  /* Mailbox n Message Pending */
 
 /* ------------------------------------------------------------------------------------------------------------------------
         CAN_RML1                             Pos/Masks                        Description
    ------------------------------------------------------------------------------------------------------------------------ */
-#define BITP_CAN_RML1_MB00                    0
-#define BITP_CAN_RML1_MB01                    1
-#define BITP_CAN_RML1_MB02                    2
-#define BITP_CAN_RML1_MB03                    3
-#define BITP_CAN_RML1_MB04                    4
-#define BITP_CAN_RML1_MB05                    5
-#define BITP_CAN_RML1_MB06                    6
-#define BITP_CAN_RML1_MB07                    7
-#define BITP_CAN_RML1_MB08                    8
-#define BITP_CAN_RML1_MB09                    9
-#define BITP_CAN_RML1_MB10                   10
-#define BITP_CAN_RML1_MB11                   11
-#define BITP_CAN_RML1_MB12                   12
-#define BITP_CAN_RML1_MB13                   13
-#define BITP_CAN_RML1_MB14                   14
-#define BITP_CAN_RML1_MB15                   15
-#define BITM_CAN_RML1_MB00                   (_ADI_MSK(0x00000001,uint16_t))
-#define BITM_CAN_RML1_MB01                   (_ADI_MSK(0x00000002,uint16_t))
-#define BITM_CAN_RML1_MB02                   (_ADI_MSK(0x00000004,uint16_t))
-#define BITM_CAN_RML1_MB03                   (_ADI_MSK(0x00000008,uint16_t))
-#define BITM_CAN_RML1_MB04                   (_ADI_MSK(0x00000010,uint16_t))
-#define BITM_CAN_RML1_MB05                   (_ADI_MSK(0x00000020,uint16_t))
-#define BITM_CAN_RML1_MB06                   (_ADI_MSK(0x00000040,uint16_t))
-#define BITM_CAN_RML1_MB07                   (_ADI_MSK(0x00000080,uint16_t))
-#define BITM_CAN_RML1_MB08                   (_ADI_MSK(0x00000100,uint16_t))
-#define BITM_CAN_RML1_MB09                   (_ADI_MSK(0x00000200,uint16_t))
-#define BITM_CAN_RML1_MB10                   (_ADI_MSK(0x00000400,uint16_t))
-#define BITM_CAN_RML1_MB11                   (_ADI_MSK(0x00000800,uint16_t))
-#define BITM_CAN_RML1_MB12                   (_ADI_MSK(0x00001000,uint16_t))
-#define BITM_CAN_RML1_MB13                   (_ADI_MSK(0x00002000,uint16_t))
-#define BITM_CAN_RML1_MB14                   (_ADI_MSK(0x00004000,uint16_t))
-#define BITM_CAN_RML1_MB15                   (_ADI_MSK(0x00008000,uint16_t))
+#define BITP_CAN_RML1_MB00                    0                               /* Mailbox n Message Lost */
+#define BITP_CAN_RML1_MB01                    1                               /* Mailbox n Message Lost */
+#define BITP_CAN_RML1_MB02                    2                               /* Mailbox n Message Lost */
+#define BITP_CAN_RML1_MB03                    3                               /* Mailbox n Message Lost */
+#define BITP_CAN_RML1_MB04                    4                               /* Mailbox n Message Lost */
+#define BITP_CAN_RML1_MB05                    5                               /* Mailbox n Message Lost */
+#define BITP_CAN_RML1_MB06                    6                               /* Mailbox n Message Lost */
+#define BITP_CAN_RML1_MB07                    7                               /* Mailbox n Message Lost */
+#define BITP_CAN_RML1_MB08                    8                               /* Mailbox n Message Lost */
+#define BITP_CAN_RML1_MB09                    9                               /* Mailbox n Message Lost */
+#define BITP_CAN_RML1_MB10                   10                               /* Mailbox n Message Lost */
+#define BITP_CAN_RML1_MB11                   11                               /* Mailbox n Message Lost */
+#define BITP_CAN_RML1_MB12                   12                               /* Mailbox n Message Lost */
+#define BITP_CAN_RML1_MB13                   13                               /* Mailbox n Message Lost */
+#define BITP_CAN_RML1_MB14                   14                               /* Mailbox n Message Lost */
+#define BITP_CAN_RML1_MB15                   15                               /* Mailbox n Message Lost */
+#define BITM_CAN_RML1_MB00                   (_ADI_MSK(0x00000001,uint16_t))  /* Mailbox n Message Lost */
+#define BITM_CAN_RML1_MB01                   (_ADI_MSK(0x00000002,uint16_t))  /* Mailbox n Message Lost */
+#define BITM_CAN_RML1_MB02                   (_ADI_MSK(0x00000004,uint16_t))  /* Mailbox n Message Lost */
+#define BITM_CAN_RML1_MB03                   (_ADI_MSK(0x00000008,uint16_t))  /* Mailbox n Message Lost */
+#define BITM_CAN_RML1_MB04                   (_ADI_MSK(0x00000010,uint16_t))  /* Mailbox n Message Lost */
+#define BITM_CAN_RML1_MB05                   (_ADI_MSK(0x00000020,uint16_t))  /* Mailbox n Message Lost */
+#define BITM_CAN_RML1_MB06                   (_ADI_MSK(0x00000040,uint16_t))  /* Mailbox n Message Lost */
+#define BITM_CAN_RML1_MB07                   (_ADI_MSK(0x00000080,uint16_t))  /* Mailbox n Message Lost */
+#define BITM_CAN_RML1_MB08                   (_ADI_MSK(0x00000100,uint16_t))  /* Mailbox n Message Lost */
+#define BITM_CAN_RML1_MB09                   (_ADI_MSK(0x00000200,uint16_t))  /* Mailbox n Message Lost */
+#define BITM_CAN_RML1_MB10                   (_ADI_MSK(0x00000400,uint16_t))  /* Mailbox n Message Lost */
+#define BITM_CAN_RML1_MB11                   (_ADI_MSK(0x00000800,uint16_t))  /* Mailbox n Message Lost */
+#define BITM_CAN_RML1_MB12                   (_ADI_MSK(0x00001000,uint16_t))  /* Mailbox n Message Lost */
+#define BITM_CAN_RML1_MB13                   (_ADI_MSK(0x00002000,uint16_t))  /* Mailbox n Message Lost */
+#define BITM_CAN_RML1_MB14                   (_ADI_MSK(0x00004000,uint16_t))  /* Mailbox n Message Lost */
+#define BITM_CAN_RML1_MB15                   (_ADI_MSK(0x00008000,uint16_t))  /* Mailbox n Message Lost */
 
 /* ------------------------------------------------------------------------------------------------------------------------
         CAN_MBTIF1                           Pos/Masks                        Description
    ------------------------------------------------------------------------------------------------------------------------ */
-#define BITP_CAN_MBTIF1_MB00                  0
-#define BITP_CAN_MBTIF1_MB01                  1
-#define BITP_CAN_MBTIF1_MB02                  2
-#define BITP_CAN_MBTIF1_MB03                  3
-#define BITP_CAN_MBTIF1_MB04                  4
-#define BITP_CAN_MBTIF1_MB05                  5
-#define BITP_CAN_MBTIF1_MB06                  6
-#define BITP_CAN_MBTIF1_MB07                  7
-#define BITP_CAN_MBTIF1_MB08                  8
-#define BITP_CAN_MBTIF1_MB09                  9
-#define BITP_CAN_MBTIF1_MB10                 10
-#define BITP_CAN_MBTIF1_MB11                 11
-#define BITP_CAN_MBTIF1_MB12                 12
-#define BITP_CAN_MBTIF1_MB13                 13
-#define BITP_CAN_MBTIF1_MB14                 14
-#define BITP_CAN_MBTIF1_MB15                 15
-#define BITM_CAN_MBTIF1_MB00                 (_ADI_MSK(0x00000001,uint16_t))
-#define BITM_CAN_MBTIF1_MB01                 (_ADI_MSK(0x00000002,uint16_t))
-#define BITM_CAN_MBTIF1_MB02                 (_ADI_MSK(0x00000004,uint16_t))
-#define BITM_CAN_MBTIF1_MB03                 (_ADI_MSK(0x00000008,uint16_t))
-#define BITM_CAN_MBTIF1_MB04                 (_ADI_MSK(0x00000010,uint16_t))
-#define BITM_CAN_MBTIF1_MB05                 (_ADI_MSK(0x00000020,uint16_t))
-#define BITM_CAN_MBTIF1_MB06                 (_ADI_MSK(0x00000040,uint16_t))
-#define BITM_CAN_MBTIF1_MB07                 (_ADI_MSK(0x00000080,uint16_t))
-#define BITM_CAN_MBTIF1_MB08                 (_ADI_MSK(0x00000100,uint16_t))
-#define BITM_CAN_MBTIF1_MB09                 (_ADI_MSK(0x00000200,uint16_t))
-#define BITM_CAN_MBTIF1_MB10                 (_ADI_MSK(0x00000400,uint16_t))
-#define BITM_CAN_MBTIF1_MB11                 (_ADI_MSK(0x00000800,uint16_t))
-#define BITM_CAN_MBTIF1_MB12                 (_ADI_MSK(0x00001000,uint16_t))
-#define BITM_CAN_MBTIF1_MB13                 (_ADI_MSK(0x00002000,uint16_t))
-#define BITM_CAN_MBTIF1_MB14                 (_ADI_MSK(0x00004000,uint16_t))
-#define BITM_CAN_MBTIF1_MB15                 (_ADI_MSK(0x00008000,uint16_t))
+#define BITP_CAN_MBTIF1_MB00                  0                               /* Mailbox n Transmit Interrupt Pending */
+#define BITP_CAN_MBTIF1_MB01                  1                               /* Mailbox n Transmit Interrupt Pending */
+#define BITP_CAN_MBTIF1_MB02                  2                               /* Mailbox n Transmit Interrupt Pending */
+#define BITP_CAN_MBTIF1_MB03                  3                               /* Mailbox n Transmit Interrupt Pending */
+#define BITP_CAN_MBTIF1_MB04                  4                               /* Mailbox n Transmit Interrupt Pending */
+#define BITP_CAN_MBTIF1_MB05                  5                               /* Mailbox n Transmit Interrupt Pending */
+#define BITP_CAN_MBTIF1_MB06                  6                               /* Mailbox n Transmit Interrupt Pending */
+#define BITP_CAN_MBTIF1_MB07                  7                               /* Mailbox n Transmit Interrupt Pending */
+#define BITP_CAN_MBTIF1_MB08                  8                               /* Mailbox n Transmit Interrupt Pending */
+#define BITP_CAN_MBTIF1_MB09                  9                               /* Mailbox n Transmit Interrupt Pending */
+#define BITP_CAN_MBTIF1_MB10                 10                               /* Mailbox n Transmit Interrupt Pending */
+#define BITP_CAN_MBTIF1_MB11                 11                               /* Mailbox n Transmit Interrupt Pending */
+#define BITP_CAN_MBTIF1_MB12                 12                               /* Mailbox n Transmit Interrupt Pending */
+#define BITP_CAN_MBTIF1_MB13                 13                               /* Mailbox n Transmit Interrupt Pending */
+#define BITP_CAN_MBTIF1_MB14                 14                               /* Mailbox n Transmit Interrupt Pending */
+#define BITP_CAN_MBTIF1_MB15                 15                               /* Mailbox n Transmit Interrupt Pending */
+#define BITM_CAN_MBTIF1_MB00                 (_ADI_MSK(0x00000001,uint16_t))  /* Mailbox n Transmit Interrupt Pending */
+#define BITM_CAN_MBTIF1_MB01                 (_ADI_MSK(0x00000002,uint16_t))  /* Mailbox n Transmit Interrupt Pending */
+#define BITM_CAN_MBTIF1_MB02                 (_ADI_MSK(0x00000004,uint16_t))  /* Mailbox n Transmit Interrupt Pending */
+#define BITM_CAN_MBTIF1_MB03                 (_ADI_MSK(0x00000008,uint16_t))  /* Mailbox n Transmit Interrupt Pending */
+#define BITM_CAN_MBTIF1_MB04                 (_ADI_MSK(0x00000010,uint16_t))  /* Mailbox n Transmit Interrupt Pending */
+#define BITM_CAN_MBTIF1_MB05                 (_ADI_MSK(0x00000020,uint16_t))  /* Mailbox n Transmit Interrupt Pending */
+#define BITM_CAN_MBTIF1_MB06                 (_ADI_MSK(0x00000040,uint16_t))  /* Mailbox n Transmit Interrupt Pending */
+#define BITM_CAN_MBTIF1_MB07                 (_ADI_MSK(0x00000080,uint16_t))  /* Mailbox n Transmit Interrupt Pending */
+#define BITM_CAN_MBTIF1_MB08                 (_ADI_MSK(0x00000100,uint16_t))  /* Mailbox n Transmit Interrupt Pending */
+#define BITM_CAN_MBTIF1_MB09                 (_ADI_MSK(0x00000200,uint16_t))  /* Mailbox n Transmit Interrupt Pending */
+#define BITM_CAN_MBTIF1_MB10                 (_ADI_MSK(0x00000400,uint16_t))  /* Mailbox n Transmit Interrupt Pending */
+#define BITM_CAN_MBTIF1_MB11                 (_ADI_MSK(0x00000800,uint16_t))  /* Mailbox n Transmit Interrupt Pending */
+#define BITM_CAN_MBTIF1_MB12                 (_ADI_MSK(0x00001000,uint16_t))  /* Mailbox n Transmit Interrupt Pending */
+#define BITM_CAN_MBTIF1_MB13                 (_ADI_MSK(0x00002000,uint16_t))  /* Mailbox n Transmit Interrupt Pending */
+#define BITM_CAN_MBTIF1_MB14                 (_ADI_MSK(0x00004000,uint16_t))  /* Mailbox n Transmit Interrupt Pending */
+#define BITM_CAN_MBTIF1_MB15                 (_ADI_MSK(0x00008000,uint16_t))  /* Mailbox n Transmit Interrupt Pending */
 
 /* ------------------------------------------------------------------------------------------------------------------------
         CAN_MBRIF1                           Pos/Masks                        Description
    ------------------------------------------------------------------------------------------------------------------------ */
-#define BITP_CAN_MBRIF1_MB00                  0
-#define BITP_CAN_MBRIF1_MB01                  1
-#define BITP_CAN_MBRIF1_MB02                  2
-#define BITP_CAN_MBRIF1_MB03                  3
-#define BITP_CAN_MBRIF1_MB04                  4
-#define BITP_CAN_MBRIF1_MB05                  5
-#define BITP_CAN_MBRIF1_MB06                  6
-#define BITP_CAN_MBRIF1_MB07                  7
-#define BITP_CAN_MBRIF1_MB08                  8
-#define BITP_CAN_MBRIF1_MB09                  9
-#define BITP_CAN_MBRIF1_MB10                 10
-#define BITP_CAN_MBRIF1_MB11                 11
-#define BITP_CAN_MBRIF1_MB12                 12
-#define BITP_CAN_MBRIF1_MB13                 13
-#define BITP_CAN_MBRIF1_MB14                 14
-#define BITP_CAN_MBRIF1_MB15                 15
-#define BITM_CAN_MBRIF1_MB00                 (_ADI_MSK(0x00000001,uint16_t))
-#define BITM_CAN_MBRIF1_MB01                 (_ADI_MSK(0x00000002,uint16_t))
-#define BITM_CAN_MBRIF1_MB02                 (_ADI_MSK(0x00000004,uint16_t))
-#define BITM_CAN_MBRIF1_MB03                 (_ADI_MSK(0x00000008,uint16_t))
-#define BITM_CAN_MBRIF1_MB04                 (_ADI_MSK(0x00000010,uint16_t))
-#define BITM_CAN_MBRIF1_MB05                 (_ADI_MSK(0x00000020,uint16_t))
-#define BITM_CAN_MBRIF1_MB06                 (_ADI_MSK(0x00000040,uint16_t))
-#define BITM_CAN_MBRIF1_MB07                 (_ADI_MSK(0x00000080,uint16_t))
-#define BITM_CAN_MBRIF1_MB08                 (_ADI_MSK(0x00000100,uint16_t))
-#define BITM_CAN_MBRIF1_MB09                 (_ADI_MSK(0x00000200,uint16_t))
-#define BITM_CAN_MBRIF1_MB10                 (_ADI_MSK(0x00000400,uint16_t))
-#define BITM_CAN_MBRIF1_MB11                 (_ADI_MSK(0x00000800,uint16_t))
-#define BITM_CAN_MBRIF1_MB12                 (_ADI_MSK(0x00001000,uint16_t))
-#define BITM_CAN_MBRIF1_MB13                 (_ADI_MSK(0x00002000,uint16_t))
-#define BITM_CAN_MBRIF1_MB14                 (_ADI_MSK(0x00004000,uint16_t))
-#define BITM_CAN_MBRIF1_MB15                 (_ADI_MSK(0x00008000,uint16_t))
+#define BITP_CAN_MBRIF1_MB00                  0                               /* Mailbox n Receive Interrupt Pending */
+#define BITP_CAN_MBRIF1_MB01                  1                               /* Mailbox n Receive Interrupt Pending */
+#define BITP_CAN_MBRIF1_MB02                  2                               /* Mailbox n Receive Interrupt Pending */
+#define BITP_CAN_MBRIF1_MB03                  3                               /* Mailbox n Receive Interrupt Pending */
+#define BITP_CAN_MBRIF1_MB04                  4                               /* Mailbox n Receive Interrupt Pending */
+#define BITP_CAN_MBRIF1_MB05                  5                               /* Mailbox n Receive Interrupt Pending */
+#define BITP_CAN_MBRIF1_MB06                  6                               /* Mailbox n Receive Interrupt Pending */
+#define BITP_CAN_MBRIF1_MB07                  7                               /* Mailbox n Receive Interrupt Pending */
+#define BITP_CAN_MBRIF1_MB08                  8                               /* Mailbox n Receive Interrupt Pending */
+#define BITP_CAN_MBRIF1_MB09                  9                               /* Mailbox n Receive Interrupt Pending */
+#define BITP_CAN_MBRIF1_MB10                 10                               /* Mailbox n Receive Interrupt Pending */
+#define BITP_CAN_MBRIF1_MB11                 11                               /* Mailbox n Receive Interrupt Pending */
+#define BITP_CAN_MBRIF1_MB12                 12                               /* Mailbox n Receive Interrupt Pending */
+#define BITP_CAN_MBRIF1_MB13                 13                               /* Mailbox n Receive Interrupt Pending */
+#define BITP_CAN_MBRIF1_MB14                 14                               /* Mailbox n Receive Interrupt Pending */
+#define BITP_CAN_MBRIF1_MB15                 15                               /* Mailbox n Receive Interrupt Pending */
+#define BITM_CAN_MBRIF1_MB00                 (_ADI_MSK(0x00000001,uint16_t))  /* Mailbox n Receive Interrupt Pending */
+#define BITM_CAN_MBRIF1_MB01                 (_ADI_MSK(0x00000002,uint16_t))  /* Mailbox n Receive Interrupt Pending */
+#define BITM_CAN_MBRIF1_MB02                 (_ADI_MSK(0x00000004,uint16_t))  /* Mailbox n Receive Interrupt Pending */
+#define BITM_CAN_MBRIF1_MB03                 (_ADI_MSK(0x00000008,uint16_t))  /* Mailbox n Receive Interrupt Pending */
+#define BITM_CAN_MBRIF1_MB04                 (_ADI_MSK(0x00000010,uint16_t))  /* Mailbox n Receive Interrupt Pending */
+#define BITM_CAN_MBRIF1_MB05                 (_ADI_MSK(0x00000020,uint16_t))  /* Mailbox n Receive Interrupt Pending */
+#define BITM_CAN_MBRIF1_MB06                 (_ADI_MSK(0x00000040,uint16_t))  /* Mailbox n Receive Interrupt Pending */
+#define BITM_CAN_MBRIF1_MB07                 (_ADI_MSK(0x00000080,uint16_t))  /* Mailbox n Receive Interrupt Pending */
+#define BITM_CAN_MBRIF1_MB08                 (_ADI_MSK(0x00000100,uint16_t))  /* Mailbox n Receive Interrupt Pending */
+#define BITM_CAN_MBRIF1_MB09                 (_ADI_MSK(0x00000200,uint16_t))  /* Mailbox n Receive Interrupt Pending */
+#define BITM_CAN_MBRIF1_MB10                 (_ADI_MSK(0x00000400,uint16_t))  /* Mailbox n Receive Interrupt Pending */
+#define BITM_CAN_MBRIF1_MB11                 (_ADI_MSK(0x00000800,uint16_t))  /* Mailbox n Receive Interrupt Pending */
+#define BITM_CAN_MBRIF1_MB12                 (_ADI_MSK(0x00001000,uint16_t))  /* Mailbox n Receive Interrupt Pending */
+#define BITM_CAN_MBRIF1_MB13                 (_ADI_MSK(0x00002000,uint16_t))  /* Mailbox n Receive Interrupt Pending */
+#define BITM_CAN_MBRIF1_MB14                 (_ADI_MSK(0x00004000,uint16_t))  /* Mailbox n Receive Interrupt Pending */
+#define BITM_CAN_MBRIF1_MB15                 (_ADI_MSK(0x00008000,uint16_t))  /* Mailbox n Receive Interrupt Pending */
 
 /* ------------------------------------------------------------------------------------------------------------------------
         CAN_MBIM1                            Pos/Masks                        Description
    ------------------------------------------------------------------------------------------------------------------------ */
-#define BITP_CAN_MBIM1_MB00                   0
-#define BITP_CAN_MBIM1_MB01                   1
-#define BITP_CAN_MBIM1_MB02                   2
-#define BITP_CAN_MBIM1_MB03                   3
-#define BITP_CAN_MBIM1_MB04                   4
-#define BITP_CAN_MBIM1_MB05                   5
-#define BITP_CAN_MBIM1_MB06                   6
-#define BITP_CAN_MBIM1_MB07                   7
-#define BITP_CAN_MBIM1_MB08                   8
-#define BITP_CAN_MBIM1_MB09                   9
-#define BITP_CAN_MBIM1_MB10                  10
-#define BITP_CAN_MBIM1_MB11                  11
-#define BITP_CAN_MBIM1_MB12                  12
-#define BITP_CAN_MBIM1_MB13                  13
-#define BITP_CAN_MBIM1_MB14                  14
-#define BITP_CAN_MBIM1_MB15                  15
-#define BITM_CAN_MBIM1_MB00                  (_ADI_MSK(0x00000001,uint16_t))
-#define BITM_CAN_MBIM1_MB01                  (_ADI_MSK(0x00000002,uint16_t))
-#define BITM_CAN_MBIM1_MB02                  (_ADI_MSK(0x00000004,uint16_t))
-#define BITM_CAN_MBIM1_MB03                  (_ADI_MSK(0x00000008,uint16_t))
-#define BITM_CAN_MBIM1_MB04                  (_ADI_MSK(0x00000010,uint16_t))
-#define BITM_CAN_MBIM1_MB05                  (_ADI_MSK(0x00000020,uint16_t))
-#define BITM_CAN_MBIM1_MB06                  (_ADI_MSK(0x00000040,uint16_t))
-#define BITM_CAN_MBIM1_MB07                  (_ADI_MSK(0x00000080,uint16_t))
-#define BITM_CAN_MBIM1_MB08                  (_ADI_MSK(0x00000100,uint16_t))
-#define BITM_CAN_MBIM1_MB09                  (_ADI_MSK(0x00000200,uint16_t))
-#define BITM_CAN_MBIM1_MB10                  (_ADI_MSK(0x00000400,uint16_t))
-#define BITM_CAN_MBIM1_MB11                  (_ADI_MSK(0x00000800,uint16_t))
-#define BITM_CAN_MBIM1_MB12                  (_ADI_MSK(0x00001000,uint16_t))
-#define BITM_CAN_MBIM1_MB13                  (_ADI_MSK(0x00002000,uint16_t))
-#define BITM_CAN_MBIM1_MB14                  (_ADI_MSK(0x00004000,uint16_t))
-#define BITM_CAN_MBIM1_MB15                  (_ADI_MSK(0x00008000,uint16_t))
+#define BITP_CAN_MBIM1_MB00                   0                               /* Mailbox n Transmit and Receive Interrupt Enable */
+#define BITP_CAN_MBIM1_MB01                   1                               /* Mailbox n Transmit and Receive Interrupt Enable */
+#define BITP_CAN_MBIM1_MB02                   2                               /* Mailbox n Transmit and Receive Interrupt Enable */
+#define BITP_CAN_MBIM1_MB03                   3                               /* Mailbox n Transmit and Receive Interrupt Enable */
+#define BITP_CAN_MBIM1_MB04                   4                               /* Mailbox n Transmit and Receive Interrupt Enable */
+#define BITP_CAN_MBIM1_MB05                   5                               /* Mailbox n Transmit and Receive Interrupt Enable */
+#define BITP_CAN_MBIM1_MB06                   6                               /* Mailbox n Transmit and Receive Interrupt Enable */
+#define BITP_CAN_MBIM1_MB07                   7                               /* Mailbox n Transmit and Receive Interrupt Enable */
+#define BITP_CAN_MBIM1_MB08                   8                               /* Mailbox n Transmit and Receive Interrupt Enable */
+#define BITP_CAN_MBIM1_MB09                   9                               /* Mailbox n Transmit and Receive Interrupt Enable */
+#define BITP_CAN_MBIM1_MB10                  10                               /* Mailbox n Transmit and Receive Interrupt Enable */
+#define BITP_CAN_MBIM1_MB11                  11                               /* Mailbox n Transmit and Receive Interrupt Enable */
+#define BITP_CAN_MBIM1_MB12                  12                               /* Mailbox n Transmit and Receive Interrupt Enable */
+#define BITP_CAN_MBIM1_MB13                  13                               /* Mailbox n Transmit and Receive Interrupt Enable */
+#define BITP_CAN_MBIM1_MB14                  14                               /* Mailbox n Transmit and Receive Interrupt Enable */
+#define BITP_CAN_MBIM1_MB15                  15                               /* Mailbox n Transmit and Receive Interrupt Enable */
+#define BITM_CAN_MBIM1_MB00                  (_ADI_MSK(0x00000001,uint16_t))  /* Mailbox n Transmit and Receive Interrupt Enable */
+#define BITM_CAN_MBIM1_MB01                  (_ADI_MSK(0x00000002,uint16_t))  /* Mailbox n Transmit and Receive Interrupt Enable */
+#define BITM_CAN_MBIM1_MB02                  (_ADI_MSK(0x00000004,uint16_t))  /* Mailbox n Transmit and Receive Interrupt Enable */
+#define BITM_CAN_MBIM1_MB03                  (_ADI_MSK(0x00000008,uint16_t))  /* Mailbox n Transmit and Receive Interrupt Enable */
+#define BITM_CAN_MBIM1_MB04                  (_ADI_MSK(0x00000010,uint16_t))  /* Mailbox n Transmit and Receive Interrupt Enable */
+#define BITM_CAN_MBIM1_MB05                  (_ADI_MSK(0x00000020,uint16_t))  /* Mailbox n Transmit and Receive Interrupt Enable */
+#define BITM_CAN_MBIM1_MB06                  (_ADI_MSK(0x00000040,uint16_t))  /* Mailbox n Transmit and Receive Interrupt Enable */
+#define BITM_CAN_MBIM1_MB07                  (_ADI_MSK(0x00000080,uint16_t))  /* Mailbox n Transmit and Receive Interrupt Enable */
+#define BITM_CAN_MBIM1_MB08                  (_ADI_MSK(0x00000100,uint16_t))  /* Mailbox n Transmit and Receive Interrupt Enable */
+#define BITM_CAN_MBIM1_MB09                  (_ADI_MSK(0x00000200,uint16_t))  /* Mailbox n Transmit and Receive Interrupt Enable */
+#define BITM_CAN_MBIM1_MB10                  (_ADI_MSK(0x00000400,uint16_t))  /* Mailbox n Transmit and Receive Interrupt Enable */
+#define BITM_CAN_MBIM1_MB11                  (_ADI_MSK(0x00000800,uint16_t))  /* Mailbox n Transmit and Receive Interrupt Enable */
+#define BITM_CAN_MBIM1_MB12                  (_ADI_MSK(0x00001000,uint16_t))  /* Mailbox n Transmit and Receive Interrupt Enable */
+#define BITM_CAN_MBIM1_MB13                  (_ADI_MSK(0x00002000,uint16_t))  /* Mailbox n Transmit and Receive Interrupt Enable */
+#define BITM_CAN_MBIM1_MB14                  (_ADI_MSK(0x00004000,uint16_t))  /* Mailbox n Transmit and Receive Interrupt Enable */
+#define BITM_CAN_MBIM1_MB15                  (_ADI_MSK(0x00008000,uint16_t))  /* Mailbox n Transmit and Receive Interrupt Enable */
 
 /* ------------------------------------------------------------------------------------------------------------------------
         CAN_RFH1                             Pos/Masks                        Description
    ------------------------------------------------------------------------------------------------------------------------ */
-#define BITP_CAN_RFH1_MB00                    0
-#define BITP_CAN_RFH1_MB01                    1
-#define BITP_CAN_RFH1_MB02                    2
-#define BITP_CAN_RFH1_MB03                    3
-#define BITP_CAN_RFH1_MB04                    4
-#define BITP_CAN_RFH1_MB05                    5
-#define BITP_CAN_RFH1_MB06                    6
-#define BITP_CAN_RFH1_MB07                    7
-#define BITP_CAN_RFH1_MB08                    8
-#define BITP_CAN_RFH1_MB09                    9
-#define BITP_CAN_RFH1_MB10                   10
-#define BITP_CAN_RFH1_MB11                   11
-#define BITP_CAN_RFH1_MB12                   12
-#define BITP_CAN_RFH1_MB13                   13
-#define BITP_CAN_RFH1_MB14                   14
-#define BITP_CAN_RFH1_MB15                   15
-#define BITM_CAN_RFH1_MB00                   (_ADI_MSK(0x00000001,uint16_t))
-#define BITM_CAN_RFH1_MB01                   (_ADI_MSK(0x00000002,uint16_t))
-#define BITM_CAN_RFH1_MB02                   (_ADI_MSK(0x00000004,uint16_t))
-#define BITM_CAN_RFH1_MB03                   (_ADI_MSK(0x00000008,uint16_t))
-#define BITM_CAN_RFH1_MB04                   (_ADI_MSK(0x00000010,uint16_t))
-#define BITM_CAN_RFH1_MB05                   (_ADI_MSK(0x00000020,uint16_t))
-#define BITM_CAN_RFH1_MB06                   (_ADI_MSK(0x00000040,uint16_t))
-#define BITM_CAN_RFH1_MB07                   (_ADI_MSK(0x00000080,uint16_t))
-#define BITM_CAN_RFH1_MB08                   (_ADI_MSK(0x00000100,uint16_t))
-#define BITM_CAN_RFH1_MB09                   (_ADI_MSK(0x00000200,uint16_t))
-#define BITM_CAN_RFH1_MB10                   (_ADI_MSK(0x00000400,uint16_t))
-#define BITM_CAN_RFH1_MB11                   (_ADI_MSK(0x00000800,uint16_t))
-#define BITM_CAN_RFH1_MB12                   (_ADI_MSK(0x00001000,uint16_t))
-#define BITM_CAN_RFH1_MB13                   (_ADI_MSK(0x00002000,uint16_t))
-#define BITM_CAN_RFH1_MB14                   (_ADI_MSK(0x00004000,uint16_t))
-#define BITM_CAN_RFH1_MB15                   (_ADI_MSK(0x00008000,uint16_t))
+#define BITP_CAN_RFH1_MB00                    0                               /* Mailbox n Remote Frame Handling Enable */
+#define BITP_CAN_RFH1_MB01                    1                               /* Mailbox n Remote Frame Handling Enable */
+#define BITP_CAN_RFH1_MB02                    2                               /* Mailbox n Remote Frame Handling Enable */
+#define BITP_CAN_RFH1_MB03                    3                               /* Mailbox n Remote Frame Handling Enable */
+#define BITP_CAN_RFH1_MB04                    4                               /* Mailbox n Remote Frame Handling Enable */
+#define BITP_CAN_RFH1_MB05                    5                               /* Mailbox n Remote Frame Handling Enable */
+#define BITP_CAN_RFH1_MB06                    6                               /* Mailbox n Remote Frame Handling Enable */
+#define BITP_CAN_RFH1_MB07                    7                               /* Mailbox n Remote Frame Handling Enable */
+#define BITP_CAN_RFH1_MB08                    8                               /* Mailbox n Remote Frame Handling Enable */
+#define BITP_CAN_RFH1_MB09                    9                               /* Mailbox n Remote Frame Handling Enable */
+#define BITP_CAN_RFH1_MB10                   10                               /* Mailbox n Remote Frame Handling Enable */
+#define BITP_CAN_RFH1_MB11                   11                               /* Mailbox n Remote Frame Handling Enable */
+#define BITP_CAN_RFH1_MB12                   12                               /* Mailbox n Remote Frame Handling Enable */
+#define BITP_CAN_RFH1_MB13                   13                               /* Mailbox n Remote Frame Handling Enable */
+#define BITP_CAN_RFH1_MB14                   14                               /* Mailbox n Remote Frame Handling Enable */
+#define BITP_CAN_RFH1_MB15                   15                               /* Mailbox n Remote Frame Handling Enable */
+#define BITM_CAN_RFH1_MB00                   (_ADI_MSK(0x00000001,uint16_t))  /* Mailbox n Remote Frame Handling Enable */
+#define BITM_CAN_RFH1_MB01                   (_ADI_MSK(0x00000002,uint16_t))  /* Mailbox n Remote Frame Handling Enable */
+#define BITM_CAN_RFH1_MB02                   (_ADI_MSK(0x00000004,uint16_t))  /* Mailbox n Remote Frame Handling Enable */
+#define BITM_CAN_RFH1_MB03                   (_ADI_MSK(0x00000008,uint16_t))  /* Mailbox n Remote Frame Handling Enable */
+#define BITM_CAN_RFH1_MB04                   (_ADI_MSK(0x00000010,uint16_t))  /* Mailbox n Remote Frame Handling Enable */
+#define BITM_CAN_RFH1_MB05                   (_ADI_MSK(0x00000020,uint16_t))  /* Mailbox n Remote Frame Handling Enable */
+#define BITM_CAN_RFH1_MB06                   (_ADI_MSK(0x00000040,uint16_t))  /* Mailbox n Remote Frame Handling Enable */
+#define BITM_CAN_RFH1_MB07                   (_ADI_MSK(0x00000080,uint16_t))  /* Mailbox n Remote Frame Handling Enable */
+#define BITM_CAN_RFH1_MB08                   (_ADI_MSK(0x00000100,uint16_t))  /* Mailbox n Remote Frame Handling Enable */
+#define BITM_CAN_RFH1_MB09                   (_ADI_MSK(0x00000200,uint16_t))  /* Mailbox n Remote Frame Handling Enable */
+#define BITM_CAN_RFH1_MB10                   (_ADI_MSK(0x00000400,uint16_t))  /* Mailbox n Remote Frame Handling Enable */
+#define BITM_CAN_RFH1_MB11                   (_ADI_MSK(0x00000800,uint16_t))  /* Mailbox n Remote Frame Handling Enable */
+#define BITM_CAN_RFH1_MB12                   (_ADI_MSK(0x00001000,uint16_t))  /* Mailbox n Remote Frame Handling Enable */
+#define BITM_CAN_RFH1_MB13                   (_ADI_MSK(0x00002000,uint16_t))  /* Mailbox n Remote Frame Handling Enable */
+#define BITM_CAN_RFH1_MB14                   (_ADI_MSK(0x00004000,uint16_t))  /* Mailbox n Remote Frame Handling Enable */
+#define BITM_CAN_RFH1_MB15                   (_ADI_MSK(0x00008000,uint16_t))  /* Mailbox n Remote Frame Handling Enable */
 
 /* ------------------------------------------------------------------------------------------------------------------------
         CAN_OPSS1                            Pos/Masks                        Description
    ------------------------------------------------------------------------------------------------------------------------ */
-#define BITP_CAN_OPSS1_MB00                   0
-#define BITP_CAN_OPSS1_MB01                   1
-#define BITP_CAN_OPSS1_MB02                   2
-#define BITP_CAN_OPSS1_MB03                   3
-#define BITP_CAN_OPSS1_MB04                   4
-#define BITP_CAN_OPSS1_MB05                   5
-#define BITP_CAN_OPSS1_MB06                   6
-#define BITP_CAN_OPSS1_MB07                   7
-#define BITP_CAN_OPSS1_MB08                   8
-#define BITP_CAN_OPSS1_MB09                   9
-#define BITP_CAN_OPSS1_MB10                  10
-#define BITP_CAN_OPSS1_MB11                  11
-#define BITP_CAN_OPSS1_MB12                  12
-#define BITP_CAN_OPSS1_MB13                  13
-#define BITP_CAN_OPSS1_MB14                  14
-#define BITP_CAN_OPSS1_MB15                  15
-#define BITM_CAN_OPSS1_MB00                  (_ADI_MSK(0x00000001,uint16_t))
-#define BITM_CAN_OPSS1_MB01                  (_ADI_MSK(0x00000002,uint16_t))
-#define BITM_CAN_OPSS1_MB02                  (_ADI_MSK(0x00000004,uint16_t))
-#define BITM_CAN_OPSS1_MB03                  (_ADI_MSK(0x00000008,uint16_t))
-#define BITM_CAN_OPSS1_MB04                  (_ADI_MSK(0x00000010,uint16_t))
-#define BITM_CAN_OPSS1_MB05                  (_ADI_MSK(0x00000020,uint16_t))
-#define BITM_CAN_OPSS1_MB06                  (_ADI_MSK(0x00000040,uint16_t))
-#define BITM_CAN_OPSS1_MB07                  (_ADI_MSK(0x00000080,uint16_t))
-#define BITM_CAN_OPSS1_MB08                  (_ADI_MSK(0x00000100,uint16_t))
-#define BITM_CAN_OPSS1_MB09                  (_ADI_MSK(0x00000200,uint16_t))
-#define BITM_CAN_OPSS1_MB10                  (_ADI_MSK(0x00000400,uint16_t))
-#define BITM_CAN_OPSS1_MB11                  (_ADI_MSK(0x00000800,uint16_t))
-#define BITM_CAN_OPSS1_MB12                  (_ADI_MSK(0x00001000,uint16_t))
-#define BITM_CAN_OPSS1_MB13                  (_ADI_MSK(0x00002000,uint16_t))
-#define BITM_CAN_OPSS1_MB14                  (_ADI_MSK(0x00004000,uint16_t))
-#define BITM_CAN_OPSS1_MB15                  (_ADI_MSK(0x00008000,uint16_t))
+#define BITP_CAN_OPSS1_MB00                   0                               /* Mailbox n Overwrite Protection Enable */
+#define BITP_CAN_OPSS1_MB01                   1                               /* Mailbox n Overwrite Protection Enable */
+#define BITP_CAN_OPSS1_MB02                   2                               /* Mailbox n Overwrite Protection Enable */
+#define BITP_CAN_OPSS1_MB03                   3                               /* Mailbox n Overwrite Protection Enable */
+#define BITP_CAN_OPSS1_MB04                   4                               /* Mailbox n Overwrite Protection Enable */
+#define BITP_CAN_OPSS1_MB05                   5                               /* Mailbox n Overwrite Protection Enable */
+#define BITP_CAN_OPSS1_MB06                   6                               /* Mailbox n Overwrite Protection Enable */
+#define BITP_CAN_OPSS1_MB07                   7                               /* Mailbox n Overwrite Protection Enable */
+#define BITP_CAN_OPSS1_MB08                   8                               /* Mailbox n Overwrite Protection Enable */
+#define BITP_CAN_OPSS1_MB09                   9                               /* Mailbox n Overwrite Protection Enable */
+#define BITP_CAN_OPSS1_MB10                  10                               /* Mailbox n Overwrite Protection Enable */
+#define BITP_CAN_OPSS1_MB11                  11                               /* Mailbox n Overwrite Protection Enable */
+#define BITP_CAN_OPSS1_MB12                  12                               /* Mailbox n Overwrite Protection Enable */
+#define BITP_CAN_OPSS1_MB13                  13                               /* Mailbox n Overwrite Protection Enable */
+#define BITP_CAN_OPSS1_MB14                  14                               /* Mailbox n Overwrite Protection Enable */
+#define BITP_CAN_OPSS1_MB15                  15                               /* Mailbox n Overwrite Protection Enable */
+#define BITM_CAN_OPSS1_MB00                  (_ADI_MSK(0x00000001,uint16_t))  /* Mailbox n Overwrite Protection Enable */
+#define BITM_CAN_OPSS1_MB01                  (_ADI_MSK(0x00000002,uint16_t))  /* Mailbox n Overwrite Protection Enable */
+#define BITM_CAN_OPSS1_MB02                  (_ADI_MSK(0x00000004,uint16_t))  /* Mailbox n Overwrite Protection Enable */
+#define BITM_CAN_OPSS1_MB03                  (_ADI_MSK(0x00000008,uint16_t))  /* Mailbox n Overwrite Protection Enable */
+#define BITM_CAN_OPSS1_MB04                  (_ADI_MSK(0x00000010,uint16_t))  /* Mailbox n Overwrite Protection Enable */
+#define BITM_CAN_OPSS1_MB05                  (_ADI_MSK(0x00000020,uint16_t))  /* Mailbox n Overwrite Protection Enable */
+#define BITM_CAN_OPSS1_MB06                  (_ADI_MSK(0x00000040,uint16_t))  /* Mailbox n Overwrite Protection Enable */
+#define BITM_CAN_OPSS1_MB07                  (_ADI_MSK(0x00000080,uint16_t))  /* Mailbox n Overwrite Protection Enable */
+#define BITM_CAN_OPSS1_MB08                  (_ADI_MSK(0x00000100,uint16_t))  /* Mailbox n Overwrite Protection Enable */
+#define BITM_CAN_OPSS1_MB09                  (_ADI_MSK(0x00000200,uint16_t))  /* Mailbox n Overwrite Protection Enable */
+#define BITM_CAN_OPSS1_MB10                  (_ADI_MSK(0x00000400,uint16_t))  /* Mailbox n Overwrite Protection Enable */
+#define BITM_CAN_OPSS1_MB11                  (_ADI_MSK(0x00000800,uint16_t))  /* Mailbox n Overwrite Protection Enable */
+#define BITM_CAN_OPSS1_MB12                  (_ADI_MSK(0x00001000,uint16_t))  /* Mailbox n Overwrite Protection Enable */
+#define BITM_CAN_OPSS1_MB13                  (_ADI_MSK(0x00002000,uint16_t))  /* Mailbox n Overwrite Protection Enable */
+#define BITM_CAN_OPSS1_MB14                  (_ADI_MSK(0x00004000,uint16_t))  /* Mailbox n Overwrite Protection Enable */
+#define BITM_CAN_OPSS1_MB15                  (_ADI_MSK(0x00008000,uint16_t))  /* Mailbox n Overwrite Protection Enable */
 
 /* ------------------------------------------------------------------------------------------------------------------------
         CAN_MC2                              Pos/Masks                        Description
    ------------------------------------------------------------------------------------------------------------------------ */
-#define BITP_CAN_MC2_MB00                     0
-#define BITP_CAN_MC2_MB01                     1
-#define BITP_CAN_MC2_MB02                     2
-#define BITP_CAN_MC2_MB03                     3
-#define BITP_CAN_MC2_MB04                     4
-#define BITP_CAN_MC2_MB05                     5
-#define BITP_CAN_MC2_MB06                     6
-#define BITP_CAN_MC2_MB07                     7
-#define BITP_CAN_MC2_MB08                     8
-#define BITP_CAN_MC2_MB09                     9
-#define BITP_CAN_MC2_MB10                    10
-#define BITP_CAN_MC2_MB11                    11
-#define BITP_CAN_MC2_MB12                    12
-#define BITP_CAN_MC2_MB13                    13
-#define BITP_CAN_MC2_MB14                    14
-#define BITP_CAN_MC2_MB15                    15
-#define BITM_CAN_MC2_MB00                    (_ADI_MSK(0x00000001,uint16_t))
-#define BITM_CAN_MC2_MB01                    (_ADI_MSK(0x00000002,uint16_t))
-#define BITM_CAN_MC2_MB02                    (_ADI_MSK(0x00000004,uint16_t))
-#define BITM_CAN_MC2_MB03                    (_ADI_MSK(0x00000008,uint16_t))
-#define BITM_CAN_MC2_MB04                    (_ADI_MSK(0x00000010,uint16_t))
-#define BITM_CAN_MC2_MB05                    (_ADI_MSK(0x00000020,uint16_t))
-#define BITM_CAN_MC2_MB06                    (_ADI_MSK(0x00000040,uint16_t))
-#define BITM_CAN_MC2_MB07                    (_ADI_MSK(0x00000080,uint16_t))
-#define BITM_CAN_MC2_MB08                    (_ADI_MSK(0x00000100,uint16_t))
-#define BITM_CAN_MC2_MB09                    (_ADI_MSK(0x00000200,uint16_t))
-#define BITM_CAN_MC2_MB10                    (_ADI_MSK(0x00000400,uint16_t))
-#define BITM_CAN_MC2_MB11                    (_ADI_MSK(0x00000800,uint16_t))
-#define BITM_CAN_MC2_MB12                    (_ADI_MSK(0x00001000,uint16_t))
-#define BITM_CAN_MC2_MB13                    (_ADI_MSK(0x00002000,uint16_t))
-#define BITM_CAN_MC2_MB14                    (_ADI_MSK(0x00004000,uint16_t))
-#define BITM_CAN_MC2_MB15                    (_ADI_MSK(0x00008000,uint16_t))
+#define BITP_CAN_MC2_MB00                     0                               /* Mailbox n Enable/Disable */
+#define BITP_CAN_MC2_MB01                     1                               /* Mailbox n Enable/Disable */
+#define BITP_CAN_MC2_MB02                     2                               /* Mailbox n Enable/Disable */
+#define BITP_CAN_MC2_MB03                     3                               /* Mailbox n Enable/Disable */
+#define BITP_CAN_MC2_MB04                     4                               /* Mailbox n Enable/Disable */
+#define BITP_CAN_MC2_MB05                     5                               /* Mailbox n Enable/Disable */
+#define BITP_CAN_MC2_MB06                     6                               /* Mailbox n Enable/Disable */
+#define BITP_CAN_MC2_MB07                     7                               /* Mailbox n Enable/Disable */
+#define BITP_CAN_MC2_MB08                     8                               /* Mailbox n Enable/Disable */
+#define BITP_CAN_MC2_MB09                     9                               /* Mailbox n Enable/Disable */
+#define BITP_CAN_MC2_MB10                    10                               /* Mailbox n Enable/Disable */
+#define BITP_CAN_MC2_MB11                    11                               /* Mailbox n Enable/Disable */
+#define BITP_CAN_MC2_MB12                    12                               /* Mailbox n Enable/Disable */
+#define BITP_CAN_MC2_MB13                    13                               /* Mailbox n Enable/Disable */
+#define BITP_CAN_MC2_MB14                    14                               /* Mailbox n Enable/Disable */
+#define BITP_CAN_MC2_MB15                    15                               /* Mailbox n Enable/Disable */
+#define BITM_CAN_MC2_MB00                    (_ADI_MSK(0x00000001,uint16_t))  /* Mailbox n Enable/Disable */
+#define BITM_CAN_MC2_MB01                    (_ADI_MSK(0x00000002,uint16_t))  /* Mailbox n Enable/Disable */
+#define BITM_CAN_MC2_MB02                    (_ADI_MSK(0x00000004,uint16_t))  /* Mailbox n Enable/Disable */
+#define BITM_CAN_MC2_MB03                    (_ADI_MSK(0x00000008,uint16_t))  /* Mailbox n Enable/Disable */
+#define BITM_CAN_MC2_MB04                    (_ADI_MSK(0x00000010,uint16_t))  /* Mailbox n Enable/Disable */
+#define BITM_CAN_MC2_MB05                    (_ADI_MSK(0x00000020,uint16_t))  /* Mailbox n Enable/Disable */
+#define BITM_CAN_MC2_MB06                    (_ADI_MSK(0x00000040,uint16_t))  /* Mailbox n Enable/Disable */
+#define BITM_CAN_MC2_MB07                    (_ADI_MSK(0x00000080,uint16_t))  /* Mailbox n Enable/Disable */
+#define BITM_CAN_MC2_MB08                    (_ADI_MSK(0x00000100,uint16_t))  /* Mailbox n Enable/Disable */
+#define BITM_CAN_MC2_MB09                    (_ADI_MSK(0x00000200,uint16_t))  /* Mailbox n Enable/Disable */
+#define BITM_CAN_MC2_MB10                    (_ADI_MSK(0x00000400,uint16_t))  /* Mailbox n Enable/Disable */
+#define BITM_CAN_MC2_MB11                    (_ADI_MSK(0x00000800,uint16_t))  /* Mailbox n Enable/Disable */
+#define BITM_CAN_MC2_MB12                    (_ADI_MSK(0x00001000,uint16_t))  /* Mailbox n Enable/Disable */
+#define BITM_CAN_MC2_MB13                    (_ADI_MSK(0x00002000,uint16_t))  /* Mailbox n Enable/Disable */
+#define BITM_CAN_MC2_MB14                    (_ADI_MSK(0x00004000,uint16_t))  /* Mailbox n Enable/Disable */
+#define BITM_CAN_MC2_MB15                    (_ADI_MSK(0x00008000,uint16_t))  /* Mailbox n Enable/Disable */
 
 /* ------------------------------------------------------------------------------------------------------------------------
         CAN_MD2                              Pos/Masks                        Description
    ------------------------------------------------------------------------------------------------------------------------ */
-#define BITP_CAN_MD2_MB00                     0
-#define BITP_CAN_MD2_MB01                     1
-#define BITP_CAN_MD2_MB02                     2
-#define BITP_CAN_MD2_MB03                     3
-#define BITP_CAN_MD2_MB04                     4
-#define BITP_CAN_MD2_MB05                     5
-#define BITP_CAN_MD2_MB06                     6
-#define BITP_CAN_MD2_MB07                     7
-#define BITP_CAN_MD2_MB08                     8
-#define BITP_CAN_MD2_MB09                     9
-#define BITP_CAN_MD2_MB10                    10
-#define BITP_CAN_MD2_MB11                    11
-#define BITP_CAN_MD2_MB12                    12
-#define BITP_CAN_MD2_MB13                    13
-#define BITP_CAN_MD2_MB14                    14
-#define BITP_CAN_MD2_MB15                    15
-#define BITM_CAN_MD2_MB00                    (_ADI_MSK(0x00000001,uint16_t))
-#define BITM_CAN_MD2_MB01                    (_ADI_MSK(0x00000002,uint16_t))
-#define BITM_CAN_MD2_MB02                    (_ADI_MSK(0x00000004,uint16_t))
-#define BITM_CAN_MD2_MB03                    (_ADI_MSK(0x00000008,uint16_t))
-#define BITM_CAN_MD2_MB04                    (_ADI_MSK(0x00000010,uint16_t))
-#define BITM_CAN_MD2_MB05                    (_ADI_MSK(0x00000020,uint16_t))
-#define BITM_CAN_MD2_MB06                    (_ADI_MSK(0x00000040,uint16_t))
-#define BITM_CAN_MD2_MB07                    (_ADI_MSK(0x00000080,uint16_t))
-#define BITM_CAN_MD2_MB08                    (_ADI_MSK(0x00000100,uint16_t))
-#define BITM_CAN_MD2_MB09                    (_ADI_MSK(0x00000200,uint16_t))
-#define BITM_CAN_MD2_MB10                    (_ADI_MSK(0x00000400,uint16_t))
-#define BITM_CAN_MD2_MB11                    (_ADI_MSK(0x00000800,uint16_t))
-#define BITM_CAN_MD2_MB12                    (_ADI_MSK(0x00001000,uint16_t))
-#define BITM_CAN_MD2_MB13                    (_ADI_MSK(0x00002000,uint16_t))
-#define BITM_CAN_MD2_MB14                    (_ADI_MSK(0x00004000,uint16_t))
-#define BITM_CAN_MD2_MB15                    (_ADI_MSK(0x00008000,uint16_t))
+#define BITP_CAN_MD2_MB00                     0                               /* Mailbox n Transmit/Receive */
+#define BITP_CAN_MD2_MB01                     1                               /* Mailbox n Transmit/Receive */
+#define BITP_CAN_MD2_MB02                     2                               /* Mailbox n Transmit/Receive */
+#define BITP_CAN_MD2_MB03                     3                               /* Mailbox n Transmit/Receive */
+#define BITP_CAN_MD2_MB04                     4                               /* Mailbox n Transmit/Receive */
+#define BITP_CAN_MD2_MB05                     5                               /* Mailbox n Transmit/Receive */
+#define BITP_CAN_MD2_MB06                     6                               /* Mailbox n Transmit/Receive */
+#define BITP_CAN_MD2_MB07                     7                               /* Mailbox n Transmit/Receive */
+#define BITP_CAN_MD2_MB08                     8                               /* Mailbox n Transmit/Receive */
+#define BITP_CAN_MD2_MB09                     9                               /* Mailbox n Transmit/Receive */
+#define BITP_CAN_MD2_MB10                    10                               /* Mailbox n Transmit/Receive */
+#define BITP_CAN_MD2_MB11                    11                               /* Mailbox n Transmit/Receive */
+#define BITP_CAN_MD2_MB12                    12                               /* Mailbox n Transmit/Receive */
+#define BITP_CAN_MD2_MB13                    13                               /* Mailbox n Transmit/Receive */
+#define BITP_CAN_MD2_MB14                    14                               /* Mailbox n Transmit/Receive */
+#define BITP_CAN_MD2_MB15                    15                               /* Mailbox n Transmit/Receive */
+#define BITM_CAN_MD2_MB00                    (_ADI_MSK(0x00000001,uint16_t))  /* Mailbox n Transmit/Receive */
+#define BITM_CAN_MD2_MB01                    (_ADI_MSK(0x00000002,uint16_t))  /* Mailbox n Transmit/Receive */
+#define BITM_CAN_MD2_MB02                    (_ADI_MSK(0x00000004,uint16_t))  /* Mailbox n Transmit/Receive */
+#define BITM_CAN_MD2_MB03                    (_ADI_MSK(0x00000008,uint16_t))  /* Mailbox n Transmit/Receive */
+#define BITM_CAN_MD2_MB04                    (_ADI_MSK(0x00000010,uint16_t))  /* Mailbox n Transmit/Receive */
+#define BITM_CAN_MD2_MB05                    (_ADI_MSK(0x00000020,uint16_t))  /* Mailbox n Transmit/Receive */
+#define BITM_CAN_MD2_MB06                    (_ADI_MSK(0x00000040,uint16_t))  /* Mailbox n Transmit/Receive */
+#define BITM_CAN_MD2_MB07                    (_ADI_MSK(0x00000080,uint16_t))  /* Mailbox n Transmit/Receive */
+#define BITM_CAN_MD2_MB08                    (_ADI_MSK(0x00000100,uint16_t))  /* Mailbox n Transmit/Receive */
+#define BITM_CAN_MD2_MB09                    (_ADI_MSK(0x00000200,uint16_t))  /* Mailbox n Transmit/Receive */
+#define BITM_CAN_MD2_MB10                    (_ADI_MSK(0x00000400,uint16_t))  /* Mailbox n Transmit/Receive */
+#define BITM_CAN_MD2_MB11                    (_ADI_MSK(0x00000800,uint16_t))  /* Mailbox n Transmit/Receive */
+#define BITM_CAN_MD2_MB12                    (_ADI_MSK(0x00001000,uint16_t))  /* Mailbox n Transmit/Receive */
+#define BITM_CAN_MD2_MB13                    (_ADI_MSK(0x00002000,uint16_t))  /* Mailbox n Transmit/Receive */
+#define BITM_CAN_MD2_MB14                    (_ADI_MSK(0x00004000,uint16_t))  /* Mailbox n Transmit/Receive */
+#define BITM_CAN_MD2_MB15                    (_ADI_MSK(0x00008000,uint16_t))  /* Mailbox n Transmit/Receive */
 
 /* ------------------------------------------------------------------------------------------------------------------------
         CAN_TRS2                             Pos/Masks                        Description
    ------------------------------------------------------------------------------------------------------------------------ */
-#define BITP_CAN_TRS2_MB00                    0
-#define BITP_CAN_TRS2_MB01                    1
-#define BITP_CAN_TRS2_MB02                    2
-#define BITP_CAN_TRS2_MB03                    3
-#define BITP_CAN_TRS2_MB04                    4
-#define BITP_CAN_TRS2_MB05                    5
-#define BITP_CAN_TRS2_MB06                    6
-#define BITP_CAN_TRS2_MB07                    7
-#define BITP_CAN_TRS2_MB08                    8
-#define BITP_CAN_TRS2_MB09                    9
-#define BITP_CAN_TRS2_MB10                   10
-#define BITP_CAN_TRS2_MB11                   11
-#define BITP_CAN_TRS2_MB12                   12
-#define BITP_CAN_TRS2_MB13                   13
-#define BITP_CAN_TRS2_MB14                   14
-#define BITP_CAN_TRS2_MB15                   15
-#define BITM_CAN_TRS2_MB00                   (_ADI_MSK(0x00000001,uint16_t))
-#define BITM_CAN_TRS2_MB01                   (_ADI_MSK(0x00000002,uint16_t))
-#define BITM_CAN_TRS2_MB02                   (_ADI_MSK(0x00000004,uint16_t))
-#define BITM_CAN_TRS2_MB03                   (_ADI_MSK(0x00000008,uint16_t))
-#define BITM_CAN_TRS2_MB04                   (_ADI_MSK(0x00000010,uint16_t))
-#define BITM_CAN_TRS2_MB05                   (_ADI_MSK(0x00000020,uint16_t))
-#define BITM_CAN_TRS2_MB06                   (_ADI_MSK(0x00000040,uint16_t))
-#define BITM_CAN_TRS2_MB07                   (_ADI_MSK(0x00000080,uint16_t))
-#define BITM_CAN_TRS2_MB08                   (_ADI_MSK(0x00000100,uint16_t))
-#define BITM_CAN_TRS2_MB09                   (_ADI_MSK(0x00000200,uint16_t))
-#define BITM_CAN_TRS2_MB10                   (_ADI_MSK(0x00000400,uint16_t))
-#define BITM_CAN_TRS2_MB11                   (_ADI_MSK(0x00000800,uint16_t))
-#define BITM_CAN_TRS2_MB12                   (_ADI_MSK(0x00001000,uint16_t))
-#define BITM_CAN_TRS2_MB13                   (_ADI_MSK(0x00002000,uint16_t))
-#define BITM_CAN_TRS2_MB14                   (_ADI_MSK(0x00004000,uint16_t))
-#define BITM_CAN_TRS2_MB15                   (_ADI_MSK(0x00008000,uint16_t))
+#define BITP_CAN_TRS2_MB00                    0                               /* Mailbox n Transmit Request */
+#define BITP_CAN_TRS2_MB01                    1                               /* Mailbox n Transmit Request */
+#define BITP_CAN_TRS2_MB02                    2                               /* Mailbox n Transmit Request */
+#define BITP_CAN_TRS2_MB03                    3                               /* Mailbox n Transmit Request */
+#define BITP_CAN_TRS2_MB04                    4                               /* Mailbox n Transmit Request */
+#define BITP_CAN_TRS2_MB05                    5                               /* Mailbox n Transmit Request */
+#define BITP_CAN_TRS2_MB06                    6                               /* Mailbox n Transmit Request */
+#define BITP_CAN_TRS2_MB07                    7                               /* Mailbox n Transmit Request */
+#define BITP_CAN_TRS2_MB08                    8                               /* Mailbox n Transmit Request */
+#define BITP_CAN_TRS2_MB09                    9                               /* Mailbox n Transmit Request */
+#define BITP_CAN_TRS2_MB10                   10                               /* Mailbox n Transmit Request */
+#define BITP_CAN_TRS2_MB11                   11                               /* Mailbox n Transmit Request */
+#define BITP_CAN_TRS2_MB12                   12                               /* Mailbox n Transmit Request */
+#define BITP_CAN_TRS2_MB13                   13                               /* Mailbox n Transmit Request */
+#define BITP_CAN_TRS2_MB14                   14                               /* Mailbox n Transmit Request */
+#define BITP_CAN_TRS2_MB15                   15                               /* Mailbox n Transmit Request */
+#define BITM_CAN_TRS2_MB00                   (_ADI_MSK(0x00000001,uint16_t))  /* Mailbox n Transmit Request */
+#define BITM_CAN_TRS2_MB01                   (_ADI_MSK(0x00000002,uint16_t))  /* Mailbox n Transmit Request */
+#define BITM_CAN_TRS2_MB02                   (_ADI_MSK(0x00000004,uint16_t))  /* Mailbox n Transmit Request */
+#define BITM_CAN_TRS2_MB03                   (_ADI_MSK(0x00000008,uint16_t))  /* Mailbox n Transmit Request */
+#define BITM_CAN_TRS2_MB04                   (_ADI_MSK(0x00000010,uint16_t))  /* Mailbox n Transmit Request */
+#define BITM_CAN_TRS2_MB05                   (_ADI_MSK(0x00000020,uint16_t))  /* Mailbox n Transmit Request */
+#define BITM_CAN_TRS2_MB06                   (_ADI_MSK(0x00000040,uint16_t))  /* Mailbox n Transmit Request */
+#define BITM_CAN_TRS2_MB07                   (_ADI_MSK(0x00000080,uint16_t))  /* Mailbox n Transmit Request */
+#define BITM_CAN_TRS2_MB08                   (_ADI_MSK(0x00000100,uint16_t))  /* Mailbox n Transmit Request */
+#define BITM_CAN_TRS2_MB09                   (_ADI_MSK(0x00000200,uint16_t))  /* Mailbox n Transmit Request */
+#define BITM_CAN_TRS2_MB10                   (_ADI_MSK(0x00000400,uint16_t))  /* Mailbox n Transmit Request */
+#define BITM_CAN_TRS2_MB11                   (_ADI_MSK(0x00000800,uint16_t))  /* Mailbox n Transmit Request */
+#define BITM_CAN_TRS2_MB12                   (_ADI_MSK(0x00001000,uint16_t))  /* Mailbox n Transmit Request */
+#define BITM_CAN_TRS2_MB13                   (_ADI_MSK(0x00002000,uint16_t))  /* Mailbox n Transmit Request */
+#define BITM_CAN_TRS2_MB14                   (_ADI_MSK(0x00004000,uint16_t))  /* Mailbox n Transmit Request */
+#define BITM_CAN_TRS2_MB15                   (_ADI_MSK(0x00008000,uint16_t))  /* Mailbox n Transmit Request */
 
 /* ------------------------------------------------------------------------------------------------------------------------
         CAN_TRR2                             Pos/Masks                        Description
    ------------------------------------------------------------------------------------------------------------------------ */
-#define BITP_CAN_TRR2_MB00                    0
-#define BITP_CAN_TRR2_MB01                    1
-#define BITP_CAN_TRR2_MB02                    2
-#define BITP_CAN_TRR2_MB03                    3
-#define BITP_CAN_TRR2_MB04                    4
-#define BITP_CAN_TRR2_MB05                    5
-#define BITP_CAN_TRR2_MB06                    6
-#define BITP_CAN_TRR2_MB07                    7
-#define BITP_CAN_TRR2_MB08                    8
-#define BITP_CAN_TRR2_MB09                    9
-#define BITP_CAN_TRR2_MB10                   10
-#define BITP_CAN_TRR2_MB11                   11
-#define BITP_CAN_TRR2_MB12                   12
-#define BITP_CAN_TRR2_MB13                   13
-#define BITP_CAN_TRR2_MB14                   14
-#define BITP_CAN_TRR2_MB15                   15
-#define BITM_CAN_TRR2_MB00                   (_ADI_MSK(0x00000001,uint16_t))
-#define BITM_CAN_TRR2_MB01                   (_ADI_MSK(0x00000002,uint16_t))
-#define BITM_CAN_TRR2_MB02                   (_ADI_MSK(0x00000004,uint16_t))
-#define BITM_CAN_TRR2_MB03                   (_ADI_MSK(0x00000008,uint16_t))
-#define BITM_CAN_TRR2_MB04                   (_ADI_MSK(0x00000010,uint16_t))
-#define BITM_CAN_TRR2_MB05                   (_ADI_MSK(0x00000020,uint16_t))
-#define BITM_CAN_TRR2_MB06                   (_ADI_MSK(0x00000040,uint16_t))
-#define BITM_CAN_TRR2_MB07                   (_ADI_MSK(0x00000080,uint16_t))
-#define BITM_CAN_TRR2_MB08                   (_ADI_MSK(0x00000100,uint16_t))
-#define BITM_CAN_TRR2_MB09                   (_ADI_MSK(0x00000200,uint16_t))
-#define BITM_CAN_TRR2_MB10                   (_ADI_MSK(0x00000400,uint16_t))
-#define BITM_CAN_TRR2_MB11                   (_ADI_MSK(0x00000800,uint16_t))
-#define BITM_CAN_TRR2_MB12                   (_ADI_MSK(0x00001000,uint16_t))
-#define BITM_CAN_TRR2_MB13                   (_ADI_MSK(0x00002000,uint16_t))
-#define BITM_CAN_TRR2_MB14                   (_ADI_MSK(0x00004000,uint16_t))
-#define BITM_CAN_TRR2_MB15                   (_ADI_MSK(0x00008000,uint16_t))
+#define BITP_CAN_TRR2_MB00                    0                               /* Mailbox n Transmit Abort */
+#define BITP_CAN_TRR2_MB01                    1                               /* Mailbox n Transmit Abort */
+#define BITP_CAN_TRR2_MB02                    2                               /* Mailbox n Transmit Abort */
+#define BITP_CAN_TRR2_MB03                    3                               /* Mailbox n Transmit Abort */
+#define BITP_CAN_TRR2_MB04                    4                               /* Mailbox n Transmit Abort */
+#define BITP_CAN_TRR2_MB05                    5                               /* Mailbox n Transmit Abort */
+#define BITP_CAN_TRR2_MB06                    6                               /* Mailbox n Transmit Abort */
+#define BITP_CAN_TRR2_MB07                    7                               /* Mailbox n Transmit Abort */
+#define BITP_CAN_TRR2_MB08                    8                               /* Mailbox n Transmit Abort */
+#define BITP_CAN_TRR2_MB09                    9                               /* Mailbox n Transmit Abort */
+#define BITP_CAN_TRR2_MB10                   10                               /* Mailbox n Transmit Abort */
+#define BITP_CAN_TRR2_MB11                   11                               /* Mailbox n Transmit Abort */
+#define BITP_CAN_TRR2_MB12                   12                               /* Mailbox n Transmit Abort */
+#define BITP_CAN_TRR2_MB13                   13                               /* Mailbox n Transmit Abort */
+#define BITP_CAN_TRR2_MB14                   14                               /* Mailbox n Transmit Abort */
+#define BITP_CAN_TRR2_MB15                   15                               /* Mailbox n Transmit Abort */
+#define BITM_CAN_TRR2_MB00                   (_ADI_MSK(0x00000001,uint16_t))  /* Mailbox n Transmit Abort */
+#define BITM_CAN_TRR2_MB01                   (_ADI_MSK(0x00000002,uint16_t))  /* Mailbox n Transmit Abort */
+#define BITM_CAN_TRR2_MB02                   (_ADI_MSK(0x00000004,uint16_t))  /* Mailbox n Transmit Abort */
+#define BITM_CAN_TRR2_MB03                   (_ADI_MSK(0x00000008,uint16_t))  /* Mailbox n Transmit Abort */
+#define BITM_CAN_TRR2_MB04                   (_ADI_MSK(0x00000010,uint16_t))  /* Mailbox n Transmit Abort */
+#define BITM_CAN_TRR2_MB05                   (_ADI_MSK(0x00000020,uint16_t))  /* Mailbox n Transmit Abort */
+#define BITM_CAN_TRR2_MB06                   (_ADI_MSK(0x00000040,uint16_t))  /* Mailbox n Transmit Abort */
+#define BITM_CAN_TRR2_MB07                   (_ADI_MSK(0x00000080,uint16_t))  /* Mailbox n Transmit Abort */
+#define BITM_CAN_TRR2_MB08                   (_ADI_MSK(0x00000100,uint16_t))  /* Mailbox n Transmit Abort */
+#define BITM_CAN_TRR2_MB09                   (_ADI_MSK(0x00000200,uint16_t))  /* Mailbox n Transmit Abort */
+#define BITM_CAN_TRR2_MB10                   (_ADI_MSK(0x00000400,uint16_t))  /* Mailbox n Transmit Abort */
+#define BITM_CAN_TRR2_MB11                   (_ADI_MSK(0x00000800,uint16_t))  /* Mailbox n Transmit Abort */
+#define BITM_CAN_TRR2_MB12                   (_ADI_MSK(0x00001000,uint16_t))  /* Mailbox n Transmit Abort */
+#define BITM_CAN_TRR2_MB13                   (_ADI_MSK(0x00002000,uint16_t))  /* Mailbox n Transmit Abort */
+#define BITM_CAN_TRR2_MB14                   (_ADI_MSK(0x00004000,uint16_t))  /* Mailbox n Transmit Abort */
+#define BITM_CAN_TRR2_MB15                   (_ADI_MSK(0x00008000,uint16_t))  /* Mailbox n Transmit Abort */
 
 /* ------------------------------------------------------------------------------------------------------------------------
         CAN_TA2                              Pos/Masks                        Description
    ------------------------------------------------------------------------------------------------------------------------ */
-#define BITP_CAN_TA2_MB00                     0
-#define BITP_CAN_TA2_MB01                     1
-#define BITP_CAN_TA2_MB02                     2
-#define BITP_CAN_TA2_MB03                     3
-#define BITP_CAN_TA2_MB04                     4
-#define BITP_CAN_TA2_MB05                     5
-#define BITP_CAN_TA2_MB06                     6
-#define BITP_CAN_TA2_MB07                     7
-#define BITP_CAN_TA2_MB08                     8
-#define BITP_CAN_TA2_MB09                     9
-#define BITP_CAN_TA2_MB10                    10
-#define BITP_CAN_TA2_MB11                    11
-#define BITP_CAN_TA2_MB12                    12
-#define BITP_CAN_TA2_MB13                    13
-#define BITP_CAN_TA2_MB14                    14
-#define BITP_CAN_TA2_MB15                    15
-#define BITM_CAN_TA2_MB00                    (_ADI_MSK(0x00000001,uint16_t))
-#define BITM_CAN_TA2_MB01                    (_ADI_MSK(0x00000002,uint16_t))
-#define BITM_CAN_TA2_MB02                    (_ADI_MSK(0x00000004,uint16_t))
-#define BITM_CAN_TA2_MB03                    (_ADI_MSK(0x00000008,uint16_t))
-#define BITM_CAN_TA2_MB04                    (_ADI_MSK(0x00000010,uint16_t))
-#define BITM_CAN_TA2_MB05                    (_ADI_MSK(0x00000020,uint16_t))
-#define BITM_CAN_TA2_MB06                    (_ADI_MSK(0x00000040,uint16_t))
-#define BITM_CAN_TA2_MB07                    (_ADI_MSK(0x00000080,uint16_t))
-#define BITM_CAN_TA2_MB08                    (_ADI_MSK(0x00000100,uint16_t))
-#define BITM_CAN_TA2_MB09                    (_ADI_MSK(0x00000200,uint16_t))
-#define BITM_CAN_TA2_MB10                    (_ADI_MSK(0x00000400,uint16_t))
-#define BITM_CAN_TA2_MB11                    (_ADI_MSK(0x00000800,uint16_t))
-#define BITM_CAN_TA2_MB12                    (_ADI_MSK(0x00001000,uint16_t))
-#define BITM_CAN_TA2_MB13                    (_ADI_MSK(0x00002000,uint16_t))
-#define BITM_CAN_TA2_MB14                    (_ADI_MSK(0x00004000,uint16_t))
-#define BITM_CAN_TA2_MB15                    (_ADI_MSK(0x00008000,uint16_t))
+#define BITP_CAN_TA2_MB00                     0                               /* Mailbox n Transmit Acknowledge */
+#define BITP_CAN_TA2_MB01                     1                               /* Mailbox n Transmit Acknowledge */
+#define BITP_CAN_TA2_MB02                     2                               /* Mailbox n Transmit Acknowledge */
+#define BITP_CAN_TA2_MB03                     3                               /* Mailbox n Transmit Acknowledge */
+#define BITP_CAN_TA2_MB04                     4                               /* Mailbox n Transmit Acknowledge */
+#define BITP_CAN_TA2_MB05                     5                               /* Mailbox n Transmit Acknowledge */
+#define BITP_CAN_TA2_MB06                     6                               /* Mailbox n Transmit Acknowledge */
+#define BITP_CAN_TA2_MB07                     7                               /* Mailbox n Transmit Acknowledge */
+#define BITP_CAN_TA2_MB08                     8                               /* Mailbox n Transmit Acknowledge */
+#define BITP_CAN_TA2_MB09                     9                               /* Mailbox n Transmit Acknowledge */
+#define BITP_CAN_TA2_MB10                    10                               /* Mailbox n Transmit Acknowledge */
+#define BITP_CAN_TA2_MB11                    11                               /* Mailbox n Transmit Acknowledge */
+#define BITP_CAN_TA2_MB12                    12                               /* Mailbox n Transmit Acknowledge */
+#define BITP_CAN_TA2_MB13                    13                               /* Mailbox n Transmit Acknowledge */
+#define BITP_CAN_TA2_MB14                    14                               /* Mailbox n Transmit Acknowledge */
+#define BITP_CAN_TA2_MB15                    15                               /* Mailbox n Transmit Acknowledge */
+#define BITM_CAN_TA2_MB00                    (_ADI_MSK(0x00000001,uint16_t))  /* Mailbox n Transmit Acknowledge */
+#define BITM_CAN_TA2_MB01                    (_ADI_MSK(0x00000002,uint16_t))  /* Mailbox n Transmit Acknowledge */
+#define BITM_CAN_TA2_MB02                    (_ADI_MSK(0x00000004,uint16_t))  /* Mailbox n Transmit Acknowledge */
+#define BITM_CAN_TA2_MB03                    (_ADI_MSK(0x00000008,uint16_t))  /* Mailbox n Transmit Acknowledge */
+#define BITM_CAN_TA2_MB04                    (_ADI_MSK(0x00000010,uint16_t))  /* Mailbox n Transmit Acknowledge */
+#define BITM_CAN_TA2_MB05                    (_ADI_MSK(0x00000020,uint16_t))  /* Mailbox n Transmit Acknowledge */
+#define BITM_CAN_TA2_MB06                    (_ADI_MSK(0x00000040,uint16_t))  /* Mailbox n Transmit Acknowledge */
+#define BITM_CAN_TA2_MB07                    (_ADI_MSK(0x00000080,uint16_t))  /* Mailbox n Transmit Acknowledge */
+#define BITM_CAN_TA2_MB08                    (_ADI_MSK(0x00000100,uint16_t))  /* Mailbox n Transmit Acknowledge */
+#define BITM_CAN_TA2_MB09                    (_ADI_MSK(0x00000200,uint16_t))  /* Mailbox n Transmit Acknowledge */
+#define BITM_CAN_TA2_MB10                    (_ADI_MSK(0x00000400,uint16_t))  /* Mailbox n Transmit Acknowledge */
+#define BITM_CAN_TA2_MB11                    (_ADI_MSK(0x00000800,uint16_t))  /* Mailbox n Transmit Acknowledge */
+#define BITM_CAN_TA2_MB12                    (_ADI_MSK(0x00001000,uint16_t))  /* Mailbox n Transmit Acknowledge */
+#define BITM_CAN_TA2_MB13                    (_ADI_MSK(0x00002000,uint16_t))  /* Mailbox n Transmit Acknowledge */
+#define BITM_CAN_TA2_MB14                    (_ADI_MSK(0x00004000,uint16_t))  /* Mailbox n Transmit Acknowledge */
+#define BITM_CAN_TA2_MB15                    (_ADI_MSK(0x00008000,uint16_t))  /* Mailbox n Transmit Acknowledge */
 
 /* ------------------------------------------------------------------------------------------------------------------------
         CAN_AA2                              Pos/Masks                        Description
    ------------------------------------------------------------------------------------------------------------------------ */
-#define BITP_CAN_AA2_MB00                     0
-#define BITP_CAN_AA2_MB01                     1
-#define BITP_CAN_AA2_MB02                     2
-#define BITP_CAN_AA2_MB03                     3
-#define BITP_CAN_AA2_MB04                     4
-#define BITP_CAN_AA2_MB05                     5
-#define BITP_CAN_AA2_MB06                     6
-#define BITP_CAN_AA2_MB07                     7
-#define BITP_CAN_AA2_MB08                     8
-#define BITP_CAN_AA2_MB09                     9
-#define BITP_CAN_AA2_MB10                    10
-#define BITP_CAN_AA2_MB11                    11
-#define BITP_CAN_AA2_MB12                    12
-#define BITP_CAN_AA2_MB13                    13
-#define BITP_CAN_AA2_MB14                    14
-#define BITP_CAN_AA2_MB15                    15
-#define BITM_CAN_AA2_MB00                    (_ADI_MSK(0x00000001,uint16_t))
-#define BITM_CAN_AA2_MB01                    (_ADI_MSK(0x00000002,uint16_t))
-#define BITM_CAN_AA2_MB02                    (_ADI_MSK(0x00000004,uint16_t))
-#define BITM_CAN_AA2_MB03                    (_ADI_MSK(0x00000008,uint16_t))
-#define BITM_CAN_AA2_MB04                    (_ADI_MSK(0x00000010,uint16_t))
-#define BITM_CAN_AA2_MB05                    (_ADI_MSK(0x00000020,uint16_t))
-#define BITM_CAN_AA2_MB06                    (_ADI_MSK(0x00000040,uint16_t))
-#define BITM_CAN_AA2_MB07                    (_ADI_MSK(0x00000080,uint16_t))
-#define BITM_CAN_AA2_MB08                    (_ADI_MSK(0x00000100,uint16_t))
-#define BITM_CAN_AA2_MB09                    (_ADI_MSK(0x00000200,uint16_t))
-#define BITM_CAN_AA2_MB10                    (_ADI_MSK(0x00000400,uint16_t))
-#define BITM_CAN_AA2_MB11                    (_ADI_MSK(0x00000800,uint16_t))
-#define BITM_CAN_AA2_MB12                    (_ADI_MSK(0x00001000,uint16_t))
-#define BITM_CAN_AA2_MB13                    (_ADI_MSK(0x00002000,uint16_t))
-#define BITM_CAN_AA2_MB14                    (_ADI_MSK(0x00004000,uint16_t))
-#define BITM_CAN_AA2_MB15                    (_ADI_MSK(0x00008000,uint16_t))
+#define BITP_CAN_AA2_MB00                     0                               /* Mailbox n Abort Acknowledge */
+#define BITP_CAN_AA2_MB01                     1                               /* Mailbox n Abort Acknowledge */
+#define BITP_CAN_AA2_MB02                     2                               /* Mailbox n Abort Acknowledge */
+#define BITP_CAN_AA2_MB03                     3                               /* Mailbox n Abort Acknowledge */
+#define BITP_CAN_AA2_MB04                     4                               /* Mailbox n Abort Acknowledge */
+#define BITP_CAN_AA2_MB05                     5                               /* Mailbox n Abort Acknowledge */
+#define BITP_CAN_AA2_MB06                     6                               /* Mailbox n Abort Acknowledge */
+#define BITP_CAN_AA2_MB07                     7                               /* Mailbox n Abort Acknowledge */
+#define BITP_CAN_AA2_MB08                     8                               /* Mailbox n Abort Acknowledge */
+#define BITP_CAN_AA2_MB09                     9                               /* Mailbox n Abort Acknowledge */
+#define BITP_CAN_AA2_MB10                    10                               /* Mailbox n Abort Acknowledge */
+#define BITP_CAN_AA2_MB11                    11                               /* Mailbox n Abort Acknowledge */
+#define BITP_CAN_AA2_MB12                    12                               /* Mailbox n Abort Acknowledge */
+#define BITP_CAN_AA2_MB13                    13                               /* Mailbox n Abort Acknowledge */
+#define BITP_CAN_AA2_MB14                    14                               /* Mailbox n Abort Acknowledge */
+#define BITP_CAN_AA2_MB15                    15                               /* Mailbox n Abort Acknowledge */
+#define BITM_CAN_AA2_MB00                    (_ADI_MSK(0x00000001,uint16_t))  /* Mailbox n Abort Acknowledge */
+#define BITM_CAN_AA2_MB01                    (_ADI_MSK(0x00000002,uint16_t))  /* Mailbox n Abort Acknowledge */
+#define BITM_CAN_AA2_MB02                    (_ADI_MSK(0x00000004,uint16_t))  /* Mailbox n Abort Acknowledge */
+#define BITM_CAN_AA2_MB03                    (_ADI_MSK(0x00000008,uint16_t))  /* Mailbox n Abort Acknowledge */
+#define BITM_CAN_AA2_MB04                    (_ADI_MSK(0x00000010,uint16_t))  /* Mailbox n Abort Acknowledge */
+#define BITM_CAN_AA2_MB05                    (_ADI_MSK(0x00000020,uint16_t))  /* Mailbox n Abort Acknowledge */
+#define BITM_CAN_AA2_MB06                    (_ADI_MSK(0x00000040,uint16_t))  /* Mailbox n Abort Acknowledge */
+#define BITM_CAN_AA2_MB07                    (_ADI_MSK(0x00000080,uint16_t))  /* Mailbox n Abort Acknowledge */
+#define BITM_CAN_AA2_MB08                    (_ADI_MSK(0x00000100,uint16_t))  /* Mailbox n Abort Acknowledge */
+#define BITM_CAN_AA2_MB09                    (_ADI_MSK(0x00000200,uint16_t))  /* Mailbox n Abort Acknowledge */
+#define BITM_CAN_AA2_MB10                    (_ADI_MSK(0x00000400,uint16_t))  /* Mailbox n Abort Acknowledge */
+#define BITM_CAN_AA2_MB11                    (_ADI_MSK(0x00000800,uint16_t))  /* Mailbox n Abort Acknowledge */
+#define BITM_CAN_AA2_MB12                    (_ADI_MSK(0x00001000,uint16_t))  /* Mailbox n Abort Acknowledge */
+#define BITM_CAN_AA2_MB13                    (_ADI_MSK(0x00002000,uint16_t))  /* Mailbox n Abort Acknowledge */
+#define BITM_CAN_AA2_MB14                    (_ADI_MSK(0x00004000,uint16_t))  /* Mailbox n Abort Acknowledge */
+#define BITM_CAN_AA2_MB15                    (_ADI_MSK(0x00008000,uint16_t))  /* Mailbox n Abort Acknowledge */
 
 /* ------------------------------------------------------------------------------------------------------------------------
         CAN_RMP2                             Pos/Masks                        Description
    ------------------------------------------------------------------------------------------------------------------------ */
-#define BITP_CAN_RMP2_MB00                    0
-#define BITP_CAN_RMP2_MB01                    1
-#define BITP_CAN_RMP2_MB02                    2
-#define BITP_CAN_RMP2_MB03                    3
-#define BITP_CAN_RMP2_MB04                    4
-#define BITP_CAN_RMP2_MB05                    5
-#define BITP_CAN_RMP2_MB06                    6
-#define BITP_CAN_RMP2_MB07                    7
-#define BITP_CAN_RMP2_MB08                    8
-#define BITP_CAN_RMP2_MB09                    9
-#define BITP_CAN_RMP2_MB10                   10
-#define BITP_CAN_RMP2_MB11                   11
-#define BITP_CAN_RMP2_MB12                   12
-#define BITP_CAN_RMP2_MB13                   13
-#define BITP_CAN_RMP2_MB14                   14
-#define BITP_CAN_RMP2_MB15                   15
-#define BITM_CAN_RMP2_MB00                   (_ADI_MSK(0x00000001,uint16_t))
-#define BITM_CAN_RMP2_MB01                   (_ADI_MSK(0x00000002,uint16_t))
-#define BITM_CAN_RMP2_MB02                   (_ADI_MSK(0x00000004,uint16_t))
-#define BITM_CAN_RMP2_MB03                   (_ADI_MSK(0x00000008,uint16_t))
-#define BITM_CAN_RMP2_MB04                   (_ADI_MSK(0x00000010,uint16_t))
-#define BITM_CAN_RMP2_MB05                   (_ADI_MSK(0x00000020,uint16_t))
-#define BITM_CAN_RMP2_MB06                   (_ADI_MSK(0x00000040,uint16_t))
-#define BITM_CAN_RMP2_MB07                   (_ADI_MSK(0x00000080,uint16_t))
-#define BITM_CAN_RMP2_MB08                   (_ADI_MSK(0x00000100,uint16_t))
-#define BITM_CAN_RMP2_MB09                   (_ADI_MSK(0x00000200,uint16_t))
-#define BITM_CAN_RMP2_MB10                   (_ADI_MSK(0x00000400,uint16_t))
-#define BITM_CAN_RMP2_MB11                   (_ADI_MSK(0x00000800,uint16_t))
-#define BITM_CAN_RMP2_MB12                   (_ADI_MSK(0x00001000,uint16_t))
-#define BITM_CAN_RMP2_MB13                   (_ADI_MSK(0x00002000,uint16_t))
-#define BITM_CAN_RMP2_MB14                   (_ADI_MSK(0x00004000,uint16_t))
-#define BITM_CAN_RMP2_MB15                   (_ADI_MSK(0x00008000,uint16_t))
+#define BITP_CAN_RMP2_MB00                    0                               /* Mailbox n Message Pending */
+#define BITP_CAN_RMP2_MB01                    1                               /* Mailbox n Message Pending */
+#define BITP_CAN_RMP2_MB02                    2                               /* Mailbox n Message Pending */
+#define BITP_CAN_RMP2_MB03                    3                               /* Mailbox n Message Pending */
+#define BITP_CAN_RMP2_MB04                    4                               /* Mailbox n Message Pending */
+#define BITP_CAN_RMP2_MB05                    5                               /* Mailbox n Message Pending */
+#define BITP_CAN_RMP2_MB06                    6                               /* Mailbox n Message Pending */
+#define BITP_CAN_RMP2_MB07                    7                               /* Mailbox n Message Pending */
+#define BITP_CAN_RMP2_MB08                    8                               /* Mailbox n Message Pending */
+#define BITP_CAN_RMP2_MB09                    9                               /* Mailbox n Message Pending */
+#define BITP_CAN_RMP2_MB10                   10                               /* Mailbox n Message Pending */
+#define BITP_CAN_RMP2_MB11                   11                               /* Mailbox n Message Pending */
+#define BITP_CAN_RMP2_MB12                   12                               /* Mailbox n Message Pending */
+#define BITP_CAN_RMP2_MB13                   13                               /* Mailbox n Message Pending */
+#define BITP_CAN_RMP2_MB14                   14                               /* Mailbox n Message Pending */
+#define BITP_CAN_RMP2_MB15                   15                               /* Mailbox n Message Pending */
+#define BITM_CAN_RMP2_MB00                   (_ADI_MSK(0x00000001,uint16_t))  /* Mailbox n Message Pending */
+#define BITM_CAN_RMP2_MB01                   (_ADI_MSK(0x00000002,uint16_t))  /* Mailbox n Message Pending */
+#define BITM_CAN_RMP2_MB02                   (_ADI_MSK(0x00000004,uint16_t))  /* Mailbox n Message Pending */
+#define BITM_CAN_RMP2_MB03                   (_ADI_MSK(0x00000008,uint16_t))  /* Mailbox n Message Pending */
+#define BITM_CAN_RMP2_MB04                   (_ADI_MSK(0x00000010,uint16_t))  /* Mailbox n Message Pending */
+#define BITM_CAN_RMP2_MB05                   (_ADI_MSK(0x00000020,uint16_t))  /* Mailbox n Message Pending */
+#define BITM_CAN_RMP2_MB06                   (_ADI_MSK(0x00000040,uint16_t))  /* Mailbox n Message Pending */
+#define BITM_CAN_RMP2_MB07                   (_ADI_MSK(0x00000080,uint16_t))  /* Mailbox n Message Pending */
+#define BITM_CAN_RMP2_MB08                   (_ADI_MSK(0x00000100,uint16_t))  /* Mailbox n Message Pending */
+#define BITM_CAN_RMP2_MB09                   (_ADI_MSK(0x00000200,uint16_t))  /* Mailbox n Message Pending */
+#define BITM_CAN_RMP2_MB10                   (_ADI_MSK(0x00000400,uint16_t))  /* Mailbox n Message Pending */
+#define BITM_CAN_RMP2_MB11                   (_ADI_MSK(0x00000800,uint16_t))  /* Mailbox n Message Pending */
+#define BITM_CAN_RMP2_MB12                   (_ADI_MSK(0x00001000,uint16_t))  /* Mailbox n Message Pending */
+#define BITM_CAN_RMP2_MB13                   (_ADI_MSK(0x00002000,uint16_t))  /* Mailbox n Message Pending */
+#define BITM_CAN_RMP2_MB14                   (_ADI_MSK(0x00004000,uint16_t))  /* Mailbox n Message Pending */
+#define BITM_CAN_RMP2_MB15                   (_ADI_MSK(0x00008000,uint16_t))  /* Mailbox n Message Pending */
 
 /* ------------------------------------------------------------------------------------------------------------------------
         CAN_RML2                             Pos/Masks                        Description
    ------------------------------------------------------------------------------------------------------------------------ */
-#define BITP_CAN_RML2_MB00                    0
-#define BITP_CAN_RML2_MB01                    1
-#define BITP_CAN_RML2_MB02                    2
-#define BITP_CAN_RML2_MB03                    3
-#define BITP_CAN_RML2_MB04                    4
-#define BITP_CAN_RML2_MB05                    5
-#define BITP_CAN_RML2_MB06                    6
-#define BITP_CAN_RML2_MB07                    7
-#define BITP_CAN_RML2_MB08                    8
-#define BITP_CAN_RML2_MB09                    9
-#define BITP_CAN_RML2_MB10                   10
-#define BITP_CAN_RML2_MB11                   11
-#define BITP_CAN_RML2_MB12                   12
-#define BITP_CAN_RML2_MB13                   13
-#define BITP_CAN_RML2_MB14                   14
-#define BITP_CAN_RML2_MB15                   15
-#define BITM_CAN_RML2_MB00                   (_ADI_MSK(0x00000001,uint16_t))
-#define BITM_CAN_RML2_MB01                   (_ADI_MSK(0x00000002,uint16_t))
-#define BITM_CAN_RML2_MB02                   (_ADI_MSK(0x00000004,uint16_t))
-#define BITM_CAN_RML2_MB03                   (_ADI_MSK(0x00000008,uint16_t))
-#define BITM_CAN_RML2_MB04                   (_ADI_MSK(0x00000010,uint16_t))
-#define BITM_CAN_RML2_MB05                   (_ADI_MSK(0x00000020,uint16_t))
-#define BITM_CAN_RML2_MB06                   (_ADI_MSK(0x00000040,uint16_t))
-#define BITM_CAN_RML2_MB07                   (_ADI_MSK(0x00000080,uint16_t))
-#define BITM_CAN_RML2_MB08                   (_ADI_MSK(0x00000100,uint16_t))
-#define BITM_CAN_RML2_MB09                   (_ADI_MSK(0x00000200,uint16_t))
-#define BITM_CAN_RML2_MB10                   (_ADI_MSK(0x00000400,uint16_t))
-#define BITM_CAN_RML2_MB11                   (_ADI_MSK(0x00000800,uint16_t))
-#define BITM_CAN_RML2_MB12                   (_ADI_MSK(0x00001000,uint16_t))
-#define BITM_CAN_RML2_MB13                   (_ADI_MSK(0x00002000,uint16_t))
-#define BITM_CAN_RML2_MB14                   (_ADI_MSK(0x00004000,uint16_t))
-#define BITM_CAN_RML2_MB15                   (_ADI_MSK(0x00008000,uint16_t))
+#define BITP_CAN_RML2_MB00                    0                               /* Mailbox n Message Lost */
+#define BITP_CAN_RML2_MB01                    1                               /* Mailbox n Message Lost */
+#define BITP_CAN_RML2_MB02                    2                               /* Mailbox n Message Lost */
+#define BITP_CAN_RML2_MB03                    3                               /* Mailbox n Message Lost */
+#define BITP_CAN_RML2_MB04                    4                               /* Mailbox n Message Lost */
+#define BITP_CAN_RML2_MB05                    5                               /* Mailbox n Message Lost */
+#define BITP_CAN_RML2_MB06                    6                               /* Mailbox n Message Lost */
+#define BITP_CAN_RML2_MB07                    7                               /* Mailbox n Message Lost */
+#define BITP_CAN_RML2_MB08                    8                               /* Mailbox n Message Lost */
+#define BITP_CAN_RML2_MB09                    9                               /* Mailbox n Message Lost */
+#define BITP_CAN_RML2_MB10                   10                               /* Mailbox n Message Lost */
+#define BITP_CAN_RML2_MB11                   11                               /* Mailbox n Message Lost */
+#define BITP_CAN_RML2_MB12                   12                               /* Mailbox n Message Lost */
+#define BITP_CAN_RML2_MB13                   13                               /* Mailbox n Message Lost */
+#define BITP_CAN_RML2_MB14                   14                               /* Mailbox n Message Lost */
+#define BITP_CAN_RML2_MB15                   15                               /* Mailbox n Message Lost */
+#define BITM_CAN_RML2_MB00                   (_ADI_MSK(0x00000001,uint16_t))  /* Mailbox n Message Lost */
+#define BITM_CAN_RML2_MB01                   (_ADI_MSK(0x00000002,uint16_t))  /* Mailbox n Message Lost */
+#define BITM_CAN_RML2_MB02                   (_ADI_MSK(0x00000004,uint16_t))  /* Mailbox n Message Lost */
+#define BITM_CAN_RML2_MB03                   (_ADI_MSK(0x00000008,uint16_t))  /* Mailbox n Message Lost */
+#define BITM_CAN_RML2_MB04                   (_ADI_MSK(0x00000010,uint16_t))  /* Mailbox n Message Lost */
+#define BITM_CAN_RML2_MB05                   (_ADI_MSK(0x00000020,uint16_t))  /* Mailbox n Message Lost */
+#define BITM_CAN_RML2_MB06                   (_ADI_MSK(0x00000040,uint16_t))  /* Mailbox n Message Lost */
+#define BITM_CAN_RML2_MB07                   (_ADI_MSK(0x00000080,uint16_t))  /* Mailbox n Message Lost */
+#define BITM_CAN_RML2_MB08                   (_ADI_MSK(0x00000100,uint16_t))  /* Mailbox n Message Lost */
+#define BITM_CAN_RML2_MB09                   (_ADI_MSK(0x00000200,uint16_t))  /* Mailbox n Message Lost */
+#define BITM_CAN_RML2_MB10                   (_ADI_MSK(0x00000400,uint16_t))  /* Mailbox n Message Lost */
+#define BITM_CAN_RML2_MB11                   (_ADI_MSK(0x00000800,uint16_t))  /* Mailbox n Message Lost */
+#define BITM_CAN_RML2_MB12                   (_ADI_MSK(0x00001000,uint16_t))  /* Mailbox n Message Lost */
+#define BITM_CAN_RML2_MB13                   (_ADI_MSK(0x00002000,uint16_t))  /* Mailbox n Message Lost */
+#define BITM_CAN_RML2_MB14                   (_ADI_MSK(0x00004000,uint16_t))  /* Mailbox n Message Lost */
+#define BITM_CAN_RML2_MB15                   (_ADI_MSK(0x00008000,uint16_t))  /* Mailbox n Message Lost */
 
 /* ------------------------------------------------------------------------------------------------------------------------
         CAN_MBTIF2                           Pos/Masks                        Description
    ------------------------------------------------------------------------------------------------------------------------ */
-#define BITP_CAN_MBTIF2_MB00                  0
-#define BITP_CAN_MBTIF2_MB01                  1
-#define BITP_CAN_MBTIF2_MB02                  2
-#define BITP_CAN_MBTIF2_MB03                  3
-#define BITP_CAN_MBTIF2_MB04                  4
-#define BITP_CAN_MBTIF2_MB05                  5
-#define BITP_CAN_MBTIF2_MB06                  6
-#define BITP_CAN_MBTIF2_MB07                  7
-#define BITP_CAN_MBTIF2_MB08                  8
-#define BITP_CAN_MBTIF2_MB09                  9
-#define BITP_CAN_MBTIF2_MB10                 10
-#define BITP_CAN_MBTIF2_MB11                 11
-#define BITP_CAN_MBTIF2_MB12                 12
-#define BITP_CAN_MBTIF2_MB13                 13
-#define BITP_CAN_MBTIF2_MB14                 14
-#define BITP_CAN_MBTIF2_MB15                 15
-#define BITM_CAN_MBTIF2_MB00                 (_ADI_MSK(0x00000001,uint16_t))
-#define BITM_CAN_MBTIF2_MB01                 (_ADI_MSK(0x00000002,uint16_t))
-#define BITM_CAN_MBTIF2_MB02                 (_ADI_MSK(0x00000004,uint16_t))
-#define BITM_CAN_MBTIF2_MB03                 (_ADI_MSK(0x00000008,uint16_t))
-#define BITM_CAN_MBTIF2_MB04                 (_ADI_MSK(0x00000010,uint16_t))
-#define BITM_CAN_MBTIF2_MB05                 (_ADI_MSK(0x00000020,uint16_t))
-#define BITM_CAN_MBTIF2_MB06                 (_ADI_MSK(0x00000040,uint16_t))
-#define BITM_CAN_MBTIF2_MB07                 (_ADI_MSK(0x00000080,uint16_t))
-#define BITM_CAN_MBTIF2_MB08                 (_ADI_MSK(0x00000100,uint16_t))
-#define BITM_CAN_MBTIF2_MB09                 (_ADI_MSK(0x00000200,uint16_t))
-#define BITM_CAN_MBTIF2_MB10                 (_ADI_MSK(0x00000400,uint16_t))
-#define BITM_CAN_MBTIF2_MB11                 (_ADI_MSK(0x00000800,uint16_t))
-#define BITM_CAN_MBTIF2_MB12                 (_ADI_MSK(0x00001000,uint16_t))
-#define BITM_CAN_MBTIF2_MB13                 (_ADI_MSK(0x00002000,uint16_t))
-#define BITM_CAN_MBTIF2_MB14                 (_ADI_MSK(0x00004000,uint16_t))
-#define BITM_CAN_MBTIF2_MB15                 (_ADI_MSK(0x00008000,uint16_t))
+#define BITP_CAN_MBTIF2_MB00                  0                               /* Mailbox n Transmit Interrupt Pending */
+#define BITP_CAN_MBTIF2_MB01                  1                               /* Mailbox n Transmit Interrupt Pending */
+#define BITP_CAN_MBTIF2_MB02                  2                               /* Mailbox n Transmit Interrupt Pending */
+#define BITP_CAN_MBTIF2_MB03                  3                               /* Mailbox n Transmit Interrupt Pending */
+#define BITP_CAN_MBTIF2_MB04                  4                               /* Mailbox n Transmit Interrupt Pending */
+#define BITP_CAN_MBTIF2_MB05                  5                               /* Mailbox n Transmit Interrupt Pending */
+#define BITP_CAN_MBTIF2_MB06                  6                               /* Mailbox n Transmit Interrupt Pending */
+#define BITP_CAN_MBTIF2_MB07                  7                               /* Mailbox n Transmit Interrupt Pending */
+#define BITP_CAN_MBTIF2_MB08                  8                               /* Mailbox n Transmit Interrupt Pending */
+#define BITP_CAN_MBTIF2_MB09                  9                               /* Mailbox n Transmit Interrupt Pending */
+#define BITP_CAN_MBTIF2_MB10                 10                               /* Mailbox n Transmit Interrupt Pending */
+#define BITP_CAN_MBTIF2_MB11                 11                               /* Mailbox n Transmit Interrupt Pending */
+#define BITP_CAN_MBTIF2_MB12                 12                               /* Mailbox n Transmit Interrupt Pending */
+#define BITP_CAN_MBTIF2_MB13                 13                               /* Mailbox n Transmit Interrupt Pending */
+#define BITP_CAN_MBTIF2_MB14                 14                               /* Mailbox n Transmit Interrupt Pending */
+#define BITP_CAN_MBTIF2_MB15                 15                               /* Mailbox n Transmit Interrupt Pending */
+#define BITM_CAN_MBTIF2_MB00                 (_ADI_MSK(0x00000001,uint16_t))  /* Mailbox n Transmit Interrupt Pending */
+#define BITM_CAN_MBTIF2_MB01                 (_ADI_MSK(0x00000002,uint16_t))  /* Mailbox n Transmit Interrupt Pending */
+#define BITM_CAN_MBTIF2_MB02                 (_ADI_MSK(0x00000004,uint16_t))  /* Mailbox n Transmit Interrupt Pending */
+#define BITM_CAN_MBTIF2_MB03                 (_ADI_MSK(0x00000008,uint16_t))  /* Mailbox n Transmit Interrupt Pending */
+#define BITM_CAN_MBTIF2_MB04                 (_ADI_MSK(0x00000010,uint16_t))  /* Mailbox n Transmit Interrupt Pending */
+#define BITM_CAN_MBTIF2_MB05                 (_ADI_MSK(0x00000020,uint16_t))  /* Mailbox n Transmit Interrupt Pending */
+#define BITM_CAN_MBTIF2_MB06                 (_ADI_MSK(0x00000040,uint16_t))  /* Mailbox n Transmit Interrupt Pending */
+#define BITM_CAN_MBTIF2_MB07                 (_ADI_MSK(0x00000080,uint16_t))  /* Mailbox n Transmit Interrupt Pending */
+#define BITM_CAN_MBTIF2_MB08                 (_ADI_MSK(0x00000100,uint16_t))  /* Mailbox n Transmit Interrupt Pending */
+#define BITM_CAN_MBTIF2_MB09                 (_ADI_MSK(0x00000200,uint16_t))  /* Mailbox n Transmit Interrupt Pending */
+#define BITM_CAN_MBTIF2_MB10                 (_ADI_MSK(0x00000400,uint16_t))  /* Mailbox n Transmit Interrupt Pending */
+#define BITM_CAN_MBTIF2_MB11                 (_ADI_MSK(0x00000800,uint16_t))  /* Mailbox n Transmit Interrupt Pending */
+#define BITM_CAN_MBTIF2_MB12                 (_ADI_MSK(0x00001000,uint16_t))  /* Mailbox n Transmit Interrupt Pending */
+#define BITM_CAN_MBTIF2_MB13                 (_ADI_MSK(0x00002000,uint16_t))  /* Mailbox n Transmit Interrupt Pending */
+#define BITM_CAN_MBTIF2_MB14                 (_ADI_MSK(0x00004000,uint16_t))  /* Mailbox n Transmit Interrupt Pending */
+#define BITM_CAN_MBTIF2_MB15                 (_ADI_MSK(0x00008000,uint16_t))  /* Mailbox n Transmit Interrupt Pending */
 
 /* ------------------------------------------------------------------------------------------------------------------------
         CAN_MBRIF2                           Pos/Masks                        Description
    ------------------------------------------------------------------------------------------------------------------------ */
-#define BITP_CAN_MBRIF2_MB00                  0
-#define BITP_CAN_MBRIF2_MB01                  1
-#define BITP_CAN_MBRIF2_MB02                  2
-#define BITP_CAN_MBRIF2_MB03                  3
-#define BITP_CAN_MBRIF2_MB04                  4
-#define BITP_CAN_MBRIF2_MB05                  5
-#define BITP_CAN_MBRIF2_MB06                  6
-#define BITP_CAN_MBRIF2_MB07                  7
-#define BITP_CAN_MBRIF2_MB08                  8
-#define BITP_CAN_MBRIF2_MB09                  9
-#define BITP_CAN_MBRIF2_MB10                 10
-#define BITP_CAN_MBRIF2_MB11                 11
-#define BITP_CAN_MBRIF2_MB12                 12
-#define BITP_CAN_MBRIF2_MB13                 13
-#define BITP_CAN_MBRIF2_MB14                 14
-#define BITP_CAN_MBRIF2_MB15                 15
-#define BITM_CAN_MBRIF2_MB00                 (_ADI_MSK(0x00000001,uint16_t))
-#define BITM_CAN_MBRIF2_MB01                 (_ADI_MSK(0x00000002,uint16_t))
-#define BITM_CAN_MBRIF2_MB02                 (_ADI_MSK(0x00000004,uint16_t))
-#define BITM_CAN_MBRIF2_MB03                 (_ADI_MSK(0x00000008,uint16_t))
-#define BITM_CAN_MBRIF2_MB04                 (_ADI_MSK(0x00000010,uint16_t))
-#define BITM_CAN_MBRIF2_MB05                 (_ADI_MSK(0x00000020,uint16_t))
-#define BITM_CAN_MBRIF2_MB06                 (_ADI_MSK(0x00000040,uint16_t))
-#define BITM_CAN_MBRIF2_MB07                 (_ADI_MSK(0x00000080,uint16_t))
-#define BITM_CAN_MBRIF2_MB08                 (_ADI_MSK(0x00000100,uint16_t))
-#define BITM_CAN_MBRIF2_MB09                 (_ADI_MSK(0x00000200,uint16_t))
-#define BITM_CAN_MBRIF2_MB10                 (_ADI_MSK(0x00000400,uint16_t))
-#define BITM_CAN_MBRIF2_MB11                 (_ADI_MSK(0x00000800,uint16_t))
-#define BITM_CAN_MBRIF2_MB12                 (_ADI_MSK(0x00001000,uint16_t))
-#define BITM_CAN_MBRIF2_MB13                 (_ADI_MSK(0x00002000,uint16_t))
-#define BITM_CAN_MBRIF2_MB14                 (_ADI_MSK(0x00004000,uint16_t))
-#define BITM_CAN_MBRIF2_MB15                 (_ADI_MSK(0x00008000,uint16_t))
+#define BITP_CAN_MBRIF2_MB00                  0                               /* Mailbox n Receive Interrupt Pending */
+#define BITP_CAN_MBRIF2_MB01                  1                               /* Mailbox n Receive Interrupt Pending */
+#define BITP_CAN_MBRIF2_MB02                  2                               /* Mailbox n Receive Interrupt Pending */
+#define BITP_CAN_MBRIF2_MB03                  3                               /* Mailbox n Receive Interrupt Pending */
+#define BITP_CAN_MBRIF2_MB04                  4                               /* Mailbox n Receive Interrupt Pending */
+#define BITP_CAN_MBRIF2_MB05                  5                               /* Mailbox n Receive Interrupt Pending */
+#define BITP_CAN_MBRIF2_MB06                  6                               /* Mailbox n Receive Interrupt Pending */
+#define BITP_CAN_MBRIF2_MB07                  7                               /* Mailbox n Receive Interrupt Pending */
+#define BITP_CAN_MBRIF2_MB08                  8                               /* Mailbox n Receive Interrupt Pending */
+#define BITP_CAN_MBRIF2_MB09                  9                               /* Mailbox n Receive Interrupt Pending */
+#define BITP_CAN_MBRIF2_MB10                 10                               /* Mailbox n Receive Interrupt Pending */
+#define BITP_CAN_MBRIF2_MB11                 11                               /* Mailbox n Receive Interrupt Pending */
+#define BITP_CAN_MBRIF2_MB12                 12                               /* Mailbox n Receive Interrupt Pending */
+#define BITP_CAN_MBRIF2_MB13                 13                               /* Mailbox n Receive Interrupt Pending */
+#define BITP_CAN_MBRIF2_MB14                 14                               /* Mailbox n Receive Interrupt Pending */
+#define BITP_CAN_MBRIF2_MB15                 15                               /* Mailbox n Receive Interrupt Pending */
+#define BITM_CAN_MBRIF2_MB00                 (_ADI_MSK(0x00000001,uint16_t))  /* Mailbox n Receive Interrupt Pending */
+#define BITM_CAN_MBRIF2_MB01                 (_ADI_MSK(0x00000002,uint16_t))  /* Mailbox n Receive Interrupt Pending */
+#define BITM_CAN_MBRIF2_MB02                 (_ADI_MSK(0x00000004,uint16_t))  /* Mailbox n Receive Interrupt Pending */
+#define BITM_CAN_MBRIF2_MB03                 (_ADI_MSK(0x00000008,uint16_t))  /* Mailbox n Receive Interrupt Pending */
+#define BITM_CAN_MBRIF2_MB04                 (_ADI_MSK(0x00000010,uint16_t))  /* Mailbox n Receive Interrupt Pending */
+#define BITM_CAN_MBRIF2_MB05                 (_ADI_MSK(0x00000020,uint16_t))  /* Mailbox n Receive Interrupt Pending */
+#define BITM_CAN_MBRIF2_MB06                 (_ADI_MSK(0x00000040,uint16_t))  /* Mailbox n Receive Interrupt Pending */
+#define BITM_CAN_MBRIF2_MB07                 (_ADI_MSK(0x00000080,uint16_t))  /* Mailbox n Receive Interrupt Pending */
+#define BITM_CAN_MBRIF2_MB08                 (_ADI_MSK(0x00000100,uint16_t))  /* Mailbox n Receive Interrupt Pending */
+#define BITM_CAN_MBRIF2_MB09                 (_ADI_MSK(0x00000200,uint16_t))  /* Mailbox n Receive Interrupt Pending */
+#define BITM_CAN_MBRIF2_MB10                 (_ADI_MSK(0x00000400,uint16_t))  /* Mailbox n Receive Interrupt Pending */
+#define BITM_CAN_MBRIF2_MB11                 (_ADI_MSK(0x00000800,uint16_t))  /* Mailbox n Receive Interrupt Pending */
+#define BITM_CAN_MBRIF2_MB12                 (_ADI_MSK(0x00001000,uint16_t))  /* Mailbox n Receive Interrupt Pending */
+#define BITM_CAN_MBRIF2_MB13                 (_ADI_MSK(0x00002000,uint16_t))  /* Mailbox n Receive Interrupt Pending */
+#define BITM_CAN_MBRIF2_MB14                 (_ADI_MSK(0x00004000,uint16_t))  /* Mailbox n Receive Interrupt Pending */
+#define BITM_CAN_MBRIF2_MB15                 (_ADI_MSK(0x00008000,uint16_t))  /* Mailbox n Receive Interrupt Pending */
 
 /* ------------------------------------------------------------------------------------------------------------------------
         CAN_MBIM2                            Pos/Masks                        Description
    ------------------------------------------------------------------------------------------------------------------------ */
-#define BITP_CAN_MBIM2_MB00                   0
-#define BITP_CAN_MBIM2_MB01                   1
-#define BITP_CAN_MBIM2_MB02                   2
-#define BITP_CAN_MBIM2_MB03                   3
-#define BITP_CAN_MBIM2_MB04                   4
-#define BITP_CAN_MBIM2_MB05                   5
-#define BITP_CAN_MBIM2_MB06                   6
-#define BITP_CAN_MBIM2_MB07                   7
-#define BITP_CAN_MBIM2_MB08                   8
-#define BITP_CAN_MBIM2_MB09                   9
-#define BITP_CAN_MBIM2_MB10                  10
-#define BITP_CAN_MBIM2_MB11                  11
-#define BITP_CAN_MBIM2_MB12                  12
-#define BITP_CAN_MBIM2_MB13                  13
-#define BITP_CAN_MBIM2_MB14                  14
-#define BITP_CAN_MBIM2_MB15                  15
-#define BITM_CAN_MBIM2_MB00                  (_ADI_MSK(0x00000001,uint16_t))
-#define BITM_CAN_MBIM2_MB01                  (_ADI_MSK(0x00000002,uint16_t))
-#define BITM_CAN_MBIM2_MB02                  (_ADI_MSK(0x00000004,uint16_t))
-#define BITM_CAN_MBIM2_MB03                  (_ADI_MSK(0x00000008,uint16_t))
-#define BITM_CAN_MBIM2_MB04                  (_ADI_MSK(0x00000010,uint16_t))
-#define BITM_CAN_MBIM2_MB05                  (_ADI_MSK(0x00000020,uint16_t))
-#define BITM_CAN_MBIM2_MB06                  (_ADI_MSK(0x00000040,uint16_t))
-#define BITM_CAN_MBIM2_MB07                  (_ADI_MSK(0x00000080,uint16_t))
-#define BITM_CAN_MBIM2_MB08                  (_ADI_MSK(0x00000100,uint16_t))
-#define BITM_CAN_MBIM2_MB09                  (_ADI_MSK(0x00000200,uint16_t))
-#define BITM_CAN_MBIM2_MB10                  (_ADI_MSK(0x00000400,uint16_t))
-#define BITM_CAN_MBIM2_MB11                  (_ADI_MSK(0x00000800,uint16_t))
-#define BITM_CAN_MBIM2_MB12                  (_ADI_MSK(0x00001000,uint16_t))
-#define BITM_CAN_MBIM2_MB13                  (_ADI_MSK(0x00002000,uint16_t))
-#define BITM_CAN_MBIM2_MB14                  (_ADI_MSK(0x00004000,uint16_t))
-#define BITM_CAN_MBIM2_MB15                  (_ADI_MSK(0x00008000,uint16_t))
+#define BITP_CAN_MBIM2_MB00                   0                               /* Mailbox n Transmit and Receive Interrupt Enable */
+#define BITP_CAN_MBIM2_MB01                   1                               /* Mailbox n Transmit and Receive Interrupt Enable */
+#define BITP_CAN_MBIM2_MB02                   2                               /* Mailbox n Transmit and Receive Interrupt Enable */
+#define BITP_CAN_MBIM2_MB03                   3                               /* Mailbox n Transmit and Receive Interrupt Enable */
+#define BITP_CAN_MBIM2_MB04                   4                               /* Mailbox n Transmit and Receive Interrupt Enable */
+#define BITP_CAN_MBIM2_MB05                   5                               /* Mailbox n Transmit and Receive Interrupt Enable */
+#define BITP_CAN_MBIM2_MB06                   6                               /* Mailbox n Transmit and Receive Interrupt Enable */
+#define BITP_CAN_MBIM2_MB07                   7                               /* Mailbox n Transmit and Receive Interrupt Enable */
+#define BITP_CAN_MBIM2_MB08                   8                               /* Mailbox n Transmit and Receive Interrupt Enable */
+#define BITP_CAN_MBIM2_MB09                   9                               /* Mailbox n Transmit and Receive Interrupt Enable */
+#define BITP_CAN_MBIM2_MB10                  10                               /* Mailbox n Transmit and Receive Interrupt Enable */
+#define BITP_CAN_MBIM2_MB11                  11                               /* Mailbox n Transmit and Receive Interrupt Enable */
+#define BITP_CAN_MBIM2_MB12                  12                               /* Mailbox n Transmit and Receive Interrupt Enable */
+#define BITP_CAN_MBIM2_MB13                  13                               /* Mailbox n Transmit and Receive Interrupt Enable */
+#define BITP_CAN_MBIM2_MB14                  14                               /* Mailbox n Transmit and Receive Interrupt Enable */
+#define BITP_CAN_MBIM2_MB15                  15                               /* Mailbox n Transmit and Receive Interrupt Enable */
+#define BITM_CAN_MBIM2_MB00                  (_ADI_MSK(0x00000001,uint16_t))  /* Mailbox n Transmit and Receive Interrupt Enable */
+#define BITM_CAN_MBIM2_MB01                  (_ADI_MSK(0x00000002,uint16_t))  /* Mailbox n Transmit and Receive Interrupt Enable */
+#define BITM_CAN_MBIM2_MB02                  (_ADI_MSK(0x00000004,uint16_t))  /* Mailbox n Transmit and Receive Interrupt Enable */
+#define BITM_CAN_MBIM2_MB03                  (_ADI_MSK(0x00000008,uint16_t))  /* Mailbox n Transmit and Receive Interrupt Enable */
+#define BITM_CAN_MBIM2_MB04                  (_ADI_MSK(0x00000010,uint16_t))  /* Mailbox n Transmit and Receive Interrupt Enable */
+#define BITM_CAN_MBIM2_MB05                  (_ADI_MSK(0x00000020,uint16_t))  /* Mailbox n Transmit and Receive Interrupt Enable */
+#define BITM_CAN_MBIM2_MB06                  (_ADI_MSK(0x00000040,uint16_t))  /* Mailbox n Transmit and Receive Interrupt Enable */
+#define BITM_CAN_MBIM2_MB07                  (_ADI_MSK(0x00000080,uint16_t))  /* Mailbox n Transmit and Receive Interrupt Enable */
+#define BITM_CAN_MBIM2_MB08                  (_ADI_MSK(0x00000100,uint16_t))  /* Mailbox n Transmit and Receive Interrupt Enable */
+#define BITM_CAN_MBIM2_MB09                  (_ADI_MSK(0x00000200,uint16_t))  /* Mailbox n Transmit and Receive Interrupt Enable */
+#define BITM_CAN_MBIM2_MB10                  (_ADI_MSK(0x00000400,uint16_t))  /* Mailbox n Transmit and Receive Interrupt Enable */
+#define BITM_CAN_MBIM2_MB11                  (_ADI_MSK(0x00000800,uint16_t))  /* Mailbox n Transmit and Receive Interrupt Enable */
+#define BITM_CAN_MBIM2_MB12                  (_ADI_MSK(0x00001000,uint16_t))  /* Mailbox n Transmit and Receive Interrupt Enable */
+#define BITM_CAN_MBIM2_MB13                  (_ADI_MSK(0x00002000,uint16_t))  /* Mailbox n Transmit and Receive Interrupt Enable */
+#define BITM_CAN_MBIM2_MB14                  (_ADI_MSK(0x00004000,uint16_t))  /* Mailbox n Transmit and Receive Interrupt Enable */
+#define BITM_CAN_MBIM2_MB15                  (_ADI_MSK(0x00008000,uint16_t))  /* Mailbox n Transmit and Receive Interrupt Enable */
 
 /* ------------------------------------------------------------------------------------------------------------------------
         CAN_RFH2                             Pos/Masks                        Description
    ------------------------------------------------------------------------------------------------------------------------ */
-#define BITP_CAN_RFH2_MB00                    0
-#define BITP_CAN_RFH2_MB01                    1
-#define BITP_CAN_RFH2_MB02                    2
-#define BITP_CAN_RFH2_MB03                    3
-#define BITP_CAN_RFH2_MB04                    4
-#define BITP_CAN_RFH2_MB05                    5
-#define BITP_CAN_RFH2_MB06                    6
-#define BITP_CAN_RFH2_MB07                    7
-#define BITP_CAN_RFH2_MB08                    8
-#define BITP_CAN_RFH2_MB09                    9
-#define BITP_CAN_RFH2_MB10                   10
-#define BITP_CAN_RFH2_MB11                   11
-#define BITP_CAN_RFH2_MB12                   12
-#define BITP_CAN_RFH2_MB13                   13
-#define BITP_CAN_RFH2_MB14                   14
-#define BITP_CAN_RFH2_MB15                   15
-#define BITM_CAN_RFH2_MB00                   (_ADI_MSK(0x00000001,uint16_t))
-#define BITM_CAN_RFH2_MB01                   (_ADI_MSK(0x00000002,uint16_t))
-#define BITM_CAN_RFH2_MB02                   (_ADI_MSK(0x00000004,uint16_t))
-#define BITM_CAN_RFH2_MB03                   (_ADI_MSK(0x00000008,uint16_t))
-#define BITM_CAN_RFH2_MB04                   (_ADI_MSK(0x00000010,uint16_t))
-#define BITM_CAN_RFH2_MB05                   (_ADI_MSK(0x00000020,uint16_t))
-#define BITM_CAN_RFH2_MB06                   (_ADI_MSK(0x00000040,uint16_t))
-#define BITM_CAN_RFH2_MB07                   (_ADI_MSK(0x00000080,uint16_t))
-#define BITM_CAN_RFH2_MB08                   (_ADI_MSK(0x00000100,uint16_t))
-#define BITM_CAN_RFH2_MB09                   (_ADI_MSK(0x00000200,uint16_t))
-#define BITM_CAN_RFH2_MB10                   (_ADI_MSK(0x00000400,uint16_t))
-#define BITM_CAN_RFH2_MB11                   (_ADI_MSK(0x00000800,uint16_t))
-#define BITM_CAN_RFH2_MB12                   (_ADI_MSK(0x00001000,uint16_t))
-#define BITM_CAN_RFH2_MB13                   (_ADI_MSK(0x00002000,uint16_t))
-#define BITM_CAN_RFH2_MB14                   (_ADI_MSK(0x00004000,uint16_t))
-#define BITM_CAN_RFH2_MB15                   (_ADI_MSK(0x00008000,uint16_t))
+#define BITP_CAN_RFH2_MB00                    0                               /* Mailbox n Remote Frame Handling Enable */
+#define BITP_CAN_RFH2_MB01                    1                               /* Mailbox n Remote Frame Handling Enable */
+#define BITP_CAN_RFH2_MB02                    2                               /* Mailbox n Remote Frame Handling Enable */
+#define BITP_CAN_RFH2_MB03                    3                               /* Mailbox n Remote Frame Handling Enable */
+#define BITP_CAN_RFH2_MB04                    4                               /* Mailbox n Remote Frame Handling Enable */
+#define BITP_CAN_RFH2_MB05                    5                               /* Mailbox n Remote Frame Handling Enable */
+#define BITP_CAN_RFH2_MB06                    6                               /* Mailbox n Remote Frame Handling Enable */
+#define BITP_CAN_RFH2_MB07                    7                               /* Mailbox n Remote Frame Handling Enable */
+#define BITP_CAN_RFH2_MB08                    8                               /* Mailbox n Remote Frame Handling Enable */
+#define BITP_CAN_RFH2_MB09                    9                               /* Mailbox n Remote Frame Handling Enable */
+#define BITP_CAN_RFH2_MB10                   10                               /* Mailbox n Remote Frame Handling Enable */
+#define BITP_CAN_RFH2_MB11                   11                               /* Mailbox n Remote Frame Handling Enable */
+#define BITP_CAN_RFH2_MB12                   12                               /* Mailbox n Remote Frame Handling Enable */
+#define BITP_CAN_RFH2_MB13                   13                               /* Mailbox n Remote Frame Handling Enable */
+#define BITP_CAN_RFH2_MB14                   14                               /* Mailbox n Remote Frame Handling Enable */
+#define BITP_CAN_RFH2_MB15                   15                               /* Mailbox n Remote Frame Handling Enable */
+#define BITM_CAN_RFH2_MB00                   (_ADI_MSK(0x00000001,uint16_t))  /* Mailbox n Remote Frame Handling Enable */
+#define BITM_CAN_RFH2_MB01                   (_ADI_MSK(0x00000002,uint16_t))  /* Mailbox n Remote Frame Handling Enable */
+#define BITM_CAN_RFH2_MB02                   (_ADI_MSK(0x00000004,uint16_t))  /* Mailbox n Remote Frame Handling Enable */
+#define BITM_CAN_RFH2_MB03                   (_ADI_MSK(0x00000008,uint16_t))  /* Mailbox n Remote Frame Handling Enable */
+#define BITM_CAN_RFH2_MB04                   (_ADI_MSK(0x00000010,uint16_t))  /* Mailbox n Remote Frame Handling Enable */
+#define BITM_CAN_RFH2_MB05                   (_ADI_MSK(0x00000020,uint16_t))  /* Mailbox n Remote Frame Handling Enable */
+#define BITM_CAN_RFH2_MB06                   (_ADI_MSK(0x00000040,uint16_t))  /* Mailbox n Remote Frame Handling Enable */
+#define BITM_CAN_RFH2_MB07                   (_ADI_MSK(0x00000080,uint16_t))  /* Mailbox n Remote Frame Handling Enable */
+#define BITM_CAN_RFH2_MB08                   (_ADI_MSK(0x00000100,uint16_t))  /* Mailbox n Remote Frame Handling Enable */
+#define BITM_CAN_RFH2_MB09                   (_ADI_MSK(0x00000200,uint16_t))  /* Mailbox n Remote Frame Handling Enable */
+#define BITM_CAN_RFH2_MB10                   (_ADI_MSK(0x00000400,uint16_t))  /* Mailbox n Remote Frame Handling Enable */
+#define BITM_CAN_RFH2_MB11                   (_ADI_MSK(0x00000800,uint16_t))  /* Mailbox n Remote Frame Handling Enable */
+#define BITM_CAN_RFH2_MB12                   (_ADI_MSK(0x00001000,uint16_t))  /* Mailbox n Remote Frame Handling Enable */
+#define BITM_CAN_RFH2_MB13                   (_ADI_MSK(0x00002000,uint16_t))  /* Mailbox n Remote Frame Handling Enable */
+#define BITM_CAN_RFH2_MB14                   (_ADI_MSK(0x00004000,uint16_t))  /* Mailbox n Remote Frame Handling Enable */
+#define BITM_CAN_RFH2_MB15                   (_ADI_MSK(0x00008000,uint16_t))  /* Mailbox n Remote Frame Handling Enable */
 
 /* ------------------------------------------------------------------------------------------------------------------------
         CAN_OPSS2                            Pos/Masks                        Description
    ------------------------------------------------------------------------------------------------------------------------ */
-#define BITP_CAN_OPSS2_MB00                   0
-#define BITP_CAN_OPSS2_MB01                   1
-#define BITP_CAN_OPSS2_MB02                   2
-#define BITP_CAN_OPSS2_MB03                   3
-#define BITP_CAN_OPSS2_MB04                   4
-#define BITP_CAN_OPSS2_MB05                   5
-#define BITP_CAN_OPSS2_MB06                   6
-#define BITP_CAN_OPSS2_MB07                   7
-#define BITP_CAN_OPSS2_MB08                   8
-#define BITP_CAN_OPSS2_MB09                   9
-#define BITP_CAN_OPSS2_MB10                  10
-#define BITP_CAN_OPSS2_MB11                  11
-#define BITP_CAN_OPSS2_MB12                  12
-#define BITP_CAN_OPSS2_MB13                  13
-#define BITP_CAN_OPSS2_MB14                  14
-#define BITP_CAN_OPSS2_MB15                  15
-#define BITM_CAN_OPSS2_MB00                  (_ADI_MSK(0x00000001,uint16_t))
-#define BITM_CAN_OPSS2_MB01                  (_ADI_MSK(0x00000002,uint16_t))
-#define BITM_CAN_OPSS2_MB02                  (_ADI_MSK(0x00000004,uint16_t))
-#define BITM_CAN_OPSS2_MB03                  (_ADI_MSK(0x00000008,uint16_t))
-#define BITM_CAN_OPSS2_MB04                  (_ADI_MSK(0x00000010,uint16_t))
-#define BITM_CAN_OPSS2_MB05                  (_ADI_MSK(0x00000020,uint16_t))
-#define BITM_CAN_OPSS2_MB06                  (_ADI_MSK(0x00000040,uint16_t))
-#define BITM_CAN_OPSS2_MB07                  (_ADI_MSK(0x00000080,uint16_t))
-#define BITM_CAN_OPSS2_MB08                  (_ADI_MSK(0x00000100,uint16_t))
-#define BITM_CAN_OPSS2_MB09                  (_ADI_MSK(0x00000200,uint16_t))
-#define BITM_CAN_OPSS2_MB10                  (_ADI_MSK(0x00000400,uint16_t))
-#define BITM_CAN_OPSS2_MB11                  (_ADI_MSK(0x00000800,uint16_t))
-#define BITM_CAN_OPSS2_MB12                  (_ADI_MSK(0x00001000,uint16_t))
-#define BITM_CAN_OPSS2_MB13                  (_ADI_MSK(0x00002000,uint16_t))
-#define BITM_CAN_OPSS2_MB14                  (_ADI_MSK(0x00004000,uint16_t))
-#define BITM_CAN_OPSS2_MB15                  (_ADI_MSK(0x00008000,uint16_t))
+#define BITP_CAN_OPSS2_MB00                   0                               /* Mailbox n Overwrite Protection Enable */
+#define BITP_CAN_OPSS2_MB01                   1                               /* Mailbox n Overwrite Protection Enable */
+#define BITP_CAN_OPSS2_MB02                   2                               /* Mailbox n Overwrite Protection Enable */
+#define BITP_CAN_OPSS2_MB03                   3                               /* Mailbox n Overwrite Protection Enable */
+#define BITP_CAN_OPSS2_MB04                   4                               /* Mailbox n Overwrite Protection Enable */
+#define BITP_CAN_OPSS2_MB05                   5                               /* Mailbox n Overwrite Protection Enable */
+#define BITP_CAN_OPSS2_MB06                   6                               /* Mailbox n Overwrite Protection Enable */
+#define BITP_CAN_OPSS2_MB07                   7                               /* Mailbox n Overwrite Protection Enable */
+#define BITP_CAN_OPSS2_MB08                   8                               /* Mailbox n Overwrite Protection Enable */
+#define BITP_CAN_OPSS2_MB09                   9                               /* Mailbox n Overwrite Protection Enable */
+#define BITP_CAN_OPSS2_MB10                  10                               /* Mailbox n Overwrite Protection Enable */
+#define BITP_CAN_OPSS2_MB11                  11                               /* Mailbox n Overwrite Protection Enable */
+#define BITP_CAN_OPSS2_MB12                  12                               /* Mailbox n Overwrite Protection Enable */
+#define BITP_CAN_OPSS2_MB13                  13                               /* Mailbox n Overwrite Protection Enable */
+#define BITP_CAN_OPSS2_MB14                  14                               /* Mailbox n Overwrite Protection Enable */
+#define BITP_CAN_OPSS2_MB15                  15                               /* Mailbox n Overwrite Protection Enable */
+#define BITM_CAN_OPSS2_MB00                  (_ADI_MSK(0x00000001,uint16_t))  /* Mailbox n Overwrite Protection Enable */
+#define BITM_CAN_OPSS2_MB01                  (_ADI_MSK(0x00000002,uint16_t))  /* Mailbox n Overwrite Protection Enable */
+#define BITM_CAN_OPSS2_MB02                  (_ADI_MSK(0x00000004,uint16_t))  /* Mailbox n Overwrite Protection Enable */
+#define BITM_CAN_OPSS2_MB03                  (_ADI_MSK(0x00000008,uint16_t))  /* Mailbox n Overwrite Protection Enable */
+#define BITM_CAN_OPSS2_MB04                  (_ADI_MSK(0x00000010,uint16_t))  /* Mailbox n Overwrite Protection Enable */
+#define BITM_CAN_OPSS2_MB05                  (_ADI_MSK(0x00000020,uint16_t))  /* Mailbox n Overwrite Protection Enable */
+#define BITM_CAN_OPSS2_MB06                  (_ADI_MSK(0x00000040,uint16_t))  /* Mailbox n Overwrite Protection Enable */
+#define BITM_CAN_OPSS2_MB07                  (_ADI_MSK(0x00000080,uint16_t))  /* Mailbox n Overwrite Protection Enable */
+#define BITM_CAN_OPSS2_MB08                  (_ADI_MSK(0x00000100,uint16_t))  /* Mailbox n Overwrite Protection Enable */
+#define BITM_CAN_OPSS2_MB09                  (_ADI_MSK(0x00000200,uint16_t))  /* Mailbox n Overwrite Protection Enable */
+#define BITM_CAN_OPSS2_MB10                  (_ADI_MSK(0x00000400,uint16_t))  /* Mailbox n Overwrite Protection Enable */
+#define BITM_CAN_OPSS2_MB11                  (_ADI_MSK(0x00000800,uint16_t))  /* Mailbox n Overwrite Protection Enable */
+#define BITM_CAN_OPSS2_MB12                  (_ADI_MSK(0x00001000,uint16_t))  /* Mailbox n Overwrite Protection Enable */
+#define BITM_CAN_OPSS2_MB13                  (_ADI_MSK(0x00002000,uint16_t))  /* Mailbox n Overwrite Protection Enable */
+#define BITM_CAN_OPSS2_MB14                  (_ADI_MSK(0x00004000,uint16_t))  /* Mailbox n Overwrite Protection Enable */
+#define BITM_CAN_OPSS2_MB15                  (_ADI_MSK(0x00008000,uint16_t))  /* Mailbox n Overwrite Protection Enable */
 
 /* ------------------------------------------------------------------------------------------------------------------------
         CAN_CLK                              Pos/Masks                        Description
@@ -2137,14 +2136,14 @@
 #define BITP_CAN_DBG_MRB                      5                               /* Mode Read Back */
 #define BITP_CAN_DBG_MAA                      4                               /* Mode Auto Acknowledge */
 #define BITP_CAN_DBG_DIL                      3                               /* Disable Internal Loop */
-#define BITP_CAN_DBG_DTO                      2                               /* Disable Transmit Output Pin */
+#define BITP_CAN_DBG_DTO                      2                               /* Disable Tx Output Pin */
 #define BITP_CAN_DBG_DRI                      1                               /* Disable Receive Input Pin */
 #define BITP_CAN_DBG_DEC                      0                               /* Disable Transmit and Receive Error Counters */
 #define BITM_CAN_DBG_CDE                     (_ADI_MSK(0x00008000,uint16_t))  /* CAN Debug Mode Enable */
 #define BITM_CAN_DBG_MRB                     (_ADI_MSK(0x00000020,uint16_t))  /* Mode Read Back */
 #define BITM_CAN_DBG_MAA                     (_ADI_MSK(0x00000010,uint16_t))  /* Mode Auto Acknowledge */
 #define BITM_CAN_DBG_DIL                     (_ADI_MSK(0x00000008,uint16_t))  /* Disable Internal Loop */
-#define BITM_CAN_DBG_DTO                     (_ADI_MSK(0x00000004,uint16_t))  /* Disable Transmit Output Pin */
+#define BITM_CAN_DBG_DTO                     (_ADI_MSK(0x00000004,uint16_t))  /* Disable Tx Output Pin */
 #define BITM_CAN_DBG_DRI                     (_ADI_MSK(0x00000002,uint16_t))  /* Disable Receive Input Pin */
 #define BITM_CAN_DBG_DEC                     (_ADI_MSK(0x00000001,uint16_t))  /* Disable Transmit and Receive Error Counters */
 
@@ -2212,7 +2211,7 @@
 #define BITP_CAN_GIM_UIAIM                    5                               /* Unimplemented Address Interrupt Mask */
 #define BITP_CAN_GIM_WUIM                     4                               /* Wake Up Interrupt Mask */
 #define BITP_CAN_GIM_BOIM                     3                               /* Bus Off Interrupt Mask */
-#define BITP_CAN_GIM_EPIM                     2                               /* Error Warning Receive Interrupt Mask */
+#define BITP_CAN_GIM_EPIM                     2                               /* Error Passive Interrupt Mask */
 #define BITP_CAN_GIM_EWRIM                    1                               /* Error Warning Receive Interrupt Mask */
 #define BITP_CAN_GIM_EWTIM                    0                               /* Error Warning Transmit Interrupt Mask */
 #define BITM_CAN_GIM_ADIM                    (_ADI_MSK(0x00000400,uint16_t))  /* Access Denied Interrupt Mask */
@@ -2222,7 +2221,7 @@
 #define BITM_CAN_GIM_UIAIM                   (_ADI_MSK(0x00000020,uint16_t))  /* Unimplemented Address Interrupt Mask */
 #define BITM_CAN_GIM_WUIM                    (_ADI_MSK(0x00000010,uint16_t))  /* Wake Up Interrupt Mask */
 #define BITM_CAN_GIM_BOIM                    (_ADI_MSK(0x00000008,uint16_t))  /* Bus Off Interrupt Mask */
-#define BITM_CAN_GIM_EPIM                    (_ADI_MSK(0x00000004,uint16_t))  /* Error Warning Receive Interrupt Mask */
+#define BITM_CAN_GIM_EPIM                    (_ADI_MSK(0x00000004,uint16_t))  /* Error Passive Interrupt Mask */
 #define BITM_CAN_GIM_EWRIM                   (_ADI_MSK(0x00000002,uint16_t))  /* Error Warning Receive Interrupt Mask */
 #define BITM_CAN_GIM_EWTIM                   (_ADI_MSK(0x00000001,uint16_t))  /* Error Warning Transmit Interrupt Mask */
 
@@ -2236,7 +2235,7 @@
 #define BITP_CAN_GIF_UIAIF                    5                               /* Unimplemented Address Interrupt Flag */
 #define BITP_CAN_GIF_WUIF                     4                               /* Wake Up Interrupt Flag */
 #define BITP_CAN_GIF_BOIF                     3                               /* Bus Off Interrupt Flag */
-#define BITP_CAN_GIF_EPIF                     2                               /* Error Warning Receive Interrupt Flag */
+#define BITP_CAN_GIF_EPIF                     2                               /* Error Passive Interrupt Flag */
 #define BITP_CAN_GIF_EWRIF                    1                               /* Error Warning Receive Interrupt Flag */
 #define BITP_CAN_GIF_EWTIF                    0                               /* Error Warning Transmit Interrupt Flag */
 #define BITM_CAN_GIF_ADIF                    (_ADI_MSK(0x00000400,uint16_t))  /* Access Denied Interrupt Flag */
@@ -2246,7 +2245,7 @@
 #define BITM_CAN_GIF_UIAIF                   (_ADI_MSK(0x00000020,uint16_t))  /* Unimplemented Address Interrupt Flag */
 #define BITM_CAN_GIF_WUIF                    (_ADI_MSK(0x00000010,uint16_t))  /* Wake Up Interrupt Flag */
 #define BITM_CAN_GIF_BOIF                    (_ADI_MSK(0x00000008,uint16_t))  /* Bus Off Interrupt Flag */
-#define BITM_CAN_GIF_EPIF                    (_ADI_MSK(0x00000004,uint16_t))  /* Error Warning Receive Interrupt Flag */
+#define BITM_CAN_GIF_EPIF                    (_ADI_MSK(0x00000004,uint16_t))  /* Error Passive Interrupt Flag */
 #define BITM_CAN_GIF_EWRIF                   (_ADI_MSK(0x00000002,uint16_t))  /* Error Warning Receive Interrupt Flag */
 #define BITM_CAN_GIF_EWTIF                   (_ADI_MSK(0x00000001,uint16_t))  /* Error Warning Transmit Interrupt Flag */
 
@@ -2271,18 +2270,18 @@
 /* ------------------------------------------------------------------------------------------------------------------------
         CAN_INT                              Pos/Masks                        Description
    ------------------------------------------------------------------------------------------------------------------------ */
-#define BITP_CAN_INT_CANTRX                   7                               /* Serial Input From Transceiver */
+#define BITP_CAN_INT_CANRX                    7                               /* Serial Input From Transceiver */
 #define BITP_CAN_INT_CANTX                    6                               /* Serial Input To Transceiver */
 #define BITP_CAN_INT_SMACK                    3                               /* Sleep Mode Acknowledge */
 #define BITP_CAN_INT_GIRQ                     2                               /* Global CAN Interrupt Output */
 #define BITP_CAN_INT_MBTIRQ                   1                               /* Mailbox Transmit Interrupt Output */
-#define BITP_CAN_INT_MBIRQ                    0                               /* Mailbox Receive Interrupt Output */
-#define BITM_CAN_INT_CANTRX                  (_ADI_MSK(0x00000080,uint16_t))  /* Serial Input From Transceiver */
+#define BITP_CAN_INT_MBRIRQ                   0                               /* Mailbox Receive Interrupt Output */
+#define BITM_CAN_INT_CANRX                   (_ADI_MSK(0x00000080,uint16_t))  /* Serial Input From Transceiver */
 #define BITM_CAN_INT_CANTX                   (_ADI_MSK(0x00000040,uint16_t))  /* Serial Input To Transceiver */
 #define BITM_CAN_INT_SMACK                   (_ADI_MSK(0x00000008,uint16_t))  /* Sleep Mode Acknowledge */
 #define BITM_CAN_INT_GIRQ                    (_ADI_MSK(0x00000004,uint16_t))  /* Global CAN Interrupt Output */
 #define BITM_CAN_INT_MBTIRQ                  (_ADI_MSK(0x00000002,uint16_t))  /* Mailbox Transmit Interrupt Output */
-#define BITM_CAN_INT_MBIRQ                   (_ADI_MSK(0x00000001,uint16_t))  /* Mailbox Receive Interrupt Output */
+#define BITM_CAN_INT_MBRIRQ                  (_ADI_MSK(0x00000001,uint16_t))  /* Mailbox Receive Interrupt Output */
 
 /* ------------------------------------------------------------------------------------------------------------------------
         CAN_MBTD                             Pos/Masks                        Description
@@ -2347,34 +2346,34 @@
 /* ------------------------------------------------------------------------------------------------------------------------
         CAN_MBn_DATA0                        Pos/Masks                        Description
    ------------------------------------------------------------------------------------------------------------------------ */
-#define BITP_CAN_MB_DATA0_DFB6                8
-#define BITP_CAN_MB_DATA0_DFB7                0
-#define BITM_CAN_MB_DATA0_DFB6               (_ADI_MSK(0x0000FF00,uint16_t))
-#define BITM_CAN_MB_DATA0_DFB7               (_ADI_MSK(0x000000FF,uint16_t))
+#define BITP_CAN_MB_DATA0_DFB6                8                               /* Data Field Byte 6 */
+#define BITP_CAN_MB_DATA0_DFB7                0                               /* Data Field Byte 7 */
+#define BITM_CAN_MB_DATA0_DFB6               (_ADI_MSK(0x0000FF00,uint16_t))  /* Data Field Byte 6 */
+#define BITM_CAN_MB_DATA0_DFB7               (_ADI_MSK(0x000000FF,uint16_t))  /* Data Field Byte 7 */
 
 /* ------------------------------------------------------------------------------------------------------------------------
         CAN_MBn_DATA1                        Pos/Masks                        Description
    ------------------------------------------------------------------------------------------------------------------------ */
-#define BITP_CAN_MB_DATA1_DFB4                8
-#define BITP_CAN_MB_DATA1_DFB5                0
-#define BITM_CAN_MB_DATA1_DFB4               (_ADI_MSK(0x0000FF00,uint16_t))
-#define BITM_CAN_MB_DATA1_DFB5               (_ADI_MSK(0x000000FF,uint16_t))
+#define BITP_CAN_MB_DATA1_DFB4                8                               /* Data Field Byte 4 */
+#define BITP_CAN_MB_DATA1_DFB5                0                               /* Data Field Byte 5 */
+#define BITM_CAN_MB_DATA1_DFB4               (_ADI_MSK(0x0000FF00,uint16_t))  /* Data Field Byte 4 */
+#define BITM_CAN_MB_DATA1_DFB5               (_ADI_MSK(0x000000FF,uint16_t))  /* Data Field Byte 5 */
 
 /* ------------------------------------------------------------------------------------------------------------------------
         CAN_MBn_DATA2                        Pos/Masks                        Description
    ------------------------------------------------------------------------------------------------------------------------ */
-#define BITP_CAN_MB_DATA2_DFB2                8
-#define BITP_CAN_MB_DATA2_DFB3                0
-#define BITM_CAN_MB_DATA2_DFB2               (_ADI_MSK(0x0000FF00,uint16_t))
-#define BITM_CAN_MB_DATA2_DFB3               (_ADI_MSK(0x000000FF,uint16_t))
+#define BITP_CAN_MB_DATA2_DFB2                8                               /* Data Field Byte 2 */
+#define BITP_CAN_MB_DATA2_DFB3                0                               /* Data Field Byte 3 */
+#define BITM_CAN_MB_DATA2_DFB2               (_ADI_MSK(0x0000FF00,uint16_t))  /* Data Field Byte 2 */
+#define BITM_CAN_MB_DATA2_DFB3               (_ADI_MSK(0x000000FF,uint16_t))  /* Data Field Byte 3 */
 
 /* ------------------------------------------------------------------------------------------------------------------------
         CAN_MBn_DATA3                        Pos/Masks                        Description
    ------------------------------------------------------------------------------------------------------------------------ */
-#define BITP_CAN_MB_DATA3_DFB0                8
-#define BITP_CAN_MB_DATA3_DFB1                0
-#define BITM_CAN_MB_DATA3_DFB0               (_ADI_MSK(0x0000FF00,uint16_t))
-#define BITM_CAN_MB_DATA3_DFB1               (_ADI_MSK(0x000000FF,uint16_t))
+#define BITP_CAN_MB_DATA3_DFB0                8                               /* Data Field Byte 0 */
+#define BITP_CAN_MB_DATA3_DFB1                0                               /* Data Field Byte 1 */
+#define BITM_CAN_MB_DATA3_DFB0               (_ADI_MSK(0x0000FF00,uint16_t))  /* Data Field Byte 0 */
+#define BITM_CAN_MB_DATA3_DFB1               (_ADI_MSK(0x000000FF,uint16_t))  /* Data Field Byte 1 */
 
 /* ------------------------------------------------------------------------------------------------------------------------
         CAN_MBn_LENGTH                       Pos/Masks                        Description
@@ -6114,94 +6113,92 @@
 #define ENUM_EPPI_CTL2_FS1FIN_EN             (_ADI_MSK(0x00000002,uint32_t))  /* FS1FINEN: Finish sent after frame/line RX done */
 
 /* ==================================================
-        Motor Control PWM Unit Registers
+        Pulse-Width Modulator Registers
    ================================================== */
 
 /* =========================
         PWM0
    ========================= */
-#define REG_PWM0_CTL                    0xFFC1B000         /* PWM0 PWM Control Register */
-#define REG_PWM0_CHANCFG                0xFFC1B004         /* PWM0 PWM Channel Config Register */
-#define REG_PWM0_TRIPCFG                0xFFC1B008         /* PWM0 PWM Trip Config Register */
-#define REG_PWM0_STAT                   0xFFC1B00C         /* PWM0 PWM Status Register */
-#define REG_PWM0_IMSK                   0xFFC1B010         /* PWM0 PWM Interrupt Mask Register */
-#define REG_PWM0_ILAT                   0xFFC1B014         /* PWM0 PWM Interrupt Latch Register */
-#define REG_PWM0_CHOPCFG                0xFFC1B018         /* PWM0 PWM Chop Configuration Register */
-#define REG_PWM0_DT                     0xFFC1B01C         /* PWM0 PWM Dead Time Register */
+#define REG_PWM0_CTL                    0xFFC1B000         /* PWM0 Control Register */
+#define REG_PWM0_CHANCFG                0xFFC1B004         /* PWM0 Channel Config Register */
+#define REG_PWM0_TRIPCFG                0xFFC1B008         /* PWM0 Trip Config Register */
+#define REG_PWM0_STAT                   0xFFC1B00C         /* PWM0 Status Register */
+#define REG_PWM0_IMSK                   0xFFC1B010         /* PWM0 Interrupt Mask Register */
+#define REG_PWM0_ILAT                   0xFFC1B014         /* PWM0 Interrupt Latch Register */
+#define REG_PWM0_CHOPCFG                0xFFC1B018         /* PWM0 Chop Configuration Register */
+#define REG_PWM0_DT                     0xFFC1B01C         /* PWM0 Dead Time Register */
 #define REG_PWM0_SYNC_WID               0xFFC1B020         /* PWM0 Sync Pulse Width Register */
-#define REG_PWM0_TM0                    0xFFC1B024         /* PWM0 Timer0 Period register */
-#define REG_PWM0_TM1                    0xFFC1B028         /* PWM0 Timer1 Period register */
-#define REG_PWM0_TM2                    0xFFC1B02C         /* PWM0 Timer2 Period register */
-#define REG_PWM0_TM3                    0xFFC1B030         /* PWM0 Timer3 Period register */
-#define REG_PWM0_TM4                    0xFFC1B034         /* PWM0 Timer4 Period register */
-#define REG_PWM0_DLYA                   0xFFC1B038         /* PWM0 Channel A Delay register */
-#define REG_PWM0_DLYB                   0xFFC1B03C         /* PWM0 Channel B Delay register */
-#define REG_PWM0_DLYC                   0xFFC1B040         /* PWM0 Channel C Delay register */
-#define REG_PWM0_DLYD                   0xFFC1B044         /* PWM0 Channel D Delay register */
-#define REG_PWM0_ACTL                   0xFFC1B048         /* PWM0 Channel A Control register */
-#define REG_PWM0_AH0                    0xFFC1B04C         /* PWM0 Channel A High Duty-0 register */
-#define REG_PWM0_AH1                    0xFFC1B050         /* PWM0 Channel A High Duty-1 register */
-#define REG_PWM0_AL0                    0xFFC1B05C         /* PWM0 Channel A Low Duty-0 register */
-#define REG_PWM0_AL1                    0xFFC1B060         /* PWM0 Channel A Low Duty-1 register */
-#define REG_PWM0_BCTL                   0xFFC1B064         /* PWM0 Channel B Control register */
-#define REG_PWM0_BH0                    0xFFC1B068         /* PWM0 Channel B High Duty-0 register */
-#define REG_PWM0_BH1                    0xFFC1B06C         /* PWM0 Channel B High Duty-1 register */
-#define REG_PWM0_BL0                    0xFFC1B078         /* PWM0 Channel B Low Duty-0 register */
-#define REG_PWM0_BL1                    0xFFC1B07C         /* PWM0 Channel B Low Duty-1 register */
-#define REG_PWM0_CCTL                   0xFFC1B080         /* PWM0 Channel C Control register */
-#define REG_PWM0_CH0                    0xFFC1B084         /* PWM0 Channel C High Duty-0 register */
-#define REG_PWM0_CH1                    0xFFC1B088         /* PWM0 Channel C High Duty-1 register */
-#define REG_PWM0_CL0                    0xFFC1B094         /* PWM0 Channel C Low Duty-0 register */
-#define REG_PWM0_CL1                    0xFFC1B098         /* PWM0 Channel C Low Duty-1 register */
-#define REG_PWM0_DCTL                   0xFFC1B09C         /* PWM0 Channel D Control register */
-#define REG_PWM0_DH0                    0xFFC1B0A0         /* PWM0 Channel D High Duty-0 register */
-#define REG_PWM0_DH1                    0xFFC1B0A4         /* PWM0 Channel D High Duty-1 register */
-#define REG_PWM0_DL0                    0xFFC1B0B0         /* PWM0 Channel D Low Duty-0 register */
-#define REG_PWM0_DL1                    0xFFC1B0B4         /* PWM0 Channel D Low Duty-1 register */
-#define REG_PWM0_REVID                  0xFFC1B0FC         /* PWM0 PWM Revision ID Register */
+#define REG_PWM0_TM0                    0xFFC1B024         /* PWM0 Timer 0 Period Register */
+#define REG_PWM0_TM1                    0xFFC1B028         /* PWM0 Timer 1 Period Register */
+#define REG_PWM0_TM2                    0xFFC1B02C         /* PWM0 Timer 2 Period Register */
+#define REG_PWM0_TM3                    0xFFC1B030         /* PWM0 Timer 3 Period Register */
+#define REG_PWM0_TM4                    0xFFC1B034         /* PWM0 Timer 4 Period Register */
+#define REG_PWM0_DLYA                   0xFFC1B038         /* PWM0 Channel A Delay Register */
+#define REG_PWM0_DLYB                   0xFFC1B03C         /* PWM0 Channel B Delay Register */
+#define REG_PWM0_DLYC                   0xFFC1B040         /* PWM0 Channel C Delay Register */
+#define REG_PWM0_DLYD                   0xFFC1B044         /* PWM0 Channel D Delay Register */
+#define REG_PWM0_ACTL                   0xFFC1B048         /* PWM0 Channel A Control Register */
+#define REG_PWM0_AH0                    0xFFC1B04C         /* PWM0 Channel A-High Duty-0 Register */
+#define REG_PWM0_AH1                    0xFFC1B050         /* PWM0 Channel A-High Duty-1 Register */
+#define REG_PWM0_AL0                    0xFFC1B05C         /* PWM0 Channel A-Low Duty-0 Register */
+#define REG_PWM0_AL1                    0xFFC1B060         /* PWM0 Channel A-Low Duty-1 Register */
+#define REG_PWM0_BCTL                   0xFFC1B064         /* PWM0 Channel B Control Register */
+#define REG_PWM0_BH0                    0xFFC1B068         /* PWM0 Channel B-High Duty-0 Register */
+#define REG_PWM0_BH1                    0xFFC1B06C         /* PWM0 Channel B-High Duty-1 Register */
+#define REG_PWM0_BL0                    0xFFC1B078         /* PWM0 Channel B-Low Duty-0 Register */
+#define REG_PWM0_BL1                    0xFFC1B07C         /* PWM0 Channel B-Low Duty-1 Register */
+#define REG_PWM0_CCTL                   0xFFC1B080         /* PWM0 Channel C Control Register */
+#define REG_PWM0_CH0                    0xFFC1B084         /* PWM0 Channel C-High Pulse Duty Register 0 */
+#define REG_PWM0_CH1                    0xFFC1B088         /* PWM0 Channel C-High Pulse Duty Register 1 */
+#define REG_PWM0_CL0                    0xFFC1B094         /* PWM0 Channel C-Low Pulse Duty Register 0 */
+#define REG_PWM0_CL1                    0xFFC1B098         /* PWM0 Channel C-Low Duty-1 Register */
+#define REG_PWM0_DCTL                   0xFFC1B09C         /* PWM0 Channel D Control Register */
+#define REG_PWM0_DH0                    0xFFC1B0A0         /* PWM0 Channel D-High Duty-0 Register */
+#define REG_PWM0_DH1                    0xFFC1B0A4         /* PWM0 Channel D-High Pulse Duty Register 1 */
+#define REG_PWM0_DL0                    0xFFC1B0B0         /* PWM0 Channel D-Low Pulse Duty Register 0 */
+#define REG_PWM0_DL1                    0xFFC1B0B4         /* PWM0 Channel D-Low Pulse Duty Register 1 */
 
 /* =========================
         PWM1
    ========================= */
-#define REG_PWM1_CTL                    0xFFC1B400         /* PWM1 PWM Control Register */
-#define REG_PWM1_CHANCFG                0xFFC1B404         /* PWM1 PWM Channel Config Register */
-#define REG_PWM1_TRIPCFG                0xFFC1B408         /* PWM1 PWM Trip Config Register */
-#define REG_PWM1_STAT                   0xFFC1B40C         /* PWM1 PWM Status Register */
-#define REG_PWM1_IMSK                   0xFFC1B410         /* PWM1 PWM Interrupt Mask Register */
-#define REG_PWM1_ILAT                   0xFFC1B414         /* PWM1 PWM Interrupt Latch Register */
-#define REG_PWM1_CHOPCFG                0xFFC1B418         /* PWM1 PWM Chop Configuration Register */
-#define REG_PWM1_DT                     0xFFC1B41C         /* PWM1 PWM Dead Time Register */
+#define REG_PWM1_CTL                    0xFFC1B400         /* PWM1 Control Register */
+#define REG_PWM1_CHANCFG                0xFFC1B404         /* PWM1 Channel Config Register */
+#define REG_PWM1_TRIPCFG                0xFFC1B408         /* PWM1 Trip Config Register */
+#define REG_PWM1_STAT                   0xFFC1B40C         /* PWM1 Status Register */
+#define REG_PWM1_IMSK                   0xFFC1B410         /* PWM1 Interrupt Mask Register */
+#define REG_PWM1_ILAT                   0xFFC1B414         /* PWM1 Interrupt Latch Register */
+#define REG_PWM1_CHOPCFG                0xFFC1B418         /* PWM1 Chop Configuration Register */
+#define REG_PWM1_DT                     0xFFC1B41C         /* PWM1 Dead Time Register */
 #define REG_PWM1_SYNC_WID               0xFFC1B420         /* PWM1 Sync Pulse Width Register */
-#define REG_PWM1_TM0                    0xFFC1B424         /* PWM1 Timer0 Period register */
-#define REG_PWM1_TM1                    0xFFC1B428         /* PWM1 Timer1 Period register */
-#define REG_PWM1_TM2                    0xFFC1B42C         /* PWM1 Timer2 Period register */
-#define REG_PWM1_TM3                    0xFFC1B430         /* PWM1 Timer3 Period register */
-#define REG_PWM1_TM4                    0xFFC1B434         /* PWM1 Timer4 Period register */
-#define REG_PWM1_DLYA                   0xFFC1B438         /* PWM1 Channel A Delay register */
-#define REG_PWM1_DLYB                   0xFFC1B43C         /* PWM1 Channel B Delay register */
-#define REG_PWM1_DLYC                   0xFFC1B440         /* PWM1 Channel C Delay register */
-#define REG_PWM1_DLYD                   0xFFC1B444         /* PWM1 Channel D Delay register */
-#define REG_PWM1_ACTL                   0xFFC1B448         /* PWM1 Channel A Control register */
-#define REG_PWM1_AH0                    0xFFC1B44C         /* PWM1 Channel A High Duty-0 register */
-#define REG_PWM1_AH1                    0xFFC1B450         /* PWM1 Channel A High Duty-1 register */
-#define REG_PWM1_AL0                    0xFFC1B45C         /* PWM1 Channel A Low Duty-0 register */
-#define REG_PWM1_AL1                    0xFFC1B460         /* PWM1 Channel A Low Duty-1 register */
-#define REG_PWM1_BCTL                   0xFFC1B464         /* PWM1 Channel B Control register */
-#define REG_PWM1_BH0                    0xFFC1B468         /* PWM1 Channel B High Duty-0 register */
-#define REG_PWM1_BH1                    0xFFC1B46C         /* PWM1 Channel B High Duty-1 register */
-#define REG_PWM1_BL0                    0xFFC1B478         /* PWM1 Channel B Low Duty-0 register */
-#define REG_PWM1_BL1                    0xFFC1B47C         /* PWM1 Channel B Low Duty-1 register */
-#define REG_PWM1_CCTL                   0xFFC1B480         /* PWM1 Channel C Control register */
-#define REG_PWM1_CH0                    0xFFC1B484         /* PWM1 Channel C High Duty-0 register */
-#define REG_PWM1_CH1                    0xFFC1B488         /* PWM1 Channel C High Duty-1 register */
-#define REG_PWM1_CL0                    0xFFC1B494         /* PWM1 Channel C Low Duty-0 register */
-#define REG_PWM1_CL1                    0xFFC1B498         /* PWM1 Channel C Low Duty-1 register */
-#define REG_PWM1_DCTL                   0xFFC1B49C         /* PWM1 Channel D Control register */
-#define REG_PWM1_DH0                    0xFFC1B4A0         /* PWM1 Channel D High Duty-0 register */
-#define REG_PWM1_DH1                    0xFFC1B4A4         /* PWM1 Channel D High Duty-1 register */
-#define REG_PWM1_DL0                    0xFFC1B4B0         /* PWM1 Channel D Low Duty-0 register */
-#define REG_PWM1_DL1                    0xFFC1B4B4         /* PWM1 Channel D Low Duty-1 register */
-#define REG_PWM1_REVID                  0xFFC1B4FC         /* PWM1 PWM Revision ID Register */
+#define REG_PWM1_TM0                    0xFFC1B424         /* PWM1 Timer 0 Period Register */
+#define REG_PWM1_TM1                    0xFFC1B428         /* PWM1 Timer 1 Period Register */
+#define REG_PWM1_TM2                    0xFFC1B42C         /* PWM1 Timer 2 Period Register */
+#define REG_PWM1_TM3                    0xFFC1B430         /* PWM1 Timer 3 Period Register */
+#define REG_PWM1_TM4                    0xFFC1B434         /* PWM1 Timer 4 Period Register */
+#define REG_PWM1_DLYA                   0xFFC1B438         /* PWM1 Channel A Delay Register */
+#define REG_PWM1_DLYB                   0xFFC1B43C         /* PWM1 Channel B Delay Register */
+#define REG_PWM1_DLYC                   0xFFC1B440         /* PWM1 Channel C Delay Register */
+#define REG_PWM1_DLYD                   0xFFC1B444         /* PWM1 Channel D Delay Register */
+#define REG_PWM1_ACTL                   0xFFC1B448         /* PWM1 Channel A Control Register */
+#define REG_PWM1_AH0                    0xFFC1B44C         /* PWM1 Channel A-High Duty-0 Register */
+#define REG_PWM1_AH1                    0xFFC1B450         /* PWM1 Channel A-High Duty-1 Register */
+#define REG_PWM1_AL0                    0xFFC1B45C         /* PWM1 Channel A-Low Duty-0 Register */
+#define REG_PWM1_AL1                    0xFFC1B460         /* PWM1 Channel A-Low Duty-1 Register */
+#define REG_PWM1_BCTL                   0xFFC1B464         /* PWM1 Channel B Control Register */
+#define REG_PWM1_BH0                    0xFFC1B468         /* PWM1 Channel B-High Duty-0 Register */
+#define REG_PWM1_BH1                    0xFFC1B46C         /* PWM1 Channel B-High Duty-1 Register */
+#define REG_PWM1_BL0                    0xFFC1B478         /* PWM1 Channel B-Low Duty-0 Register */
+#define REG_PWM1_BL1                    0xFFC1B47C         /* PWM1 Channel B-Low Duty-1 Register */
+#define REG_PWM1_CCTL                   0xFFC1B480         /* PWM1 Channel C Control Register */
+#define REG_PWM1_CH0                    0xFFC1B484         /* PWM1 Channel C-High Pulse Duty Register 0 */
+#define REG_PWM1_CH1                    0xFFC1B488         /* PWM1 Channel C-High Pulse Duty Register 1 */
+#define REG_PWM1_CL0                    0xFFC1B494         /* PWM1 Channel C-Low Pulse Duty Register 0 */
+#define REG_PWM1_CL1                    0xFFC1B498         /* PWM1 Channel C-Low Duty-1 Register */
+#define REG_PWM1_DCTL                   0xFFC1B49C         /* PWM1 Channel D Control Register */
+#define REG_PWM1_DH0                    0xFFC1B4A0         /* PWM1 Channel D-High Duty-0 Register */
+#define REG_PWM1_DH1                    0xFFC1B4A4         /* PWM1 Channel D-High Pulse Duty Register 1 */
+#define REG_PWM1_DL0                    0xFFC1B4B0         /* PWM1 Channel D-Low Pulse Duty Register 0 */
+#define REG_PWM1_DL1                    0xFFC1B4B4         /* PWM1 Channel D-Low Pulse Duty Register 1 */
 
 /* =========================
         PWM
@@ -6212,51 +6209,51 @@
 #define BITP_PWM_CTL_INTSYNCREF              18                               /* Timer reference for Internal Sync */
 #define BITP_PWM_CTL_EXTSYNCSEL              17                               /* External Sync Select */
 #define BITP_PWM_CTL_EXTSYNC                 16                               /* External Sync */
-#define BITP_PWM_CTL_DLYDEN                   7                               /* Enable Delay Counter for Channel-D */
-#define BITP_PWM_CTL_DLYCEN                   6                               /* Enable Delay Counter for Channel-C */
-#define BITP_PWM_CTL_DLYBEN                   5                               /* Enable Delay Counter for Channel-B */
-#define BITP_PWM_CTL_DLYAEN                   4                               /* Enable Delay Counter for Channel-A */
-#define BITP_PWM_CTL_SWTRIP                   2                               /* Fault Trip Condition */
+#define BITP_PWM_CTL_DLYDEN                   7                               /* Enable Delay Counter for Channel D */
+#define BITP_PWM_CTL_DLYCEN                   6                               /* Enable Delay Counter for Channel C */
+#define BITP_PWM_CTL_DLYBEN                   5                               /* Enable Delay Counter for Channel B */
+#define BITP_PWM_CTL_DLYAEN                   4                               /* Enable Delay Counter for Channel A */
+#define BITP_PWM_CTL_SWTRIP                   2                               /* Software Trip */
 #define BITP_PWM_CTL_EMURUN                   1                               /* Output Behavior During Emulation Mode */
 #define BITP_PWM_CTL_GLOBEN                   0                               /* Module Enable */
 
 #define BITM_PWM_CTL_INTSYNCREF              (_ADI_MSK(0x001C0000,uint32_t))  /* Timer reference for Internal Sync */
-#define ENUM_PWM_CTL_INTSYNC_0               (_ADI_MSK(0x00000000,uint32_t))  /* INTSYNCREF: TMR0 */
-#define ENUM_PWM_CTL_INTSYNC_1               (_ADI_MSK(0x00040000,uint32_t))  /* INTSYNCREF: TMR1 */
-#define ENUM_PWM_CTL_INTSYNC_2               (_ADI_MSK(0x00080000,uint32_t))  /* INTSYNCREF: TMR2 */
-#define ENUM_PWM_CTL_INTSYNC_3               (_ADI_MSK(0x000C0000,uint32_t))  /* INTSYNCREF: TMR3 */
-#define ENUM_PWM_CTL_INTSYNC_4               (_ADI_MSK(0x00100000,uint32_t))  /* INTSYNCREF: TMR4 */
+#define ENUM_PWM_CTL_INTSYNC_0               (_ADI_MSK(0x00000000,uint32_t))  /* INTSYNCREF: PWMTMR0 provides sync reference */
+#define ENUM_PWM_CTL_INTSYNC_1               (_ADI_MSK(0x00040000,uint32_t))  /* INTSYNCREF: PWMTMR1 provides sync reference */
+#define ENUM_PWM_CTL_INTSYNC_2               (_ADI_MSK(0x00080000,uint32_t))  /* INTSYNCREF: PWMTMR2 provides sync reference */
+#define ENUM_PWM_CTL_INTSYNC_3               (_ADI_MSK(0x000C0000,uint32_t))  /* INTSYNCREF: PWMTMR3 provides sync reference */
+#define ENUM_PWM_CTL_INTSYNC_4               (_ADI_MSK(0x00100000,uint32_t))  /* INTSYNCREF: PWMTMR4 provides sync reference */
 
 #define BITM_PWM_CTL_EXTSYNCSEL              (_ADI_MSK(0x00020000,uint32_t))  /* External Sync Select */
-#define ENUM_PWM_CTL_EXTSYNC_ASYNC           (_ADI_MSK(0x00000000,uint32_t))  /* EXTSYNCSEL: Async */
-#define ENUM_PWM_CTL_EXTSYNC_SYNC            (_ADI_MSK(0x00020000,uint32_t))  /* EXTSYNCSEL: Sync */
+#define ENUM_PWM_CTL_EXTSYNC_ASYNC           (_ADI_MSK(0x00000000,uint32_t))  /* EXTSYNCSEL: Asynchronous External Sync */
+#define ENUM_PWM_CTL_EXTSYNC_SYNC            (_ADI_MSK(0x00020000,uint32_t))  /* EXTSYNCSEL: Synchronous External Sync */
 
 #define BITM_PWM_CTL_EXTSYNC                 (_ADI_MSK(0x00010000,uint32_t))  /* External Sync */
 #define ENUM_PWM_CTL_INTSYNC                 (_ADI_MSK(0x00000000,uint32_t))  /* EXTSYNC: Internal sync used */
 #define ENUM_PWM_CTL_EXTSYNC                 (_ADI_MSK(0x00010000,uint32_t))  /* EXTSYNC: External sync used */
 
-#define BITM_PWM_CTL_DLYDEN                  (_ADI_MSK(0x00000080,uint32_t))  /* Enable Delay Counter for Channel-D */
+#define BITM_PWM_CTL_DLYDEN                  (_ADI_MSK(0x00000080,uint32_t))  /* Enable Delay Counter for Channel D */
 #define ENUM_PWM_CTL_DLYD_DIS                (_ADI_MSK(0x00000000,uint32_t))  /* DLYDEN: Disable */
 #define ENUM_PWM_CTL_DLYD_EN                 (_ADI_MSK(0x00000080,uint32_t))  /* DLYDEN: Enable */
 
-#define BITM_PWM_CTL_DLYCEN                  (_ADI_MSK(0x00000040,uint32_t))  /* Enable Delay Counter for Channel-C */
+#define BITM_PWM_CTL_DLYCEN                  (_ADI_MSK(0x00000040,uint32_t))  /* Enable Delay Counter for Channel C */
 #define ENUM_PWM_CTL_DLYC_DIS                (_ADI_MSK(0x00000000,uint32_t))  /* DLYCEN: Disable */
 #define ENUM_PWM_CTL_DLYC_EN                 (_ADI_MSK(0x00000040,uint32_t))  /* DLYCEN: Enable */
 
-#define BITM_PWM_CTL_DLYBEN                  (_ADI_MSK(0x00000020,uint32_t))  /* Enable Delay Counter for Channel-B */
+#define BITM_PWM_CTL_DLYBEN                  (_ADI_MSK(0x00000020,uint32_t))  /* Enable Delay Counter for Channel B */
 #define ENUM_PWM_CTL_DLYB_DIS                (_ADI_MSK(0x00000000,uint32_t))  /* DLYBEN: Disable */
 #define ENUM_PWM_CTL_DLYB_EN                 (_ADI_MSK(0x00000020,uint32_t))  /* DLYBEN: Enable */
 
-#define BITM_PWM_CTL_DLYAEN                  (_ADI_MSK(0x00000010,uint32_t))  /* Enable Delay Counter for Channel-A */
+#define BITM_PWM_CTL_DLYAEN                  (_ADI_MSK(0x00000010,uint32_t))  /* Enable Delay Counter for Channel A */
 #define ENUM_PWM_CTL_DLYA_DIS                (_ADI_MSK(0x00000000,uint32_t))  /* DLYAEN: Disable */
 #define ENUM_PWM_CTL_DLYA_EN                 (_ADI_MSK(0x00000010,uint32_t))  /* DLYAEN: Enable */
 
-#define BITM_PWM_CTL_SWTRIP                  (_ADI_MSK(0x00000004,uint32_t))  /* Fault Trip Condition */
-#define ENUM_PWM_CTL_FORCE_TRIP              (_ADI_MSK(0x00000004,uint32_t))  /* SWTRIP: Force a Fault trip condition */
+#define BITM_PWM_CTL_SWTRIP                  (_ADI_MSK(0x00000004,uint32_t))  /* Software Trip */
+#define ENUM_PWM_CTL_FORCE_TRIP              (_ADI_MSK(0x00000004,uint32_t))  /* SWTRIP: Force a Fault Trip Condition */
 
 #define BITM_PWM_CTL_EMURUN                  (_ADI_MSK(0x00000002,uint32_t))  /* Output Behavior During Emulation Mode */
-#define ENUM_PWM_CTL_EMURUN_DIS              (_ADI_MSK(0x00000000,uint32_t))  /* EMURUN: Outputs disabled */
-#define ENUM_PWM_CTL_EMURUN_EN               (_ADI_MSK(0x00000002,uint32_t))  /* EMURUN: Outputs enabled */
+#define ENUM_PWM_CTL_EMURUN_DIS              (_ADI_MSK(0x00000000,uint32_t))  /* EMURUN: Disable Outputs */
+#define ENUM_PWM_CTL_EMURUN_EN               (_ADI_MSK(0x00000002,uint32_t))  /* EMURUN: Enable Outputs */
 
 #define BITM_PWM_CTL_GLOBEN                  (_ADI_MSK(0x00000001,uint32_t))  /* Module Enable */
 #define ENUM_PWM_CTL_PWM_DIS                 (_ADI_MSK(0x00000000,uint32_t))  /* GLOBEN: Disable */
@@ -6265,146 +6262,126 @@
 /* ------------------------------------------------------------------------------------------------------------------------
         PWM_CHANCFG                          Pos/Masks                        Description
    ------------------------------------------------------------------------------------------------------------------------ */
-#define BITP_PWM_CHANCFG_ENCHOPDL            30                               /* Channel-D Gate Chopping Enable Low Side */
-#define BITP_PWM_CHANCFG_POLDL               29                               /* Channel-D Lo side Polarity */
-#define BITP_PWM_CHANCFG_ENHPDH              28                               /* Channel-D Hi Precision enable for Hi side Output */
-#define BITP_PWM_CHANCFG_ENCHOPDH            27                               /* Channel-D Gate Chopping Enable High Side */
-#define BITP_PWM_CHANCFG_POLDH               26                               /* Channel-D High side Polarity */
-#define BITP_PWM_CHANCFG_MODELSD             25                               /* Channel-D Mode of Lo Side Output */
-#define BITP_PWM_CHANCFG_REFTMRD             24                               /* Channel-D Timer Reference */
-#define BITP_PWM_CHANCFG_ENCHOPCL            22                               /* Channel-C Gate Chopping Enable Low Side */
-#define BITP_PWM_CHANCFG_POLCL               21                               /* Channel-C Lo side Polarity */
-#define BITP_PWM_CHANCFG_ENHPCH              20                               /* Channel-C Hi Precision enable for Hi side Output */
-#define BITP_PWM_CHANCFG_ENCHOPCH            19                               /* Channel-C Gate Chopping Enable High Side */
-#define BITP_PWM_CHANCFG_POLCH               18                               /* Channel-C High side Polarity */
-#define BITP_PWM_CHANCFG_MODELSC             17                               /* Channel-C Mode of Lo Side Output */
-#define BITP_PWM_CHANCFG_REFTMRC             16                               /* Channel-C Timer Reference */
-#define BITP_PWM_CHANCFG_ENCHOPBL            14                               /* Channel-B Gate Chopping Enable Low Side */
-#define BITP_PWM_CHANCFG_POLBL               13                               /* Channel-B Lo side Polarity */
-#define BITP_PWM_CHANCFG_ENHPBH              12                               /* Channel-B Hi Precision enable for Hi side Output */
-#define BITP_PWM_CHANCFG_ENCHOPBH            11                               /* Channel-B Gate Chopping Enable High Side */
-#define BITP_PWM_CHANCFG_POLBH               10                               /* Channel-B High side Polarity */
-#define BITP_PWM_CHANCFG_MODELSB              9                               /* Channel-B Mode of Lo Side Output */
-#define BITP_PWM_CHANCFG_REFTMRB              8                               /* Channel-B Timer Reference */
-#define BITP_PWM_CHANCFG_ENCHOPAL             6                               /* Channel-A Gate Chopping Enable Low Side */
-#define BITP_PWM_CHANCFG_POLAL                5                               /* Channel-A Lo side Polarity */
-#define BITP_PWM_CHANCFG_ENHPAH               4                               /* Channel-A Hi Precision enable for Hi side Output */
-#define BITP_PWM_CHANCFG_ENCHOPAH             3                               /* Channel-A Gate Chopping Enable High Side */
-#define BITP_PWM_CHANCFG_POLAH                2                               /* Channel-A High side Polarity */
-#define BITP_PWM_CHANCFG_MODELSA              1                               /* Channel-A Mode of Lo Side Output */
-#define BITP_PWM_CHANCFG_REFTMRA              0                               /* Channel-A Timer Reference */
+#define BITP_PWM_CHANCFG_ENCHOPDL            30                               /* Channel D Gate Chopping Enable Low Side */
+#define BITP_PWM_CHANCFG_POLDL               29                               /* Channel D low side Polarity */
+#define BITP_PWM_CHANCFG_ENCHOPDH            27                               /* Channel D Gate Chopping Enable High Side */
+#define BITP_PWM_CHANCFG_POLDH               26                               /* Channel D High side Polarity */
+#define BITP_PWM_CHANCFG_MODELSD             25                               /* Channel D Mode of low Side Output */
+#define BITP_PWM_CHANCFG_REFTMRD             24                               /* Channel D Timer Reference */
+#define BITP_PWM_CHANCFG_ENCHOPCL            22                               /* Channel C Gate Chopping Enable Low Side */
+#define BITP_PWM_CHANCFG_POLCL               21                               /* Channel C low side Polarity */
+#define BITP_PWM_CHANCFG_ENCHOPCH            19                               /* Channel C Gate Chopping Enable High Side */
+#define BITP_PWM_CHANCFG_POLCH               18                               /* Channel C High side Polarity */
+#define BITP_PWM_CHANCFG_MODELSC             17                               /* Channel C Mode of low Side Output */
+#define BITP_PWM_CHANCFG_REFTMRC             16                               /* Channel C Timer Reference */
+#define BITP_PWM_CHANCFG_ENCHOPBL            14                               /* Channel B Gate Chopping Enable Low Side */
+#define BITP_PWM_CHANCFG_POLBL               13                               /* Channel B low side Polarity */
+#define BITP_PWM_CHANCFG_ENCHOPBH            11                               /* Channel B Gate Chopping Enable High Side */
+#define BITP_PWM_CHANCFG_POLBH               10                               /* Channel B High side Polarity */
+#define BITP_PWM_CHANCFG_MODELSB              9                               /* Channel B Mode of low Side Output */
+#define BITP_PWM_CHANCFG_REFTMRB              8                               /* Channel B Timer Reference */
+#define BITP_PWM_CHANCFG_ENCHOPAL             6                               /* Channel A Gate Chopping Enable Low Side */
+#define BITP_PWM_CHANCFG_POLAL                5                               /* Channel A low side Polarity */
+#define BITP_PWM_CHANCFG_ENCHOPAH             3                               /* Channel A Gate Chopping Enable High Side */
+#define BITP_PWM_CHANCFG_POLAH                2                               /* Channel A High side Polarity */
+#define BITP_PWM_CHANCFG_MODELSA              1                               /* Channel A Mode of low Side Output */
+#define BITP_PWM_CHANCFG_REFTMRA              0                               /* Channel A Timer Reference */
 
-#define BITM_PWM_CHANCFG_ENCHOPDL            (_ADI_MSK(0x40000000,uint32_t))  /* Channel-D Gate Chopping Enable Low Side */
-#define ENUM_PWM_CHANCFG_CHOPDL_DIS          (_ADI_MSK(0x00000000,uint32_t))  /* ENCHOPDL: Disable */
-#define ENUM_PWM_CHANCFG_CHOPDL_EN           (_ADI_MSK(0x40000000,uint32_t))  /* ENCHOPDL: Enable */
+#define BITM_PWM_CHANCFG_ENCHOPDL            (_ADI_MSK(0x40000000,uint32_t))  /* Channel D Gate Chopping Enable Low Side */
+#define ENUM_PWM_CHANCFG_CHOPDL_DIS          (_ADI_MSK(0x00000000,uint32_t))  /* ENCHOPDL: Disable Chopping Channel D Low Side */
+#define ENUM_PWM_CHANCFG_CHOPDL_EN           (_ADI_MSK(0x40000000,uint32_t))  /* ENCHOPDL: Enable Chopping Channel D Low Side */
 
-#define BITM_PWM_CHANCFG_POLDL               (_ADI_MSK(0x20000000,uint32_t))  /* Channel-D Lo side Polarity */
+#define BITM_PWM_CHANCFG_POLDL               (_ADI_MSK(0x20000000,uint32_t))  /* Channel D low side Polarity */
 #define ENUM_PWM_CHANCFG_DL_ACTLO            (_ADI_MSK(0x00000000,uint32_t))  /* POLDL: Active Low */
 #define ENUM_PWM_CHANCFG_DL_ACTHI            (_ADI_MSK(0x20000000,uint32_t))  /* POLDL: Active High */
 
-#define BITM_PWM_CHANCFG_ENHPDH              (_ADI_MSK(0x10000000,uint32_t))  /* Channel-D Hi Precision enable for Hi side Output */
-#define ENUM_PWM_CHANCFG_HPDH_DIS            (_ADI_MSK(0x00000000,uint32_t))  /* ENHPDH: Disable */
-#define ENUM_PWM_CHANCFG_HPDH_EN             (_ADI_MSK(0x10000000,uint32_t))  /* ENHPDH: Enable */
+#define BITM_PWM_CHANCFG_ENCHOPDH            (_ADI_MSK(0x08000000,uint32_t))  /* Channel D Gate Chopping Enable High Side */
+#define ENUM_PWM_CHANCFG_CHOPDH_DIS          (_ADI_MSK(0x00000000,uint32_t))  /* ENCHOPDH: Disable Chopping Channel D High Side */
+#define ENUM_PWM_CHANCFG_CHOPDH_EN           (_ADI_MSK(0x08000000,uint32_t))  /* ENCHOPDH: Enable Chopping Channel D High Side */
 
-#define BITM_PWM_CHANCFG_ENCHOPDH            (_ADI_MSK(0x08000000,uint32_t))  /* Channel-D Gate Chopping Enable High Side */
-#define ENUM_PWM_CHANCFG_CHOPDH_DIS          (_ADI_MSK(0x00000000,uint32_t))  /* ENCHOPDH: Disable */
-#define ENUM_PWM_CHANCFG_CHOPDH_EN           (_ADI_MSK(0x08000000,uint32_t))  /* ENCHOPDH: Enable */
-
-#define BITM_PWM_CHANCFG_POLDH               (_ADI_MSK(0x04000000,uint32_t))  /* Channel-D High side Polarity */
+#define BITM_PWM_CHANCFG_POLDH               (_ADI_MSK(0x04000000,uint32_t))  /* Channel D High side Polarity */
 #define ENUM_PWM_CHANCFG_DH_ACTLO            (_ADI_MSK(0x00000000,uint32_t))  /* POLDH: Active Low */
 #define ENUM_PWM_CHANCFG_DH_ACTHI            (_ADI_MSK(0x04000000,uint32_t))  /* POLDH: Active High */
 
-#define BITM_PWM_CHANCFG_MODELSD             (_ADI_MSK(0x02000000,uint32_t))  /* Channel-D Mode of Lo Side Output */
-#define ENUM_PWM_CHANCFG_LOD_INVHI           (_ADI_MSK(0x00000000,uint32_t))  /* MODELSD: Invert of Hi output */
+#define BITM_PWM_CHANCFG_MODELSD             (_ADI_MSK(0x02000000,uint32_t))  /* Channel D Mode of low Side Output */
+#define ENUM_PWM_CHANCFG_LOD_INVHI           (_ADI_MSK(0x00000000,uint32_t))  /* MODELSD: Invert of high output */
 #define ENUM_PWM_CHANCFG_LOD_IND             (_ADI_MSK(0x02000000,uint32_t))  /* MODELSD: Independent control */
 
-#define BITM_PWM_CHANCFG_REFTMRD             (_ADI_MSK(0x01000000,uint32_t))  /* Channel-D Timer Reference */
-#define ENUM_PWM_CHANCFG_REFTMRD_0           (_ADI_MSK(0x00000000,uint32_t))  /* REFTMRD: TMR0 is Channel D reference */
-#define ENUM_PWM_CHANCFG_REFTMRD_1           (_ADI_MSK(0x01000000,uint32_t))  /* REFTMRD: TMR1 is Channel D reference */
+#define BITM_PWM_CHANCFG_REFTMRD             (_ADI_MSK(0x01000000,uint32_t))  /* Channel D Timer Reference */
+#define ENUM_PWM_CHANCFG_REFTMRD_0           (_ADI_MSK(0x00000000,uint32_t))  /* REFTMRD: PWMTMR0 is Channel D reference */
+#define ENUM_PWM_CHANCFG_REFTMRD_1           (_ADI_MSK(0x01000000,uint32_t))  /* REFTMRD: PWMTMR1 is Channel D reference */
 
-#define BITM_PWM_CHANCFG_ENCHOPCL            (_ADI_MSK(0x00400000,uint32_t))  /* Channel-C Gate Chopping Enable Low Side */
-#define ENUM_PWM_CHANCFG_CHOPCL_DIS          (_ADI_MSK(0x00000000,uint32_t))  /* ENCHOPCL: Disable */
-#define ENUM_PWM_CHANCFG_CHOPCL_EN           (_ADI_MSK(0x00400000,uint32_t))  /* ENCHOPCL: Enable */
+#define BITM_PWM_CHANCFG_ENCHOPCL            (_ADI_MSK(0x00400000,uint32_t))  /* Channel C Gate Chopping Enable Low Side */
+#define ENUM_PWM_CHANCFG_CHOPCL_DIS          (_ADI_MSK(0x00000000,uint32_t))  /* ENCHOPCL: Disable Chopping Channel C Low Side */
+#define ENUM_PWM_CHANCFG_CHOPCL_EN           (_ADI_MSK(0x00400000,uint32_t))  /* ENCHOPCL: Enable Chopping Channel C Low Side */
 
-#define BITM_PWM_CHANCFG_POLCL               (_ADI_MSK(0x00200000,uint32_t))  /* Channel-C Lo side Polarity */
+#define BITM_PWM_CHANCFG_POLCL               (_ADI_MSK(0x00200000,uint32_t))  /* Channel C low side Polarity */
 #define ENUM_PWM_CHANCFG_CL_ACTLO            (_ADI_MSK(0x00000000,uint32_t))  /* POLCL: Active Low */
 #define ENUM_PWM_CHANCFG_CL_ACTHI            (_ADI_MSK(0x00200000,uint32_t))  /* POLCL: Active High */
 
-#define BITM_PWM_CHANCFG_ENHPCH              (_ADI_MSK(0x00100000,uint32_t))  /* Channel-C Hi Precision enable for Hi side Output */
-#define ENUM_PWM_CHANCFG_HPCH_DIS            (_ADI_MSK(0x00000000,uint32_t))  /* ENHPCH: Disable */
-#define ENUM_PWM_CHANCFG_HPCH_EN             (_ADI_MSK(0x00100000,uint32_t))  /* ENHPCH: Enable */
+#define BITM_PWM_CHANCFG_ENCHOPCH            (_ADI_MSK(0x00080000,uint32_t))  /* Channel C Gate Chopping Enable High Side */
+#define ENUM_PWM_CHANCFG_CHOPCH_DIS          (_ADI_MSK(0x00000000,uint32_t))  /* ENCHOPCH: Disable Chopping Channel C High Side */
+#define ENUM_PWM_CHANCFG_CHOPCH_EN           (_ADI_MSK(0x00080000,uint32_t))  /* ENCHOPCH: Enable Chopping Channel C High Side */
 
-#define BITM_PWM_CHANCFG_ENCHOPCH            (_ADI_MSK(0x00080000,uint32_t))  /* Channel-C Gate Chopping Enable High Side */
-#define ENUM_PWM_CHANCFG_CHOPCH_DIS          (_ADI_MSK(0x00000000,uint32_t))  /* ENCHOPCH: Disable */
-#define ENUM_PWM_CHANCFG_CHOPCH_EN           (_ADI_MSK(0x00080000,uint32_t))  /* ENCHOPCH: Enable */
-
-#define BITM_PWM_CHANCFG_POLCH               (_ADI_MSK(0x00040000,uint32_t))  /* Channel-C High side Polarity */
+#define BITM_PWM_CHANCFG_POLCH               (_ADI_MSK(0x00040000,uint32_t))  /* Channel C High side Polarity */
 #define ENUM_PWM_CHANCFG_CH_ACTLO            (_ADI_MSK(0x00000000,uint32_t))  /* POLCH: Active Low */
 #define ENUM_PWM_CHANCFG_CH_ACTHI            (_ADI_MSK(0x00040000,uint32_t))  /* POLCH: Active High */
 
-#define BITM_PWM_CHANCFG_MODELSC             (_ADI_MSK(0x00020000,uint32_t))  /* Channel-C Mode of Lo Side Output */
-#define ENUM_PWM_CHANCFG_LOC_INVHI           (_ADI_MSK(0x00000000,uint32_t))  /* MODELSC: Invert of Hi output */
+#define BITM_PWM_CHANCFG_MODELSC             (_ADI_MSK(0x00020000,uint32_t))  /* Channel C Mode of low Side Output */
+#define ENUM_PWM_CHANCFG_LOC_INVHI           (_ADI_MSK(0x00000000,uint32_t))  /* MODELSC: Invert of high output */
 #define ENUM_PWM_CHANCFG_LOC_IND             (_ADI_MSK(0x00020000,uint32_t))  /* MODELSC: Independent control */
 
-#define BITM_PWM_CHANCFG_REFTMRC             (_ADI_MSK(0x00010000,uint32_t))  /* Channel-C Timer Reference */
-#define ENUM_PWM_CHANCFG_REFTMRC_0           (_ADI_MSK(0x00000000,uint32_t))  /* REFTMRC: TMR0 is Channel C reference */
-#define ENUM_PWM_CHANCFG_REFTMRC_1           (_ADI_MSK(0x00010000,uint32_t))  /* REFTMRC: TMR1 is Channel C reference */
+#define BITM_PWM_CHANCFG_REFTMRC             (_ADI_MSK(0x00010000,uint32_t))  /* Channel C Timer Reference */
+#define ENUM_PWM_CHANCFG_REFTMRC_0           (_ADI_MSK(0x00000000,uint32_t))  /* REFTMRC: PWMTMR0 is Channel C reference */
+#define ENUM_PWM_CHANCFG_REFTMRC_1           (_ADI_MSK(0x00010000,uint32_t))  /* REFTMRC: PWMTMR1 is Channel C reference */
 
-#define BITM_PWM_CHANCFG_ENCHOPBL            (_ADI_MSK(0x00004000,uint32_t))  /* Channel-B Gate Chopping Enable Low Side */
-#define ENUM_PWM_CHANCFG_CHOPBL_DIS          (_ADI_MSK(0x00000000,uint32_t))  /* ENCHOPBL: Disable */
-#define ENUM_PWM_CHANCFG_CHOPBL_EN           (_ADI_MSK(0x00004000,uint32_t))  /* ENCHOPBL: Enable */
+#define BITM_PWM_CHANCFG_ENCHOPBL            (_ADI_MSK(0x00004000,uint32_t))  /* Channel B Gate Chopping Enable Low Side */
+#define ENUM_PWM_CHANCFG_CHOPBL_DIS          (_ADI_MSK(0x00000000,uint32_t))  /* ENCHOPBL: Disable Chopping Channel B Low Side */
+#define ENUM_PWM_CHANCFG_CHOPBL_EN           (_ADI_MSK(0x00004000,uint32_t))  /* ENCHOPBL: Enable Chopping Channel B Low Side */
 
-#define BITM_PWM_CHANCFG_POLBL               (_ADI_MSK(0x00002000,uint32_t))  /* Channel-B Lo side Polarity */
+#define BITM_PWM_CHANCFG_POLBL               (_ADI_MSK(0x00002000,uint32_t))  /* Channel B low side Polarity */
 #define ENUM_PWM_CHANCFG_BL_ACTLO            (_ADI_MSK(0x00000000,uint32_t))  /* POLBL: Active Low */
 #define ENUM_PWM_CHANCFG_BL_ACTHI            (_ADI_MSK(0x00002000,uint32_t))  /* POLBL: Active High */
 
-#define BITM_PWM_CHANCFG_ENHPBH              (_ADI_MSK(0x00001000,uint32_t))  /* Channel-B Hi Precision enable for Hi side Output */
-#define ENUM_PWM_CHANCFG_HPBH_DIS            (_ADI_MSK(0x00000000,uint32_t))  /* ENHPBH: Disable */
-#define ENUM_PWM_CHANCFG_HPBH_EN             (_ADI_MSK(0x00001000,uint32_t))  /* ENHPBH: Enable */
+#define BITM_PWM_CHANCFG_ENCHOPBH            (_ADI_MSK(0x00000800,uint32_t))  /* Channel B Gate Chopping Enable High Side */
+#define ENUM_PWM_CHANCFG_CHOPBH_DIS          (_ADI_MSK(0x00000000,uint32_t))  /* ENCHOPBH: Disable Chopping Channel B High Side */
+#define ENUM_PWM_CHANCFG_CHOPBH_EN           (_ADI_MSK(0x00000800,uint32_t))  /* ENCHOPBH: Enable Chopping Channel B High Side */
 
-#define BITM_PWM_CHANCFG_ENCHOPBH            (_ADI_MSK(0x00000800,uint32_t))  /* Channel-B Gate Chopping Enable High Side */
-#define ENUM_PWM_CHANCFG_CHOPBH_DIS          (_ADI_MSK(0x00000000,uint32_t))  /* ENCHOPBH: Disable */
-#define ENUM_PWM_CHANCFG_CHOPBH_EN           (_ADI_MSK(0x00000800,uint32_t))  /* ENCHOPBH: Enable */
-
-#define BITM_PWM_CHANCFG_POLBH               (_ADI_MSK(0x00000400,uint32_t))  /* Channel-B High side Polarity */
+#define BITM_PWM_CHANCFG_POLBH               (_ADI_MSK(0x00000400,uint32_t))  /* Channel B High side Polarity */
 #define ENUM_PWM_CHANCFG_BH_ACTLO            (_ADI_MSK(0x00000000,uint32_t))  /* POLBH: Active Low */
 #define ENUM_PWM_CHANCFG_BH_ACTHI            (_ADI_MSK(0x00000400,uint32_t))  /* POLBH: Active High */
 
-#define BITM_PWM_CHANCFG_MODELSB             (_ADI_MSK(0x00000200,uint32_t))  /* Channel-B Mode of Lo Side Output */
-#define ENUM_PWM_CHANCFG_LOB_INV             (_ADI_MSK(0x00000000,uint32_t))  /* MODELSB: Invert of Hi output */
+#define BITM_PWM_CHANCFG_MODELSB             (_ADI_MSK(0x00000200,uint32_t))  /* Channel B Mode of low Side Output */
+#define ENUM_PWM_CHANCFG_LOB_INV             (_ADI_MSK(0x00000000,uint32_t))  /* MODELSB: Invert of high output */
 #define ENUM_PWM_CHANCFG_LOB_IND             (_ADI_MSK(0x00000200,uint32_t))  /* MODELSB: Independent control */
 
-#define BITM_PWM_CHANCFG_REFTMRB             (_ADI_MSK(0x00000100,uint32_t))  /* Channel-B Timer Reference */
-#define ENUM_PWM_CHANCFG_REFTMRB_0           (_ADI_MSK(0x00000000,uint32_t))  /* REFTMRB: TMR0 is Channel  B reference */
-#define ENUM_PWM_CHANCFG_REFTMRB_1           (_ADI_MSK(0x00000100,uint32_t))  /* REFTMRB: TMR1 is Channel B reference */
+#define BITM_PWM_CHANCFG_REFTMRB             (_ADI_MSK(0x00000100,uint32_t))  /* Channel B Timer Reference */
+#define ENUM_PWM_CHANCFG_REFTMRB_0           (_ADI_MSK(0x00000000,uint32_t))  /* REFTMRB: PWMTMR0 is Channel  B reference */
+#define ENUM_PWM_CHANCFG_REFTMRB_1           (_ADI_MSK(0x00000100,uint32_t))  /* REFTMRB: PWMTMR1 is Channel B reference */
 
-#define BITM_PWM_CHANCFG_ENCHOPAL            (_ADI_MSK(0x00000040,uint32_t))  /* Channel-A Gate Chopping Enable Low Side */
-#define ENUM_PWM_CHANCFG_CHOPAL_DIS          (_ADI_MSK(0x00000000,uint32_t))  /* ENCHOPAL: Disable */
-#define ENUM_PWM_CHANCFG_CHOPAL_EN           (_ADI_MSK(0x00000040,uint32_t))  /* ENCHOPAL: Enable */
+#define BITM_PWM_CHANCFG_ENCHOPAL            (_ADI_MSK(0x00000040,uint32_t))  /* Channel A Gate Chopping Enable Low Side */
+#define ENUM_PWM_CHANCFG_CHOPAL_DIS          (_ADI_MSK(0x00000000,uint32_t))  /* ENCHOPAL: Disable Chopping Channel A Low Side */
+#define ENUM_PWM_CHANCFG_CHOPAL_EN           (_ADI_MSK(0x00000040,uint32_t))  /* ENCHOPAL: Enable Chopping Channel A Low Side */
 
-#define BITM_PWM_CHANCFG_POLAL               (_ADI_MSK(0x00000020,uint32_t))  /* Channel-A Lo side Polarity */
+#define BITM_PWM_CHANCFG_POLAL               (_ADI_MSK(0x00000020,uint32_t))  /* Channel A low side Polarity */
 #define ENUM_PWM_CHANCFG_AL_ACTLO            (_ADI_MSK(0x00000000,uint32_t))  /* POLAL: Active Low */
 #define ENUM_PWM_CHANCFG_AL_ACTHI            (_ADI_MSK(0x00000020,uint32_t))  /* POLAL: Active High */
 
-#define BITM_PWM_CHANCFG_ENHPAH              (_ADI_MSK(0x00000010,uint32_t))  /* Channel-A Hi Precision enable for Hi side Output */
-#define ENUM_PWM_CHANCFG_HPAH_DIS            (_ADI_MSK(0x00000000,uint32_t))  /* ENHPAH: Disable */
-#define ENUM_PWM_CHANCFG_HPAH_EN             (_ADI_MSK(0x00000010,uint32_t))  /* ENHPAH: Enable */
+#define BITM_PWM_CHANCFG_ENCHOPAH            (_ADI_MSK(0x00000008,uint32_t))  /* Channel A Gate Chopping Enable High Side */
+#define ENUM_PWM_CHANCFG_CHOPAH_DIS          (_ADI_MSK(0x00000000,uint32_t))  /* ENCHOPAH: Disable Chopping Channel A High Side */
+#define ENUM_PWM_CHANCFG_CHOPAH_EN           (_ADI_MSK(0x00000008,uint32_t))  /* ENCHOPAH: Enable Chopping Channel A High Side */
 
-#define BITM_PWM_CHANCFG_ENCHOPAH            (_ADI_MSK(0x00000008,uint32_t))  /* Channel-A Gate Chopping Enable High Side */
-#define ENUM_PWM_CHANCFG_CHOPAH_DIS          (_ADI_MSK(0x00000000,uint32_t))  /* ENCHOPAH: Disable */
-#define ENUM_PWM_CHANCFG_CHOPAH_EN           (_ADI_MSK(0x00000008,uint32_t))  /* ENCHOPAH: Enable */
-
-#define BITM_PWM_CHANCFG_POLAH               (_ADI_MSK(0x00000004,uint32_t))  /* Channel-A High side Polarity */
+#define BITM_PWM_CHANCFG_POLAH               (_ADI_MSK(0x00000004,uint32_t))  /* Channel A High side Polarity */
 #define ENUM_PWM_CHANCFG_AH_ACTLO            (_ADI_MSK(0x00000000,uint32_t))  /* POLAH: Active Low */
 #define ENUM_PWM_CHANCFG_AH_ACTHI            (_ADI_MSK(0x00000004,uint32_t))  /* POLAH: Active High */
 
-#define BITM_PWM_CHANCFG_MODELSA             (_ADI_MSK(0x00000002,uint32_t))  /* Channel-A Mode of Lo Side Output */
-#define ENUM_PWM_CHANCFG_LOA_INVHI           (_ADI_MSK(0x00000000,uint32_t))  /* MODELSA: Invert of Hi output */
+#define BITM_PWM_CHANCFG_MODELSA             (_ADI_MSK(0x00000002,uint32_t))  /* Channel A Mode of low Side Output */
+#define ENUM_PWM_CHANCFG_LOA_INVHI           (_ADI_MSK(0x00000000,uint32_t))  /* MODELSA: Invert of high output */
 #define ENUM_PWM_CHANCFG_LOA_IND             (_ADI_MSK(0x00000002,uint32_t))  /* MODELSA: Independent control */
 
-#define BITM_PWM_CHANCFG_REFTMRA             (_ADI_MSK(0x00000001,uint32_t))  /* Channel-A Timer Reference */
-#define ENUM_PWM_CHANCFG_REFTMRA_0           (_ADI_MSK(0x00000000,uint32_t))  /* REFTMRA: TMR0 is Channel A reference */
-#define ENUM_PWM_CHANCFG_REFTMRA_1           (_ADI_MSK(0x00000001,uint32_t))  /* REFTMRA: TMR1 is Channel A reference */
+#define BITM_PWM_CHANCFG_REFTMRA             (_ADI_MSK(0x00000001,uint32_t))  /* Channel A Timer Reference */
+#define ENUM_PWM_CHANCFG_REFTMRA_0           (_ADI_MSK(0x00000000,uint32_t))  /* REFTMRA: PWMTMR0 is Channel A reference */
+#define ENUM_PWM_CHANCFG_REFTMRA_1           (_ADI_MSK(0x00000001,uint32_t))  /* REFTMRA: PWMTMR1 is Channel A reference */
 
 /* ------------------------------------------------------------------------------------------------------------------------
         PWM_TRIPCFG                          Pos/Masks                        Description
@@ -6427,83 +6404,82 @@
 #define BITP_PWM_TRIPCFG_EN0A                 0                               /* Enable TRIP0 as a trip source for Channel A */
 
 #define BITM_PWM_TRIPCFG_MODE1D              (_ADI_MSK(0x08000000,uint32_t))  /* Mode of TRIP1 for Channel D */
-#define ENUM_PWM_TRIPCFG_TRIP1D_FLT          (_ADI_MSK(0x00000000,uint32_t))  /* MODE1D: Fault Trip */
-#define ENUM_PWM_TRIPCFG_TRIP1D_RSTRT        (_ADI_MSK(0x08000000,uint32_t))  /* MODE1D: Self Restart */
+#define ENUM_PWM_TRIPCFG_TRIP1D_FLT          (_ADI_MSK(0x00000000,uint32_t))  /* MODE1D: Fault Trip on TRIP1 Input */
+#define ENUM_PWM_TRIPCFG_TRIP1D_RSTRT        (_ADI_MSK(0x08000000,uint32_t))  /* MODE1D: Self Restart on TRIP1 Input */
 
 #define BITM_PWM_TRIPCFG_EN1D                (_ADI_MSK(0x04000000,uint32_t))  /* Enable TRIP1 as a trip source for Channel D */
-#define ENUM_PWM_TRIPCFG_TRIP1D_DIS          (_ADI_MSK(0x00000000,uint32_t))  /* EN1D: Disable */
-#define ENUM_PWM_TRIPCFG_TRIP1D_EN           (_ADI_MSK(0x04000000,uint32_t))  /* EN1D: Enable */
+#define ENUM_PWM_TRIPCFG_TRIP1D_DIS          (_ADI_MSK(0x00000000,uint32_t))  /* EN1D: Disable TRIP1 for Channel D */
+#define ENUM_PWM_TRIPCFG_TRIP1D_EN           (_ADI_MSK(0x04000000,uint32_t))  /* EN1D: Enable TRIP1 for Channel D */
 
 #define BITM_PWM_TRIPCFG_MODE0D              (_ADI_MSK(0x02000000,uint32_t))  /* Mode of TRIP0 for Channel D */
-#define ENUM_PWM_TRIPCFG_TRIP0D_FLT          (_ADI_MSK(0x00000000,uint32_t))  /* MODE0D: Fault Trip */
-#define ENUM_PWM_TRIPCFG_TRIP0D_RSTRT        (_ADI_MSK(0x02000000,uint32_t))  /* MODE0D: Self Restart */
+#define ENUM_PWM_TRIPCFG_TRIP0D_FLT          (_ADI_MSK(0x00000000,uint32_t))  /* MODE0D: Fault Trip on TRIP0 Input */
+#define ENUM_PWM_TRIPCFG_TRIP0D_RSTRT        (_ADI_MSK(0x02000000,uint32_t))  /* MODE0D: Self Restart on TRIP0 Input */
 
 #define BITM_PWM_TRIPCFG_EN0D                (_ADI_MSK(0x01000000,uint32_t))  /* Enable TRIP0 as a trip source for Channel D */
-#define ENUM_PWM_TRIPCFG_TRIP0D_DIS          (_ADI_MSK(0x00000000,uint32_t))  /* EN0D: Disable */
-#define ENUM_PWM_TRIPCFG_TRIP0D_EN           (_ADI_MSK(0x01000000,uint32_t))  /* EN0D: Enable */
+#define ENUM_PWM_TRIPCFG_TRIP0D_DIS          (_ADI_MSK(0x00000000,uint32_t))  /* EN0D: Disable TRIP0 for Channel D */
+#define ENUM_PWM_TRIPCFG_TRIP0D_EN           (_ADI_MSK(0x01000000,uint32_t))  /* EN0D: Enable TRIP0 for Channel D */
 
 #define BITM_PWM_TRIPCFG_MODE1C              (_ADI_MSK(0x00080000,uint32_t))  /* Mode of TRIP1 for Channel C */
-#define ENUM_PWM_TRIPCFG_TRIP1C_FLT          (_ADI_MSK(0x00000000,uint32_t))  /* MODE1C: Fault Trip */
-#define ENUM_PWM_TRIPCFG_TRIP1C_RSTRT        (_ADI_MSK(0x00080000,uint32_t))  /* MODE1C: Self Restart */
+#define ENUM_PWM_TRIPCFG_TRIP1C_FLT          (_ADI_MSK(0x00000000,uint32_t))  /* MODE1C: Fault Trip on TRIP1 Input */
+#define ENUM_PWM_TRIPCFG_TRIP1C_RSTRT        (_ADI_MSK(0x00080000,uint32_t))  /* MODE1C: Self Restart on TRIP1 Input */
 
 #define BITM_PWM_TRIPCFG_EN1C                (_ADI_MSK(0x00040000,uint32_t))  /* Enable TRIP1 as a trip source for Channel C */
-#define ENUM_PWM_TRIPCFG_TRIP1C_DIS          (_ADI_MSK(0x00000000,uint32_t))  /* EN1C: Disable */
-#define ENUM_PWM_TRIPCFG_TRIP1C_EN           (_ADI_MSK(0x00040000,uint32_t))  /* EN1C: Enable */
+#define ENUM_PWM_TRIPCFG_TRIP1C_DIS          (_ADI_MSK(0x00000000,uint32_t))  /* EN1C: Disable TRIP1 for Channel C */
+#define ENUM_PWM_TRIPCFG_TRIP1C_EN           (_ADI_MSK(0x00040000,uint32_t))  /* EN1C: Enable TRIP1 for Channel C */
 
 #define BITM_PWM_TRIPCFG_MODE0C              (_ADI_MSK(0x00020000,uint32_t))  /* Mode of TRIP0 for Channel C */
-#define ENUM_PWM_TRIPCFG_TRIP0C_FLT          (_ADI_MSK(0x00000000,uint32_t))  /* MODE0C: Fault Trip */
-#define ENUM_PWM_TRIPCFG_TRIP0C_RSTRT        (_ADI_MSK(0x00020000,uint32_t))  /* MODE0C: Self Restart */
+#define ENUM_PWM_TRIPCFG_TRIP0C_FLT          (_ADI_MSK(0x00000000,uint32_t))  /* MODE0C: Fault Trip on TRIP0 Input */
+#define ENUM_PWM_TRIPCFG_TRIP0C_RSTRT        (_ADI_MSK(0x00020000,uint32_t))  /* MODE0C: Self Restart on TRIP0 Input */
 
 #define BITM_PWM_TRIPCFG_EN0C                (_ADI_MSK(0x00010000,uint32_t))  /* Enable TRIP0 as a trip source for Channel C */
-#define ENUM_PWM_TRIPCFG_TRIP0C_DIS          (_ADI_MSK(0x00000000,uint32_t))  /* EN0C: Disable */
-#define ENUM_PWM_TRIPCFG_TRIP0C_EN           (_ADI_MSK(0x00010000,uint32_t))  /* EN0C: Enable */
+#define ENUM_PWM_TRIPCFG_TRIP0C_DIS          (_ADI_MSK(0x00000000,uint32_t))  /* EN0C: Disable TRIP0 for Channel C */
+#define ENUM_PWM_TRIPCFG_TRIP0C_EN           (_ADI_MSK(0x00010000,uint32_t))  /* EN0C: Enable TRIP0 for Channel C */
 
 #define BITM_PWM_TRIPCFG_MODE1B              (_ADI_MSK(0x00000800,uint32_t))  /* Mode of TRIP1 for Channel B */
-#define ENUM_PWM_TRIPCFG_TRIP1B_FLT          (_ADI_MSK(0x00000000,uint32_t))  /* MODE1B: Fault Trip */
-#define ENUM_PWM_TRIPCFG_TRIP1B_RSTRT        (_ADI_MSK(0x00000800,uint32_t))  /* MODE1B: Self Restart */
+#define ENUM_PWM_TRIPCFG_TRIP1B_FLT          (_ADI_MSK(0x00000000,uint32_t))  /* MODE1B: Fault Trip on TRIP1 Input */
+#define ENUM_PWM_TRIPCFG_TRIP1B_RSTRT        (_ADI_MSK(0x00000800,uint32_t))  /* MODE1B: Self Restart on TRIP1 Input */
 
 #define BITM_PWM_TRIPCFG_EN1B                (_ADI_MSK(0x00000400,uint32_t))  /* Enable TRIP1 as a trip source for Channel B */
-#define ENUM_PWM_TRIPCFG_TRIP1B_DIS          (_ADI_MSK(0x00000000,uint32_t))  /* EN1B: Disable */
-#define ENUM_PWM_TRIPCFG_TRIP1B_EN           (_ADI_MSK(0x00000400,uint32_t))  /* EN1B: Enable */
+#define ENUM_PWM_TRIPCFG_TRIP1B_DIS          (_ADI_MSK(0x00000000,uint32_t))  /* EN1B: Disable TRIP1 for Channel B */
+#define ENUM_PWM_TRIPCFG_TRIP1B_EN           (_ADI_MSK(0x00000400,uint32_t))  /* EN1B: Enable TRIP1 for Channel B */
 
 #define BITM_PWM_TRIPCFG_MODE0B              (_ADI_MSK(0x00000200,uint32_t))  /* Mode of TRIP0 for Channel B */
-#define ENUM_PWM_TRIPCFG_TRIP0B_FLT          (_ADI_MSK(0x00000000,uint32_t))  /* MODE0B: Fault Trip */
-#define ENUM_PWM_TRIPCFG_TRIP0B_RSTRT        (_ADI_MSK(0x00000200,uint32_t))  /* MODE0B: Self Restart */
+#define ENUM_PWM_TRIPCFG_TRIP0B_FLT          (_ADI_MSK(0x00000000,uint32_t))  /* MODE0B: Fault Trip on TRIP0 Input */
+#define ENUM_PWM_TRIPCFG_TRIP0B_RSTRT        (_ADI_MSK(0x00000200,uint32_t))  /* MODE0B: Self Restart on TRIP0 Input */
 
 #define BITM_PWM_TRIPCFG_EN0B                (_ADI_MSK(0x00000100,uint32_t))  /* Enable TRIP0 as a trip source for Channel B */
-#define ENUM_PWM_TRIPCFG_TRIP0B_DIS          (_ADI_MSK(0x00000000,uint32_t))  /* EN0B: Disable */
-#define ENUM_PWM_TRIPCFG_TRIP0B_EN           (_ADI_MSK(0x00000100,uint32_t))  /* EN0B: Enable */
+#define ENUM_PWM_TRIPCFG_TRIP0B_DIS          (_ADI_MSK(0x00000000,uint32_t))  /* EN0B: Disable TRIP0 for Channel B */
+#define ENUM_PWM_TRIPCFG_TRIP0B_EN           (_ADI_MSK(0x00000100,uint32_t))  /* EN0B: Enable TRIP0 for Channel B */
 
 #define BITM_PWM_TRIPCFG_MODE1A              (_ADI_MSK(0x00000008,uint32_t))  /* Mode of TRIP1 for Channel A */
-#define ENUM_PWM_TRIPCFG_TRIP1A_FLT          (_ADI_MSK(0x00000000,uint32_t))  /* MODE1A: Fault Trip */
-#define ENUM_PWM_TRIPCFG_TRIP1A_RSTRT        (_ADI_MSK(0x00000008,uint32_t))  /* MODE1A: Self Restart */
+#define ENUM_PWM_TRIPCFG_TRIP1A_FLT          (_ADI_MSK(0x00000000,uint32_t))  /* MODE1A: Fault Trip on TRIP1 Input */
+#define ENUM_PWM_TRIPCFG_TRIP1A_RSTRT        (_ADI_MSK(0x00000008,uint32_t))  /* MODE1A: Self Restart on TRIP1 Input */
 
 #define BITM_PWM_TRIPCFG_EN1A                (_ADI_MSK(0x00000004,uint32_t))  /* Enable TRIP1 as a trip source for Channel A */
-#define ENUM_PWM_TRIPCFG_TRIP1A_DIS          (_ADI_MSK(0x00000000,uint32_t))  /* EN1A: Disable */
-#define ENUM_PWM_TRIPCFG_TRIP1A_EN           (_ADI_MSK(0x00000004,uint32_t))  /* EN1A: Enable */
+#define ENUM_PWM_TRIPCFG_TRIP1A_DIS          (_ADI_MSK(0x00000000,uint32_t))  /* EN1A: Disable TRIP1 for Channel A */
+#define ENUM_PWM_TRIPCFG_TRIP1A_EN           (_ADI_MSK(0x00000004,uint32_t))  /* EN1A: Enable TRIP1 for Channel A */
 
 #define BITM_PWM_TRIPCFG_MODE0A              (_ADI_MSK(0x00000002,uint32_t))  /* Mode of TRIP0 for Channel A */
-#define ENUM_PWM_TRIPCFG_TRIP0A_FLT          (_ADI_MSK(0x00000000,uint32_t))  /* MODE0A: Fault Trip */
-#define ENUM_PWM_TRIPCFG_TRIP0A_RSTRT        (_ADI_MSK(0x00000002,uint32_t))  /* MODE0A: Self Restart */
+#define ENUM_PWM_TRIPCFG_TRIP0A_FLT          (_ADI_MSK(0x00000000,uint32_t))  /* MODE0A: Fault Trip on TRIP0 Input */
+#define ENUM_PWM_TRIPCFG_TRIP0A_RSTRT        (_ADI_MSK(0x00000002,uint32_t))  /* MODE0A: Self Restart on TRIP0 Input */
 
 #define BITM_PWM_TRIPCFG_EN0A                (_ADI_MSK(0x00000001,uint32_t))  /* Enable TRIP0 as a trip source for Channel A */
-#define ENUM_PWM_TRIPCFG_TRIP0A_DIS          (_ADI_MSK(0x00000000,uint32_t))  /* EN0A: Disable */
-#define ENUM_PWM_TRIPCFG_TRIP0A_EN           (_ADI_MSK(0x00000001,uint32_t))  /* EN0A: Enable */
+#define ENUM_PWM_TRIPCFG_TRIP0A_DIS          (_ADI_MSK(0x00000000,uint32_t))  /* EN0A: Disable TRIP0 for Channel A */
+#define ENUM_PWM_TRIPCFG_TRIP0A_EN           (_ADI_MSK(0x00000001,uint32_t))  /* EN0A: Enable TRIP0 for Channel A */
 
 /* ------------------------------------------------------------------------------------------------------------------------
         PWM_STAT                             Pos/Masks                        Description
    ------------------------------------------------------------------------------------------------------------------------ */
-#define BITP_PWM_STAT_HPRDY                  31                               /* Ready Status */
-#define BITP_PWM_STAT_TMR4PHASE              28                               /* TMR4 Phase Status */
-#define BITP_PWM_STAT_TMR3PHASE              27                               /* TMR3 Phase Status */
-#define BITP_PWM_STAT_TMR2PHASE              26                               /* TMR2 Phase Status */
-#define BITP_PWM_STAT_TMR1PHASE              25                               /* TMR1 Phase Status */
-#define BITP_PWM_STAT_TMR0PHASE              24                               /* TMR0 Phase Status */
-#define BITP_PWM_STAT_TMR4PER                20                               /* TMR4 Period Boundary Status */
-#define BITP_PWM_STAT_TMR3PER                19                               /* TMR3 Period Boundary Status */
-#define BITP_PWM_STAT_TMR2PER                18                               /* TMR2 Period Boundary Status */
-#define BITP_PWM_STAT_TMR1PER                17                               /* TMR1 Period Boundary Status */
-#define BITP_PWM_STAT_TMR0PER                16                               /* TMR0 Period Boundary Status */
+#define BITP_PWM_STAT_TMR4PHASE              28                               /* PWMTMR4 Phase Status */
+#define BITP_PWM_STAT_TMR3PHASE              27                               /* PWMTMR3 Phase Status */
+#define BITP_PWM_STAT_TMR2PHASE              26                               /* PWMTMR2 Phase Status */
+#define BITP_PWM_STAT_TMR1PHASE              25                               /* PWMTMR1 Phase Status */
+#define BITP_PWM_STAT_TMR0PHASE              24                               /* PWMTMR0 Phase Status */
+#define BITP_PWM_STAT_TMR4PER                20                               /* PWMTMR4 Period Boundary Status */
+#define BITP_PWM_STAT_TMR3PER                19                               /* PWMTMR3 Period Boundary Status */
+#define BITP_PWM_STAT_TMR2PER                18                               /* PWMTMR2 Period Boundary Status */
+#define BITP_PWM_STAT_TMR1PER                17                               /* PWMTMR1 Period Boundary Status */
+#define BITP_PWM_STAT_TMR0PER                16                               /* PWMTMR0 Period Boundary Status */
 #define BITP_PWM_STAT_SRTRIPD                11                               /* Self-Restart Trip Status for Channel D */
 #define BITP_PWM_STAT_FLTTRIPD               10                               /* Fault Trip Status for Channel D */
 #define BITP_PWM_STAT_SRTRIPC                 9                               /* Self-Restart Trip Status for Channel C */
@@ -6512,54 +6488,50 @@
 #define BITP_PWM_STAT_FLTTRIPB                6                               /* Fault Trip Status for Channel B */
 #define BITP_PWM_STAT_SRTRIPA                 5                               /* Self-Restart Trip Status for Channel A */
 #define BITP_PWM_STAT_FLTTRIPA                4                               /* Fault Trip Status for Channel A */
-#define BITP_PWM_STAT_RAWTRIP1                3                               /* TRIP1 Level Status */
-#define BITP_PWM_STAT_RAWTRIP0                2                               /* TRIP0 Level Status */
+#define BITP_PWM_STAT_RAWTRIP1                3                               /* Raw Trip 1 Status */
+#define BITP_PWM_STAT_RAWTRIP0                2                               /* Raw Trip 0 Status */
 #define BITP_PWM_STAT_TRIP1                   1                               /* Status bit set when TRIP1 is active low */
 #define BITP_PWM_STAT_TRIP0                   0                               /* Status bit set when TRIP0 is active low */
 
-#define BITM_PWM_STAT_HPRDY                  (_ADI_MSK(0x80000000,uint32_t))  /* Ready Status */
-#define ENUM_PWM_STAT_NOT_HPRDY              (_ADI_MSK(0x00000000,uint32_t))  /* HPRDY: HPPWM Not Ready For Operation */
-#define ENUM_PWM_STAT_HPRDY                  (_ADI_MSK(0x80000000,uint32_t))  /* HPRDY: HPPWM Ready For Operation */
+#define BITM_PWM_STAT_TMR4PHASE              (_ADI_MSK(0x10000000,uint32_t))  /* PWMTMR4 Phase Status */
+#define ENUM_PWM_STAT_TMR4PH1                (_ADI_MSK(0x00000000,uint32_t))  /* TMR4PHASE: 1st Half Phase */
+#define ENUM_PWM_STAT_TMR4PH2                (_ADI_MSK(0x10000000,uint32_t))  /* TMR4PHASE: 2nd Half Phase */
 
-#define BITM_PWM_STAT_TMR4PHASE              (_ADI_MSK(0x10000000,uint32_t))  /* TMR4 Phase Status */
-#define ENUM_PWM_STAT_TMR4PH1                (_ADI_MSK(0x00000000,uint32_t))  /* TMR4PHASE: 1st Half */
-#define ENUM_PWM_STAT_TMR4PH2                (_ADI_MSK(0x10000000,uint32_t))  /* TMR4PHASE: 2nd Half */
+#define BITM_PWM_STAT_TMR3PHASE              (_ADI_MSK(0x08000000,uint32_t))  /* PWMTMR3 Phase Status */
+#define ENUM_PWM_STAT_TMR3PH1                (_ADI_MSK(0x00000000,uint32_t))  /* TMR3PHASE: 1st Half Phase */
+#define ENUM_PWM_STAT_TMR3PH2                (_ADI_MSK(0x08000000,uint32_t))  /* TMR3PHASE: 2nd Half Phase */
 
-#define BITM_PWM_STAT_TMR3PHASE              (_ADI_MSK(0x08000000,uint32_t))  /* TMR3 Phase Status */
-#define ENUM_PWM_STAT_TMR3PH1                (_ADI_MSK(0x00000000,uint32_t))  /* TMR3PHASE: 1st Half */
-#define ENUM_PWM_STAT_TMR3PH2                (_ADI_MSK(0x08000000,uint32_t))  /* TMR3PHASE: 2nd Half */
+#define BITM_PWM_STAT_TMR2PHASE              (_ADI_MSK(0x04000000,uint32_t))  /* PWMTMR2 Phase Status */
+#define ENUM_PWM_STAT_TMR2PH1                (_ADI_MSK(0x00000000,uint32_t))  /* TMR2PHASE: 1st Half Phase */
+#define ENUM_PWM_STAT_TMR2PH2                (_ADI_MSK(0x04000000,uint32_t))  /* TMR2PHASE: 2nd Half Phase */
 
-#define BITM_PWM_STAT_TMR2PHASE              (_ADI_MSK(0x04000000,uint32_t))  /* TMR2 Phase Status */
-#define ENUM_PWM_STAT_TMR2PH1                (_ADI_MSK(0x00000000,uint32_t))  /* TMR2PHASE: 1st Half */
-#define ENUM_PWM_STAT_TMR2PH2                (_ADI_MSK(0x04000000,uint32_t))  /* TMR2PHASE: 2nd Half */
+#define BITM_PWM_STAT_TMR1PHASE              (_ADI_MSK(0x02000000,uint32_t))  /* PWMTMR1 Phase Status */
+#define ENUM_PWM_STAT_TMR1PH1                (_ADI_MSK(0x00000000,uint32_t))  /* TMR1PHASE: 1st Half Phase */
+#define ENUM_PWM_STAT_TMR1PH2                (_ADI_MSK(0x02000000,uint32_t))  /* TMR1PHASE: 2nd Half Phase */
 
-#define BITM_PWM_STAT_TMR1PHASE              (_ADI_MSK(0x02000000,uint32_t))  /* TMR1 Phase Status */
-#define ENUM_PWM_STAT_TMR1PH1                (_ADI_MSK(0x00000000,uint32_t))  /* TMR1PHASE: 1st Half */
-#define ENUM_PWM_STAT_TMR1PH2                (_ADI_MSK(0x02000000,uint32_t))  /* TMR1PHASE: 2nd Half */
+#define BITM_PWM_STAT_TMR0PHASE              (_ADI_MSK(0x01000000,uint32_t))  /* PWMTMR0 Phase Status */
+#define ENUM_PWM_STAT_TMR0PH1                (_ADI_MSK(0x00000000,uint32_t))  /* TMR0PHASE: 1st Half Phase */
+#define ENUM_PWM_STAT_TMR0PH2                (_ADI_MSK(0x01000000,uint32_t))  /* TMR0PHASE: 2nd Half Phase */
 
-#define BITM_PWM_STAT_TMR0PHASE              (_ADI_MSK(0x01000000,uint32_t))  /* TMR0 Phase Status */
-#define ENUM_PWM_STAT_TMR0PH1                (_ADI_MSK(0x00000000,uint32_t))  /* TMR0PHASE: 1st Half */
-#define ENUM_PWM_STAT_TMR0PH2                (_ADI_MSK(0x01000000,uint32_t))  /* TMR0PHASE: 2nd Half */
+#define BITM_PWM_STAT_TMR4PER                (_ADI_MSK(0x00100000,uint32_t))  /* PWMTMR4 Period Boundary Status */
+#define ENUM_PWM_STAT_NOT_PER4               (_ADI_MSK(0x00000000,uint32_t))  /* TMR4PER: PWMTMR4 period boundary not reached */
+#define ENUM_PWM_STAT_PER4                   (_ADI_MSK(0x00100000,uint32_t))  /* TMR4PER: PWMTMR4 period boundary reached */
 
-#define BITM_PWM_STAT_TMR4PER                (_ADI_MSK(0x00100000,uint32_t))  /* TMR4 Period Boundary Status */
-#define ENUM_PWM_STAT_NOT_PER4               (_ADI_MSK(0x00000000,uint32_t))  /* TMR4PER: TMR4 Period boundary not reached */
-#define ENUM_PWM_STAT_PER4                   (_ADI_MSK(0x00100000,uint32_t))  /* TMR4PER: TMR4 Period boundary reached */
+#define BITM_PWM_STAT_TMR3PER                (_ADI_MSK(0x00080000,uint32_t))  /* PWMTMR3 Period Boundary Status */
+#define ENUM_PWM_STAT_NOT_PER3               (_ADI_MSK(0x00000000,uint32_t))  /* TMR3PER: PWMTMR3 period boundary not reached */
+#define ENUM_PWM_STAT_PER3                   (_ADI_MSK(0x00080000,uint32_t))  /* TMR3PER: PWMTMR3 period boundary reached */
 
-#define BITM_PWM_STAT_TMR3PER                (_ADI_MSK(0x00080000,uint32_t))  /* TMR3 Period Boundary Status */
-#define ENUM_PWM_STAT_NOT_PER3               (_ADI_MSK(0x00000000,uint32_t))  /* TMR3PER: TMR3 Period boundary not reached */
-#define ENUM_PWM_STAT_PER3                   (_ADI_MSK(0x00080000,uint32_t))  /* TMR3PER: TMR3 Period boundary reached */
+#define BITM_PWM_STAT_TMR2PER                (_ADI_MSK(0x00040000,uint32_t))  /* PWMTMR2 Period Boundary Status */
+#define ENUM_PWM_STAT_NOT_PER2               (_ADI_MSK(0x00000000,uint32_t))  /* TMR2PER: PWMTMR2 period boundary not reached */
+#define ENUM_PWM_STAT_PER2                   (_ADI_MSK(0x00040000,uint32_t))  /* TMR2PER: PWMTMR2 period boundary reached */
 
-#define BITM_PWM_STAT_TMR2PER                (_ADI_MSK(0x00040000,uint32_t))  /* TMR2 Period Boundary Status */
-#define ENUM_PWM_STAT_NOT_PER2               (_ADI_MSK(0x00000000,uint32_t))  /* TMR2PER: TMR2 Period boundary not reached */
-#define ENUM_PWM_STAT_PER2                   (_ADI_MSK(0x00040000,uint32_t))  /* TMR2PER: TMR2 Period boundary reached */
+#define BITM_PWM_STAT_TMR1PER                (_ADI_MSK(0x00020000,uint32_t))  /* PWMTMR1 Period Boundary Status */
+#define ENUM_PWM_STAT_NOT_PER1               (_ADI_MSK(0x00000000,uint32_t))  /* TMR1PER: PWMTMR1 period boundary not reached */
+#define ENUM_PWM_STAT_PER1                   (_ADI_MSK(0x00020000,uint32_t))  /* TMR1PER: PWMTMR1 period boundary reached */
 
-#define BITM_PWM_STAT_TMR1PER                (_ADI_MSK(0x00020000,uint32_t))  /* TMR1 Period Boundary Status */
-#define ENUM_PWM_STAT_NOT_PER1               (_ADI_MSK(0x00000000,uint32_t))  /* TMR1PER: TMR1 Period boundary not reached */
-#define ENUM_PWM_STAT_PER1                   (_ADI_MSK(0x00020000,uint32_t))  /* TMR1PER: TMR1 Period boundary reached */
-
-#define BITM_PWM_STAT_TMR0PER                (_ADI_MSK(0x00010000,uint32_t))  /* TMR0 Period Boundary Status */
-#define ENUM_PWM_STAT_NOT_PER0               (_ADI_MSK(0x00000000,uint32_t))  /* TMR0PER: TMR0 Period boundary not reached */
-#define ENUM_PWM_STAT_PER0                   (_ADI_MSK(0x00010000,uint32_t))  /* TMR0PER: TMR0 Period boundary reached */
+#define BITM_PWM_STAT_TMR0PER                (_ADI_MSK(0x00010000,uint32_t))  /* PWMTMR0 Period Boundary Status */
+#define ENUM_PWM_STAT_NOT_PER0               (_ADI_MSK(0x00000000,uint32_t))  /* TMR0PER: PWMTMR0 period boundary not reached */
+#define ENUM_PWM_STAT_PER0                   (_ADI_MSK(0x00010000,uint32_t))  /* TMR0PER: PWMTMR0 period boundary reached */
 
 #define BITM_PWM_STAT_SRTRIPD                (_ADI_MSK(0x00000800,uint32_t))  /* Self-Restart Trip Status for Channel D */
 #define ENUM_PWM_STAT_SRD_NOTRIP             (_ADI_MSK(0x00000000,uint32_t))  /* SRTRIPD: Channel D Self-Restart Trip Status is "not tripped" */
@@ -6593,11 +6565,11 @@
 #define ENUM_PWM_STAT_FLTA_NOTRIP            (_ADI_MSK(0x00000000,uint32_t))  /* FLTTRIPA: Channel A Fault Trip Status is "not tripped" */
 #define ENUM_PWM_STAT_FLTA_TRIP              (_ADI_MSK(0x00000010,uint32_t))  /* FLTTRIPA: Channel A Fault Trip Status is "tripped" */
 
-#define BITM_PWM_STAT_RAWTRIP1               (_ADI_MSK(0x00000008,uint32_t))  /* TRIP1 Level Status */
+#define BITM_PWM_STAT_RAWTRIP1               (_ADI_MSK(0x00000008,uint32_t))  /* Raw Trip 1 Status */
 #define ENUM_PWM_STAT_TRIP1LVL_LO            (_ADI_MSK(0x00000000,uint32_t))  /* RAWTRIP1: TRIP1 Level is Low */
 #define ENUM_PWM_STAT_TRIP1LVL_HI            (_ADI_MSK(0x00000008,uint32_t))  /* RAWTRIP1: TRIP1 Level is High */
 
-#define BITM_PWM_STAT_RAWTRIP0               (_ADI_MSK(0x00000004,uint32_t))  /* TRIP0 Level Status */
+#define BITM_PWM_STAT_RAWTRIP0               (_ADI_MSK(0x00000004,uint32_t))  /* Raw Trip 0 Status */
 #define ENUM_PWM_STAT_TRIP0LVL_LO            (_ADI_MSK(0x00000000,uint32_t))  /* RAWTRIP0: TRIP0 Level is Low */
 #define ENUM_PWM_STAT_TRIP0LVL_HI            (_ADI_MSK(0x00000004,uint32_t))  /* RAWTRIP0: TRIP0 Level is High */
 
@@ -6612,92 +6584,92 @@
 /* ------------------------------------------------------------------------------------------------------------------------
         PWM_IMSK                             Pos/Masks                        Description
    ------------------------------------------------------------------------------------------------------------------------ */
-#define BITP_PWM_IMSK_TMR4PER                20                               /* TMR4 Period Boundary Interrupt Mask */
-#define BITP_PWM_IMSK_TMR3PER                19                               /* TMR3 Period Boundary Interrupt Mask */
-#define BITP_PWM_IMSK_TMR2PER                18                               /* TMR2 Period Boundary Interrupt Mask */
-#define BITP_PWM_IMSK_TMR1PER                17                               /* TMR1 Period Boundary Interrupt Mask */
-#define BITP_PWM_IMSK_TMR0PER                16                               /* TMR0 Period Boundary Interrupt Mask */
-#define BITP_PWM_IMSK_TRIP1                   1                               /* TRIP1 Interrupt Mask */
-#define BITP_PWM_IMSK_TRIP0                   0                               /* TRIP0 Interrupt Mask */
+#define BITP_PWM_IMSK_TMR4PER                20                               /* PWMTMR4 Period Boundary Interrupt Enable */
+#define BITP_PWM_IMSK_TMR3PER                19                               /* PWMTMR3 Period Boundary Interrupt Enable */
+#define BITP_PWM_IMSK_TMR2PER                18                               /* PWMTMR2 Period Boundary Interrupt Enable */
+#define BITP_PWM_IMSK_TMR1PER                17                               /* PWMTMR1 Period Boundary Interrupt Enable */
+#define BITP_PWM_IMSK_TMR0PER                16                               /* PWMTMR0 Period Boundary Interrupt Enable */
+#define BITP_PWM_IMSK_TRIP1                   1                               /* TRIP1 Interrupt Enable */
+#define BITP_PWM_IMSK_TRIP0                   0                               /* TRIP0 Interrupt Enable */
 
-#define BITM_PWM_IMSK_TMR4PER                (_ADI_MSK(0x00100000,uint32_t))  /* TMR4 Period Boundary Interrupt Mask */
-#define ENUM_PWM_IMSK_PER4_MSK               (_ADI_MSK(0x00000000,uint32_t))  /* TMR4PER: Mask TMR4 Period Interrupt */
-#define ENUM_PWM_IMSK_PER4_UMSK              (_ADI_MSK(0x00100000,uint32_t))  /* TMR4PER: Unmask TMR4 Period Interrupt */
+#define BITM_PWM_IMSK_TMR4PER                (_ADI_MSK(0x00100000,uint32_t))  /* PWMTMR4 Period Boundary Interrupt Enable */
+#define ENUM_PWM_IMSK_PER4_MSK               (_ADI_MSK(0x00000000,uint32_t))  /* TMR4PER: Mask PWMTMR4 Period Interrupt */
+#define ENUM_PWM_IMSK_PER4_UMSK              (_ADI_MSK(0x00100000,uint32_t))  /* TMR4PER: Unmask PWMTMR4 Period Interrupt */
 
-#define BITM_PWM_IMSK_TMR3PER                (_ADI_MSK(0x00080000,uint32_t))  /* TMR3 Period Boundary Interrupt Mask */
-#define ENUM_PWM_IMSK_PER3_MSK               (_ADI_MSK(0x00000000,uint32_t))  /* TMR3PER: Mask TMR3 Period Interrupt */
-#define ENUM_PWM_IMSK_PER3_UMSK              (_ADI_MSK(0x00080000,uint32_t))  /* TMR3PER: Unmask TMR3 Period Interrupt */
+#define BITM_PWM_IMSK_TMR3PER                (_ADI_MSK(0x00080000,uint32_t))  /* PWMTMR3 Period Boundary Interrupt Enable */
+#define ENUM_PWM_IMSK_PER3_MSK               (_ADI_MSK(0x00000000,uint32_t))  /* TMR3PER: Mask PWMTMR3 Period Interrupt */
+#define ENUM_PWM_IMSK_PER3_UMSK              (_ADI_MSK(0x00080000,uint32_t))  /* TMR3PER: Unmask PWMTMR3 Period Interrupt */
 
-#define BITM_PWM_IMSK_TMR2PER                (_ADI_MSK(0x00040000,uint32_t))  /* TMR2 Period Boundary Interrupt Mask */
-#define ENUM_PWM_IMSK_PER2_MSK               (_ADI_MSK(0x00000000,uint32_t))  /* TMR2PER: Mask TMR2 Period Interrupt */
-#define ENUM_PWM_IMSK_PER2_UMSK              (_ADI_MSK(0x00040000,uint32_t))  /* TMR2PER: Unmask TMR2 Period Interrupt */
+#define BITM_PWM_IMSK_TMR2PER                (_ADI_MSK(0x00040000,uint32_t))  /* PWMTMR2 Period Boundary Interrupt Enable */
+#define ENUM_PWM_IMSK_PER2_MSK               (_ADI_MSK(0x00000000,uint32_t))  /* TMR2PER: Mask PWMTMR2 Period Interrupt */
+#define ENUM_PWM_IMSK_PER2_UMSK              (_ADI_MSK(0x00040000,uint32_t))  /* TMR2PER: Unmask PWMTMR2 Period Interrupt */
 
-#define BITM_PWM_IMSK_TMR1PER                (_ADI_MSK(0x00020000,uint32_t))  /* TMR1 Period Boundary Interrupt Mask */
-#define ENUM_PWM_IMSK_PER1_MSK               (_ADI_MSK(0x00000000,uint32_t))  /* TMR1PER: Mask TMR1 Period Interrupt */
-#define ENUM_PWM_IMSK_PER1_UMSK              (_ADI_MSK(0x00020000,uint32_t))  /* TMR1PER: Unmask TMR1 Period Interrupt */
+#define BITM_PWM_IMSK_TMR1PER                (_ADI_MSK(0x00020000,uint32_t))  /* PWMTMR1 Period Boundary Interrupt Enable */
+#define ENUM_PWM_IMSK_PER1_MSK               (_ADI_MSK(0x00000000,uint32_t))  /* TMR1PER: Mask PWMTMR1 Period Interrupt */
+#define ENUM_PWM_IMSK_PER1_UMSK              (_ADI_MSK(0x00020000,uint32_t))  /* TMR1PER: Unmask PWMTMR1 Period Interrupt */
 
-#define BITM_PWM_IMSK_TMR0PER                (_ADI_MSK(0x00010000,uint32_t))  /* TMR0 Period Boundary Interrupt Mask */
-#define ENUM_PWM_IMSK_PER0_MSK               (_ADI_MSK(0x00000000,uint32_t))  /* TMR0PER: Mask TMR0 Period Interrupt */
-#define ENUM_PWM_IMSK_PER0_UMSK              (_ADI_MSK(0x00010000,uint32_t))  /* TMR0PER: Unmask TMR0 Period Interrupt */
+#define BITM_PWM_IMSK_TMR0PER                (_ADI_MSK(0x00010000,uint32_t))  /* PWMTMR0 Period Boundary Interrupt Enable */
+#define ENUM_PWM_IMSK_PER0_MSK               (_ADI_MSK(0x00000000,uint32_t))  /* TMR0PER: Mask PWMTMR0 Period Interrupt */
+#define ENUM_PWM_IMSK_PER0_UMSK              (_ADI_MSK(0x00010000,uint32_t))  /* TMR0PER: Unmask PWMTMR0 Period Interrupt */
 
-#define BITM_PWM_IMSK_TRIP1                  (_ADI_MSK(0x00000002,uint32_t))  /* TRIP1 Interrupt Mask */
+#define BITM_PWM_IMSK_TRIP1                  (_ADI_MSK(0x00000002,uint32_t))  /* TRIP1 Interrupt Enable */
 #define ENUM_PWM_IMSK_TRIP1_MSK              (_ADI_MSK(0x00000000,uint32_t))  /* TRIP1: Mask TRIP1 Interrupt */
 #define ENUM_PWM_IMSK_TRIP1_UMSK             (_ADI_MSK(0x00000002,uint32_t))  /* TRIP1: Unmask TRIP1 Interrupt */
 
-#define BITM_PWM_IMSK_TRIP0                  (_ADI_MSK(0x00000001,uint32_t))  /* TRIP0 Interrupt Mask */
+#define BITM_PWM_IMSK_TRIP0                  (_ADI_MSK(0x00000001,uint32_t))  /* TRIP0 Interrupt Enable */
 #define ENUM_PWM_IMSK_TRIP0_MSK              (_ADI_MSK(0x00000000,uint32_t))  /* TRIP0: Mask TRIP0 Interrupt */
 #define ENUM_PWM_IMSK_TRIP0_UMSK             (_ADI_MSK(0x00000001,uint32_t))  /* TRIP0: Unmask TRIP0 Interrupt */
 
 /* ------------------------------------------------------------------------------------------------------------------------
         PWM_ILAT                             Pos/Masks                        Description
    ------------------------------------------------------------------------------------------------------------------------ */
-#define BITP_PWM_ILAT_TMR4PER                20                               /* TMR4 Period Boundary Interrupt Masked Status */
-#define BITP_PWM_ILAT_TMR3PER                19                               /* TMR3 Period Boundary Interrupt Masked Status */
-#define BITP_PWM_ILAT_TMR2PER                18                               /* TMR2 Period Boundary Interrupt Masked Status */
-#define BITP_PWM_ILAT_TMR1PER                17                               /* TMR1 Period Boundary Interrupt Masked Status */
-#define BITP_PWM_ILAT_TMR0PER                16                               /* TMR0 Period Boundary Interrupt Masked Status */
-#define BITP_PWM_ILAT_TRIP1                   1                               /* TRIP1 Interrupt Masked Status */
-#define BITP_PWM_ILAT_TRIP0                   0                               /* TRIP0 Interrupt Masked Status */
+#define BITP_PWM_ILAT_TMR4PER                20                               /* PWMTMR4 Period Latched Interrupt Status */
+#define BITP_PWM_ILAT_TMR3PER                19                               /* PWMTMR3 Period Latched Interrupt Status */
+#define BITP_PWM_ILAT_TMR2PER                18                               /* PWMTMR2 Period Latched Interrupt Status */
+#define BITP_PWM_ILAT_TMR1PER                17                               /* PWMTMR1 Period Latched Interrupt Status */
+#define BITP_PWM_ILAT_TMR0PER                16                               /* PWMTMR0 Period Boundary Interrupt Latched Status */
+#define BITP_PWM_ILAT_TRIP1                   1                               /* TRIP1 Interrupt Latched Status */
+#define BITP_PWM_ILAT_TRIP0                   0                               /* TRIP0 Interrupt Latched Status */
 
-#define BITM_PWM_ILAT_TMR4PER                (_ADI_MSK(0x00100000,uint32_t))  /* TMR4 Period Boundary Interrupt Masked Status */
-#define ENUM_PWM_ILAT_PER4_INTLO             (_ADI_MSK(0x00000000,uint32_t))  /* TMR4PER:  */
-#define ENUM_PWM_ILAT_PER4_INTHI             (_ADI_MSK(0x00100000,uint32_t))  /* TMR4PER:  */
+#define BITM_PWM_ILAT_TMR4PER                (_ADI_MSK(0x00100000,uint32_t))  /* PWMTMR4 Period Latched Interrupt Status */
+#define ENUM_PWM_ILAT_PER4_INTLO             (_ADI_MSK(0x00000000,uint32_t))  /* TMR4PER: No Interrupt Latched */
+#define ENUM_PWM_ILAT_PER4_INTHI             (_ADI_MSK(0x00100000,uint32_t))  /* TMR4PER: Interrupt Latched */
 
-#define BITM_PWM_ILAT_TMR3PER                (_ADI_MSK(0x00080000,uint32_t))  /* TMR3 Period Boundary Interrupt Masked Status */
-#define ENUM_PWM_ILAT_PER3_INTLO             (_ADI_MSK(0x00000000,uint32_t))  /* TMR3PER:  */
-#define ENUM_PWM_ILAT_PER3_INTHI             (_ADI_MSK(0x00080000,uint32_t))  /* TMR3PER:  */
+#define BITM_PWM_ILAT_TMR3PER                (_ADI_MSK(0x00080000,uint32_t))  /* PWMTMR3 Period Latched Interrupt Status */
+#define ENUM_PWM_ILAT_PER3_INTLO             (_ADI_MSK(0x00000000,uint32_t))  /* TMR3PER: No Interrupt Latched */
+#define ENUM_PWM_ILAT_PER3_INTHI             (_ADI_MSK(0x00080000,uint32_t))  /* TMR3PER: Interrupt Latched */
 
-#define BITM_PWM_ILAT_TMR2PER                (_ADI_MSK(0x00040000,uint32_t))  /* TMR2 Period Boundary Interrupt Masked Status */
-#define ENUM_PWM_ILAT_PER2_INTLO             (_ADI_MSK(0x00000000,uint32_t))  /* TMR2PER:  */
-#define ENUM_PWM_ILAT_PER2_INTHI             (_ADI_MSK(0x00040000,uint32_t))  /* TMR2PER:  */
+#define BITM_PWM_ILAT_TMR2PER                (_ADI_MSK(0x00040000,uint32_t))  /* PWMTMR2 Period Latched Interrupt Status */
+#define ENUM_PWM_ILAT_PER2_INTLO             (_ADI_MSK(0x00000000,uint32_t))  /* TMR2PER: No Interrupt Latched */
+#define ENUM_PWM_ILAT_PER2_INTHI             (_ADI_MSK(0x00040000,uint32_t))  /* TMR2PER: Interrupt Latched */
 
-#define BITM_PWM_ILAT_TMR1PER                (_ADI_MSK(0x00020000,uint32_t))  /* TMR1 Period Boundary Interrupt Masked Status */
-#define ENUM_PWM_ILAT_PER1_INTLO             (_ADI_MSK(0x00000000,uint32_t))  /* TMR1PER:  */
-#define ENUM_PWM_ILAT_PER1_INTHI             (_ADI_MSK(0x00020000,uint32_t))  /* TMR1PER:  */
+#define BITM_PWM_ILAT_TMR1PER                (_ADI_MSK(0x00020000,uint32_t))  /* PWMTMR1 Period Latched Interrupt Status */
+#define ENUM_PWM_ILAT_PER1_INTLO             (_ADI_MSK(0x00000000,uint32_t))  /* TMR1PER: No Interrupt Latched */
+#define ENUM_PWM_ILAT_PER1_INTHI             (_ADI_MSK(0x00020000,uint32_t))  /* TMR1PER: Interrupt Latched */
 
-#define BITM_PWM_ILAT_TMR0PER                (_ADI_MSK(0x00010000,uint32_t))  /* TMR0 Period Boundary Interrupt Masked Status */
-#define ENUM_PWM_ILAT_PER0_INTLO             (_ADI_MSK(0x00000000,uint32_t))  /* TMR0PER:  */
-#define ENUM_PWM_ILAT_PER0_INTHI             (_ADI_MSK(0x00010000,uint32_t))  /* TMR0PER:  */
+#define BITM_PWM_ILAT_TMR0PER                (_ADI_MSK(0x00010000,uint32_t))  /* PWMTMR0 Period Boundary Interrupt Latched Status */
+#define ENUM_PWM_ILAT_PER0_INTLO             (_ADI_MSK(0x00000000,uint32_t))  /* TMR0PER: No Interrupt Latched */
+#define ENUM_PWM_ILAT_PER0_INTHI             (_ADI_MSK(0x00010000,uint32_t))  /* TMR0PER: Interrupt Latched */
 
-#define BITM_PWM_ILAT_TRIP1                  (_ADI_MSK(0x00000002,uint32_t))  /* TRIP1 Interrupt Masked Status */
-#define ENUM_PWM_ILAT_TRIP1_INTLO            (_ADI_MSK(0x00000000,uint32_t))  /* TRIP1:  */
-#define ENUM_PWM_ILAT_TRIP1_INTHI            (_ADI_MSK(0x00000002,uint32_t))  /* TRIP1:  */
+#define BITM_PWM_ILAT_TRIP1                  (_ADI_MSK(0x00000002,uint32_t))  /* TRIP1 Interrupt Latched Status */
+#define ENUM_PWM_ILAT_TRIP1_INTLO            (_ADI_MSK(0x00000000,uint32_t))  /* TRIP1: No Interrupt Latched */
+#define ENUM_PWM_ILAT_TRIP1_INTHI            (_ADI_MSK(0x00000002,uint32_t))  /* TRIP1: Interrupt Latched */
 
-#define BITM_PWM_ILAT_TRIP0                  (_ADI_MSK(0x00000001,uint32_t))  /* TRIP0 Interrupt Masked Status */
-#define ENUM_PWM_ILAT_TRIP0_INTLO            (_ADI_MSK(0x00000000,uint32_t))  /* TRIP0:  */
-#define ENUM_PWM_ILAT_TRIP0_INTHI            (_ADI_MSK(0x00000001,uint32_t))  /* TRIP0:  */
+#define BITM_PWM_ILAT_TRIP0                  (_ADI_MSK(0x00000001,uint32_t))  /* TRIP0 Interrupt Latched Status */
+#define ENUM_PWM_ILAT_TRIP0_INTLO            (_ADI_MSK(0x00000000,uint32_t))  /* TRIP0: No Interrupt Latched */
+#define ENUM_PWM_ILAT_TRIP0_INTHI            (_ADI_MSK(0x00000001,uint32_t))  /* TRIP0: Interrupt Latched */
 
 /* ------------------------------------------------------------------------------------------------------------------------
         PWM_CHOPCFG                          Pos/Masks                        Description
    ------------------------------------------------------------------------------------------------------------------------ */
-#define BITP_PWM_CHOPCFG_VALUE                0                               /* PWM Gate Chopping Period */
-#define BITM_PWM_CHOPCFG_VALUE               (_ADI_MSK(0x000000FF,uint32_t))  /* PWM Gate Chopping Period */
+#define BITP_PWM_CHOPCFG_VALUE                0                               /* Gate Chopping Divisor */
+#define BITM_PWM_CHOPCFG_VALUE               (_ADI_MSK(0x000000FF,uint32_t))  /* Gate Chopping Divisor */
 
 /* ------------------------------------------------------------------------------------------------------------------------
         PWM_DT                               Pos/Masks                        Description
    ------------------------------------------------------------------------------------------------------------------------ */
-#define BITP_PWM_DT_VALUE                     0                               /* PWM Dead Time */
-#define BITM_PWM_DT_VALUE                    (_ADI_MSK(0x000003FF,uint32_t))  /* PWM Dead Time */
+#define BITP_PWM_DT_VALUE                     0                               /* Dead Time */
+#define BITM_PWM_DT_VALUE                    (_ADI_MSK(0x000003FF,uint32_t))  /* Dead Time */
 
 /* ------------------------------------------------------------------------------------------------------------------------
         PWM_SYNC_WID                         Pos/Masks                        Description
@@ -6708,57 +6680,63 @@
 /* ------------------------------------------------------------------------------------------------------------------------
         PWM_TM0                              Pos/Masks                        Description
    ------------------------------------------------------------------------------------------------------------------------ */
-#define BITP_PWM_TM0_VALUE                    0
-#define BITM_PWM_TM0_VALUE                   (_ADI_MSK(0x0000FFFF,uint32_t))
+#define BITP_PWM_TM0_VALUE                    0                               /* Timer PWMTMR0 Period Value */
+#define BITM_PWM_TM0_VALUE                   (_ADI_MSK(0x0000FFFF,uint32_t))  /* Timer PWMTMR0 Period Value */
 
 /* ------------------------------------------------------------------------------------------------------------------------
         PWM_TM1                              Pos/Masks                        Description
    ------------------------------------------------------------------------------------------------------------------------ */
-#define BITP_PWM_TM1_VALUE                    0
-#define BITM_PWM_TM1_VALUE                   (_ADI_MSK(0x0000FFFF,uint32_t))
+#define BITP_PWM_TM1_VALUE                    0                               /* Timer PWMTMR1 Period Value */
+#define BITM_PWM_TM1_VALUE                   (_ADI_MSK(0x0000FFFF,uint32_t))  /* Timer PWMTMR1 Period Value */
 
 /* ------------------------------------------------------------------------------------------------------------------------
         PWM_TM2                              Pos/Masks                        Description
    ------------------------------------------------------------------------------------------------------------------------ */
-#define BITP_PWM_TM2_VALUE                    0
-#define BITM_PWM_TM2_VALUE                   (_ADI_MSK(0x0000FFFF,uint32_t))
+#define BITP_PWM_TM2_VALUE                    0                               /* Timer PWMTMR2 Period Value */
+#define BITM_PWM_TM2_VALUE                   (_ADI_MSK(0x0000FFFF,uint32_t))  /* Timer PWMTMR2 Period Value */
 
 /* ------------------------------------------------------------------------------------------------------------------------
         PWM_TM3                              Pos/Masks                        Description
    ------------------------------------------------------------------------------------------------------------------------ */
-#define BITP_PWM_TM3_VALUE                    0
-#define BITM_PWM_TM3_VALUE                   (_ADI_MSK(0x0000FFFF,uint32_t))
+#define BITP_PWM_TM3_VALUE                    0                               /* Timer PWMTMR3 Period Value */
+#define BITM_PWM_TM3_VALUE                   (_ADI_MSK(0x0000FFFF,uint32_t))  /* Timer PWMTMR3 Period Value */
 
 /* ------------------------------------------------------------------------------------------------------------------------
         PWM_TM4                              Pos/Masks                        Description
    ------------------------------------------------------------------------------------------------------------------------ */
-#define BITP_PWM_TM4_VALUE                    0
-#define BITM_PWM_TM4_VALUE                   (_ADI_MSK(0x0000FFFF,uint32_t))
+#define BITP_PWM_TM4_VALUE                    0                               /* Timer PWMTMR4 Period Value */
+#define BITM_PWM_TM4_VALUE                   (_ADI_MSK(0x0000FFFF,uint32_t))  /* Timer PWMTMR4 Period Value */
+
+/* ------------------------------------------------------------------------------------------------------------------------
+        PWM_DLYA                             Pos/Masks                        Description
+   ------------------------------------------------------------------------------------------------------------------------ */
+#define BITP_PWM_DLYA_VALUE                   0                               /* Channel A Delay Value */
+#define BITM_PWM_DLYA_VALUE                  (_ADI_MSK(0x0000FFFF,uint32_t))  /* Channel A Delay Value */
 
 /* ------------------------------------------------------------------------------------------------------------------------
         PWM_DLYB                             Pos/Masks                        Description
    ------------------------------------------------------------------------------------------------------------------------ */
-#define BITP_PWM_DLYB_VALUE                   0
-#define BITM_PWM_DLYB_VALUE                  (_ADI_MSK(0x0000FFFF,uint32_t))
+#define BITP_PWM_DLYB_VALUE                   0                               /* Channel B Delay Value */
+#define BITM_PWM_DLYB_VALUE                  (_ADI_MSK(0x0000FFFF,uint32_t))  /* Channel B Delay Value */
 
 /* ------------------------------------------------------------------------------------------------------------------------
         PWM_DLYC                             Pos/Masks                        Description
    ------------------------------------------------------------------------------------------------------------------------ */
-#define BITP_PWM_DLYC_VALUE                   0
-#define BITM_PWM_DLYC_VALUE                  (_ADI_MSK(0x0000FFFF,uint32_t))
+#define BITP_PWM_DLYC_VALUE                   0                               /* Channel C Delay Value */
+#define BITM_PWM_DLYC_VALUE                  (_ADI_MSK(0x0000FFFF,uint32_t))  /* Channel C Delay Value */
 
 /* ------------------------------------------------------------------------------------------------------------------------
         PWM_DLYD                             Pos/Masks                        Description
    ------------------------------------------------------------------------------------------------------------------------ */
-#define BITP_PWM_DLYD_VALUE                   0
-#define BITM_PWM_DLYD_VALUE                  (_ADI_MSK(0x0000FFFF,uint32_t))
+#define BITP_PWM_DLYD_VALUE                   0                               /* Channel D Delay Value */
+#define BITM_PWM_DLYD_VALUE                  (_ADI_MSK(0x0000FFFF,uint32_t))  /* Channel D Delay Value */
 
 /* ------------------------------------------------------------------------------------------------------------------------
         PWM_ACTL                             Pos/Masks                        Description
    ------------------------------------------------------------------------------------------------------------------------ */
 #define BITP_PWM_ACTL_PULSEMODELO            10                               /* Low Side Output Pulse Position */
 #define BITP_PWM_ACTL_PULSEMODEHI             8                               /* High Side Output Pulse Position */
-#define BITP_PWM_ACTL_XOVR                    2                               /* Hi-Lo Crossover Enable */
+#define BITP_PWM_ACTL_XOVR                    2                               /* high-low Crossover Enable */
 #define BITP_PWM_ACTL_DISLO                   1                               /* Channel Low Side Output Disable */
 #define BITP_PWM_ACTL_DISHI                   0                               /* Channel High Side Output Disable */
 
@@ -6774,48 +6752,48 @@
 #define ENUM_PWM_LEFT_HI                     (_ADI_MSK(0x00000200,uint32_t))  /* PULSEMODEHI: Left Half */
 #define ENUM_PWM_RIGHT_HI                    (_ADI_MSK(0x00000300,uint32_t))  /* PULSEMODEHI: Right Half */
 
-#define BITM_PWM_ACTL_XOVR                   (_ADI_MSK(0x00000004,uint32_t))  /* Hi-Lo Crossover Enable */
-#define ENUM_PWM_XOVR_DIS                    (_ADI_MSK(0x00000000,uint32_t))  /* XOVR: No Crossover */
-#define ENUM_PWM_XOVR_EN                     (_ADI_MSK(0x00000004,uint32_t))  /* XOVR: Crossover */
+#define BITM_PWM_ACTL_XOVR                   (_ADI_MSK(0x00000004,uint32_t))  /* high-low Crossover Enable */
+#define ENUM_PWM_XOVR_DIS                    (_ADI_MSK(0x00000000,uint32_t))  /* XOVR: Disable Crossover */
+#define ENUM_PWM_XOVR_EN                     (_ADI_MSK(0x00000004,uint32_t))  /* XOVR: Enable Crossover */
 
 #define BITM_PWM_ACTL_DISLO                  (_ADI_MSK(0x00000002,uint32_t))  /* Channel Low Side Output Disable */
-#define ENUM_PWM_LO_DIS                      (_ADI_MSK(0x00000000,uint32_t))  /* DISLO: Channel High-side output disable */
-#define ENUM_PWM_LO_EN                       (_ADI_MSK(0x00000002,uint32_t))  /* DISLO: Channel High-side output enable */
+#define ENUM_PWM_LO_DIS                      (_ADI_MSK(0x00000000,uint32_t))  /* DISLO: Disable Low Side Output */
+#define ENUM_PWM_LO_EN                       (_ADI_MSK(0x00000002,uint32_t))  /* DISLO: Enable Low Side Output */
 
 #define BITM_PWM_ACTL_DISHI                  (_ADI_MSK(0x00000001,uint32_t))  /* Channel High Side Output Disable */
-#define ENUM_PWM_HI_DIS                      (_ADI_MSK(0x00000000,uint32_t))  /* DISHI: Channel High-side output disable */
-#define ENUM_PWM_HI_EN                       (_ADI_MSK(0x00000001,uint32_t))  /* DISHI: Channel High-side output enable */
+#define ENUM_PWM_HI_DIS                      (_ADI_MSK(0x00000000,uint32_t))  /* DISHI: Disable High Side Output */
+#define ENUM_PWM_HI_EN                       (_ADI_MSK(0x00000001,uint32_t))  /* DISHI: Enable High Side Output */
 
 /* ------------------------------------------------------------------------------------------------------------------------
         PWM_AH0                              Pos/Masks                        Description
    ------------------------------------------------------------------------------------------------------------------------ */
-#define BITP_PWM_AH0_DUTY                     0
-#define BITM_PWM_AH0_DUTY                    (_ADI_MSK(0x0000FFFF,uint32_t))
+#define BITP_PWM_AH0_DUTY                     0                               /* Duty Cycle Asserted Count */
+#define BITM_PWM_AH0_DUTY                    (_ADI_MSK(0x0000FFFF,uint32_t))  /* Duty Cycle Asserted Count */
 
 /* ------------------------------------------------------------------------------------------------------------------------
         PWM_AH1                              Pos/Masks                        Description
    ------------------------------------------------------------------------------------------------------------------------ */
-#define BITP_PWM_AH1_DUTY                     0
-#define BITM_PWM_AH1_DUTY                    (_ADI_MSK(0x0000FFFF,uint32_t))
+#define BITP_PWM_AH1_DUTY                     0                               /* Duty Cycle De-Asserted Count */
+#define BITM_PWM_AH1_DUTY                    (_ADI_MSK(0x0000FFFF,uint32_t))  /* Duty Cycle De-Asserted Count */
 
 /* ------------------------------------------------------------------------------------------------------------------------
         PWM_AL0                              Pos/Masks                        Description
    ------------------------------------------------------------------------------------------------------------------------ */
-#define BITP_PWM_AL0_DUTY                     0
-#define BITM_PWM_AL0_DUTY                    (_ADI_MSK(0x0000FFFF,uint32_t))
+#define BITP_PWM_AL0_DUTY                     0                               /* Duty Cycle Asserted Count */
+#define BITM_PWM_AL0_DUTY                    (_ADI_MSK(0x0000FFFF,uint32_t))  /* Duty Cycle Asserted Count */
 
 /* ------------------------------------------------------------------------------------------------------------------------
         PWM_AL1                              Pos/Masks                        Description
    ------------------------------------------------------------------------------------------------------------------------ */
-#define BITP_PWM_AL1_DUTY                     0
-#define BITM_PWM_AL1_DUTY                    (_ADI_MSK(0x0000FFFF,uint32_t))
+#define BITP_PWM_AL1_DUTY                     0                               /* Duty Cycle De-Asserted Count */
+#define BITM_PWM_AL1_DUTY                    (_ADI_MSK(0x0000FFFF,uint32_t))  /* Duty Cycle De-Asserted Count */
 
 /* ------------------------------------------------------------------------------------------------------------------------
         PWM_BCTL                             Pos/Masks                        Description
    ------------------------------------------------------------------------------------------------------------------------ */
 #define BITP_PWM_BCTL_PULSEMODELO            10                               /* Low Side Output Pulse Position */
 #define BITP_PWM_BCTL_PULSEMODEHI             8                               /* High Side Output Pulse Position */
-#define BITP_PWM_BCTL_XOVR                    2                               /* Hi-Lo Crossover Enable */
+#define BITP_PWM_BCTL_XOVR                    2                               /* high-low Crossover Enable */
 #define BITP_PWM_BCTL_DISLO                   1                               /* Channel Low Side Output Disable */
 #define BITP_PWM_BCTL_DISHI                   0                               /* Channel High Side Output Disable */
 
@@ -6823,40 +6801,40 @@
 
 #define BITM_PWM_BCTL_PULSEMODELO            (_ADI_MSK(0x00000C00,uint32_t))  /* Low Side Output Pulse Position */
 #define BITM_PWM_BCTL_PULSEMODEHI            (_ADI_MSK(0x00000300,uint32_t))  /* High Side Output Pulse Position */
-#define BITM_PWM_BCTL_XOVR                   (_ADI_MSK(0x00000004,uint32_t))  /* Hi-Lo Crossover Enable */
+#define BITM_PWM_BCTL_XOVR                   (_ADI_MSK(0x00000004,uint32_t))  /* high-low Crossover Enable */
 #define BITM_PWM_BCTL_DISLO                  (_ADI_MSK(0x00000002,uint32_t))  /* Channel Low Side Output Disable */
 #define BITM_PWM_BCTL_DISHI                  (_ADI_MSK(0x00000001,uint32_t))  /* Channel High Side Output Disable */
 
 /* ------------------------------------------------------------------------------------------------------------------------
         PWM_BH0                              Pos/Masks                        Description
    ------------------------------------------------------------------------------------------------------------------------ */
-#define BITP_PWM_BH0_DUTY                     0
-#define BITM_PWM_BH0_DUTY                    (_ADI_MSK(0x0000FFFF,uint32_t))
+#define BITP_PWM_BH0_DUTY                     0                               /* Duty Cycle Asserted Count */
+#define BITM_PWM_BH0_DUTY                    (_ADI_MSK(0x0000FFFF,uint32_t))  /* Duty Cycle Asserted Count */
 
 /* ------------------------------------------------------------------------------------------------------------------------
         PWM_BH1                              Pos/Masks                        Description
    ------------------------------------------------------------------------------------------------------------------------ */
-#define BITP_PWM_BH1_DUTY                     0
-#define BITM_PWM_BH1_DUTY                    (_ADI_MSK(0x0000FFFF,uint32_t))
+#define BITP_PWM_BH1_DUTY                     0                               /* Duty Cycle De-Asserted Count */
+#define BITM_PWM_BH1_DUTY                    (_ADI_MSK(0x0000FFFF,uint32_t))  /* Duty Cycle De-Asserted Count */
 
 /* ------------------------------------------------------------------------------------------------------------------------
         PWM_BL0                              Pos/Masks                        Description
    ------------------------------------------------------------------------------------------------------------------------ */
-#define BITP_PWM_BL0_DUTY                     0
-#define BITM_PWM_BL0_DUTY                    (_ADI_MSK(0x0000FFFF,uint32_t))
+#define BITP_PWM_BL0_DUTY                     0                               /* Duty Cycle Asserted Count */
+#define BITM_PWM_BL0_DUTY                    (_ADI_MSK(0x0000FFFF,uint32_t))  /* Duty Cycle Asserted Count */
 
 /* ------------------------------------------------------------------------------------------------------------------------
         PWM_BL1                              Pos/Masks                        Description
    ------------------------------------------------------------------------------------------------------------------------ */
-#define BITP_PWM_BL1_DUTY                     0
-#define BITM_PWM_BL1_DUTY                    (_ADI_MSK(0x0000FFFF,uint32_t))
+#define BITP_PWM_BL1_DUTY                     0                               /* Duty Cycle De-Asserted Count */
+#define BITM_PWM_BL1_DUTY                    (_ADI_MSK(0x0000FFFF,uint32_t))  /* Duty Cycle De-Asserted Count */
 
 /* ------------------------------------------------------------------------------------------------------------------------
         PWM_CCTL                             Pos/Masks                        Description
    ------------------------------------------------------------------------------------------------------------------------ */
 #define BITP_PWM_CCTL_PULSEMODELO            10                               /* Low Side Output Pulse Position */
 #define BITP_PWM_CCTL_PULSEMODEHI             8                               /* High Side Output Pulse Position */
-#define BITP_PWM_CCTL_XOVR                    2                               /* Hi-Lo Crossover Enable */
+#define BITP_PWM_CCTL_XOVR                    2                               /* high-low Crossover Enable */
 #define BITP_PWM_CCTL_DISLO                   1                               /* Channel Low Side Output Disable */
 #define BITP_PWM_CCTL_DISHI                   0                               /* Channel High Side Output Disable */
 
@@ -6864,40 +6842,40 @@
 
 #define BITM_PWM_CCTL_PULSEMODELO            (_ADI_MSK(0x00000C00,uint32_t))  /* Low Side Output Pulse Position */
 #define BITM_PWM_CCTL_PULSEMODEHI            (_ADI_MSK(0x00000300,uint32_t))  /* High Side Output Pulse Position */
-#define BITM_PWM_CCTL_XOVR                   (_ADI_MSK(0x00000004,uint32_t))  /* Hi-Lo Crossover Enable */
+#define BITM_PWM_CCTL_XOVR                   (_ADI_MSK(0x00000004,uint32_t))  /* high-low Crossover Enable */
 #define BITM_PWM_CCTL_DISLO                  (_ADI_MSK(0x00000002,uint32_t))  /* Channel Low Side Output Disable */
 #define BITM_PWM_CCTL_DISHI                  (_ADI_MSK(0x00000001,uint32_t))  /* Channel High Side Output Disable */
 
 /* ------------------------------------------------------------------------------------------------------------------------
         PWM_CH0                              Pos/Masks                        Description
    ------------------------------------------------------------------------------------------------------------------------ */
-#define BITP_PWM_CH0_DUTY                     0
-#define BITM_PWM_CH0_DUTY                    (_ADI_MSK(0x0000FFFF,uint32_t))
+#define BITP_PWM_CH0_DUTY                     0                               /* Duty Cycle Asserted Count */
+#define BITM_PWM_CH0_DUTY                    (_ADI_MSK(0x0000FFFF,uint32_t))  /* Duty Cycle Asserted Count */
 
 /* ------------------------------------------------------------------------------------------------------------------------
         PWM_CH1                              Pos/Masks                        Description
    ------------------------------------------------------------------------------------------------------------------------ */
-#define BITP_PWM_CH1_DUTY                     0
-#define BITM_PWM_CH1_DUTY                    (_ADI_MSK(0x0000FFFF,uint32_t))
+#define BITP_PWM_CH1_DUTY                     0                               /* Duty Cycle De-Asserted Count */
+#define BITM_PWM_CH1_DUTY                    (_ADI_MSK(0x0000FFFF,uint32_t))  /* Duty Cycle De-Asserted Count */
 
 /* ------------------------------------------------------------------------------------------------------------------------
         PWM_CL0                              Pos/Masks                        Description
    ------------------------------------------------------------------------------------------------------------------------ */
-#define BITP_PWM_CL0_DUTY                     0
-#define BITM_PWM_CL0_DUTY                    (_ADI_MSK(0x0000FFFF,uint32_t))
+#define BITP_PWM_CL0_DUTY                     0                               /* Duty Cycle Asserted Count */
+#define BITM_PWM_CL0_DUTY                    (_ADI_MSK(0x0000FFFF,uint32_t))  /* Duty Cycle Asserted Count */
 
 /* ------------------------------------------------------------------------------------------------------------------------
         PWM_CL1                              Pos/Masks                        Description
    ------------------------------------------------------------------------------------------------------------------------ */
-#define BITP_PWM_CL1_DUTY                     0
-#define BITM_PWM_CL1_DUTY                    (_ADI_MSK(0x0000FFFF,uint32_t))
+#define BITP_PWM_CL1_DUTY                     0                               /* Duty Cycle De-Asserted Count */
+#define BITM_PWM_CL1_DUTY                    (_ADI_MSK(0x0000FFFF,uint32_t))  /* Duty Cycle De-Asserted Count */
 
 /* ------------------------------------------------------------------------------------------------------------------------
         PWM_DCTL                             Pos/Masks                        Description
    ------------------------------------------------------------------------------------------------------------------------ */
 #define BITP_PWM_DCTL_PULSEMODELO            10                               /* Low Side Output Pulse Position */
 #define BITP_PWM_DCTL_PULSEMODEHI             8                               /* High Side Output Pulse Position */
-#define BITP_PWM_DCTL_XOVR                    2                               /* Hi-Lo Crossover Enable */
+#define BITP_PWM_DCTL_XOVR                    2                               /* high-low Crossover Enable */
 #define BITP_PWM_DCTL_DISLO                   1                               /* Channel Low Side Output Disable */
 #define BITP_PWM_DCTL_DISHI                   0                               /* Channel High Side Output Disable */
 
@@ -6905,41 +6883,33 @@
 
 #define BITM_PWM_DCTL_PULSEMODELO            (_ADI_MSK(0x00000C00,uint32_t))  /* Low Side Output Pulse Position */
 #define BITM_PWM_DCTL_PULSEMODEHI            (_ADI_MSK(0x00000300,uint32_t))  /* High Side Output Pulse Position */
-#define BITM_PWM_DCTL_XOVR                   (_ADI_MSK(0x00000004,uint32_t))  /* Hi-Lo Crossover Enable */
+#define BITM_PWM_DCTL_XOVR                   (_ADI_MSK(0x00000004,uint32_t))  /* high-low Crossover Enable */
 #define BITM_PWM_DCTL_DISLO                  (_ADI_MSK(0x00000002,uint32_t))  /* Channel Low Side Output Disable */
 #define BITM_PWM_DCTL_DISHI                  (_ADI_MSK(0x00000001,uint32_t))  /* Channel High Side Output Disable */
 
 /* ------------------------------------------------------------------------------------------------------------------------
         PWM_DH0                              Pos/Masks                        Description
    ------------------------------------------------------------------------------------------------------------------------ */
-#define BITP_PWM_DH0_DUTY                     0
-#define BITM_PWM_DH0_DUTY                    (_ADI_MSK(0x0000FFFF,uint32_t))
+#define BITP_PWM_DH0_DUTY                     0                               /* Duty Cycle Asserted Count */
+#define BITM_PWM_DH0_DUTY                    (_ADI_MSK(0x0000FFFF,uint32_t))  /* Duty Cycle Asserted Count */
 
 /* ------------------------------------------------------------------------------------------------------------------------
         PWM_DH1                              Pos/Masks                        Description
    ------------------------------------------------------------------------------------------------------------------------ */
-#define BITP_PWM_DH1_DUTY                     0
-#define BITM_PWM_DH1_DUTY                    (_ADI_MSK(0x0000FFFF,uint32_t))
+#define BITP_PWM_DH1_DUTY                     0                               /* Duty Cycle De-Asserted Count */
+#define BITM_PWM_DH1_DUTY                    (_ADI_MSK(0x0000FFFF,uint32_t))  /* Duty Cycle De-Asserted Count */
 
 /* ------------------------------------------------------------------------------------------------------------------------
         PWM_DL0                              Pos/Masks                        Description
    ------------------------------------------------------------------------------------------------------------------------ */
-#define BITP_PWM_DL0_DUTY                     0
-#define BITM_PWM_DL0_DUTY                    (_ADI_MSK(0x0000FFFF,uint32_t))
+#define BITP_PWM_DL0_DUTY                     0                               /* Duty Cycle Asserted Count */
+#define BITM_PWM_DL0_DUTY                    (_ADI_MSK(0x0000FFFF,uint32_t))  /* Duty Cycle Asserted Count */
 
 /* ------------------------------------------------------------------------------------------------------------------------
         PWM_DL1                              Pos/Masks                        Description
    ------------------------------------------------------------------------------------------------------------------------ */
-#define BITP_PWM_DL1_DUTY                     0
-#define BITM_PWM_DL1_DUTY                    (_ADI_MSK(0x0000FFFF,uint32_t))
-
-/* ------------------------------------------------------------------------------------------------------------------------
-        PWM_REVID                            Pos/Masks                        Description
-   ------------------------------------------------------------------------------------------------------------------------ */
-#define BITP_PWM_REVID_MAJOR                  4                               /* Major Revision ID */
-#define BITP_PWM_REVID_REV                    0                               /* Incremental Revision ID */
-#define BITM_PWM_REVID_MAJOR                 (_ADI_MSK(0x000000F0,uint32_t))  /* Major Revision ID */
-#define BITM_PWM_REVID_REV                   (_ADI_MSK(0x0000000F,uint32_t))  /* Incremental Revision ID */
+#define BITP_PWM_DL1_DUTY                     0                               /* Duty Cycle De-Asserted Count */
+#define BITM_PWM_DL1_DUTY                    (_ADI_MSK(0x0000FFFF,uint32_t))  /* Duty Cycle De-Asserted Count */
 
 /* ==================================================
         Video Subsystem Registers Registers
@@ -6962,16 +6932,12 @@
 #define BITP_VID_CONN_PPI2TX                 16                               /* PPI_2_TX Connectivity */
 #define BITP_VID_CONN_PPI1TX                 12                               /* PPI_1_TX Connectivity */
 #define BITP_VID_CONN_PPI0TX                  8                               /* PPI_0_TX Connectivity */
-#define BITP_VID_CONN_PVP0IN                  4                               /* PVP_IN Connectivity */
-#define BITP_VID_CONN_PIXC0IN                 0                               /* PIXC_IN Connectivity */
 #define BITM_VID_CONN_PPI2BCAST              (_ADI_MSK(0x00800000,uint32_t))  /* PPI_2 Broadcast Mode */
 #define BITM_VID_CONN_PPI1BCAST              (_ADI_MSK(0x00400000,uint32_t))  /* PPI_1 Broadcast Mode */
 #define BITM_VID_CONN_PPI0BCAST              (_ADI_MSK(0x00200000,uint32_t))  /* PPI_0 Broadcast Mode */
 #define BITM_VID_CONN_PPI2TX                 (_ADI_MSK(0x000F0000,uint32_t))  /* PPI_2_TX Connectivity */
 #define BITM_VID_CONN_PPI1TX                 (_ADI_MSK(0x0000F000,uint32_t))  /* PPI_1_TX Connectivity */
 #define BITM_VID_CONN_PPI0TX                 (_ADI_MSK(0x00000F00,uint32_t))  /* PPI_0_TX Connectivity */
-#define BITM_VID_CONN_PVP0IN                 (_ADI_MSK(0x000000F0,uint32_t))  /* PVP_IN Connectivity */
-#define BITM_VID_CONN_PIXC0IN                (_ADI_MSK(0x0000000F,uint32_t))  /* PIXC_IN Connectivity */
 
 /* ==================================================
         System Watchpoint Unit Registers
@@ -7502,278 +7468,274 @@
 #define BITM_SDU_GHLT_MS0                    (_ADI_MSK(0x00000001,uint32_t))  /* Master Select 0 */
 
 /* ==================================================
-        Ethernet MAC Register Definitions Registers
+        Ethernet MAC Registers
    ================================================== */
 
 /* =========================
         EMAC0
    ========================= */
 #define REG_EMAC0_MACCFG                0xFFC20000         /* EMAC0 MAC Configuration Register */
-#define REG_EMAC0_MACFRMFILT            0xFFC20004         /* EMAC0 Filter Register for filtering Received Frames */
-#define REG_EMAC0_HASHTBL_HI            0xFFC20008         /* EMAC0 Contains the Upper 32 bits of the hash table */
-#define REG_EMAC0_HASHTBL_LO            0xFFC2000C         /* EMAC0 Contains the lower 32 bits of the hash table */
-#define REG_EMAC0_GMII_ADDR             0xFFC20010         /* EMAC0 Management Address Register */
-#define REG_EMAC0_GMII_DATA             0xFFC20014         /* EMAC0 Management Data Register */
-#define REG_EMAC0_FLOWCTL               0xFFC20018         /* EMAC0 MAC FLow Control Register */
+#define REG_EMAC0_MACFRMFILT            0xFFC20004         /* EMAC0 MAC Rx Frame Filter Register */
+#define REG_EMAC0_HASHTBL_HI            0xFFC20008         /* EMAC0 Hash Table High Register */
+#define REG_EMAC0_HASHTBL_LO            0xFFC2000C         /* EMAC0 Hash Table Low Register */
+#define REG_EMAC0_SMI_ADDR              0xFFC20010         /* EMAC0 SMI Address Register */
+#define REG_EMAC0_SMI_DATA              0xFFC20014         /* EMAC0 SMI Data Register */
+#define REG_EMAC0_FLOWCTL               0xFFC20018         /* EMAC0 FLow Control Register */
 #define REG_EMAC0_VLANTAG               0xFFC2001C         /* EMAC0 VLAN Tag Register */
-#define REG_EMAC0_VER                   0xFFC20020         /* EMAC0 EMAC Version Register */
-#define REG_EMAC0_DBG                   0xFFC20024         /* EMAC0 EMAC Debug Register */
-#define REG_EMAC0_RMTWKUP               0xFFC20028         /* EMAC0 Remote wake up frame register */
-#define REG_EMAC0_PMT_CTLSTAT           0xFFC2002C         /* EMAC0 PMT Control and Status Register */
-#define REG_EMAC0_ISTAT                 0xFFC20038         /* EMAC0 EMAC Interrupt Status Register */
-#define REG_EMAC0_IMSK                  0xFFC2003C         /* EMAC0 EMAC Interrupt Mask Register */
-#define REG_EMAC0_ADDR0_HI              0xFFC20040         /* EMAC0 EMAC Address0 High Register */
-#define REG_EMAC0_ADDR0_LO              0xFFC20044         /* EMAC0 EMAC Address0 Low Register */
+#define REG_EMAC0_DBG                   0xFFC20024         /* EMAC0 Debug Register */
+#define REG_EMAC0_ISTAT                 0xFFC20038         /* EMAC0 Interrupt Status Register */
+#define REG_EMAC0_IMSK                  0xFFC2003C         /* EMAC0 Interrupt Mask Register */
+#define REG_EMAC0_ADDR0_HI              0xFFC20040         /* EMAC0 MAC Address 0 High Register */
+#define REG_EMAC0_ADDR0_LO              0xFFC20044         /* EMAC0 MAC Address 0 Low Register */
 #define REG_EMAC0_MMC_CTL               0xFFC20100         /* EMAC0 MMC Control Register */
-#define REG_EMAC0_MMC_RXINT             0xFFC20104         /* EMAC0 MMC RX Interrupt Register */
-#define REG_EMAC0_MMC_TXINT             0xFFC20108         /* EMAC0 MMC TX Interrupt Register */
-#define REG_EMAC0_MMC_RXIMSK            0xFFC2010C         /* EMAC0 MMC RX Interrupt Mask Register */
+#define REG_EMAC0_MMC_RXINT             0xFFC20104         /* EMAC0 MMC Rx Interrupt Register */
+#define REG_EMAC0_MMC_TXINT             0xFFC20108         /* EMAC0 MMC Tx Interrupt Register */
+#define REG_EMAC0_MMC_RXIMSK            0xFFC2010C         /* EMAC0 MMC Rx Interrupt Mask Register */
 #define REG_EMAC0_MMC_TXIMSK            0xFFC20110         /* EMAC0 MMC TX Interrupt Mask Register */
-#define REG_EMAC0_TXOCTCNT_GB           0xFFC20114         /* EMAC0 Num bytes transmitted exclusive of preamble */
-#define REG_EMAC0_TXFRMCNT_GB           0xFFC20118         /* EMAC0 Num frames transmitted exclusive of retired */
-#define REG_EMAC0_TXBCASTFRM_G          0xFFC2011C         /* EMAC0 Number of good broadcast frames transmitted. */
-#define REG_EMAC0_TXMCASTFRM_G          0xFFC20120         /* EMAC0 Number of good multicast frames transmitted. */
-#define REG_EMAC0_TX64_GB               0xFFC20124         /* EMAC0 Number of 64 byte length frames */
-#define REG_EMAC0_TX65TO127_GB          0xFFC20128         /* EMAC0 Number of frames of length b/w 65-127 (inclusive) bytes */
-#define REG_EMAC0_TX128TO255_GB         0xFFC2012C         /* EMAC0 Number of frames of length b/w 128-255 (inclusive) bytes */
-#define REG_EMAC0_TX256TO511_GB         0xFFC20130         /* EMAC0 Number of frames of length b/w 256-511 (inclusive) bytes */
-#define REG_EMAC0_TX512TO1023_GB        0xFFC20134         /* EMAC0 Number of frames of length b/w 512-1023 (inclusive) bytes */
-#define REG_EMAC0_TX1024TOMAX_GB        0xFFC20138         /* EMAC0 Number of frames of length b/w 1024-max (inclusive) bytes */
-#define REG_EMAC0_TXUCASTFRM_GB         0xFFC2013C         /* EMAC0 Number of good and bad unicast frames transmitted */
-#define REG_EMAC0_TXMCASTFRM_GB         0xFFC20140         /* EMAC0 Number of good and bad multicast frames transmitted */
-#define REG_EMAC0_TXBCASTFRM_GB         0xFFC20144         /* EMAC0 Number of good and bad broadcast frames transmitted */
-#define REG_EMAC0_TXUNDR_ERR            0xFFC20148         /* EMAC0 Number of frames aborted due to frame underflow error */
-#define REG_EMAC0_TXSNGCOL_G            0xFFC2014C         /* EMAC0 Number of transmitted frames after single collision */
-#define REG_EMAC0_TXMULTCOL_G           0xFFC20150         /* EMAC0 Number of transmitted frames with more than one collision */
-#define REG_EMAC0_TXDEFERRED            0xFFC20154         /* EMAC0 Number of transmitted frames after deferral */
-#define REG_EMAC0_TXLATECOL             0xFFC20158         /* EMAC0 Number of frames aborted due to late collision error */
-#define REG_EMAC0_TXEXCESSCOL           0xFFC2015C         /* EMAC0 Number of aborted frames due to excessive collisions */
-#define REG_EMAC0_TXCARR_ERR            0xFFC20160         /* EMAC0 Number of aborted frames due to carrier sense error */
-#define REG_EMAC0_TXOCTCNT_G            0xFFC20164         /* EMAC0 Number of bytes transmitted in good frames only */
-#define REG_EMAC0_TXFRMCNT_G            0xFFC20168         /* EMAC0 Number of good frames transmitted. */
-#define REG_EMAC0_TXEXCESSDEF           0xFFC2016C         /* EMAC0 Number of frames aborted due to excessive deferral */
-#define REG_EMAC0_TXPAUSEFRM            0xFFC20170         /* EMAC0 Number of good PAUSE frames transmitted. */
-#define REG_EMAC0_TXVLANFRM_G           0xFFC20174         /* EMAC0 Number of VLAN frames transmitted */
-#define REG_EMAC0_RXFRMCNT_GB           0xFFC20180         /* EMAC0 Number of good and bad frames received. */
-#define REG_EMAC0_RXOCTCNT_GB           0xFFC20184         /* EMAC0 Number of bytes received in good and bad frames */
-#define REG_EMAC0_RXOCTCNT_G            0xFFC20188         /* EMAC0 Number of bytes received only in good frames */
-#define REG_EMAC0_RXBCASTFRM_G          0xFFC2018C         /* EMAC0 Number of good broadcast frames received. */
-#define REG_EMAC0_RXMCASTFRM_G          0xFFC20190         /* EMAC0 Number of good multicast frames received */
-#define REG_EMAC0_RXCRC_ERR             0xFFC20194         /* EMAC0 Number of frames received with CRC error */
-#define REG_EMAC0_RXALIGN_ERR           0xFFC20198         /* EMAC0 Number of frames with alignment error */
-#define REG_EMAC0_RXRUNT_ERR            0xFFC2019C         /* EMAC0 Number of frames received with runt error. */
-#define REG_EMAC0_RXJAB_ERR             0xFFC201A0         /* EMAC0 Number of frames received with length greater than 1518 */
-#define REG_EMAC0_RXUSIZE_G             0xFFC201A4         /* EMAC0 Number of frames received with length 64 */
-#define REG_EMAC0_RXOSIZE_G             0xFFC201A8         /* EMAC0 Number of frames received with length greater than maxium */
-#define REG_EMAC0_RX64_GB               0xFFC201AC         /* EMAC0 Number of good and bad frames of lengh 64 bytes */
-#define REG_EMAC0_RX65TO127_GB          0xFFC201B0         /* EMAC0 Number of good and bad frame between 64-127(inclusive) */
-#define REG_EMAC0_RX128TO255_GB         0xFFC201B4         /* EMAC0 Number of good and bad frames received with length between 128 and 255 (inclusive) bytes, exclusive of preamble. */
-#define REG_EMAC0_RX256TO511_GB         0xFFC201B8         /* EMAC0 Number of good and bad frames between 256-511(inclusive) */
-#define REG_EMAC0_RX512TO1023_GB        0xFFC201BC         /* EMAC0 Number of good and bad frames received between 512-1023 */
-#define REG_EMAC0_RX1024TOMAX_GB        0xFFC201C0         /* EMAC0 Number of frames received between 1024 and maxsize */
-#define REG_EMAC0_RXUCASTFRM_G          0xFFC201C4         /* EMAC0 Number of good unicast frames received. */
-#define REG_EMAC0_RXLEN_ERR             0xFFC201C8         /* EMAC0 Number of frames received with length error */
-#define REG_EMAC0_RXOORTYPE             0xFFC201CC         /* EMAC0 Number of frames with length not equal to valid frame size */
-#define REG_EMAC0_RXPAUSEFRM            0xFFC201D0         /* EMAC0 Number of good and valid PAUSE frames received. */
-#define REG_EMAC0_RXFIFO_OVF            0xFFC201D4         /* EMAC0 Number of missed received frames due to FIFO overflow. This counter is not present in the GMAC-CORE configuration. */
-#define REG_EMAC0_RXVLANFRM_GB          0xFFC201D8         /* EMAC0 Number of good and bad VLAN frames received. */
-#define REG_EMAC0_RXWDOG_ERR            0xFFC201DC         /* EMAC0 Frames received with error due to watchdog timeout */
-#define REG_EMAC0_IPC_RXIMSK            0xFFC20200         /* EMAC0 MMC IPC RX Interrupt Mask Register */
-#define REG_EMAC0_IPC_RXINT             0xFFC20208         /* EMAC0 MMC IPC RX Interrupt Register */
-#define REG_EMAC0_RXIPV4_GD_FRM         0xFFC20210         /* EMAC0 Number of good IPv4 datagrams */
-#define REG_EMAC0_RXIPV4_HDR_ERR_FRM    0xFFC20214         /* EMAC0 Number of IPv4 datagrams with header errors */
-#define REG_EMAC0_RXIPV4_NOPAY_FRM      0xFFC20218         /* EMAC0 Number of IPv4 datagrams without checksum */
-#define REG_EMAC0_RXIPV4_FRAG_FRM       0xFFC2021C         /* EMAC0 Number of good IPv4 datagrams with fragmentation */
-#define REG_EMAC0_RXIPV4_UDSBL_FRM      0xFFC20220         /* EMAC0 Number of IPv4 UDP datagrams with disabled checksum */
-#define REG_EMAC0_RXIPV6_GD_FRM         0xFFC20224         /* EMAC0 Number of IPv4 datagrams with TCP/UDP/ICMP payloads */
-#define REG_EMAC0_RXIPV6_HDR_ERR_FRM    0xFFC20228         /* EMAC0 Number of IPv6 datagrams with header errors */
-#define REG_EMAC0_RXIPV6_NOPAY_FRM      0xFFC2022C         /* EMAC0 Number of IPv6 datagrams with no TCP/UDP/ICMP payload */
-#define REG_EMAC0_RXUDP_GD_FRM          0xFFC20230         /* EMAC0 Number of good IP datagrames with good UDP payload */
-#define REG_EMAC0_RXUDP_ERR_FRM         0xFFC20234         /* EMAC0 Number of good IP datagrams with UDP checksum errors */
-#define REG_EMAC0_RXTCP_GD_FRM          0xFFC20238         /* EMAC0 Number of good IP datagrams with a good TCP payload */
-#define REG_EMAC0_RXTCP_ERR_FRM         0xFFC2023C         /* EMAC0 Number of good IP datagrams with TCP checksum errors */
-#define REG_EMAC0_RXICMP_GD_FRM         0xFFC20240         /* EMAC0 Number of good IP datagrams with a good ICMP payload */
-#define REG_EMAC0_RXICMP_ERR_FRM        0xFFC20244         /* EMAC0 Number of good IP datagrams with ICMP checksum errors */
-#define REG_EMAC0_RXIPV4_GD_OCT         0xFFC20250         /* EMAC0 Bytes received in IPv4 datagrams including tcp,udp or icmp */
-#define REG_EMAC0_RXIPV4_HDR_ERR_OCT    0xFFC20254         /* EMAC0 Bytes received in IPv4 datagrams with header errors */
-#define REG_EMAC0_RXIPV4_NOPAY_OCT      0xFFC20258         /* EMAC0 Bytes received in IPv4 datagrams without tcp,udp,icmp load */
-#define REG_EMAC0_RXIPV4_FRAG_OCT       0xFFC2025C         /* EMAC0 Bytes received in fragmented IPv4 datagrams */
-#define REG_EMAC0_RXIPV4_UDSBL_OCT      0xFFC20260         /* EMAC0 Bytes received in UDP segment with checksum disabled */
-#define REG_EMAC0_RXIPV6_GD_OCT         0xFFC20264         /* EMAC0 Bytes received in good IPv6  including tcp,udp or icmp load */
-#define REG_EMAC0_RXIPV6_HDR_ERR_OCT    0xFFC20268         /* EMAC0 Number of bytes received in IPv6 with header errors */
-#define REG_EMAC0_RXIPV6_NOPAY_OCT      0xFFC2026C         /* EMAC0 Bytes received in IPv6 without tcp,udp or icmp load */
-#define REG_EMAC0_RXUDP_GD_OCT          0xFFC20270         /* EMAC0 Number of bytes received in good UDP segments */
-#define REG_EMAC0_RXUDP_ERR_OCT         0xFFC20274         /* EMAC0 Number of bytes received in UDP segment with checksum err */
-#define REG_EMAC0_RXTCP_GD_OCT          0xFFC20278         /* EMAC0 Number of bytes received in a good TCP segment */
-#define REG_EMAC0_RXTCP_ERR_OCT         0xFFC2027C         /* EMAC0 Number of bytes received in TCP segment with checksum err */
-#define REG_EMAC0_RXICMP_GD_OCT         0xFFC20280         /* EMAC0 Number of bytes received in a good ICMP segment */
-#define REG_EMAC0_RXICMP_ERR_OCT        0xFFC20284         /* EMAC0 Bytes received in an ICMP segment with checksum errors */
-#define REG_EMAC0_TM_CTL                0xFFC20700         /* EMAC0 EMAC Time Stamp Control Register */
-#define REG_EMAC0_TM_SUBSEC             0xFFC20704         /* EMAC0 EMAC Time Stamp Sub Second Increment */
-#define REG_EMAC0_TM_SEC                0xFFC20708         /* EMAC0 EMAC Time Stamp Second Register */
-#define REG_EMAC0_TM_NSEC               0xFFC2070C         /* EMAC0 EMAC Time Stamp Nano Second Register */
-#define REG_EMAC0_TM_SECUPDT            0xFFC20710         /* EMAC0 EMAC Time Stamp Seconds Update */
-#define REG_EMAC0_TM_NSECUPDT           0xFFC20714         /* EMAC0 EMAC Time Stamp Nano Seconds Update */
-#define REG_EMAC0_TM_ADDEND             0xFFC20718         /* EMAC0 EMAC Time Stamp Addend Register */
-#define REG_EMAC0_TM_TGTM               0xFFC2071C         /* EMAC0 EMAC Time Stamp Target Time Sec. */
-#define REG_EMAC0_TM_NTGTM              0xFFC20720         /* EMAC0 EMAC Time Stamp Target Time Nanosec. */
-#define REG_EMAC0_TM_HISEC              0xFFC20724         /* EMAC0 EMAC Time Stamp High Second Register */
-#define REG_EMAC0_TM_STMPSTAT           0xFFC20728         /* EMAC0 EMAC Time Stamp Status Register */
-#define REG_EMAC0_TM_PPSCTL             0xFFC2072C         /* EMAC0 EMAC PPS Control Register */
-#define REG_EMAC0_TM_AUXSTMP_NSEC       0xFFC20730         /* EMAC0 EMAC Auxillary Time Stamp Nano Register */
-#define REG_EMAC0_TM_AUXSTMP_SEC        0xFFC20734         /* EMAC0 EMAC Auxillary Time Stamp Sec Register */
-#define REG_EMAC0_DMA_BUSMODE           0xFFC21000         /* EMAC0 Bus Operating Modes for EMAC DMA */
-#define REG_EMAC0_DMA_TXPOLL            0xFFC21004         /* EMAC0 TX DMA Poll demand register */
-#define REG_EMAC0_DMA_RXPOLL            0xFFC21008         /* EMAC0 RX DMA Poll demand register */
-#define REG_EMAC0_DMA_RXDSC_ADDR        0xFFC2100C         /* EMAC0 RX Descriptor List Address */
-#define REG_EMAC0_DMA_TXDSC_ADDR        0xFFC21010         /* EMAC0 TX Descriptor List Address */
+#define REG_EMAC0_TXOCTCNT_GB           0xFFC20114         /* EMAC0 Tx OCT Count (Good/Bad) Register */
+#define REG_EMAC0_TXFRMCNT_GB           0xFFC20118         /* EMAC0 Tx Frame Count (Good/Bad) Register */
+#define REG_EMAC0_TXBCASTFRM_G          0xFFC2011C         /* EMAC0 Tx Broadcast Frames (Good) Register */
+#define REG_EMAC0_TXMCASTFRM_G          0xFFC20120         /* EMAC0 Tx Multicast Frames (Good) Register */
+#define REG_EMAC0_TX64_GB               0xFFC20124         /* EMAC0 Tx 64-Byte Frames (Good/Bad) Register */
+#define REG_EMAC0_TX65TO127_GB          0xFFC20128         /* EMAC0 Tx 65- to 127-Byte Frames (Good/Bad) Register */
+#define REG_EMAC0_TX128TO255_GB         0xFFC2012C         /* EMAC0 Tx 128- to 255-Byte Frames (Good/Bad) Register */
+#define REG_EMAC0_TX256TO511_GB         0xFFC20130         /* EMAC0 Tx 256- to 511-Byte Frames (Good/Bad) Register */
+#define REG_EMAC0_TX512TO1023_GB        0xFFC20134         /* EMAC0 Tx 512- to 1023-Byte Frames (Good/Bad) Register */
+#define REG_EMAC0_TX1024TOMAX_GB        0xFFC20138         /* EMAC0 Tx 1024- to Max-Byte Frames (Good/Bad) Register */
+#define REG_EMAC0_TXUCASTFRM_GB         0xFFC2013C         /* EMAC0 Tx Unicast Frames (Good/Bad) Register */
+#define REG_EMAC0_TXMCASTFRM_GB         0xFFC20140         /* EMAC0 Tx Multicast Frames (Good/Bad) Register */
+#define REG_EMAC0_TXBCASTFRM_GB         0xFFC20144         /* EMAC0 Tx Broadcast Frames (Good/Bad) Register */
+#define REG_EMAC0_TXUNDR_ERR            0xFFC20148         /* EMAC0 Tx Underflow Error Register */
+#define REG_EMAC0_TXSNGCOL_G            0xFFC2014C         /* EMAC0 Tx Single Collision (Good) Register */
+#define REG_EMAC0_TXMULTCOL_G           0xFFC20150         /* EMAC0 Tx Multiple Collision (Good) Register */
+#define REG_EMAC0_TXDEFERRED            0xFFC20154         /* EMAC0 Tx Deferred Register */
+#define REG_EMAC0_TXLATECOL             0xFFC20158         /* EMAC0 Tx Late Collision Register */
+#define REG_EMAC0_TXEXCESSCOL           0xFFC2015C         /* EMAC0 Tx Excess Collision Register */
+#define REG_EMAC0_TXCARR_ERR            0xFFC20160         /* EMAC0 Tx Carrier Error Register */
+#define REG_EMAC0_TXOCTCNT_G            0xFFC20164         /* EMAC0 Tx Octet Count (Good) Register */
+#define REG_EMAC0_TXFRMCNT_G            0xFFC20168         /* EMAC0 Tx Frame Count (Good) Register */
+#define REG_EMAC0_TXEXCESSDEF           0xFFC2016C         /* EMAC0 Tx Excess Deferral Register */
+#define REG_EMAC0_TXPAUSEFRM            0xFFC20170         /* EMAC0 Tx Pause Frame Register */
+#define REG_EMAC0_TXVLANFRM_G           0xFFC20174         /* EMAC0 Tx VLAN Frames (Good) Register */
+#define REG_EMAC0_RXFRMCNT_GB           0xFFC20180         /* EMAC0 Rx Frame Count (Good/Bad) Register */
+#define REG_EMAC0_RXOCTCNT_GB           0xFFC20184         /* EMAC0 Rx Octet Count (Good/Bad) Register */
+#define REG_EMAC0_RXOCTCNT_G            0xFFC20188         /* EMAC0 Rx Octet Count (Good) Register */
+#define REG_EMAC0_RXBCASTFRM_G          0xFFC2018C         /* EMAC0 Rx Broadcast Frames (Good) Register */
+#define REG_EMAC0_RXMCASTFRM_G          0xFFC20190         /* EMAC0 Rx Multicast Frames (Good) Register */
+#define REG_EMAC0_RXCRC_ERR             0xFFC20194         /* EMAC0 Rx CRC Error Register */
+#define REG_EMAC0_RXALIGN_ERR           0xFFC20198         /* EMAC0 Rx alignment Error Register */
+#define REG_EMAC0_RXRUNT_ERR            0xFFC2019C         /* EMAC0 Rx Runt Error Register */
+#define REG_EMAC0_RXJAB_ERR             0xFFC201A0         /* EMAC0 Rx Jab Error Register */
+#define REG_EMAC0_RXUSIZE_G             0xFFC201A4         /* EMAC0 Rx Undersize (Good) Register */
+#define REG_EMAC0_RXOSIZE_G             0xFFC201A8         /* EMAC0 Rx Oversize (Good) Register */
+#define REG_EMAC0_RX64_GB               0xFFC201AC         /* EMAC0 Rx 64-Byte Frames (Good/Bad) Register */
+#define REG_EMAC0_RX65TO127_GB          0xFFC201B0         /* EMAC0 Rx 65- to 127-Byte Frames (Good/Bad) Register */
+#define REG_EMAC0_RX128TO255_GB         0xFFC201B4         /* EMAC0 Rx 128- to 255-Byte Frames (Good/Bad) Register */
+#define REG_EMAC0_RX256TO511_GB         0xFFC201B8         /* EMAC0 Rx 256- to 511-Byte Frames (Good/Bad) Register */
+#define REG_EMAC0_RX512TO1023_GB        0xFFC201BC         /* EMAC0 Rx 512- to 1023-Byte Frames (Good/Bad) Register */
+#define REG_EMAC0_RX1024TOMAX_GB        0xFFC201C0         /* EMAC0 Rx 1024- to Max-Byte Frames (Good/Bad) Register */
+#define REG_EMAC0_RXUCASTFRM_G          0xFFC201C4         /* EMAC0 Rx Unicast Frames (Good) Register */
+#define REG_EMAC0_RXLEN_ERR             0xFFC201C8         /* EMAC0 Rx Length Error Register */
+#define REG_EMAC0_RXOORTYPE             0xFFC201CC         /* EMAC0 Rx Out Of Range Type Register */
+#define REG_EMAC0_RXPAUSEFRM            0xFFC201D0         /* EMAC0 Rx Pause Frames Register */
+#define REG_EMAC0_RXFIFO_OVF            0xFFC201D4         /* EMAC0 Rx FIFO Overflow Register */
+#define REG_EMAC0_RXVLANFRM_GB          0xFFC201D8         /* EMAC0 Rx VLAN Frames (Good/Bad) Register */
+#define REG_EMAC0_RXWDOG_ERR            0xFFC201DC         /* EMAC0 Rx Watch Dog Error Register */
+#define REG_EMAC0_IPC_RXIMSK            0xFFC20200         /* EMAC0 MMC IPC Rx Interrupt Mask Register */
+#define REG_EMAC0_IPC_RXINT             0xFFC20208         /* EMAC0 MMC IPC Rx Interrupt Register */
+#define REG_EMAC0_RXIPV4_GD_FRM         0xFFC20210         /* EMAC0 Rx IPv4 Datagrams (Good) Register */
+#define REG_EMAC0_RXIPV4_HDR_ERR_FRM    0xFFC20214         /* EMAC0 Rx IPv4 Datagrams Header Errors Register */
+#define REG_EMAC0_RXIPV4_NOPAY_FRM      0xFFC20218         /* EMAC0 Rx IPv4 Datagrams No Payload Frame Register */
+#define REG_EMAC0_RXIPV4_FRAG_FRM       0xFFC2021C         /* EMAC0 Rx IPv4 Datagrams Fragmented Frames Register */
+#define REG_EMAC0_RXIPV4_UDSBL_FRM      0xFFC20220         /* EMAC0 Rx IPv4 UDP Disabled Frames Register */
+#define REG_EMAC0_RXIPV6_GD_FRM         0xFFC20224         /* EMAC0 Rx IPv6 Datagrams Good Frames Register */
+#define REG_EMAC0_RXIPV6_HDR_ERR_FRM    0xFFC20228         /* EMAC0 Rx IPv6 Datagrams Header Error Frames Register */
+#define REG_EMAC0_RXIPV6_NOPAY_FRM      0xFFC2022C         /* EMAC0 Rx IPv6 Datagrams No Payload Frames Register */
+#define REG_EMAC0_RXUDP_GD_FRM          0xFFC20230         /* EMAC0 Rx UDP Good Frames Register */
+#define REG_EMAC0_RXUDP_ERR_FRM         0xFFC20234         /* EMAC0 Rx UDP Error Frames Register */
+#define REG_EMAC0_RXTCP_GD_FRM          0xFFC20238         /* EMAC0 Rx TCP Good Frames Register */
+#define REG_EMAC0_RXTCP_ERR_FRM         0xFFC2023C         /* EMAC0 Rx TCP Error Frames Register */
+#define REG_EMAC0_RXICMP_GD_FRM         0xFFC20240         /* EMAC0 Rx ICMP Good Frames Register */
+#define REG_EMAC0_RXICMP_ERR_FRM        0xFFC20244         /* EMAC0 Rx ICMP Error Frames Register */
+#define REG_EMAC0_RXIPV4_GD_OCT         0xFFC20250         /* EMAC0 Rx IPv4 Datagrams Good Octets Register */
+#define REG_EMAC0_RXIPV4_HDR_ERR_OCT    0xFFC20254         /* EMAC0 Rx IPv4 Datagrams Header Errors Register */
+#define REG_EMAC0_RXIPV4_NOPAY_OCT      0xFFC20258         /* EMAC0 Rx IPv4 Datagrams No Payload Octets Register */
+#define REG_EMAC0_RXIPV4_FRAG_OCT       0xFFC2025C         /* EMAC0 Rx IPv4 Datagrams Fragmented Octets Register */
+#define REG_EMAC0_RXIPV4_UDSBL_OCT      0xFFC20260         /* EMAC0 Rx IPv4 UDP Disabled Octets Register */
+#define REG_EMAC0_RXIPV6_GD_OCT         0xFFC20264         /* EMAC0 Rx IPv6 Good Octets Register */
+#define REG_EMAC0_RXIPV6_HDR_ERR_OCT    0xFFC20268         /* EMAC0 Rx IPv6 Header Errors Register */
+#define REG_EMAC0_RXIPV6_NOPAY_OCT      0xFFC2026C         /* EMAC0 Rx IPv6 No Payload Octets Register */
+#define REG_EMAC0_RXUDP_GD_OCT          0xFFC20270         /* EMAC0 Rx UDP Good Octets Register */
+#define REG_EMAC0_RXUDP_ERR_OCT         0xFFC20274         /* EMAC0 Rx UDP Error Octets Register */
+#define REG_EMAC0_RXTCP_GD_OCT          0xFFC20278         /* EMAC0 Rx TCP Good Octets Register */
+#define REG_EMAC0_RXTCP_ERR_OCT         0xFFC2027C         /* EMAC0 Rx TCP Error Octets Register */
+#define REG_EMAC0_RXICMP_GD_OCT         0xFFC20280         /* EMAC0 Rx ICMP Good Octets Register */
+#define REG_EMAC0_RXICMP_ERR_OCT        0xFFC20284         /* EMAC0 Rx ICMP Error Octets Register */
+#define REG_EMAC0_TM_CTL                0xFFC20700         /* EMAC0 Time Stamp Control Register */
+#define REG_EMAC0_TM_SUBSEC             0xFFC20704         /* EMAC0 Time Stamp Sub Second Increment Register */
+#define REG_EMAC0_TM_SEC                0xFFC20708         /* EMAC0 Time Stamp Low Seconds Register */
+#define REG_EMAC0_TM_NSEC               0xFFC2070C         /* EMAC0 Time Stamp Nano Seconds Register */
+#define REG_EMAC0_TM_SECUPDT            0xFFC20710         /* EMAC0 Time Stamp Seconds Update Register */
+#define REG_EMAC0_TM_NSECUPDT           0xFFC20714         /* EMAC0 Time Stamp Nano Seconds Update Register */
+#define REG_EMAC0_TM_ADDEND             0xFFC20718         /* EMAC0 Time Stamp Addend Register */
+#define REG_EMAC0_TM_TGTM               0xFFC2071C         /* EMAC0 Time Stamp Target Time Seconds Register */
+#define REG_EMAC0_TM_NTGTM              0xFFC20720         /* EMAC0 Time Stamp Target Time Nano Seconds Register */
+#define REG_EMAC0_TM_HISEC              0xFFC20724         /* EMAC0 Time Stamp High Second Register */
+#define REG_EMAC0_TM_STMPSTAT           0xFFC20728         /* EMAC0 Time Stamp Status Register */
+#define REG_EMAC0_TM_PPSCTL             0xFFC2072C         /* EMAC0 PPS Control Register */
+#define REG_EMAC0_TM_AUXSTMP_NSEC       0xFFC20730         /* EMAC0 Time Stamp Auxilary TS Nano Seconds Register */
+#define REG_EMAC0_TM_AUXSTMP_SEC        0xFFC20734         /* EMAC0 Time Stamp Auxilary TM Seconds Register */
+#define REG_EMAC0_TM_PPSINTVL           0xFFC20760         /* EMAC0 Time Stamp PPS Interval Register */
+#define REG_EMAC0_TM_PPSWIDTH           0xFFC20764         /* EMAC0 PPS Width Register */
+#define REG_EMAC0_DMA_BUSMODE           0xFFC21000         /* EMAC0 DMA Bus Mode Register */
+#define REG_EMAC0_DMA_TXPOLL            0xFFC21004         /* EMAC0 DMA Tx Poll Demand Register */
+#define REG_EMAC0_DMA_RXPOLL            0xFFC21008         /* EMAC0 DMA Rx Poll Demand register */
+#define REG_EMAC0_DMA_RXDSC_ADDR        0xFFC2100C         /* EMAC0 DMA Rx Descriptor List Address Register */
+#define REG_EMAC0_DMA_TXDSC_ADDR        0xFFC21010         /* EMAC0 DMA Tx Descriptor List Address Register */
 #define REG_EMAC0_DMA_STAT              0xFFC21014         /* EMAC0 DMA Status Register */
 #define REG_EMAC0_DMA_OPMODE            0xFFC21018         /* EMAC0 DMA Operation Mode Register */
 #define REG_EMAC0_DMA_IEN               0xFFC2101C         /* EMAC0 DMA Interrupt Enable Register */
-#define REG_EMAC0_DMA_MISS_FRM          0xFFC21020         /* EMAC0 DMA missed frame and buffer overflow counter */
-#define REG_EMAC0_DMA_RXIWDOG           0xFFC21024         /* EMAC0 DMA RX Interrupt Watch Dog timer */
-#define REG_EMAC0_DMA_BMMODE            0xFFC21028         /* EMAC0 AXI Bus Mode Register */
-#define REG_EMAC0_DMA_BMSTAT            0xFFC2102C         /* EMAC0 AXI Status Register */
-#define REG_EMAC0_DMA_TXDSC_CUR         0xFFC21048         /* EMAC0 TX current descriptor register */
-#define REG_EMAC0_DMA_RXDSC_CUR         0xFFC2104C         /* EMAC0 RX current descriptor register */
-#define REG_EMAC0_DMA_TXBUF_CUR         0xFFC21050         /* EMAC0 TX current buffer pointer register */
-#define REG_EMAC0_DMA_RXBUF_CUR         0xFFC21054         /* EMAC0 RX current buffer pointer register */
-#define REG_EMAC0_HWFEAT                0xFFC21058         /* EMAC0 Hardware Feature Register */
+#define REG_EMAC0_DMA_MISS_FRM          0xFFC21020         /* EMAC0 DMA Missed Frame Register */
+#define REG_EMAC0_DMA_RXIWDOG           0xFFC21024         /* EMAC0 DMA Rx Interrupt Watch Dog Register */
+#define REG_EMAC0_DMA_BMMODE            0xFFC21028         /* EMAC0 DMA SCB Bus Mode Register */
+#define REG_EMAC0_DMA_BMSTAT            0xFFC2102C         /* EMAC0 DMA SCB Status Register */
+#define REG_EMAC0_DMA_TXDSC_CUR         0xFFC21048         /* EMAC0 DMA Tx Descriptor Current Register */
+#define REG_EMAC0_DMA_RXDSC_CUR         0xFFC2104C         /* EMAC0 DMA Rx Descriptor Current Register */
+#define REG_EMAC0_DMA_TXBUF_CUR         0xFFC21050         /* EMAC0 DMA Tx Buffer Current Register */
+#define REG_EMAC0_DMA_RXBUF_CUR         0xFFC21054         /* EMAC0 DMA Rx Buffer Current Register */
 
 /* =========================
         EMAC1
    ========================= */
 #define REG_EMAC1_MACCFG                0xFFC22000         /* EMAC1 MAC Configuration Register */
-#define REG_EMAC1_MACFRMFILT            0xFFC22004         /* EMAC1 Filter Register for filtering Received Frames */
-#define REG_EMAC1_HASHTBL_HI            0xFFC22008         /* EMAC1 Contains the Upper 32 bits of the hash table */
-#define REG_EMAC1_HASHTBL_LO            0xFFC2200C         /* EMAC1 Contains the lower 32 bits of the hash table */
-#define REG_EMAC1_GMII_ADDR             0xFFC22010         /* EMAC1 Management Address Register */
-#define REG_EMAC1_GMII_DATA             0xFFC22014         /* EMAC1 Management Data Register */
-#define REG_EMAC1_FLOWCTL               0xFFC22018         /* EMAC1 MAC FLow Control Register */
+#define REG_EMAC1_MACFRMFILT            0xFFC22004         /* EMAC1 MAC Rx Frame Filter Register */
+#define REG_EMAC1_HASHTBL_HI            0xFFC22008         /* EMAC1 Hash Table High Register */
+#define REG_EMAC1_HASHTBL_LO            0xFFC2200C         /* EMAC1 Hash Table Low Register */
+#define REG_EMAC1_SMI_ADDR              0xFFC22010         /* EMAC1 SMI Address Register */
+#define REG_EMAC1_SMI_DATA              0xFFC22014         /* EMAC1 SMI Data Register */
+#define REG_EMAC1_FLOWCTL               0xFFC22018         /* EMAC1 FLow Control Register */
 #define REG_EMAC1_VLANTAG               0xFFC2201C         /* EMAC1 VLAN Tag Register */
-#define REG_EMAC1_VER                   0xFFC22020         /* EMAC1 EMAC Version Register */
-#define REG_EMAC1_DBG                   0xFFC22024         /* EMAC1 EMAC Debug Register */
-#define REG_EMAC1_RMTWKUP               0xFFC22028         /* EMAC1 Remote wake up frame register */
-#define REG_EMAC1_PMT_CTLSTAT           0xFFC2202C         /* EMAC1 PMT Control and Status Register */
-#define REG_EMAC1_ISTAT                 0xFFC22038         /* EMAC1 EMAC Interrupt Status Register */
-#define REG_EMAC1_IMSK                  0xFFC2203C         /* EMAC1 EMAC Interrupt Mask Register */
-#define REG_EMAC1_ADDR0_HI              0xFFC22040         /* EMAC1 EMAC Address0 High Register */
-#define REG_EMAC1_ADDR0_LO              0xFFC22044         /* EMAC1 EMAC Address0 Low Register */
+#define REG_EMAC1_DBG                   0xFFC22024         /* EMAC1 Debug Register */
+#define REG_EMAC1_ISTAT                 0xFFC22038         /* EMAC1 Interrupt Status Register */
+#define REG_EMAC1_IMSK                  0xFFC2203C         /* EMAC1 Interrupt Mask Register */
+#define REG_EMAC1_ADDR0_HI              0xFFC22040         /* EMAC1 MAC Address 0 High Register */
+#define REG_EMAC1_ADDR0_LO              0xFFC22044         /* EMAC1 MAC Address 0 Low Register */
 #define REG_EMAC1_MMC_CTL               0xFFC22100         /* EMAC1 MMC Control Register */
-#define REG_EMAC1_MMC_RXINT             0xFFC22104         /* EMAC1 MMC RX Interrupt Register */
-#define REG_EMAC1_MMC_TXINT             0xFFC22108         /* EMAC1 MMC TX Interrupt Register */
-#define REG_EMAC1_MMC_RXIMSK            0xFFC2210C         /* EMAC1 MMC RX Interrupt Mask Register */
+#define REG_EMAC1_MMC_RXINT             0xFFC22104         /* EMAC1 MMC Rx Interrupt Register */
+#define REG_EMAC1_MMC_TXINT             0xFFC22108         /* EMAC1 MMC Tx Interrupt Register */
+#define REG_EMAC1_MMC_RXIMSK            0xFFC2210C         /* EMAC1 MMC Rx Interrupt Mask Register */
 #define REG_EMAC1_MMC_TXIMSK            0xFFC22110         /* EMAC1 MMC TX Interrupt Mask Register */
-#define REG_EMAC1_TXOCTCNT_GB           0xFFC22114         /* EMAC1 Num bytes transmitted exclusive of preamble */
-#define REG_EMAC1_TXFRMCNT_GB           0xFFC22118         /* EMAC1 Num frames transmitted exclusive of retired */
-#define REG_EMAC1_TXBCASTFRM_G          0xFFC2211C         /* EMAC1 Number of good broadcast frames transmitted. */
-#define REG_EMAC1_TXMCASTFRM_G          0xFFC22120         /* EMAC1 Number of good multicast frames transmitted. */
-#define REG_EMAC1_TX64_GB               0xFFC22124         /* EMAC1 Number of 64 byte length frames */
-#define REG_EMAC1_TX65TO127_GB          0xFFC22128         /* EMAC1 Number of frames of length b/w 65-127 (inclusive) bytes */
-#define REG_EMAC1_TX128TO255_GB         0xFFC2212C         /* EMAC1 Number of frames of length b/w 128-255 (inclusive) bytes */
-#define REG_EMAC1_TX256TO511_GB         0xFFC22130         /* EMAC1 Number of frames of length b/w 256-511 (inclusive) bytes */
-#define REG_EMAC1_TX512TO1023_GB        0xFFC22134         /* EMAC1 Number of frames of length b/w 512-1023 (inclusive) bytes */
-#define REG_EMAC1_TX1024TOMAX_GB        0xFFC22138         /* EMAC1 Number of frames of length b/w 1024-max (inclusive) bytes */
-#define REG_EMAC1_TXUCASTFRM_GB         0xFFC2213C         /* EMAC1 Number of good and bad unicast frames transmitted */
-#define REG_EMAC1_TXMCASTFRM_GB         0xFFC22140         /* EMAC1 Number of good and bad multicast frames transmitted */
-#define REG_EMAC1_TXBCASTFRM_GB         0xFFC22144         /* EMAC1 Number of good and bad broadcast frames transmitted */
-#define REG_EMAC1_TXUNDR_ERR            0xFFC22148         /* EMAC1 Number of frames aborted due to frame underflow error */
-#define REG_EMAC1_TXSNGCOL_G            0xFFC2214C         /* EMAC1 Number of transmitted frames after single collision */
-#define REG_EMAC1_TXMULTCOL_G           0xFFC22150         /* EMAC1 Number of transmitted frames with more than one collision */
-#define REG_EMAC1_TXDEFERRED            0xFFC22154         /* EMAC1 Number of transmitted frames after deferral */
-#define REG_EMAC1_TXLATECOL             0xFFC22158         /* EMAC1 Number of frames aborted due to late collision error */
-#define REG_EMAC1_TXEXCESSCOL           0xFFC2215C         /* EMAC1 Number of aborted frames due to excessive collisions */
-#define REG_EMAC1_TXCARR_ERR            0xFFC22160         /* EMAC1 Number of aborted frames due to carrier sense error */
-#define REG_EMAC1_TXOCTCNT_G            0xFFC22164         /* EMAC1 Number of bytes transmitted in good frames only */
-#define REG_EMAC1_TXFRMCNT_G            0xFFC22168         /* EMAC1 Number of good frames transmitted. */
-#define REG_EMAC1_TXEXCESSDEF           0xFFC2216C         /* EMAC1 Number of frames aborted due to excessive deferral */
-#define REG_EMAC1_TXPAUSEFRM            0xFFC22170         /* EMAC1 Number of good PAUSE frames transmitted. */
-#define REG_EMAC1_TXVLANFRM_G           0xFFC22174         /* EMAC1 Number of VLAN frames transmitted */
-#define REG_EMAC1_RXFRMCNT_GB           0xFFC22180         /* EMAC1 Number of good and bad frames received. */
-#define REG_EMAC1_RXOCTCNT_GB           0xFFC22184         /* EMAC1 Number of bytes received in good and bad frames */
-#define REG_EMAC1_RXOCTCNT_G            0xFFC22188         /* EMAC1 Number of bytes received only in good frames */
-#define REG_EMAC1_RXBCASTFRM_G          0xFFC2218C         /* EMAC1 Number of good broadcast frames received. */
-#define REG_EMAC1_RXMCASTFRM_G          0xFFC22190         /* EMAC1 Number of good multicast frames received */
-#define REG_EMAC1_RXCRC_ERR             0xFFC22194         /* EMAC1 Number of frames received with CRC error */
-#define REG_EMAC1_RXALIGN_ERR           0xFFC22198         /* EMAC1 Number of frames with alignment error */
-#define REG_EMAC1_RXRUNT_ERR            0xFFC2219C         /* EMAC1 Number of frames received with runt error. */
-#define REG_EMAC1_RXJAB_ERR             0xFFC221A0         /* EMAC1 Number of frames received with length greater than 1518 */
-#define REG_EMAC1_RXUSIZE_G             0xFFC221A4         /* EMAC1 Number of frames received with length 64 */
-#define REG_EMAC1_RXOSIZE_G             0xFFC221A8         /* EMAC1 Number of frames received with length greater than maxium */
-#define REG_EMAC1_RX64_GB               0xFFC221AC         /* EMAC1 Number of good and bad frames of lengh 64 bytes */
-#define REG_EMAC1_RX65TO127_GB          0xFFC221B0         /* EMAC1 Number of good and bad frame between 64-127(inclusive) */
-#define REG_EMAC1_RX128TO255_GB         0xFFC221B4         /* EMAC1 Number of good and bad frames received with length between 128 and 255 (inclusive) bytes, exclusive of preamble. */
-#define REG_EMAC1_RX256TO511_GB         0xFFC221B8         /* EMAC1 Number of good and bad frames between 256-511(inclusive) */
-#define REG_EMAC1_RX512TO1023_GB        0xFFC221BC         /* EMAC1 Number of good and bad frames received between 512-1023 */
-#define REG_EMAC1_RX1024TOMAX_GB        0xFFC221C0         /* EMAC1 Number of frames received between 1024 and maxsize */
-#define REG_EMAC1_RXUCASTFRM_G          0xFFC221C4         /* EMAC1 Number of good unicast frames received. */
-#define REG_EMAC1_RXLEN_ERR             0xFFC221C8         /* EMAC1 Number of frames received with length error */
-#define REG_EMAC1_RXOORTYPE             0xFFC221CC         /* EMAC1 Number of frames with length not equal to valid frame size */
-#define REG_EMAC1_RXPAUSEFRM            0xFFC221D0         /* EMAC1 Number of good and valid PAUSE frames received. */
-#define REG_EMAC1_RXFIFO_OVF            0xFFC221D4         /* EMAC1 Number of missed received frames due to FIFO overflow. This counter is not present in the GMAC-CORE configuration. */
-#define REG_EMAC1_RXVLANFRM_GB          0xFFC221D8         /* EMAC1 Number of good and bad VLAN frames received. */
-#define REG_EMAC1_RXWDOG_ERR            0xFFC221DC         /* EMAC1 Frames received with error due to watchdog timeout */
-#define REG_EMAC1_IPC_RXIMSK            0xFFC22200         /* EMAC1 MMC IPC RX Interrupt Mask Register */
-#define REG_EMAC1_IPC_RXINT             0xFFC22208         /* EMAC1 MMC IPC RX Interrupt Register */
-#define REG_EMAC1_RXIPV4_GD_FRM         0xFFC22210         /* EMAC1 Number of good IPv4 datagrams */
-#define REG_EMAC1_RXIPV4_HDR_ERR_FRM    0xFFC22214         /* EMAC1 Number of IPv4 datagrams with header errors */
-#define REG_EMAC1_RXIPV4_NOPAY_FRM      0xFFC22218         /* EMAC1 Number of IPv4 datagrams without checksum */
-#define REG_EMAC1_RXIPV4_FRAG_FRM       0xFFC2221C         /* EMAC1 Number of good IPv4 datagrams with fragmentation */
-#define REG_EMAC1_RXIPV4_UDSBL_FRM      0xFFC22220         /* EMAC1 Number of IPv4 UDP datagrams with disabled checksum */
-#define REG_EMAC1_RXIPV6_GD_FRM         0xFFC22224         /* EMAC1 Number of IPv4 datagrams with TCP/UDP/ICMP payloads */
-#define REG_EMAC1_RXIPV6_HDR_ERR_FRM    0xFFC22228         /* EMAC1 Number of IPv6 datagrams with header errors */
-#define REG_EMAC1_RXIPV6_NOPAY_FRM      0xFFC2222C         /* EMAC1 Number of IPv6 datagrams with no TCP/UDP/ICMP payload */
-#define REG_EMAC1_RXUDP_GD_FRM          0xFFC22230         /* EMAC1 Number of good IP datagrames with good UDP payload */
-#define REG_EMAC1_RXUDP_ERR_FRM         0xFFC22234         /* EMAC1 Number of good IP datagrams with UDP checksum errors */
-#define REG_EMAC1_RXTCP_GD_FRM          0xFFC22238         /* EMAC1 Number of good IP datagrams with a good TCP payload */
-#define REG_EMAC1_RXTCP_ERR_FRM         0xFFC2223C         /* EMAC1 Number of good IP datagrams with TCP checksum errors */
-#define REG_EMAC1_RXICMP_GD_FRM         0xFFC22240         /* EMAC1 Number of good IP datagrams with a good ICMP payload */
-#define REG_EMAC1_RXICMP_ERR_FRM        0xFFC22244         /* EMAC1 Number of good IP datagrams with ICMP checksum errors */
-#define REG_EMAC1_RXIPV4_GD_OCT         0xFFC22250         /* EMAC1 Bytes received in IPv4 datagrams including tcp,udp or icmp */
-#define REG_EMAC1_RXIPV4_HDR_ERR_OCT    0xFFC22254         /* EMAC1 Bytes received in IPv4 datagrams with header errors */
-#define REG_EMAC1_RXIPV4_NOPAY_OCT      0xFFC22258         /* EMAC1 Bytes received in IPv4 datagrams without tcp,udp,icmp load */
-#define REG_EMAC1_RXIPV4_FRAG_OCT       0xFFC2225C         /* EMAC1 Bytes received in fragmented IPv4 datagrams */
-#define REG_EMAC1_RXIPV4_UDSBL_OCT      0xFFC22260         /* EMAC1 Bytes received in UDP segment with checksum disabled */
-#define REG_EMAC1_RXIPV6_GD_OCT         0xFFC22264         /* EMAC1 Bytes received in good IPv6  including tcp,udp or icmp load */
-#define REG_EMAC1_RXIPV6_HDR_ERR_OCT    0xFFC22268         /* EMAC1 Number of bytes received in IPv6 with header errors */
-#define REG_EMAC1_RXIPV6_NOPAY_OCT      0xFFC2226C         /* EMAC1 Bytes received in IPv6 without tcp,udp or icmp load */
-#define REG_EMAC1_RXUDP_GD_OCT          0xFFC22270         /* EMAC1 Number of bytes received in good UDP segments */
-#define REG_EMAC1_RXUDP_ERR_OCT         0xFFC22274         /* EMAC1 Number of bytes received in UDP segment with checksum err */
-#define REG_EMAC1_RXTCP_GD_OCT          0xFFC22278         /* EMAC1 Number of bytes received in a good TCP segment */
-#define REG_EMAC1_RXTCP_ERR_OCT         0xFFC2227C         /* EMAC1 Number of bytes received in TCP segment with checksum err */
-#define REG_EMAC1_RXICMP_GD_OCT         0xFFC22280         /* EMAC1 Number of bytes received in a good ICMP segment */
-#define REG_EMAC1_RXICMP_ERR_OCT        0xFFC22284         /* EMAC1 Bytes received in an ICMP segment with checksum errors */
-#define REG_EMAC1_TM_CTL                0xFFC22700         /* EMAC1 EMAC Time Stamp Control Register */
-#define REG_EMAC1_TM_SUBSEC             0xFFC22704         /* EMAC1 EMAC Time Stamp Sub Second Increment */
-#define REG_EMAC1_TM_SEC                0xFFC22708         /* EMAC1 EMAC Time Stamp Second Register */
-#define REG_EMAC1_TM_NSEC               0xFFC2270C         /* EMAC1 EMAC Time Stamp Nano Second Register */
-#define REG_EMAC1_TM_SECUPDT            0xFFC22710         /* EMAC1 EMAC Time Stamp Seconds Update */
-#define REG_EMAC1_TM_NSECUPDT           0xFFC22714         /* EMAC1 EMAC Time Stamp Nano Seconds Update */
-#define REG_EMAC1_TM_ADDEND             0xFFC22718         /* EMAC1 EMAC Time Stamp Addend Register */
-#define REG_EMAC1_TM_TGTM               0xFFC2271C         /* EMAC1 EMAC Time Stamp Target Time Sec. */
-#define REG_EMAC1_TM_NTGTM              0xFFC22720         /* EMAC1 EMAC Time Stamp Target Time Nanosec. */
-#define REG_EMAC1_TM_HISEC              0xFFC22724         /* EMAC1 EMAC Time Stamp High Second Register */
-#define REG_EMAC1_TM_STMPSTAT           0xFFC22728         /* EMAC1 EMAC Time Stamp Status Register */
-#define REG_EMAC1_TM_PPSCTL             0xFFC2272C         /* EMAC1 EMAC PPS Control Register */
-#define REG_EMAC1_TM_AUXSTMP_NSEC       0xFFC22730         /* EMAC1 EMAC Auxillary Time Stamp Nano Register */
-#define REG_EMAC1_TM_AUXSTMP_SEC        0xFFC22734         /* EMAC1 EMAC Auxillary Time Stamp Sec Register */
-#define REG_EMAC1_DMA_BUSMODE           0xFFC23000         /* EMAC1 Bus Operating Modes for EMAC DMA */
-#define REG_EMAC1_DMA_TXPOLL            0xFFC23004         /* EMAC1 TX DMA Poll demand register */
-#define REG_EMAC1_DMA_RXPOLL            0xFFC23008         /* EMAC1 RX DMA Poll demand register */
-#define REG_EMAC1_DMA_RXDSC_ADDR        0xFFC2300C         /* EMAC1 RX Descriptor List Address */
-#define REG_EMAC1_DMA_TXDSC_ADDR        0xFFC23010         /* EMAC1 TX Descriptor List Address */
+#define REG_EMAC1_TXOCTCNT_GB           0xFFC22114         /* EMAC1 Tx OCT Count (Good/Bad) Register */
+#define REG_EMAC1_TXFRMCNT_GB           0xFFC22118         /* EMAC1 Tx Frame Count (Good/Bad) Register */
+#define REG_EMAC1_TXBCASTFRM_G          0xFFC2211C         /* EMAC1 Tx Broadcast Frames (Good) Register */
+#define REG_EMAC1_TXMCASTFRM_G          0xFFC22120         /* EMAC1 Tx Multicast Frames (Good) Register */
+#define REG_EMAC1_TX64_GB               0xFFC22124         /* EMAC1 Tx 64-Byte Frames (Good/Bad) Register */
+#define REG_EMAC1_TX65TO127_GB          0xFFC22128         /* EMAC1 Tx 65- to 127-Byte Frames (Good/Bad) Register */
+#define REG_EMAC1_TX128TO255_GB         0xFFC2212C         /* EMAC1 Tx 128- to 255-Byte Frames (Good/Bad) Register */
+#define REG_EMAC1_TX256TO511_GB         0xFFC22130         /* EMAC1 Tx 256- to 511-Byte Frames (Good/Bad) Register */
+#define REG_EMAC1_TX512TO1023_GB        0xFFC22134         /* EMAC1 Tx 512- to 1023-Byte Frames (Good/Bad) Register */
+#define REG_EMAC1_TX1024TOMAX_GB        0xFFC22138         /* EMAC1 Tx 1024- to Max-Byte Frames (Good/Bad) Register */
+#define REG_EMAC1_TXUCASTFRM_GB         0xFFC2213C         /* EMAC1 Tx Unicast Frames (Good/Bad) Register */
+#define REG_EMAC1_TXMCASTFRM_GB         0xFFC22140         /* EMAC1 Tx Multicast Frames (Good/Bad) Register */
+#define REG_EMAC1_TXBCASTFRM_GB         0xFFC22144         /* EMAC1 Tx Broadcast Frames (Good/Bad) Register */
+#define REG_EMAC1_TXUNDR_ERR            0xFFC22148         /* EMAC1 Tx Underflow Error Register */
+#define REG_EMAC1_TXSNGCOL_G            0xFFC2214C         /* EMAC1 Tx Single Collision (Good) Register */
+#define REG_EMAC1_TXMULTCOL_G           0xFFC22150         /* EMAC1 Tx Multiple Collision (Good) Register */
+#define REG_EMAC1_TXDEFERRED            0xFFC22154         /* EMAC1 Tx Deferred Register */
+#define REG_EMAC1_TXLATECOL             0xFFC22158         /* EMAC1 Tx Late Collision Register */
+#define REG_EMAC1_TXEXCESSCOL           0xFFC2215C         /* EMAC1 Tx Excess Collision Register */
+#define REG_EMAC1_TXCARR_ERR            0xFFC22160         /* EMAC1 Tx Carrier Error Register */
+#define REG_EMAC1_TXOCTCNT_G            0xFFC22164         /* EMAC1 Tx Octet Count (Good) Register */
+#define REG_EMAC1_TXFRMCNT_G            0xFFC22168         /* EMAC1 Tx Frame Count (Good) Register */
+#define REG_EMAC1_TXEXCESSDEF           0xFFC2216C         /* EMAC1 Tx Excess Deferral Register */
+#define REG_EMAC1_TXPAUSEFRM            0xFFC22170         /* EMAC1 Tx Pause Frame Register */
+#define REG_EMAC1_TXVLANFRM_G           0xFFC22174         /* EMAC1 Tx VLAN Frames (Good) Register */
+#define REG_EMAC1_RXFRMCNT_GB           0xFFC22180         /* EMAC1 Rx Frame Count (Good/Bad) Register */
+#define REG_EMAC1_RXOCTCNT_GB           0xFFC22184         /* EMAC1 Rx Octet Count (Good/Bad) Register */
+#define REG_EMAC1_RXOCTCNT_G            0xFFC22188         /* EMAC1 Rx Octet Count (Good) Register */
+#define REG_EMAC1_RXBCASTFRM_G          0xFFC2218C         /* EMAC1 Rx Broadcast Frames (Good) Register */
+#define REG_EMAC1_RXMCASTFRM_G          0xFFC22190         /* EMAC1 Rx Multicast Frames (Good) Register */
+#define REG_EMAC1_RXCRC_ERR             0xFFC22194         /* EMAC1 Rx CRC Error Register */
+#define REG_EMAC1_RXALIGN_ERR           0xFFC22198         /* EMAC1 Rx alignment Error Register */
+#define REG_EMAC1_RXRUNT_ERR            0xFFC2219C         /* EMAC1 Rx Runt Error Register */
+#define REG_EMAC1_RXJAB_ERR             0xFFC221A0         /* EMAC1 Rx Jab Error Register */
+#define REG_EMAC1_RXUSIZE_G             0xFFC221A4         /* EMAC1 Rx Undersize (Good) Register */
+#define REG_EMAC1_RXOSIZE_G             0xFFC221A8         /* EMAC1 Rx Oversize (Good) Register */
+#define REG_EMAC1_RX64_GB               0xFFC221AC         /* EMAC1 Rx 64-Byte Frames (Good/Bad) Register */
+#define REG_EMAC1_RX65TO127_GB          0xFFC221B0         /* EMAC1 Rx 65- to 127-Byte Frames (Good/Bad) Register */
+#define REG_EMAC1_RX128TO255_GB         0xFFC221B4         /* EMAC1 Rx 128- to 255-Byte Frames (Good/Bad) Register */
+#define REG_EMAC1_RX256TO511_GB         0xFFC221B8         /* EMAC1 Rx 256- to 511-Byte Frames (Good/Bad) Register */
+#define REG_EMAC1_RX512TO1023_GB        0xFFC221BC         /* EMAC1 Rx 512- to 1023-Byte Frames (Good/Bad) Register */
+#define REG_EMAC1_RX1024TOMAX_GB        0xFFC221C0         /* EMAC1 Rx 1024- to Max-Byte Frames (Good/Bad) Register */
+#define REG_EMAC1_RXUCASTFRM_G          0xFFC221C4         /* EMAC1 Rx Unicast Frames (Good) Register */
+#define REG_EMAC1_RXLEN_ERR             0xFFC221C8         /* EMAC1 Rx Length Error Register */
+#define REG_EMAC1_RXOORTYPE             0xFFC221CC         /* EMAC1 Rx Out Of Range Type Register */
+#define REG_EMAC1_RXPAUSEFRM            0xFFC221D0         /* EMAC1 Rx Pause Frames Register */
+#define REG_EMAC1_RXFIFO_OVF            0xFFC221D4         /* EMAC1 Rx FIFO Overflow Register */
+#define REG_EMAC1_RXVLANFRM_GB          0xFFC221D8         /* EMAC1 Rx VLAN Frames (Good/Bad) Register */
+#define REG_EMAC1_RXWDOG_ERR            0xFFC221DC         /* EMAC1 Rx Watch Dog Error Register */
+#define REG_EMAC1_IPC_RXIMSK            0xFFC22200         /* EMAC1 MMC IPC Rx Interrupt Mask Register */
+#define REG_EMAC1_IPC_RXINT             0xFFC22208         /* EMAC1 MMC IPC Rx Interrupt Register */
+#define REG_EMAC1_RXIPV4_GD_FRM         0xFFC22210         /* EMAC1 Rx IPv4 Datagrams (Good) Register */
+#define REG_EMAC1_RXIPV4_HDR_ERR_FRM    0xFFC22214         /* EMAC1 Rx IPv4 Datagrams Header Errors Register */
+#define REG_EMAC1_RXIPV4_NOPAY_FRM      0xFFC22218         /* EMAC1 Rx IPv4 Datagrams No Payload Frame Register */
+#define REG_EMAC1_RXIPV4_FRAG_FRM       0xFFC2221C         /* EMAC1 Rx IPv4 Datagrams Fragmented Frames Register */
+#define REG_EMAC1_RXIPV4_UDSBL_FRM      0xFFC22220         /* EMAC1 Rx IPv4 UDP Disabled Frames Register */
+#define REG_EMAC1_RXIPV6_GD_FRM         0xFFC22224         /* EMAC1 Rx IPv6 Datagrams Good Frames Register */
+#define REG_EMAC1_RXIPV6_HDR_ERR_FRM    0xFFC22228         /* EMAC1 Rx IPv6 Datagrams Header Error Frames Register */
+#define REG_EMAC1_RXIPV6_NOPAY_FRM      0xFFC2222C         /* EMAC1 Rx IPv6 Datagrams No Payload Frames Register */
+#define REG_EMAC1_RXUDP_GD_FRM          0xFFC22230         /* EMAC1 Rx UDP Good Frames Register */
+#define REG_EMAC1_RXUDP_ERR_FRM         0xFFC22234         /* EMAC1 Rx UDP Error Frames Register */
+#define REG_EMAC1_RXTCP_GD_FRM          0xFFC22238         /* EMAC1 Rx TCP Good Frames Register */
+#define REG_EMAC1_RXTCP_ERR_FRM         0xFFC2223C         /* EMAC1 Rx TCP Error Frames Register */
+#define REG_EMAC1_RXICMP_GD_FRM         0xFFC22240         /* EMAC1 Rx ICMP Good Frames Register */
+#define REG_EMAC1_RXICMP_ERR_FRM        0xFFC22244         /* EMAC1 Rx ICMP Error Frames Register */
+#define REG_EMAC1_RXIPV4_GD_OCT         0xFFC22250         /* EMAC1 Rx IPv4 Datagrams Good Octets Register */
+#define REG_EMAC1_RXIPV4_HDR_ERR_OCT    0xFFC22254         /* EMAC1 Rx IPv4 Datagrams Header Errors Register */
+#define REG_EMAC1_RXIPV4_NOPAY_OCT      0xFFC22258         /* EMAC1 Rx IPv4 Datagrams No Payload Octets Register */
+#define REG_EMAC1_RXIPV4_FRAG_OCT       0xFFC2225C         /* EMAC1 Rx IPv4 Datagrams Fragmented Octets Register */
+#define REG_EMAC1_RXIPV4_UDSBL_OCT      0xFFC22260         /* EMAC1 Rx IPv4 UDP Disabled Octets Register */
+#define REG_EMAC1_RXIPV6_GD_OCT         0xFFC22264         /* EMAC1 Rx IPv6 Good Octets Register */
+#define REG_EMAC1_RXIPV6_HDR_ERR_OCT    0xFFC22268         /* EMAC1 Rx IPv6 Header Errors Register */
+#define REG_EMAC1_RXIPV6_NOPAY_OCT      0xFFC2226C         /* EMAC1 Rx IPv6 No Payload Octets Register */
+#define REG_EMAC1_RXUDP_GD_OCT          0xFFC22270         /* EMAC1 Rx UDP Good Octets Register */
+#define REG_EMAC1_RXUDP_ERR_OCT         0xFFC22274         /* EMAC1 Rx UDP Error Octets Register */
+#define REG_EMAC1_RXTCP_GD_OCT          0xFFC22278         /* EMAC1 Rx TCP Good Octets Register */
+#define REG_EMAC1_RXTCP_ERR_OCT         0xFFC2227C         /* EMAC1 Rx TCP Error Octets Register */
+#define REG_EMAC1_RXICMP_GD_OCT         0xFFC22280         /* EMAC1 Rx ICMP Good Octets Register */
+#define REG_EMAC1_RXICMP_ERR_OCT        0xFFC22284         /* EMAC1 Rx ICMP Error Octets Register */
+#define REG_EMAC1_TM_CTL                0xFFC22700         /* EMAC1 Time Stamp Control Register */
+#define REG_EMAC1_TM_SUBSEC             0xFFC22704         /* EMAC1 Time Stamp Sub Second Increment Register */
+#define REG_EMAC1_TM_SEC                0xFFC22708         /* EMAC1 Time Stamp Low Seconds Register */
+#define REG_EMAC1_TM_NSEC               0xFFC2270C         /* EMAC1 Time Stamp Nano Seconds Register */
+#define REG_EMAC1_TM_SECUPDT            0xFFC22710         /* EMAC1 Time Stamp Seconds Update Register */
+#define REG_EMAC1_TM_NSECUPDT           0xFFC22714         /* EMAC1 Time Stamp Nano Seconds Update Register */
+#define REG_EMAC1_TM_ADDEND             0xFFC22718         /* EMAC1 Time Stamp Addend Register */
+#define REG_EMAC1_TM_TGTM               0xFFC2271C         /* EMAC1 Time Stamp Target Time Seconds Register */
+#define REG_EMAC1_TM_NTGTM              0xFFC22720         /* EMAC1 Time Stamp Target Time Nano Seconds Register */
+#define REG_EMAC1_TM_HISEC              0xFFC22724         /* EMAC1 Time Stamp High Second Register */
+#define REG_EMAC1_TM_STMPSTAT           0xFFC22728         /* EMAC1 Time Stamp Status Register */
+#define REG_EMAC1_TM_PPSCTL             0xFFC2272C         /* EMAC1 PPS Control Register */
+#define REG_EMAC1_TM_AUXSTMP_NSEC       0xFFC22730         /* EMAC1 Time Stamp Auxilary TS Nano Seconds Register */
+#define REG_EMAC1_TM_AUXSTMP_SEC        0xFFC22734         /* EMAC1 Time Stamp Auxilary TM Seconds Register */
+#define REG_EMAC1_TM_PPSINTVL           0xFFC22760         /* EMAC1 Time Stamp PPS Interval Register */
+#define REG_EMAC1_TM_PPSWIDTH           0xFFC22764         /* EMAC1 PPS Width Register */
+#define REG_EMAC1_DMA_BUSMODE           0xFFC23000         /* EMAC1 DMA Bus Mode Register */
+#define REG_EMAC1_DMA_TXPOLL            0xFFC23004         /* EMAC1 DMA Tx Poll Demand Register */
+#define REG_EMAC1_DMA_RXPOLL            0xFFC23008         /* EMAC1 DMA Rx Poll Demand register */
+#define REG_EMAC1_DMA_RXDSC_ADDR        0xFFC2300C         /* EMAC1 DMA Rx Descriptor List Address Register */
+#define REG_EMAC1_DMA_TXDSC_ADDR        0xFFC23010         /* EMAC1 DMA Tx Descriptor List Address Register */
 #define REG_EMAC1_DMA_STAT              0xFFC23014         /* EMAC1 DMA Status Register */
 #define REG_EMAC1_DMA_OPMODE            0xFFC23018         /* EMAC1 DMA Operation Mode Register */
 #define REG_EMAC1_DMA_IEN               0xFFC2301C         /* EMAC1 DMA Interrupt Enable Register */
-#define REG_EMAC1_DMA_MISS_FRM          0xFFC23020         /* EMAC1 DMA missed frame and buffer overflow counter */
-#define REG_EMAC1_DMA_RXIWDOG           0xFFC23024         /* EMAC1 DMA RX Interrupt Watch Dog timer */
-#define REG_EMAC1_DMA_BMMODE            0xFFC23028         /* EMAC1 AXI Bus Mode Register */
-#define REG_EMAC1_DMA_BMSTAT            0xFFC2302C         /* EMAC1 AXI Status Register */
-#define REG_EMAC1_DMA_TXDSC_CUR         0xFFC23048         /* EMAC1 TX current descriptor register */
-#define REG_EMAC1_DMA_RXDSC_CUR         0xFFC2304C         /* EMAC1 RX current descriptor register */
-#define REG_EMAC1_DMA_TXBUF_CUR         0xFFC23050         /* EMAC1 TX current buffer pointer register */
-#define REG_EMAC1_DMA_RXBUF_CUR         0xFFC23054         /* EMAC1 RX current buffer pointer register */
-#define REG_EMAC1_HWFEAT                0xFFC23058         /* EMAC1 Hardware Feature Register */
+#define REG_EMAC1_DMA_MISS_FRM          0xFFC23020         /* EMAC1 DMA Missed Frame Register */
+#define REG_EMAC1_DMA_RXIWDOG           0xFFC23024         /* EMAC1 DMA Rx Interrupt Watch Dog Register */
+#define REG_EMAC1_DMA_BMMODE            0xFFC23028         /* EMAC1 DMA SCB Bus Mode Register */
+#define REG_EMAC1_DMA_BMSTAT            0xFFC2302C         /* EMAC1 DMA SCB Status Register */
+#define REG_EMAC1_DMA_TXDSC_CUR         0xFFC23048         /* EMAC1 DMA Tx Descriptor Current Register */
+#define REG_EMAC1_DMA_RXDSC_CUR         0xFFC2304C         /* EMAC1 DMA Rx Descriptor Current Register */
+#define REG_EMAC1_DMA_TXBUF_CUR         0xFFC23050         /* EMAC1 DMA Tx Buffer Current Register */
+#define REG_EMAC1_DMA_RXBUF_CUR         0xFFC23054         /* EMAC1 DMA Rx Buffer Current Register */
 
 /* =========================
         EMAC
@@ -7781,25 +7743,24 @@
 /* ------------------------------------------------------------------------------------------------------------------------
         EMAC_MACCFG                          Pos/Masks                        Description
    ------------------------------------------------------------------------------------------------------------------------ */
-#define BITP_EMAC_MACCFG_CST                 25                               /* CRC stripping for Type Frames */
+#define BITP_EMAC_MACCFG_CST                 25                               /* CRC Stripping */
 #define BITP_EMAC_MACCFG_WD                  23                               /* Watch Dog Disable */
 #define BITP_EMAC_MACCFG_JB                  22                               /* Jabber Disable */
 #define BITP_EMAC_MACCFG_JE                  20                               /* Jumbo Frame Enable */
 #define BITP_EMAC_MACCFG_IFG                 17                               /* Inter Frame Gap */
-#define BITP_EMAC_MACCFG_DCRS                16                               /* Disable Carrier Sense during Transmission */
-#define BITP_EMAC_MACCFG_PS                  15                               /* Port Select */
+#define BITP_EMAC_MACCFG_DCRS                16                               /* Disable Carrier Sense */
 #define BITP_EMAC_MACCFG_FES                 14                               /* Speed of Operation */
 #define BITP_EMAC_MACCFG_DO                  13                               /* Disable Receive Own */
-#define BITP_EMAC_MACCFG_LM                  12                               /* LoopBack Mode */
+#define BITP_EMAC_MACCFG_LM                  12                               /* Loopback Mode */
 #define BITP_EMAC_MACCFG_DM                  11                               /* Duplex Mode */
-#define BITP_EMAC_MACCFG_IPC                 10                               /* Enables Checksum Offload function */
-#define BITP_EMAC_MACCFG_DR                   9                               /* Disable Retry - Used in Half Duplex mode */
+#define BITP_EMAC_MACCFG_IPC                 10                               /* IP Checksum */
+#define BITP_EMAC_MACCFG_DR                   9                               /* Disable Retry */
 #define BITP_EMAC_MACCFG_ACS                  7                               /* Automatic Pad/CRC Stripping */
 #define BITP_EMAC_MACCFG_BL                   5                               /* Back Off Limit */
-#define BITP_EMAC_MACCFG_DC                   4                               /* Used in Half Duplex Mode for deffering transmission */
+#define BITP_EMAC_MACCFG_DC                   4                               /* Deferral Check */
 #define BITP_EMAC_MACCFG_TE                   3                               /* Transmitter Enable */
 #define BITP_EMAC_MACCFG_RE                   2                               /* Receiver Enable */
-#define BITM_EMAC_MACCFG_CST                 (_ADI_MSK(0x02000000,uint32_t))  /* CRC stripping for Type Frames */
+#define BITM_EMAC_MACCFG_CST                 (_ADI_MSK(0x02000000,uint32_t))  /* CRC Stripping */
 #define BITM_EMAC_MACCFG_WD                  (_ADI_MSK(0x00800000,uint32_t))  /* Watch Dog Disable */
 #define BITM_EMAC_MACCFG_JB                  (_ADI_MSK(0x00400000,uint32_t))  /* Jabber Disable */
 #define BITM_EMAC_MACCFG_JE                  (_ADI_MSK(0x00100000,uint32_t))  /* Jumbo Frame Enable */
@@ -7813,18 +7774,14 @@
 #define ENUM_EMAC_MACCFG_BIT_TIMES_56        (_ADI_MSK(0x000A0000,uint32_t))  /* IFG: 56 bit times */
 #define ENUM_EMAC_MACCFG_BIT_TIMES_48        (_ADI_MSK(0x000C0000,uint32_t))  /* IFG: 48 bit times */
 #define ENUM_EMAC_MACCFG_BIT_TIMES_40        (_ADI_MSK(0x000E0000,uint32_t))  /* IFG: 40 bit times */
-#define BITM_EMAC_MACCFG_DCRS                (_ADI_MSK(0x00010000,uint32_t))  /* Disable Carrier Sense during Transmission */
-
-#define BITM_EMAC_MACCFG_PS                  (_ADI_MSK(0x00008000,uint32_t))  /* Port Select */
-#define ENUM_EMAC_MACCFG_PORT_10_100         (_ADI_MSK(0x00000000,uint32_t))  /* PS: 10/100Mbps */
-#define ENUM_EMAC_MACCFG_PORT_1000           (_ADI_MSK(0x00008000,uint32_t))  /* PS: 100 Mbps */
+#define BITM_EMAC_MACCFG_DCRS                (_ADI_MSK(0x00010000,uint32_t))  /* Disable Carrier Sense */
 #define BITM_EMAC_MACCFG_FES                 (_ADI_MSK(0x00004000,uint32_t))  /* Speed of Operation */
 #define BITM_EMAC_MACCFG_DO                  (_ADI_MSK(0x00002000,uint32_t))  /* Disable Receive Own */
-#define BITM_EMAC_MACCFG_LM                  (_ADI_MSK(0x00001000,uint32_t))  /* LoopBack Mode */
+#define BITM_EMAC_MACCFG_LM                  (_ADI_MSK(0x00001000,uint32_t))  /* Loopback Mode */
 #define BITM_EMAC_MACCFG_DM                  (_ADI_MSK(0x00000800,uint32_t))  /* Duplex Mode */
-#define BITM_EMAC_MACCFG_IPC                 (_ADI_MSK(0x00000400,uint32_t))  /* Enables Checksum Offload function */
+#define BITM_EMAC_MACCFG_IPC                 (_ADI_MSK(0x00000400,uint32_t))  /* IP Checksum */
 
-#define BITM_EMAC_MACCFG_DR                  (_ADI_MSK(0x00000200,uint32_t))  /* Disable Retry - Used in Half Duplex mode */
+#define BITM_EMAC_MACCFG_DR                  (_ADI_MSK(0x00000200,uint32_t))  /* Disable Retry */
 #define ENUM_EMAC_MACCFG_RETRY_ENABLED       (_ADI_MSK(0x00000000,uint32_t))  /* DR: Retry enabled */
 #define ENUM_EMAC_MACCFG_RETRY_DISABLED      (_ADI_MSK(0x00000200,uint32_t))  /* DR: Retry disabled */
 #define BITM_EMAC_MACCFG_ACS                 (_ADI_MSK(0x00000080,uint32_t))  /* Automatic Pad/CRC Stripping */
@@ -7834,7 +7791,7 @@
 #define ENUM_EMAC_MACCFG_BL_8                (_ADI_MSK(0x00000020,uint32_t))  /* BL: k = min (n, 8) */
 #define ENUM_EMAC_MACCFG_BL_4                (_ADI_MSK(0x00000040,uint32_t))  /* BL: k = min (n, 4) */
 #define ENUM_EMAC_MACCFG_BL_1                (_ADI_MSK(0x00000060,uint32_t))  /* BL: k = min (n, 1) */
-#define BITM_EMAC_MACCFG_DC                  (_ADI_MSK(0x00000010,uint32_t))  /* Used in Half Duplex Mode for deffering transmission */
+#define BITM_EMAC_MACCFG_DC                  (_ADI_MSK(0x00000010,uint32_t))  /* Deferral Check */
 #define BITM_EMAC_MACCFG_TE                  (_ADI_MSK(0x00000008,uint32_t))  /* Transmitter Enable */
 #define BITM_EMAC_MACCFG_RE                  (_ADI_MSK(0x00000004,uint32_t))  /* Receiver Enable */
 
@@ -7843,169 +7800,115 @@
    ------------------------------------------------------------------------------------------------------------------------ */
 #define BITP_EMAC_MACFRMFILT_RA              31                               /* Receive All Frames */
 #define BITP_EMAC_MACFRMFILT_HPF             10                               /* Hash or Perfect Filter */
-#define BITP_EMAC_MACFRMFILT_SAF              9                               /* Source Address Filter Enable */
-#define BITP_EMAC_MACFRMFILT_SAIF             8                               /* Source Address Inverse Filtering Mode */
-#define BITP_EMAC_MACFRMFILT_PCF              6                               /* Pass Control Frames - Controls Forwarding of control frames */
+#define BITP_EMAC_MACFRMFILT_PCF              6                               /* Pass Control Frames */
 #define BITP_EMAC_MACFRMFILT_DBF              5                               /* Disable Broadcast Frames */
 #define BITP_EMAC_MACFRMFILT_PM               4                               /* Pass All Multicast Frames */
-#define BITP_EMAC_MACFRMFILT_DAIF             3                               /* Destination Address Inverse Filtering mode */
-#define BITP_EMAC_MACFRMFILT_HMC              2                               /* Hash Multicast - Receive multicast frames */
-#define BITP_EMAC_MACFRMFILT_HUC              1                               /* Hash Unicast - Receive unicast Frames */
-#define BITP_EMAC_MACFRMFILT_PR               0                               /* Promiscuous Mode - Receive all the frames */
+#define BITP_EMAC_MACFRMFILT_DAIF             3                               /* Destination Address Inverse Filtering */
+#define BITP_EMAC_MACFRMFILT_HMC              2                               /* Hash Multicast */
+#define BITP_EMAC_MACFRMFILT_HUC              1                               /* Hash Unicast */
+#define BITP_EMAC_MACFRMFILT_PR               0                               /* Promiscuous Mode */
 #define BITM_EMAC_MACFRMFILT_RA              (_ADI_MSK(0x80000000,uint32_t))  /* Receive All Frames */
 #define BITM_EMAC_MACFRMFILT_HPF             (_ADI_MSK(0x00000400,uint32_t))  /* Hash or Perfect Filter */
-#define BITM_EMAC_MACFRMFILT_SAF             (_ADI_MSK(0x00000200,uint32_t))  /* Source Address Filter Enable */
-#define BITM_EMAC_MACFRMFILT_SAIF            (_ADI_MSK(0x00000100,uint32_t))  /* Source Address Inverse Filtering Mode */
 
-#define BITM_EMAC_MACFRMFILT_PCF             (_ADI_MSK(0x000000C0,uint32_t))  /* Pass Control Frames - Controls Forwarding of control frames */
-#define ENUM_EMAC_MACFRMFILT_FILT_ALL        (_ADI_MSK(0x00000000,uint32_t))  /* PCF: Filters all control frames */
-#define ENUM_EMAC_MACFRMFILT_NO_PAUSE        (_ADI_MSK(0x00000040,uint32_t))  /* PCF: Forwards all frames except PAUSE */
-#define ENUM_EMAC_MACFRMFILT_FWD_ALL         (_ADI_MSK(0x00000080,uint32_t))  /* PCF: Forwards all frames */
-#define ENUM_EMAC_MACFRMFILT_PADR_FILT       (_ADI_MSK(0x000000C0,uint32_t))  /* PCF: Forward frames that passed the address filter */
+#define BITM_EMAC_MACFRMFILT_PCF             (_ADI_MSK(0x000000C0,uint32_t))  /* Pass Control Frames */
+#define ENUM_EMAC_MACFRMFILT_FILT_ALL        (_ADI_MSK(0x00000000,uint32_t))  /* PCF: Pass no control frames */
+#define ENUM_EMAC_MACFRMFILT_NO_PAUSE        (_ADI_MSK(0x00000040,uint32_t))  /* PCF: Pass no PAUSE frames */
+#define ENUM_EMAC_MACFRMFILT_FWD_ALL         (_ADI_MSK(0x00000080,uint32_t))  /* PCF: Pass all control frames */
+#define ENUM_EMAC_MACFRMFILT_PADR_FILT       (_ADI_MSK(0x000000C0,uint32_t))  /* PCF: Pass address filtered control frames */
 
 #define BITM_EMAC_MACFRMFILT_DBF             (_ADI_MSK(0x00000020,uint32_t))  /* Disable Broadcast Frames */
 #define ENUM_EMAC_MACFRMFILT_DIS_BCAST       (_ADI_MSK(0x00000000,uint32_t))  /* DBF: AFM module passes all received broadcast frames */
 #define ENUM_EMAC_MACFRMFILT_EN_BCAST        (_ADI_MSK(0x00000020,uint32_t))  /* DBF: AFM module filters all incoming broadcast frames */
 #define BITM_EMAC_MACFRMFILT_PM              (_ADI_MSK(0x00000010,uint32_t))  /* Pass All Multicast Frames */
-#define BITM_EMAC_MACFRMFILT_DAIF            (_ADI_MSK(0x00000008,uint32_t))  /* Destination Address Inverse Filtering mode */
-#define BITM_EMAC_MACFRMFILT_HMC             (_ADI_MSK(0x00000004,uint32_t))  /* Hash Multicast - Receive multicast frames */
-#define BITM_EMAC_MACFRMFILT_HUC             (_ADI_MSK(0x00000002,uint32_t))  /* Hash Unicast - Receive unicast Frames */
-#define BITM_EMAC_MACFRMFILT_PR              (_ADI_MSK(0x00000001,uint32_t))  /* Promiscuous Mode - Receive all the frames */
+#define BITM_EMAC_MACFRMFILT_DAIF            (_ADI_MSK(0x00000008,uint32_t))  /* Destination Address Inverse Filtering */
+#define BITM_EMAC_MACFRMFILT_HMC             (_ADI_MSK(0x00000004,uint32_t))  /* Hash Multicast */
+#define BITM_EMAC_MACFRMFILT_HUC             (_ADI_MSK(0x00000002,uint32_t))  /* Hash Unicast */
+#define BITM_EMAC_MACFRMFILT_PR              (_ADI_MSK(0x00000001,uint32_t))  /* Promiscuous Mode */
 
 /* ------------------------------------------------------------------------------------------------------------------------
-        EMAC_GMII_ADDR                       Pos/Masks                        Description
+        EMAC_SMI_ADDR                        Pos/Masks                        Description
    ------------------------------------------------------------------------------------------------------------------------ */
-#define BITP_EMAC_GMII_ADDR_PA               11                               /* Physcial Layer Address - Selecting the PHY */
-#define BITP_EMAC_GMII_ADDR_GR                6                               /* GMII Register Addres in the selected PHY */
-#define BITP_EMAC_GMII_ADDR_CR                2                               /* CSR Clock Range - Specifies MDC frequency */
-#define BITP_EMAC_GMII_ADDR_GW                1                               /* GMII Write - Indicates MDIO Write/Read Operation */
-#define BITP_EMAC_GMII_ADDR_GB                0                               /* GMII Busy bit - indicates MDIO is busy or not */
-#define BITM_EMAC_GMII_ADDR_PA               (_ADI_MSK(0x0000F800,uint32_t))  /* Physcial Layer Address - Selecting the PHY */
-#define BITM_EMAC_GMII_ADDR_GR               (_ADI_MSK(0x000007C0,uint32_t))  /* GMII Register Addres in the selected PHY */
-
-#define BITM_EMAC_GMII_ADDR_CR               (_ADI_MSK(0x0000003C,uint32_t))  /* CSR Clock Range - Specifies MDC frequency */
-#define ENUM_EMAC_GMII_ADDR_60_100           (_ADI_MSK(0x00000000,uint32_t))  /* CR: clk_csr_i=60-100 MHz; MDC Clock=clk_csr_i/42 */
-#define ENUM_EMAC_GMII_ADDR_100_150          (_ADI_MSK(0x00000004,uint32_t))  /* CR: clk_csr_i=100-150 MHz; MDC Clock=clk_csr_i/62 */
-#define ENUM_EMAC_GMII_ADDR_CSR_BY_8         (_ADI_MSK(0x00000028,uint32_t))  /* CR: MDC Clock=clk_csr_i/8 */
-#define ENUM_EMAC_GMII_ADDR_CSR_BY_10        (_ADI_MSK(0x0000002C,uint32_t))  /* CR: MDC Clock=clk_csr_i/10 */
-#define ENUM_EMAC_GMII_ADDR_CSR_BY_12        (_ADI_MSK(0x00000030,uint32_t))  /* CR: MDC Clock=clk_csr_i/12 */
-#define ENUM_EMAC_GMII_ADDR_CSR_BY_14        (_ADI_MSK(0x00000034,uint32_t))  /* CR: MDC Clock=clk_csr_i/14 */
-#define ENUM_EMAC_GMII_ADDR_CSR_BY_16        (_ADI_MSK(0x00000038,uint32_t))  /* CR: MDC Clock=clk_csr_i/16 */
-#define ENUM_EMAC_GMII_ADDR_CSR_BY_18        (_ADI_MSK(0x0000003C,uint32_t))  /* CR: MDC Clock=clk_csr_i/18 */
-#define ENUM_EMAC_GMII_ADDR_25_35            (_ADI_MSK(0x00000008,uint32_t))  /* CR: clk_csr_i=20-35 MHz; MDC Clock=clk_csr_i/16 */
-#define ENUM_EMAC_GMII_ADDR_35_60            (_ADI_MSK(0x0000000C,uint32_t))  /* CR: clk_csr_i=35-60 MHz; MDC Clock=clk_csr_i/26 */
-#define ENUM_EMAC_GMII_ADDR_150_250          (_ADI_MSK(0x00000010,uint32_t))  /* CR: clk_csr_i=150-250 MHz; MDC Clock=clk_csr_i/102 */
-#define ENUM_EMAC_GMII_ADDR_250_300          (_ADI_MSK(0x00000014,uint32_t))  /* CR: clk_csr_i=250-300 MHz; MDC Clock=clk_csr_i/124 */
-#define ENUM_EMAC_GMII_ADDR_CSR_BY_4         (_ADI_MSK(0x00000020,uint32_t))  /* CR: MDC Clock=clk_csr_i/4 */
-#define ENUM_EMAC_GMII_ADDR_CSR_BY_6         (_ADI_MSK(0x00000024,uint32_t))  /* CR: MDC Clock=clk_csr_i/6 */
-#define BITM_EMAC_GMII_ADDR_GW               (_ADI_MSK(0x00000002,uint32_t))  /* GMII Write - Indicates MDIO Write/Read Operation */
-#define BITM_EMAC_GMII_ADDR_GB               (_ADI_MSK(0x00000001,uint32_t))  /* GMII Busy bit - indicates MDIO is busy or not */
+#define BITP_EMAC_SMI_ADDR_PA                11                               /* Physical Layer Address */
+#define BITP_EMAC_SMI_ADDR_SMIR               6                               /* SMI Register Address */
+#define BITP_EMAC_SMI_ADDR_CR                 2                               /* Clock Range */
+#define BITP_EMAC_SMI_ADDR_SMIW               1                               /* SMI Write */
+#define BITP_EMAC_SMI_ADDR_SMIB               0                               /* SMI Busy */
+#define BITM_EMAC_SMI_ADDR_PA                (_ADI_MSK(0x0000F800,uint32_t))  /* Physical Layer Address */
+#define BITM_EMAC_SMI_ADDR_SMIR              (_ADI_MSK(0x000007C0,uint32_t))  /* SMI Register Address */
+#define BITM_EMAC_SMI_ADDR_CR                (_ADI_MSK(0x0000003C,uint32_t))  /* Clock Range */
+#define BITM_EMAC_SMI_ADDR_SMIW              (_ADI_MSK(0x00000002,uint32_t))  /* SMI Write */
+#define BITM_EMAC_SMI_ADDR_SMIB              (_ADI_MSK(0x00000001,uint32_t))  /* SMI Busy */
 
 /* ------------------------------------------------------------------------------------------------------------------------
-        EMAC_GMII_DATA                       Pos/Masks                        Description
+        EMAC_SMI_DATA                        Pos/Masks                        Description
    ------------------------------------------------------------------------------------------------------------------------ */
-#define BITP_EMAC_GMII_DATA_GD                0                               /* GMII Data - Read/Write Data */
-#define BITM_EMAC_GMII_DATA_GD               (_ADI_MSK(0x0000FFFF,uint32_t))  /* GMII Data - Read/Write Data */
+#define BITP_EMAC_SMI_DATA_SMID               0                               /* SMI Data */
+#define BITM_EMAC_SMI_DATA_SMID              (_ADI_MSK(0x0000FFFF,uint32_t))  /* SMI Data */
 
 /* ------------------------------------------------------------------------------------------------------------------------
         EMAC_FLOWCTL                         Pos/Masks                        Description
    ------------------------------------------------------------------------------------------------------------------------ */
-#define BITP_EMAC_FLOWCTL_PT                 16                               /* Pause Time - to be specified in Frame */
-#define BITP_EMAC_FLOWCTL_DZPQ                7                               /* Disable Zero-Quanta Pause */
-#define BITP_EMAC_FLOWCTL_PLT                 4                               /* Pause Low Threshold */
+#define BITP_EMAC_FLOWCTL_PT                 16                               /* Pause Time */
 #define BITP_EMAC_FLOWCTL_UP                  3                               /* Unicast Pause Frame Detect */
 #define BITP_EMAC_FLOWCTL_RFE                 2                               /* Receive Flow Control Enable */
 #define BITP_EMAC_FLOWCTL_TFE                 1                               /* Transmit Flow Control Enable */
-#define BITP_EMAC_FLOWCTL_FCB_BPA             0                               /* Initiate pause control frame */
-#define BITM_EMAC_FLOWCTL_PT                 (_ADI_MSK(0xFFFF0000,uint32_t))  /* Pause Time - to be specified in Frame */
-#define BITM_EMAC_FLOWCTL_DZPQ               (_ADI_MSK(0x00000080,uint32_t))  /* Disable Zero-Quanta Pause */
-
-#define BITM_EMAC_FLOWCTL_PLT                (_ADI_MSK(0x00000030,uint32_t))  /* Pause Low Threshold */
-#define ENUM_EMAC_FLOWCTL_LESS_PT_4          (_ADI_MSK(0x00000000,uint32_t))  /* PLT: Pause time minus 4 slot times */
-#define ENUM_EMAC_FLOWCTL_LESS_PT_28         (_ADI_MSK(0x00000010,uint32_t))  /* PLT: Pause time minus 28 slot times */
-#define ENUM_EMAC_FLOWCTL_LESS_PT_144        (_ADI_MSK(0x00000020,uint32_t))  /* PLT: Pause time minus 144 slot times */
-#define ENUM_EMAC_FLOWCTL_LESS_PT_256        (_ADI_MSK(0x00000030,uint32_t))  /* PLT: Pause time minus 256 slot times */
+#define BITP_EMAC_FLOWCTL_FCBBPA              0                               /* Initiate Pause Control Frame */
+#define BITM_EMAC_FLOWCTL_PT                 (_ADI_MSK(0xFFFF0000,uint32_t))  /* Pause Time */
 #define BITM_EMAC_FLOWCTL_UP                 (_ADI_MSK(0x00000008,uint32_t))  /* Unicast Pause Frame Detect */
 #define BITM_EMAC_FLOWCTL_RFE                (_ADI_MSK(0x00000004,uint32_t))  /* Receive Flow Control Enable */
 #define BITM_EMAC_FLOWCTL_TFE                (_ADI_MSK(0x00000002,uint32_t))  /* Transmit Flow Control Enable */
-#define BITM_EMAC_FLOWCTL_FCB_BPA            (_ADI_MSK(0x00000001,uint32_t))  /* Initiate pause control frame */
+#define BITM_EMAC_FLOWCTL_FCBBPA             (_ADI_MSK(0x00000001,uint32_t))  /* Initiate Pause Control Frame */
 
 /* ------------------------------------------------------------------------------------------------------------------------
         EMAC_VLANTAG                         Pos/Masks                        Description
    ------------------------------------------------------------------------------------------------------------------------ */
-#define BITP_EMAC_VLANTAG_ETV                16                               /* Enable 12 bit VLAN Tag Comparison */
-#define BITP_EMAC_VLANTAG_VL                  0                               /* VLAN Tag identifer for receive frames */
-#define BITM_EMAC_VLANTAG_ETV                (_ADI_MSK(0x00010000,uint32_t))  /* Enable 12 bit VLAN Tag Comparison */
-#define BITM_EMAC_VLANTAG_VL                 (_ADI_MSK(0x0000FFFF,uint32_t))  /* VLAN Tag identifer for receive frames */
-
-/* ------------------------------------------------------------------------------------------------------------------------
-        EMAC_VER                             Pos/Masks                        Description
-   ------------------------------------------------------------------------------------------------------------------------ */
-#define BITP_EMAC_VER_UVER                    8                               /* SUPERVISOR Defined Version */
-#define BITP_EMAC_VER_VER                     0                               /* Synopsys Define Version */
-#define BITM_EMAC_VER_UVER                   (_ADI_MSK(0x0000FF00,uint32_t))  /* SUPERVISOR Defined Version */
-#define BITM_EMAC_VER_VER                    (_ADI_MSK(0x000000FF,uint32_t))  /* Synopsys Define Version */
+#define BITP_EMAC_VLANTAG_ETV                16                               /* Enable Tag VLAN Comparison */
+#define BITP_EMAC_VLANTAG_VL                  0                               /* VLAN Tag Id Receive Frames */
+#define BITM_EMAC_VLANTAG_ETV                (_ADI_MSK(0x00010000,uint32_t))  /* Enable Tag VLAN Comparison */
+#define BITM_EMAC_VLANTAG_VL                 (_ADI_MSK(0x0000FFFF,uint32_t))  /* VLAN Tag Id Receive Frames */
 
 /* ------------------------------------------------------------------------------------------------------------------------
         EMAC_DBG                             Pos/Masks                        Description
    ------------------------------------------------------------------------------------------------------------------------ */
-#define BITP_EMAC_DBG_TXFIFOFULL             25                               /* Indicates that TX FIFO is full */
-#define BITP_EMAC_DBG_TXFIFONE               24                               /* Indicates that TX FIFO is not empty */
-#define BITP_EMAC_DBG_TXFIFOACT              22                               /* Indicates that TX FIFO is active */
-#define BITP_EMAC_DBG_TXFIFOCTLST            20                               /* Indicates the state of TX FIFO controller */
-#define BITP_EMAC_DBG_TXPAUSE                19                               /* Indicates that MAC TX state is paused */
-#define BITP_EMAC_DBG_TXFRCTL                17                               /* Indicates the state of the TX Frame controller module */
-#define BITP_EMAC_DBG_MIITX                  16                               /* Indicates that MII is actively transmitting the frame */
-#define BITP_EMAC_DBG_RXFIFOST                8                               /* Indicates the state of the RX FIFO */
-#define BITP_EMAC_DBG_RXFIFOCTLST             5                               /* Indicates the state of RX FIFO controller */
-#define BITP_EMAC_DBG_RXFIFOACT               4                               /* Indicates that RXFIFO is active */
-#define BITP_EMAC_DBG_SFIFOST                 1                               /* Returns the state of FIFO */
-#define BITP_EMAC_DBG_MIIRX                   0                               /* Indicates that MII is actively receiving the data */
-#define BITM_EMAC_DBG_TXFIFOFULL             (_ADI_MSK(0x02000000,uint32_t))  /* Indicates that TX FIFO is full */
-#define BITM_EMAC_DBG_TXFIFONE               (_ADI_MSK(0x01000000,uint32_t))  /* Indicates that TX FIFO is not empty */
-#define BITM_EMAC_DBG_TXFIFOACT              (_ADI_MSK(0x00400000,uint32_t))  /* Indicates that TX FIFO is active */
-#define BITM_EMAC_DBG_TXFIFOCTLST            (_ADI_MSK(0x00300000,uint32_t))  /* Indicates the state of TX FIFO controller */
-#define BITM_EMAC_DBG_TXPAUSE                (_ADI_MSK(0x00080000,uint32_t))  /* Indicates that MAC TX state is paused */
+#define BITP_EMAC_DBG_TXFIFOFULL             25                               /* Tx FIFO Full */
+#define BITP_EMAC_DBG_TXFIFONE               24                               /* Tx FIFO Not Empty */
+#define BITP_EMAC_DBG_TXFIFOACT              22                               /* Tx FIFO Active */
+#define BITP_EMAC_DBG_TXFIFOCTLST            20                               /* Tx FIFO Controller State */
+#define BITP_EMAC_DBG_TXPAUSE                19                               /* Tx Paused */
+#define BITP_EMAC_DBG_TXFRCTL                17                               /* Tx Frame Controller State */
+#define BITP_EMAC_DBG_MMTEA                  16                               /* MM Tx Engine Active */
+#define BITP_EMAC_DBG_RXFIFOST                8                               /* Rx FIFO State */
+#define BITP_EMAC_DBG_RXFIFOCTLST             5                               /* Rx FIFO Controller State */
+#define BITP_EMAC_DBG_RXFIFOACT               4                               /* Rx FIFO Active */
+#define BITP_EMAC_DBG_SFIFOST                 1                               /* Small FIFO State */
+#define BITP_EMAC_DBG_MMREA                   0                               /* MM Rx Engine Active */
+#define BITM_EMAC_DBG_TXFIFOFULL             (_ADI_MSK(0x02000000,uint32_t))  /* Tx FIFO Full */
+#define BITM_EMAC_DBG_TXFIFONE               (_ADI_MSK(0x01000000,uint32_t))  /* Tx FIFO Not Empty */
+#define BITM_EMAC_DBG_TXFIFOACT              (_ADI_MSK(0x00400000,uint32_t))  /* Tx FIFO Active */
+#define BITM_EMAC_DBG_TXFIFOCTLST            (_ADI_MSK(0x00300000,uint32_t))  /* Tx FIFO Controller State */
+#define BITM_EMAC_DBG_TXPAUSE                (_ADI_MSK(0x00080000,uint32_t))  /* Tx Paused */
 
-#define BITM_EMAC_DBG_TXFRCTL                (_ADI_MSK(0x00060000,uint32_t))  /* Indicates the state of the TX Frame controller module */
-#define ENUM_EMAC_DBG_TXFRCTL_IDLE           (_ADI_MSK(0x00000000,uint32_t))  /* TXFRCTL: IDLE */
-#define ENUM_EMAC_DBG_TXFRCTL_WT_STATUS      (_ADI_MSK(0x00020000,uint32_t))  /* TXFRCTL: Waiting for Status of previous frame or IFG/backoff period to be over */
-#define ENUM_EMAC_DBG_TXFRCTL_PAUSE          (_ADI_MSK(0x00040000,uint32_t))  /* TXFRCTL: Generating and transmitting a PAUSE control frame (in full duplex mode) */
-#define ENUM_EMAC_DBG_TXFRCTL_TXFRAME        (_ADI_MSK(0x00060000,uint32_t))  /* TXFRCTL: Transferring input frame for transmission */
-#define BITM_EMAC_DBG_MIITX                  (_ADI_MSK(0x00010000,uint32_t))  /* Indicates that MII is actively transmitting the frame */
+#define BITM_EMAC_DBG_TXFRCTL                (_ADI_MSK(0x00060000,uint32_t))  /* Tx Frame Controller State */
+#define ENUM_EMAC_DBG_TXFRCTL_IDLE           (_ADI_MSK(0x00000000,uint32_t))  /* TXFRCTL: Idle */
+#define ENUM_EMAC_DBG_TXFRCTL_WT_STATUS      (_ADI_MSK(0x00020000,uint32_t))  /* TXFRCTL: Wait */
+#define ENUM_EMAC_DBG_TXFRCTL_PAUSE          (_ADI_MSK(0x00040000,uint32_t))  /* TXFRCTL: Pause */
+#define ENUM_EMAC_DBG_TXFRCTL_TXFRAME        (_ADI_MSK(0x00060000,uint32_t))  /* TXFRCTL: Transmit */
+#define BITM_EMAC_DBG_MMTEA                  (_ADI_MSK(0x00010000,uint32_t))  /* MM Tx Engine Active */
 
-#define BITM_EMAC_DBG_RXFIFOST               (_ADI_MSK(0x00000300,uint32_t))  /* Indicates the state of the RX FIFO */
-#define ENUM_EMAC_DBG_FIFO_EMPTY             (_ADI_MSK(0x00000000,uint32_t))  /* RXFIFOST: RX FIFO Empty */
-#define ENUM_EMAC_DBG_FIFO_BEL_THERSHLD      (_ADI_MSK(0x00000100,uint32_t))  /* RXFIFOST: RX FIFO fill-level below flow-control deactivate threshold */
-#define ENUM_EMAC_DBG_FIFO_ABV_THERSHLD      (_ADI_MSK(0x00000200,uint32_t))  /* RXFIFOST: RX FIFO fill-level above flow-control deactivate threshold */
-#define ENUM_EMAC_DBG_FIFO_FULL              (_ADI_MSK(0x00000300,uint32_t))  /* RXFIFOST: RX FIFO Full */
+#define BITM_EMAC_DBG_RXFIFOST               (_ADI_MSK(0x00000300,uint32_t))  /* Rx FIFO State */
+#define ENUM_EMAC_DBG_FIFO_EMPTY             (_ADI_MSK(0x00000000,uint32_t))  /* RXFIFOST: Rx FIFO Empty */
+#define ENUM_EMAC_DBG_FIFO_BEL_THERSHLD      (_ADI_MSK(0x00000100,uint32_t))  /* RXFIFOST: Rx FIFO Below De-activate FCT */
+#define ENUM_EMAC_DBG_FIFO_ABV_THERSHLD      (_ADI_MSK(0x00000200,uint32_t))  /* RXFIFOST: Rx FIFO Above De-activate FCT */
+#define ENUM_EMAC_DBG_FIFO_FULL              (_ADI_MSK(0x00000300,uint32_t))  /* RXFIFOST: Rx FIFO Full */
 
-#define BITM_EMAC_DBG_RXFIFOCTLST            (_ADI_MSK(0x00000060,uint32_t))  /* Indicates the state of RX FIFO controller */
-#define ENUM_EMAC_DBG_IDLE_FIFO              (_ADI_MSK(0x00000000,uint32_t))  /* RXFIFOCTLST: IDLE state */
-#define ENUM_EMAC_DBG_RD_DATA_FIFO           (_ADI_MSK(0x00000020,uint32_t))  /* RXFIFOCTLST: Reading frame data */
-#define ENUM_EMAC_DBG_RD_STS_FIFO            (_ADI_MSK(0x00000040,uint32_t))  /* RXFIFOCTLST: Reading frame status (or time-stamp) */
-#define ENUM_EMAC_DBG_FLUSH_FIFO             (_ADI_MSK(0x00000060,uint32_t))  /* RXFIFOCTLST: Flushing the frame data and Status */
-#define BITM_EMAC_DBG_RXFIFOACT              (_ADI_MSK(0x00000010,uint32_t))  /* Indicates that RXFIFO is active */
-#define BITM_EMAC_DBG_SFIFOST                (_ADI_MSK(0x00000006,uint32_t))  /* Returns the state of FIFO */
-#define BITM_EMAC_DBG_MIIRX                  (_ADI_MSK(0x00000001,uint32_t))  /* Indicates that MII is actively receiving the data */
-
-/* ------------------------------------------------------------------------------------------------------------------------
-        EMAC_PMT_CTLSTAT                     Pos/Masks                        Description
-   ------------------------------------------------------------------------------------------------------------------------ */
-#define BITP_EMAC_PMT_CTLSTAT_RPTRRST        31                               /* When set, resets the remote wake up filter pointer */
-#define BITP_EMAC_PMT_CTLSTAT_GLOBEN          9                               /* Enables wake up event on reception of a unicast frame */
-#define BITP_EMAC_PMT_CTLSTAT_WAKERX          6                               /* Indicates that wake-up frame is received */
-#define BITP_EMAC_PMT_CTLSTAT_MPKTRX          5                               /* Indicates that magic packet is received */
-#define BITP_EMAC_PMT_CTLSTAT_WAKEN           2                               /* Enables wake up event on reception of wake up frame */
-#define BITP_EMAC_PMT_CTLSTAT_MPKTEN          1                               /* Enables wake up event on reception of magic packet */
-#define BITP_EMAC_PMT_CTLSTAT_PD              0                               /* When set MAC drops all frames until magic packet or wakeup */
-#define BITM_EMAC_PMT_CTLSTAT_RPTRRST        (_ADI_MSK(0x80000000,uint32_t))  /* When set, resets the remote wake up filter pointer */
-#define BITM_EMAC_PMT_CTLSTAT_GLOBEN         (_ADI_MSK(0x00000200,uint32_t))  /* Enables wake up event on reception of a unicast frame */
-#define BITM_EMAC_PMT_CTLSTAT_WAKERX         (_ADI_MSK(0x00000040,uint32_t))  /* Indicates that wake-up frame is received */
-#define BITM_EMAC_PMT_CTLSTAT_MPKTRX         (_ADI_MSK(0x00000020,uint32_t))  /* Indicates that magic packet is received */
-#define BITM_EMAC_PMT_CTLSTAT_WAKEN          (_ADI_MSK(0x00000004,uint32_t))  /* Enables wake up event on reception of wake up frame */
-#define BITM_EMAC_PMT_CTLSTAT_MPKTEN         (_ADI_MSK(0x00000002,uint32_t))  /* Enables wake up event on reception of magic packet */
-#define BITM_EMAC_PMT_CTLSTAT_PD             (_ADI_MSK(0x00000001,uint32_t))  /* When set MAC drops all frames until magic packet or wakeup */
+#define BITM_EMAC_DBG_RXFIFOCTLST            (_ADI_MSK(0x00000060,uint32_t))  /* Rx FIFO Controller State */
+#define ENUM_EMAC_DBG_IDLE_FIFO              (_ADI_MSK(0x00000000,uint32_t))  /* RXFIFOCTLST: Idle */
+#define ENUM_EMAC_DBG_RD_DATA_FIFO           (_ADI_MSK(0x00000020,uint32_t))  /* RXFIFOCTLST: Read Data */
+#define ENUM_EMAC_DBG_RD_STS_FIFO            (_ADI_MSK(0x00000040,uint32_t))  /* RXFIFOCTLST: Read Status */
+#define ENUM_EMAC_DBG_FLUSH_FIFO             (_ADI_MSK(0x00000060,uint32_t))  /* RXFIFOCTLST: Flush */
+#define BITM_EMAC_DBG_RXFIFOACT              (_ADI_MSK(0x00000010,uint32_t))  /* Rx FIFO Active */
+#define BITM_EMAC_DBG_SFIFOST                (_ADI_MSK(0x00000006,uint32_t))  /* Small FIFO State */
+#define BITM_EMAC_DBG_MMREA                  (_ADI_MSK(0x00000001,uint32_t))  /* MM Rx Engine Active */
 
 /* ------------------------------------------------------------------------------------------------------------------------
         EMAC_ISTAT                           Pos/Masks                        Description
@@ -8015,568 +7918,559 @@
 #define BITP_EMAC_ISTAT_MMCTX                 6                               /* MMC Transmit Interrupt Status */
 #define BITP_EMAC_ISTAT_MMCRX                 5                               /* MMC Receive Interrupt Status */
 #define BITP_EMAC_ISTAT_MMC                   4                               /* MMC Interrupt Status */
-#define BITP_EMAC_ISTAT_PMT                   3                               /* PMT Interrupt Status */
 #define BITM_EMAC_ISTAT_TS                   (_ADI_MSK(0x00000200,uint32_t))  /* Time Stamp Interrupt Status */
 #define BITM_EMAC_ISTAT_MMCRC                (_ADI_MSK(0x00000080,uint32_t))  /* MMC Receive Checksum Offload Interrupt Status */
 #define BITM_EMAC_ISTAT_MMCTX                (_ADI_MSK(0x00000040,uint32_t))  /* MMC Transmit Interrupt Status */
 #define BITM_EMAC_ISTAT_MMCRX                (_ADI_MSK(0x00000020,uint32_t))  /* MMC Receive Interrupt Status */
 #define BITM_EMAC_ISTAT_MMC                  (_ADI_MSK(0x00000010,uint32_t))  /* MMC Interrupt Status */
-#define BITM_EMAC_ISTAT_PMT                  (_ADI_MSK(0x00000008,uint32_t))  /* PMT Interrupt Status */
 
 /* ------------------------------------------------------------------------------------------------------------------------
         EMAC_IMSK                            Pos/Masks                        Description
    ------------------------------------------------------------------------------------------------------------------------ */
 #define BITP_EMAC_IMSK_TS                     9                               /* Time Stamp Interrupt Mask */
-#define BITP_EMAC_IMSK_PMT                    3                               /* PMT Interrupt mask */
 #define BITM_EMAC_IMSK_TS                    (_ADI_MSK(0x00000200,uint32_t))  /* Time Stamp Interrupt Mask */
-#define BITM_EMAC_IMSK_PMT                   (_ADI_MSK(0x00000008,uint32_t))  /* PMT Interrupt mask */
 
 /* ------------------------------------------------------------------------------------------------------------------------
         EMAC_ADDR0_HI                        Pos/Masks                        Description
    ------------------------------------------------------------------------------------------------------------------------ */
-#define BITP_EMAC_ADDR0_HI_MO                31                               /* MO */
-#define BITP_EMAC_ADDR0_HI_ADDR               0                               /* Upper 16 bits of Addr. */
-#define BITM_EMAC_ADDR0_HI_MO                (_ADI_MSK(0x80000000,uint32_t))  /* MO */
-#define BITM_EMAC_ADDR0_HI_ADDR              (_ADI_MSK(0x0000FFFF,uint32_t))  /* Upper 16 bits of Addr. */
+#define BITP_EMAC_ADDR0_HI_ADDR               0                               /* Address */
+#define BITM_EMAC_ADDR0_HI_ADDR              (_ADI_MSK(0x0000FFFF,uint32_t))  /* Address */
 
 /* ------------------------------------------------------------------------------------------------------------------------
         EMAC_MMC_CTL                         Pos/Masks                        Description
    ------------------------------------------------------------------------------------------------------------------------ */
-#define BITP_EMAC_MMC_CTL_FULLPSET            5                               /* MMC counter preset values */
-#define BITP_EMAC_MMC_CTL_CNTRPSET            4                               /* When set, MMC counters will be preset */
-#define BITP_EMAC_MMC_CTL_CNTRFRZ             3                               /* When Set MMC counters are frozen to current value */
-#define BITP_EMAC_MMC_CTL_RDRST               2                               /* When set MMC counters will be reset when they are read */
-#define BITP_EMAC_MMC_CTL_NOROLL              1                               /* Set when counter does not rollover to 0 after reaching max */
-#define BITP_EMAC_MMC_CTL_RST                 0                               /* When set counters will be reset */
-#define BITM_EMAC_MMC_CTL_FULLPSET           (_ADI_MSK(0x00000020,uint32_t))  /* MMC counter preset values */
-#define BITM_EMAC_MMC_CTL_CNTRPSET           (_ADI_MSK(0x00000010,uint32_t))  /* When set, MMC counters will be preset */
-#define BITM_EMAC_MMC_CTL_CNTRFRZ            (_ADI_MSK(0x00000008,uint32_t))  /* When Set MMC counters are frozen to current value */
-#define BITM_EMAC_MMC_CTL_RDRST              (_ADI_MSK(0x00000004,uint32_t))  /* When set MMC counters will be reset when they are read */
-#define BITM_EMAC_MMC_CTL_NOROLL             (_ADI_MSK(0x00000002,uint32_t))  /* Set when counter does not rollover to 0 after reaching max */
-#define BITM_EMAC_MMC_CTL_RST                (_ADI_MSK(0x00000001,uint32_t))  /* When set counters will be reset */
+#define BITP_EMAC_MMC_CTL_FULLPSET            5                               /* Full Preset */
+#define BITP_EMAC_MMC_CTL_CNTRPSET            4                               /* Counter Reset/Preset */
+#define BITP_EMAC_MMC_CTL_CNTRFRZ             3                               /* Counter Freeze */
+#define BITP_EMAC_MMC_CTL_RDRST               2                               /* Read Reset */
+#define BITP_EMAC_MMC_CTL_NOROLL              1                               /* No Rollover */
+#define BITP_EMAC_MMC_CTL_RST                 0                               /* Reset */
+#define BITM_EMAC_MMC_CTL_FULLPSET           (_ADI_MSK(0x00000020,uint32_t))  /* Full Preset */
+#define BITM_EMAC_MMC_CTL_CNTRPSET           (_ADI_MSK(0x00000010,uint32_t))  /* Counter Reset/Preset */
+#define BITM_EMAC_MMC_CTL_CNTRFRZ            (_ADI_MSK(0x00000008,uint32_t))  /* Counter Freeze */
+#define BITM_EMAC_MMC_CTL_RDRST              (_ADI_MSK(0x00000004,uint32_t))  /* Read Reset */
+#define BITM_EMAC_MMC_CTL_NOROLL             (_ADI_MSK(0x00000002,uint32_t))  /* No Rollover */
+#define BITM_EMAC_MMC_CTL_RST                (_ADI_MSK(0x00000001,uint32_t))  /* Reset */
 
 /* ------------------------------------------------------------------------------------------------------------------------
         EMAC_MMC_RXINT                       Pos/Masks                        Description
    ------------------------------------------------------------------------------------------------------------------------ */
-#define BITP_EMAC_MMC_RXINT_WDOGERR          23                               /* Set when rxwatchdog_error counter reaches full or half */
-#define BITP_EMAC_MMC_RXINT_VLANFRGB         22                               /* Set when rxvlanframes_gb counter reaches full or half */
-#define BITP_EMAC_MMC_RXINT_FIFOOVF          21                               /* Set when rxffiooverflow counter reaches full or half */
-#define BITP_EMAC_MMC_RXINT_PAUSEFR          20                               /* Set when rxpauseframes counter reaches full or half */
-#define BITP_EMAC_MMC_RXINT_OUTRANGE         19                               /* Set when rxoutofrangetype counter reaches full or half */
-#define BITP_EMAC_MMC_RXINT_LENERR           18                               /* This bit is set when rxlengtherror counter reaches full or half */
-#define BITP_EMAC_MMC_RXINT_UCASTG           17                               /* Set when rxunicastframes_g counter reaches full or half */
-#define BITP_EMAC_MMC_RXINT_R1024TOMAX       16                               /* Set when rx1024tomaxoctets_gb counter reaches full or half */
-#define BITP_EMAC_MMC_RXINT_R512TO1023       15                               /* Set when rx512to1023octets_gb counter reaches full or half */
-#define BITP_EMAC_MMC_RXINT_R256TO511        14                               /* Set when rx255to511octets_gb counter reaches full or half */
-#define BITP_EMAC_MMC_RXINT_R128TO255        13                               /* This bit is set when rx128to255octets_gb counter reaches full or half */
-#define BITP_EMAC_MMC_RXINT_R65TO127         12                               /* Set when rx65t0127octects_gb counter reaches full or half */
-#define BITP_EMAC_MMC_RXINT_R64              11                               /* Sset when rx64octets_gb counter reaches full or half */
-#define BITP_EMAC_MMC_RXINT_OSIZEG           10                               /* This bit is set when rxoversize_g counter reaches full or half */
-#define BITP_EMAC_MMC_RXINT_USIZEG            9                               /* This bit is set when rxundersize_g counter reaches full or half */
-#define BITP_EMAC_MMC_RXINT_JABERR            8                               /* This bit is set when rxjabbererror counter reaches full or half */
-#define BITP_EMAC_MMC_RXINT_RUNTERR           7                               /* This bit is set when rxrunterror counter reaches full or half */
-#define BITP_EMAC_MMC_RXINT_ALIGNERR          6                               /* Set when rx alignment error counter reaches half or full */
-#define BITP_EMAC_MMC_RXINT_CRCERR            5                               /* This bit is set when rxcrcerror coutner reaches full or half */
-#define BITP_EMAC_MMC_RXINT_MCASTG            4                               /* Set when rx multicast frame counter reaches half or full */
-#define BITP_EMAC_MMC_RXINT_BCASTG            3                               /* Set when rx broadcast counter reaches half or full */
-#define BITP_EMAC_MMC_RXINT_OCTCNTG           2                               /* set when rx octet counter reaches half or full */
-#define BITP_EMAC_MMC_RXINT_OCTCNTGB          1                               /* Set when rx octet count reaches half or full */
-#define BITP_EMAC_MMC_RXINT_FRCNTGB           0                               /* Set when rx frame counter reaches half or full */
-#define BITM_EMAC_MMC_RXINT_WDOGERR          (_ADI_MSK(0x00800000,uint32_t))  /* Set when rxwatchdog_error counter reaches full or half */
-#define BITM_EMAC_MMC_RXINT_VLANFRGB         (_ADI_MSK(0x00400000,uint32_t))  /* Set when rxvlanframes_gb counter reaches full or half */
-#define BITM_EMAC_MMC_RXINT_FIFOOVF          (_ADI_MSK(0x00200000,uint32_t))  /* Set when rxffiooverflow counter reaches full or half */
-#define BITM_EMAC_MMC_RXINT_PAUSEFR          (_ADI_MSK(0x00100000,uint32_t))  /* Set when rxpauseframes counter reaches full or half */
-#define BITM_EMAC_MMC_RXINT_OUTRANGE         (_ADI_MSK(0x00080000,uint32_t))  /* Set when rxoutofrangetype counter reaches full or half */
-#define BITM_EMAC_MMC_RXINT_LENERR           (_ADI_MSK(0x00040000,uint32_t))  /* This bit is set when rxlengtherror counter reaches full or half */
-#define BITM_EMAC_MMC_RXINT_UCASTG           (_ADI_MSK(0x00020000,uint32_t))  /* Set when rxunicastframes_g counter reaches full or half */
-#define BITM_EMAC_MMC_RXINT_R1024TOMAX       (_ADI_MSK(0x00010000,uint32_t))  /* Set when rx1024tomaxoctets_gb counter reaches full or half */
-#define BITM_EMAC_MMC_RXINT_R512TO1023       (_ADI_MSK(0x00008000,uint32_t))  /* Set when rx512to1023octets_gb counter reaches full or half */
-#define BITM_EMAC_MMC_RXINT_R256TO511        (_ADI_MSK(0x00004000,uint32_t))  /* Set when rx255to511octets_gb counter reaches full or half */
-#define BITM_EMAC_MMC_RXINT_R128TO255        (_ADI_MSK(0x00002000,uint32_t))  /* This bit is set when rx128to255octets_gb counter reaches full or half */
-#define BITM_EMAC_MMC_RXINT_R65TO127         (_ADI_MSK(0x00001000,uint32_t))  /* Set when rx65t0127octects_gb counter reaches full or half */
-#define BITM_EMAC_MMC_RXINT_R64              (_ADI_MSK(0x00000800,uint32_t))  /* Sset when rx64octets_gb counter reaches full or half */
-#define BITM_EMAC_MMC_RXINT_OSIZEG           (_ADI_MSK(0x00000400,uint32_t))  /* This bit is set when rxoversize_g counter reaches full or half */
-#define BITM_EMAC_MMC_RXINT_USIZEG           (_ADI_MSK(0x00000200,uint32_t))  /* This bit is set when rxundersize_g counter reaches full or half */
-#define BITM_EMAC_MMC_RXINT_JABERR           (_ADI_MSK(0x00000100,uint32_t))  /* This bit is set when rxjabbererror counter reaches full or half */
-#define BITM_EMAC_MMC_RXINT_RUNTERR          (_ADI_MSK(0x00000080,uint32_t))  /* This bit is set when rxrunterror counter reaches full or half */
-#define BITM_EMAC_MMC_RXINT_ALIGNERR         (_ADI_MSK(0x00000040,uint32_t))  /* Set when rx alignment error counter reaches half or full */
-#define BITM_EMAC_MMC_RXINT_CRCERR           (_ADI_MSK(0x00000020,uint32_t))  /* This bit is set when rxcrcerror coutner reaches full or half */
-#define BITM_EMAC_MMC_RXINT_MCASTG           (_ADI_MSK(0x00000010,uint32_t))  /* Set when rx multicast frame counter reaches half or full */
-#define BITM_EMAC_MMC_RXINT_BCASTG           (_ADI_MSK(0x00000008,uint32_t))  /* Set when rx broadcast counter reaches half or full */
-#define BITM_EMAC_MMC_RXINT_OCTCNTG          (_ADI_MSK(0x00000004,uint32_t))  /* set when rx octet counter reaches half or full */
-#define BITM_EMAC_MMC_RXINT_OCTCNTGB         (_ADI_MSK(0x00000002,uint32_t))  /* Set when rx octet count reaches half or full */
-#define BITM_EMAC_MMC_RXINT_FRCNTGB          (_ADI_MSK(0x00000001,uint32_t))  /* Set when rx frame counter reaches half or full */
+#define BITP_EMAC_MMC_RXINT_WDOGERR          23                               /* Rx Watch Dog Error Count Half/Full */
+#define BITP_EMAC_MMC_RXINT_VLANFRGB         22                               /* Rx VLAN Frames (Good/Bad) Count Half/Full */
+#define BITP_EMAC_MMC_RXINT_FIFOOVF          21                               /* Rx FIFO Overflow Count Half/Full */
+#define BITP_EMAC_MMC_RXINT_PAUSEFR          20                               /* Rx Pause Frames Count Half/Full */
+#define BITP_EMAC_MMC_RXINT_OUTRANGE         19                               /* Rx Out Of Range Type Count Half/Full */
+#define BITP_EMAC_MMC_RXINT_LENERR           18                               /* Rx Length Error Count Half/Full */
+#define BITP_EMAC_MMC_RXINT_UCASTG           17                               /* Rx Unicast Frames (Good) Count Half/Full */
+#define BITP_EMAC_MMC_RXINT_R1024TOMAX       16                               /* Rx 1024-to-max Octets (Good/Bad) Count Half/Full */
+#define BITP_EMAC_MMC_RXINT_R512TO1023       15                               /* Rx 512-to-1023 Octets (Good/Bad) Count Half/Full */
+#define BITP_EMAC_MMC_RXINT_R256TO511        14                               /* Rx 255-to-511 Octets (Good/Bad) Count Half/Full */
+#define BITP_EMAC_MMC_RXINT_R128TO255        13                               /* Rx 128-to-255 Octets (Good/Bad) Count Half/Full */
+#define BITP_EMAC_MMC_RXINT_R65TO127         12                               /* Rx 65-to-127 Octets (Good/Bad) Count Half/Full */
+#define BITP_EMAC_MMC_RXINT_R64              11                               /* Rx 64 Octets (Good/Bad) Count Half/Full */
+#define BITP_EMAC_MMC_RXINT_OSIZEG           10                               /* Rx Oversize (Good) Count Half/Full */
+#define BITP_EMAC_MMC_RXINT_USIZEG            9                               /* Rx Undersize (Good) Count Half/Full */
+#define BITP_EMAC_MMC_RXINT_JABERR            8                               /* Rx Jabber Error Count Half/Full */
+#define BITP_EMAC_MMC_RXINT_RUNTERR           7                               /* Rx Runt Error Count Half/Full */
+#define BITP_EMAC_MMC_RXINT_ALIGNERR          6                               /* Rx Alignment Error Count Half/Full */
+#define BITP_EMAC_MMC_RXINT_CRCERR            5                               /* Rx CRC Error Counter Half/Full */
+#define BITP_EMAC_MMC_RXINT_MCASTG            4                               /* Rx Multicast Count (Good) Half/Full */
+#define BITP_EMAC_MMC_RXINT_BCASTG            3                               /* Rx Broadcast Count (Good) Half/Full */
+#define BITP_EMAC_MMC_RXINT_OCTCNTG           2                               /* Octet Count (Good) Half/Full */
+#define BITP_EMAC_MMC_RXINT_OCTCNTGB          1                               /* Octet Count (Good/Bad) Half/Full */
+#define BITP_EMAC_MMC_RXINT_FRCNTGB           0                               /* Frame Count (Good/Bad) Half/Full */
+#define BITM_EMAC_MMC_RXINT_WDOGERR          (_ADI_MSK(0x00800000,uint32_t))  /* Rx Watch Dog Error Count Half/Full */
+#define BITM_EMAC_MMC_RXINT_VLANFRGB         (_ADI_MSK(0x00400000,uint32_t))  /* Rx VLAN Frames (Good/Bad) Count Half/Full */
+#define BITM_EMAC_MMC_RXINT_FIFOOVF          (_ADI_MSK(0x00200000,uint32_t))  /* Rx FIFO Overflow Count Half/Full */
+#define BITM_EMAC_MMC_RXINT_PAUSEFR          (_ADI_MSK(0x00100000,uint32_t))  /* Rx Pause Frames Count Half/Full */
+#define BITM_EMAC_MMC_RXINT_OUTRANGE         (_ADI_MSK(0x00080000,uint32_t))  /* Rx Out Of Range Type Count Half/Full */
+#define BITM_EMAC_MMC_RXINT_LENERR           (_ADI_MSK(0x00040000,uint32_t))  /* Rx Length Error Count Half/Full */
+#define BITM_EMAC_MMC_RXINT_UCASTG           (_ADI_MSK(0x00020000,uint32_t))  /* Rx Unicast Frames (Good) Count Half/Full */
+#define BITM_EMAC_MMC_RXINT_R1024TOMAX       (_ADI_MSK(0x00010000,uint32_t))  /* Rx 1024-to-max Octets (Good/Bad) Count Half/Full */
+#define BITM_EMAC_MMC_RXINT_R512TO1023       (_ADI_MSK(0x00008000,uint32_t))  /* Rx 512-to-1023 Octets (Good/Bad) Count Half/Full */
+#define BITM_EMAC_MMC_RXINT_R256TO511        (_ADI_MSK(0x00004000,uint32_t))  /* Rx 255-to-511 Octets (Good/Bad) Count Half/Full */
+#define BITM_EMAC_MMC_RXINT_R128TO255        (_ADI_MSK(0x00002000,uint32_t))  /* Rx 128-to-255 Octets (Good/Bad) Count Half/Full */
+#define BITM_EMAC_MMC_RXINT_R65TO127         (_ADI_MSK(0x00001000,uint32_t))  /* Rx 65-to-127 Octets (Good/Bad) Count Half/Full */
+#define BITM_EMAC_MMC_RXINT_R64              (_ADI_MSK(0x00000800,uint32_t))  /* Rx 64 Octets (Good/Bad) Count Half/Full */
+#define BITM_EMAC_MMC_RXINT_OSIZEG           (_ADI_MSK(0x00000400,uint32_t))  /* Rx Oversize (Good) Count Half/Full */
+#define BITM_EMAC_MMC_RXINT_USIZEG           (_ADI_MSK(0x00000200,uint32_t))  /* Rx Undersize (Good) Count Half/Full */
+#define BITM_EMAC_MMC_RXINT_JABERR           (_ADI_MSK(0x00000100,uint32_t))  /* Rx Jabber Error Count Half/Full */
+#define BITM_EMAC_MMC_RXINT_RUNTERR          (_ADI_MSK(0x00000080,uint32_t))  /* Rx Runt Error Count Half/Full */
+#define BITM_EMAC_MMC_RXINT_ALIGNERR         (_ADI_MSK(0x00000040,uint32_t))  /* Rx Alignment Error Count Half/Full */
+#define BITM_EMAC_MMC_RXINT_CRCERR           (_ADI_MSK(0x00000020,uint32_t))  /* Rx CRC Error Counter Half/Full */
+#define BITM_EMAC_MMC_RXINT_MCASTG           (_ADI_MSK(0x00000010,uint32_t))  /* Rx Multicast Count (Good) Half/Full */
+#define BITM_EMAC_MMC_RXINT_BCASTG           (_ADI_MSK(0x00000008,uint32_t))  /* Rx Broadcast Count (Good) Half/Full */
+#define BITM_EMAC_MMC_RXINT_OCTCNTG          (_ADI_MSK(0x00000004,uint32_t))  /* Octet Count (Good) Half/Full */
+#define BITM_EMAC_MMC_RXINT_OCTCNTGB         (_ADI_MSK(0x00000002,uint32_t))  /* Octet Count (Good/Bad) Half/Full */
+#define BITM_EMAC_MMC_RXINT_FRCNTGB          (_ADI_MSK(0x00000001,uint32_t))  /* Frame Count (Good/Bad) Half/Full */
 
 /* ------------------------------------------------------------------------------------------------------------------------
         EMAC_MMC_TXINT                       Pos/Masks                        Description
    ------------------------------------------------------------------------------------------------------------------------ */
-#define BITP_EMAC_MMC_TXINT_VLANFRGB         24                               /* Set when txvlanframes_g counter reaches full or half */
-#define BITP_EMAC_MMC_TXINT_PAUSEFRM         23                               /* Set when txpauseframes counter reaches full or half */
-#define BITP_EMAC_MMC_TXINT_EXCESSDEF        22                               /* Set when txoexcessdef counter reaches full or half */
-#define BITP_EMAC_MMC_TXINT_FRCNTG           21                               /* Set when txframecount_g counter reaches full or half */
-#define BITP_EMAC_MMC_TXINT_OCTCNTG          20                               /* Set when txoctetcount_g counter reaches full or half */
-#define BITP_EMAC_MMC_TXINT_CARRERR          19                               /* This bit is set when txcarriererr counter reaches full or half */
-#define BITP_EMAC_MMC_TXINT_EXCESSCOL        18                               /* This bit is set when txexesscol counter reaches full or half */
-#define BITP_EMAC_MMC_TXINT_LATECOL          17                               /* This bit is set when txlatecol counter reaches full or half */
-#define BITP_EMAC_MMC_TXINT_DEFERRED         16                               /* Set when txdeffered counter reaches full or half */
-#define BITP_EMAC_MMC_TXINT_MULTCOLG         15                               /* Set when txmulticol_g counter reaches full or half */
-#define BITP_EMAC_MMC_TXINT_SNGCOLG          14                               /* Set when txsinglecol_g counter reaches full or half */
-#define BITP_EMAC_MMC_TXINT_UNDERR           13                               /* Set when txunderflowerror counter reaches full or half */
-#define BITP_EMAC_MMC_TXINT_BCASTGB          12                               /* Set when txbroadcastframes_gb counter reaches full or half */
-#define BITP_EMAC_MMC_TXINT_MCASTGB          11                               /* Set when txmulticastframes_gb counter reaches full or half */
-#define BITP_EMAC_MMC_TXINT_UCASTGB          10                               /* Set when txunicastframes_gb counter reaches full or half */
-#define BITP_EMAC_MMC_TXINT_T1024TOMAX        9                               /* Set when tx1024tomaxoctets_gb counter reaches full or half */
-#define BITP_EMAC_MMC_TXINT_T512TO1023        8                               /* Set when tx512to1023octets_gb counter reaches full or half */
-#define BITP_EMAC_MMC_TXINT_T256TO511         7                               /* Set when tx256to511octets_gb counter reaches full or half */
-#define BITP_EMAC_MMC_TXINT_T128TO255         6                               /* Set when tx128to255octets_gb counter reaches full or half */
-#define BITP_EMAC_MMC_TXINT_T65TO127          5                               /* Set when tx65to127octets_gb counter reaches full or half */
-#define BITP_EMAC_MMC_TXINT_T64               4                               /* Set when tx64octets_gb counter reaches full or half */
-#define BITP_EMAC_MMC_TXINT_MCASTG            3                               /* Set when txmulticastframes_g counter reaches full or half */
-#define BITP_EMAC_MMC_TXINT_BCASTG            2                               /* Set when txbroadcastframes_g counter reaches full or half */
-#define BITP_EMAC_MMC_TXINT_FRCNTGB           1                               /* Set when txframecount_gb counter reaches full or half */
-#define BITP_EMAC_MMC_TXINT_OCTCNTGB          0                               /* Set when txoctetcount_gb counter reaches full or half */
-#define BITM_EMAC_MMC_TXINT_VLANFRGB         (_ADI_MSK(0x01000000,uint32_t))  /* Set when txvlanframes_g counter reaches full or half */
-#define BITM_EMAC_MMC_TXINT_PAUSEFRM         (_ADI_MSK(0x00800000,uint32_t))  /* Set when txpauseframes counter reaches full or half */
-#define BITM_EMAC_MMC_TXINT_EXCESSDEF        (_ADI_MSK(0x00400000,uint32_t))  /* Set when txoexcessdef counter reaches full or half */
-#define BITM_EMAC_MMC_TXINT_FRCNTG           (_ADI_MSK(0x00200000,uint32_t))  /* Set when txframecount_g counter reaches full or half */
-#define BITM_EMAC_MMC_TXINT_OCTCNTG          (_ADI_MSK(0x00100000,uint32_t))  /* Set when txoctetcount_g counter reaches full or half */
-#define BITM_EMAC_MMC_TXINT_CARRERR          (_ADI_MSK(0x00080000,uint32_t))  /* This bit is set when txcarriererr counter reaches full or half */
-#define BITM_EMAC_MMC_TXINT_EXCESSCOL        (_ADI_MSK(0x00040000,uint32_t))  /* This bit is set when txexesscol counter reaches full or half */
-#define BITM_EMAC_MMC_TXINT_LATECOL          (_ADI_MSK(0x00020000,uint32_t))  /* This bit is set when txlatecol counter reaches full or half */
-#define BITM_EMAC_MMC_TXINT_DEFERRED         (_ADI_MSK(0x00010000,uint32_t))  /* Set when txdeffered counter reaches full or half */
-#define BITM_EMAC_MMC_TXINT_MULTCOLG         (_ADI_MSK(0x00008000,uint32_t))  /* Set when txmulticol_g counter reaches full or half */
-#define BITM_EMAC_MMC_TXINT_SNGCOLG          (_ADI_MSK(0x00004000,uint32_t))  /* Set when txsinglecol_g counter reaches full or half */
-#define BITM_EMAC_MMC_TXINT_UNDERR           (_ADI_MSK(0x00002000,uint32_t))  /* Set when txunderflowerror counter reaches full or half */
-#define BITM_EMAC_MMC_TXINT_BCASTGB          (_ADI_MSK(0x00001000,uint32_t))  /* Set when txbroadcastframes_gb counter reaches full or half */
-#define BITM_EMAC_MMC_TXINT_MCASTGB          (_ADI_MSK(0x00000800,uint32_t))  /* Set when txmulticastframes_gb counter reaches full or half */
-#define BITM_EMAC_MMC_TXINT_UCASTGB          (_ADI_MSK(0x00000400,uint32_t))  /* Set when txunicastframes_gb counter reaches full or half */
-#define BITM_EMAC_MMC_TXINT_T1024TOMAX       (_ADI_MSK(0x00000200,uint32_t))  /* Set when tx1024tomaxoctets_gb counter reaches full or half */
-#define BITM_EMAC_MMC_TXINT_T512TO1023       (_ADI_MSK(0x00000100,uint32_t))  /* Set when tx512to1023octets_gb counter reaches full or half */
-#define BITM_EMAC_MMC_TXINT_T256TO511        (_ADI_MSK(0x00000080,uint32_t))  /* Set when tx256to511octets_gb counter reaches full or half */
-#define BITM_EMAC_MMC_TXINT_T128TO255        (_ADI_MSK(0x00000040,uint32_t))  /* Set when tx128to255octets_gb counter reaches full or half */
-#define BITM_EMAC_MMC_TXINT_T65TO127         (_ADI_MSK(0x00000020,uint32_t))  /* Set when tx65to127octets_gb counter reaches full or half */
-#define BITM_EMAC_MMC_TXINT_T64              (_ADI_MSK(0x00000010,uint32_t))  /* Set when tx64octets_gb counter reaches full or half */
-#define BITM_EMAC_MMC_TXINT_MCASTG           (_ADI_MSK(0x00000008,uint32_t))  /* Set when txmulticastframes_g counter reaches full or half */
-#define BITM_EMAC_MMC_TXINT_BCASTG           (_ADI_MSK(0x00000004,uint32_t))  /* Set when txbroadcastframes_g counter reaches full or half */
-#define BITM_EMAC_MMC_TXINT_FRCNTGB          (_ADI_MSK(0x00000002,uint32_t))  /* Set when txframecount_gb counter reaches full or half */
-#define BITM_EMAC_MMC_TXINT_OCTCNTGB         (_ADI_MSK(0x00000001,uint32_t))  /* Set when txoctetcount_gb counter reaches full or half */
+#define BITP_EMAC_MMC_TXINT_VLANFRGB         24                               /* Tx VLAN Frames (Good) Count Half/Full */
+#define BITP_EMAC_MMC_TXINT_PAUSEFRM         23                               /* Tx Pause Frames Count Half/Full */
+#define BITP_EMAC_MMC_TXINT_EXCESSDEF        22                               /* Tx Excess Deferred Count Half/Full */
+#define BITP_EMAC_MMC_TXINT_FRCNTG           21                               /* Tx Frame Count (Good) Count Half/Full */
+#define BITP_EMAC_MMC_TXINT_OCTCNTG          20                               /* Tx Octet Count (Good) Count Half/Full */
+#define BITP_EMAC_MMC_TXINT_CARRERR          19                               /* Tx Carrier Error Count Half/Full */
+#define BITP_EMAC_MMC_TXINT_EXCESSCOL        18                               /* Tx Exess Collision Count Half/Full */
+#define BITP_EMAC_MMC_TXINT_LATECOL          17                               /* Tx Late Collision Count Half/Full */
+#define BITP_EMAC_MMC_TXINT_DEFERRED         16                               /* Tx Deffered Count Half/Full */
+#define BITP_EMAC_MMC_TXINT_MULTCOLG         15                               /* Tx Multiple collision (Good) Count Half/Full */
+#define BITP_EMAC_MMC_TXINT_SNGCOLG          14                               /* Tx Single Collision (Good) Count Half/Full */
+#define BITP_EMAC_MMC_TXINT_UNDERR           13                               /* Tx Underflow Error Count Half/Full */
+#define BITP_EMAC_MMC_TXINT_BCASTGB          12                               /* Tx Broadcast Frames (Good/Bad) Count Half/Full */
+#define BITP_EMAC_MMC_TXINT_MCASTGB          11                               /* Tx Multicast Frames (Good/Bad) Count Half/Full */
+#define BITP_EMAC_MMC_TXINT_UCASTGB          10                               /* Tx Unicast Frames (Good/Bad) Count Half/Full */
+#define BITP_EMAC_MMC_TXINT_T1024TOMAX        9                               /* Tx 1024-to-max Octets (Good/Bad) Count Half/Full */
+#define BITP_EMAC_MMC_TXINT_T512TO1023        8                               /* Tx 512-to-1023 Octets (Good/Bad) Count Half/Full */
+#define BITP_EMAC_MMC_TXINT_T256TO511         7                               /* Tx 256-to-511 Octets (Good/Bad) Count Half/Full */
+#define BITP_EMAC_MMC_TXINT_T128TO255         6                               /* Tx 128-to-255 Octets (Good/Bad) Count Half/Full */
+#define BITP_EMAC_MMC_TXINT_T65TO127          5                               /* Tx 65-to-127 Octets (Good/Bad) Count Half/Full */
+#define BITP_EMAC_MMC_TXINT_T64               4                               /* Tx 64 Octets (Good/Bad) Count Half/Full */
+#define BITP_EMAC_MMC_TXINT_MCASTG            3                               /* Tx Multicast Frames (Good) Count Half/Full */
+#define BITP_EMAC_MMC_TXINT_BCASTG            2                               /* Tx Broadcast Frames (Good) Count Half/Full */
+#define BITP_EMAC_MMC_TXINT_FRCNTGB           1                               /* Tx Frame Count (Good/Bad) Count Half/Full */
+#define BITP_EMAC_MMC_TXINT_OCTCNTGB          0                               /* Tx Octet Count (Good/Bad) Count Half/Full */
+#define BITM_EMAC_MMC_TXINT_VLANFRGB         (_ADI_MSK(0x01000000,uint32_t))  /* Tx VLAN Frames (Good) Count Half/Full */
+#define BITM_EMAC_MMC_TXINT_PAUSEFRM         (_ADI_MSK(0x00800000,uint32_t))  /* Tx Pause Frames Count Half/Full */
+#define BITM_EMAC_MMC_TXINT_EXCESSDEF        (_ADI_MSK(0x00400000,uint32_t))  /* Tx Excess Deferred Count Half/Full */
+#define BITM_EMAC_MMC_TXINT_FRCNTG           (_ADI_MSK(0x00200000,uint32_t))  /* Tx Frame Count (Good) Count Half/Full */
+#define BITM_EMAC_MMC_TXINT_OCTCNTG          (_ADI_MSK(0x00100000,uint32_t))  /* Tx Octet Count (Good) Count Half/Full */
+#define BITM_EMAC_MMC_TXINT_CARRERR          (_ADI_MSK(0x00080000,uint32_t))  /* Tx Carrier Error Count Half/Full */
+#define BITM_EMAC_MMC_TXINT_EXCESSCOL        (_ADI_MSK(0x00040000,uint32_t))  /* Tx Exess Collision Count Half/Full */
+#define BITM_EMAC_MMC_TXINT_LATECOL          (_ADI_MSK(0x00020000,uint32_t))  /* Tx Late Collision Count Half/Full */
+#define BITM_EMAC_MMC_TXINT_DEFERRED         (_ADI_MSK(0x00010000,uint32_t))  /* Tx Deffered Count Half/Full */
+#define BITM_EMAC_MMC_TXINT_MULTCOLG         (_ADI_MSK(0x00008000,uint32_t))  /* Tx Multiple collision (Good) Count Half/Full */
+#define BITM_EMAC_MMC_TXINT_SNGCOLG          (_ADI_MSK(0x00004000,uint32_t))  /* Tx Single Collision (Good) Count Half/Full */
+#define BITM_EMAC_MMC_TXINT_UNDERR           (_ADI_MSK(0x00002000,uint32_t))  /* Tx Underflow Error Count Half/Full */
+#define BITM_EMAC_MMC_TXINT_BCASTGB          (_ADI_MSK(0x00001000,uint32_t))  /* Tx Broadcast Frames (Good/Bad) Count Half/Full */
+#define BITM_EMAC_MMC_TXINT_MCASTGB          (_ADI_MSK(0x00000800,uint32_t))  /* Tx Multicast Frames (Good/Bad) Count Half/Full */
+#define BITM_EMAC_MMC_TXINT_UCASTGB          (_ADI_MSK(0x00000400,uint32_t))  /* Tx Unicast Frames (Good/Bad) Count Half/Full */
+#define BITM_EMAC_MMC_TXINT_T1024TOMAX       (_ADI_MSK(0x00000200,uint32_t))  /* Tx 1024-to-max Octets (Good/Bad) Count Half/Full */
+#define BITM_EMAC_MMC_TXINT_T512TO1023       (_ADI_MSK(0x00000100,uint32_t))  /* Tx 512-to-1023 Octets (Good/Bad) Count Half/Full */
+#define BITM_EMAC_MMC_TXINT_T256TO511        (_ADI_MSK(0x00000080,uint32_t))  /* Tx 256-to-511 Octets (Good/Bad) Count Half/Full */
+#define BITM_EMAC_MMC_TXINT_T128TO255        (_ADI_MSK(0x00000040,uint32_t))  /* Tx 128-to-255 Octets (Good/Bad) Count Half/Full */
+#define BITM_EMAC_MMC_TXINT_T65TO127         (_ADI_MSK(0x00000020,uint32_t))  /* Tx 65-to-127 Octets (Good/Bad) Count Half/Full */
+#define BITM_EMAC_MMC_TXINT_T64              (_ADI_MSK(0x00000010,uint32_t))  /* Tx 64 Octets (Good/Bad) Count Half/Full */
+#define BITM_EMAC_MMC_TXINT_MCASTG           (_ADI_MSK(0x00000008,uint32_t))  /* Tx Multicast Frames (Good) Count Half/Full */
+#define BITM_EMAC_MMC_TXINT_BCASTG           (_ADI_MSK(0x00000004,uint32_t))  /* Tx Broadcast Frames (Good) Count Half/Full */
+#define BITM_EMAC_MMC_TXINT_FRCNTGB          (_ADI_MSK(0x00000002,uint32_t))  /* Tx Frame Count (Good/Bad) Count Half/Full */
+#define BITM_EMAC_MMC_TXINT_OCTCNTGB         (_ADI_MSK(0x00000001,uint32_t))  /* Tx Octet Count (Good/Bad) Count Half/Full */
 
 /* ------------------------------------------------------------------------------------------------------------------------
         EMAC_MMC_RXIMSK                      Pos/Masks                        Description
    ------------------------------------------------------------------------------------------------------------------------ */
-#define BITP_EMAC_MMC_RXIMSK_WATCHERR        23                               /* Setting this bit masks the interrupt when rxwatchdog_error counter reaches full or half */
-#define BITP_EMAC_MMC_RXIMSK_VLANFRGB        22                               /* Setting this bit masks the interrupt when rxvlanframes_gb counter reaches full or half */
-#define BITP_EMAC_MMC_RXIMSK_FIFOOV          21                               /* Setting this bit masks the interrupt when rxffiooverflow counter reaches full or half */
-#define BITP_EMAC_MMC_RXIMSK_PAUSEFRM        20                               /* Setting this bit masks the interrupt when rxpauseframes counter reaches full or half */
-#define BITP_EMAC_MMC_RXIMSK_OUTRANGE        19                               /* Setting this bit masks the interrupt when rxoutofrangetype counter reaches full or half */
-#define BITP_EMAC_MMC_RXIMSK_LENERR          18                               /* Setting this bit masks the interrupt when rxlengtherror counter reaches full or half */
-#define BITP_EMAC_MMC_RXIMSK_UCASTG          17                               /* Setting this bit masks the interrupt when rxunicastframes_g counter reaches full or half */
-#define BITP_EMAC_MMC_RXIMSK_R1024TOMAX      16                               /* Setting this bit masks the interrupt when rx1024tomaxoctets_gb counter reaches full or half */
-#define BITP_EMAC_MMC_RXIMSK_R512TO1023      15                               /* Setting this bit masks the interrupt when rx512to1023octets_gb counter reaches full or half */
-#define BITP_EMAC_MMC_RXIMSK_R256TO511       14                               /* Setting this bit masks the interrupt when rx255to511octets_gb counter reaches full or half */
-#define BITP_EMAC_MMC_RXIMSK_R128TO255       13                               /* Setting this bit masks the interrupt when rx128to255octets_gb counter reaches full or half */
-#define BITP_EMAC_MMC_RXIMSK_R65TO127        12                               /* Setting this bit masks the interrupt when rx65t0127octects_gb counter reaches full or half */
-#define BITP_EMAC_MMC_RXIMSK_R64             11                               /* Setting this bit masks the interrupt when rx64octets_gb counter reaches full or half */
-#define BITP_EMAC_MMC_RXIMSK_OSIZEG          10                               /* Setting this bit masks the interrupt when rxoversize_g counter reaches full or half */
-#define BITP_EMAC_MMC_RXIMSK_USIZEG           9                               /* Setting this bit masks the interrupt when rxundersize_g counter reaches full or half */
-#define BITP_EMAC_MMC_RXIMSK_JABERR           8                               /* Setting this bit masks the interrupt when rxjabbererror counter reaches full or half */
-#define BITP_EMAC_MMC_RXIMSK_RUNTERR          7                               /* Setting this bit masks the interrupt when rxrunterror counter reaches full or half */
-#define BITP_EMAC_MMC_RXIMSK_ALIGNERR         6                               /* Setting this bit masks the interrupt when rxalignmenterror counter reaches full or half */
-#define BITP_EMAC_MMC_RXIMSK_CRCERR           5                               /* Setting this bit masks the interrupt when rxcrcerror coutner reaches full or half */
-#define BITP_EMAC_MMC_RXIMSK_MCASTG           4                               /* Setting this bit masks the interrupt when rxmulticastframes_g counter reaches full or half */
-#define BITP_EMAC_MMC_RXIMSK_BCASTG           3                               /* Setting this bit masks the interrupt when rxbroadcastframes_g counter reaches full or half */
-#define BITP_EMAC_MMC_RXIMSK_OCTCNTG          2                               /* Setting this bit masks the interrupt when rxoctetcount_g counter reaches full or half */
-#define BITP_EMAC_MMC_RXIMSK_OCTCNTGB         1                               /* Setting this bit masks the interrupt when rxoctetcount_gb counter reaches half or full */
-#define BITP_EMAC_MMC_RXIMSK_FRCNTGB          0                               /* Setting this bit masks the interrupt when rxframecount_gb counter reaches half or full */
-#define BITM_EMAC_MMC_RXIMSK_WATCHERR        (_ADI_MSK(0x00800000,uint32_t))  /* Setting this bit masks the interrupt when rxwatchdog_error counter reaches full or half */
-#define BITM_EMAC_MMC_RXIMSK_VLANFRGB        (_ADI_MSK(0x00400000,uint32_t))  /* Setting this bit masks the interrupt when rxvlanframes_gb counter reaches full or half */
-#define BITM_EMAC_MMC_RXIMSK_FIFOOV          (_ADI_MSK(0x00200000,uint32_t))  /* Setting this bit masks the interrupt when rxffiooverflow counter reaches full or half */
-#define BITM_EMAC_MMC_RXIMSK_PAUSEFRM        (_ADI_MSK(0x00100000,uint32_t))  /* Setting this bit masks the interrupt when rxpauseframes counter reaches full or half */
-#define BITM_EMAC_MMC_RXIMSK_OUTRANGE        (_ADI_MSK(0x00080000,uint32_t))  /* Setting this bit masks the interrupt when rxoutofrangetype counter reaches full or half */
-#define BITM_EMAC_MMC_RXIMSK_LENERR          (_ADI_MSK(0x00040000,uint32_t))  /* Setting this bit masks the interrupt when rxlengtherror counter reaches full or half */
-#define BITM_EMAC_MMC_RXIMSK_UCASTG          (_ADI_MSK(0x00020000,uint32_t))  /* Setting this bit masks the interrupt when rxunicastframes_g counter reaches full or half */
-#define BITM_EMAC_MMC_RXIMSK_R1024TOMAX      (_ADI_MSK(0x00010000,uint32_t))  /* Setting this bit masks the interrupt when rx1024tomaxoctets_gb counter reaches full or half */
-#define BITM_EMAC_MMC_RXIMSK_R512TO1023      (_ADI_MSK(0x00008000,uint32_t))  /* Setting this bit masks the interrupt when rx512to1023octets_gb counter reaches full or half */
-#define BITM_EMAC_MMC_RXIMSK_R256TO511       (_ADI_MSK(0x00004000,uint32_t))  /* Setting this bit masks the interrupt when rx255to511octets_gb counter reaches full or half */
-#define BITM_EMAC_MMC_RXIMSK_R128TO255       (_ADI_MSK(0x00002000,uint32_t))  /* Setting this bit masks the interrupt when rx128to255octets_gb counter reaches full or half */
-#define BITM_EMAC_MMC_RXIMSK_R65TO127        (_ADI_MSK(0x00001000,uint32_t))  /* Setting this bit masks the interrupt when rx65t0127octects_gb counter reaches full or half */
-#define BITM_EMAC_MMC_RXIMSK_R64             (_ADI_MSK(0x00000800,uint32_t))  /* Setting this bit masks the interrupt when rx64octets_gb counter reaches full or half */
-#define BITM_EMAC_MMC_RXIMSK_OSIZEG          (_ADI_MSK(0x00000400,uint32_t))  /* Setting this bit masks the interrupt when rxoversize_g counter reaches full or half */
-#define BITM_EMAC_MMC_RXIMSK_USIZEG          (_ADI_MSK(0x00000200,uint32_t))  /* Setting this bit masks the interrupt when rxundersize_g counter reaches full or half */
-#define BITM_EMAC_MMC_RXIMSK_JABERR          (_ADI_MSK(0x00000100,uint32_t))  /* Setting this bit masks the interrupt when rxjabbererror counter reaches full or half */
-#define BITM_EMAC_MMC_RXIMSK_RUNTERR         (_ADI_MSK(0x00000080,uint32_t))  /* Setting this bit masks the interrupt when rxrunterror counter reaches full or half */
-#define BITM_EMAC_MMC_RXIMSK_ALIGNERR        (_ADI_MSK(0x00000040,uint32_t))  /* Setting this bit masks the interrupt when rxalignmenterror counter reaches full or half */
-#define BITM_EMAC_MMC_RXIMSK_CRCERR          (_ADI_MSK(0x00000020,uint32_t))  /* Setting this bit masks the interrupt when rxcrcerror coutner reaches full or half */
-#define BITM_EMAC_MMC_RXIMSK_MCASTG          (_ADI_MSK(0x00000010,uint32_t))  /* Setting this bit masks the interrupt when rxmulticastframes_g counter reaches full or half */
-#define BITM_EMAC_MMC_RXIMSK_BCASTG          (_ADI_MSK(0x00000008,uint32_t))  /* Setting this bit masks the interrupt when rxbroadcastframes_g counter reaches full or half */
-#define BITM_EMAC_MMC_RXIMSK_OCTCNTG         (_ADI_MSK(0x00000004,uint32_t))  /* Setting this bit masks the interrupt when rxoctetcount_g counter reaches full or half */
-#define BITM_EMAC_MMC_RXIMSK_OCTCNTGB        (_ADI_MSK(0x00000002,uint32_t))  /* Setting this bit masks the interrupt when rxoctetcount_gb counter reaches half or full */
-#define BITM_EMAC_MMC_RXIMSK_FRCNTGB         (_ADI_MSK(0x00000001,uint32_t))  /* Setting this bit masks the interrupt when rxframecount_gb counter reaches half or full */
+#define BITP_EMAC_MMC_RXIMSK_WATCHERR        23                               /* Rx Watch Dog Error Count Half/Full Mask */
+#define BITP_EMAC_MMC_RXIMSK_VLANFRGB        22                               /* Rx VLAN Frames (Good/Bad) Count Half/Full Mask */
+#define BITP_EMAC_MMC_RXIMSK_FIFOOV          21                               /* Rx FIFO Overflow Count Half/Full Mask */
+#define BITP_EMAC_MMC_RXIMSK_PAUSEFRM        20                               /* Rx Pause Frames Count Half/Full Mask */
+#define BITP_EMAC_MMC_RXIMSK_OUTRANGE        19                               /* Rx Out Of Range Type Count Half/Full Mask */
+#define BITP_EMAC_MMC_RXIMSK_LENERR          18                               /* Rx Length Error Count Half/Full Mask */
+#define BITP_EMAC_MMC_RXIMSK_UCASTG          17                               /* Rx Unicast Frames (Good) Count Half/Full Mask */
+#define BITP_EMAC_MMC_RXIMSK_R1024TOMAX      16                               /* Rx 1024-to-max Octets (Good/Bad) Count Half/Full Mask */
+#define BITP_EMAC_MMC_RXIMSK_R512TO1023      15                               /* Rx 512-to-1023 Octets (Good/Bad) Count Half/Full Mask */
+#define BITP_EMAC_MMC_RXIMSK_R256TO511       14                               /* Rx 255-to-511 Octets (Good/Bad) Count Half/Full Mask */
+#define BITP_EMAC_MMC_RXIMSK_R128TO255       13                               /* Rx 128-to-255 Octets (Good/Bad) Count Half/Full Mask */
+#define BITP_EMAC_MMC_RXIMSK_R65TO127        12                               /* Rx 65-to-127 Octets (Good/Bad) Count Half/Full Mask */
+#define BITP_EMAC_MMC_RXIMSK_R64             11                               /* Rx 64 Octets (Good/Bad) Count Half/Full Mask */
+#define BITP_EMAC_MMC_RXIMSK_OSIZEG          10                               /* Rx Oversize (Good) Count Half/Full Mask */
+#define BITP_EMAC_MMC_RXIMSK_USIZEG           9                               /* Rx Undersize (Good) Count Half/Full Mask */
+#define BITP_EMAC_MMC_RXIMSK_JABERR           8                               /* Rx Jabber Error Count Half/Full Mask */
+#define BITP_EMAC_MMC_RXIMSK_RUNTERR          7                               /* Rx Runt Error Count Half/Full Mask */
+#define BITP_EMAC_MMC_RXIMSK_ALIGNERR         6                               /* Rx Alignment Error Count Half/Full Mask */
+#define BITP_EMAC_MMC_RXIMSK_CRCERR           5                               /* Rx CRC Error Count Half/Full Mask */
+#define BITP_EMAC_MMC_RXIMSK_MCASTG           4                               /* Rx Multicast Frames (Good) Count Half/Full Mask */
+#define BITP_EMAC_MMC_RXIMSK_BCASTG           3                               /* Rx Broadcast Frames (Good) Count Half/Full Mask */
+#define BITP_EMAC_MMC_RXIMSK_OCTCNTG          2                               /* Rx Octet Count (Good) Count Half/Full Mask */
+#define BITP_EMAC_MMC_RXIMSK_OCTCNTGB         1                               /* Rx Octet Count (Good/Bad) Count Half/Full Mask */
+#define BITP_EMAC_MMC_RXIMSK_FRCNTGB          0                               /* Rx Frame Count (Good/Bad) Count Half/Full Mask */
+#define BITM_EMAC_MMC_RXIMSK_WATCHERR        (_ADI_MSK(0x00800000,uint32_t))  /* Rx Watch Dog Error Count Half/Full Mask */
+#define BITM_EMAC_MMC_RXIMSK_VLANFRGB        (_ADI_MSK(0x00400000,uint32_t))  /* Rx VLAN Frames (Good/Bad) Count Half/Full Mask */
+#define BITM_EMAC_MMC_RXIMSK_FIFOOV          (_ADI_MSK(0x00200000,uint32_t))  /* Rx FIFO Overflow Count Half/Full Mask */
+#define BITM_EMAC_MMC_RXIMSK_PAUSEFRM        (_ADI_MSK(0x00100000,uint32_t))  /* Rx Pause Frames Count Half/Full Mask */
+#define BITM_EMAC_MMC_RXIMSK_OUTRANGE        (_ADI_MSK(0x00080000,uint32_t))  /* Rx Out Of Range Type Count Half/Full Mask */
+#define BITM_EMAC_MMC_RXIMSK_LENERR          (_ADI_MSK(0x00040000,uint32_t))  /* Rx Length Error Count Half/Full Mask */
+#define BITM_EMAC_MMC_RXIMSK_UCASTG          (_ADI_MSK(0x00020000,uint32_t))  /* Rx Unicast Frames (Good) Count Half/Full Mask */
+#define BITM_EMAC_MMC_RXIMSK_R1024TOMAX      (_ADI_MSK(0x00010000,uint32_t))  /* Rx 1024-to-max Octets (Good/Bad) Count Half/Full Mask */
+#define BITM_EMAC_MMC_RXIMSK_R512TO1023      (_ADI_MSK(0x00008000,uint32_t))  /* Rx 512-to-1023 Octets (Good/Bad) Count Half/Full Mask */
+#define BITM_EMAC_MMC_RXIMSK_R256TO511       (_ADI_MSK(0x00004000,uint32_t))  /* Rx 255-to-511 Octets (Good/Bad) Count Half/Full Mask */
+#define BITM_EMAC_MMC_RXIMSK_R128TO255       (_ADI_MSK(0x00002000,uint32_t))  /* Rx 128-to-255 Octets (Good/Bad) Count Half/Full Mask */
+#define BITM_EMAC_MMC_RXIMSK_R65TO127        (_ADI_MSK(0x00001000,uint32_t))  /* Rx 65-to-127 Octets (Good/Bad) Count Half/Full Mask */
+#define BITM_EMAC_MMC_RXIMSK_R64             (_ADI_MSK(0x00000800,uint32_t))  /* Rx 64 Octets (Good/Bad) Count Half/Full Mask */
+#define BITM_EMAC_MMC_RXIMSK_OSIZEG          (_ADI_MSK(0x00000400,uint32_t))  /* Rx Oversize (Good) Count Half/Full Mask */
+#define BITM_EMAC_MMC_RXIMSK_USIZEG          (_ADI_MSK(0x00000200,uint32_t))  /* Rx Undersize (Good) Count Half/Full Mask */
+#define BITM_EMAC_MMC_RXIMSK_JABERR          (_ADI_MSK(0x00000100,uint32_t))  /* Rx Jabber Error Count Half/Full Mask */
+#define BITM_EMAC_MMC_RXIMSK_RUNTERR         (_ADI_MSK(0x00000080,uint32_t))  /* Rx Runt Error Count Half/Full Mask */
+#define BITM_EMAC_MMC_RXIMSK_ALIGNERR        (_ADI_MSK(0x00000040,uint32_t))  /* Rx Alignment Error Count Half/Full Mask */
+#define BITM_EMAC_MMC_RXIMSK_CRCERR          (_ADI_MSK(0x00000020,uint32_t))  /* Rx CRC Error Count Half/Full Mask */
+#define BITM_EMAC_MMC_RXIMSK_MCASTG          (_ADI_MSK(0x00000010,uint32_t))  /* Rx Multicast Frames (Good) Count Half/Full Mask */
+#define BITM_EMAC_MMC_RXIMSK_BCASTG          (_ADI_MSK(0x00000008,uint32_t))  /* Rx Broadcast Frames (Good) Count Half/Full Mask */
+#define BITM_EMAC_MMC_RXIMSK_OCTCNTG         (_ADI_MSK(0x00000004,uint32_t))  /* Rx Octet Count (Good) Count Half/Full Mask */
+#define BITM_EMAC_MMC_RXIMSK_OCTCNTGB        (_ADI_MSK(0x00000002,uint32_t))  /* Rx Octet Count (Good/Bad) Count Half/Full Mask */
+#define BITM_EMAC_MMC_RXIMSK_FRCNTGB         (_ADI_MSK(0x00000001,uint32_t))  /* Rx Frame Count (Good/Bad) Count Half/Full Mask */
 
 /* ------------------------------------------------------------------------------------------------------------------------
         EMAC_MMC_TXIMSK                      Pos/Masks                        Description
    ------------------------------------------------------------------------------------------------------------------------ */
-#define BITP_EMAC_MMC_TXIMSK_VLANFRG         24                               /* Setting this bit masks the interrupt when txvlanframes_g counter reaches full or half */
-#define BITP_EMAC_MMC_TXIMSK_PAUSEFRM        23                               /* Setting this bit masks the interrupt when txpauseframes counter reaches full or half */
-#define BITP_EMAC_MMC_TXIMSK_EXCESSDEF       22                               /* Setting this bit masks the interrupt when txoexcessdef counter reaches full or half */
-#define BITP_EMAC_MMC_TXIMSK_FRCNTG          21                               /* Setting this bit masks the interrupt when txframecount_g counter reaches full or half */
-#define BITP_EMAC_MMC_TXIMSK_OCTCNTG         20                               /* Setting this bit masks the interrupt when txoctetcount_g counter reaches full or half */
-#define BITP_EMAC_MMC_TXIMSK_CARRERR         19                               /* Setting this bit masks the interrupt when txcarriererr counter reaches full or half */
-#define BITP_EMAC_MMC_TXIMSK_EXCESSCOL       18                               /* Setting this bit masks the interrupt when txexesscol counter reaches full or half */
-#define BITP_EMAC_MMC_TXIMSK_LATECOL         17                               /* Setting this bit masks the interrupt when txlatecol counter reaches full or half */
-#define BITP_EMAC_MMC_TXIMSK_DEFERRED        16                               /* Setting this bit masks the interrupt when txdeffered counter reaches full or half */
-#define BITP_EMAC_MMC_TXIMSK_MULTCOLG        15                               /* Setting this bit masks the interrupt when txmulticol_g counter reaches full or half */
-#define BITP_EMAC_MMC_TXIMSK_SNGCOLG         14                               /* Setting this bit masks the interrupt when txsinglecol_g counter reaches full or half */
-#define BITP_EMAC_MMC_TXIMSK_UNDERR          13                               /* Setting this bit masks the interrupt when txunderflowerror counter reaches full or half */
-#define BITP_EMAC_MMC_TXIMSK_BCASTGB         12                               /* Setting this bit masks the interrupt when txbroadcastframes_gb counter reaches full or half */
-#define BITP_EMAC_MMC_TXIMSK_MCASTGB         11                               /* Setting this bit masks the interrupt when txmulticastframes_gb counter reaches full or half */
-#define BITP_EMAC_MMC_TXIMSK_UCASTGB         10                               /* Setting this bit masks the interrupt when txunicastframes_gb counter reaches full or half */
-#define BITP_EMAC_MMC_TXIMSK_T1024TOMAX       9                               /* Setting this bit masks the interrupt when tx1024tomaxoctets_gb counter reaches full or half */
-#define BITP_EMAC_MMC_TXIMSK_T512TO1023       8                               /* Setting this bit masks the interrupt when tx512to1023octets_gb counter reaches full or half */
-#define BITP_EMAC_MMC_TXIMSK_T256TO511        7                               /* Setting this bit masks the interrupt when tx256to511octets_gb counter reaches full or half */
-#define BITP_EMAC_MMC_TXIMSK_T128TO255        6                               /* Setting this bit masks the interrupt when tx128to255octets_gb counter reaches full or half */
-#define BITP_EMAC_MMC_TXIMSK_T65TO127         5                               /* Setting this bit masks the interrupt when tx65to127octets_gb counter reaches full or half */
-#define BITP_EMAC_MMC_TXIMSK_T64              4                               /* Setting this bit masks the interrupt when tx64octets_gb counter reaches full or half */
-#define BITP_EMAC_MMC_TXIMSK_MCASTG           3                               /* Setting this bit masks the interrupt when txmulticastframes_g counter reaches full or half */
-#define BITP_EMAC_MMC_TXIMSK_BCASTG           2                               /* Setting this bit masks the interrupt when txbroadcastframes_g counter reaches full or half */
-#define BITP_EMAC_MMC_TXIMSK_FRCNTGB          1                               /* Setting this bit masks the interrupt when txframecount_gb counter reaches full or half */
-#define BITP_EMAC_MMC_TXIMSK_OCTCNTGB         0                               /* Setting this bit masks the interrupt when txoctetcount_gb counter reaches full or half */
-#define BITM_EMAC_MMC_TXIMSK_VLANFRG         (_ADI_MSK(0x01000000,uint32_t))  /* Setting this bit masks the interrupt when txvlanframes_g counter reaches full or half */
-#define BITM_EMAC_MMC_TXIMSK_PAUSEFRM        (_ADI_MSK(0x00800000,uint32_t))  /* Setting this bit masks the interrupt when txpauseframes counter reaches full or half */
-#define BITM_EMAC_MMC_TXIMSK_EXCESSDEF       (_ADI_MSK(0x00400000,uint32_t))  /* Setting this bit masks the interrupt when txoexcessdef counter reaches full or half */
-#define BITM_EMAC_MMC_TXIMSK_FRCNTG          (_ADI_MSK(0x00200000,uint32_t))  /* Setting this bit masks the interrupt when txframecount_g counter reaches full or half */
-#define BITM_EMAC_MMC_TXIMSK_OCTCNTG         (_ADI_MSK(0x00100000,uint32_t))  /* Setting this bit masks the interrupt when txoctetcount_g counter reaches full or half */
-#define BITM_EMAC_MMC_TXIMSK_CARRERR         (_ADI_MSK(0x00080000,uint32_t))  /* Setting this bit masks the interrupt when txcarriererr counter reaches full or half */
-#define BITM_EMAC_MMC_TXIMSK_EXCESSCOL       (_ADI_MSK(0x00040000,uint32_t))  /* Setting this bit masks the interrupt when txexesscol counter reaches full or half */
-#define BITM_EMAC_MMC_TXIMSK_LATECOL         (_ADI_MSK(0x00020000,uint32_t))  /* Setting this bit masks the interrupt when txlatecol counter reaches full or half */
-#define BITM_EMAC_MMC_TXIMSK_DEFERRED        (_ADI_MSK(0x00010000,uint32_t))  /* Setting this bit masks the interrupt when txdeffered counter reaches full or half */
-#define BITM_EMAC_MMC_TXIMSK_MULTCOLG        (_ADI_MSK(0x00008000,uint32_t))  /* Setting this bit masks the interrupt when txmulticol_g counter reaches full or half */
-#define BITM_EMAC_MMC_TXIMSK_SNGCOLG         (_ADI_MSK(0x00004000,uint32_t))  /* Setting this bit masks the interrupt when txsinglecol_g counter reaches full or half */
-#define BITM_EMAC_MMC_TXIMSK_UNDERR          (_ADI_MSK(0x00002000,uint32_t))  /* Setting this bit masks the interrupt when txunderflowerror counter reaches full or half */
-#define BITM_EMAC_MMC_TXIMSK_BCASTGB         (_ADI_MSK(0x00001000,uint32_t))  /* Setting this bit masks the interrupt when txbroadcastframes_gb counter reaches full or half */
-#define BITM_EMAC_MMC_TXIMSK_MCASTGB         (_ADI_MSK(0x00000800,uint32_t))  /* Setting this bit masks the interrupt when txmulticastframes_gb counter reaches full or half */
-#define BITM_EMAC_MMC_TXIMSK_UCASTGB         (_ADI_MSK(0x00000400,uint32_t))  /* Setting this bit masks the interrupt when txunicastframes_gb counter reaches full or half */
-#define BITM_EMAC_MMC_TXIMSK_T1024TOMAX      (_ADI_MSK(0x00000200,uint32_t))  /* Setting this bit masks the interrupt when tx1024tomaxoctets_gb counter reaches full or half */
-#define BITM_EMAC_MMC_TXIMSK_T512TO1023      (_ADI_MSK(0x00000100,uint32_t))  /* Setting this bit masks the interrupt when tx512to1023octets_gb counter reaches full or half */
-#define BITM_EMAC_MMC_TXIMSK_T256TO511       (_ADI_MSK(0x00000080,uint32_t))  /* Setting this bit masks the interrupt when tx256to511octets_gb counter reaches full or half */
-#define BITM_EMAC_MMC_TXIMSK_T128TO255       (_ADI_MSK(0x00000040,uint32_t))  /* Setting this bit masks the interrupt when tx128to255octets_gb counter reaches full or half */
-#define BITM_EMAC_MMC_TXIMSK_T65TO127        (_ADI_MSK(0x00000020,uint32_t))  /* Setting this bit masks the interrupt when tx65to127octets_gb counter reaches full or half */
-#define BITM_EMAC_MMC_TXIMSK_T64             (_ADI_MSK(0x00000010,uint32_t))  /* Setting this bit masks the interrupt when tx64octets_gb counter reaches full or half */
-#define BITM_EMAC_MMC_TXIMSK_MCASTG          (_ADI_MSK(0x00000008,uint32_t))  /* Setting this bit masks the interrupt when txmulticastframes_g counter reaches full or half */
-#define BITM_EMAC_MMC_TXIMSK_BCASTG          (_ADI_MSK(0x00000004,uint32_t))  /* Setting this bit masks the interrupt when txbroadcastframes_g counter reaches full or half */
-#define BITM_EMAC_MMC_TXIMSK_FRCNTGB         (_ADI_MSK(0x00000002,uint32_t))  /* Setting this bit masks the interrupt when txframecount_gb counter reaches full or half */
-#define BITM_EMAC_MMC_TXIMSK_OCTCNTGB        (_ADI_MSK(0x00000001,uint32_t))  /* Setting this bit masks the interrupt when txoctetcount_gb counter reaches full or half */
+#define BITP_EMAC_MMC_TXIMSK_VLANFRG         24                               /* Tx VLAN Frames (Good) Count Half/Full Mask */
+#define BITP_EMAC_MMC_TXIMSK_PAUSEFRM        23                               /* Tx Pause Frames Count Half/Full Mask */
+#define BITP_EMAC_MMC_TXIMSK_EXCESSDEF       22                               /* Tx Excess Deferred Count Half/Full Mask */
+#define BITP_EMAC_MMC_TXIMSK_FRCNTG          21                               /* Tx Frame Count (Good) Count Half/Full Mask */
+#define BITP_EMAC_MMC_TXIMSK_OCTCNTG         20                               /* Tx Octet Count (Good) Count Half/Full Mask */
+#define BITP_EMAC_MMC_TXIMSK_CARRERR         19                               /* Tx Carrier Error Count Half/Full Mask */
+#define BITP_EMAC_MMC_TXIMSK_EXCESSCOL       18                               /* Tx Exess collision Count Half/Full Mask */
+#define BITP_EMAC_MMC_TXIMSK_LATECOL         17                               /* Tx Late Collision Count Half/Full Mask */
+#define BITP_EMAC_MMC_TXIMSK_DEFERRED        16                               /* Tx Deferred Count Half/Full Mask */
+#define BITP_EMAC_MMC_TXIMSK_MULTCOLG        15                               /* Tx Multiple Collisions (Good) Count Mask */
+#define BITP_EMAC_MMC_TXIMSK_SNGCOLG         14                               /* Tx Single Collision (Good) Count Half/Full Mask */
+#define BITP_EMAC_MMC_TXIMSK_UNDERR          13                               /* Tx Underflow Error Count Half/Full Mask */
+#define BITP_EMAC_MMC_TXIMSK_BCASTGB         12                               /* Tx Broadcast Frames (Good/Bad) Count Half/Full Mask */
+#define BITP_EMAC_MMC_TXIMSK_MCASTGB         11                               /* Tx Multicast Frames (Good/Bad) Count Half/Full Mask */
+#define BITP_EMAC_MMC_TXIMSK_UCASTGB         10                               /* Tx Unicast Frames (Good/Bad) Count Half/Full Mask */
+#define BITP_EMAC_MMC_TXIMSK_T1024TOMAX       9                               /* Tx 1024-to-max Octets (Good/Bad) Count Half/Full Mask */
+#define BITP_EMAC_MMC_TXIMSK_T512TO1023       8                               /* Tx 512-to-1023 Octets (Good/Bad) Count Half/Full Mask */
+#define BITP_EMAC_MMC_TXIMSK_T256TO511        7                               /* Tx 256-to-511 Octets (Good/Bad) Count Half/Full Mask */
+#define BITP_EMAC_MMC_TXIMSK_T128TO255        6                               /* Tx 128-to-255 Octets (Good/Bad) Count Half/Full Mask */
+#define BITP_EMAC_MMC_TXIMSK_T65TO127         5                               /* Tx 65-to-127 Octets (Good/Bad) Count Half/Full Mask */
+#define BITP_EMAC_MMC_TXIMSK_T64              4                               /* Tx 64 Octets (Good/Bad) Count Half/Full Mask */
+#define BITP_EMAC_MMC_TXIMSK_MCASTG           3                               /* Tx Multicast Frames (Good) Count Half/Full Mask */
+#define BITP_EMAC_MMC_TXIMSK_BCASTG           2                               /* Tx Broadcast Frames (Good) Count Half/Full Mask */
+#define BITP_EMAC_MMC_TXIMSK_FRCNTGB          1                               /* Tx Frame Count (Good/Bad) Count Half/Full Mask */
+#define BITP_EMAC_MMC_TXIMSK_OCTCNTGB         0                               /* Tx Octet Count (Good/Bad) Count Half/Full Mask */
+#define BITM_EMAC_MMC_TXIMSK_VLANFRG         (_ADI_MSK(0x01000000,uint32_t))  /* Tx VLAN Frames (Good) Count Half/Full Mask */
+#define BITM_EMAC_MMC_TXIMSK_PAUSEFRM        (_ADI_MSK(0x00800000,uint32_t))  /* Tx Pause Frames Count Half/Full Mask */
+#define BITM_EMAC_MMC_TXIMSK_EXCESSDEF       (_ADI_MSK(0x00400000,uint32_t))  /* Tx Excess Deferred Count Half/Full Mask */
+#define BITM_EMAC_MMC_TXIMSK_FRCNTG          (_ADI_MSK(0x00200000,uint32_t))  /* Tx Frame Count (Good) Count Half/Full Mask */
+#define BITM_EMAC_MMC_TXIMSK_OCTCNTG         (_ADI_MSK(0x00100000,uint32_t))  /* Tx Octet Count (Good) Count Half/Full Mask */
+#define BITM_EMAC_MMC_TXIMSK_CARRERR         (_ADI_MSK(0x00080000,uint32_t))  /* Tx Carrier Error Count Half/Full Mask */
+#define BITM_EMAC_MMC_TXIMSK_EXCESSCOL       (_ADI_MSK(0x00040000,uint32_t))  /* Tx Exess collision Count Half/Full Mask */
+#define BITM_EMAC_MMC_TXIMSK_LATECOL         (_ADI_MSK(0x00020000,uint32_t))  /* Tx Late Collision Count Half/Full Mask */
+#define BITM_EMAC_MMC_TXIMSK_DEFERRED        (_ADI_MSK(0x00010000,uint32_t))  /* Tx Deferred Count Half/Full Mask */
+#define BITM_EMAC_MMC_TXIMSK_MULTCOLG        (_ADI_MSK(0x00008000,uint32_t))  /* Tx Multiple Collisions (Good) Count Mask */
+#define BITM_EMAC_MMC_TXIMSK_SNGCOLG         (_ADI_MSK(0x00004000,uint32_t))  /* Tx Single Collision (Good) Count Half/Full Mask */
+#define BITM_EMAC_MMC_TXIMSK_UNDERR          (_ADI_MSK(0x00002000,uint32_t))  /* Tx Underflow Error Count Half/Full Mask */
+#define BITM_EMAC_MMC_TXIMSK_BCASTGB         (_ADI_MSK(0x00001000,uint32_t))  /* Tx Broadcast Frames (Good/Bad) Count Half/Full Mask */
+#define BITM_EMAC_MMC_TXIMSK_MCASTGB         (_ADI_MSK(0x00000800,uint32_t))  /* Tx Multicast Frames (Good/Bad) Count Half/Full Mask */
+#define BITM_EMAC_MMC_TXIMSK_UCASTGB         (_ADI_MSK(0x00000400,uint32_t))  /* Tx Unicast Frames (Good/Bad) Count Half/Full Mask */
+#define BITM_EMAC_MMC_TXIMSK_T1024TOMAX      (_ADI_MSK(0x00000200,uint32_t))  /* Tx 1024-to-max Octets (Good/Bad) Count Half/Full Mask */
+#define BITM_EMAC_MMC_TXIMSK_T512TO1023      (_ADI_MSK(0x00000100,uint32_t))  /* Tx 512-to-1023 Octets (Good/Bad) Count Half/Full Mask */
+#define BITM_EMAC_MMC_TXIMSK_T256TO511       (_ADI_MSK(0x00000080,uint32_t))  /* Tx 256-to-511 Octets (Good/Bad) Count Half/Full Mask */
+#define BITM_EMAC_MMC_TXIMSK_T128TO255       (_ADI_MSK(0x00000040,uint32_t))  /* Tx 128-to-255 Octets (Good/Bad) Count Half/Full Mask */
+#define BITM_EMAC_MMC_TXIMSK_T65TO127        (_ADI_MSK(0x00000020,uint32_t))  /* Tx 65-to-127 Octets (Good/Bad) Count Half/Full Mask */
+#define BITM_EMAC_MMC_TXIMSK_T64             (_ADI_MSK(0x00000010,uint32_t))  /* Tx 64 Octets (Good/Bad) Count Half/Full Mask */
+#define BITM_EMAC_MMC_TXIMSK_MCASTG          (_ADI_MSK(0x00000008,uint32_t))  /* Tx Multicast Frames (Good) Count Half/Full Mask */
+#define BITM_EMAC_MMC_TXIMSK_BCASTG          (_ADI_MSK(0x00000004,uint32_t))  /* Tx Broadcast Frames (Good) Count Half/Full Mask */
+#define BITM_EMAC_MMC_TXIMSK_FRCNTGB         (_ADI_MSK(0x00000002,uint32_t))  /* Tx Frame Count (Good/Bad) Count Half/Full Mask */
+#define BITM_EMAC_MMC_TXIMSK_OCTCNTGB        (_ADI_MSK(0x00000001,uint32_t))  /* Tx Octet Count (Good/Bad) Count Half/Full Mask */
 
 /* ------------------------------------------------------------------------------------------------------------------------
         EMAC_IPC_RXIMSK                      Pos/Masks                        Description
    ------------------------------------------------------------------------------------------------------------------------ */
-#define BITP_EMAC_IPC_RXIMSK_ICMPERROCT      29                               /* Setting this bit masks the interrupt when the rxicmp_err_octets counter reaches half the maximum value, and also when it reaches the maximum value. */
-#define BITP_EMAC_IPC_RXIMSK_ICMPGOCT        28                               /* Setting this bit masks the interrupt when the rxicmp_gd_octets counter reaches half the maximum value, and also when it reaches the maximum value. */
-#define BITP_EMAC_IPC_RXIMSK_TCPERROCT       27                               /* Setting this bit masks the interrupt when the rxtcp_err_octets counter reaches half the maximum value, and also when it reaches the maximum value. */
-#define BITP_EMAC_IPC_RXIMSK_TCPGOCT         26                               /* Setting this bit masks the interrupt when the rxtcp_gd_octets counter reaches half the maximum value, and also when it reaches the maximum value. */
-#define BITP_EMAC_IPC_RXIMSK_UDPERROCT       25                               /* Setting this bit masks the interrupt when the rxudp_err_octets counter reaches half the maximum value, and also when it reaches the maximum value. */
-#define BITP_EMAC_IPC_RXIMSK_UDPGOCT         24                               /* Setting this bit masks the interrupt when the rxudp_gd_octets counter reaches half the maximum value, and also when it reaches the maximum value. */
-#define BITP_EMAC_IPC_RXIMSK_V6NOPAYOCT      23                               /* Setting this bit masks the interrupt when the rxipv6_nopay_octets counter reaches half the maximum value, and also when it reaches the maximum value. */
-#define BITP_EMAC_IPC_RXIMSK_V6HDERROCT      22                               /* Setting this bit masks the interrupt when the rxipv6_hdrerr_octets counter reaches half the maximum value, and also when it reaches the maximum value. */
-#define BITP_EMAC_IPC_RXIMSK_V6GOCT          21                               /* Setting this bit masks the interrupt when the rxipv6_gd_octets counter reaches half the maximum value, and also when it reaches the maximum value. */
-#define BITP_EMAC_IPC_RXIMSK_V4UDSBLOCT      20                               /* Setting this bit masks the interrupt when the rxipv4_udsbl_octets counter reaches half the maximum value, and also when it reaches the maximum value. */
-#define BITP_EMAC_IPC_RXIMSK_V4FRAGOCT       19                               /* Setting this bit masks the interrupt when the rxipv4_frag_octets counter reaches half the maximum value, and also when it reaches the maximum value. */
-#define BITP_EMAC_IPC_RXIMSK_V4NOPAYOCT      18                               /* Setting this bit masks the interrupt when the rxipv4_nopay_octets counter reaches half the maximum value, and also when it reaches the maximum value. */
-#define BITP_EMAC_IPC_RXIMSK_V4HDERROCT      17                               /* Setting this bit masks the interrupt when the rxipv4_hdrerr_octets counter reaches half the maximum value, and also when it reaches the maximum value. */
-#define BITP_EMAC_IPC_RXIMSK_V4GOCT          16                               /* Setting this bit masks the interrupt when the rxipv4_gd_octets counter reaches half the maximum value, and also when it reaches the maximum value. */
-#define BITP_EMAC_IPC_RXIMSK_ICMPERRFRM      13                               /* Setting this bit masks the interrupt when the rxicmp_err_frms counter reaches half the maximum value, and also when it reaches the maximum value. */
-#define BITP_EMAC_IPC_RXIMSK_ICMPGFRM        12                               /* Setting this bit masks the interrupt when the rxicmp_gd_frms counter reaches half the maximum value, and also when it reaches the maximum value. */
-#define BITP_EMAC_IPC_RXIMSK_TCPERRFRM       11                               /* Setting this bit masks the interrupt when the rxtcp_err_frms counter reaches half the maximum value, and also when it reaches the maximum value. */
-#define BITP_EMAC_IPC_RXIMSK_TCPGFRM         10                               /* Setting this bit masks the interrupt when the rxtcp_gd_frms counter reaches half the maximum value, and also when it reaches the maximum value. */
-#define BITP_EMAC_IPC_RXIMSK_UDPERRFRM        9                               /* Setting this bit masks the interrupt when the rxudp_err_frms counter reaches half the maximum value, and also when it reaches the maximum value. */
-#define BITP_EMAC_IPC_RXIMSK_UDPGFRM          8                               /* Setting this bit masks the interrupt when the rxudp_gd_frms counter reaches half the maximum value, and also when it reaches the maximum value. */
-#define BITP_EMAC_IPC_RXIMSK_V6NOPAYFRM       7                               /* Setting this bit masks the interrupt when the rxipv6_nopay_frms counter reaches half the maximum value, and also when it reaches the maximum value. */
-#define BITP_EMAC_IPC_RXIMSK_V6HDERRFRM       6                               /* Setting this bit masks the interrupt when the rxipv6_hdrerr_frms counter reaches half the maximum value, and also when it reaches the maximum value. */
-#define BITP_EMAC_IPC_RXIMSK_V6GFRM           5                               /* Setting this bit masks the interrupt when the rxipv6_gd_frms counter reaches half the maximum value, and also when it reaches the maximum value. */
-#define BITP_EMAC_IPC_RXIMSK_V4UDSBLFRM       4                               /* Setting this bit masks the interrupt when the rxipv4_udsbl_frms counter reaches half the maximum value, and also when it reaches the maximum value. */
-#define BITP_EMAC_IPC_RXIMSK_V4FRAGFRM        3                               /* Setting this bit masks the interrupt when the rxipv4_frag_frms counter reaches half the maximum value, and also when it reaches the maximum value. */
-#define BITP_EMAC_IPC_RXIMSK_V4NOPAYFRM       2                               /* Setting this bit masks the interrupt when the rxipv4_nopay_frms counter reaches half the maximum value, and also when it reaches the maximum value. */
-#define BITP_EMAC_IPC_RXIMSK_V4HDERRFRM       1                               /* Setting this bit masks the interrupt when the rxipv4_hdrerr_frms counter reaches half the maximum value, and also when it reaches the maximum value. */
-#define BITP_EMAC_IPC_RXIMSK_V4GFRM           0                               /* Setting this bit masks the interrupt when the rxipv4_gd_frms counter reaches half the maximum value, and also when it reaches the maximum value. */
-#define BITM_EMAC_IPC_RXIMSK_ICMPERROCT      (_ADI_MSK(0x20000000,uint32_t))  /* Setting this bit masks the interrupt when the rxicmp_err_octets counter reaches half the maximum value, and also when it reaches the maximum value. */
-#define BITM_EMAC_IPC_RXIMSK_ICMPGOCT        (_ADI_MSK(0x10000000,uint32_t))  /* Setting this bit masks the interrupt when the rxicmp_gd_octets counter reaches half the maximum value, and also when it reaches the maximum value. */
-#define BITM_EMAC_IPC_RXIMSK_TCPERROCT       (_ADI_MSK(0x08000000,uint32_t))  /* Setting this bit masks the interrupt when the rxtcp_err_octets counter reaches half the maximum value, and also when it reaches the maximum value. */
-#define BITM_EMAC_IPC_RXIMSK_TCPGOCT         (_ADI_MSK(0x04000000,uint32_t))  /* Setting this bit masks the interrupt when the rxtcp_gd_octets counter reaches half the maximum value, and also when it reaches the maximum value. */
-#define BITM_EMAC_IPC_RXIMSK_UDPERROCT       (_ADI_MSK(0x02000000,uint32_t))  /* Setting this bit masks the interrupt when the rxudp_err_octets counter reaches half the maximum value, and also when it reaches the maximum value. */
-#define BITM_EMAC_IPC_RXIMSK_UDPGOCT         (_ADI_MSK(0x01000000,uint32_t))  /* Setting this bit masks the interrupt when the rxudp_gd_octets counter reaches half the maximum value, and also when it reaches the maximum value. */
-#define BITM_EMAC_IPC_RXIMSK_V6NOPAYOCT      (_ADI_MSK(0x00800000,uint32_t))  /* Setting this bit masks the interrupt when the rxipv6_nopay_octets counter reaches half the maximum value, and also when it reaches the maximum value. */
-#define BITM_EMAC_IPC_RXIMSK_V6HDERROCT      (_ADI_MSK(0x00400000,uint32_t))  /* Setting this bit masks the interrupt when the rxipv6_hdrerr_octets counter reaches half the maximum value, and also when it reaches the maximum value. */
-#define BITM_EMAC_IPC_RXIMSK_V6GOCT          (_ADI_MSK(0x00200000,uint32_t))  /* Setting this bit masks the interrupt when the rxipv6_gd_octets counter reaches half the maximum value, and also when it reaches the maximum value. */
-#define BITM_EMAC_IPC_RXIMSK_V4UDSBLOCT      (_ADI_MSK(0x00100000,uint32_t))  /* Setting this bit masks the interrupt when the rxipv4_udsbl_octets counter reaches half the maximum value, and also when it reaches the maximum value. */
-#define BITM_EMAC_IPC_RXIMSK_V4FRAGOCT       (_ADI_MSK(0x00080000,uint32_t))  /* Setting this bit masks the interrupt when the rxipv4_frag_octets counter reaches half the maximum value, and also when it reaches the maximum value. */
-#define BITM_EMAC_IPC_RXIMSK_V4NOPAYOCT      (_ADI_MSK(0x00040000,uint32_t))  /* Setting this bit masks the interrupt when the rxipv4_nopay_octets counter reaches half the maximum value, and also when it reaches the maximum value. */
-#define BITM_EMAC_IPC_RXIMSK_V4HDERROCT      (_ADI_MSK(0x00020000,uint32_t))  /* Setting this bit masks the interrupt when the rxipv4_hdrerr_octets counter reaches half the maximum value, and also when it reaches the maximum value. */
-#define BITM_EMAC_IPC_RXIMSK_V4GOCT          (_ADI_MSK(0x00010000,uint32_t))  /* Setting this bit masks the interrupt when the rxipv4_gd_octets counter reaches half the maximum value, and also when it reaches the maximum value. */
-#define BITM_EMAC_IPC_RXIMSK_ICMPERRFRM      (_ADI_MSK(0x00002000,uint32_t))  /* Setting this bit masks the interrupt when the rxicmp_err_frms counter reaches half the maximum value, and also when it reaches the maximum value. */
-#define BITM_EMAC_IPC_RXIMSK_ICMPGFRM        (_ADI_MSK(0x00001000,uint32_t))  /* Setting this bit masks the interrupt when the rxicmp_gd_frms counter reaches half the maximum value, and also when it reaches the maximum value. */
-#define BITM_EMAC_IPC_RXIMSK_TCPERRFRM       (_ADI_MSK(0x00000800,uint32_t))  /* Setting this bit masks the interrupt when the rxtcp_err_frms counter reaches half the maximum value, and also when it reaches the maximum value. */
-#define BITM_EMAC_IPC_RXIMSK_TCPGFRM         (_ADI_MSK(0x00000400,uint32_t))  /* Setting this bit masks the interrupt when the rxtcp_gd_frms counter reaches half the maximum value, and also when it reaches the maximum value. */
-#define BITM_EMAC_IPC_RXIMSK_UDPERRFRM       (_ADI_MSK(0x00000200,uint32_t))  /* Setting this bit masks the interrupt when the rxudp_err_frms counter reaches half the maximum value, and also when it reaches the maximum value. */
-#define BITM_EMAC_IPC_RXIMSK_UDPGFRM         (_ADI_MSK(0x00000100,uint32_t))  /* Setting this bit masks the interrupt when the rxudp_gd_frms counter reaches half the maximum value, and also when it reaches the maximum value. */
-#define BITM_EMAC_IPC_RXIMSK_V6NOPAYFRM      (_ADI_MSK(0x00000080,uint32_t))  /* Setting this bit masks the interrupt when the rxipv6_nopay_frms counter reaches half the maximum value, and also when it reaches the maximum value. */
-#define BITM_EMAC_IPC_RXIMSK_V6HDERRFRM      (_ADI_MSK(0x00000040,uint32_t))  /* Setting this bit masks the interrupt when the rxipv6_hdrerr_frms counter reaches half the maximum value, and also when it reaches the maximum value. */
-#define BITM_EMAC_IPC_RXIMSK_V6GFRM          (_ADI_MSK(0x00000020,uint32_t))  /* Setting this bit masks the interrupt when the rxipv6_gd_frms counter reaches half the maximum value, and also when it reaches the maximum value. */
-#define BITM_EMAC_IPC_RXIMSK_V4UDSBLFRM      (_ADI_MSK(0x00000010,uint32_t))  /* Setting this bit masks the interrupt when the rxipv4_udsbl_frms counter reaches half the maximum value, and also when it reaches the maximum value. */
-#define BITM_EMAC_IPC_RXIMSK_V4FRAGFRM       (_ADI_MSK(0x00000008,uint32_t))  /* Setting this bit masks the interrupt when the rxipv4_frag_frms counter reaches half the maximum value, and also when it reaches the maximum value. */
-#define BITM_EMAC_IPC_RXIMSK_V4NOPAYFRM      (_ADI_MSK(0x00000004,uint32_t))  /* Setting this bit masks the interrupt when the rxipv4_nopay_frms counter reaches half the maximum value, and also when it reaches the maximum value. */
-#define BITM_EMAC_IPC_RXIMSK_V4HDERRFRM      (_ADI_MSK(0x00000002,uint32_t))  /* Setting this bit masks the interrupt when the rxipv4_hdrerr_frms counter reaches half the maximum value, and also when it reaches the maximum value. */
-#define BITM_EMAC_IPC_RXIMSK_V4GFRM          (_ADI_MSK(0x00000001,uint32_t))  /* Setting this bit masks the interrupt when the rxipv4_gd_frms counter reaches half the maximum value, and also when it reaches the maximum value. */
+#define BITP_EMAC_IPC_RXIMSK_ICMPERROCT      29                               /* Rx ICMP Error Octets Count Half/Full Mask */
+#define BITP_EMAC_IPC_RXIMSK_ICMPGOCT        28                               /* Rx ICMP (Good) Octets Count Half/Full Mask */
+#define BITP_EMAC_IPC_RXIMSK_TCPERROCT       27                               /* Rx TCP Error Octets Count Half/Full Mask */
+#define BITP_EMAC_IPC_RXIMSK_TCPGOCT         26                               /* Rx TCP (Good) Octets Count Half/Full Mask */
+#define BITP_EMAC_IPC_RXIMSK_UDPERROCT       25                               /* Rx UDP Error Octets Count Half/Full Mask */
+#define BITP_EMAC_IPC_RXIMSK_UDPGOCT         24                               /* Rx UDP (Good) Octets Count Half/Full Mask */
+#define BITP_EMAC_IPC_RXIMSK_V6NOPAYOCT      23                               /* Rx IPv6 No Payload Octets Count Half/Full Mask */
+#define BITP_EMAC_IPC_RXIMSK_V6HDERROCT      22                               /* Rx IPv6 Header Error Octets Count Half/Full Mask */
+#define BITP_EMAC_IPC_RXIMSK_V6GOCT          21                               /* Rx IPv6 (Good) Octets Count Half/Full Mask */
+#define BITP_EMAC_IPC_RXIMSK_V4UDSBLOCT      20                               /* Rx IPv4 UDS Disable Octets Count Half/Full Mask */
+#define BITP_EMAC_IPC_RXIMSK_V4FRAGOCT       19                               /* Rx IPv4 Fragmented Octets Count Half/Full Mask */
+#define BITP_EMAC_IPC_RXIMSK_V4NOPAYOCT      18                               /* Rx IPv4 No Payload Octets Count Half/Full Mask */
+#define BITP_EMAC_IPC_RXIMSK_V4HDERROCT      17                               /* Rx IPv4 Header Error Octets Count Half/Full Mask */
+#define BITP_EMAC_IPC_RXIMSK_V4GOCT          16                               /* Rx IPv4 (Good) Octets Count Half/Full Mask */
+#define BITP_EMAC_IPC_RXIMSK_ICMPERRFRM      13                               /* Rx ICMP Error Frames Count Half/Full Mask */
+#define BITP_EMAC_IPC_RXIMSK_ICMPGFRM        12                               /* Rx ICMP (Good) Frames Count Half/Full Mask */
+#define BITP_EMAC_IPC_RXIMSK_TCPERRFRM       11                               /* Rx TCP Error Frames Count Half/Full Mask */
+#define BITP_EMAC_IPC_RXIMSK_TCPGFRM         10                               /* Rx TCP (Good) Frames Count Half/Full Mask */
+#define BITP_EMAC_IPC_RXIMSK_UDPERRFRM        9                               /* Rx UDP Error Frames Count Half/Full Mask */
+#define BITP_EMAC_IPC_RXIMSK_UDPGFRM          8                               /* Rx UDP (Good) Frames Count Half/Full Mask */
+#define BITP_EMAC_IPC_RXIMSK_V6NOPAYFRM       7                               /* Rx IPv6 No Payload Frames Count Half/Full Mask */
+#define BITP_EMAC_IPC_RXIMSK_V6HDERRFRM       6                               /* Rx IPv6 Header Error Frames Count Half/Full Mask */
+#define BITP_EMAC_IPC_RXIMSK_V6GFRM           5                               /* Rx IPv6 (Good) Frames Count Half/Full Mask */
+#define BITP_EMAC_IPC_RXIMSK_V4UDSBLFRM       4                               /* Rx IPv4 UDS Disable Frames Count Half/Full Mask */
+#define BITP_EMAC_IPC_RXIMSK_V4FRAGFRM        3                               /* Rx IPv4 Fragmented Frames Count Half/Full Mask */
+#define BITP_EMAC_IPC_RXIMSK_V4NOPAYFRM       2                               /* Rx IPv4 No Payload Frame Count Half/Full Mask */
+#define BITP_EMAC_IPC_RXIMSK_V4HDERRFRM       1                               /* Rx IPv4 Header Error Frame Count Half/Full Mask */
+#define BITP_EMAC_IPC_RXIMSK_V4GFRM           0                               /* Rx IPv4 (Good) Frames Count Half/Full Mask */
+#define BITM_EMAC_IPC_RXIMSK_ICMPERROCT      (_ADI_MSK(0x20000000,uint32_t))  /* Rx ICMP Error Octets Count Half/Full Mask */
+#define BITM_EMAC_IPC_RXIMSK_ICMPGOCT        (_ADI_MSK(0x10000000,uint32_t))  /* Rx ICMP (Good) Octets Count Half/Full Mask */
+#define BITM_EMAC_IPC_RXIMSK_TCPERROCT       (_ADI_MSK(0x08000000,uint32_t))  /* Rx TCP Error Octets Count Half/Full Mask */
+#define BITM_EMAC_IPC_RXIMSK_TCPGOCT         (_ADI_MSK(0x04000000,uint32_t))  /* Rx TCP (Good) Octets Count Half/Full Mask */
+#define BITM_EMAC_IPC_RXIMSK_UDPERROCT       (_ADI_MSK(0x02000000,uint32_t))  /* Rx UDP Error Octets Count Half/Full Mask */
+#define BITM_EMAC_IPC_RXIMSK_UDPGOCT         (_ADI_MSK(0x01000000,uint32_t))  /* Rx UDP (Good) Octets Count Half/Full Mask */
+#define BITM_EMAC_IPC_RXIMSK_V6NOPAYOCT      (_ADI_MSK(0x00800000,uint32_t))  /* Rx IPv6 No Payload Octets Count Half/Full Mask */
+#define BITM_EMAC_IPC_RXIMSK_V6HDERROCT      (_ADI_MSK(0x00400000,uint32_t))  /* Rx IPv6 Header Error Octets Count Half/Full Mask */
+#define BITM_EMAC_IPC_RXIMSK_V6GOCT          (_ADI_MSK(0x00200000,uint32_t))  /* Rx IPv6 (Good) Octets Count Half/Full Mask */
+#define BITM_EMAC_IPC_RXIMSK_V4UDSBLOCT      (_ADI_MSK(0x00100000,uint32_t))  /* Rx IPv4 UDS Disable Octets Count Half/Full Mask */
+#define BITM_EMAC_IPC_RXIMSK_V4FRAGOCT       (_ADI_MSK(0x00080000,uint32_t))  /* Rx IPv4 Fragmented Octets Count Half/Full Mask */
+#define BITM_EMAC_IPC_RXIMSK_V4NOPAYOCT      (_ADI_MSK(0x00040000,uint32_t))  /* Rx IPv4 No Payload Octets Count Half/Full Mask */
+#define BITM_EMAC_IPC_RXIMSK_V4HDERROCT      (_ADI_MSK(0x00020000,uint32_t))  /* Rx IPv4 Header Error Octets Count Half/Full Mask */
+#define BITM_EMAC_IPC_RXIMSK_V4GOCT          (_ADI_MSK(0x00010000,uint32_t))  /* Rx IPv4 (Good) Octets Count Half/Full Mask */
+#define BITM_EMAC_IPC_RXIMSK_ICMPERRFRM      (_ADI_MSK(0x00002000,uint32_t))  /* Rx ICMP Error Frames Count Half/Full Mask */
+#define BITM_EMAC_IPC_RXIMSK_ICMPGFRM        (_ADI_MSK(0x00001000,uint32_t))  /* Rx ICMP (Good) Frames Count Half/Full Mask */
+#define BITM_EMAC_IPC_RXIMSK_TCPERRFRM       (_ADI_MSK(0x00000800,uint32_t))  /* Rx TCP Error Frames Count Half/Full Mask */
+#define BITM_EMAC_IPC_RXIMSK_TCPGFRM         (_ADI_MSK(0x00000400,uint32_t))  /* Rx TCP (Good) Frames Count Half/Full Mask */
+#define BITM_EMAC_IPC_RXIMSK_UDPERRFRM       (_ADI_MSK(0x00000200,uint32_t))  /* Rx UDP Error Frames Count Half/Full Mask */
+#define BITM_EMAC_IPC_RXIMSK_UDPGFRM         (_ADI_MSK(0x00000100,uint32_t))  /* Rx UDP (Good) Frames Count Half/Full Mask */
+#define BITM_EMAC_IPC_RXIMSK_V6NOPAYFRM      (_ADI_MSK(0x00000080,uint32_t))  /* Rx IPv6 No Payload Frames Count Half/Full Mask */
+#define BITM_EMAC_IPC_RXIMSK_V6HDERRFRM      (_ADI_MSK(0x00000040,uint32_t))  /* Rx IPv6 Header Error Frames Count Half/Full Mask */
+#define BITM_EMAC_IPC_RXIMSK_V6GFRM          (_ADI_MSK(0x00000020,uint32_t))  /* Rx IPv6 (Good) Frames Count Half/Full Mask */
+#define BITM_EMAC_IPC_RXIMSK_V4UDSBLFRM      (_ADI_MSK(0x00000010,uint32_t))  /* Rx IPv4 UDS Disable Frames Count Half/Full Mask */
+#define BITM_EMAC_IPC_RXIMSK_V4FRAGFRM       (_ADI_MSK(0x00000008,uint32_t))  /* Rx IPv4 Fragmented Frames Count Half/Full Mask */
+#define BITM_EMAC_IPC_RXIMSK_V4NOPAYFRM      (_ADI_MSK(0x00000004,uint32_t))  /* Rx IPv4 No Payload Frame Count Half/Full Mask */
+#define BITM_EMAC_IPC_RXIMSK_V4HDERRFRM      (_ADI_MSK(0x00000002,uint32_t))  /* Rx IPv4 Header Error Frame Count Half/Full Mask */
+#define BITM_EMAC_IPC_RXIMSK_V4GFRM          (_ADI_MSK(0x00000001,uint32_t))  /* Rx IPv4 (Good) Frames Count Half/Full Mask */
 
 /* ------------------------------------------------------------------------------------------------------------------------
         EMAC_IPC_RXINT                       Pos/Masks                        Description
    ------------------------------------------------------------------------------------------------------------------------ */
-#define BITP_EMAC_IPC_RXINT_ICMPERROCT       29                               /* The bit is set when the rxicmp_err_octets counter reaches half the maximum value, and also when it reaches the maximum value. */
-#define BITP_EMAC_IPC_RXINT_ICMPGOCT         28                               /* The bit is set when the rxicmp_gd_octets counter reaches half the maximum value, and also when it reaches the maximum value. */
-#define BITP_EMAC_IPC_RXINT_TCPERROCT        27                               /* The bit is set when the rxtcp_err_octets counter reaches half the maximum value, and also when it reaches the maximum value. */
-#define BITP_EMAC_IPC_RXINT_TCPGOCT          26                               /* The bit is set when the rxtcp_gd_octets counter reaches half the maximum value, and also when it reaches the maximum value. */
-#define BITP_EMAC_IPC_RXINT_UDPERROCT        25                               /* The bit is set when the rxudp_err_octets counter reaches half the maximum value, and also when it reaches the maximum value. */
-#define BITP_EMAC_IPC_RXINT_UDPGOCT          24                               /* The bit is set when the rxudp_gd_octets counter reaches half the maximum value, and also when it reaches the maximum value. */
-#define BITP_EMAC_IPC_RXINT_V6NOPAYOCT       23                               /* The bit is set when the rxipv6_nopay_octets counter reaches half the maximum value, and also when it reaches the maximum value. */
-#define BITP_EMAC_IPC_RXINT_V6HDERROCT       22                               /* The bit is set when the rxipv6_hdrerr_octets counter reaches half the maximum value, and also when it reaches the maximum value. */
-#define BITP_EMAC_IPC_RXINT_V6GOCT           21                               /* The bit is set when the rxipv6_gd_octets counter reaches half the maximum value, and also when it reaches the maximum value. */
-#define BITP_EMAC_IPC_RXINT_V4UDSBLOCT       20                               /* The bit is set when the rxipv4_udsbl_octets counter reaches half the maximum value, and also when it reaches the maximum value. */
-#define BITP_EMAC_IPC_RXINT_V4FRAGOCT        19                               /* The bit is set when the rxipv4_frag_octets counter reaches half the maximum value, and also when it reaches the maximum value. */
-#define BITP_EMAC_IPC_RXINT_V4NOPAYOCT       18                               /* The bit is set when the rxipv4_nopay_octets counter reaches half the maximum value, and also when it reaches the maximum value. */
-#define BITP_EMAC_IPC_RXINT_V4HDERROCT       17                               /* The bit is set when the rxipv4_hdrerr_octets counter reaches half the maximum value, and also when it reaches the maximum value. */
-#define BITP_EMAC_IPC_RXINT_V4GOCT           16                               /* The bit is set when the rxipv4_gd_octets counter reaches half the maximum value, and also when it reaches the maximum value. */
-#define BITP_EMAC_IPC_RXINT_ICMPERRFRM       13                               /* The bit is set when the rxicmp_err_frms counter reaches half the maximum value, and also when it reaches the maximum value. */
-#define BITP_EMAC_IPC_RXINT_ICMPGFRM         12                               /* The bit is set when the rxicmp_gd_frms counter reaches half the maximum value, and also when it reaches the maximum value. */
-#define BITP_EMAC_IPC_RXINT_TCPERRFRM        11                               /* The bit is set when the rxtcp_err_frms counter reaches half the maximum value, and also when it reaches the maximum value. */
-#define BITP_EMAC_IPC_RXINT_TCPGFRM          10                               /* The bit is set when the rxtcp_gd_frms counter reaches half the maximum value, and also when it reaches the maximum value. */
-#define BITP_EMAC_IPC_RXINT_UDPERRFRM         9                               /* The bit is set when the rxudp_err_frms counter reaches half the maximum value, and also when it reaches the maximum value. */
-#define BITP_EMAC_IPC_RXINT_UDPGFRM           8                               /* The bit is set when the rxudp_gd_frms counter reaches half the maximum value, and also when it reaches the maximum value. */
-#define BITP_EMAC_IPC_RXINT_V6NOPAYFRM        7                               /* The bit is set when the rxipv6_nopay_frms counter reaches half the maximum value, and also when it reaches the maximum value. */
-#define BITP_EMAC_IPC_RXINT_V6HDERRFRM        6                               /* The bit is set when the rxipv6_hdrerr_frms counter reaches half the maximum value, and also when it reaches the maximum value. */
-#define BITP_EMAC_IPC_RXINT_V6GFRM            5                               /* The bit is set when the rxipv6_gd_frms counter reaches half the maximum value, and also when it reaches the maximum value. */
-#define BITP_EMAC_IPC_RXINT_V4UDSBLFRM        4                               /* The bit is set when the rxipv4_udsbl_frms counter reaches half the maximum value, and also when it reaches the maximum value. */
-#define BITP_EMAC_IPC_RXINT_V4FRAGFRM         3                               /* The bit is set when the rxipv4_frag_frms counter reaches half the maximum value, and also when it reaches the maximum value. */
-#define BITP_EMAC_IPC_RXINT_V4NOPAYFRM        2                               /* The bit is set when the rxipv4_nopay_frms counter reaches half the maximum value, and also when it reaches the maximum value. */
-#define BITP_EMAC_IPC_RXINT_V4HDERRFRM        1                               /* The bit is set when the rxipv4_hdrerr_frms counter reaches half the maximum value, and also when it reaches the maximum value. */
-#define BITP_EMAC_IPC_RXINT_V4GFRM            0                               /* The bit is set when the rxipv4_gd_frms counter reaches half the maximum value, and also when it reaches the maximum value. */
-#define BITM_EMAC_IPC_RXINT_ICMPERROCT       (_ADI_MSK(0x20000000,uint32_t))  /* The bit is set when the rxicmp_err_octets counter reaches half the maximum value, and also when it reaches the maximum value. */
-#define BITM_EMAC_IPC_RXINT_ICMPGOCT         (_ADI_MSK(0x10000000,uint32_t))  /* The bit is set when the rxicmp_gd_octets counter reaches half the maximum value, and also when it reaches the maximum value. */
-#define BITM_EMAC_IPC_RXINT_TCPERROCT        (_ADI_MSK(0x08000000,uint32_t))  /* The bit is set when the rxtcp_err_octets counter reaches half the maximum value, and also when it reaches the maximum value. */
-#define BITM_EMAC_IPC_RXINT_TCPGOCT          (_ADI_MSK(0x04000000,uint32_t))  /* The bit is set when the rxtcp_gd_octets counter reaches half the maximum value, and also when it reaches the maximum value. */
-#define BITM_EMAC_IPC_RXINT_UDPERROCT        (_ADI_MSK(0x02000000,uint32_t))  /* The bit is set when the rxudp_err_octets counter reaches half the maximum value, and also when it reaches the maximum value. */
-#define BITM_EMAC_IPC_RXINT_UDPGOCT          (_ADI_MSK(0x01000000,uint32_t))  /* The bit is set when the rxudp_gd_octets counter reaches half the maximum value, and also when it reaches the maximum value. */
-#define BITM_EMAC_IPC_RXINT_V6NOPAYOCT       (_ADI_MSK(0x00800000,uint32_t))  /* The bit is set when the rxipv6_nopay_octets counter reaches half the maximum value, and also when it reaches the maximum value. */
-#define BITM_EMAC_IPC_RXINT_V6HDERROCT       (_ADI_MSK(0x00400000,uint32_t))  /* The bit is set when the rxipv6_hdrerr_octets counter reaches half the maximum value, and also when it reaches the maximum value. */
-#define BITM_EMAC_IPC_RXINT_V6GOCT           (_ADI_MSK(0x00200000,uint32_t))  /* The bit is set when the rxipv6_gd_octets counter reaches half the maximum value, and also when it reaches the maximum value. */
-#define BITM_EMAC_IPC_RXINT_V4UDSBLOCT       (_ADI_MSK(0x00100000,uint32_t))  /* The bit is set when the rxipv4_udsbl_octets counter reaches half the maximum value, and also when it reaches the maximum value. */
-#define BITM_EMAC_IPC_RXINT_V4FRAGOCT        (_ADI_MSK(0x00080000,uint32_t))  /* The bit is set when the rxipv4_frag_octets counter reaches half the maximum value, and also when it reaches the maximum value. */
-#define BITM_EMAC_IPC_RXINT_V4NOPAYOCT       (_ADI_MSK(0x00040000,uint32_t))  /* The bit is set when the rxipv4_nopay_octets counter reaches half the maximum value, and also when it reaches the maximum value. */
-#define BITM_EMAC_IPC_RXINT_V4HDERROCT       (_ADI_MSK(0x00020000,uint32_t))  /* The bit is set when the rxipv4_hdrerr_octets counter reaches half the maximum value, and also when it reaches the maximum value. */
-#define BITM_EMAC_IPC_RXINT_V4GOCT           (_ADI_MSK(0x00010000,uint32_t))  /* The bit is set when the rxipv4_gd_octets counter reaches half the maximum value, and also when it reaches the maximum value. */
-#define BITM_EMAC_IPC_RXINT_ICMPERRFRM       (_ADI_MSK(0x00002000,uint32_t))  /* The bit is set when the rxicmp_err_frms counter reaches half the maximum value, and also when it reaches the maximum value. */
-#define BITM_EMAC_IPC_RXINT_ICMPGFRM         (_ADI_MSK(0x00001000,uint32_t))  /* The bit is set when the rxicmp_gd_frms counter reaches half the maximum value, and also when it reaches the maximum value. */
-#define BITM_EMAC_IPC_RXINT_TCPERRFRM        (_ADI_MSK(0x00000800,uint32_t))  /* The bit is set when the rxtcp_err_frms counter reaches half the maximum value, and also when it reaches the maximum value. */
-#define BITM_EMAC_IPC_RXINT_TCPGFRM          (_ADI_MSK(0x00000400,uint32_t))  /* The bit is set when the rxtcp_gd_frms counter reaches half the maximum value, and also when it reaches the maximum value. */
-#define BITM_EMAC_IPC_RXINT_UDPERRFRM        (_ADI_MSK(0x00000200,uint32_t))  /* The bit is set when the rxudp_err_frms counter reaches half the maximum value, and also when it reaches the maximum value. */
-#define BITM_EMAC_IPC_RXINT_UDPGFRM          (_ADI_MSK(0x00000100,uint32_t))  /* The bit is set when the rxudp_gd_frms counter reaches half the maximum value, and also when it reaches the maximum value. */
-#define BITM_EMAC_IPC_RXINT_V6NOPAYFRM       (_ADI_MSK(0x00000080,uint32_t))  /* The bit is set when the rxipv6_nopay_frms counter reaches half the maximum value, and also when it reaches the maximum value. */
-#define BITM_EMAC_IPC_RXINT_V6HDERRFRM       (_ADI_MSK(0x00000040,uint32_t))  /* The bit is set when the rxipv6_hdrerr_frms counter reaches half the maximum value, and also when it reaches the maximum value. */
-#define BITM_EMAC_IPC_RXINT_V6GFRM           (_ADI_MSK(0x00000020,uint32_t))  /* The bit is set when the rxipv6_gd_frms counter reaches half the maximum value, and also when it reaches the maximum value. */
-#define BITM_EMAC_IPC_RXINT_V4UDSBLFRM       (_ADI_MSK(0x00000010,uint32_t))  /* The bit is set when the rxipv4_udsbl_frms counter reaches half the maximum value, and also when it reaches the maximum value. */
-#define BITM_EMAC_IPC_RXINT_V4FRAGFRM        (_ADI_MSK(0x00000008,uint32_t))  /* The bit is set when the rxipv4_frag_frms counter reaches half the maximum value, and also when it reaches the maximum value. */
-#define BITM_EMAC_IPC_RXINT_V4NOPAYFRM       (_ADI_MSK(0x00000004,uint32_t))  /* The bit is set when the rxipv4_nopay_frms counter reaches half the maximum value, and also when it reaches the maximum value. */
-#define BITM_EMAC_IPC_RXINT_V4HDERRFRM       (_ADI_MSK(0x00000002,uint32_t))  /* The bit is set when the rxipv4_hdrerr_frms counter reaches half the maximum value, and also when it reaches the maximum value. */
-#define BITM_EMAC_IPC_RXINT_V4GFRM           (_ADI_MSK(0x00000001,uint32_t))  /* The bit is set when the rxipv4_gd_frms counter reaches half the maximum value, and also when it reaches the maximum value. */
+#define BITP_EMAC_IPC_RXINT_ICMPERROCT       29                               /* Rx ICMP Error Octets Count Half/Full Interrupt */
+#define BITP_EMAC_IPC_RXINT_ICMPGOCT         28                               /* Rx ICMP (Good) Octets Count Half/Full Interrupt */
+#define BITP_EMAC_IPC_RXINT_TCPERROCT        27                               /* Rx TCP Error Octets Count Half/Full Interrupt */
+#define BITP_EMAC_IPC_RXINT_TCPGOCT          26                               /* Rx TCP (Good) Octets Count Half/Full Interrupt */
+#define BITP_EMAC_IPC_RXINT_UDPERROCT        25                               /* Rx UDP Error Octets Count Half/Full Interrupt */
+#define BITP_EMAC_IPC_RXINT_UDPGOCT          24                               /* Rx UDP (Good) Octets Count Half/Full Interrupt */
+#define BITP_EMAC_IPC_RXINT_V6NOPAYOCT       23                               /* Rx IPv6 No Payload Octets Count Half/Full Interrupt */
+#define BITP_EMAC_IPC_RXINT_V6HDERROCT       22                               /* Rx IPv6 Header Error Octets Count Half/Full Interrupt */
+#define BITP_EMAC_IPC_RXINT_V6GOCT           21                               /* Rx IPv6 (Good) Octets Count Half/Full Interrupt */
+#define BITP_EMAC_IPC_RXINT_V4UDSBLOCT       20                               /* Rx IPv4 UDS Disable Octets Count Half/Full Interrupt */
+#define BITP_EMAC_IPC_RXINT_V4FRAGOCT        19                               /* Rx IPv4 Fragmented Octets Count Half/Full Interrupt */
+#define BITP_EMAC_IPC_RXINT_V4NOPAYOCT       18                               /* Rx IPv4 No Payload Octets Count Half/Full Interrupt */
+#define BITP_EMAC_IPC_RXINT_V4HDERROCT       17                               /* Rx IPv4 Header Error Octets Count Half/Full Interrupt */
+#define BITP_EMAC_IPC_RXINT_V4GOCT           16                               /* Rx IPv4 (Good) Octets Count Half/Full Interrupt */
+#define BITP_EMAC_IPC_RXINT_ICMPERRFRM       13                               /* Rx ICMP Error Frames Count Half/Full Interrupt */
+#define BITP_EMAC_IPC_RXINT_ICMPGFRM         12                               /* Rx ICMP (Good) Frames Count Half/Full Interrupt */
+#define BITP_EMAC_IPC_RXINT_TCPERRFRM        11                               /* Rx TCP Error Frames Count Half/Full Interrupt */
+#define BITP_EMAC_IPC_RXINT_TCPGFRM          10                               /* Rx TCP (Good) Frames Count Half/Full Interrupt */
+#define BITP_EMAC_IPC_RXINT_UDPERRFRM         9                               /* Rx IDP Error Frames Count Half/Full Interrupt */
+#define BITP_EMAC_IPC_RXINT_UDPGFRM           8                               /* Rx UDP (Good) Frames Count Half/Full Interrupt */
+#define BITP_EMAC_IPC_RXINT_V6NOPAYFRM        7                               /* Rx IPv6 No Payload Frames Count Half/Full Interrupt */
+#define BITP_EMAC_IPC_RXINT_V6HDERRFRM        6                               /* Rx IPv6 Header Error Frames Count Half/Full Interrupt */
+#define BITP_EMAC_IPC_RXINT_V6GFRM            5                               /* Rx IPv6 (Good) Frames Count Half/Full Interrupt */
+#define BITP_EMAC_IPC_RXINT_V4UDSBLFRM        4                               /* Rx IPv4 UDS Disable Frames Count Half/Full Interrupt */
+#define BITP_EMAC_IPC_RXINT_V4FRAGFRM         3                               /* Rx IPv4 Fragmented Frames Count Half/Full Interrupt */
+#define BITP_EMAC_IPC_RXINT_V4NOPAYFRM        2                               /* Rx IPv4 No Payload Frames Count Half/Full Interrupt */
+#define BITP_EMAC_IPC_RXINT_V4HDERRFRM        1                               /* Rx IPv4 Header Error Frames Count Half/Full Interrupt */
+#define BITP_EMAC_IPC_RXINT_V4GFRM            0                               /* Rx IPv4 (Good) Frames Count Half/Full Interrupt */
+#define BITM_EMAC_IPC_RXINT_ICMPERROCT       (_ADI_MSK(0x20000000,uint32_t))  /* Rx ICMP Error Octets Count Half/Full Interrupt */
+#define BITM_EMAC_IPC_RXINT_ICMPGOCT         (_ADI_MSK(0x10000000,uint32_t))  /* Rx ICMP (Good) Octets Count Half/Full Interrupt */
+#define BITM_EMAC_IPC_RXINT_TCPERROCT        (_ADI_MSK(0x08000000,uint32_t))  /* Rx TCP Error Octets Count Half/Full Interrupt */
+#define BITM_EMAC_IPC_RXINT_TCPGOCT          (_ADI_MSK(0x04000000,uint32_t))  /* Rx TCP (Good) Octets Count Half/Full Interrupt */
+#define BITM_EMAC_IPC_RXINT_UDPERROCT        (_ADI_MSK(0x02000000,uint32_t))  /* Rx UDP Error Octets Count Half/Full Interrupt */
+#define BITM_EMAC_IPC_RXINT_UDPGOCT          (_ADI_MSK(0x01000000,uint32_t))  /* Rx UDP (Good) Octets Count Half/Full Interrupt */
+#define BITM_EMAC_IPC_RXINT_V6NOPAYOCT       (_ADI_MSK(0x00800000,uint32_t))  /* Rx IPv6 No Payload Octets Count Half/Full Interrupt */
+#define BITM_EMAC_IPC_RXINT_V6HDERROCT       (_ADI_MSK(0x00400000,uint32_t))  /* Rx IPv6 Header Error Octets Count Half/Full Interrupt */
+#define BITM_EMAC_IPC_RXINT_V6GOCT           (_ADI_MSK(0x00200000,uint32_t))  /* Rx IPv6 (Good) Octets Count Half/Full Interrupt */
+#define BITM_EMAC_IPC_RXINT_V4UDSBLOCT       (_ADI_MSK(0x00100000,uint32_t))  /* Rx IPv4 UDS Disable Octets Count Half/Full Interrupt */
+#define BITM_EMAC_IPC_RXINT_V4FRAGOCT        (_ADI_MSK(0x00080000,uint32_t))  /* Rx IPv4 Fragmented Octets Count Half/Full Interrupt */
+#define BITM_EMAC_IPC_RXINT_V4NOPAYOCT       (_ADI_MSK(0x00040000,uint32_t))  /* Rx IPv4 No Payload Octets Count Half/Full Interrupt */
+#define BITM_EMAC_IPC_RXINT_V4HDERROCT       (_ADI_MSK(0x00020000,uint32_t))  /* Rx IPv4 Header Error Octets Count Half/Full Interrupt */
+#define BITM_EMAC_IPC_RXINT_V4GOCT           (_ADI_MSK(0x00010000,uint32_t))  /* Rx IPv4 (Good) Octets Count Half/Full Interrupt */
+#define BITM_EMAC_IPC_RXINT_ICMPERRFRM       (_ADI_MSK(0x00002000,uint32_t))  /* Rx ICMP Error Frames Count Half/Full Interrupt */
+#define BITM_EMAC_IPC_RXINT_ICMPGFRM         (_ADI_MSK(0x00001000,uint32_t))  /* Rx ICMP (Good) Frames Count Half/Full Interrupt */
+#define BITM_EMAC_IPC_RXINT_TCPERRFRM        (_ADI_MSK(0x00000800,uint32_t))  /* Rx TCP Error Frames Count Half/Full Interrupt */
+#define BITM_EMAC_IPC_RXINT_TCPGFRM          (_ADI_MSK(0x00000400,uint32_t))  /* Rx TCP (Good) Frames Count Half/Full Interrupt */
+#define BITM_EMAC_IPC_RXINT_UDPERRFRM        (_ADI_MSK(0x00000200,uint32_t))  /* Rx IDP Error Frames Count Half/Full Interrupt */
+#define BITM_EMAC_IPC_RXINT_UDPGFRM          (_ADI_MSK(0x00000100,uint32_t))  /* Rx UDP (Good) Frames Count Half/Full Interrupt */
+#define BITM_EMAC_IPC_RXINT_V6NOPAYFRM       (_ADI_MSK(0x00000080,uint32_t))  /* Rx IPv6 No Payload Frames Count Half/Full Interrupt */
+#define BITM_EMAC_IPC_RXINT_V6HDERRFRM       (_ADI_MSK(0x00000040,uint32_t))  /* Rx IPv6 Header Error Frames Count Half/Full Interrupt */
+#define BITM_EMAC_IPC_RXINT_V6GFRM           (_ADI_MSK(0x00000020,uint32_t))  /* Rx IPv6 (Good) Frames Count Half/Full Interrupt */
+#define BITM_EMAC_IPC_RXINT_V4UDSBLFRM       (_ADI_MSK(0x00000010,uint32_t))  /* Rx IPv4 UDS Disable Frames Count Half/Full Interrupt */
+#define BITM_EMAC_IPC_RXINT_V4FRAGFRM        (_ADI_MSK(0x00000008,uint32_t))  /* Rx IPv4 Fragmented Frames Count Half/Full Interrupt */
+#define BITM_EMAC_IPC_RXINT_V4NOPAYFRM       (_ADI_MSK(0x00000004,uint32_t))  /* Rx IPv4 No Payload Frames Count Half/Full Interrupt */
+#define BITM_EMAC_IPC_RXINT_V4HDERRFRM       (_ADI_MSK(0x00000002,uint32_t))  /* Rx IPv4 Header Error Frames Count Half/Full Interrupt */
+#define BITM_EMAC_IPC_RXINT_V4GFRM           (_ADI_MSK(0x00000001,uint32_t))  /* Rx IPv4 (Good) Frames Count Half/Full Interrupt */
 
 /* ------------------------------------------------------------------------------------------------------------------------
         EMAC_TM_CTL                          Pos/Masks                        Description
    ------------------------------------------------------------------------------------------------------------------------ */
-#define BITP_EMAC_TM_CTL_ATSFC               19                               /* Auxillary Snapshot FIFO Clear */
-#define BITP_EMAC_TM_CTL_MACADDREN           18                               /* Enable Mac address for PTP filtering */
-#define BITP_EMAC_TM_CTL_CLKTYPE             16                               /* Select the type of clock node */
-#define BITP_EMAC_TM_CTL_MFRMEN              15                               /* Enable Time Stamp for frames relevant to Master */
-#define BITP_EMAC_TM_CTL_EVTFRMEN            14                               /* Enable Time Stamp for Event Frames */
-#define BITP_EMAC_TM_CTL_V4EN                13                               /* Enable Time Stamp for IPV4 Frames */
-#define BITP_EMAC_TM_CTL_V6EN                12                               /* Enable Time Stamp for IPV6 Frames */
-#define BITP_EMAC_TM_CTL_PTPEN               11                               /* Enable Time stamp for PTP over Ethernet */
-#define BITP_EMAC_TM_CTL_V2EN                10                               /* Enable PTP packet Snooping for VER2 */
-#define BITP_EMAC_TM_CTL_ROCTL                9                               /* Time Stamp Control Digital or Binary Rollover */
-#define BITP_EMAC_TM_CTL_ALLFRMEN             8                               /* Enable Time Stamp for all Frames */
-#define BITP_EMAC_TM_CTL_ADDUPDT              5                               /* Addend Register Update */
-#define BITP_EMAC_TM_CTL_TRIGEN               4                               /* Time Stamp Interrupt Trigger Enable */
-#define BITP_EMAC_TM_CTL_UPDT                 3                               /* Time Stamp Update */
-#define BITP_EMAC_TM_CTL_INIT                 2                               /* Time Stamp Intialize */
-#define BITP_EMAC_TM_CTL_CFUPDT               1                               /* Time Stamp Fine or Coarse Update */
-#define BITP_EMAC_TM_CTL_EN                   0                               /* Time Stamp Enable */
-#define BITM_EMAC_TM_CTL_ATSFC               (_ADI_MSK(0x00080000,uint32_t))  /* Auxillary Snapshot FIFO Clear */
+#define BITP_EMAC_TM_CTL_ATSFC               24                               /* Auxilary Time Stamp FIFO Clear */
+#define BITP_EMAC_TM_CTL_TSENMACADDR         18                               /* Time Stamp Enable MAC Address */
+#define BITP_EMAC_TM_CTL_SNAPTYPSEL          16                               /* Snapshot Type Select */
+#define BITP_EMAC_TM_CTL_TSMSTRENA           15                               /* Time Stamp Master (Frames) Enable */
+#define BITP_EMAC_TM_CTL_TSEVNTENA           14                               /* Time Stamp Event (PTP Frames) Enable */
+#define BITP_EMAC_TM_CTL_TSIPV4ENA           13                               /* Time Stamp IPV4 (PTP Frames) Enable */
+#define BITP_EMAC_TM_CTL_TSIPV6ENA           12                               /* Time Stamp IPV6 (PTP Frames) Enable */
+#define BITP_EMAC_TM_CTL_TSIPENA             11                               /* Time Stamp IP Enable */
+#define BITP_EMAC_TM_CTL_TSVER2ENA           10                               /* Time Stamp VER2 (Snooping) Enable */
+#define BITP_EMAC_TM_CTL_TSCTRLSSR            9                               /* Time Stamp Control Nanosecond Rollover */
+#define BITP_EMAC_TM_CTL_TSENALL              8                               /* Time Stamp Enable All (Frames) */
+#define BITP_EMAC_TM_CTL_TSADDREG             5                               /* Time Stamp Addend Register Update */
+#define BITP_EMAC_TM_CTL_TSTRIG               4                               /* Time Stamp (Target Time) Trigger Enable */
+#define BITP_EMAC_TM_CTL_TSUPDT               3                               /* Time Stamp (System Time) Update */
+#define BITP_EMAC_TM_CTL_TSINIT               2                               /* Time Stamp (System Time) Initialize */
+#define BITP_EMAC_TM_CTL_TSCFUPDT             1                               /* Time Stamp (System Time) Fine/Coarse Update */
+#define BITP_EMAC_TM_CTL_TSENA                0                               /* Time Stamp (PTP) Enable */
+#define BITM_EMAC_TM_CTL_ATSFC               (_ADI_MSK(0x01000000,uint32_t))  /* Auxilary Time Stamp FIFO Clear */
 
-#define BITM_EMAC_TM_CTL_MACADDREN           (_ADI_MSK(0x00040000,uint32_t))  /* Enable Mac address for PTP filtering */
-#define ENUM_EMAC_TM_CTL_D_PTP_ADDRFILT      (_ADI_MSK(0x00000000,uint32_t))  /* MACADDREN: Disable PTP MAC address filter */
-#define ENUM_EMAC_TM_CTL_E_PTP_ADDRFILT      (_ADI_MSK(0x00040000,uint32_t))  /* MACADDREN: Enable PTP MAC address filter */
+#define BITM_EMAC_TM_CTL_TSENMACADDR         (_ADI_MSK(0x00040000,uint32_t))  /* Time Stamp Enable MAC Address */
+#define ENUM_EMAC_TM_CTL_D_PTP_ADDRFILT      (_ADI_MSK(0x00000000,uint32_t))  /* TSENMACADDR: Disable PTP MAC address filter */
+#define ENUM_EMAC_TM_CTL_E_PTP_ADDRFILT      (_ADI_MSK(0x00040000,uint32_t))  /* TSENMACADDR: Enable PTP MAC address filter */
+#define BITM_EMAC_TM_CTL_SNAPTYPSEL          (_ADI_MSK(0x00030000,uint32_t))  /* Snapshot Type Select */
 
-#define BITM_EMAC_TM_CTL_CLKTYPE             (_ADI_MSK(0x00030000,uint32_t))  /* Select the type of clock node */
-#define ENUM_EMAC_TM_CTL_CLK_ORDINARY        (_ADI_MSK(0x00000000,uint32_t))  /* CLKTYPE: Ordinary clock */
-#define ENUM_EMAC_TM_CTL_CLK_BOUNDARY        (_ADI_MSK(0x00010000,uint32_t))  /* CLKTYPE: Boundary clock */
-#define ENUM_EMAC_TM_CTL_TS_END_2_END        (_ADI_MSK(0x00020000,uint32_t))  /* CLKTYPE: End-to-End Transparent clock */
-#define ENUM_EMAC_TM_CTL_TS_PEER_2_PEER      (_ADI_MSK(0x00030000,uint32_t))  /* CLKTYPE: Peer-to-peer Transparent clock */
+#define BITM_EMAC_TM_CTL_TSMSTRENA           (_ADI_MSK(0x00008000,uint32_t))  /* Time Stamp Master (Frames) Enable */
+#define ENUM_EMAC_TM_CTL_E_SLVSNPT_MSGS      (_ADI_MSK(0x00000000,uint32_t))  /* TSMSTRENA: Enable Snapshot for Slave Messages */
+#define ENUM_EMAC_TM_CTL_E_MSSNPST_MSGS      (_ADI_MSK(0x00008000,uint32_t))  /* TSMSTRENA: Enable Snapshot for Master Messages */
 
-#define BITM_EMAC_TM_CTL_MFRMEN              (_ADI_MSK(0x00008000,uint32_t))  /* Enable Time Stamp for frames relevant to Master */
-#define ENUM_EMAC_TM_CTL_E_SLVSNPT_MSGS      (_ADI_MSK(0x00000000,uint32_t))  /* MFRMEN: Enable Slave Snapshot messages */
-#define ENUM_EMAC_TM_CTL_E_MSSNPST_MSGS      (_ADI_MSK(0x00008000,uint32_t))  /* MFRMEN: Enable Master snapshot messages */
+#define BITM_EMAC_TM_CTL_TSEVNTENA           (_ADI_MSK(0x00004000,uint32_t))  /* Time Stamp Event (PTP Frames) Enable */
+#define ENUM_EMAC_TM_CTL_E_ATSTMP_MSGS       (_ADI_MSK(0x00000000,uint32_t))  /* TSEVNTENA: Enable Time Stamp for All Messages */
+#define ENUM_EMAC_TM_CTL_E_ETSTMP_MSGS       (_ADI_MSK(0x00004000,uint32_t))  /* TSEVNTENA: Enable Time Stamp for Event Messages Only */
 
-#define BITM_EMAC_TM_CTL_EVTFRMEN            (_ADI_MSK(0x00004000,uint32_t))  /* Enable Time Stamp for Event Frames */
-#define ENUM_EMAC_TM_CTL_E_ATSTMP_MSGS       (_ADI_MSK(0x00000000,uint32_t))  /* EVTFRMEN: Enable all timestamp messages */
-#define ENUM_EMAC_TM_CTL_E_ETSTMP_MSGS       (_ADI_MSK(0x00004000,uint32_t))  /* EVTFRMEN: Enable event timestamp messages only */
+#define BITM_EMAC_TM_CTL_TSIPV4ENA           (_ADI_MSK(0x00002000,uint32_t))  /* Time Stamp IPV4 (PTP Frames) Enable */
+#define ENUM_EMAC_TM_CTL_D_TSTMP_IPV4        (_ADI_MSK(0x00000000,uint32_t))  /* TSIPV4ENA: Disable Time Stamp for PTP Over IPv4 Frames */
+#define ENUM_EMAC_TM_CTL_E_TSTMP_IPV4        (_ADI_MSK(0x00002000,uint32_t))  /* TSIPV4ENA: Enable Time Stamp for PTP Over IPv4 Frames */
 
-#define BITM_EMAC_TM_CTL_V4EN                (_ADI_MSK(0x00002000,uint32_t))  /* Enable Time Stamp for IPV4 Frames */
-#define ENUM_EMAC_TM_CTL_D_TSTMP_IPV4        (_ADI_MSK(0x00000000,uint32_t))  /* V4EN: Disable timestamp for IPv4 frames */
-#define ENUM_EMAC_TM_CTL_E_TSTMP_IPV4        (_ADI_MSK(0x00002000,uint32_t))  /* V4EN: Enable timestamp for IPv4 frames */
+#define BITM_EMAC_TM_CTL_TSIPV6ENA           (_ADI_MSK(0x00001000,uint32_t))  /* Time Stamp IPV6 (PTP Frames) Enable */
+#define ENUM_EMAC_TM_CTL_D_TSTMP_IPV6        (_ADI_MSK(0x00000000,uint32_t))  /* TSIPV6ENA: Disable Time Stamp for PTP Over IPv6 frames */
+#define ENUM_EMAC_TM_CTL_E_TSTMP_IPV6        (_ADI_MSK(0x00001000,uint32_t))  /* TSIPV6ENA: Enable Time Stamp for PTP Over IPv6 Frames */
 
-#define BITM_EMAC_TM_CTL_V6EN                (_ADI_MSK(0x00001000,uint32_t))  /* Enable Time Stamp for IPV6 Frames */
-#define ENUM_EMAC_TM_CTL_D_TSTMP_IPV6        (_ADI_MSK(0x00000000,uint32_t))  /* V6EN: Disable timestamp for IPv6 frames */
-#define ENUM_EMAC_TM_CTL_E_TSTMP_IPV6        (_ADI_MSK(0x00001000,uint32_t))  /* V6EN: Enable timestamp for IPv6 frames */
+#define BITM_EMAC_TM_CTL_TSIPENA             (_ADI_MSK(0x00000800,uint32_t))  /* Time Stamp IP Enable */
+#define ENUM_EMAC_TM_CTL_D_PTP_OV_ETHER      (_ADI_MSK(0x00000000,uint32_t))  /* TSIPENA: Disable PTP Over Ethernet Frames */
+#define ENUM_EMAC_TM_CTL_E_PTP_OV_ETHER      (_ADI_MSK(0x00000800,uint32_t))  /* TSIPENA: Enable PTP Over Ethernet Frames */
 
-#define BITM_EMAC_TM_CTL_PTPEN               (_ADI_MSK(0x00000800,uint32_t))  /* Enable Time stamp for PTP over Ethernet */
-#define ENUM_EMAC_TM_CTL_D_PTP_OV_ETHER      (_ADI_MSK(0x00000000,uint32_t))  /* PTPEN: Disable PTP over ethenet frames */
-#define ENUM_EMAC_TM_CTL_E_PTP_OV_ETHER      (_ADI_MSK(0x00000800,uint32_t))  /* PTPEN: Enable PTP over ethernet */
+#define BITM_EMAC_TM_CTL_TSVER2ENA           (_ADI_MSK(0x00000400,uint32_t))  /* Time Stamp VER2 (Snooping) Enable */
+#define ENUM_EMAC_TM_CTL_D_PKT_SNOOP_V2      (_ADI_MSK(0x00000000,uint32_t))  /* TSVER2ENA: Disable packet snooping for V2 frames */
+#define ENUM_EMAC_TM_CTL_E_PKT_SNOOP_V2      (_ADI_MSK(0x00000400,uint32_t))  /* TSVER2ENA: Enable packet snooping for V2 frames */
 
-#define BITM_EMAC_TM_CTL_V2EN                (_ADI_MSK(0x00000400,uint32_t))  /* Enable PTP packet Snooping for VER2 */
-#define ENUM_EMAC_TM_CTL_D_PKT_SNOOP_V2      (_ADI_MSK(0x00000000,uint32_t))  /* V2EN: Disable packet snooping for V2 frames */
-#define ENUM_EMAC_TM_CTL_E_PKT_SNOOP_V2      (_ADI_MSK(0x00000400,uint32_t))  /* V2EN: Enable packet snooping for V2 frames */
+#define BITM_EMAC_TM_CTL_TSCTRLSSR           (_ADI_MSK(0x00000200,uint32_t))  /* Time Stamp Control Nanosecond Rollover */
+#define ENUM_EMAC_TM_CTL_RO_SUBSEC_RES       (_ADI_MSK(0x00000000,uint32_t))  /* TSCTRLSSR: Roll Over Nanosecond After 0x7FFFFFFF */
+#define ENUM_EMAC_TM_CTL_RO_NANO_RES         (_ADI_MSK(0x00000200,uint32_t))  /* TSCTRLSSR: Roll Over Nanosecond After 0x3B9AC9FF */
 
-#define BITM_EMAC_TM_CTL_ROCTL               (_ADI_MSK(0x00000200,uint32_t))  /* Time Stamp Control Digital or Binary Rollover */
-#define ENUM_EMAC_TM_CTL_RO_SUBSEC_RES       (_ADI_MSK(0x00000000,uint32_t))  /* ROCTL: Roll over with subsecond accuracy */
-#define ENUM_EMAC_TM_CTL_RO_NANO_RES         (_ADI_MSK(0x00000200,uint32_t))  /* ROCTL: Roll over with nansecond accuracy */
+#define BITM_EMAC_TM_CTL_TSENALL             (_ADI_MSK(0x00000100,uint32_t))  /* Time Stamp Enable All (Frames) */
+#define ENUM_EMAC_TM_CTL_D_TSALL_FRAMES      (_ADI_MSK(0x00000000,uint32_t))  /* TSENALL: Disable timestamp for all frames */
+#define ENUM_EMAC_TM_CTL_E_TSALL_FRAMES      (_ADI_MSK(0x00000100,uint32_t))  /* TSENALL: Enable timestamp for all frames */
+#define BITM_EMAC_TM_CTL_TSADDREG            (_ADI_MSK(0x00000020,uint32_t))  /* Time Stamp Addend Register Update */
 
-#define BITM_EMAC_TM_CTL_ALLFRMEN            (_ADI_MSK(0x00000100,uint32_t))  /* Enable Time Stamp for all Frames */
-#define ENUM_EMAC_TM_CTL_D_TSALL_FRAMES      (_ADI_MSK(0x00000000,uint32_t))  /* ALLFRMEN: Disable timestamp for all frames */
-#define ENUM_EMAC_TM_CTL_E_TSALL_FRAMES      (_ADI_MSK(0x00000100,uint32_t))  /* ALLFRMEN: Enable timestamp for all frames */
-#define BITM_EMAC_TM_CTL_ADDUPDT             (_ADI_MSK(0x00000020,uint32_t))  /* Addend Register Update */
+#define BITM_EMAC_TM_CTL_TSTRIG              (_ADI_MSK(0x00000010,uint32_t))  /* Time Stamp (Target Time) Trigger Enable */
+#define ENUM_EMAC_TM_CTL_EN_TRIGGER          (_ADI_MSK(0x00000010,uint32_t))  /* TSTRIG: Interrupt (TS) if system time is greater than target time register */
 
-#define BITM_EMAC_TM_CTL_TRIGEN              (_ADI_MSK(0x00000010,uint32_t))  /* Time Stamp Interrupt Trigger Enable */
-#define ENUM_EMAC_TM_CTL_EN_TRIGGER          (_ADI_MSK(0x00000010,uint32_t))  /* TRIGEN: Interrupt (TS) if system time is greater than target time register */
+#define BITM_EMAC_TM_CTL_TSUPDT              (_ADI_MSK(0x00000008,uint32_t))  /* Time Stamp (System Time) Update */
+#define ENUM_EMAC_TM_CTL_EN_UPDATE           (_ADI_MSK(0x00000008,uint32_t))  /* TSUPDT: System time updated with Time stamp register values */
 
-#define BITM_EMAC_TM_CTL_UPDT                (_ADI_MSK(0x00000008,uint32_t))  /* Time Stamp Update */
-#define ENUM_EMAC_TM_CTL_EN_UPDATE           (_ADI_MSK(0x00000008,uint32_t))  /* UPDT: System time updated with Time stamp register values */
+#define BITM_EMAC_TM_CTL_TSINIT              (_ADI_MSK(0x00000004,uint32_t))  /* Time Stamp (System Time) Initialize */
+#define ENUM_EMAC_TM_CTL_EN_TS_INIT          (_ADI_MSK(0x00000004,uint32_t))  /* TSINIT: System time initialized with Time stamp register values */
 
-#define BITM_EMAC_TM_CTL_INIT                (_ADI_MSK(0x00000004,uint32_t))  /* Time Stamp Intialize */
-#define ENUM_EMAC_TM_CTL_EN_TS_INIT          (_ADI_MSK(0x00000004,uint32_t))  /* INIT: System time initialized with Time stamp register values */
+#define BITM_EMAC_TM_CTL_TSCFUPDT            (_ADI_MSK(0x00000002,uint32_t))  /* Time Stamp (System Time) Fine/Coarse Update */
+#define ENUM_EMAC_TM_CTL_EN_COARSE_UPDT      (_ADI_MSK(0x00000000,uint32_t))  /* TSCFUPDT: Use Coarse Correction Method for System Time Update */
+#define ENUM_EMAC_TM_CTL_EN_FINE_UPDT        (_ADI_MSK(0x00000002,uint32_t))  /* TSCFUPDT: Use Fine Correction Method for System Time Update */
 
-#define BITM_EMAC_TM_CTL_CFUPDT              (_ADI_MSK(0x00000002,uint32_t))  /* Time Stamp Fine or Coarse Update */
-#define ENUM_EMAC_TM_CTL_EN_COARSE_UPDT      (_ADI_MSK(0x00000000,uint32_t))  /* CFUPDT: System time stamp update to be done using Coarse method */
-#define ENUM_EMAC_TM_CTL_EN_FINE_UPDT        (_ADI_MSK(0x00000002,uint32_t))  /* CFUPDT: System time stamp update to be done using fine update method */
-
-#define BITM_EMAC_TM_CTL_EN                  (_ADI_MSK(0x00000001,uint32_t))  /* Time Stamp Enable */
-#define ENUM_EMAC_TM_CTL_DTS                 (_ADI_MSK(0x00000000,uint32_t))  /* EN: Disable timestamp */
-#define ENUM_EMAC_TM_CTL_TS                  (_ADI_MSK(0x00000001,uint32_t))  /* EN: Enable timestamp */
+#define BITM_EMAC_TM_CTL_TSENA               (_ADI_MSK(0x00000001,uint32_t))  /* Time Stamp (PTP) Enable */
+#define ENUM_EMAC_TM_CTL_DTS                 (_ADI_MSK(0x00000000,uint32_t))  /* TSENA: Disable PTP Module */
+#define ENUM_EMAC_TM_CTL_TS                  (_ADI_MSK(0x00000001,uint32_t))  /* TSENA: Enable PTP Module */
 
 /* ------------------------------------------------------------------------------------------------------------------------
         EMAC_TM_SUBSEC                       Pos/Masks                        Description
    ------------------------------------------------------------------------------------------------------------------------ */
-#define BITP_EMAC_TM_SUBSEC_VALUE             0                               /* Sub-Second Incrementt Value */
-#define BITM_EMAC_TM_SUBSEC_VALUE            (_ADI_MSK(0x000000FF,uint32_t))  /* Sub-Second Incrementt Value */
+#define BITP_EMAC_TM_SUBSEC_SSINC             0                               /* Sub-Second Increment Value */
+#define BITM_EMAC_TM_SUBSEC_SSINC            (_ADI_MSK(0x000000FF,uint32_t))  /* Sub-Second Increment Value */
 
 /* ------------------------------------------------------------------------------------------------------------------------
         EMAC_TM_NSEC                         Pos/Masks                        Description
    ------------------------------------------------------------------------------------------------------------------------ */
-#define BITP_EMAC_TM_NSEC_PSNT               31                               /* Positive or Negative Time */
-#define BITP_EMAC_TM_NSEC_TSSS                0                               /* Time Stamp Sub Seconds */
-#define BITM_EMAC_TM_NSEC_PSNT               (_ADI_MSK(0x80000000,uint32_t))  /* Positive or Negative Time */
-#define BITM_EMAC_TM_NSEC_TSSS               (_ADI_MSK(0x7FFFFFFF,uint32_t))  /* Time Stamp Sub Seconds */
+#define BITP_EMAC_TM_NSEC_TSSS                0                               /* Time Stamp Nanoseconds */
+#define BITM_EMAC_TM_NSEC_TSSS               (_ADI_MSK(0x7FFFFFFF,uint32_t))  /* Time Stamp Nanoseconds */
 
 /* ------------------------------------------------------------------------------------------------------------------------
         EMAC_TM_NSECUPDT                     Pos/Masks                        Description
    ------------------------------------------------------------------------------------------------------------------------ */
 #define BITP_EMAC_TM_NSECUPDT_ADDSUB         31                               /* Add or Subtract the Time */
-#define BITP_EMAC_TM_NSECUPDT_TSSSU           0                               /* Time Stamp Sub Second Init/Incr */
+#define BITP_EMAC_TM_NSECUPDT_TSSS            0                               /* Time Stamp Sub Second Initialize/Increment */
 #define BITM_EMAC_TM_NSECUPDT_ADDSUB         (_ADI_MSK(0x80000000,uint32_t))  /* Add or Subtract the Time */
-#define BITM_EMAC_TM_NSECUPDT_TSSSU          (_ADI_MSK(0x7FFFFFFF,uint32_t))  /* Time Stamp Sub Second Init/Incr */
+#define BITM_EMAC_TM_NSECUPDT_TSSS           (_ADI_MSK(0x7FFFFFFF,uint32_t))  /* Time Stamp Sub Second Initialize/Increment */
 
 /* ------------------------------------------------------------------------------------------------------------------------
         EMAC_TM_NTGTM                        Pos/Masks                        Description
    ------------------------------------------------------------------------------------------------------------------------ */
-#define BITP_EMAC_TM_NTGTM_VALUE              0                               /* Target Time Nano Seconds */
-#define BITM_EMAC_TM_NTGTM_VALUE             (_ADI_MSK(0x7FFFFFFF,uint32_t))  /* Target Time Nano Seconds */
+#define BITP_EMAC_TM_NTGTM_TSTRBUSY          31                               /* Target Time Register Busy */
+#define BITP_EMAC_TM_NTGTM_TSTR               0                               /* Target Time Nano Seconds */
+#define BITM_EMAC_TM_NTGTM_TSTRBUSY          (_ADI_MSK(0x80000000,uint32_t))  /* Target Time Register Busy */
+#define BITM_EMAC_TM_NTGTM_TSTR              (_ADI_MSK(0x7FFFFFFF,uint32_t))  /* Target Time Nano Seconds */
 
 /* ------------------------------------------------------------------------------------------------------------------------
         EMAC_TM_HISEC                        Pos/Masks                        Description
    ------------------------------------------------------------------------------------------------------------------------ */
-#define BITP_EMAC_TM_HISEC_VALUE              0                               /* Time Stamp High Second Register */
-#define BITM_EMAC_TM_HISEC_VALUE             (_ADI_MSK(0x0000FFFF,uint32_t))  /* Time Stamp High Second Register */
+#define BITP_EMAC_TM_HISEC_TSHWR              0                               /* Time Stamp Higher Word Seconds Register */
+#define BITM_EMAC_TM_HISEC_TSHWR             (_ADI_MSK(0x0000FFFF,uint32_t))  /* Time Stamp Higher Word Seconds Register */
 
 /* ------------------------------------------------------------------------------------------------------------------------
         EMAC_TM_STMPSTAT                     Pos/Masks                        Description
    ------------------------------------------------------------------------------------------------------------------------ */
-#define BITP_EMAC_TM_STMPSTAT_ATSNS          25                               /* Auxillary Time Stamp Number of Snapshots */
-#define BITP_EMAC_TM_STMPSTAT_ATSSTM         24                               /* Auxillary Time stamp snapshot trigger missed */
-#define BITP_EMAC_TM_STMPSTAT_ATSTS           2                               /* Auxillary Time Stamp Trigger Snapshot */
-#define BITP_EMAC_TM_STMPSTAT_TSTGT           1                               /* Time Stamp Target Time Reached */
+#define BITP_EMAC_TM_STMPSTAT_ATSNS          25                               /* Auxilary Time Stamp Number of Snapshots */
+#define BITP_EMAC_TM_STMPSTAT_ATSSTM         24                               /* Auxilary Time Stamp Snapshot Trigger Missed */
+#define BITP_EMAC_TM_STMPSTAT_TSTRGTERR       3                               /* Time Stamp Target Time Programming Error */
+#define BITP_EMAC_TM_STMPSTAT_ATSTS           2                               /* Auxilary Time Stamp Trigger Snapshot */
+#define BITP_EMAC_TM_STMPSTAT_TSTARGT         1                               /* Time Stamp Target Time Reached */
 #define BITP_EMAC_TM_STMPSTAT_TSSOVF          0                               /* Time Stamp Seconds Overflow */
-#define BITM_EMAC_TM_STMPSTAT_ATSNS          (_ADI_MSK(0x0E000000,uint32_t))  /* Auxillary Time Stamp Number of Snapshots */
-#define BITM_EMAC_TM_STMPSTAT_ATSSTM         (_ADI_MSK(0x01000000,uint32_t))  /* Auxillary Time stamp snapshot trigger missed */
-#define BITM_EMAC_TM_STMPSTAT_ATSTS          (_ADI_MSK(0x00000004,uint32_t))  /* Auxillary Time Stamp Trigger Snapshot */
-#define BITM_EMAC_TM_STMPSTAT_TSTGT          (_ADI_MSK(0x00000002,uint32_t))  /* Time Stamp Target Time Reached */
+#define BITM_EMAC_TM_STMPSTAT_ATSNS          (_ADI_MSK(0x0E000000,uint32_t))  /* Auxilary Time Stamp Number of Snapshots */
+#define BITM_EMAC_TM_STMPSTAT_ATSSTM         (_ADI_MSK(0x01000000,uint32_t))  /* Auxilary Time Stamp Snapshot Trigger Missed */
+#define BITM_EMAC_TM_STMPSTAT_TSTRGTERR      (_ADI_MSK(0x00000008,uint32_t))  /* Time Stamp Target Time Programming Error */
+#define BITM_EMAC_TM_STMPSTAT_ATSTS          (_ADI_MSK(0x00000004,uint32_t))  /* Auxilary Time Stamp Trigger Snapshot */
+#define BITM_EMAC_TM_STMPSTAT_TSTARGT        (_ADI_MSK(0x00000002,uint32_t))  /* Time Stamp Target Time Reached */
 #define BITM_EMAC_TM_STMPSTAT_TSSOVF         (_ADI_MSK(0x00000001,uint32_t))  /* Time Stamp Seconds Overflow */
 
 /* ------------------------------------------------------------------------------------------------------------------------
         EMAC_TM_PPSCTL                       Pos/Masks                        Description
    ------------------------------------------------------------------------------------------------------------------------ */
-#define BITP_EMAC_TM_PPSCTL_PPSCTL            0                               /* Controls the duration between 2 PPS */
-#define BITM_EMAC_TM_PPSCTL_PPSCTL           (_ADI_MSK(0x0000000F,uint32_t))  /* Controls the duration between 2 PPS */
+#define BITP_EMAC_TM_PPSCTL_TRGTMODSEL        5                               /* Target Time Register Mode */
+#define BITP_EMAC_TM_PPSCTL_PPSEN             4                               /* Enable the flexible PPS output mode */
+#define BITP_EMAC_TM_PPSCTL_PPSCTL            0                               /* PPS Frequency Control */
+#define BITM_EMAC_TM_PPSCTL_TRGTMODSEL       (_ADI_MSK(0x00000060,uint32_t))  /* Target Time Register Mode */
+#define BITM_EMAC_TM_PPSCTL_PPSEN            (_ADI_MSK(0x00000010,uint32_t))  /* Enable the flexible PPS output mode */
+#define BITM_EMAC_TM_PPSCTL_PPSCTL           (_ADI_MSK(0x0000000F,uint32_t))  /* PPS Frequency Control */
 
 /* ------------------------------------------------------------------------------------------------------------------------
         EMAC_DMA_BUSMODE                     Pos/Masks                        Description
    ------------------------------------------------------------------------------------------------------------------------ */
-#define BITP_EMAC_DMA_BUSMODE_AAL            25                               /* Address Aligned Bursts - start address is aligned */
-#define BITP_EMAC_DMA_BUSMODE_PBL8           24                               /* PBL is multiplied by 8 */
-#define BITP_EMAC_DMA_BUSMODE_USP            23                               /* Use seperate PBL for TX and RX DMA */
-#define BITP_EMAC_DMA_BUSMODE_RPBL           17                               /* Receive Programmable Burst Length - maximum number of beats in RX DMA */
-#define BITP_EMAC_DMA_BUSMODE_FB             16                               /* Fixed Burst -  selects only fixed burst lengths when set */
-#define BITP_EMAC_DMA_BUSMODE_PBL             8                               /* Programmable Burst Length - specifies the maximum number of beats */
-#define BITP_EMAC_DMA_BUSMODE_ATDS            7                               /* Alternate Descriptor Size - size of descriptor is 8 words */
-#define BITP_EMAC_DMA_BUSMODE_DSL             2                               /* Descriptor Skip Length in unchained Descriptors */
-#define BITP_EMAC_DMA_BUSMODE_SWR             0                               /* Software Reset - resetting all the blocks */
-#define BITM_EMAC_DMA_BUSMODE_AAL            (_ADI_MSK(0x02000000,uint32_t))  /* Address Aligned Bursts - start address is aligned */
-#define BITM_EMAC_DMA_BUSMODE_PBL8           (_ADI_MSK(0x01000000,uint32_t))  /* PBL is multiplied by 8 */
-#define BITM_EMAC_DMA_BUSMODE_USP            (_ADI_MSK(0x00800000,uint32_t))  /* Use seperate PBL for TX and RX DMA */
-#define BITM_EMAC_DMA_BUSMODE_RPBL           (_ADI_MSK(0x007E0000,uint32_t))  /* Receive Programmable Burst Length - maximum number of beats in RX DMA */
-#define BITM_EMAC_DMA_BUSMODE_FB             (_ADI_MSK(0x00010000,uint32_t))  /* Fixed Burst -  selects only fixed burst lengths when set */
-#define BITM_EMAC_DMA_BUSMODE_PBL            (_ADI_MSK(0x00003F00,uint32_t))  /* Programmable Burst Length - specifies the maximum number of beats */
-#define BITM_EMAC_DMA_BUSMODE_ATDS           (_ADI_MSK(0x00000080,uint32_t))  /* Alternate Descriptor Size - size of descriptor is 8 words */
-#define BITM_EMAC_DMA_BUSMODE_DSL            (_ADI_MSK(0x0000007C,uint32_t))  /* Descriptor Skip Length in unchained Descriptors */
-#define BITM_EMAC_DMA_BUSMODE_SWR            (_ADI_MSK(0x00000001,uint32_t))  /* Software Reset - resetting all the blocks */
+#define BITP_EMAC_DMA_BUSMODE_AAL            25                               /* Address Aligned Bursts */
+#define BITP_EMAC_DMA_BUSMODE_PBL8           24                               /* PBL * 8 */
+#define BITP_EMAC_DMA_BUSMODE_USP            23                               /* Use Separate PBL */
+#define BITP_EMAC_DMA_BUSMODE_RPBL           17                               /* Receive Programmable Burst Length */
+#define BITP_EMAC_DMA_BUSMODE_FB             16                               /* Fixed Burst */
+#define BITP_EMAC_DMA_BUSMODE_PBL             8                               /* Programmable Burst Length */
+#define BITP_EMAC_DMA_BUSMODE_ATDS            7                               /* Alternate Descriptor Size */
+#define BITP_EMAC_DMA_BUSMODE_DSL             2                               /* Descriptor Skip Length */
+#define BITP_EMAC_DMA_BUSMODE_SWR             0                               /* Software Reset */
+#define BITM_EMAC_DMA_BUSMODE_AAL            (_ADI_MSK(0x02000000,uint32_t))  /* Address Aligned Bursts */
+#define BITM_EMAC_DMA_BUSMODE_PBL8           (_ADI_MSK(0x01000000,uint32_t))  /* PBL * 8 */
+#define BITM_EMAC_DMA_BUSMODE_USP            (_ADI_MSK(0x00800000,uint32_t))  /* Use Separate PBL */
+#define BITM_EMAC_DMA_BUSMODE_RPBL           (_ADI_MSK(0x007E0000,uint32_t))  /* Receive Programmable Burst Length */
+#define BITM_EMAC_DMA_BUSMODE_FB             (_ADI_MSK(0x00010000,uint32_t))  /* Fixed Burst */
+#define BITM_EMAC_DMA_BUSMODE_PBL            (_ADI_MSK(0x00003F00,uint32_t))  /* Programmable Burst Length */
+#define BITM_EMAC_DMA_BUSMODE_ATDS           (_ADI_MSK(0x00000080,uint32_t))  /* Alternate Descriptor Size */
+#define BITM_EMAC_DMA_BUSMODE_DSL            (_ADI_MSK(0x0000007C,uint32_t))  /* Descriptor Skip Length */
+#define BITM_EMAC_DMA_BUSMODE_SWR            (_ADI_MSK(0x00000001,uint32_t))  /* Software Reset */
 
 /* ------------------------------------------------------------------------------------------------------------------------
         EMAC_DMA_STAT                        Pos/Masks                        Description
    ------------------------------------------------------------------------------------------------------------------------ */
 #define BITP_EMAC_DMA_STAT_TTI               29                               /* Time Stamp Trigger Interrupt */
-#define BITP_EMAC_DMA_STAT_GPI               28                               /* GMAC PMT Interrupt - Reflecting Interrupt from PMT block */
-#define BITP_EMAC_DMA_STAT_GMI               27                               /* GMAC MMC Interrupt - Reflecting Interrupt from MMC block */
-#define BITP_EMAC_DMA_STAT_GLI               26                               /* GMAC Line Interface Interrupt - For BF60x Configuration, this interrupt wont come */
-#define BITP_EMAC_DMA_STAT_EB                23                               /* Error Bits - indicates the type of Fatal Error */
-#define BITP_EMAC_DMA_STAT_TS                20                               /* Transmit Process State - State of TX DMA */
-#define BITP_EMAC_DMA_STAT_RS                17                               /* Receive Process State - State of RX DMA */
-#define BITP_EMAC_DMA_STAT_NIS               16                               /* Normal Interrupt Summary - Generation of interrupt in normal cases */
-#define BITP_EMAC_DMA_STAT_AIS               15                               /* Abornmal Interrupt Summary - Generation of interrupt in error cases */
+#define BITP_EMAC_DMA_STAT_MCI               27                               /* MAC MMC Interrupt */
+#define BITP_EMAC_DMA_STAT_EB                23                               /* Error Bits */
+#define BITP_EMAC_DMA_STAT_TS                20                               /* Transmit Process State */
+#define BITP_EMAC_DMA_STAT_RS                17                               /* Receive Process State */
+#define BITP_EMAC_DMA_STAT_NIS               16                               /* Normal Interrupt Summary */
+#define BITP_EMAC_DMA_STAT_AIS               15                               /* Abnormal Interrupt Summary */
 #define BITP_EMAC_DMA_STAT_ERI               14                               /* Early Receive Interrupt */
 #define BITP_EMAC_DMA_STAT_FBI               13                               /* Fatal Bus Error Interrupt */
-#define BITP_EMAC_DMA_STAT_ETI               10                               /* Early Transmit Interrupt - indicates the TX frame is now in FIFO */
-#define BITP_EMAC_DMA_STAT_RWT                9                               /* Receive WatchDog Timeout - reception of a frame greater than max bytes */
+#define BITP_EMAC_DMA_STAT_ETI               10                               /* Early Transmit Interrupt */
+#define BITP_EMAC_DMA_STAT_RWT                9                               /* Receive WatchDog Timeout */
 #define BITP_EMAC_DMA_STAT_RPS                8                               /* Receive Process Stopped */
-#define BITP_EMAC_DMA_STAT_RU                 7                               /* Receive Buffer Unavailable - next receive descriptor not available for EMAC */
-#define BITP_EMAC_DMA_STAT_RI                 6                               /* Receive Interrupt - completion of frame reception */
-#define BITP_EMAC_DMA_STAT_UNF                5                               /* Transmit Buffer had an underflow */
-#define BITP_EMAC_DMA_STAT_OVF                4                               /* Receive Buffer had an overflow */
-#define BITP_EMAC_DMA_STAT_TJT                3                               /* Transmit Jabber Timeout - indicates that TX has been excessively active */
-#define BITP_EMAC_DMA_STAT_TU                 2                               /* Transmit Buffer Unavailable - indicates that next TX descriptor is not available for EMAC */
+#define BITP_EMAC_DMA_STAT_RU                 7                               /* Receive Buffer Unavailable */
+#define BITP_EMAC_DMA_STAT_RI                 6                               /* Receive Interrupt */
+#define BITP_EMAC_DMA_STAT_UNF                5                               /* Transmit Buffer Underflow */
+#define BITP_EMAC_DMA_STAT_OVF                4                               /* Receive Buffer Overflow */
+#define BITP_EMAC_DMA_STAT_TJT                3                               /* Transmit Jabber Timeout */
+#define BITP_EMAC_DMA_STAT_TU                 2                               /* Transmit Buffer Unavailable */
 #define BITP_EMAC_DMA_STAT_TPS                1                               /* Transmit Process Stopped */
-#define BITP_EMAC_DMA_STAT_TI                 0                               /* Transmit Interrupt - Indicates the completion of frame transmission */
+#define BITP_EMAC_DMA_STAT_TI                 0                               /* Transmit Interrupt */
 #define BITM_EMAC_DMA_STAT_TTI               (_ADI_MSK(0x20000000,uint32_t))  /* Time Stamp Trigger Interrupt */
-#define BITM_EMAC_DMA_STAT_GPI               (_ADI_MSK(0x10000000,uint32_t))  /* GMAC PMT Interrupt - Reflecting Interrupt from PMT block */
-#define BITM_EMAC_DMA_STAT_GMI               (_ADI_MSK(0x08000000,uint32_t))  /* GMAC MMC Interrupt - Reflecting Interrupt from MMC block */
-#define BITM_EMAC_DMA_STAT_GLI               (_ADI_MSK(0x04000000,uint32_t))  /* GMAC Line Interface Interrupt - For BF60x Configuration, this interrupt wont come */
-#define BITM_EMAC_DMA_STAT_EB                (_ADI_MSK(0x03800000,uint32_t))  /* Error Bits - indicates the type of Fatal Error */
+#define BITM_EMAC_DMA_STAT_MCI               (_ADI_MSK(0x08000000,uint32_t))  /* MAC MMC Interrupt */
+#define BITM_EMAC_DMA_STAT_EB                (_ADI_MSK(0x03800000,uint32_t))  /* Error Bits */
 
-#define BITM_EMAC_DMA_STAT_TS                (_ADI_MSK(0x00700000,uint32_t))  /* Transmit Process State - State of TX DMA */
+#define BITM_EMAC_DMA_STAT_TS                (_ADI_MSK(0x00700000,uint32_t))  /* Transmit Process State */
 #define ENUM_EMAC_DMA_STAT_TS_STOPPED        (_ADI_MSK(0x00000000,uint32_t))  /* TS: Stopped; Reset or Stop Transmit Command issued */
 #define ENUM_EMAC_DMA_STAT_TS_R_FTD          (_ADI_MSK(0x00100000,uint32_t))  /* TS: Running; Fetching Transmit Transfer Descriptor */
 #define ENUM_EMAC_DMA_STAT_TS_R_WSTAT        (_ADI_MSK(0x00200000,uint32_t))  /* TS: Running; Waiting for status */
@@ -8585,52 +8479,52 @@
 #define ENUM_EMAC_DMA_STAT_TS_SUSPENDED      (_ADI_MSK(0x00600000,uint32_t))  /* TS: Suspended; Transmit Descriptor Unavailable or TX Buffer Underflow */
 #define ENUM_EMAC_DMA_STAT_TS_R_CLSTD        (_ADI_MSK(0x00700000,uint32_t))  /* TS: Closing Transmit Descriptor */
 
-#define BITM_EMAC_DMA_STAT_RS                (_ADI_MSK(0x000E0000,uint32_t))  /* Receive Process State - State of RX DMA */
+#define BITM_EMAC_DMA_STAT_RS                (_ADI_MSK(0x000E0000,uint32_t))  /* Receive Process State */
 #define ENUM_EMAC_DMA_STAT_RS_STOPPED        (_ADI_MSK(0x00000000,uint32_t))  /* RS: Stopped: Reset or Stop Receive Command issued. */
 #define ENUM_EMAC_DMA_STAT_RS_R_FRD          (_ADI_MSK(0x00020000,uint32_t))  /* RS: Running: Fetching Receive Transfer Descriptor. */
 #define ENUM_EMAC_DMA_STAT_RS_R_WTRX         (_ADI_MSK(0x00060000,uint32_t))  /* RS: Running: Waiting for receive packet */
 #define ENUM_EMAC_DMA_STAT_RS_SUSPENDED      (_ADI_MSK(0x00080000,uint32_t))  /* RS: Suspended: Receive Descriptor Unavailable */
 #define ENUM_EMAC_DMA_STAT_RS_R_CLSRD        (_ADI_MSK(0x000A0000,uint32_t))  /* RS: Running: Closing Receive Descriptor */
 #define ENUM_EMAC_DMA_STAT_RS_WR_TSTMP       (_ADI_MSK(0x000C0000,uint32_t))  /* RS: TIME_STAMP write state */
-#define ENUM_EMAC_DMA_STAT_RS_R_RXWRHM       (_ADI_MSK(0x000E0000,uint32_t))  /* RS: Running: Transferring  RX packet data from RX buffer to host memory */
-#define BITM_EMAC_DMA_STAT_NIS               (_ADI_MSK(0x00010000,uint32_t))  /* Normal Interrupt Summary - Generation of interrupt in normal cases */
-#define BITM_EMAC_DMA_STAT_AIS               (_ADI_MSK(0x00008000,uint32_t))  /* Abornmal Interrupt Summary - Generation of interrupt in error cases */
+#define ENUM_EMAC_DMA_STAT_RS_R_RXWRHM       (_ADI_MSK(0x000E0000,uint32_t))  /* RS: Running: Transferring RX packet data from RX buffer to host memory */
+#define BITM_EMAC_DMA_STAT_NIS               (_ADI_MSK(0x00010000,uint32_t))  /* Normal Interrupt Summary */
+#define BITM_EMAC_DMA_STAT_AIS               (_ADI_MSK(0x00008000,uint32_t))  /* Abnormal Interrupt Summary */
 #define BITM_EMAC_DMA_STAT_ERI               (_ADI_MSK(0x00004000,uint32_t))  /* Early Receive Interrupt */
 #define BITM_EMAC_DMA_STAT_FBI               (_ADI_MSK(0x00002000,uint32_t))  /* Fatal Bus Error Interrupt */
-#define BITM_EMAC_DMA_STAT_ETI               (_ADI_MSK(0x00000400,uint32_t))  /* Early Transmit Interrupt - indicates the TX frame is now in FIFO */
-#define BITM_EMAC_DMA_STAT_RWT               (_ADI_MSK(0x00000200,uint32_t))  /* Receive WatchDog Timeout - reception of a frame greater than max bytes */
+#define BITM_EMAC_DMA_STAT_ETI               (_ADI_MSK(0x00000400,uint32_t))  /* Early Transmit Interrupt */
+#define BITM_EMAC_DMA_STAT_RWT               (_ADI_MSK(0x00000200,uint32_t))  /* Receive WatchDog Timeout */
 #define BITM_EMAC_DMA_STAT_RPS               (_ADI_MSK(0x00000100,uint32_t))  /* Receive Process Stopped */
-#define BITM_EMAC_DMA_STAT_RU                (_ADI_MSK(0x00000080,uint32_t))  /* Receive Buffer Unavailable - next receive descriptor not available for EMAC */
-#define BITM_EMAC_DMA_STAT_RI                (_ADI_MSK(0x00000040,uint32_t))  /* Receive Interrupt - completion of frame reception */
-#define BITM_EMAC_DMA_STAT_UNF               (_ADI_MSK(0x00000020,uint32_t))  /* Transmit Buffer had an underflow */
-#define BITM_EMAC_DMA_STAT_OVF               (_ADI_MSK(0x00000010,uint32_t))  /* Receive Buffer had an overflow */
-#define BITM_EMAC_DMA_STAT_TJT               (_ADI_MSK(0x00000008,uint32_t))  /* Transmit Jabber Timeout - indicates that TX has been excessively active */
-#define BITM_EMAC_DMA_STAT_TU                (_ADI_MSK(0x00000004,uint32_t))  /* Transmit Buffer Unavailable - indicates that next TX descriptor is not available for EMAC */
+#define BITM_EMAC_DMA_STAT_RU                (_ADI_MSK(0x00000080,uint32_t))  /* Receive Buffer Unavailable */
+#define BITM_EMAC_DMA_STAT_RI                (_ADI_MSK(0x00000040,uint32_t))  /* Receive Interrupt */
+#define BITM_EMAC_DMA_STAT_UNF               (_ADI_MSK(0x00000020,uint32_t))  /* Transmit Buffer Underflow */
+#define BITM_EMAC_DMA_STAT_OVF               (_ADI_MSK(0x00000010,uint32_t))  /* Receive Buffer Overflow */
+#define BITM_EMAC_DMA_STAT_TJT               (_ADI_MSK(0x00000008,uint32_t))  /* Transmit Jabber Timeout */
+#define BITM_EMAC_DMA_STAT_TU                (_ADI_MSK(0x00000004,uint32_t))  /* Transmit Buffer Unavailable */
 #define BITM_EMAC_DMA_STAT_TPS               (_ADI_MSK(0x00000002,uint32_t))  /* Transmit Process Stopped */
-#define BITM_EMAC_DMA_STAT_TI                (_ADI_MSK(0x00000001,uint32_t))  /* Transmit Interrupt - Indicates the completion of frame transmission */
+#define BITM_EMAC_DMA_STAT_TI                (_ADI_MSK(0x00000001,uint32_t))  /* Transmit Interrupt */
 
 /* ------------------------------------------------------------------------------------------------------------------------
         EMAC_DMA_OPMODE                      Pos/Masks                        Description
    ------------------------------------------------------------------------------------------------------------------------ */
-#define BITP_EMAC_DMA_OPMODE_DT              26                               /* Disable dropping of IP checksum error frames */
-#define BITP_EMAC_DMA_OPMODE_RSF             25                               /* Receive Store and Forward - Starts DMA only when complete frame is present in RX FIFO */
-#define BITP_EMAC_DMA_OPMODE_DFF             24                               /* Disable Flushing of received frames */
-#define BITP_EMAC_DMA_OPMODE_TSF             21                               /* Transmit Store and Forward - starts transmission only when full frame is present in TX FIFO */
+#define BITP_EMAC_DMA_OPMODE_DT              26                               /* Disable Dropping TCP/IP Errors */
+#define BITP_EMAC_DMA_OPMODE_RSF             25                               /* Receive Store and Forward */
+#define BITP_EMAC_DMA_OPMODE_DFF             24                               /* Disable Flushing of received Frames */
+#define BITP_EMAC_DMA_OPMODE_TSF             21                               /* Transmit Store and Forward */
 #define BITP_EMAC_DMA_OPMODE_FTF             20                               /* Flush Transmit FIFO */
-#define BITP_EMAC_DMA_OPMODE_TTC             14                               /* Transmit Threshold control */
-#define BITP_EMAC_DMA_OPMODE_ST              13                               /* Start/Stop Transmission command */
+#define BITP_EMAC_DMA_OPMODE_TTC             14                               /* Transmit Threshold Control */
+#define BITP_EMAC_DMA_OPMODE_ST              13                               /* Start/Stop Transmission */
 #define BITP_EMAC_DMA_OPMODE_FEF              7                               /* Forward Error Frames */
 #define BITP_EMAC_DMA_OPMODE_FUF              6                               /* Forward Undersized good Frames */
-#define BITP_EMAC_DMA_OPMODE_RTC              3                               /* Receive Threshold Control - Sets the threshold level of the receive FIFO */
-#define BITP_EMAC_DMA_OPMODE_OSF              2                               /* Operate on Second Frame - Operating on second frame before getting the status of first */
-#define BITP_EMAC_DMA_OPMODE_SR               1                               /* Start/Stop Receive - Starting/stopping the RX DMA */
-#define BITM_EMAC_DMA_OPMODE_DT              (_ADI_MSK(0x04000000,uint32_t))  /* Disable dropping of IP checksum error frames */
-#define BITM_EMAC_DMA_OPMODE_RSF             (_ADI_MSK(0x02000000,uint32_t))  /* Receive Store and Forward - Starts DMA only when complete frame is present in RX FIFO */
-#define BITM_EMAC_DMA_OPMODE_DFF             (_ADI_MSK(0x01000000,uint32_t))  /* Disable Flushing of received frames */
-#define BITM_EMAC_DMA_OPMODE_TSF             (_ADI_MSK(0x00200000,uint32_t))  /* Transmit Store and Forward - starts transmission only when full frame is present in TX FIFO */
+#define BITP_EMAC_DMA_OPMODE_RTC              3                               /* Receive Threshold Control */
+#define BITP_EMAC_DMA_OPMODE_OSF              2                               /* Operate on Second Frame */
+#define BITP_EMAC_DMA_OPMODE_SR               1                               /* Start/Stop Receive */
+#define BITM_EMAC_DMA_OPMODE_DT              (_ADI_MSK(0x04000000,uint32_t))  /* Disable Dropping TCP/IP Errors */
+#define BITM_EMAC_DMA_OPMODE_RSF             (_ADI_MSK(0x02000000,uint32_t))  /* Receive Store and Forward */
+#define BITM_EMAC_DMA_OPMODE_DFF             (_ADI_MSK(0x01000000,uint32_t))  /* Disable Flushing of received Frames */
+#define BITM_EMAC_DMA_OPMODE_TSF             (_ADI_MSK(0x00200000,uint32_t))  /* Transmit Store and Forward */
 #define BITM_EMAC_DMA_OPMODE_FTF             (_ADI_MSK(0x00100000,uint32_t))  /* Flush Transmit FIFO */
 
-#define BITM_EMAC_DMA_OPMODE_TTC             (_ADI_MSK(0x0001C000,uint32_t))  /* Transmit Threshold control */
+#define BITM_EMAC_DMA_OPMODE_TTC             (_ADI_MSK(0x0001C000,uint32_t))  /* Transmit Threshold Control */
 #define ENUM_EMAC_DMA_OPMODE_TTC_64          (_ADI_MSK(0x00000000,uint32_t))  /* TTC: 64 */
 #define ENUM_EMAC_DMA_OPMODE_TTC_128         (_ADI_MSK(0x00004000,uint32_t))  /* TTC: 128 */
 #define ENUM_EMAC_DMA_OPMODE_TTC_192         (_ADI_MSK(0x00008000,uint32_t))  /* TTC: 192 */
@@ -8639,17 +8533,17 @@
 #define ENUM_EMAC_DMA_OPMODE_TTC_32          (_ADI_MSK(0x00014000,uint32_t))  /* TTC: 32 */
 #define ENUM_EMAC_DMA_OPMODE_TTC_24          (_ADI_MSK(0x00018000,uint32_t))  /* TTC: 24 */
 #define ENUM_EMAC_DMA_OPMODE_TTC_16          (_ADI_MSK(0x0001C000,uint32_t))  /* TTC: 16 */
-#define BITM_EMAC_DMA_OPMODE_ST              (_ADI_MSK(0x00002000,uint32_t))  /* Start/Stop Transmission command */
+#define BITM_EMAC_DMA_OPMODE_ST              (_ADI_MSK(0x00002000,uint32_t))  /* Start/Stop Transmission */
 #define BITM_EMAC_DMA_OPMODE_FEF             (_ADI_MSK(0x00000080,uint32_t))  /* Forward Error Frames */
 #define BITM_EMAC_DMA_OPMODE_FUF             (_ADI_MSK(0x00000040,uint32_t))  /* Forward Undersized good Frames */
 
-#define BITM_EMAC_DMA_OPMODE_RTC             (_ADI_MSK(0x00000018,uint32_t))  /* Receive Threshold Control - Sets the threshold level of the receive FIFO */
+#define BITM_EMAC_DMA_OPMODE_RTC             (_ADI_MSK(0x00000018,uint32_t))  /* Receive Threshold Control */
 #define ENUM_EMAC_DMA_OPMODE_RTC_64          (_ADI_MSK(0x00000000,uint32_t))  /* RTC: 64 */
 #define ENUM_EMAC_DMA_OPMODE_RTC_32          (_ADI_MSK(0x00000008,uint32_t))  /* RTC: 32 */
 #define ENUM_EMAC_DMA_OPMODE_RTC_96          (_ADI_MSK(0x00000010,uint32_t))  /* RTC: 96 */
 #define ENUM_EMAC_DMA_OPMODE_RTC_128         (_ADI_MSK(0x00000018,uint32_t))  /* RTC: 128 */
-#define BITM_EMAC_DMA_OPMODE_OSF             (_ADI_MSK(0x00000004,uint32_t))  /* Operate on Second Frame - Operating on second frame before getting the status of first */
-#define BITM_EMAC_DMA_OPMODE_SR              (_ADI_MSK(0x00000002,uint32_t))  /* Start/Stop Receive - Starting/stopping the RX DMA */
+#define BITM_EMAC_DMA_OPMODE_OSF             (_ADI_MSK(0x00000004,uint32_t))  /* Operate on Second Frame */
+#define BITM_EMAC_DMA_OPMODE_SR              (_ADI_MSK(0x00000002,uint32_t))  /* Start/Stop Receive */
 
 /* ------------------------------------------------------------------------------------------------------------------------
         EMAC_DMA_IEN                         Pos/Masks                        Description
@@ -8688,14 +8582,14 @@
 /* ------------------------------------------------------------------------------------------------------------------------
         EMAC_DMA_MISS_FRM                    Pos/Masks                        Description
    ------------------------------------------------------------------------------------------------------------------------ */
-#define BITP_EMAC_DMA_MISS_FRM_OVFFIFO       28                               /* Overflow bit for FIFO Overflow counter */
-#define BITP_EMAC_DMA_MISS_FRM_MISSFROV      17                               /* Number of frames missed due to buffer overflow */
-#define BITP_EMAC_DMA_MISS_FRM_OVFMISS       16                               /* Overflow bit for missed frame counter */
-#define BITP_EMAC_DMA_MISS_FRM_MISSFRUN       0                               /* Number of frames missed due to buffer unavailability */
-#define BITM_EMAC_DMA_MISS_FRM_OVFFIFO       (_ADI_MSK(0x10000000,uint32_t))  /* Overflow bit for FIFO Overflow counter */
-#define BITM_EMAC_DMA_MISS_FRM_MISSFROV      (_ADI_MSK(0x0FFE0000,uint32_t))  /* Number of frames missed due to buffer overflow */
-#define BITM_EMAC_DMA_MISS_FRM_OVFMISS       (_ADI_MSK(0x00010000,uint32_t))  /* Overflow bit for missed frame counter */
-#define BITM_EMAC_DMA_MISS_FRM_MISSFRUN      (_ADI_MSK(0x0000FFFF,uint32_t))  /* Number of frames missed due to buffer unavailability */
+#define BITP_EMAC_DMA_MISS_FRM_OVFFIFO       28                               /* Overflow bit for FIFO Overflow Counter */
+#define BITP_EMAC_DMA_MISS_FRM_MISSFROV      17                               /* Missed Frames Buffer Overflow */
+#define BITP_EMAC_DMA_MISS_FRM_OVFMISS       16                               /* Overflow bit for Missed Frame Counter */
+#define BITP_EMAC_DMA_MISS_FRM_MISSFRUN       0                               /* Missed Frames Unavailable Buffer */
+#define BITM_EMAC_DMA_MISS_FRM_OVFFIFO       (_ADI_MSK(0x10000000,uint32_t))  /* Overflow bit for FIFO Overflow Counter */
+#define BITM_EMAC_DMA_MISS_FRM_MISSFROV      (_ADI_MSK(0x0FFE0000,uint32_t))  /* Missed Frames Buffer Overflow */
+#define BITM_EMAC_DMA_MISS_FRM_OVFMISS       (_ADI_MSK(0x00010000,uint32_t))  /* Overflow bit for Missed Frame Counter */
+#define BITM_EMAC_DMA_MISS_FRM_MISSFRUN      (_ADI_MSK(0x0000FFFF,uint32_t))  /* Missed Frames Unavailable Buffer */
 
 /* ------------------------------------------------------------------------------------------------------------------------
         EMAC_DMA_RXIWDOG                     Pos/Masks                        Description
@@ -8706,78 +8600,28 @@
 /* ------------------------------------------------------------------------------------------------------------------------
         EMAC_DMA_BMMODE                      Pos/Masks                        Description
    ------------------------------------------------------------------------------------------------------------------------ */
-#define BITP_EMAC_DMA_BMMODE_LPIEN           31                               /* Enable Low power interface */
-#define BITP_EMAC_DMA_BMMODE_UNLK            30                               /* Unlock on magic packet or   remote wake up */
-#define BITP_EMAC_DMA_BMMODE_WROSRLMT        20                               /* Axi Maximum Write outstanding Request */
-#define BITP_EMAC_DMA_BMMODE_RDOSRLMT        16                               /* Axi Maximum Read outstanding request */
+#define BITP_EMAC_DMA_BMMODE_WROSRLMT        20                               /* SCB Maximum Write Outstanding Request */
+#define BITP_EMAC_DMA_BMMODE_RDOSRLMT        16                               /* SCB Maximum Read Outstanding Request */
 #define BITP_EMAC_DMA_BMMODE_AAL             12                               /* Address Aligned Beats */
-#define BITP_EMAC_DMA_BMMODE_BLEN256          7                               /* Axi Burst Length 256 */
-#define BITP_EMAC_DMA_BMMODE_BLEN128          6                               /* Axi Burst Length 128 */
-#define BITP_EMAC_DMA_BMMODE_BLEN64           5                               /* Axi Burst Length 64 */
-#define BITP_EMAC_DMA_BMMODE_BLEN32           4                               /* Axi Burst Length 32 */
-#define BITP_EMAC_DMA_BMMODE_BLEN16           3                               /* Axi Burst Legnth 16 */
-#define BITP_EMAC_DMA_BMMODE_BLEN8            2                               /* Axi Burst Length 8 */
-#define BITP_EMAC_DMA_BMMODE_BLEN4            1                               /* Axi Burst Length 4 */
-#define BITP_EMAC_DMA_BMMODE_UNDEF            0                               /* Axi Undefined Busrt Length */
-#define BITM_EMAC_DMA_BMMODE_LPIEN           (_ADI_MSK(0x80000000,uint32_t))  /* Enable Low power interface */
-#define BITM_EMAC_DMA_BMMODE_UNLK            (_ADI_MSK(0x40000000,uint32_t))  /* Unlock on magic packet or   remote wake up */
-#define BITM_EMAC_DMA_BMMODE_WROSRLMT        (_ADI_MSK(0x00700000,uint32_t))  /* Axi Maximum Write outstanding Request */
-#define BITM_EMAC_DMA_BMMODE_RDOSRLMT        (_ADI_MSK(0x00070000,uint32_t))  /* Axi Maximum Read outstanding request */
+#define BITP_EMAC_DMA_BMMODE_BLEN16           3                               /* SCB Burst Length 16 */
+#define BITP_EMAC_DMA_BMMODE_BLEN8            2                               /* SCB Burst Length 8 */
+#define BITP_EMAC_DMA_BMMODE_BLEN4            1                               /* SCB Burst Length 4 */
+#define BITP_EMAC_DMA_BMMODE_UNDEF            0                               /* SCB Undefined Burst Length */
+#define BITM_EMAC_DMA_BMMODE_WROSRLMT        (_ADI_MSK(0x00700000,uint32_t))  /* SCB Maximum Write Outstanding Request */
+#define BITM_EMAC_DMA_BMMODE_RDOSRLMT        (_ADI_MSK(0x00070000,uint32_t))  /* SCB Maximum Read Outstanding Request */
 #define BITM_EMAC_DMA_BMMODE_AAL             (_ADI_MSK(0x00001000,uint32_t))  /* Address Aligned Beats */
-#define BITM_EMAC_DMA_BMMODE_BLEN256         (_ADI_MSK(0x00000080,uint32_t))  /* Axi Burst Length 256 */
-#define BITM_EMAC_DMA_BMMODE_BLEN128         (_ADI_MSK(0x00000040,uint32_t))  /* Axi Burst Length 128 */
-#define BITM_EMAC_DMA_BMMODE_BLEN64          (_ADI_MSK(0x00000020,uint32_t))  /* Axi Burst Length 64 */
-#define BITM_EMAC_DMA_BMMODE_BLEN32          (_ADI_MSK(0x00000010,uint32_t))  /* Axi Burst Length 32 */
-#define BITM_EMAC_DMA_BMMODE_BLEN16          (_ADI_MSK(0x00000008,uint32_t))  /* Axi Burst Legnth 16 */
-#define BITM_EMAC_DMA_BMMODE_BLEN8           (_ADI_MSK(0x00000004,uint32_t))  /* Axi Burst Length 8 */
-#define BITM_EMAC_DMA_BMMODE_BLEN4           (_ADI_MSK(0x00000002,uint32_t))  /* Axi Burst Length 4 */
-#define BITM_EMAC_DMA_BMMODE_UNDEF           (_ADI_MSK(0x00000001,uint32_t))  /* Axi Undefined Busrt Length */
+#define BITM_EMAC_DMA_BMMODE_BLEN16          (_ADI_MSK(0x00000008,uint32_t))  /* SCB Burst Length 16 */
+#define BITM_EMAC_DMA_BMMODE_BLEN8           (_ADI_MSK(0x00000004,uint32_t))  /* SCB Burst Length 8 */
+#define BITM_EMAC_DMA_BMMODE_BLEN4           (_ADI_MSK(0x00000002,uint32_t))  /* SCB Burst Length 4 */
+#define BITM_EMAC_DMA_BMMODE_UNDEF           (_ADI_MSK(0x00000001,uint32_t))  /* SCB Undefined Burst Length */
 
 /* ------------------------------------------------------------------------------------------------------------------------
         EMAC_DMA_BMSTAT                      Pos/Masks                        Description
    ------------------------------------------------------------------------------------------------------------------------ */
-#define BITP_EMAC_DMA_BMSTAT_BUSRD            1                               /* Indicates that AXI master's read channel is active */
-#define BITP_EMAC_DMA_BMSTAT_BUSWR            0                               /* Indicates that AXI master's write channel is active */
-#define BITM_EMAC_DMA_BMSTAT_BUSRD           (_ADI_MSK(0x00000002,uint32_t))  /* Indicates that AXI master's read channel is active */
-#define BITM_EMAC_DMA_BMSTAT_BUSWR           (_ADI_MSK(0x00000001,uint32_t))  /* Indicates that AXI master's write channel is active */
-
-/* ------------------------------------------------------------------------------------------------------------------------
-        EMAC_HWFEAT                          Pos/Masks                        Description
-   ------------------------------------------------------------------------------------------------------------------------ */
-#define BITP_EMAC_HWFEAT_ALTDESC             24                               /* Alternate Descriptor selected */
-#define BITP_EMAC_HWFEAT_RXFIFO2048          19                               /* RXFIFO not greater than 2048 */
-#define BITP_EMAC_HWFEAT_RXIPC2              18                               /* RX IP Checksum Type2 selected */
-#define BITP_EMAC_HWFEAT_RXIPC1              17                               /* RX IP Checksum Type1 not selected */
-#define BITP_EMAC_HWFEAT_TXCHOFF             16                               /* TX checksum offload selected */
-#define BITP_EMAC_HWFEAT_IEEE1588ADV         13                               /* IEEE 1588-2008 selected */
-#define BITP_EMAC_HWFEAT_IEEE1588BASIC       12                               /* IEEE 1588-2002 selected */
-#define BITP_EMAC_HWFEAT_RMON                11                               /* RMON module selected */
-#define BITP_EMAC_HWFEAT_PMTMAGIC            10                               /* PMT Magic Packet selected */
-#define BITP_EMAC_HWFEAT_PMTREMOTE            9                               /* PMT Remote wake up selected */
-#define BITP_EMAC_HWFEAT_MDIO                 8                               /* MDIO Selected */
-#define BITP_EMAC_HWFEAT_PCS                  6                               /* PCS not selected */
-#define BITP_EMAC_HWFEAT_MMACADDR             5                               /* Multiple Mac address not selected */
-#define BITP_EMAC_HWFEAT_HASH                 4                               /* Hash Filter Selected */
-#define BITP_EMAC_HWFEAT_HD                   2                               /* Half Duplex Selected */
-#define BITP_EMAC_HWFEAT_MBPS1000             1                               /* 1000 MBPS not selected */
-#define BITP_EMAC_HWFEAT_MBPS10100            0                               /* 10/100 MBPS selected */
-#define BITM_EMAC_HWFEAT_ALTDESC             (_ADI_MSK(0x01000000,uint32_t))  /* Alternate Descriptor selected */
-#define BITM_EMAC_HWFEAT_RXFIFO2048          (_ADI_MSK(0x00080000,uint32_t))  /* RXFIFO not greater than 2048 */
-#define BITM_EMAC_HWFEAT_RXIPC2              (_ADI_MSK(0x00040000,uint32_t))  /* RX IP Checksum Type2 selected */
-#define BITM_EMAC_HWFEAT_RXIPC1              (_ADI_MSK(0x00020000,uint32_t))  /* RX IP Checksum Type1 not selected */
-#define BITM_EMAC_HWFEAT_TXCHOFF             (_ADI_MSK(0x00010000,uint32_t))  /* TX checksum offload selected */
-#define BITM_EMAC_HWFEAT_IEEE1588ADV         (_ADI_MSK(0x00002000,uint32_t))  /* IEEE 1588-2008 selected */
-#define BITM_EMAC_HWFEAT_IEEE1588BASIC       (_ADI_MSK(0x00001000,uint32_t))  /* IEEE 1588-2002 selected */
-#define BITM_EMAC_HWFEAT_RMON                (_ADI_MSK(0x00000800,uint32_t))  /* RMON module selected */
-#define BITM_EMAC_HWFEAT_PMTMAGIC            (_ADI_MSK(0x00000400,uint32_t))  /* PMT Magic Packet selected */
-#define BITM_EMAC_HWFEAT_PMTREMOTE           (_ADI_MSK(0x00000200,uint32_t))  /* PMT Remote wake up selected */
-#define BITM_EMAC_HWFEAT_MDIO                (_ADI_MSK(0x00000100,uint32_t))  /* MDIO Selected */
-#define BITM_EMAC_HWFEAT_PCS                 (_ADI_MSK(0x00000040,uint32_t))  /* PCS not selected */
-#define BITM_EMAC_HWFEAT_MMACADDR            (_ADI_MSK(0x00000020,uint32_t))  /* Multiple Mac address not selected */
-#define BITM_EMAC_HWFEAT_HASH                (_ADI_MSK(0x00000010,uint32_t))  /* Hash Filter Selected */
-#define BITM_EMAC_HWFEAT_HD                  (_ADI_MSK(0x00000004,uint32_t))  /* Half Duplex Selected */
-#define BITM_EMAC_HWFEAT_MBPS1000            (_ADI_MSK(0x00000002,uint32_t))  /* 1000 MBPS not selected */
-#define BITM_EMAC_HWFEAT_MBPS10100           (_ADI_MSK(0x00000001,uint32_t))  /* 10/100 MBPS selected */
+#define BITP_EMAC_DMA_BMSTAT_BUSRD            1                               /* Bus (SCB master) Read Active */
+#define BITP_EMAC_DMA_BMSTAT_BUSWR            0                               /* Bus (SCB master) Write Active */
+#define BITM_EMAC_DMA_BMSTAT_BUSRD           (_ADI_MSK(0x00000002,uint32_t))  /* Bus (SCB master) Read Active */
+#define BITM_EMAC_DMA_BMSTAT_BUSWR           (_ADI_MSK(0x00000001,uint32_t))  /* Bus (SCB master) Write Active */
 
 /* ==================================================
         Serial Port Registers
@@ -8977,7 +8821,7 @@
 #define BITM_SPORT_CTL_A_FSED                (_ADI_MSK(0x00080000,uint32_t))  /* Frame Sync Edge Detect */
 #define BITM_SPORT_CTL_FSED                  (_ADI_MSK(0x00080000,uint32_t))  /* Frame Sync Edge Detect */
 #define ENUM_SPORT_CTL_LEVEL_FS              (_ADI_MSK(0x00000000,uint32_t))  /* FSED: Level detect frame sync */
-#define ENUM_SPORT_CTL_EDGE_FS               (_ADI_MSK(0x00080000,uint32_t))  /* FSED: Edge detect frame sync (multi-channel only) */
+#define ENUM_SPORT_CTL_EDGE_FS               (_ADI_MSK(0x00080000,uint32_t))  /* FSED: Edge detect frame sync */
 
 #define BITM_SPORT_CTL_A_RJUST               (_ADI_MSK(0x00040000,uint32_t))  /* Right-Justified Operation Mode */
 #define BITM_SPORT_CTL_RJUST                 (_ADI_MSK(0x00040000,uint32_t))  /* Right-Justified Operation Mode */
@@ -9277,16 +9121,16 @@
 #define REG_SPI0_CLK                    0xFFC40410         /* SPI0 Clock Rate Register */
 #define REG_SPI0_DLY                    0xFFC40414         /* SPI0 Delay Register */
 #define REG_SPI0_SLVSEL                 0xFFC40418         /* SPI0 Slave Select Register */
-#define REG_SPI0_RWC                    0xFFC4041C         /* SPI0 Receive Word Count Register */
-#define REG_SPI0_RWCR                   0xFFC40420         /* SPI0 Receive Word Count Reload Register */
-#define REG_SPI0_TWC                    0xFFC40424         /* SPI0 Transmit Word Count Register */
-#define REG_SPI0_TWCR                   0xFFC40428         /* SPI0 Transmit Word Count Reload Register */
+#define REG_SPI0_RWC                    0xFFC4041C         /* SPI0 Received Word Count Register */
+#define REG_SPI0_RWCR                   0xFFC40420         /* SPI0 Received Word Count Reload Register */
+#define REG_SPI0_TWC                    0xFFC40424         /* SPI0 Transmitted Word Count Register */
+#define REG_SPI0_TWCR                   0xFFC40428         /* SPI0 Transmitted Word Count Reload Register */
 #define REG_SPI0_IMSK                   0xFFC40430         /* SPI0 Interrupt Mask Register */
 #define REG_SPI0_IMSK_CLR               0xFFC40434         /* SPI0 Interrupt Mask Clear Register */
 #define REG_SPI0_IMSK_SET               0xFFC40438         /* SPI0 Interrupt Mask Set Register */
 #define REG_SPI0_STAT                   0xFFC40440         /* SPI0 Status Register */
-#define REG_SPI0_ILAT                   0xFFC40444         /* SPI0 Interrupt Latch Register */
-#define REG_SPI0_ILAT_CLR               0xFFC40448         /* SPI0 Interrupt Latch Clear Register */
+#define REG_SPI0_ILAT                   0xFFC40444         /* SPI0 Masked Interrupt Condition Register */
+#define REG_SPI0_ILAT_CLR               0xFFC40448         /* SPI0 Masked Interrupt Clear Register */
 #define REG_SPI0_RFIFO                  0xFFC40450         /* SPI0 Receive FIFO Data Register */
 #define REG_SPI0_TFIFO                  0xFFC40458         /* SPI0 Transmit FIFO Data Register */
 
@@ -9299,16 +9143,16 @@
 #define REG_SPI1_CLK                    0xFFC40510         /* SPI1 Clock Rate Register */
 #define REG_SPI1_DLY                    0xFFC40514         /* SPI1 Delay Register */
 #define REG_SPI1_SLVSEL                 0xFFC40518         /* SPI1 Slave Select Register */
-#define REG_SPI1_RWC                    0xFFC4051C         /* SPI1 Receive Word Count Register */
-#define REG_SPI1_RWCR                   0xFFC40520         /* SPI1 Receive Word Count Reload Register */
-#define REG_SPI1_TWC                    0xFFC40524         /* SPI1 Transmit Word Count Register */
-#define REG_SPI1_TWCR                   0xFFC40528         /* SPI1 Transmit Word Count Reload Register */
+#define REG_SPI1_RWC                    0xFFC4051C         /* SPI1 Received Word Count Register */
+#define REG_SPI1_RWCR                   0xFFC40520         /* SPI1 Received Word Count Reload Register */
+#define REG_SPI1_TWC                    0xFFC40524         /* SPI1 Transmitted Word Count Register */
+#define REG_SPI1_TWCR                   0xFFC40528         /* SPI1 Transmitted Word Count Reload Register */
 #define REG_SPI1_IMSK                   0xFFC40530         /* SPI1 Interrupt Mask Register */
 #define REG_SPI1_IMSK_CLR               0xFFC40534         /* SPI1 Interrupt Mask Clear Register */
 #define REG_SPI1_IMSK_SET               0xFFC40538         /* SPI1 Interrupt Mask Set Register */
 #define REG_SPI1_STAT                   0xFFC40540         /* SPI1 Status Register */
-#define REG_SPI1_ILAT                   0xFFC40544         /* SPI1 Interrupt Latch Register */
-#define REG_SPI1_ILAT_CLR               0xFFC40548         /* SPI1 Interrupt Latch Clear Register */
+#define REG_SPI1_ILAT                   0xFFC40544         /* SPI1 Masked Interrupt Condition Register */
+#define REG_SPI1_ILAT_CLR               0xFFC40548         /* SPI1 Masked Interrupt Clear Register */
 #define REG_SPI1_RFIFO                  0xFFC40550         /* SPI1 Receive FIFO Data Register */
 #define REG_SPI1_TFIFO                  0xFFC40558         /* SPI1 Transmit FIFO Data Register */
 
@@ -9320,16 +9164,16 @@
    ------------------------------------------------------------------------------------------------------------------------ */
 #define BITP_SPI_CTL_SOSI                    22                               /* Start on MOSI */
 #define BITP_SPI_CTL_MIOM                    20                               /* Multiple I/O Mode */
-#define BITP_SPI_CTL_FMODE                   18                               /* Fast Mode */
+#define BITP_SPI_CTL_FMODE                   18                               /* Fast-Mode Enable */
 #define BITP_SPI_CTL_FCWM                    16                               /* Flow Control Watermark */
 #define BITP_SPI_CTL_FCPL                    15                               /* Flow Control Polarity */
-#define BITP_SPI_CTL_FCCH                    14                               /* Flow Control Channel */
+#define BITP_SPI_CTL_FCCH                    14                               /* Flow Control Channel Selection */
 #define BITP_SPI_CTL_FCEN                    13                               /* Flow Control Enable */
 #define BITP_SPI_CTL_LSBF                    12                               /* Least Significant Bit First */
 #define BITP_SPI_CTL_SIZE                     9                               /* Word Transfer Size */
 #define BITP_SPI_CTL_EMISO                    8                               /* Enable MISO */
-#define BITP_SPI_CTL_SELST                    7                               /* Select State */
-#define BITP_SPI_CTL_ASSEL                    6                               /* Assert Slave Select */
+#define BITP_SPI_CTL_SELST                    7                               /* Slave Select Polarity Between Transfers */
+#define BITP_SPI_CTL_ASSEL                    6                               /* Slave Select Pin Control */
 #define BITP_SPI_CTL_CPOL                     5                               /* Clock Polarity */
 #define BITP_SPI_CTL_CPHA                     4                               /* Clock Phase */
 #define BITP_SPI_CTL_ODM                      3                               /* Open Drain Mode */
@@ -9346,30 +9190,30 @@
 #define ENUM_SPI_CTL_MIO_DUAL                (_ADI_MSK(0x00100000,uint32_t))  /* MIOM: DIOM operation */
 #define ENUM_SPI_CTL_MIO_QUAD                (_ADI_MSK(0x00200000,uint32_t))  /* MIOM: QIOM operation */
 
-#define BITM_SPI_CTL_FMODE                   (_ADI_MSK(0x00040000,uint32_t))  /* Fast Mode */
+#define BITM_SPI_CTL_FMODE                   (_ADI_MSK(0x00040000,uint32_t))  /* Fast-Mode Enable */
 #define ENUM_SPI_CTL_FAST_DIS                (_ADI_MSK(0x00000000,uint32_t))  /* FMODE: Disable */
 #define ENUM_SPI_CTL_FAST_EN                 (_ADI_MSK(0x00040000,uint32_t))  /* FMODE: Enable */
 
 #define BITM_SPI_CTL_FCWM                    (_ADI_MSK(0x00030000,uint32_t))  /* Flow Control Watermark */
-#define ENUM_SPI_CTL_FIFO0                   (_ADI_MSK(0x00000000,uint32_t))  /* FCWM: Empty (TFIFO) or full (RFIFO) */
-#define ENUM_SPI_CTL_FIFO1                   (_ADI_MSK(0x00010000,uint32_t))  /* FCWM: 75% or more empty (TFIFO) or full (RFIFO) */
-#define ENUM_SPI_CTL_FIFO2                   (_ADI_MSK(0x00020000,uint32_t))  /* FCWM: 50% or more empty (TFIFO) or full (RFIFO) */
+#define ENUM_SPI_CTL_FIFO0                   (_ADI_MSK(0x00000000,uint32_t))  /* FCWM: TFIFO empty or RFIFO full */
+#define ENUM_SPI_CTL_FIFO1                   (_ADI_MSK(0x00010000,uint32_t))  /* FCWM: TFIFO 75% or more empty, or RFIFO full */
+#define ENUM_SPI_CTL_FIFO2                   (_ADI_MSK(0x00020000,uint32_t))  /* FCWM: TFIFO 50% or more empty, or RFIFO full */
 
 #define BITM_SPI_CTL_FCPL                    (_ADI_MSK(0x00008000,uint32_t))  /* Flow Control Polarity */
-#define ENUM_SPI_CTL_FLOW_LO                 (_ADI_MSK(0x00000000,uint32_t))  /* FCPL: Low active RDY */
-#define ENUM_SPI_CTL_FLOW_HI                 (_ADI_MSK(0x00008000,uint32_t))  /* FCPL: High active RDY */
+#define ENUM_SPI_CTL_FLOW_LO                 (_ADI_MSK(0x00000000,uint32_t))  /* FCPL: Active-low RDY */
+#define ENUM_SPI_CTL_FLOW_HI                 (_ADI_MSK(0x00008000,uint32_t))  /* FCPL: Active-high RDY */
 
-#define BITM_SPI_CTL_FCCH                    (_ADI_MSK(0x00004000,uint32_t))  /* Flow Control Channel */
-#define ENUM_SPI_CTL_FLOW_RX                 (_ADI_MSK(0x00000000,uint32_t))  /* FCCH: Receive flow control */
-#define ENUM_SPI_CTL_FLOW_TX                 (_ADI_MSK(0x00004000,uint32_t))  /* FCCH: Transmit flow control */
+#define BITM_SPI_CTL_FCCH                    (_ADI_MSK(0x00004000,uint32_t))  /* Flow Control Channel Selection */
+#define ENUM_SPI_CTL_FLOW_RX                 (_ADI_MSK(0x00000000,uint32_t))  /* FCCH: Flow control on RX buffer */
+#define ENUM_SPI_CTL_FLOW_TX                 (_ADI_MSK(0x00004000,uint32_t))  /* FCCH: Flow control on TX buffer */
 
 #define BITM_SPI_CTL_FCEN                    (_ADI_MSK(0x00002000,uint32_t))  /* Flow Control Enable */
 #define ENUM_SPI_CTL_FLOW_DIS                (_ADI_MSK(0x00000000,uint32_t))  /* FCEN: Disable */
 #define ENUM_SPI_CTL_FLOW_EN                 (_ADI_MSK(0x00002000,uint32_t))  /* FCEN: Enable */
 
 #define BITM_SPI_CTL_LSBF                    (_ADI_MSK(0x00001000,uint32_t))  /* Least Significant Bit First */
-#define ENUM_SPI_CTL_MSB_FIRST               (_ADI_MSK(0x00000000,uint32_t))  /* LSBF: MSBF (big endian) */
-#define ENUM_SPI_CTL_LSB_FIRST               (_ADI_MSK(0x00001000,uint32_t))  /* LSBF: LSBF (little endian) */
+#define ENUM_SPI_CTL_MSB_FIRST               (_ADI_MSK(0x00000000,uint32_t))  /* LSBF: MSB sent/received first (big endian) */
+#define ENUM_SPI_CTL_LSB_FIRST               (_ADI_MSK(0x00001000,uint32_t))  /* LSBF: LSB sent/received first (little endian) */
 
 #define BITM_SPI_CTL_SIZE                    (_ADI_MSK(0x00000600,uint32_t))  /* Word Transfer Size */
 #define ENUM_SPI_CTL_SIZE08                  (_ADI_MSK(0x00000000,uint32_t))  /* SIZE: 8-bit word */
@@ -9380,21 +9224,21 @@
 #define ENUM_SPI_CTL_MISO_DIS                (_ADI_MSK(0x00000000,uint32_t))  /* EMISO: Disable */
 #define ENUM_SPI_CTL_MISO_EN                 (_ADI_MSK(0x00000100,uint32_t))  /* EMISO: Enable */
 
-#define BITM_SPI_CTL_SELST                   (_ADI_MSK(0x00000080,uint32_t))  /* Select State */
+#define BITM_SPI_CTL_SELST                   (_ADI_MSK(0x00000080,uint32_t))  /* Slave Select Polarity Between Transfers */
 #define ENUM_SPI_CTL_DEASSRT_SSEL            (_ADI_MSK(0x00000000,uint32_t))  /* SELST: De-assert slave select (high) */
 #define ENUM_SPI_CTL_ASSRT_SSEL              (_ADI_MSK(0x00000080,uint32_t))  /* SELST: Assert slave select (low) */
 
-#define BITM_SPI_CTL_ASSEL                   (_ADI_MSK(0x00000040,uint32_t))  /* Assert Slave Select */
+#define BITM_SPI_CTL_ASSEL                   (_ADI_MSK(0x00000040,uint32_t))  /* Slave Select Pin Control */
 #define ENUM_SPI_CTL_SW_SSEL                 (_ADI_MSK(0x00000000,uint32_t))  /* ASSEL: Software Slave Select Control */
 #define ENUM_SPI_CTL_HW_SSEL                 (_ADI_MSK(0x00000040,uint32_t))  /* ASSEL: Hardware Slave Select Control */
 
 #define BITM_SPI_CTL_CPOL                    (_ADI_MSK(0x00000020,uint32_t))  /* Clock Polarity */
-#define ENUM_SPI_CTL_SCKHI                   (_ADI_MSK(0x00000000,uint32_t))  /* CPOL: SCK active-high */
-#define ENUM_SPI_CTL_SCKLO                   (_ADI_MSK(0x00000020,uint32_t))  /* CPOL: SCK active-low */
+#define ENUM_SPI_CTL_SCKHI                   (_ADI_MSK(0x00000000,uint32_t))  /* CPOL: Active-high SPI CLK */
+#define ENUM_SPI_CTL_SCKLO                   (_ADI_MSK(0x00000020,uint32_t))  /* CPOL: Active-low SPI CLK */
 
 #define BITM_SPI_CTL_CPHA                    (_ADI_MSK(0x00000010,uint32_t))  /* Clock Phase */
-#define ENUM_SPI_CTL_SCKMID                  (_ADI_MSK(0x00000000,uint32_t))  /* CPHA: SCK toggles from middle */
-#define ENUM_SPI_CTL_SCKBEG                  (_ADI_MSK(0x00000010,uint32_t))  /* CPHA: SCK toggles from start */
+#define ENUM_SPI_CTL_SCKMID                  (_ADI_MSK(0x00000000,uint32_t))  /* CPHA: SPI CLK toggles from middle */
+#define ENUM_SPI_CTL_SCKBEG                  (_ADI_MSK(0x00000010,uint32_t))  /* CPHA: SPI CLK toggles from start */
 
 #define BITM_SPI_CTL_ODM                     (_ADI_MSK(0x00000008,uint32_t))  /* Open Drain Mode */
 #define ENUM_SPI_CTL_ODM_DIS                 (_ADI_MSK(0x00000000,uint32_t))  /* ODM: Disable */
@@ -9437,8 +9281,8 @@
 #define ENUM_SPI_RXCTL_RWM_75                (_ADI_MSK(0x00003000,uint32_t))  /* RRWM: 75% full RFIFO */
 
 #define BITM_SPI_RXCTL_RDO                   (_ADI_MSK(0x00000100,uint32_t))  /* Receive Data Overrun */
-#define ENUM_SPI_RXCTL_DISCARD               (_ADI_MSK(0x00000000,uint32_t))  /* RDO: Keep buffered data, discard incoming data */
-#define ENUM_SPI_RXCTL_OVERWRITE             (_ADI_MSK(0x00000100,uint32_t))  /* RDO: Overwrite buffered data with incoming data */
+#define ENUM_SPI_RXCTL_DISCARD               (_ADI_MSK(0x00000000,uint32_t))  /* RDO: KeDiscard incoming data if SPI_RFIFO is full */
+#define ENUM_SPI_RXCTL_OVERWRITE             (_ADI_MSK(0x00000100,uint32_t))  /* RDO: Overwrite old data if SPI_RFIFO is full */
 
 #define BITM_SPI_RXCTL_RDR                   (_ADI_MSK(0x00000070,uint32_t))  /* Receive Data Request */
 #define ENUM_SPI_RXCTL_RDR_DIS               (_ADI_MSK(0x00000000,uint32_t))  /* RDR: Disabled */
@@ -9485,8 +9329,8 @@
 #define ENUM_SPI_TXCTL_RWM_75                (_ADI_MSK(0x00003000,uint32_t))  /* TRWM: 75% empty TFIFO */
 
 #define BITM_SPI_TXCTL_TDU                   (_ADI_MSK(0x00000100,uint32_t))  /* Transmit Data Under-run */
-#define ENUM_SPI_TXCTL_LASTWD                (_ADI_MSK(0x00000000,uint32_t))  /* TDU: Last buffered word transmitted as data */
-#define ENUM_SPI_TXCTL_ZERO                  (_ADI_MSK(0x00000100,uint32_t))  /* TDU: Zero transmitted as data */
+#define ENUM_SPI_TXCTL_LASTWD                (_ADI_MSK(0x00000000,uint32_t))  /* TDU: Send last word when SPI_TFIFO is empty */
+#define ENUM_SPI_TXCTL_ZERO                  (_ADI_MSK(0x00000100,uint32_t))  /* TDU: Send zeros when SPI_TFIFO is empty */
 
 #define BITM_SPI_TXCTL_TDR                   (_ADI_MSK(0x00000070,uint32_t))  /* Transmit Data Request */
 #define ENUM_SPI_TXCTL_TDR_DIS               (_ADI_MSK(0x00000000,uint32_t))  /* TDR: Disabled */
@@ -9517,12 +9361,12 @@
 /* ------------------------------------------------------------------------------------------------------------------------
         SPI_DLY                              Pos/Masks                        Description
    ------------------------------------------------------------------------------------------------------------------------ */
-#define BITP_SPI_DLY_LAGX                     9                               /* Lag Extend SPI Clock */
-#define BITP_SPI_DLY_LEADX                    8                               /* Lead Extend SPI Clock */
-#define BITP_SPI_DLY_STOP                     0                               /* Stop Bits */
-#define BITM_SPI_DLY_LAGX                    (_ADI_MSK(0x00000200,uint32_t))  /* Lag Extend SPI Clock */
-#define BITM_SPI_DLY_LEADX                   (_ADI_MSK(0x00000100,uint32_t))  /* Lead Extend SPI Clock */
-#define BITM_SPI_DLY_STOP                    (_ADI_MSK(0x000000FF,uint32_t))  /* Stop Bits */
+#define BITP_SPI_DLY_LAGX                     9                               /* Extended SPI Clock Lag Control */
+#define BITP_SPI_DLY_LEADX                    8                               /* Extended SPI Clock Lead Control */
+#define BITP_SPI_DLY_STOP                     0                               /* Transfer delay time in multiples of SPI clock period */
+#define BITM_SPI_DLY_LAGX                    (_ADI_MSK(0x00000200,uint32_t))  /* Extended SPI Clock Lag Control */
+#define BITM_SPI_DLY_LEADX                   (_ADI_MSK(0x00000100,uint32_t))  /* Extended SPI Clock Lead Control */
+#define BITM_SPI_DLY_STOP                    (_ADI_MSK(0x000000FF,uint32_t))  /* Transfer delay time in multiples of SPI clock period */
 
 /* ------------------------------------------------------------------------------------------------------------------------
         SPI_SLVSEL                           Pos/Masks                        Description
@@ -9601,26 +9445,26 @@
 /* ------------------------------------------------------------------------------------------------------------------------
         SPI_RWC                              Pos/Masks                        Description
    ------------------------------------------------------------------------------------------------------------------------ */
-#define BITP_SPI_RWC_VALUE                    0                               /* Receive Word Count */
-#define BITM_SPI_RWC_VALUE                   (_ADI_MSK(0x0000FFFF,uint32_t))  /* Receive Word Count */
+#define BITP_SPI_RWC_VALUE                    0                               /* Received Word Count */
+#define BITM_SPI_RWC_VALUE                   (_ADI_MSK(0x0000FFFF,uint32_t))  /* Received Word Count */
 
 /* ------------------------------------------------------------------------------------------------------------------------
         SPI_RWCR                             Pos/Masks                        Description
    ------------------------------------------------------------------------------------------------------------------------ */
-#define BITP_SPI_RWCR_VALUE                   0                               /* Receive Word Count Reload */
-#define BITM_SPI_RWCR_VALUE                  (_ADI_MSK(0x0000FFFF,uint32_t))  /* Receive Word Count Reload */
+#define BITP_SPI_RWCR_VALUE                   0                               /* Received Word Count Reload */
+#define BITM_SPI_RWCR_VALUE                  (_ADI_MSK(0x0000FFFF,uint32_t))  /* Received Word Count Reload */
 
 /* ------------------------------------------------------------------------------------------------------------------------
         SPI_TWC                              Pos/Masks                        Description
    ------------------------------------------------------------------------------------------------------------------------ */
-#define BITP_SPI_TWC_VALUE                    0                               /* Transmit Word Count */
-#define BITM_SPI_TWC_VALUE                   (_ADI_MSK(0x0000FFFF,uint32_t))  /* Transmit Word Count */
+#define BITP_SPI_TWC_VALUE                    0                               /* Transmitted Word Count */
+#define BITM_SPI_TWC_VALUE                   (_ADI_MSK(0x0000FFFF,uint32_t))  /* Transmitted Word Count */
 
 /* ------------------------------------------------------------------------------------------------------------------------
         SPI_TWCR                             Pos/Masks                        Description
    ------------------------------------------------------------------------------------------------------------------------ */
-#define BITP_SPI_TWCR_VALUE                   0                               /* Transmit Word Count Reload */
-#define BITM_SPI_TWCR_VALUE                  (_ADI_MSK(0x0000FFFF,uint32_t))  /* Transmit Word Count Reload */
+#define BITP_SPI_TWCR_VALUE                   0                               /* Transmitted Word Count Reload */
+#define BITM_SPI_TWCR_VALUE                  (_ADI_MSK(0x0000FFFF,uint32_t))  /* Transmitted Word Count Reload */
 
 /* ------------------------------------------------------------------------------------------------------------------------
         SPI_IMSK                             Pos/Masks                        Description
@@ -9733,54 +9577,54 @@
 /* ------------------------------------------------------------------------------------------------------------------------
         SPI_STAT                             Pos/Masks                        Description
    ------------------------------------------------------------------------------------------------------------------------ */
-#define BITP_SPI_STAT_TFF                    23                               /* Tx FIFO Full */
-#define BITP_SPI_STAT_RFE                    22                               /* Rx FIFO Empty */
-#define BITP_SPI_STAT_FCS                    20                               /* Flow Control Stall */
-#define BITP_SPI_STAT_TFS                    16                               /* Tx FIFO Status */
-#define BITP_SPI_STAT_RFS                    12                               /* Rx FIFO Status */
-#define BITP_SPI_STAT_TF                     11                               /* Transmit Finish */
-#define BITP_SPI_STAT_RF                     10                               /* Receive Finish */
+#define BITP_SPI_STAT_TFF                    23                               /* SPI_TFIFO Full */
+#define BITP_SPI_STAT_RFE                    22                               /* SPI_RFIFO Empty */
+#define BITP_SPI_STAT_FCS                    20                               /* Flow Control Stall Indication */
+#define BITP_SPI_STAT_TFS                    16                               /* SPI_TFIFO Status */
+#define BITP_SPI_STAT_RFS                    12                               /* SPI_RFIFO Status */
+#define BITP_SPI_STAT_TF                     11                               /* Transmit Finish Indication */
+#define BITP_SPI_STAT_RF                     10                               /* Receive Finish Indication */
 #define BITP_SPI_STAT_TS                      9                               /* Transmit Start */
 #define BITP_SPI_STAT_RS                      8                               /* Receive Start */
-#define BITP_SPI_STAT_MF                      7                               /* Mode Fault */
-#define BITP_SPI_STAT_TC                      6                               /* Transmit Collision */
-#define BITP_SPI_STAT_TUR                     5                               /* Transmit Underrun */
-#define BITP_SPI_STAT_ROR                     4                               /* Receive Overrun */
-#define BITP_SPI_STAT_TUWM                    2                               /* Transmit Urgent Watermark */
-#define BITP_SPI_STAT_RUWM                    1                               /* Receive Urgent Watermark */
+#define BITP_SPI_STAT_MF                      7                               /* Mode Fault Indication */
+#define BITP_SPI_STAT_TC                      6                               /* Transmit Collision Indication */
+#define BITP_SPI_STAT_TUR                     5                               /* Transmit Underrun Indication */
+#define BITP_SPI_STAT_ROR                     4                               /* Receive Overrun Indication */
+#define BITP_SPI_STAT_TUWM                    2                               /* Transmit Urgent Watermark Breached */
+#define BITP_SPI_STAT_RUWM                    1                               /* Receive Urgent Watermark Breached */
 #define BITP_SPI_STAT_SPIF                    0                               /* SPI Finished */
 
-#define BITM_SPI_STAT_TFF                    (_ADI_MSK(0x00800000,uint32_t))  /* Tx FIFO Full */
+#define BITM_SPI_STAT_TFF                    (_ADI_MSK(0x00800000,uint32_t))  /* SPI_TFIFO Full */
 #define ENUM_SPI_STAT_TFIFO_NF               (_ADI_MSK(0x00000000,uint32_t))  /* TFF: Not full Tx FIFO */
 #define ENUM_SPI_STAT_TFIFO_F                (_ADI_MSK(0x00800000,uint32_t))  /* TFF: Full Tx FIFO */
 
-#define BITM_SPI_STAT_RFE                    (_ADI_MSK(0x00400000,uint32_t))  /* Rx FIFO Empty */
+#define BITM_SPI_STAT_RFE                    (_ADI_MSK(0x00400000,uint32_t))  /* SPI_RFIFO Empty */
 #define ENUM_SPI_STAT_RFIFO_E                (_ADI_MSK(0x00000000,uint32_t))  /* RFE: Empty Rx FIFO */
 #define ENUM_SPI_STAT_RFIFO_NE               (_ADI_MSK(0x00400000,uint32_t))  /* RFE: Not empty Rx FIFO */
 
-#define BITM_SPI_STAT_FCS                    (_ADI_MSK(0x00100000,uint32_t))  /* Flow Control Stall */
+#define BITM_SPI_STAT_FCS                    (_ADI_MSK(0x00100000,uint32_t))  /* Flow Control Stall Indication */
 #define ENUM_SPI_STAT_STALL                  (_ADI_MSK(0x00000000,uint32_t))  /* FCS: Stall (RDY pin asserted) */
 #define ENUM_SPI_STAT_NOSTALL                (_ADI_MSK(0x00100000,uint32_t))  /* FCS: No stall (RDY pin de-asserted) */
 
-#define BITM_SPI_STAT_TFS                    (_ADI_MSK(0x00070000,uint32_t))  /* Tx FIFO Status */
+#define BITM_SPI_STAT_TFS                    (_ADI_MSK(0x00070000,uint32_t))  /* SPI_TFIFO Status */
 #define ENUM_SPI_STAT_TFIFO_FULL             (_ADI_MSK(0x00000000,uint32_t))  /* TFS: Full TFIFO */
 #define ENUM_SPI_STAT_TFIFO_25               (_ADI_MSK(0x00010000,uint32_t))  /* TFS: 25% empty TFIFO */
 #define ENUM_SPI_STAT_TFIFO_50               (_ADI_MSK(0x00020000,uint32_t))  /* TFS: 50% empty TFIFO */
 #define ENUM_SPI_STAT_TFIFO_75               (_ADI_MSK(0x00030000,uint32_t))  /* TFS: 75% empty TFIFO */
 #define ENUM_SPI_STAT_TFIFO_EMPTY            (_ADI_MSK(0x00040000,uint32_t))  /* TFS: Empty TFIFO */
 
-#define BITM_SPI_STAT_RFS                    (_ADI_MSK(0x00007000,uint32_t))  /* Rx FIFO Status */
+#define BITM_SPI_STAT_RFS                    (_ADI_MSK(0x00007000,uint32_t))  /* SPI_RFIFO Status */
 #define ENUM_SPI_STAT_RFIFO_EMPTY            (_ADI_MSK(0x00000000,uint32_t))  /* RFS: Empty RFIFO */
 #define ENUM_SPI_STAT_RFIFO_25               (_ADI_MSK(0x00001000,uint32_t))  /* RFS: 25% full RFIFO */
 #define ENUM_SPI_STAT_RFIFO_50               (_ADI_MSK(0x00002000,uint32_t))  /* RFS: 50% full RFIFO */
 #define ENUM_SPI_STAT_RFIFO_75               (_ADI_MSK(0x00003000,uint32_t))  /* RFS: 75% full RFIFO */
 #define ENUM_SPI_STAT_RFIFO_FULL             (_ADI_MSK(0x00004000,uint32_t))  /* RFS: Full RFIFO */
 
-#define BITM_SPI_STAT_TF                     (_ADI_MSK(0x00000800,uint32_t))  /* Transmit Finish */
+#define BITM_SPI_STAT_TF                     (_ADI_MSK(0x00000800,uint32_t))  /* Transmit Finish Indication */
 #define ENUM_SPI_STAT_TF_LO                  (_ADI_MSK(0x00000000,uint32_t))  /* TF: No status */
 #define ENUM_SPI_STAT_TF_HI                  (_ADI_MSK(0x00000800,uint32_t))  /* TF: Transmit finish detected */
 
-#define BITM_SPI_STAT_RF                     (_ADI_MSK(0x00000400,uint32_t))  /* Receive Finish */
+#define BITM_SPI_STAT_RF                     (_ADI_MSK(0x00000400,uint32_t))  /* Receive Finish Indication */
 #define ENUM_SPI_STAT_RF_LO                  (_ADI_MSK(0x00000000,uint32_t))  /* RF: No status */
 #define ENUM_SPI_STAT_RF_HI                  (_ADI_MSK(0x00000400,uint32_t))  /* RF: Receive finish detected */
 
@@ -9792,29 +9636,29 @@
 #define ENUM_SPI_STAT_RS_LO                  (_ADI_MSK(0x00000000,uint32_t))  /* RS: No status */
 #define ENUM_SPI_STAT_RS_HI                  (_ADI_MSK(0x00000100,uint32_t))  /* RS: Receive start detected */
 
-#define BITM_SPI_STAT_MF                     (_ADI_MSK(0x00000080,uint32_t))  /* Mode Fault */
+#define BITM_SPI_STAT_MF                     (_ADI_MSK(0x00000080,uint32_t))  /* Mode Fault Indication */
 #define ENUM_SPI_STAT_MF_LO                  (_ADI_MSK(0x00000000,uint32_t))  /* MF: No status */
 #define ENUM_SPI_STAT_MF_HI                  (_ADI_MSK(0x00000080,uint32_t))  /* MF: Mode fault occurred */
 
-#define BITM_SPI_STAT_TC                     (_ADI_MSK(0x00000040,uint32_t))  /* Transmit Collision */
+#define BITM_SPI_STAT_TC                     (_ADI_MSK(0x00000040,uint32_t))  /* Transmit Collision Indication */
 #define ENUM_SPI_STAT_TC_LO                  (_ADI_MSK(0x00000000,uint32_t))  /* TC: No status */
 #define ENUM_SPI_STAT_TC_HI                  (_ADI_MSK(0x00000040,uint32_t))  /* TC: Transmit collision occurred */
 
-#define BITM_SPI_STAT_TUR                    (_ADI_MSK(0x00000020,uint32_t))  /* Transmit Underrun */
+#define BITM_SPI_STAT_TUR                    (_ADI_MSK(0x00000020,uint32_t))  /* Transmit Underrun Indication */
 #define ENUM_SPI_STAT_TUR_LO                 (_ADI_MSK(0x00000000,uint32_t))  /* TUR: No status */
-#define ENUM_SPI_STAT_TUR_HI                 (_ADI_MSK(0x00000020,uint32_t))  /* TUR: Transmit under-run occurred */
+#define ENUM_SPI_STAT_TUR_HI                 (_ADI_MSK(0x00000020,uint32_t))  /* TUR: Transmit underrun occurred */
 
-#define BITM_SPI_STAT_ROR                    (_ADI_MSK(0x00000010,uint32_t))  /* Receive Overrun */
+#define BITM_SPI_STAT_ROR                    (_ADI_MSK(0x00000010,uint32_t))  /* Receive Overrun Indication */
 #define ENUM_SPI_STAT_ROR_LO                 (_ADI_MSK(0x00000000,uint32_t))  /* ROR: No status */
 #define ENUM_SPI_STAT_ROR_HI                 (_ADI_MSK(0x00000010,uint32_t))  /* ROR: Receive overrun occurred */
 
-#define BITM_SPI_STAT_TUWM                   (_ADI_MSK(0x00000004,uint32_t))  /* Transmit Urgent Watermark */
-#define ENUM_SPI_STAT_TUWM_LO                (_ADI_MSK(0x00000000,uint32_t))  /* TUWM: Regular Tx watermark reached */
-#define ENUM_SPI_STAT_TUWM_HI                (_ADI_MSK(0x00000004,uint32_t))  /* TUWM: Urgent Tx watermark reached */
+#define BITM_SPI_STAT_TUWM                   (_ADI_MSK(0x00000004,uint32_t))  /* Transmit Urgent Watermark Breached */
+#define ENUM_SPI_STAT_TUWM_LO                (_ADI_MSK(0x00000000,uint32_t))  /* TUWM: TX Regular Watermark reached */
+#define ENUM_SPI_STAT_TUWM_HI                (_ADI_MSK(0x00000004,uint32_t))  /* TUWM: TX Urgent Watermark breached */
 
-#define BITM_SPI_STAT_RUWM                   (_ADI_MSK(0x00000002,uint32_t))  /* Receive Urgent Watermark */
-#define ENUM_SPI_STAT_RUWM_LO                (_ADI_MSK(0x00000000,uint32_t))  /* RUWM: Regular Rx watermark reached */
-#define ENUM_SPI_STAT_RUWM_HI                (_ADI_MSK(0x00000002,uint32_t))  /* RUWM: Urgent Rx watermark reached */
+#define BITM_SPI_STAT_RUWM                   (_ADI_MSK(0x00000002,uint32_t))  /* Receive Urgent Watermark Breached */
+#define ENUM_SPI_STAT_RUWM_LO                (_ADI_MSK(0x00000000,uint32_t))  /* RUWM: RX Regular Watermark reached */
+#define ENUM_SPI_STAT_RUWM_HI                (_ADI_MSK(0x00000002,uint32_t))  /* RUWM: RX Urgent Watermark breached */
 
 #define BITM_SPI_STAT_SPIF                   (_ADI_MSK(0x00000001,uint32_t))  /* SPI Finished */
 #define ENUM_SPI_STAT_SPIF_LO                (_ADI_MSK(0x00000000,uint32_t))  /* SPIF: No status */
@@ -11523,7 +11367,6 @@
 #define ENUM_DDR_CFG_SDRSIZE512              (_ADI_MSK(0x00000300,uint32_t))  /* SDRSIZE: 512M Bit SDRAM */
 #define ENUM_DDR_CFG_SDRSIZE1G               (_ADI_MSK(0x00000400,uint32_t))  /* SDRSIZE: 1G Bit SDRAM */
 #define ENUM_DDR_CFG_SDRSIZE2G               (_ADI_MSK(0x00000500,uint32_t))  /* SDRSIZE: 2G Bit SDRAM */
-#define ENUM_DDR_CFG_SDRSIZE4G               (_ADI_MSK(0x00000600,uint32_t))  /* SDRSIZE: 4G Bit SDRAM (DDR2 only) */
 
 #define BITM_DDR_CFG_SDRWID                  (_ADI_MSK(0x000000F0,uint32_t))  /* SDRAM Width */
 #define ENUM_DDR_CFG_SDRWID16                (_ADI_MSK(0x00000020,uint32_t))  /* SDRWID: 16-Bit Wide SDRAM */
@@ -11711,7 +11554,7 @@
 #define BITM_DDR_PADCTL_DQODS                (_ADI_MSK(0x00000003,uint32_t))  /* DQ Output Drive Strength */
 
 /* ==================================================
-        System Connection Block Registers
+        System Cross Bar Registers
    ================================================== */
 
 /* =========================
@@ -13277,13 +13120,11 @@
         CGU_CLKOUTSEL                        Pos/Masks                        Description
    ------------------------------------------------------------------------------------------------------------------------ */
 #define BITP_CGU_CLKOUTSEL_LOCK              31                               /* Lock */
-#define BITP_CGU_CLKOUTSEL_USBCLKSEL         16                               /* USBCLK Select */
 #define BITP_CGU_CLKOUTSEL_CLKOUTSEL          0                               /* CLKOUT Select */
 
 #define BITM_CGU_CLKOUTSEL_LOCK              (_ADI_MSK(0x80000000,uint32_t))  /* Lock */
 #define ENUM_CGU_CLKOUTSEL_UNLOCK            (_ADI_MSK(0x00000000,uint32_t))  /* LOCK: Unlock */
 #define ENUM_CGU_CLKOUTSEL_LOCK              (_ADI_MSK(0x80000000,uint32_t))  /* LOCK: Lock */
-#define BITM_CGU_CLKOUTSEL_USBCLKSEL         (_ADI_MSK(0x003F0000,uint32_t))  /* USBCLK Select */
 
 #define BITM_CGU_CLKOUTSEL_CLKOUTSEL         (_ADI_MSK(0x0000000F,uint32_t))  /* CLKOUT Select */
 #define ENUM_CGU_CLKOUTSEL_CLKIN             (_ADI_MSK(0x00000000,uint32_t))  /* CLKOUTSEL: CLKIN */
@@ -13293,9 +13134,7 @@
 #define ENUM_CGU_CLKOUTSEL_SCLK0             (_ADI_MSK(0x00000003,uint32_t))  /* CLKOUTSEL: SCLK0 */
 #define ENUM_CGU_CLKOUTSEL_SCLK1             (_ADI_MSK(0x00000004,uint32_t))  /* CLKOUTSEL: SCLK1 */
 #define ENUM_CGU_CLKOUTSEL_DCLKDIV2          (_ADI_MSK(0x00000005,uint32_t))  /* CLKOUTSEL: DCLK/2 */
-#define ENUM_CGU_CLKOUTSEL_USBPLL            (_ADI_MSK(0x00000006,uint32_t))  /* CLKOUTSEL: USB PLL */
 #define ENUM_CGU_CLKOUTSEL_OUTCLK            (_ADI_MSK(0x00000007,uint32_t))  /* CLKOUTSEL: OUTCLK */
-#define ENUM_CGU_CLKOUTSEL_USBCLKIN          (_ADI_MSK(0x00000008,uint32_t))  /* CLKOUTSEL: USB CLKIN */
 
 /* ==================================================
         Dynamic Power Management Registers
@@ -13568,338 +13407,347 @@
 #define BITM_EFS_PGM_TIMING_PGMWAIT          (_ADI_MSK(0x00000FFF,uint32_t))  /* Program Bit Wait */
 
 /* ==================================================
-        Universal Serial Bus Multipoint High-speed Dual Role Controller Registers
+        Universal Serial Bus Controller Registers
    ================================================== */
 
 /* =========================
         USB0
    ========================= */
-#define REG_USB0_FADDR                  0xFFCC1000         /* USB0 Device Address in Peripheral Mode */
-#define REG_USB0_POWER                  0xFFCC1001         /* USB0 Power and Device Control */
-#define REG_USB0_INTRTX                 0xFFCC1002         /* USB0 Transmit Interrupt */
-#define REG_USB0_INTRRX                 0xFFCC1004         /* USB0 Receive Interrupts */
-#define REG_USB0_INTRTXE                0xFFCC1006         /* USB0 Transmit Interrupt Enable */
-#define REG_USB0_INTRRXE                0xFFCC1008         /* USB0 Receive Interrupt Enable */
-#define REG_USB0_IRQ                    0xFFCC100A         /* USB0 USB Interrupts */
-#define REG_USB0_IEN                    0xFFCC100B         /* USB0 USB Interrupt Enable */
-#define REG_USB0_FRAME                  0xFFCC100C         /* USB0 Frame Number */
-#define REG_USB0_INDEX                  0xFFCC100E         /* USB0 Index */
-#define REG_USB0_TESTMODE               0xFFCC100F         /* USB0 Testmodes */
-#define REG_USB0_EPI_TXMAXP0            0xFFCC1010         /* USB0 Transmit Maximum Packet Length */
-#define REG_USB0_EPI_TXCSR0_P           0xFFCC1012         /* USB0 Transmit Configuration and Status */
-#define REG_USB0_EPI_TXCSR0_H           0xFFCC1012         /* USB0 Transmit Configuration and Status */
-#define REG_USB0_EP0I_CSR0_P            0xFFCC1012         /* USB0 Config and Status EP0 */
-#define REG_USB0_EP0I_CSR0_H            0xFFCC1012         /* USB0 Config and Status EP0 */
-#define REG_USB0_EPI_RXMAXP0            0xFFCC1014         /* USB0 Receive Maximum Packet Length */
-#define REG_USB0_EPI_RXCSR0_H           0xFFCC1016         /* USB0 Receive Configuration and Status Register */
-#define REG_USB0_EPI_RXCSR0_P           0xFFCC1016         /* USB0 Receive Configuration and Status Register */
-#define REG_USB0_EP0I_CNT0              0xFFCC1018         /* USB0 Number of Received Bytes for Endpoint 0 */
-#define REG_USB0_EPI_RXCNT0             0xFFCC1018         /* USB0 Number of Byte Received */
-#define REG_USB0_EPI_TXTYPE0            0xFFCC101A         /* USB0 Transmit Type */
-#define REG_USB0_EP0I_TYPE0             0xFFCC101A         /* USB0 Speed for Endpoint 0 */
-#define REG_USB0_EPI_TXINTERVAL0        0xFFCC101B         /* USB0 Transmit Polling Interval */
-#define REG_USB0_EP0I_NAKLIMIT0         0xFFCC101B         /* USB0 NAK Response Timeout for Endpoint 0 */
-#define REG_USB0_EPI_RXTYPE0            0xFFCC101C         /* USB0 Receive Type */
-#define REG_USB0_EPI_RXINTERVAL0        0xFFCC101D         /* USB0 Receive Polling Interval */
-#define REG_USB0_EP0I_CFGDATA0          0xFFCC101F         /* USB0 Configuration Information */
-#define REG_USB0_FIFOB0                 0xFFCC1020         /* USB0 FIFO Data */
-#define REG_USB0_FIFOB1                 0xFFCC1024         /* USB0 FIFO Data */
-#define REG_USB0_FIFOB2                 0xFFCC1028         /* USB0 FIFO Data */
-#define REG_USB0_FIFOB3                 0xFFCC102C         /* USB0 FIFO Data */
-#define REG_USB0_FIFOB4                 0xFFCC1030         /* USB0 FIFO Data */
-#define REG_USB0_FIFOB5                 0xFFCC1034         /* USB0 FIFO Data */
-#define REG_USB0_FIFOB6                 0xFFCC1038         /* USB0 FIFO Data */
-#define REG_USB0_FIFOB7                 0xFFCC103C         /* USB0 FIFO Data */
-#define REG_USB0_FIFOB8                 0xFFCC1040         /* USB0 FIFO Data */
-#define REG_USB0_FIFOB9                 0xFFCC1044         /* USB0 FIFO Data */
-#define REG_USB0_FIFOB10                0xFFCC1048         /* USB0 FIFO Data */
-#define REG_USB0_FIFOB11                0xFFCC104C         /* USB0 FIFO Data */
-#define REG_USB0_FIFOH0                 0xFFCC1020         /* USB0 FIFO Data */
-#define REG_USB0_FIFOH1                 0xFFCC1024         /* USB0 FIFO Data */
-#define REG_USB0_FIFOH2                 0xFFCC1028         /* USB0 FIFO Data */
-#define REG_USB0_FIFOH3                 0xFFCC102C         /* USB0 FIFO Data */
-#define REG_USB0_FIFOH4                 0xFFCC1030         /* USB0 FIFO Data */
-#define REG_USB0_FIFOH5                 0xFFCC1034         /* USB0 FIFO Data */
-#define REG_USB0_FIFOH6                 0xFFCC1038         /* USB0 FIFO Data */
-#define REG_USB0_FIFOH7                 0xFFCC103C         /* USB0 FIFO Data */
-#define REG_USB0_FIFOH8                 0xFFCC1040         /* USB0 FIFO Data */
-#define REG_USB0_FIFOH9                 0xFFCC1044         /* USB0 FIFO Data */
-#define REG_USB0_FIFOH10                0xFFCC1048         /* USB0 FIFO Data */
-#define REG_USB0_FIFOH11                0xFFCC104C         /* USB0 FIFO Data */
-#define REG_USB0_FIFO0                  0xFFCC1020         /* USB0 FIFO Data */
-#define REG_USB0_FIFO1                  0xFFCC1024         /* USB0 FIFO Data */
-#define REG_USB0_FIFO2                  0xFFCC1028         /* USB0 FIFO Data */
-#define REG_USB0_FIFO3                  0xFFCC102C         /* USB0 FIFO Data */
-#define REG_USB0_FIFO4                  0xFFCC1030         /* USB0 FIFO Data */
-#define REG_USB0_FIFO5                  0xFFCC1034         /* USB0 FIFO Data */
-#define REG_USB0_FIFO6                  0xFFCC1038         /* USB0 FIFO Data */
-#define REG_USB0_FIFO7                  0xFFCC103C         /* USB0 FIFO Data */
-#define REG_USB0_FIFO8                  0xFFCC1040         /* USB0 FIFO Data */
-#define REG_USB0_FIFO9                  0xFFCC1044         /* USB0 FIFO Data */
-#define REG_USB0_FIFO10                 0xFFCC1048         /* USB0 FIFO Data */
-#define REG_USB0_FIFO11                 0xFFCC104C         /* USB0 FIFO Data */
-#define REG_USB0_DEV_CTL                0xFFCC1060         /* USB0 Device Control */
-#define REG_USB0_TXFIFOSZ               0xFFCC1062         /* USB0 Transmit FIFO Size */
-#define REG_USB0_RXFIFOSZ               0xFFCC1063         /* USB0 Receive FIFO Size */
-#define REG_USB0_TXFIFOADDR             0xFFCC1064         /* USB0 Transmit FIFO Address */
-#define REG_USB0_RXFIFOADDR             0xFFCC1066         /* USB0 Receive FIFO Address */
-#define REG_USB0_VENDSTAT               0xFFCC1068         /* USB0 Vendor Status */
-#define REG_USB0_HWVERS                 0xFFCC106C         /* USB0 Hardware Version */
-#define REG_USB0_EPINFO                 0xFFCC1078         /* USB0 Endpoint Info */
-#define REG_USB0_RAMINFO                0xFFCC1079         /* USB0 Ram Information */
-#define REG_USB0_LINKINFO               0xFFCC107A         /* USB0 Programmable Delay Values */
-#define REG_USB0_VPLEN                  0xFFCC107B         /* USB0 VBus Pulse Duration */
-#define REG_USB0_HS_EOF1                0xFFCC107C         /* USB0 High Speed End of Frame Remaining */
-#define REG_USB0_FS_EOF1                0xFFCC107D         /* USB0 Full Speed End of Frame Remaining */
-#define REG_USB0_LS_EOF1                0xFFCC107E         /* USB0 Low Speed End of Frame Remaining */
-#define REG_USB0_SOFT_RST               0xFFCC107F         /* USB0 Software Reset */
-#define REG_USB0_TXFUNCADDR0            0xFFCC1080         /* USB0 Transmit Function Address */
-#define REG_USB0_TXFUNCADDR1            0xFFCC1088         /* USB0 Transmit Function Address */
-#define REG_USB0_TXFUNCADDR2            0xFFCC1090         /* USB0 Transmit Function Address */
-#define REG_USB0_TXFUNCADDR3            0xFFCC1098         /* USB0 Transmit Function Address */
-#define REG_USB0_TXFUNCADDR4            0xFFCC10A0         /* USB0 Transmit Function Address */
-#define REG_USB0_TXFUNCADDR5            0xFFCC10A8         /* USB0 Transmit Function Address */
-#define REG_USB0_TXFUNCADDR6            0xFFCC10B0         /* USB0 Transmit Function Address */
-#define REG_USB0_TXFUNCADDR7            0xFFCC10B8         /* USB0 Transmit Function Address */
-#define REG_USB0_TXFUNCADDR8            0xFFCC10C0         /* USB0 Transmit Function Address */
-#define REG_USB0_TXFUNCADDR9            0xFFCC10C8         /* USB0 Transmit Function Address */
-#define REG_USB0_TXFUNCADDR10           0xFFCC10D0         /* USB0 Transmit Function Address */
-#define REG_USB0_TXFUNCADDR11           0xFFCC10D8         /* USB0 Transmit Function Address */
-#define REG_USB0_TXHUBADDR0             0xFFCC1082         /* USB0 Transmit Hub Address */
-#define REG_USB0_TXHUBADDR1             0xFFCC108A         /* USB0 Transmit Hub Address */
-#define REG_USB0_TXHUBADDR2             0xFFCC1092         /* USB0 Transmit Hub Address */
-#define REG_USB0_TXHUBADDR3             0xFFCC109A         /* USB0 Transmit Hub Address */
-#define REG_USB0_TXHUBADDR4             0xFFCC10A2         /* USB0 Transmit Hub Address */
-#define REG_USB0_TXHUBADDR5             0xFFCC10AA         /* USB0 Transmit Hub Address */
-#define REG_USB0_TXHUBADDR6             0xFFCC10B2         /* USB0 Transmit Hub Address */
-#define REG_USB0_TXHUBADDR7             0xFFCC10BA         /* USB0 Transmit Hub Address */
-#define REG_USB0_TXHUBADDR8             0xFFCC10C2         /* USB0 Transmit Hub Address */
-#define REG_USB0_TXHUBADDR9             0xFFCC10CA         /* USB0 Transmit Hub Address */
-#define REG_USB0_TXHUBADDR10            0xFFCC10D2         /* USB0 Transmit Hub Address */
-#define REG_USB0_TXHUBADDR11            0xFFCC10DA         /* USB0 Transmit Hub Address */
-#define REG_USB0_TXHUBPORT0             0xFFCC1083         /* USB0 Transmit Hub Port */
-#define REG_USB0_TXHUBPORT1             0xFFCC108B         /* USB0 Transmit Hub Port */
-#define REG_USB0_TXHUBPORT2             0xFFCC1093         /* USB0 Transmit Hub Port */
-#define REG_USB0_TXHUBPORT3             0xFFCC109B         /* USB0 Transmit Hub Port */
-#define REG_USB0_TXHUBPORT4             0xFFCC10A3         /* USB0 Transmit Hub Port */
-#define REG_USB0_TXHUBPORT5             0xFFCC10AB         /* USB0 Transmit Hub Port */
-#define REG_USB0_TXHUBPORT6             0xFFCC10B3         /* USB0 Transmit Hub Port */
-#define REG_USB0_TXHUBPORT7             0xFFCC10BB         /* USB0 Transmit Hub Port */
-#define REG_USB0_TXHUBPORT8             0xFFCC10C3         /* USB0 Transmit Hub Port */
-#define REG_USB0_TXHUBPORT9             0xFFCC10CB         /* USB0 Transmit Hub Port */
-#define REG_USB0_TXHUBPORT10            0xFFCC10D3         /* USB0 Transmit Hub Port */
-#define REG_USB0_TXHUBPORT11            0xFFCC10DB         /* USB0 Transmit Hub Port */
-#define REG_USB0_RXFUNCADDR0            0xFFCC1084         /* USB0 Receive Function Address */
-#define REG_USB0_RXFUNCADDR1            0xFFCC108C         /* USB0 Receive Function Address */
-#define REG_USB0_RXFUNCADDR2            0xFFCC1094         /* USB0 Receive Function Address */
-#define REG_USB0_RXFUNCADDR3            0xFFCC109C         /* USB0 Receive Function Address */
-#define REG_USB0_RXFUNCADDR4            0xFFCC10A4         /* USB0 Receive Function Address */
-#define REG_USB0_RXFUNCADDR5            0xFFCC10AC         /* USB0 Receive Function Address */
-#define REG_USB0_RXFUNCADDR6            0xFFCC10B4         /* USB0 Receive Function Address */
-#define REG_USB0_RXFUNCADDR7            0xFFCC10BC         /* USB0 Receive Function Address */
-#define REG_USB0_RXFUNCADDR8            0xFFCC10C4         /* USB0 Receive Function Address */
-#define REG_USB0_RXFUNCADDR9            0xFFCC10CC         /* USB0 Receive Function Address */
-#define REG_USB0_RXFUNCADDR10           0xFFCC10D4         /* USB0 Receive Function Address */
-#define REG_USB0_RXFUNCADDR11           0xFFCC10DC         /* USB0 Receive Function Address */
-#define REG_USB0_RXHUBADDR0             0xFFCC1086         /* USB0 Receive Hub Address */
-#define REG_USB0_RXHUBADDR1             0xFFCC108E         /* USB0 Receive Hub Address */
-#define REG_USB0_RXHUBADDR2             0xFFCC1096         /* USB0 Receive Hub Address */
-#define REG_USB0_RXHUBADDR3             0xFFCC109E         /* USB0 Receive Hub Address */
-#define REG_USB0_RXHUBADDR4             0xFFCC10A6         /* USB0 Receive Hub Address */
-#define REG_USB0_RXHUBADDR5             0xFFCC10AE         /* USB0 Receive Hub Address */
-#define REG_USB0_RXHUBADDR6             0xFFCC10B6         /* USB0 Receive Hub Address */
-#define REG_USB0_RXHUBADDR7             0xFFCC10BE         /* USB0 Receive Hub Address */
-#define REG_USB0_RXHUBADDR8             0xFFCC10C6         /* USB0 Receive Hub Address */
-#define REG_USB0_RXHUBADDR9             0xFFCC10CE         /* USB0 Receive Hub Address */
-#define REG_USB0_RXHUBADDR10            0xFFCC10D6         /* USB0 Receive Hub Address */
-#define REG_USB0_RXHUBADDR11            0xFFCC10DE         /* USB0 Receive Hub Address */
-#define REG_USB0_RXHUBPORT0             0xFFCC1087         /* USB0 Receive Hub Port */
-#define REG_USB0_RXHUBPORT1             0xFFCC108F         /* USB0 Receive Hub Port */
-#define REG_USB0_RXHUBPORT2             0xFFCC1097         /* USB0 Receive Hub Port */
-#define REG_USB0_RXHUBPORT3             0xFFCC109F         /* USB0 Receive Hub Port */
-#define REG_USB0_RXHUBPORT4             0xFFCC10A7         /* USB0 Receive Hub Port */
-#define REG_USB0_RXHUBPORT5             0xFFCC10AF         /* USB0 Receive Hub Port */
-#define REG_USB0_RXHUBPORT6             0xFFCC10B7         /* USB0 Receive Hub Port */
-#define REG_USB0_RXHUBPORT7             0xFFCC10BF         /* USB0 Receive Hub Port */
-#define REG_USB0_RXHUBPORT8             0xFFCC10C7         /* USB0 Receive Hub Port */
-#define REG_USB0_RXHUBPORT9             0xFFCC10CF         /* USB0 Receive Hub Port */
-#define REG_USB0_RXHUBPORT10            0xFFCC10D7         /* USB0 Receive Hub Port */
-#define REG_USB0_RXHUBPORT11            0xFFCC10DF         /* USB0 Receive Hub Port */
-#define REG_USB0_EP0_CSR0_H             0xFFCC1102         /* USB0 Config and Status EP0 */
-#define REG_USB0_EP0_CSR0_P             0xFFCC1102         /* USB0 Config and Status EP0 */
-#define REG_USB0_EP0_CNT0               0xFFCC1108         /* USB0 Number of Received Bytes for Endpoint 0 */
-#define REG_USB0_EP0_TYPE0              0xFFCC110A         /* USB0 Speed for Endpoint 0 */
-#define REG_USB0_EP0_NAKLIMIT0          0xFFCC110B         /* USB0 NAK Response Timeout for Endpoint 0 */
-#define REG_USB0_EP0_CFGDATA0           0xFFCC110F         /* USB0 Configuration Information */
-#define REG_USB0_EP_TXMAXP0             0xFFCC1110         /* USB0 Transmit Maximum Packet Length */
-#define REG_USB0_EP_TXMAXP1             0xFFCC1120         /* USB0 Transmit Maximum Packet Length */
-#define REG_USB0_EP_TXMAXP2             0xFFCC1130         /* USB0 Transmit Maximum Packet Length */
-#define REG_USB0_EP_TXMAXP3             0xFFCC1140         /* USB0 Transmit Maximum Packet Length */
-#define REG_USB0_EP_TXMAXP4             0xFFCC1150         /* USB0 Transmit Maximum Packet Length */
-#define REG_USB0_EP_TXMAXP5             0xFFCC1160         /* USB0 Transmit Maximum Packet Length */
-#define REG_USB0_EP_TXMAXP6             0xFFCC1170         /* USB0 Transmit Maximum Packet Length */
-#define REG_USB0_EP_TXMAXP7             0xFFCC1180         /* USB0 Transmit Maximum Packet Length */
-#define REG_USB0_EP_TXMAXP8             0xFFCC1190         /* USB0 Transmit Maximum Packet Length */
-#define REG_USB0_EP_TXMAXP9             0xFFCC11A0         /* USB0 Transmit Maximum Packet Length */
-#define REG_USB0_EP_TXMAXP10            0xFFCC11B0         /* USB0 Transmit Maximum Packet Length */
-#define REG_USB0_EP_TXCSR0_H            0xFFCC1112         /* USB0 Transmit Configuration and Status */
-#define REG_USB0_EP_TXCSR1_H            0xFFCC1122         /* USB0 Transmit Configuration and Status */
-#define REG_USB0_EP_TXCSR2_H            0xFFCC1132         /* USB0 Transmit Configuration and Status */
-#define REG_USB0_EP_TXCSR3_H            0xFFCC1142         /* USB0 Transmit Configuration and Status */
-#define REG_USB0_EP_TXCSR4_H            0xFFCC1152         /* USB0 Transmit Configuration and Status */
-#define REG_USB0_EP_TXCSR5_H            0xFFCC1162         /* USB0 Transmit Configuration and Status */
-#define REG_USB0_EP_TXCSR6_H            0xFFCC1172         /* USB0 Transmit Configuration and Status */
-#define REG_USB0_EP_TXCSR7_H            0xFFCC1182         /* USB0 Transmit Configuration and Status */
-#define REG_USB0_EP_TXCSR8_H            0xFFCC1192         /* USB0 Transmit Configuration and Status */
-#define REG_USB0_EP_TXCSR9_H            0xFFCC11A2         /* USB0 Transmit Configuration and Status */
-#define REG_USB0_EP_TXCSR10_H           0xFFCC11B2         /* USB0 Transmit Configuration and Status */
-#define REG_USB0_EP_TXCSR0_P            0xFFCC1112         /* USB0 Transmit Configuration and Status */
-#define REG_USB0_EP_TXCSR1_P            0xFFCC1122         /* USB0 Transmit Configuration and Status */
-#define REG_USB0_EP_TXCSR2_P            0xFFCC1132         /* USB0 Transmit Configuration and Status */
-#define REG_USB0_EP_TXCSR3_P            0xFFCC1142         /* USB0 Transmit Configuration and Status */
-#define REG_USB0_EP_TXCSR4_P            0xFFCC1152         /* USB0 Transmit Configuration and Status */
-#define REG_USB0_EP_TXCSR5_P            0xFFCC1162         /* USB0 Transmit Configuration and Status */
-#define REG_USB0_EP_TXCSR6_P            0xFFCC1172         /* USB0 Transmit Configuration and Status */
-#define REG_USB0_EP_TXCSR7_P            0xFFCC1182         /* USB0 Transmit Configuration and Status */
-#define REG_USB0_EP_TXCSR8_P            0xFFCC1192         /* USB0 Transmit Configuration and Status */
-#define REG_USB0_EP_TXCSR9_P            0xFFCC11A2         /* USB0 Transmit Configuration and Status */
-#define REG_USB0_EP_TXCSR10_P           0xFFCC11B2         /* USB0 Transmit Configuration and Status */
-#define REG_USB0_EP_RXMAXP0             0xFFCC1114         /* USB0 Receive Maximum Packet Length */
-#define REG_USB0_EP_RXMAXP1             0xFFCC1124         /* USB0 Receive Maximum Packet Length */
-#define REG_USB0_EP_RXMAXP2             0xFFCC1134         /* USB0 Receive Maximum Packet Length */
-#define REG_USB0_EP_RXMAXP3             0xFFCC1144         /* USB0 Receive Maximum Packet Length */
-#define REG_USB0_EP_RXMAXP4             0xFFCC1154         /* USB0 Receive Maximum Packet Length */
-#define REG_USB0_EP_RXMAXP5             0xFFCC1164         /* USB0 Receive Maximum Packet Length */
-#define REG_USB0_EP_RXMAXP6             0xFFCC1174         /* USB0 Receive Maximum Packet Length */
-#define REG_USB0_EP_RXMAXP7             0xFFCC1184         /* USB0 Receive Maximum Packet Length */
-#define REG_USB0_EP_RXMAXP8             0xFFCC1194         /* USB0 Receive Maximum Packet Length */
-#define REG_USB0_EP_RXMAXP9             0xFFCC11A4         /* USB0 Receive Maximum Packet Length */
-#define REG_USB0_EP_RXMAXP10            0xFFCC11B4         /* USB0 Receive Maximum Packet Length */
-#define REG_USB0_EP_RXCSR0_H            0xFFCC1116         /* USB0 Receive Configuration and Status Register */
-#define REG_USB0_EP_RXCSR1_H            0xFFCC1126         /* USB0 Receive Configuration and Status Register */
-#define REG_USB0_EP_RXCSR2_H            0xFFCC1136         /* USB0 Receive Configuration and Status Register */
-#define REG_USB0_EP_RXCSR3_H            0xFFCC1146         /* USB0 Receive Configuration and Status Register */
-#define REG_USB0_EP_RXCSR4_H            0xFFCC1156         /* USB0 Receive Configuration and Status Register */
-#define REG_USB0_EP_RXCSR5_H            0xFFCC1166         /* USB0 Receive Configuration and Status Register */
-#define REG_USB0_EP_RXCSR6_H            0xFFCC1176         /* USB0 Receive Configuration and Status Register */
-#define REG_USB0_EP_RXCSR7_H            0xFFCC1186         /* USB0 Receive Configuration and Status Register */
-#define REG_USB0_EP_RXCSR8_H            0xFFCC1196         /* USB0 Receive Configuration and Status Register */
-#define REG_USB0_EP_RXCSR9_H            0xFFCC11A6         /* USB0 Receive Configuration and Status Register */
-#define REG_USB0_EP_RXCSR10_H           0xFFCC11B6         /* USB0 Receive Configuration and Status Register */
-#define REG_USB0_EP_RXCSR0_P            0xFFCC1116         /* USB0 Receive Configuration and Status Register */
-#define REG_USB0_EP_RXCSR1_P            0xFFCC1126         /* USB0 Receive Configuration and Status Register */
-#define REG_USB0_EP_RXCSR2_P            0xFFCC1136         /* USB0 Receive Configuration and Status Register */
-#define REG_USB0_EP_RXCSR3_P            0xFFCC1146         /* USB0 Receive Configuration and Status Register */
-#define REG_USB0_EP_RXCSR4_P            0xFFCC1156         /* USB0 Receive Configuration and Status Register */
-#define REG_USB0_EP_RXCSR5_P            0xFFCC1166         /* USB0 Receive Configuration and Status Register */
-#define REG_USB0_EP_RXCSR6_P            0xFFCC1176         /* USB0 Receive Configuration and Status Register */
-#define REG_USB0_EP_RXCSR7_P            0xFFCC1186         /* USB0 Receive Configuration and Status Register */
-#define REG_USB0_EP_RXCSR8_P            0xFFCC1196         /* USB0 Receive Configuration and Status Register */
-#define REG_USB0_EP_RXCSR9_P            0xFFCC11A6         /* USB0 Receive Configuration and Status Register */
-#define REG_USB0_EP_RXCSR10_P           0xFFCC11B6         /* USB0 Receive Configuration and Status Register */
-#define REG_USB0_EP_RXCNT0              0xFFCC1118         /* USB0 Number of Byte Received */
-#define REG_USB0_EP_RXCNT1              0xFFCC1128         /* USB0 Number of Byte Received */
-#define REG_USB0_EP_RXCNT2              0xFFCC1138         /* USB0 Number of Byte Received */
-#define REG_USB0_EP_RXCNT3              0xFFCC1148         /* USB0 Number of Byte Received */
-#define REG_USB0_EP_RXCNT4              0xFFCC1158         /* USB0 Number of Byte Received */
-#define REG_USB0_EP_RXCNT5              0xFFCC1168         /* USB0 Number of Byte Received */
-#define REG_USB0_EP_RXCNT6              0xFFCC1178         /* USB0 Number of Byte Received */
-#define REG_USB0_EP_RXCNT7              0xFFCC1188         /* USB0 Number of Byte Received */
-#define REG_USB0_EP_RXCNT8              0xFFCC1198         /* USB0 Number of Byte Received */
-#define REG_USB0_EP_RXCNT9              0xFFCC11A8         /* USB0 Number of Byte Received */
-#define REG_USB0_EP_RXCNT10             0xFFCC11B8         /* USB0 Number of Byte Received */
-#define REG_USB0_EP_TXTYPE0             0xFFCC111A         /* USB0 Transmit Type */
-#define REG_USB0_EP_TXTYPE1             0xFFCC112A         /* USB0 Transmit Type */
-#define REG_USB0_EP_TXTYPE2             0xFFCC113A         /* USB0 Transmit Type */
-#define REG_USB0_EP_TXTYPE3             0xFFCC114A         /* USB0 Transmit Type */
-#define REG_USB0_EP_TXTYPE4             0xFFCC115A         /* USB0 Transmit Type */
-#define REG_USB0_EP_TXTYPE5             0xFFCC116A         /* USB0 Transmit Type */
-#define REG_USB0_EP_TXTYPE6             0xFFCC117A         /* USB0 Transmit Type */
-#define REG_USB0_EP_TXTYPE7             0xFFCC118A         /* USB0 Transmit Type */
-#define REG_USB0_EP_TXTYPE8             0xFFCC119A         /* USB0 Transmit Type */
-#define REG_USB0_EP_TXTYPE9             0xFFCC11AA         /* USB0 Transmit Type */
-#define REG_USB0_EP_TXTYPE10            0xFFCC11BA         /* USB0 Transmit Type */
-#define REG_USB0_EP_TXINTERVAL0         0xFFCC111B         /* USB0 Transmit Polling Interval */
-#define REG_USB0_EP_TXINTERVAL1         0xFFCC112B         /* USB0 Transmit Polling Interval */
-#define REG_USB0_EP_TXINTERVAL2         0xFFCC113B         /* USB0 Transmit Polling Interval */
-#define REG_USB0_EP_TXINTERVAL3         0xFFCC114B         /* USB0 Transmit Polling Interval */
-#define REG_USB0_EP_TXINTERVAL4         0xFFCC115B         /* USB0 Transmit Polling Interval */
-#define REG_USB0_EP_TXINTERVAL5         0xFFCC116B         /* USB0 Transmit Polling Interval */
-#define REG_USB0_EP_TXINTERVAL6         0xFFCC117B         /* USB0 Transmit Polling Interval */
-#define REG_USB0_EP_TXINTERVAL7         0xFFCC118B         /* USB0 Transmit Polling Interval */
-#define REG_USB0_EP_TXINTERVAL8         0xFFCC119B         /* USB0 Transmit Polling Interval */
-#define REG_USB0_EP_TXINTERVAL9         0xFFCC11AB         /* USB0 Transmit Polling Interval */
-#define REG_USB0_EP_TXINTERVAL10        0xFFCC11BB         /* USB0 Transmit Polling Interval */
-#define REG_USB0_EP_RXTYPE0             0xFFCC111C         /* USB0 Receive Type */
-#define REG_USB0_EP_RXTYPE1             0xFFCC112C         /* USB0 Receive Type */
-#define REG_USB0_EP_RXTYPE2             0xFFCC113C         /* USB0 Receive Type */
-#define REG_USB0_EP_RXTYPE3             0xFFCC114C         /* USB0 Receive Type */
-#define REG_USB0_EP_RXTYPE4             0xFFCC115C         /* USB0 Receive Type */
-#define REG_USB0_EP_RXTYPE5             0xFFCC116C         /* USB0 Receive Type */
-#define REG_USB0_EP_RXTYPE6             0xFFCC117C         /* USB0 Receive Type */
-#define REG_USB0_EP_RXTYPE7             0xFFCC118C         /* USB0 Receive Type */
-#define REG_USB0_EP_RXTYPE8             0xFFCC119C         /* USB0 Receive Type */
-#define REG_USB0_EP_RXTYPE9             0xFFCC11AC         /* USB0 Receive Type */
-#define REG_USB0_EP_RXTYPE10            0xFFCC11BC         /* USB0 Receive Type */
-#define REG_USB0_EP_RXINTERVAL0         0xFFCC111D         /* USB0 Receive Polling Interval */
-#define REG_USB0_EP_RXINTERVAL1         0xFFCC112D         /* USB0 Receive Polling Interval */
-#define REG_USB0_EP_RXINTERVAL2         0xFFCC113D         /* USB0 Receive Polling Interval */
-#define REG_USB0_EP_RXINTERVAL3         0xFFCC114D         /* USB0 Receive Polling Interval */
-#define REG_USB0_EP_RXINTERVAL4         0xFFCC115D         /* USB0 Receive Polling Interval */
-#define REG_USB0_EP_RXINTERVAL5         0xFFCC116D         /* USB0 Receive Polling Interval */
-#define REG_USB0_EP_RXINTERVAL6         0xFFCC117D         /* USB0 Receive Polling Interval */
-#define REG_USB0_EP_RXINTERVAL7         0xFFCC118D         /* USB0 Receive Polling Interval */
-#define REG_USB0_EP_RXINTERVAL8         0xFFCC119D         /* USB0 Receive Polling Interval */
-#define REG_USB0_EP_RXINTERVAL9         0xFFCC11AD         /* USB0 Receive Polling Interval */
-#define REG_USB0_EP_RXINTERVAL10        0xFFCC11BD         /* USB0 Receive Polling Interval */
-#define REG_USB0_DMA_IRQ                0xFFCC1200         /* USB0 Interrupt Register */
-#define REG_USB0_DMA_CTL0               0xFFCC1204         /* USB0 DMA Control */
-#define REG_USB0_DMA_CTL1               0xFFCC1214         /* USB0 DMA Control */
-#define REG_USB0_DMA_CTL2               0xFFCC1224         /* USB0 DMA Control */
-#define REG_USB0_DMA_CTL3               0xFFCC1234         /* USB0 DMA Control */
-#define REG_USB0_DMA_CTL4               0xFFCC1244         /* USB0 DMA Control */
-#define REG_USB0_DMA_CTL5               0xFFCC1254         /* USB0 DMA Control */
-#define REG_USB0_DMA_CTL6               0xFFCC1264         /* USB0 DMA Control */
-#define REG_USB0_DMA_CTL7               0xFFCC1274         /* USB0 DMA Control */
-#define REG_USB0_DMA_ADDR0              0xFFCC1208         /* USB0 DMA Address */
-#define REG_USB0_DMA_ADDR1              0xFFCC1218         /* USB0 DMA Address */
-#define REG_USB0_DMA_ADDR2              0xFFCC1228         /* USB0 DMA Address */
-#define REG_USB0_DMA_ADDR3              0xFFCC1238         /* USB0 DMA Address */
-#define REG_USB0_DMA_ADDR4              0xFFCC1248         /* USB0 DMA Address */
-#define REG_USB0_DMA_ADDR5              0xFFCC1258         /* USB0 DMA Address */
-#define REG_USB0_DMA_ADDR6              0xFFCC1268         /* USB0 DMA Address */
-#define REG_USB0_DMA_ADDR7              0xFFCC1278         /* USB0 DMA Address */
-#define REG_USB0_DMA_CNT0               0xFFCC120C         /* USB0 DMA Count */
-#define REG_USB0_DMA_CNT1               0xFFCC121C         /* USB0 DMA Count */
-#define REG_USB0_DMA_CNT2               0xFFCC122C         /* USB0 DMA Count */
-#define REG_USB0_DMA_CNT3               0xFFCC123C         /* USB0 DMA Count */
-#define REG_USB0_DMA_CNT4               0xFFCC124C         /* USB0 DMA Count */
-#define REG_USB0_DMA_CNT5               0xFFCC125C         /* USB0 DMA Count */
-#define REG_USB0_DMA_CNT6               0xFFCC126C         /* USB0 DMA Count */
-#define REG_USB0_DMA_CNT7               0xFFCC127C         /* USB0 DMA Count */
-#define REG_USB0_RQPKTCNT0              0xFFCC1300         /* USB0 Request Packet Count */
-#define REG_USB0_RQPKTCNT1              0xFFCC1304         /* USB0 Request Packet Count */
-#define REG_USB0_RQPKTCNT2              0xFFCC1308         /* USB0 Request Packet Count */
-#define REG_USB0_RQPKTCNT3              0xFFCC130C         /* USB0 Request Packet Count */
-#define REG_USB0_RQPKTCNT4              0xFFCC1310         /* USB0 Request Packet Count */
-#define REG_USB0_RQPKTCNT5              0xFFCC1314         /* USB0 Request Packet Count */
-#define REG_USB0_RQPKTCNT6              0xFFCC1318         /* USB0 Request Packet Count */
-#define REG_USB0_RQPKTCNT7              0xFFCC131C         /* USB0 Request Packet Count */
-#define REG_USB0_RQPKTCNT8              0xFFCC1320         /* USB0 Request Packet Count */
-#define REG_USB0_RQPKTCNT9              0xFFCC1324         /* USB0 Request Packet Count */
-#define REG_USB0_RQPKTCNT10             0xFFCC1328         /* USB0 Request Packet Count */
-#define REG_USB0_CT_UCH                 0xFFCC1344         /* USB0 Chirp Timeout */
-#define REG_USB0_CT_HHSRTN              0xFFCC1346         /* USB0 High Speed Resume Return to Normal */
-#define REG_USB0_CT_HSBT                0xFFCC1348         /* USB0 High Speed Timeout */
-#define REG_USB0_LPM_ATTR               0xFFCC1360         /* USB0 LPM Attribute */
-#define REG_USB0_LPM_CTL                0xFFCC1362         /* USB0 LPM Control */
-#define REG_USB0_LPM_IEN                0xFFCC1363         /* USB0 LPM Interrupt Enable */
-#define REG_USB0_LPM_IRQ                0xFFCC1364         /* USB0 LPM Interrupt */
-#define REG_USB0_LPM_FADDR              0xFFCC1365         /* USB0 LPM Function Address */
-#define REG_USB0_VBUS_CTL               0xFFCC1380         /* USB0 VBus Control */
-#define REG_USB0_BAT_CHG                0xFFCC1381         /* USB0 Battery Charging */
-#define REG_USB0_PHY_CTL                0xFFCC1394         /* USB0 PHY Control */
-#define REG_USB0_PLL_OSC                0xFFCC1398         /* USB0 PLL and Oscillator Control */
+#define REG_USB0_FADDR                  0xFFCC1000         /* USB0 Function Address Register */
+#define REG_USB0_POWER                  0xFFCC1001         /* USB0 Power and Device Control Register */
+#define REG_USB0_INTRTX                 0xFFCC1002         /* USB0 Transmit Interrupt Register */
+#define REG_USB0_INTRRX                 0xFFCC1004         /* USB0 Receive Interrupt Register */
+#define REG_USB0_INTRTXE                0xFFCC1006         /* USB0 Transmit Interrupt Enable Register */
+#define REG_USB0_INTRRXE                0xFFCC1008         /* USB0 Receive Interrupt Enable Register */
+#define REG_USB0_IRQ                    0xFFCC100A         /* USB0 Common Interrupts Register */
+#define REG_USB0_IEN                    0xFFCC100B         /* USB0 Common Interrupts Enable Register */
+#define REG_USB0_FRAME                  0xFFCC100C         /* USB0 Frame Number Register */
+#define REG_USB0_INDEX                  0xFFCC100E         /* USB0 Index Register */
+#define REG_USB0_TESTMODE               0xFFCC100F         /* USB0 Testmode Register */
+#define REG_USB0_EPI_TXMAXP0            0xFFCC1010         /* USB0 EPn Transmit Maximum Packet Length Register */
+#define REG_USB0_EPI_TXCSR_P0           0xFFCC1012         /* USB0 EPn Transmit Configuration and Status (Peripheral) Register */
+#define REG_USB0_EPI_TXCSR_H0           0xFFCC1012         /* USB0 EPn Transmit Configuration and Status (Host) Register */
+#define REG_USB0_EP0I_CSR0_P            0xFFCC1012         /* USB0 EP0 Configuration and Status (Peripheral) Register */
+#define REG_USB0_EP0I_CSR0_H            0xFFCC1012         /* USB0 EP0 Configuration and Status (Host) Register */
+#define REG_USB0_EPI_RXMAXP0            0xFFCC1014         /* USB0 EPn Receive Maximum Packet Length Register */
+#define REG_USB0_EPI_RXCSR_H0           0xFFCC1016         /* USB0 EPn Receive Configuration and Status (Host) Register */
+#define REG_USB0_EPI_RXCSR_P0           0xFFCC1016         /* USB0 EPn Receive Configuration and Status (Peripheral) Register */
+#define REG_USB0_EP0I_CNT0              0xFFCC1018         /* USB0 EP0 Number of Received Bytes Register */
+#define REG_USB0_EPI_RXCNT0             0xFFCC1018         /* USB0 EPn Number of Bytes Received Register */
+#define REG_USB0_EPI_TXTYPE0            0xFFCC101A         /* USB0 EPn Transmit Type Register */
+#define REG_USB0_EP0I_TYPE0             0xFFCC101A         /* USB0 EP0 Connection Type Register */
+#define REG_USB0_EPI_TXINTERVAL0        0xFFCC101B         /* USB0 EPn Transmit Polling Interval Register */
+#define REG_USB0_EP0I_NAKLIMIT0         0xFFCC101B         /* USB0 EP0 NAK Limit Register */
+#define REG_USB0_EPI_RXTYPE0            0xFFCC101C         /* USB0 EPn Receive Type Register */
+#define REG_USB0_EPI_RXINTERVAL0        0xFFCC101D         /* USB0 EPn Receive Polling Interval Register */
+#define REG_USB0_EP0I_CFGDATA0          0xFFCC101F         /* USB0 EP0 Configuration Information Register */
+#define REG_USB0_FIFOB0                 0xFFCC1020         /* USB0 FIFO Byte (8-Bit) Register */
+#define REG_USB0_FIFOB1                 0xFFCC1024         /* USB0 FIFO Byte (8-Bit) Register */
+#define REG_USB0_FIFOB2                 0xFFCC1028         /* USB0 FIFO Byte (8-Bit) Register */
+#define REG_USB0_FIFOB3                 0xFFCC102C         /* USB0 FIFO Byte (8-Bit) Register */
+#define REG_USB0_FIFOB4                 0xFFCC1030         /* USB0 FIFO Byte (8-Bit) Register */
+#define REG_USB0_FIFOB5                 0xFFCC1034         /* USB0 FIFO Byte (8-Bit) Register */
+#define REG_USB0_FIFOB6                 0xFFCC1038         /* USB0 FIFO Byte (8-Bit) Register */
+#define REG_USB0_FIFOB7                 0xFFCC103C         /* USB0 FIFO Byte (8-Bit) Register */
+#define REG_USB0_FIFOB8                 0xFFCC1040         /* USB0 FIFO Byte (8-Bit) Register */
+#define REG_USB0_FIFOB9                 0xFFCC1044         /* USB0 FIFO Byte (8-Bit) Register */
+#define REG_USB0_FIFOB10                0xFFCC1048         /* USB0 FIFO Byte (8-Bit) Register */
+#define REG_USB0_FIFOB11                0xFFCC104C         /* USB0 FIFO Byte (8-Bit) Register */
+#define REG_USB0_FIFOH0                 0xFFCC1020         /* USB0 FIFO Half-Word (16-Bit) Register */
+#define REG_USB0_FIFOH1                 0xFFCC1024         /* USB0 FIFO Half-Word (16-Bit) Register */
+#define REG_USB0_FIFOH2                 0xFFCC1028         /* USB0 FIFO Half-Word (16-Bit) Register */
+#define REG_USB0_FIFOH3                 0xFFCC102C         /* USB0 FIFO Half-Word (16-Bit) Register */
+#define REG_USB0_FIFOH4                 0xFFCC1030         /* USB0 FIFO Half-Word (16-Bit) Register */
+#define REG_USB0_FIFOH5                 0xFFCC1034         /* USB0 FIFO Half-Word (16-Bit) Register */
+#define REG_USB0_FIFOH6                 0xFFCC1038         /* USB0 FIFO Half-Word (16-Bit) Register */
+#define REG_USB0_FIFOH7                 0xFFCC103C         /* USB0 FIFO Half-Word (16-Bit) Register */
+#define REG_USB0_FIFOH8                 0xFFCC1040         /* USB0 FIFO Half-Word (16-Bit) Register */
+#define REG_USB0_FIFOH9                 0xFFCC1044         /* USB0 FIFO Half-Word (16-Bit) Register */
+#define REG_USB0_FIFOH10                0xFFCC1048         /* USB0 FIFO Half-Word (16-Bit) Register */
+#define REG_USB0_FIFOH11                0xFFCC104C         /* USB0 FIFO Half-Word (16-Bit) Register */
+#define REG_USB0_FIFO0                  0xFFCC1020         /* USB0 FIFO Word (32-Bit) Register */
+#define REG_USB0_FIFO1                  0xFFCC1024         /* USB0 FIFO Word (32-Bit) Register */
+#define REG_USB0_FIFO2                  0xFFCC1028         /* USB0 FIFO Word (32-Bit) Register */
+#define REG_USB0_FIFO3                  0xFFCC102C         /* USB0 FIFO Word (32-Bit) Register */
+#define REG_USB0_FIFO4                  0xFFCC1030         /* USB0 FIFO Word (32-Bit) Register */
+#define REG_USB0_FIFO5                  0xFFCC1034         /* USB0 FIFO Word (32-Bit) Register */
+#define REG_USB0_FIFO6                  0xFFCC1038         /* USB0 FIFO Word (32-Bit) Register */
+#define REG_USB0_FIFO7                  0xFFCC103C         /* USB0 FIFO Word (32-Bit) Register */
+#define REG_USB0_FIFO8                  0xFFCC1040         /* USB0 FIFO Word (32-Bit) Register */
+#define REG_USB0_FIFO9                  0xFFCC1044         /* USB0 FIFO Word (32-Bit) Register */
+#define REG_USB0_FIFO10                 0xFFCC1048         /* USB0 FIFO Word (32-Bit) Register */
+#define REG_USB0_FIFO11                 0xFFCC104C         /* USB0 FIFO Word (32-Bit) Register */
+#define REG_USB0_DEV_CTL                0xFFCC1060         /* USB0 Device Control Register */
+#define REG_USB0_TXFIFOSZ               0xFFCC1062         /* USB0 Transmit FIFO Size Register */
+#define REG_USB0_RXFIFOSZ               0xFFCC1063         /* USB0 Receive FIFO Size Register */
+#define REG_USB0_TXFIFOADDR             0xFFCC1064         /* USB0 Transmit FIFO Address Register */
+#define REG_USB0_RXFIFOADDR             0xFFCC1066         /* USB0 Receive FIFO Address Register */
+#define REG_USB0_EPINFO                 0xFFCC1078         /* USB0 Endpoint Information Register */
+#define REG_USB0_RAMINFO                0xFFCC1079         /* USB0 RAM Information Register */
+#define REG_USB0_LINKINFO               0xFFCC107A         /* USB0 Link Information Register */
+#define REG_USB0_VPLEN                  0xFFCC107B         /* USB0 VBUS Pulse Length Register */
+#define REG_USB0_HS_EOF1                0xFFCC107C         /* USB0 High-Speed EOF 1 Register */
+#define REG_USB0_FS_EOF1                0xFFCC107D         /* USB0 Full-Speed EOF 1 Register */
+#define REG_USB0_LS_EOF1                0xFFCC107E         /* USB0 Low-Speed EOF 1 Register */
+#define REG_USB0_SOFT_RST               0xFFCC107F         /* USB0 Software Reset Register */
+#define REG_USB0_MP0_TXFUNCADDR         0xFFCC1080         /* USB0 EPn Transmit Function Address Register */
+#define REG_USB0_MP1_TXFUNCADDR         0xFFCC1088         /* USB0 EPn Transmit Function Address Register */
+#define REG_USB0_MP2_TXFUNCADDR         0xFFCC1090         /* USB0 EPn Transmit Function Address Register */
+#define REG_USB0_MP3_TXFUNCADDR         0xFFCC1098         /* USB0 EPn Transmit Function Address Register */
+#define REG_USB0_MP4_TXFUNCADDR         0xFFCC10A0         /* USB0 EPn Transmit Function Address Register */
+#define REG_USB0_MP5_TXFUNCADDR         0xFFCC10A8         /* USB0 EPn Transmit Function Address Register */
+#define REG_USB0_MP6_TXFUNCADDR         0xFFCC10B0         /* USB0 EPn Transmit Function Address Register */
+#define REG_USB0_MP7_TXFUNCADDR         0xFFCC10B8         /* USB0 EPn Transmit Function Address Register */
+#define REG_USB0_MP8_TXFUNCADDR         0xFFCC10C0         /* USB0 EPn Transmit Function Address Register */
+#define REG_USB0_MP9_TXFUNCADDR         0xFFCC10C8         /* USB0 EPn Transmit Function Address Register */
+#define REG_USB0_MP10_TXFUNCADDR        0xFFCC10D0         /* USB0 EPn Transmit Function Address Register */
+#define REG_USB0_MP11_TXFUNCADDR        0xFFCC10D8         /* USB0 EPn Transmit Function Address Register */
+#define REG_USB0_MP0_TXHUBADDR          0xFFCC1082         /* USB0 EPn Transmit Hub Address Register */
+#define REG_USB0_MP1_TXHUBADDR          0xFFCC108A         /* USB0 EPn Transmit Hub Address Register */
+#define REG_USB0_MP2_TXHUBADDR          0xFFCC1092         /* USB0 EPn Transmit Hub Address Register */
+#define REG_USB0_MP3_TXHUBADDR          0xFFCC109A         /* USB0 EPn Transmit Hub Address Register */
+#define REG_USB0_MP4_TXHUBADDR          0xFFCC10A2         /* USB0 EPn Transmit Hub Address Register */
+#define REG_USB0_MP5_TXHUBADDR          0xFFCC10AA         /* USB0 EPn Transmit Hub Address Register */
+#define REG_USB0_MP6_TXHUBADDR          0xFFCC10B2         /* USB0 EPn Transmit Hub Address Register */
+#define REG_USB0_MP7_TXHUBADDR          0xFFCC10BA         /* USB0 EPn Transmit Hub Address Register */
+#define REG_USB0_MP8_TXHUBADDR          0xFFCC10C2         /* USB0 EPn Transmit Hub Address Register */
+#define REG_USB0_MP9_TXHUBADDR          0xFFCC10CA         /* USB0 EPn Transmit Hub Address Register */
+#define REG_USB0_MP10_TXHUBADDR         0xFFCC10D2         /* USB0 EPn Transmit Hub Address Register */
+#define REG_USB0_MP11_TXHUBADDR         0xFFCC10DA         /* USB0 EPn Transmit Hub Address Register */
+#define REG_USB0_MP0_TXHUBPORT          0xFFCC1083         /* USB0 EPn Transmit Hub Port Register */
+#define REG_USB0_MP1_TXHUBPORT          0xFFCC108B         /* USB0 EPn Transmit Hub Port Register */
+#define REG_USB0_MP2_TXHUBPORT          0xFFCC1093         /* USB0 EPn Transmit Hub Port Register */
+#define REG_USB0_MP3_TXHUBPORT          0xFFCC109B         /* USB0 EPn Transmit Hub Port Register */
+#define REG_USB0_MP4_TXHUBPORT          0xFFCC10A3         /* USB0 EPn Transmit Hub Port Register */
+#define REG_USB0_MP5_TXHUBPORT          0xFFCC10AB         /* USB0 EPn Transmit Hub Port Register */
+#define REG_USB0_MP6_TXHUBPORT          0xFFCC10B3         /* USB0 EPn Transmit Hub Port Register */
+#define REG_USB0_MP7_TXHUBPORT          0xFFCC10BB         /* USB0 EPn Transmit Hub Port Register */
+#define REG_USB0_MP8_TXHUBPORT          0xFFCC10C3         /* USB0 EPn Transmit Hub Port Register */
+#define REG_USB0_MP9_TXHUBPORT          0xFFCC10CB         /* USB0 EPn Transmit Hub Port Register */
+#define REG_USB0_MP10_TXHUBPORT         0xFFCC10D3         /* USB0 EPn Transmit Hub Port Register */
+#define REG_USB0_MP11_TXHUBPORT         0xFFCC10DB         /* USB0 EPn Transmit Hub Port Register */
+#define REG_USB0_MP0_RXFUNCADDR         0xFFCC1084         /* USB0 EPn Receive Function Address Register */
+#define REG_USB0_MP1_RXFUNCADDR         0xFFCC108C         /* USB0 EPn Receive Function Address Register */
+#define REG_USB0_MP2_RXFUNCADDR         0xFFCC1094         /* USB0 EPn Receive Function Address Register */
+#define REG_USB0_MP3_RXFUNCADDR         0xFFCC109C         /* USB0 EPn Receive Function Address Register */
+#define REG_USB0_MP4_RXFUNCADDR         0xFFCC10A4         /* USB0 EPn Receive Function Address Register */
+#define REG_USB0_MP5_RXFUNCADDR         0xFFCC10AC         /* USB0 EPn Receive Function Address Register */
+#define REG_USB0_MP6_RXFUNCADDR         0xFFCC10B4         /* USB0 EPn Receive Function Address Register */
+#define REG_USB0_MP7_RXFUNCADDR         0xFFCC10BC         /* USB0 EPn Receive Function Address Register */
+#define REG_USB0_MP8_RXFUNCADDR         0xFFCC10C4         /* USB0 EPn Receive Function Address Register */
+#define REG_USB0_MP9_RXFUNCADDR         0xFFCC10CC         /* USB0 EPn Receive Function Address Register */
+#define REG_USB0_MP10_RXFUNCADDR        0xFFCC10D4         /* USB0 EPn Receive Function Address Register */
+#define REG_USB0_MP11_RXFUNCADDR        0xFFCC10DC         /* USB0 EPn Receive Function Address Register */
+#define REG_USB0_MP0_RXHUBADDR          0xFFCC1086         /* USB0 EPn Receive Hub Address Register */
+#define REG_USB0_MP1_RXHUBADDR          0xFFCC108E         /* USB0 EPn Receive Hub Address Register */
+#define REG_USB0_MP2_RXHUBADDR          0xFFCC1096         /* USB0 EPn Receive Hub Address Register */
+#define REG_USB0_MP3_RXHUBADDR          0xFFCC109E         /* USB0 EPn Receive Hub Address Register */
+#define REG_USB0_MP4_RXHUBADDR          0xFFCC10A6         /* USB0 EPn Receive Hub Address Register */
+#define REG_USB0_MP5_RXHUBADDR          0xFFCC10AE         /* USB0 EPn Receive Hub Address Register */
+#define REG_USB0_MP6_RXHUBADDR          0xFFCC10B6         /* USB0 EPn Receive Hub Address Register */
+#define REG_USB0_MP7_RXHUBADDR          0xFFCC10BE         /* USB0 EPn Receive Hub Address Register */
+#define REG_USB0_MP8_RXHUBADDR          0xFFCC10C6         /* USB0 EPn Receive Hub Address Register */
+#define REG_USB0_MP9_RXHUBADDR          0xFFCC10CE         /* USB0 EPn Receive Hub Address Register */
+#define REG_USB0_MP10_RXHUBADDR         0xFFCC10D6         /* USB0 EPn Receive Hub Address Register */
+#define REG_USB0_MP11_RXHUBADDR         0xFFCC10DE         /* USB0 EPn Receive Hub Address Register */
+#define REG_USB0_MP0_RXHUBPORT          0xFFCC1087         /* USB0 EPn Receive Hub Port Register */
+#define REG_USB0_MP1_RXHUBPORT          0xFFCC108F         /* USB0 EPn Receive Hub Port Register */
+#define REG_USB0_MP2_RXHUBPORT          0xFFCC1097         /* USB0 EPn Receive Hub Port Register */
+#define REG_USB0_MP3_RXHUBPORT          0xFFCC109F         /* USB0 EPn Receive Hub Port Register */
+#define REG_USB0_MP4_RXHUBPORT          0xFFCC10A7         /* USB0 EPn Receive Hub Port Register */
+#define REG_USB0_MP5_RXHUBPORT          0xFFCC10AF         /* USB0 EPn Receive Hub Port Register */
+#define REG_USB0_MP6_RXHUBPORT          0xFFCC10B7         /* USB0 EPn Receive Hub Port Register */
+#define REG_USB0_MP7_RXHUBPORT          0xFFCC10BF         /* USB0 EPn Receive Hub Port Register */
+#define REG_USB0_MP8_RXHUBPORT          0xFFCC10C7         /* USB0 EPn Receive Hub Port Register */
+#define REG_USB0_MP9_RXHUBPORT          0xFFCC10CF         /* USB0 EPn Receive Hub Port Register */
+#define REG_USB0_MP10_RXHUBPORT         0xFFCC10D7         /* USB0 EPn Receive Hub Port Register */
+#define REG_USB0_MP11_RXHUBPORT         0xFFCC10DF         /* USB0 EPn Receive Hub Port Register */
+#define REG_USB0_EP0_TXMAXP             0xFFCC1100         /* USB0 EPn Transmit Maximum Packet Length Register */
+#define REG_USB0_EP1_TXMAXP             0xFFCC1110         /* USB0 EPn Transmit Maximum Packet Length Register */
+#define REG_USB0_EP2_TXMAXP             0xFFCC1120         /* USB0 EPn Transmit Maximum Packet Length Register */
+#define REG_USB0_EP3_TXMAXP             0xFFCC1130         /* USB0 EPn Transmit Maximum Packet Length Register */
+#define REG_USB0_EP4_TXMAXP             0xFFCC1140         /* USB0 EPn Transmit Maximum Packet Length Register */
+#define REG_USB0_EP5_TXMAXP             0xFFCC1150         /* USB0 EPn Transmit Maximum Packet Length Register */
+#define REG_USB0_EP6_TXMAXP             0xFFCC1160         /* USB0 EPn Transmit Maximum Packet Length Register */
+#define REG_USB0_EP7_TXMAXP             0xFFCC1170         /* USB0 EPn Transmit Maximum Packet Length Register */
+#define REG_USB0_EP8_TXMAXP             0xFFCC1180         /* USB0 EPn Transmit Maximum Packet Length Register */
+#define REG_USB0_EP9_TXMAXP             0xFFCC1190         /* USB0 EPn Transmit Maximum Packet Length Register */
+#define REG_USB0_EP10_TXMAXP            0xFFCC11A0         /* USB0 EPn Transmit Maximum Packet Length Register */
+#define REG_USB0_EP11_TXMAXP            0xFFCC11B0         /* USB0 EPn Transmit Maximum Packet Length Register */
+#define REG_USB0_EP0_CSR0_H             0xFFCC1102         /* USB0 EP0 Configuration and Status (Host) Register */
+#define REG_USB0_EP0_TXCSR_H            0xFFCC1102         /* USB0 EPn Transmit Configuration and Status (Host) Register */
+#define REG_USB0_EP1_TXCSR_H            0xFFCC1112         /* USB0 EPn Transmit Configuration and Status (Host) Register */
+#define REG_USB0_EP2_TXCSR_H            0xFFCC1122         /* USB0 EPn Transmit Configuration and Status (Host) Register */
+#define REG_USB0_EP3_TXCSR_H            0xFFCC1132         /* USB0 EPn Transmit Configuration and Status (Host) Register */
+#define REG_USB0_EP4_TXCSR_H            0xFFCC1142         /* USB0 EPn Transmit Configuration and Status (Host) Register */
+#define REG_USB0_EP5_TXCSR_H            0xFFCC1152         /* USB0 EPn Transmit Configuration and Status (Host) Register */
+#define REG_USB0_EP6_TXCSR_H            0xFFCC1162         /* USB0 EPn Transmit Configuration and Status (Host) Register */
+#define REG_USB0_EP7_TXCSR_H            0xFFCC1172         /* USB0 EPn Transmit Configuration and Status (Host) Register */
+#define REG_USB0_EP8_TXCSR_H            0xFFCC1182         /* USB0 EPn Transmit Configuration and Status (Host) Register */
+#define REG_USB0_EP9_TXCSR_H            0xFFCC1192         /* USB0 EPn Transmit Configuration and Status (Host) Register */
+#define REG_USB0_EP10_TXCSR_H           0xFFCC11A2         /* USB0 EPn Transmit Configuration and Status (Host) Register */
+#define REG_USB0_EP11_TXCSR_H           0xFFCC11B2         /* USB0 EPn Transmit Configuration and Status (Host) Register */
+#define REG_USB0_EP0_CSR0_P             0xFFCC1102         /* USB0 EP0 Configuration and Status (Peripheral) Register */
+#define REG_USB0_EP0_TXCSR_P            0xFFCC1102         /* USB0 EPn Transmit Configuration and Status (Peripheral) Register */
+#define REG_USB0_EP1_TXCSR_P            0xFFCC1112         /* USB0 EPn Transmit Configuration and Status (Peripheral) Register */
+#define REG_USB0_EP2_TXCSR_P            0xFFCC1122         /* USB0 EPn Transmit Configuration and Status (Peripheral) Register */
+#define REG_USB0_EP3_TXCSR_P            0xFFCC1132         /* USB0 EPn Transmit Configuration and Status (Peripheral) Register */
+#define REG_USB0_EP4_TXCSR_P            0xFFCC1142         /* USB0 EPn Transmit Configuration and Status (Peripheral) Register */
+#define REG_USB0_EP5_TXCSR_P            0xFFCC1152         /* USB0 EPn Transmit Configuration and Status (Peripheral) Register */
+#define REG_USB0_EP6_TXCSR_P            0xFFCC1162         /* USB0 EPn Transmit Configuration and Status (Peripheral) Register */
+#define REG_USB0_EP7_TXCSR_P            0xFFCC1172         /* USB0 EPn Transmit Configuration and Status (Peripheral) Register */
+#define REG_USB0_EP8_TXCSR_P            0xFFCC1182         /* USB0 EPn Transmit Configuration and Status (Peripheral) Register */
+#define REG_USB0_EP9_TXCSR_P            0xFFCC1192         /* USB0 EPn Transmit Configuration and Status (Peripheral) Register */
+#define REG_USB0_EP10_TXCSR_P           0xFFCC11A2         /* USB0 EPn Transmit Configuration and Status (Peripheral) Register */
+#define REG_USB0_EP11_TXCSR_P           0xFFCC11B2         /* USB0 EPn Transmit Configuration and Status (Peripheral) Register */
+#define REG_USB0_EP0_RXMAXP             0xFFCC1104         /* USB0 EPn Receive Maximum Packet Length Register */
+#define REG_USB0_EP1_RXMAXP             0xFFCC1114         /* USB0 EPn Receive Maximum Packet Length Register */
+#define REG_USB0_EP2_RXMAXP             0xFFCC1124         /* USB0 EPn Receive Maximum Packet Length Register */
+#define REG_USB0_EP3_RXMAXP             0xFFCC1134         /* USB0 EPn Receive Maximum Packet Length Register */
+#define REG_USB0_EP4_RXMAXP             0xFFCC1144         /* USB0 EPn Receive Maximum Packet Length Register */
+#define REG_USB0_EP5_RXMAXP             0xFFCC1154         /* USB0 EPn Receive Maximum Packet Length Register */
+#define REG_USB0_EP6_RXMAXP             0xFFCC1164         /* USB0 EPn Receive Maximum Packet Length Register */
+#define REG_USB0_EP7_RXMAXP             0xFFCC1174         /* USB0 EPn Receive Maximum Packet Length Register */
+#define REG_USB0_EP8_RXMAXP             0xFFCC1184         /* USB0 EPn Receive Maximum Packet Length Register */
+#define REG_USB0_EP9_RXMAXP             0xFFCC1194         /* USB0 EPn Receive Maximum Packet Length Register */
+#define REG_USB0_EP10_RXMAXP            0xFFCC11A4         /* USB0 EPn Receive Maximum Packet Length Register */
+#define REG_USB0_EP11_RXMAXP            0xFFCC11B4         /* USB0 EPn Receive Maximum Packet Length Register */
+#define REG_USB0_EP0_RXCSR_H            0xFFCC1106         /* USB0 EPn Receive Configuration and Status (Host) Register */
+#define REG_USB0_EP1_RXCSR_H            0xFFCC1116         /* USB0 EPn Receive Configuration and Status (Host) Register */
+#define REG_USB0_EP2_RXCSR_H            0xFFCC1126         /* USB0 EPn Receive Configuration and Status (Host) Register */
+#define REG_USB0_EP3_RXCSR_H            0xFFCC1136         /* USB0 EPn Receive Configuration and Status (Host) Register */
+#define REG_USB0_EP4_RXCSR_H            0xFFCC1146         /* USB0 EPn Receive Configuration and Status (Host) Register */
+#define REG_USB0_EP5_RXCSR_H            0xFFCC1156         /* USB0 EPn Receive Configuration and Status (Host) Register */
+#define REG_USB0_EP6_RXCSR_H            0xFFCC1166         /* USB0 EPn Receive Configuration and Status (Host) Register */
+#define REG_USB0_EP7_RXCSR_H            0xFFCC1176         /* USB0 EPn Receive Configuration and Status (Host) Register */
+#define REG_USB0_EP8_RXCSR_H            0xFFCC1186         /* USB0 EPn Receive Configuration and Status (Host) Register */
+#define REG_USB0_EP9_RXCSR_H            0xFFCC1196         /* USB0 EPn Receive Configuration and Status (Host) Register */
+#define REG_USB0_EP10_RXCSR_H           0xFFCC11A6         /* USB0 EPn Receive Configuration and Status (Host) Register */
+#define REG_USB0_EP11_RXCSR_H           0xFFCC11B6         /* USB0 EPn Receive Configuration and Status (Host) Register */
+#define REG_USB0_EP0_RXCSR_P            0xFFCC1106         /* USB0 EPn Receive Configuration and Status (Peripheral) Register */
+#define REG_USB0_EP1_RXCSR_P            0xFFCC1116         /* USB0 EPn Receive Configuration and Status (Peripheral) Register */
+#define REG_USB0_EP2_RXCSR_P            0xFFCC1126         /* USB0 EPn Receive Configuration and Status (Peripheral) Register */
+#define REG_USB0_EP3_RXCSR_P            0xFFCC1136         /* USB0 EPn Receive Configuration and Status (Peripheral) Register */
+#define REG_USB0_EP4_RXCSR_P            0xFFCC1146         /* USB0 EPn Receive Configuration and Status (Peripheral) Register */
+#define REG_USB0_EP5_RXCSR_P            0xFFCC1156         /* USB0 EPn Receive Configuration and Status (Peripheral) Register */
+#define REG_USB0_EP6_RXCSR_P            0xFFCC1166         /* USB0 EPn Receive Configuration and Status (Peripheral) Register */
+#define REG_USB0_EP7_RXCSR_P            0xFFCC1176         /* USB0 EPn Receive Configuration and Status (Peripheral) Register */
+#define REG_USB0_EP8_RXCSR_P            0xFFCC1186         /* USB0 EPn Receive Configuration and Status (Peripheral) Register */
+#define REG_USB0_EP9_RXCSR_P            0xFFCC1196         /* USB0 EPn Receive Configuration and Status (Peripheral) Register */
+#define REG_USB0_EP10_RXCSR_P           0xFFCC11A6         /* USB0 EPn Receive Configuration and Status (Peripheral) Register */
+#define REG_USB0_EP11_RXCSR_P           0xFFCC11B6         /* USB0 EPn Receive Configuration and Status (Peripheral) Register */
+#define REG_USB0_EP0_CNT0               0xFFCC1108         /* USB0 EP0 Number of Received Bytes Register */
+#define REG_USB0_EP0_RXCNT              0xFFCC1108         /* USB0 EPn Number of Bytes Received Register */
+#define REG_USB0_EP1_RXCNT              0xFFCC1118         /* USB0 EPn Number of Bytes Received Register */
+#define REG_USB0_EP2_RXCNT              0xFFCC1128         /* USB0 EPn Number of Bytes Received Register */
+#define REG_USB0_EP3_RXCNT              0xFFCC1138         /* USB0 EPn Number of Bytes Received Register */
+#define REG_USB0_EP4_RXCNT              0xFFCC1148         /* USB0 EPn Number of Bytes Received Register */
+#define REG_USB0_EP5_RXCNT              0xFFCC1158         /* USB0 EPn Number of Bytes Received Register */
+#define REG_USB0_EP6_RXCNT              0xFFCC1168         /* USB0 EPn Number of Bytes Received Register */
+#define REG_USB0_EP7_RXCNT              0xFFCC1178         /* USB0 EPn Number of Bytes Received Register */
+#define REG_USB0_EP8_RXCNT              0xFFCC1188         /* USB0 EPn Number of Bytes Received Register */
+#define REG_USB0_EP9_RXCNT              0xFFCC1198         /* USB0 EPn Number of Bytes Received Register */
+#define REG_USB0_EP10_RXCNT             0xFFCC11A8         /* USB0 EPn Number of Bytes Received Register */
+#define REG_USB0_EP11_RXCNT             0xFFCC11B8         /* USB0 EPn Number of Bytes Received Register */
+#define REG_USB0_EP0_TYPE0              0xFFCC110A         /* USB0 EP0 Connection Type Register */
+#define REG_USB0_EP0_TXTYPE             0xFFCC110A         /* USB0 EPn Transmit Type Register */
+#define REG_USB0_EP1_TXTYPE             0xFFCC111A         /* USB0 EPn Transmit Type Register */
+#define REG_USB0_EP2_TXTYPE             0xFFCC112A         /* USB0 EPn Transmit Type Register */
+#define REG_USB0_EP3_TXTYPE             0xFFCC113A         /* USB0 EPn Transmit Type Register */
+#define REG_USB0_EP4_TXTYPE             0xFFCC114A         /* USB0 EPn Transmit Type Register */
+#define REG_USB0_EP5_TXTYPE             0xFFCC115A         /* USB0 EPn Transmit Type Register */
+#define REG_USB0_EP6_TXTYPE             0xFFCC116A         /* USB0 EPn Transmit Type Register */
+#define REG_USB0_EP7_TXTYPE             0xFFCC117A         /* USB0 EPn Transmit Type Register */
+#define REG_USB0_EP8_TXTYPE             0xFFCC118A         /* USB0 EPn Transmit Type Register */
+#define REG_USB0_EP9_TXTYPE             0xFFCC119A         /* USB0 EPn Transmit Type Register */
+#define REG_USB0_EP10_TXTYPE            0xFFCC11AA         /* USB0 EPn Transmit Type Register */
+#define REG_USB0_EP11_TXTYPE            0xFFCC11BA         /* USB0 EPn Transmit Type Register */
+#define REG_USB0_EP0_NAKLIMIT0          0xFFCC110B         /* USB0 EP0 NAK Limit Register */
+#define REG_USB0_EP0_TXINTERVAL         0xFFCC110B         /* USB0 EPn Transmit Polling Interval Register */
+#define REG_USB0_EP1_TXINTERVAL         0xFFCC111B         /* USB0 EPn Transmit Polling Interval Register */
+#define REG_USB0_EP2_TXINTERVAL         0xFFCC112B         /* USB0 EPn Transmit Polling Interval Register */
+#define REG_USB0_EP3_TXINTERVAL         0xFFCC113B         /* USB0 EPn Transmit Polling Interval Register */
+#define REG_USB0_EP4_TXINTERVAL         0xFFCC114B         /* USB0 EPn Transmit Polling Interval Register */
+#define REG_USB0_EP5_TXINTERVAL         0xFFCC115B         /* USB0 EPn Transmit Polling Interval Register */
+#define REG_USB0_EP6_TXINTERVAL         0xFFCC116B         /* USB0 EPn Transmit Polling Interval Register */
+#define REG_USB0_EP7_TXINTERVAL         0xFFCC117B         /* USB0 EPn Transmit Polling Interval Register */
+#define REG_USB0_EP8_TXINTERVAL         0xFFCC118B         /* USB0 EPn Transmit Polling Interval Register */
+#define REG_USB0_EP9_TXINTERVAL         0xFFCC119B         /* USB0 EPn Transmit Polling Interval Register */
+#define REG_USB0_EP10_TXINTERVAL        0xFFCC11AB         /* USB0 EPn Transmit Polling Interval Register */
+#define REG_USB0_EP11_TXINTERVAL        0xFFCC11BB         /* USB0 EPn Transmit Polling Interval Register */
+#define REG_USB0_EP0_RXTYPE             0xFFCC110C         /* USB0 EPn Receive Type Register */
+#define REG_USB0_EP1_RXTYPE             0xFFCC111C         /* USB0 EPn Receive Type Register */
+#define REG_USB0_EP2_RXTYPE             0xFFCC112C         /* USB0 EPn Receive Type Register */
+#define REG_USB0_EP3_RXTYPE             0xFFCC113C         /* USB0 EPn Receive Type Register */
+#define REG_USB0_EP4_RXTYPE             0xFFCC114C         /* USB0 EPn Receive Type Register */
+#define REG_USB0_EP5_RXTYPE             0xFFCC115C         /* USB0 EPn Receive Type Register */
+#define REG_USB0_EP6_RXTYPE             0xFFCC116C         /* USB0 EPn Receive Type Register */
+#define REG_USB0_EP7_RXTYPE             0xFFCC117C         /* USB0 EPn Receive Type Register */
+#define REG_USB0_EP8_RXTYPE             0xFFCC118C         /* USB0 EPn Receive Type Register */
+#define REG_USB0_EP9_RXTYPE             0xFFCC119C         /* USB0 EPn Receive Type Register */
+#define REG_USB0_EP10_RXTYPE            0xFFCC11AC         /* USB0 EPn Receive Type Register */
+#define REG_USB0_EP11_RXTYPE            0xFFCC11BC         /* USB0 EPn Receive Type Register */
+#define REG_USB0_EP0_RXINTERVAL         0xFFCC110D         /* USB0 EPn Receive Polling Interval Register */
+#define REG_USB0_EP1_RXINTERVAL         0xFFCC111D         /* USB0 EPn Receive Polling Interval Register */
+#define REG_USB0_EP2_RXINTERVAL         0xFFCC112D         /* USB0 EPn Receive Polling Interval Register */
+#define REG_USB0_EP3_RXINTERVAL         0xFFCC113D         /* USB0 EPn Receive Polling Interval Register */
+#define REG_USB0_EP4_RXINTERVAL         0xFFCC114D         /* USB0 EPn Receive Polling Interval Register */
+#define REG_USB0_EP5_RXINTERVAL         0xFFCC115D         /* USB0 EPn Receive Polling Interval Register */
+#define REG_USB0_EP6_RXINTERVAL         0xFFCC116D         /* USB0 EPn Receive Polling Interval Register */
+#define REG_USB0_EP7_RXINTERVAL         0xFFCC117D         /* USB0 EPn Receive Polling Interval Register */
+#define REG_USB0_EP8_RXINTERVAL         0xFFCC118D         /* USB0 EPn Receive Polling Interval Register */
+#define REG_USB0_EP9_RXINTERVAL         0xFFCC119D         /* USB0 EPn Receive Polling Interval Register */
+#define REG_USB0_EP10_RXINTERVAL        0xFFCC11AD         /* USB0 EPn Receive Polling Interval Register */
+#define REG_USB0_EP11_RXINTERVAL        0xFFCC11BD         /* USB0 EPn Receive Polling Interval Register */
+#define REG_USB0_EP0_CFGDATA0           0xFFCC110F         /* USB0 EP0 Configuration Information Register */
+#define REG_USB0_DMA_IRQ                0xFFCC1200         /* USB0 DMA Interrupt Register */
+#define REG_USB0_DMA0_CTL               0xFFCC1204         /* USB0 DMA Channel n Control Register */
+#define REG_USB0_DMA1_CTL               0xFFCC1214         /* USB0 DMA Channel n Control Register */
+#define REG_USB0_DMA2_CTL               0xFFCC1224         /* USB0 DMA Channel n Control Register */
+#define REG_USB0_DMA3_CTL               0xFFCC1234         /* USB0 DMA Channel n Control Register */
+#define REG_USB0_DMA4_CTL               0xFFCC1244         /* USB0 DMA Channel n Control Register */
+#define REG_USB0_DMA5_CTL               0xFFCC1254         /* USB0 DMA Channel n Control Register */
+#define REG_USB0_DMA6_CTL               0xFFCC1264         /* USB0 DMA Channel n Control Register */
+#define REG_USB0_DMA7_CTL               0xFFCC1274         /* USB0 DMA Channel n Control Register */
+#define REG_USB0_DMA0_ADDR              0xFFCC1208         /* USB0 DMA Channel n Address Register */
+#define REG_USB0_DMA1_ADDR              0xFFCC1218         /* USB0 DMA Channel n Address Register */
+#define REG_USB0_DMA2_ADDR              0xFFCC1228         /* USB0 DMA Channel n Address Register */
+#define REG_USB0_DMA3_ADDR              0xFFCC1238         /* USB0 DMA Channel n Address Register */
+#define REG_USB0_DMA4_ADDR              0xFFCC1248         /* USB0 DMA Channel n Address Register */
+#define REG_USB0_DMA5_ADDR              0xFFCC1258         /* USB0 DMA Channel n Address Register */
+#define REG_USB0_DMA6_ADDR              0xFFCC1268         /* USB0 DMA Channel n Address Register */
+#define REG_USB0_DMA7_ADDR              0xFFCC1278         /* USB0 DMA Channel n Address Register */
+#define REG_USB0_DMA0_CNT               0xFFCC120C         /* USB0 DMA Channel n Count Register */
+#define REG_USB0_DMA1_CNT               0xFFCC121C         /* USB0 DMA Channel n Count Register */
+#define REG_USB0_DMA2_CNT               0xFFCC122C         /* USB0 DMA Channel n Count Register */
+#define REG_USB0_DMA3_CNT               0xFFCC123C         /* USB0 DMA Channel n Count Register */
+#define REG_USB0_DMA4_CNT               0xFFCC124C         /* USB0 DMA Channel n Count Register */
+#define REG_USB0_DMA5_CNT               0xFFCC125C         /* USB0 DMA Channel n Count Register */
+#define REG_USB0_DMA6_CNT               0xFFCC126C         /* USB0 DMA Channel n Count Register */
+#define REG_USB0_DMA7_CNT               0xFFCC127C         /* USB0 DMA Channel n Count Register */
+#define REG_USB0_RQPKTCNT0              0xFFCC1300         /* USB0 EPn Request Packet Count Register */
+#define REG_USB0_RQPKTCNT1              0xFFCC1304         /* USB0 EPn Request Packet Count Register */
+#define REG_USB0_RQPKTCNT2              0xFFCC1308         /* USB0 EPn Request Packet Count Register */
+#define REG_USB0_RQPKTCNT3              0xFFCC130C         /* USB0 EPn Request Packet Count Register */
+#define REG_USB0_RQPKTCNT4              0xFFCC1310         /* USB0 EPn Request Packet Count Register */
+#define REG_USB0_RQPKTCNT5              0xFFCC1314         /* USB0 EPn Request Packet Count Register */
+#define REG_USB0_RQPKTCNT6              0xFFCC1318         /* USB0 EPn Request Packet Count Register */
+#define REG_USB0_RQPKTCNT7              0xFFCC131C         /* USB0 EPn Request Packet Count Register */
+#define REG_USB0_RQPKTCNT8              0xFFCC1320         /* USB0 EPn Request Packet Count Register */
+#define REG_USB0_RQPKTCNT9              0xFFCC1324         /* USB0 EPn Request Packet Count Register */
+#define REG_USB0_RQPKTCNT10             0xFFCC1328         /* USB0 EPn Request Packet Count Register */
+#define REG_USB0_CT_UCH                 0xFFCC1344         /* USB0 Chirp Timeout Register */
+#define REG_USB0_CT_HHSRTN              0xFFCC1346         /* USB0 Host High Speed Return to Normal Register */
+#define REG_USB0_CT_HSBT                0xFFCC1348         /* USB0 High Speed Timeout Register */
+#define REG_USB0_LPM_ATTR               0xFFCC1360         /* USB0 LPM Attribute Register */
+#define REG_USB0_LPM_CTL                0xFFCC1362         /* USB0 LPM Control Register */
+#define REG_USB0_LPM_IEN                0xFFCC1363         /* USB0 LPM Interrupt Enable Register */
+#define REG_USB0_LPM_IRQ                0xFFCC1364         /* USB0 LPM Interrupt Status Register */
+#define REG_USB0_LPM_FADDR              0xFFCC1365         /* USB0 LPM Function Address Register */
+#define REG_USB0_VBUS_CTL               0xFFCC1380         /* USB0 VBUS Control Register */
+#define REG_USB0_BAT_CHG                0xFFCC1381         /* USB0 Battery Charging Control Register */
+#define REG_USB0_PHY_CTL                0xFFCC1394         /* USB0 PHY Control Register */
+#define REG_USB0_PLL_OSC                0xFFCC1398         /* USB0 PLL and Oscillator Control Register */
 
 /* =========================
         USB
@@ -13907,1705 +13755,1680 @@
 /* ------------------------------------------------------------------------------------------------------------------------
         USB_FADDR                            Pos/Masks                        Description
    ------------------------------------------------------------------------------------------------------------------------ */
-#define BITP_USB_FADDR_VALUE                  0
-#define BITM_USB_FADDR_VALUE                 (_ADI_MSK(0x0000007F,uint8_t))
+#define BITP_USB_FADDR_VALUE                  0                               /* Function Address Value */
+#define BITM_USB_FADDR_VALUE                 (_ADI_MSK(0x0000007F,uint8_t))   /* Function Address Value */
 
 /* ------------------------------------------------------------------------------------------------------------------------
         USB_POWER                            Pos/Masks                        Description
    ------------------------------------------------------------------------------------------------------------------------ */
-#define BITP_USB_POWER_ISOUPDT                7                               /* ISO Update */
-#define BITP_USB_POWER_SOFTCONN               6                               /* Enable the D+/- Termination Resistors */
+#define BITP_USB_POWER_ISOUPDT                7                               /* ISO Update Enable */
+#define BITP_USB_POWER_SOFTCONN               6                               /* Soft Connect/Disconnect Enable */
 #define BITP_USB_POWER_HSEN                   5                               /* High Speed Mode Enable */
-#define BITP_USB_POWER_HSMODE                 4                               /* High Speed Mode Indicator */
-#define BITP_USB_POWER_RESET                  3                               /* Reset */
-#define BITP_USB_POWER_RESUME                 2                               /* Assert Resume Signaling */
+#define BITP_USB_POWER_HSMODE                 4                               /* High Speed Mode */
+#define BITP_USB_POWER_RESET                  3                               /* Reset USB */
+#define BITP_USB_POWER_RESUME                 2                               /* Resume Mode */
 #define BITP_USB_POWER_SUSPEND                1                               /* Suspend Mode */
-#define BITP_USB_POWER_SUSEN                  0                               /* Enable UTMI SuspendM Output */
+#define BITP_USB_POWER_SUSEN                  0                               /* SUSPENDM Output Enable */
 
-#define BITM_USB_POWER_ISOUPDT               (_ADI_MSK(0x00000080,uint8_t))   /* ISO Update */
-#define ENUM_USB_POWER_NO_ISOUPDT            (_ADI_MSK(0x00000000,uint8_t))   /* ISOUPDT:  */
-#define ENUM_USB_POWER_ISOUPDT               (_ADI_MSK(0x00000080,uint8_t))   /* ISOUPDT:  */
+#define BITM_USB_POWER_ISOUPDT               (_ADI_MSK(0x00000080,uint8_t))   /* ISO Update Enable */
+#define ENUM_USB_POWER_NO_ISOUPDT            (_ADI_MSK(0x00000000,uint8_t))   /* ISOUPDT: Disable ISO Update */
+#define ENUM_USB_POWER_ISOUPDT               (_ADI_MSK(0x00000080,uint8_t))   /* ISOUPDT: Enable ISO Update */
 
-#define BITM_USB_POWER_SOFTCONN              (_ADI_MSK(0x00000040,uint8_t))   /* Enable the D+/- Termination Resistors */
-#define ENUM_USB_POWER_NO_SOFTCONN           (_ADI_MSK(0x00000000,uint8_t))   /* SOFTCONN: Disable the D+/- termination resistors */
-#define ENUM_USB_POWER_SOFTCONN              (_ADI_MSK(0x00000040,uint8_t))   /* SOFTCONN: Enable the D+/- termination resistors */
+#define BITM_USB_POWER_SOFTCONN              (_ADI_MSK(0x00000040,uint8_t))   /* Soft Connect/Disconnect Enable */
+#define ENUM_USB_POWER_NO_SOFTCONN           (_ADI_MSK(0x00000000,uint8_t))   /* SOFTCONN: Disable Soft Connect/Disconnect */
+#define ENUM_USB_POWER_SOFTCONN              (_ADI_MSK(0x00000040,uint8_t))   /* SOFTCONN: Enable Soft Connect/Disconnect */
 
 #define BITM_USB_POWER_HSEN                  (_ADI_MSK(0x00000020,uint8_t))   /* High Speed Mode Enable */
-#define ENUM_USB_POWER_HSDIS                 (_ADI_MSK(0x00000000,uint8_t))   /* HSEN: USB will not attempt to negotiate high speed mode */
-#define ENUM_USB_POWER_HSEN                  (_ADI_MSK(0x00000020,uint8_t))   /* HSEN: USB will try to negotiate high speed mode */
+#define ENUM_USB_POWER_HSDIS                 (_ADI_MSK(0x00000000,uint8_t))   /* HSEN: Disable Negotiation for HS Mode */
+#define ENUM_USB_POWER_HSEN                  (_ADI_MSK(0x00000020,uint8_t))   /* HSEN: Enable Negotiation for HS Mode */
 
-#define BITM_USB_POWER_HSMODE                (_ADI_MSK(0x00000010,uint8_t))   /* High Speed Mode Indicator */
-#define ENUM_USB_POWER_NO_HSMODE             (_ADI_MSK(0x00000000,uint8_t))   /* HSMODE:  */
-#define ENUM_USB_POWER_HSMODE                (_ADI_MSK(0x00000010,uint8_t))   /* HSMODE: High speed mode  successfully negotiated during reset */
+#define BITM_USB_POWER_HSMODE                (_ADI_MSK(0x00000010,uint8_t))   /* High Speed Mode */
+#define ENUM_USB_POWER_NO_HSMODE             (_ADI_MSK(0x00000000,uint8_t))   /* HSMODE: Full Speed Mode (HS fail during reset) */
+#define ENUM_USB_POWER_HSMODE                (_ADI_MSK(0x00000010,uint8_t))   /* HSMODE: High Speed Mode (HS success during reset) */
 
-#define BITM_USB_POWER_RESET                 (_ADI_MSK(0x00000008,uint8_t))   /* Reset */
-#define ENUM_USB_POWER_NO_RESET              (_ADI_MSK(0x00000000,uint8_t))   /* RESET:  */
-#define ENUM_USB_POWER_RESET                 (_ADI_MSK(0x00000008,uint8_t))   /* RESET:  */
+#define BITM_USB_POWER_RESET                 (_ADI_MSK(0x00000008,uint8_t))   /* Reset USB */
+#define ENUM_USB_POWER_NO_RESET              (_ADI_MSK(0x00000000,uint8_t))   /* RESET: No Reset */
+#define ENUM_USB_POWER_RESET                 (_ADI_MSK(0x00000008,uint8_t))   /* RESET: Reset USB */
 
-#define BITM_USB_POWER_RESUME                (_ADI_MSK(0x00000004,uint8_t))   /* Assert Resume Signaling */
-#define ENUM_USB_POWER_NO_RESUME             (_ADI_MSK(0x00000000,uint8_t))   /* RESUME:  */
-#define ENUM_USB_POWER_RESUME                (_ADI_MSK(0x00000004,uint8_t))   /* RESUME: Cause the controller to assert resume signaling */
+#define BITM_USB_POWER_RESUME                (_ADI_MSK(0x00000004,uint8_t))   /* Resume Mode */
+#define ENUM_USB_POWER_NO_RESUME             (_ADI_MSK(0x00000000,uint8_t))   /* RESUME: Disable Resume Signaling */
+#define ENUM_USB_POWER_RESUME                (_ADI_MSK(0x00000004,uint8_t))   /* RESUME: Enable Resume Signaling */
 
 #define BITM_USB_POWER_SUSPEND               (_ADI_MSK(0x00000002,uint8_t))   /* Suspend Mode */
-#define ENUM_USB_POWER_NO_SUSPEND            (_ADI_MSK(0x00000000,uint8_t))   /* SUSPEND: This bit is automatically cleared if the resume bit is set. */
-#define ENUM_USB_POWER_SUSPEND               (_ADI_MSK(0x00000002,uint8_t))   /* SUSPEND:  */
+#define ENUM_USB_POWER_NO_SUSPEND            (_ADI_MSK(0x00000000,uint8_t))   /* SUSPEND: Disable Suspend Mode (Host) */
+#define ENUM_USB_POWER_SUSPEND               (_ADI_MSK(0x00000002,uint8_t))   /* SUSPEND: Enable Suspend Mode (Host) */
 
-#define BITM_USB_POWER_SUSEN                 (_ADI_MSK(0x00000001,uint8_t))   /* Enable UTMI SuspendM Output */
-#define ENUM_USB_POWER_SUSDIS                (_ADI_MSK(0x00000000,uint8_t))   /* SUSEN:  */
-#define ENUM_USB_POWER_SUSEN                 (_ADI_MSK(0x00000001,uint8_t))   /* SUSEN: Enable UTMI SuspendM Output */
+#define BITM_USB_POWER_SUSEN                 (_ADI_MSK(0x00000001,uint8_t))   /* SUSPENDM Output Enable */
+#define ENUM_USB_POWER_SUSDIS                (_ADI_MSK(0x00000000,uint8_t))   /* SUSEN: Disable SUSPENDM Output */
+#define ENUM_USB_POWER_SUSEN                 (_ADI_MSK(0x00000001,uint8_t))   /* SUSEN: Enable SUSPENDM Output */
 
 /* ------------------------------------------------------------------------------------------------------------------------
         USB_INTRTX                           Pos/Masks                        Description
    ------------------------------------------------------------------------------------------------------------------------ */
-#define BITP_USB_INTRTX_EP11                 11
-#define BITP_USB_INTRTX_EP10                 10
-#define BITP_USB_INTRTX_EP9                   9
-#define BITP_USB_INTRTX_EP8                   8
-#define BITP_USB_INTRTX_EP7                   7
-#define BITP_USB_INTRTX_EP6                   6
-#define BITP_USB_INTRTX_EP5                   5
-#define BITP_USB_INTRTX_EP4                   4
-#define BITP_USB_INTRTX_EP3                   3
-#define BITP_USB_INTRTX_EP2                   2
-#define BITP_USB_INTRTX_EP1                   1
-#define BITP_USB_INTRTX_EP0                   0
-#define BITM_USB_INTRTX_EP11                 (_ADI_MSK(0x00000800,uint16_t))
-#define BITM_USB_INTRTX_EP10                 (_ADI_MSK(0x00000400,uint16_t))
-#define BITM_USB_INTRTX_EP9                  (_ADI_MSK(0x00000200,uint16_t))
-#define BITM_USB_INTRTX_EP8                  (_ADI_MSK(0x00000100,uint16_t))
-#define BITM_USB_INTRTX_EP7                  (_ADI_MSK(0x00000080,uint16_t))
-#define BITM_USB_INTRTX_EP6                  (_ADI_MSK(0x00000040,uint16_t))
-#define BITM_USB_INTRTX_EP5                  (_ADI_MSK(0x00000020,uint16_t))
-#define BITM_USB_INTRTX_EP4                  (_ADI_MSK(0x00000010,uint16_t))
-#define BITM_USB_INTRTX_EP3                  (_ADI_MSK(0x00000008,uint16_t))
-#define BITM_USB_INTRTX_EP2                  (_ADI_MSK(0x00000004,uint16_t))
-#define BITM_USB_INTRTX_EP1                  (_ADI_MSK(0x00000002,uint16_t))
-#define BITM_USB_INTRTX_EP0                  (_ADI_MSK(0x00000001,uint16_t))
+#define BITP_USB_INTRTX_EP11                 11                               /* End Point 11 Tx Interrupt */
+#define BITP_USB_INTRTX_EP10                 10                               /* End Point 10 Tx Interrupt */
+#define BITP_USB_INTRTX_EP9                   9                               /* End Point 9 Tx Interrupt */
+#define BITP_USB_INTRTX_EP8                   8                               /* End Point 8 Tx Interrupt */
+#define BITP_USB_INTRTX_EP7                   7                               /* End Point 7 Tx Interrupt */
+#define BITP_USB_INTRTX_EP6                   6                               /* End Point 6 Tx Interrupt */
+#define BITP_USB_INTRTX_EP5                   5                               /* End Point 5 Tx Interrupt */
+#define BITP_USB_INTRTX_EP4                   4                               /* End Point 4 Tx Interrupt */
+#define BITP_USB_INTRTX_EP3                   3                               /* End Point 3 Tx Interrupt */
+#define BITP_USB_INTRTX_EP2                   2                               /* End Point 2 Tx Interrupt */
+#define BITP_USB_INTRTX_EP1                   1                               /* End Point 1 Tx Interrupt */
+#define BITP_USB_INTRTX_EP0                   0                               /* End Point 0 Tx Interrupt */
+#define BITM_USB_INTRTX_EP11                 (_ADI_MSK(0x00000800,uint16_t))  /* End Point 11 Tx Interrupt */
+#define BITM_USB_INTRTX_EP10                 (_ADI_MSK(0x00000400,uint16_t))  /* End Point 10 Tx Interrupt */
+#define BITM_USB_INTRTX_EP9                  (_ADI_MSK(0x00000200,uint16_t))  /* End Point 9 Tx Interrupt */
+#define BITM_USB_INTRTX_EP8                  (_ADI_MSK(0x00000100,uint16_t))  /* End Point 8 Tx Interrupt */
+#define BITM_USB_INTRTX_EP7                  (_ADI_MSK(0x00000080,uint16_t))  /* End Point 7 Tx Interrupt */
+#define BITM_USB_INTRTX_EP6                  (_ADI_MSK(0x00000040,uint16_t))  /* End Point 6 Tx Interrupt */
+#define BITM_USB_INTRTX_EP5                  (_ADI_MSK(0x00000020,uint16_t))  /* End Point 5 Tx Interrupt */
+#define BITM_USB_INTRTX_EP4                  (_ADI_MSK(0x00000010,uint16_t))  /* End Point 4 Tx Interrupt */
+#define BITM_USB_INTRTX_EP3                  (_ADI_MSK(0x00000008,uint16_t))  /* End Point 3 Tx Interrupt */
+#define BITM_USB_INTRTX_EP2                  (_ADI_MSK(0x00000004,uint16_t))  /* End Point 2 Tx Interrupt */
+#define BITM_USB_INTRTX_EP1                  (_ADI_MSK(0x00000002,uint16_t))  /* End Point 1 Tx Interrupt */
+#define BITM_USB_INTRTX_EP0                  (_ADI_MSK(0x00000001,uint16_t))  /* End Point 0 Tx Interrupt */
 
 /* ------------------------------------------------------------------------------------------------------------------------
         USB_INTRRX                           Pos/Masks                        Description
    ------------------------------------------------------------------------------------------------------------------------ */
-#define BITP_USB_INTRRX_EP11                 11
-#define BITP_USB_INTRRX_EP10                 10
-#define BITP_USB_INTRRX_EP9                   9
-#define BITP_USB_INTRRX_EP8                   8
-#define BITP_USB_INTRRX_EP7                   7
-#define BITP_USB_INTRRX_EP6                   6
-#define BITP_USB_INTRRX_EP5                   5
-#define BITP_USB_INTRRX_EP4                   4
-#define BITP_USB_INTRRX_EP3                   3
-#define BITP_USB_INTRRX_EP2                   2
-#define BITP_USB_INTRRX_EP1                   1
-#define BITM_USB_INTRRX_EP11                 (_ADI_MSK(0x00000800,uint16_t))
-#define BITM_USB_INTRRX_EP10                 (_ADI_MSK(0x00000400,uint16_t))
-#define BITM_USB_INTRRX_EP9                  (_ADI_MSK(0x00000200,uint16_t))
-#define BITM_USB_INTRRX_EP8                  (_ADI_MSK(0x00000100,uint16_t))
-#define BITM_USB_INTRRX_EP7                  (_ADI_MSK(0x00000080,uint16_t))
-#define BITM_USB_INTRRX_EP6                  (_ADI_MSK(0x00000040,uint16_t))
-#define BITM_USB_INTRRX_EP5                  (_ADI_MSK(0x00000020,uint16_t))
-#define BITM_USB_INTRRX_EP4                  (_ADI_MSK(0x00000010,uint16_t))
-#define BITM_USB_INTRRX_EP3                  (_ADI_MSK(0x00000008,uint16_t))
-#define BITM_USB_INTRRX_EP2                  (_ADI_MSK(0x00000004,uint16_t))
-#define BITM_USB_INTRRX_EP1                  (_ADI_MSK(0x00000002,uint16_t))
+#define BITP_USB_INTRRX_EP11                 11                               /* End Point 11 Rx Interrupt. */
+#define BITP_USB_INTRRX_EP10                 10                               /* End Point 10 Rx Interrupt. */
+#define BITP_USB_INTRRX_EP9                   9                               /* End Point 9 Rx Interrupt. */
+#define BITP_USB_INTRRX_EP8                   8                               /* End Point 8 Rx Interrupt. */
+#define BITP_USB_INTRRX_EP7                   7                               /* End Point 7 Rx Interrupt. */
+#define BITP_USB_INTRRX_EP6                   6                               /* End Point 6 Rx Interrupt. */
+#define BITP_USB_INTRRX_EP5                   5                               /* End Point 5 Rx Interrupt. */
+#define BITP_USB_INTRRX_EP4                   4                               /* End Point 4 Rx Interrupt. */
+#define BITP_USB_INTRRX_EP3                   3                               /* End Point 3 Rx Interrupt. */
+#define BITP_USB_INTRRX_EP2                   2                               /* End Point 2 Rx Interrupt. */
+#define BITP_USB_INTRRX_EP1                   1                               /* End Point 1 Rx Interrupt. */
+#define BITM_USB_INTRRX_EP11                 (_ADI_MSK(0x00000800,uint16_t))  /* End Point 11 Rx Interrupt. */
+#define BITM_USB_INTRRX_EP10                 (_ADI_MSK(0x00000400,uint16_t))  /* End Point 10 Rx Interrupt. */
+#define BITM_USB_INTRRX_EP9                  (_ADI_MSK(0x00000200,uint16_t))  /* End Point 9 Rx Interrupt. */
+#define BITM_USB_INTRRX_EP8                  (_ADI_MSK(0x00000100,uint16_t))  /* End Point 8 Rx Interrupt. */
+#define BITM_USB_INTRRX_EP7                  (_ADI_MSK(0x00000080,uint16_t))  /* End Point 7 Rx Interrupt. */
+#define BITM_USB_INTRRX_EP6                  (_ADI_MSK(0x00000040,uint16_t))  /* End Point 6 Rx Interrupt. */
+#define BITM_USB_INTRRX_EP5                  (_ADI_MSK(0x00000020,uint16_t))  /* End Point 5 Rx Interrupt. */
+#define BITM_USB_INTRRX_EP4                  (_ADI_MSK(0x00000010,uint16_t))  /* End Point 4 Rx Interrupt. */
+#define BITM_USB_INTRRX_EP3                  (_ADI_MSK(0x00000008,uint16_t))  /* End Point 3 Rx Interrupt. */
+#define BITM_USB_INTRRX_EP2                  (_ADI_MSK(0x00000004,uint16_t))  /* End Point 2 Rx Interrupt. */
+#define BITM_USB_INTRRX_EP1                  (_ADI_MSK(0x00000002,uint16_t))  /* End Point 1 Rx Interrupt. */
 
 /* ------------------------------------------------------------------------------------------------------------------------
         USB_INTRTXE                          Pos/Masks                        Description
    ------------------------------------------------------------------------------------------------------------------------ */
-#define BITP_USB_INTRTXE_EP11                11
-#define BITP_USB_INTRTXE_EP10                10
-#define BITP_USB_INTRTXE_EP9                  9
-#define BITP_USB_INTRTXE_EP8                  8
-#define BITP_USB_INTRTXE_EP7                  7
-#define BITP_USB_INTRTXE_EP6                  6
-#define BITP_USB_INTRTXE_EP5                  5
-#define BITP_USB_INTRTXE_EP4                  4
-#define BITP_USB_INTRTXE_EP3                  3
-#define BITP_USB_INTRTXE_EP2                  2
-#define BITP_USB_INTRTXE_EP1                  1
-#define BITP_USB_INTRTXE_EP0                  0
-#define BITM_USB_INTRTXE_EP11                (_ADI_MSK(0x00000800,uint16_t))
-#define BITM_USB_INTRTXE_EP10                (_ADI_MSK(0x00000400,uint16_t))
-#define BITM_USB_INTRTXE_EP9                 (_ADI_MSK(0x00000200,uint16_t))
-#define BITM_USB_INTRTXE_EP8                 (_ADI_MSK(0x00000100,uint16_t))
-#define BITM_USB_INTRTXE_EP7                 (_ADI_MSK(0x00000080,uint16_t))
-#define BITM_USB_INTRTXE_EP6                 (_ADI_MSK(0x00000040,uint16_t))
-#define BITM_USB_INTRTXE_EP5                 (_ADI_MSK(0x00000020,uint16_t))
-#define BITM_USB_INTRTXE_EP4                 (_ADI_MSK(0x00000010,uint16_t))
-#define BITM_USB_INTRTXE_EP3                 (_ADI_MSK(0x00000008,uint16_t))
-#define BITM_USB_INTRTXE_EP2                 (_ADI_MSK(0x00000004,uint16_t))
-#define BITM_USB_INTRTXE_EP1                 (_ADI_MSK(0x00000002,uint16_t))
-#define BITM_USB_INTRTXE_EP0                 (_ADI_MSK(0x00000001,uint16_t))
+#define BITP_USB_INTRTXE_EP11                11                               /* End Point 11 Tx Interrupt Enable */
+#define BITP_USB_INTRTXE_EP10                10                               /* End Point 10 Tx Interrupt Enable */
+#define BITP_USB_INTRTXE_EP9                  9                               /* End Point 9 Tx Interrupt Enable */
+#define BITP_USB_INTRTXE_EP8                  8                               /* End Point 8 Tx Interrupt Enable */
+#define BITP_USB_INTRTXE_EP7                  7                               /* End Point 7 Tx Interrupt Enable */
+#define BITP_USB_INTRTXE_EP6                  6                               /* End Point 6 Tx Interrupt Enable */
+#define BITP_USB_INTRTXE_EP5                  5                               /* End Point 5 Tx Interrupt Enable */
+#define BITP_USB_INTRTXE_EP4                  4                               /* End Point 4 Tx Interrupt Enable */
+#define BITP_USB_INTRTXE_EP3                  3                               /* End Point 3 Tx Interrupt Enable */
+#define BITP_USB_INTRTXE_EP2                  2                               /* End Point 2 Tx Interrupt Enable */
+#define BITP_USB_INTRTXE_EP1                  1                               /* End Point 1 Tx Interrupt Enable */
+#define BITP_USB_INTRTXE_EP0                  0                               /* End Point 0 Tx Interrupt Enable */
+#define BITM_USB_INTRTXE_EP11                (_ADI_MSK(0x00000800,uint16_t))  /* End Point 11 Tx Interrupt Enable */
+#define BITM_USB_INTRTXE_EP10                (_ADI_MSK(0x00000400,uint16_t))  /* End Point 10 Tx Interrupt Enable */
+#define BITM_USB_INTRTXE_EP9                 (_ADI_MSK(0x00000200,uint16_t))  /* End Point 9 Tx Interrupt Enable */
+#define BITM_USB_INTRTXE_EP8                 (_ADI_MSK(0x00000100,uint16_t))  /* End Point 8 Tx Interrupt Enable */
+#define BITM_USB_INTRTXE_EP7                 (_ADI_MSK(0x00000080,uint16_t))  /* End Point 7 Tx Interrupt Enable */
+#define BITM_USB_INTRTXE_EP6                 (_ADI_MSK(0x00000040,uint16_t))  /* End Point 6 Tx Interrupt Enable */
+#define BITM_USB_INTRTXE_EP5                 (_ADI_MSK(0x00000020,uint16_t))  /* End Point 5 Tx Interrupt Enable */
+#define BITM_USB_INTRTXE_EP4                 (_ADI_MSK(0x00000010,uint16_t))  /* End Point 4 Tx Interrupt Enable */
+#define BITM_USB_INTRTXE_EP3                 (_ADI_MSK(0x00000008,uint16_t))  /* End Point 3 Tx Interrupt Enable */
+#define BITM_USB_INTRTXE_EP2                 (_ADI_MSK(0x00000004,uint16_t))  /* End Point 2 Tx Interrupt Enable */
+#define BITM_USB_INTRTXE_EP1                 (_ADI_MSK(0x00000002,uint16_t))  /* End Point 1 Tx Interrupt Enable */
+#define BITM_USB_INTRTXE_EP0                 (_ADI_MSK(0x00000001,uint16_t))  /* End Point 0 Tx Interrupt Enable */
 
 /* ------------------------------------------------------------------------------------------------------------------------
         USB_INTRRXE                          Pos/Masks                        Description
    ------------------------------------------------------------------------------------------------------------------------ */
-#define BITP_USB_INTRRXE_EP11                11
-#define BITP_USB_INTRRXE_EP10                10
-#define BITP_USB_INTRRXE_EP9                  9
-#define BITP_USB_INTRRXE_EP8                  8
-#define BITP_USB_INTRRXE_EP7                  7
-#define BITP_USB_INTRRXE_EP6                  6
-#define BITP_USB_INTRRXE_EP5                  5
-#define BITP_USB_INTRRXE_EP4                  4
-#define BITP_USB_INTRRXE_EP3                  3
-#define BITP_USB_INTRRXE_EP2                  2
-#define BITP_USB_INTRRXE_EP1                  1
-#define BITM_USB_INTRRXE_EP11                (_ADI_MSK(0x00000800,uint16_t))
-#define BITM_USB_INTRRXE_EP10                (_ADI_MSK(0x00000400,uint16_t))
-#define BITM_USB_INTRRXE_EP9                 (_ADI_MSK(0x00000200,uint16_t))
-#define BITM_USB_INTRRXE_EP8                 (_ADI_MSK(0x00000100,uint16_t))
-#define BITM_USB_INTRRXE_EP7                 (_ADI_MSK(0x00000080,uint16_t))
-#define BITM_USB_INTRRXE_EP6                 (_ADI_MSK(0x00000040,uint16_t))
-#define BITM_USB_INTRRXE_EP5                 (_ADI_MSK(0x00000020,uint16_t))
-#define BITM_USB_INTRRXE_EP4                 (_ADI_MSK(0x00000010,uint16_t))
-#define BITM_USB_INTRRXE_EP3                 (_ADI_MSK(0x00000008,uint16_t))
-#define BITM_USB_INTRRXE_EP2                 (_ADI_MSK(0x00000004,uint16_t))
-#define BITM_USB_INTRRXE_EP1                 (_ADI_MSK(0x00000002,uint16_t))
+#define BITP_USB_INTRRXE_EP11                11                               /* End Point 11 Rx Interrupt Enable */
+#define BITP_USB_INTRRXE_EP10                10                               /* End Point 10 Rx Interrupt Enable */
+#define BITP_USB_INTRRXE_EP9                  9                               /* End Point 9 Rx Interrupt Enable */
+#define BITP_USB_INTRRXE_EP8                  8                               /* End Point 8 Rx Interrupt Enable */
+#define BITP_USB_INTRRXE_EP7                  7                               /* End Point 7 Rx Interrupt Enable */
+#define BITP_USB_INTRRXE_EP6                  6                               /* End Point 6 Rx Interrupt Enable */
+#define BITP_USB_INTRRXE_EP5                  5                               /* End Point 5 Rx Interrupt Enable */
+#define BITP_USB_INTRRXE_EP4                  4                               /* End Point 4 Rx Interrupt Enable */
+#define BITP_USB_INTRRXE_EP3                  3                               /* End Point 3 Rx Interrupt Enable */
+#define BITP_USB_INTRRXE_EP2                  2                               /* End Point 2 Rx Interrupt Enable */
+#define BITP_USB_INTRRXE_EP1                  1                               /* End Point 1 Rx Interrupt Enable */
+#define BITM_USB_INTRRXE_EP11                (_ADI_MSK(0x00000800,uint16_t))  /* End Point 11 Rx Interrupt Enable */
+#define BITM_USB_INTRRXE_EP10                (_ADI_MSK(0x00000400,uint16_t))  /* End Point 10 Rx Interrupt Enable */
+#define BITM_USB_INTRRXE_EP9                 (_ADI_MSK(0x00000200,uint16_t))  /* End Point 9 Rx Interrupt Enable */
+#define BITM_USB_INTRRXE_EP8                 (_ADI_MSK(0x00000100,uint16_t))  /* End Point 8 Rx Interrupt Enable */
+#define BITM_USB_INTRRXE_EP7                 (_ADI_MSK(0x00000080,uint16_t))  /* End Point 7 Rx Interrupt Enable */
+#define BITM_USB_INTRRXE_EP6                 (_ADI_MSK(0x00000040,uint16_t))  /* End Point 6 Rx Interrupt Enable */
+#define BITM_USB_INTRRXE_EP5                 (_ADI_MSK(0x00000020,uint16_t))  /* End Point 5 Rx Interrupt Enable */
+#define BITM_USB_INTRRXE_EP4                 (_ADI_MSK(0x00000010,uint16_t))  /* End Point 4 Rx Interrupt Enable */
+#define BITM_USB_INTRRXE_EP3                 (_ADI_MSK(0x00000008,uint16_t))  /* End Point 3 Rx Interrupt Enable */
+#define BITM_USB_INTRRXE_EP2                 (_ADI_MSK(0x00000004,uint16_t))  /* End Point 2 Rx Interrupt Enable */
+#define BITM_USB_INTRRXE_EP1                 (_ADI_MSK(0x00000002,uint16_t))  /* End Point 1 Rx Interrupt Enable */
 
 /* ------------------------------------------------------------------------------------------------------------------------
         USB_IRQ                              Pos/Masks                        Description
    ------------------------------------------------------------------------------------------------------------------------ */
-#define BITP_USB_IRQ_VBUSERR                  7                               /* VBus Error */
-#define BITP_USB_IRQ_SESSREQ                  6                               /* Session Request */
-#define BITP_USB_IRQ_DISCON                   5                               /* Device Disconnect */
-#define BITP_USB_IRQ_CON                      4                               /* Device Connection */
-#define BITP_USB_IRQ_SOF                      3                               /* Start of Frame */
-#define BITP_USB_IRQ_RSTBABBLE                2                               /* Reset/Babble Detection */
-#define BITP_USB_IRQ_RESUME                   1                               /* Resume Signaling Detection */
-#define BITP_USB_IRQ_SUSPEND                  0                               /* Suspend Signaling Detection */
+#define BITP_USB_IRQ_VBUSERR                  7                               /* VBUS Threshold Indicator */
+#define BITP_USB_IRQ_SESSREQ                  6                               /* Session Request Indicator */
+#define BITP_USB_IRQ_DISCON                   5                               /* Disconnect Indicator */
+#define BITP_USB_IRQ_CON                      4                               /* Connection Indicator */
+#define BITP_USB_IRQ_SOF                      3                               /* Start-of-frame Indicator */
+#define BITP_USB_IRQ_RSTBABBLE                2                               /* Reset/Babble Indicator */
+#define BITP_USB_IRQ_RESUME                   1                               /* Resume Indicator */
+#define BITP_USB_IRQ_SUSPEND                  0                               /* Suspend Indicator */
 
-#define BITM_USB_IRQ_VBUSERR                 (_ADI_MSK(0x00000080,uint8_t))   /* VBus Error */
-#define ENUM_USB_IRQ_NO_VBUSERR              (_ADI_MSK(0x00000000,uint8_t))   /* VBUSERR:  */
-#define ENUM_USB_IRQ_VBUSERR                 (_ADI_MSK(0x00000080,uint8_t))   /* VBUSERR: VBus dropped below valid threshold (A-device) */
+#define BITM_USB_IRQ_VBUSERR                 (_ADI_MSK(0x00000080,uint8_t))   /* VBUS Threshold Indicator */
+#define ENUM_USB_IRQ_NO_VBUSERR              (_ADI_MSK(0x00000000,uint8_t))   /* VBUSERR: No Interrupt */
+#define ENUM_USB_IRQ_VBUSERR                 (_ADI_MSK(0x00000080,uint8_t))   /* VBUSERR: Interrupt Pending */
 
-#define BITM_USB_IRQ_SESSREQ                 (_ADI_MSK(0x00000040,uint8_t))   /* Session Request */
-#define ENUM_USB_IRQ_NO_SESSREQ              (_ADI_MSK(0x00000000,uint8_t))   /* SESSREQ:  */
-#define ENUM_USB_IRQ_SESSREQ                 (_ADI_MSK(0x00000040,uint8_t))   /* SESSREQ: Session Request signaling detected (A-device) */
+#define BITM_USB_IRQ_SESSREQ                 (_ADI_MSK(0x00000040,uint8_t))   /* Session Request Indicator */
+#define ENUM_USB_IRQ_NO_SESSREQ              (_ADI_MSK(0x00000000,uint8_t))   /* SESSREQ: No Interrupt */
+#define ENUM_USB_IRQ_SESSREQ                 (_ADI_MSK(0x00000040,uint8_t))   /* SESSREQ: Interrupt Pending */
 
-#define BITM_USB_IRQ_DISCON                  (_ADI_MSK(0x00000020,uint8_t))   /* Device Disconnect */
-#define ENUM_USB_IRQ_NO_DISCON               (_ADI_MSK(0x00000000,uint8_t))   /* DISCON:  */
-#define ENUM_USB_IRQ_DISCON                  (_ADI_MSK(0x00000020,uint8_t))   /* DISCON: Device disconnect  detected (Host). Session ended (Device) */
+#define BITM_USB_IRQ_DISCON                  (_ADI_MSK(0x00000020,uint8_t))   /* Disconnect Indicator */
+#define ENUM_USB_IRQ_NO_DISCON               (_ADI_MSK(0x00000000,uint8_t))   /* DISCON: No Interrupt */
+#define ENUM_USB_IRQ_DISCON                  (_ADI_MSK(0x00000020,uint8_t))   /* DISCON: Interrupt Pending */
 
-#define BITM_USB_IRQ_CON                     (_ADI_MSK(0x00000010,uint8_t))   /* Device Connection */
-#define ENUM_USB_IRQ_NO_CON                  (_ADI_MSK(0x00000000,uint8_t))   /* CON:  */
-#define ENUM_USB_IRQ_CON                     (_ADI_MSK(0x00000010,uint8_t))   /* CON: Device connection is detected (Host) */
+#define BITM_USB_IRQ_CON                     (_ADI_MSK(0x00000010,uint8_t))   /* Connection Indicator */
+#define ENUM_USB_IRQ_NO_CON                  (_ADI_MSK(0x00000000,uint8_t))   /* CON: No Interrupt */
+#define ENUM_USB_IRQ_CON                     (_ADI_MSK(0x00000010,uint8_t))   /* CON: Interrupt Pending */
 
-#define BITM_USB_IRQ_SOF                     (_ADI_MSK(0x00000008,uint8_t))   /* Start of Frame */
-#define ENUM_USB_IRQ_NO_SOF                  (_ADI_MSK(0x00000000,uint8_t))   /* SOF:  */
-#define ENUM_USB_IRQ_SOF                     (_ADI_MSK(0x00000008,uint8_t))   /* SOF: Set when a new frame starts. */
+#define BITM_USB_IRQ_SOF                     (_ADI_MSK(0x00000008,uint8_t))   /* Start-of-frame Indicator */
+#define ENUM_USB_IRQ_NO_SOF                  (_ADI_MSK(0x00000000,uint8_t))   /* SOF: No Interrupt */
+#define ENUM_USB_IRQ_SOF                     (_ADI_MSK(0x00000008,uint8_t))   /* SOF: Interrupt Pending */
 
-#define BITM_USB_IRQ_RSTBABBLE               (_ADI_MSK(0x00000004,uint8_t))   /* Reset/Babble Detection */
-#define ENUM_USB_IRQ_NO_RSTBABBLE            (_ADI_MSK(0x00000000,uint8_t))   /* RSTBABBLE:  */
-#define ENUM_USB_IRQ_RSTBABBLE               (_ADI_MSK(0x00000004,uint8_t))   /* RSTBABBLE:  */
+#define BITM_USB_IRQ_RSTBABBLE               (_ADI_MSK(0x00000004,uint8_t))   /* Reset/Babble Indicator */
+#define ENUM_USB_IRQ_NO_RSTBABBLE            (_ADI_MSK(0x00000000,uint8_t))   /* RSTBABBLE: No Interrupt */
+#define ENUM_USB_IRQ_RSTBABBLE               (_ADI_MSK(0x00000004,uint8_t))   /* RSTBABBLE: Interrupt Pending */
 
-#define BITM_USB_IRQ_RESUME                  (_ADI_MSK(0x00000002,uint8_t))   /* Resume Signaling Detection */
-#define ENUM_USB_IRQ_NO_RESUME               (_ADI_MSK(0x00000000,uint8_t))   /* RESUME:  */
-#define ENUM_USB_IRQ_RESUME                  (_ADI_MSK(0x00000002,uint8_t))   /* RESUME:  */
+#define BITM_USB_IRQ_RESUME                  (_ADI_MSK(0x00000002,uint8_t))   /* Resume Indicator */
+#define ENUM_USB_IRQ_NO_RESUME               (_ADI_MSK(0x00000000,uint8_t))   /* RESUME: No Interrupt */
+#define ENUM_USB_IRQ_RESUME                  (_ADI_MSK(0x00000002,uint8_t))   /* RESUME: Interrupt Pending */
 
-#define BITM_USB_IRQ_SUSPEND                 (_ADI_MSK(0x00000001,uint8_t))   /* Suspend Signaling Detection */
-#define ENUM_USB_IRQ_NO_SUSPEND              (_ADI_MSK(0x00000000,uint8_t))   /* SUSPEND:  */
-#define ENUM_USB_IRQ_SUSPEND                 (_ADI_MSK(0x00000001,uint8_t))   /* SUSPEND: Suspend signaling is detected on the bus (Device) */
+#define BITM_USB_IRQ_SUSPEND                 (_ADI_MSK(0x00000001,uint8_t))   /* Suspend Indicator */
+#define ENUM_USB_IRQ_NO_SUSPEND              (_ADI_MSK(0x00000000,uint8_t))   /* SUSPEND: No Interrupt */
+#define ENUM_USB_IRQ_SUSPEND                 (_ADI_MSK(0x00000001,uint8_t))   /* SUSPEND: Interrupt Pending */
 
 /* ------------------------------------------------------------------------------------------------------------------------
         USB_IEN                              Pos/Masks                        Description
    ------------------------------------------------------------------------------------------------------------------------ */
-#define BITP_USB_IEN_VBUSERR                  7
-#define BITP_USB_IEN_SESSREQ                  6
-#define BITP_USB_IEN_DISCON                   5
-#define BITP_USB_IEN_CON                      4
-#define BITP_USB_IEN_SOF                      3
-#define BITP_USB_IEN_RSTBABBLE                2
-#define BITP_USB_IEN_RESUME                   1
-#define BITP_USB_IEN_SUSPEND                  0
+#define BITP_USB_IEN_VBUSERR                  7                               /* VBUS Threshold Indicator Interrupt Enable */
+#define BITP_USB_IEN_SESSREQ                  6                               /* Session Request Indicator Interrupt Enable */
+#define BITP_USB_IEN_DISCON                   5                               /* Disconnect Indicator Interrupt Enable */
+#define BITP_USB_IEN_CON                      4                               /* Connection Indicator Interrupt Enable */
+#define BITP_USB_IEN_SOF                      3                               /* Start-of-frame Indicator Interrupt Enable */
+#define BITP_USB_IEN_RSTBABBLE                2                               /* Reset/Babble Indicator Interrupt Enable */
+#define BITP_USB_IEN_RESUME                   1                               /* Resume Indicator Interrupt Enable */
+#define BITP_USB_IEN_SUSPEND                  0                               /* Suspend Indicator Interrupt Enable */
 
-#define BITM_USB_IEN_VBUSERR                 (_ADI_MSK(0x00000080,uint8_t))
-#define ENUM_USB_IEN_VBUSERRDIS              (_ADI_MSK(0x00000000,uint8_t))   /* VBUSERR:  */
-#define ENUM_USB_IEN_VBUSERREN               (_ADI_MSK(0x00000080,uint8_t))   /* VBUSERR: Interrupt enable */
+#define BITM_USB_IEN_VBUSERR                 (_ADI_MSK(0x00000080,uint8_t))   /* VBUS Threshold Indicator Interrupt Enable */
+#define ENUM_USB_IEN_VBUSERRDIS              (_ADI_MSK(0x00000000,uint8_t))   /* VBUSERR: Disable Interrupt */
+#define ENUM_USB_IEN_VBUSERREN               (_ADI_MSK(0x00000080,uint8_t))   /* VBUSERR: Enable Interrupt */
 
-#define BITM_USB_IEN_SESSREQ                 (_ADI_MSK(0x00000040,uint8_t))
-#define ENUM_USB_IEN_SESSREQDIS              (_ADI_MSK(0x00000000,uint8_t))   /* SESSREQ:  */
-#define ENUM_USB_IEN_SESSREQEN               (_ADI_MSK(0x00000040,uint8_t))   /* SESSREQ: Interrupt enable */
+#define BITM_USB_IEN_SESSREQ                 (_ADI_MSK(0x00000040,uint8_t))   /* Session Request Indicator Interrupt Enable */
+#define ENUM_USB_IEN_SESSREQDIS              (_ADI_MSK(0x00000000,uint8_t))   /* SESSREQ: Disable Interrupt */
+#define ENUM_USB_IEN_SESSREQEN               (_ADI_MSK(0x00000040,uint8_t))   /* SESSREQ: Enable Interrupt */
 
-#define BITM_USB_IEN_DISCON                  (_ADI_MSK(0x00000020,uint8_t))
-#define ENUM_USB_IEN_DISCONDIS               (_ADI_MSK(0x00000000,uint8_t))   /* DISCON:  */
-#define ENUM_USB_IEN_DISCONEN                (_ADI_MSK(0x00000020,uint8_t))   /* DISCON: Interrupt enable */
+#define BITM_USB_IEN_DISCON                  (_ADI_MSK(0x00000020,uint8_t))   /* Disconnect Indicator Interrupt Enable */
+#define ENUM_USB_IEN_DISCONDIS               (_ADI_MSK(0x00000000,uint8_t))   /* DISCON: Disable Interrupt */
+#define ENUM_USB_IEN_DISCONEN                (_ADI_MSK(0x00000020,uint8_t))   /* DISCON: Enable Interrupt */
 
-#define BITM_USB_IEN_CON                     (_ADI_MSK(0x00000010,uint8_t))
-#define ENUM_USB_IEN_CONDIS                  (_ADI_MSK(0x00000000,uint8_t))   /* CON:  */
-#define ENUM_USB_IEN_CONEN                   (_ADI_MSK(0x00000010,uint8_t))   /* CON: Interrupt enable */
+#define BITM_USB_IEN_CON                     (_ADI_MSK(0x00000010,uint8_t))   /* Connection Indicator Interrupt Enable */
+#define ENUM_USB_IEN_CONDIS                  (_ADI_MSK(0x00000000,uint8_t))   /* CON: Disable Interrupt */
+#define ENUM_USB_IEN_CONEN                   (_ADI_MSK(0x00000010,uint8_t))   /* CON: Enable Interrupt */
 
-#define BITM_USB_IEN_SOF                     (_ADI_MSK(0x00000008,uint8_t))
-#define ENUM_USB_IEN_SOFDIS                  (_ADI_MSK(0x00000000,uint8_t))   /* SOF:  */
-#define ENUM_USB_IEN_SOFEN                   (_ADI_MSK(0x00000008,uint8_t))   /* SOF: Interrupt enable */
+#define BITM_USB_IEN_SOF                     (_ADI_MSK(0x00000008,uint8_t))   /* Start-of-frame Indicator Interrupt Enable */
+#define ENUM_USB_IEN_SOFDIS                  (_ADI_MSK(0x00000000,uint8_t))   /* SOF: Disable Interrupt */
+#define ENUM_USB_IEN_SOFEN                   (_ADI_MSK(0x00000008,uint8_t))   /* SOF: Enable Interrupt */
 
-#define BITM_USB_IEN_RSTBABBLE               (_ADI_MSK(0x00000004,uint8_t))
-#define ENUM_USB_IEN_RSTBABBLEDIS            (_ADI_MSK(0x00000000,uint8_t))   /* RSTBABBLE:  */
-#define ENUM_USB_IEN_RSTBABBLEEN             (_ADI_MSK(0x00000004,uint8_t))   /* RSTBABBLE: Interrupt enable */
+#define BITM_USB_IEN_RSTBABBLE               (_ADI_MSK(0x00000004,uint8_t))   /* Reset/Babble Indicator Interrupt Enable */
+#define ENUM_USB_IEN_RSTBABBLEDIS            (_ADI_MSK(0x00000000,uint8_t))   /* RSTBABBLE: Disable Interrupt */
+#define ENUM_USB_IEN_RSTBABBLEEN             (_ADI_MSK(0x00000004,uint8_t))   /* RSTBABBLE: Enable Interrupt */
 
-#define BITM_USB_IEN_RESUME                  (_ADI_MSK(0x00000002,uint8_t))
-#define ENUM_USB_IEN_RESUMEDIS               (_ADI_MSK(0x00000000,uint8_t))   /* RESUME:  */
-#define ENUM_USB_IEN_RESUMEEN                (_ADI_MSK(0x00000002,uint8_t))   /* RESUME: Interrupt enable */
+#define BITM_USB_IEN_RESUME                  (_ADI_MSK(0x00000002,uint8_t))   /* Resume Indicator Interrupt Enable */
+#define ENUM_USB_IEN_RESUMEDIS               (_ADI_MSK(0x00000000,uint8_t))   /* RESUME: Disable Interrupt */
+#define ENUM_USB_IEN_RESUMEEN                (_ADI_MSK(0x00000002,uint8_t))   /* RESUME: Enable Interrupt */
 
-#define BITM_USB_IEN_SUSPEND                 (_ADI_MSK(0x00000001,uint8_t))
-#define ENUM_USB_IEN_SUSPENDDIS              (_ADI_MSK(0x00000000,uint8_t))   /* SUSPEND:  */
-#define ENUM_USB_IEN_SUSPENDEN               (_ADI_MSK(0x00000001,uint8_t))   /* SUSPEND: Interrupt enable */
+#define BITM_USB_IEN_SUSPEND                 (_ADI_MSK(0x00000001,uint8_t))   /* Suspend Indicator Interrupt Enable */
+#define ENUM_USB_IEN_SUSPENDDIS              (_ADI_MSK(0x00000000,uint8_t))   /* SUSPEND: Disable Interrupt */
+#define ENUM_USB_IEN_SUSPENDEN               (_ADI_MSK(0x00000001,uint8_t))   /* SUSPEND: Enable Interrupt */
 
 /* ------------------------------------------------------------------------------------------------------------------------
         USB_FRAME                            Pos/Masks                        Description
    ------------------------------------------------------------------------------------------------------------------------ */
-#define BITP_USB_FRAME_VALUE                  0                               /* Frame Number */
-#define BITM_USB_FRAME_VALUE                 (_ADI_MSK(0x000007FF,uint16_t))  /* Frame Number */
+#define BITP_USB_FRAME_VALUE                  0                               /* Frame Number Value */
+#define BITM_USB_FRAME_VALUE                 (_ADI_MSK(0x000007FF,uint16_t))  /* Frame Number Value */
 
 /* ------------------------------------------------------------------------------------------------------------------------
         USB_INDEX                            Pos/Masks                        Description
    ------------------------------------------------------------------------------------------------------------------------ */
-#define BITP_USB_INDEX_EP                     0                               /* Endpoint */
-#define BITM_USB_INDEX_EP                    (_ADI_MSK(0x0000000F,uint8_t))   /* Endpoint */
+#define BITP_USB_INDEX_EP                     0                               /* Endpoint Index */
+#define BITM_USB_INDEX_EP                    (_ADI_MSK(0x0000000F,uint8_t))   /* Endpoint Index */
 
 /* ------------------------------------------------------------------------------------------------------------------------
         USB_TESTMODE                         Pos/Masks                        Description
    ------------------------------------------------------------------------------------------------------------------------ */
-#define BITP_USB_TESTMODE_FORCEHOST           7                               /* Force Host */
 #define BITP_USB_TESTMODE_FIFOACCESS          6                               /* FIFO Access */
-#define BITP_USB_TESTMODE_FORCEFS             5                               /* Force FS */
-#define BITP_USB_TESTMODE_FORCEHS             4                               /* Force HS */
-#define BITP_USB_TESTMODE_TESTPACKET          3                               /* Test Packet */
-#define BITP_USB_TESTMODE_TESTK               2                               /* Test K */
-#define BITP_USB_TESTMODE_TESTJ               1                               /* Test J */
+#define BITP_USB_TESTMODE_TESTPACKET          3                               /* Test_Packet Mode */
+#define BITP_USB_TESTMODE_TESTK               2                               /* Test_K Mode */
+#define BITP_USB_TESTMODE_TESTJ               1                               /* Test_J Mode */
 #define BITP_USB_TESTMODE_TESTSE0NAK          0                               /* Test SE0 NAK */
-#define BITM_USB_TESTMODE_FORCEHOST          (_ADI_MSK(0x00000080,uint8_t))   /* Force Host */
 #define BITM_USB_TESTMODE_FIFOACCESS         (_ADI_MSK(0x00000040,uint8_t))   /* FIFO Access */
-#define BITM_USB_TESTMODE_FORCEFS            (_ADI_MSK(0x00000020,uint8_t))   /* Force FS */
-#define BITM_USB_TESTMODE_FORCEHS            (_ADI_MSK(0x00000010,uint8_t))   /* Force HS */
-#define BITM_USB_TESTMODE_TESTPACKET         (_ADI_MSK(0x00000008,uint8_t))   /* Test Packet */
-#define BITM_USB_TESTMODE_TESTK              (_ADI_MSK(0x00000004,uint8_t))   /* Test K */
-#define BITM_USB_TESTMODE_TESTJ              (_ADI_MSK(0x00000002,uint8_t))   /* Test J */
+#define BITM_USB_TESTMODE_TESTPACKET         (_ADI_MSK(0x00000008,uint8_t))   /* Test_Packet Mode */
+#define BITM_USB_TESTMODE_TESTK              (_ADI_MSK(0x00000004,uint8_t))   /* Test_K Mode */
+#define BITM_USB_TESTMODE_TESTJ              (_ADI_MSK(0x00000002,uint8_t))   /* Test_J Mode */
 #define BITM_USB_TESTMODE_TESTSE0NAK         (_ADI_MSK(0x00000001,uint8_t))   /* Test SE0 NAK */
 
 /* ------------------------------------------------------------------------------------------------------------------------
         USB_EPI_TXMAXP                       Pos/Masks                        Description
    ------------------------------------------------------------------------------------------------------------------------ */
-#define BITP_USB_EPI_TXMAXP_MULTM1           11                               /* Num of ISO or INT packets that may be sent per microframe */
-#define BITP_USB_EPI_TXMAXP_MAXPAY            0                               /* Max number of bytes that may be transferred per transaction */
-#define BITM_USB_EPI_TXMAXP_MULTM1           (_ADI_MSK(0x00001800,uint16_t))  /* Num of ISO or INT packets that may be sent per microframe */
-#define BITM_USB_EPI_TXMAXP_MAXPAY           (_ADI_MSK(0x000007FF,uint16_t))  /* Max number of bytes that may be transferred per transaction */
+#define BITP_USB_EPI_TXMAXP_MULTM1           11                               /* Multi-Packets per Micro-frame */
+#define BITP_USB_EPI_TXMAXP_MAXPAY            0                               /* Maximum Payload */
+#define BITM_USB_EPI_TXMAXP_MULTM1           (_ADI_MSK(0x00001800,uint16_t))  /* Multi-Packets per Micro-frame */
+#define BITM_USB_EPI_TXMAXP_MAXPAY           (_ADI_MSK(0x000007FF,uint16_t))  /* Maximum Payload */
 
 /* ------------------------------------------------------------------------------------------------------------------------
         USB_EPI_TXCSR_P                      Pos/Masks                        Description
    ------------------------------------------------------------------------------------------------------------------------ */
-#define BITP_USB_EPI_TXCSR_P_AUTOSET         15
-#define BITP_USB_EPI_TXCSR_P_ISO             14
-#define BITP_USB_EPI_TXCSR_P_DMAREQEN        12
-#define BITP_USB_EPI_TXCSR_P_FRCDATATGL      11
-#define BITP_USB_EPI_TXCSR_P_DMAREQMODE      10
-#define BITP_USB_EPI_TXCSR_P_INCOMPTX         7
-#define BITP_USB_EPI_TXCSR_P_CLRDATATGL       6
-#define BITP_USB_EPI_TXCSR_P_SENTSTALL        5
-#define BITP_USB_EPI_TXCSR_P_SENDSTALL        4
-#define BITP_USB_EPI_TXCSR_P_FLUSHFIFO        3
-#define BITP_USB_EPI_TXCSR_P_URUNERR          2
-#define BITP_USB_EPI_TXCSR_P_NEFIFO           1
-#define BITP_USB_EPI_TXCSR_P_TXPKTRDY         0
+#define BITP_USB_EPI_TXCSR_P_AUTOSET         15                               /* TxPkRdy Autoset Enable */
+#define BITP_USB_EPI_TXCSR_P_ISO             14                               /* Isochronous Transfers Enable */
+#define BITP_USB_EPI_TXCSR_P_DMAREQEN        12                               /* DMA Request Enable Tx EP */
+#define BITP_USB_EPI_TXCSR_P_FRCDATATGL      11                               /* Force Data Toggle */
+#define BITP_USB_EPI_TXCSR_P_DMAREQMODE      10                               /* DMA Mode Select */
+#define BITP_USB_EPI_TXCSR_P_INCOMPTX         7                               /* Incomplete Tx */
+#define BITP_USB_EPI_TXCSR_P_CLRDATATGL       6                               /* Clear Endpoint Data Toggle */
+#define BITP_USB_EPI_TXCSR_P_SENTSTALL        5                               /* Sent STALL */
+#define BITP_USB_EPI_TXCSR_P_SENDSTALL        4                               /* Send STALL */
+#define BITP_USB_EPI_TXCSR_P_FLUSHFIFO        3                               /* Flush Endpoint FIFO */
+#define BITP_USB_EPI_TXCSR_P_URUNERR          2                               /* Underrun Error */
+#define BITP_USB_EPI_TXCSR_P_NEFIFO           1                               /* Not Empty FIFO */
+#define BITP_USB_EPI_TXCSR_P_TXPKTRDY         0                               /* Tx Packet Ready */
 
-#define BITM_USB_EPI_TXCSR_P_AUTOSET         (_ADI_MSK(0x00008000,uint16_t))
-#define ENUM_USB_EPI_TXCSR_P_NO_AUTOSET      (_ADI_MSK(0x00000000,uint16_t))  /* AUTOSET:  */
-#define ENUM_USB_EPI_TXCSR_P_AUTOSET         (_ADI_MSK(0x00008000,uint16_t))  /* AUTOSET:  */
+#define BITM_USB_EPI_TXCSR_P_AUTOSET         (_ADI_MSK(0x00008000,uint16_t))  /* TxPkRdy Autoset Enable */
+#define ENUM_USB_EPI_TXCSR_P_NO_AUTOSET      (_ADI_MSK(0x00000000,uint16_t))  /* AUTOSET: Disable Autoset */
+#define ENUM_USB_EPI_TXCSR_P_AUTOSET         (_ADI_MSK(0x00008000,uint16_t))  /* AUTOSET: Enable Autoset */
 
-#define BITM_USB_EPI_TXCSR_P_ISO             (_ADI_MSK(0x00004000,uint16_t))
-#define ENUM_USB_EPI_TXCSR_P_ISODIS          (_ADI_MSK(0x00000000,uint16_t))  /* ISO: Disable the TX endpoint for isochronous transfers. */
-#define ENUM_USB_EPI_TXCSR_P_ISOEN           (_ADI_MSK(0x00004000,uint16_t))  /* ISO: Enable the TX endpoint for isochronous transfers */
+#define BITM_USB_EPI_TXCSR_P_ISO             (_ADI_MSK(0x00004000,uint16_t))  /* Isochronous Transfers Enable */
+#define ENUM_USB_EPI_TXCSR_P_ISODIS          (_ADI_MSK(0x00000000,uint16_t))  /* ISO: Disable Tx EP Isochronous Transfers */
+#define ENUM_USB_EPI_TXCSR_P_ISOEN           (_ADI_MSK(0x00004000,uint16_t))  /* ISO: Enable Tx EP Isochronous Transfers */
 
-#define BITM_USB_EPI_TXCSR_P_DMAREQEN        (_ADI_MSK(0x00001000,uint16_t))
-#define ENUM_USB_EPI_TXCSR_P_DMAREQDIS       (_ADI_MSK(0x00000000,uint16_t))  /* DMAREQEN: Diasable DMA requests. */
-#define ENUM_USB_EPI_TXCSR_P_DMAREQEN        (_ADI_MSK(0x00001000,uint16_t))  /* DMAREQEN: Enable DMA requests. */
+#define BITM_USB_EPI_TXCSR_P_DMAREQEN        (_ADI_MSK(0x00001000,uint16_t))  /* DMA Request Enable Tx EP */
+#define ENUM_USB_EPI_TXCSR_P_DMAREQDIS       (_ADI_MSK(0x00000000,uint16_t))  /* DMAREQEN: Disable DMA Request */
+#define ENUM_USB_EPI_TXCSR_P_DMAREQEN        (_ADI_MSK(0x00001000,uint16_t))  /* DMAREQEN: Enable DMA Request */
 
-#define BITM_USB_EPI_TXCSR_P_FRCDATATGL      (_ADI_MSK(0x00000800,uint16_t))
-#define ENUM_USB_EPI_TXCSR_P_NO_FRCTGL       (_ADI_MSK(0x00000000,uint16_t))  /* FRCDATATGL:  */
-#define ENUM_USB_EPI_TXCSR_P_FRCTGL          (_ADI_MSK(0x00000800,uint16_t))  /* FRCDATATGL:  */
+#define BITM_USB_EPI_TXCSR_P_FRCDATATGL      (_ADI_MSK(0x00000800,uint16_t))  /* Force Data Toggle */
+#define ENUM_USB_EPI_TXCSR_P_NO_FRCTGL       (_ADI_MSK(0x00000000,uint16_t))  /* FRCDATATGL: No Action */
+#define ENUM_USB_EPI_TXCSR_P_FRCTGL          (_ADI_MSK(0x00000800,uint16_t))  /* FRCDATATGL: Toggle Endpoint Data */
 
-#define BITM_USB_EPI_TXCSR_P_DMAREQMODE      (_ADI_MSK(0x00000400,uint16_t))
-#define ENUM_USB_EPI_TXCSR_P_DMARQMODE0      (_ADI_MSK(0x00000000,uint16_t))  /* DMAREQMODE: Clear this bit to select DMA request mode 0. */
-#define ENUM_USB_EPI_TXCSR_P_DMARQMODE1      (_ADI_MSK(0x00000400,uint16_t))  /* DMAREQMODE: Set this bit to select DMA request mode 1. */
+#define BITM_USB_EPI_TXCSR_P_DMAREQMODE      (_ADI_MSK(0x00000400,uint16_t))  /* DMA Mode Select */
+#define ENUM_USB_EPI_TXCSR_P_DMARQMODE0      (_ADI_MSK(0x00000000,uint16_t))  /* DMAREQMODE: DMA Request Mode 0 */
+#define ENUM_USB_EPI_TXCSR_P_DMARQMODE1      (_ADI_MSK(0x00000400,uint16_t))  /* DMAREQMODE: DMA Request Mode 1 */
 
-#define BITM_USB_EPI_TXCSR_P_INCOMPTX        (_ADI_MSK(0x00000080,uint16_t))
-#define ENUM_USB_EPI_TXCSR_P_NO_INCOMP       (_ADI_MSK(0x00000000,uint16_t))  /* INCOMPTX:  */
-#define ENUM_USB_EPI_TXCSR_P_INCOMP          (_ADI_MSK(0x00000080,uint16_t))  /* INCOMPTX:  */
+#define BITM_USB_EPI_TXCSR_P_INCOMPTX        (_ADI_MSK(0x00000080,uint16_t))  /* Incomplete Tx */
+#define ENUM_USB_EPI_TXCSR_P_NO_INCOMP       (_ADI_MSK(0x00000000,uint16_t))  /* INCOMPTX: No Status */
+#define ENUM_USB_EPI_TXCSR_P_INCOMP          (_ADI_MSK(0x00000080,uint16_t))  /* INCOMPTX: Incomplete Tx (Insufficient IN Tokens) */
 
-#define BITM_USB_EPI_TXCSR_P_CLRDATATGL      (_ADI_MSK(0x00000040,uint16_t))
-#define ENUM_USB_EPI_TXCSR_P_NO_CLRTGL       (_ADI_MSK(0x00000000,uint16_t))  /* CLRDATATGL:  */
-#define ENUM_USB_EPI_TXCSR_P_CLRTGL          (_ADI_MSK(0x00000040,uint16_t))  /* CLRDATATGL:  */
+#define BITM_USB_EPI_TXCSR_P_CLRDATATGL      (_ADI_MSK(0x00000040,uint16_t))  /* Clear Endpoint Data Toggle */
+#define ENUM_USB_EPI_TXCSR_P_NO_CLRTGL       (_ADI_MSK(0x00000000,uint16_t))  /* CLRDATATGL: No Action */
+#define ENUM_USB_EPI_TXCSR_P_CLRTGL          (_ADI_MSK(0x00000040,uint16_t))  /* CLRDATATGL: Reset EP Data Toggle to 0 */
 
-#define BITM_USB_EPI_TXCSR_P_SENTSTALL       (_ADI_MSK(0x00000020,uint16_t))
-#define ENUM_USB_EPI_TXCSR_P_NO_STALSNT      (_ADI_MSK(0x00000000,uint16_t))  /* SENTSTALL: The CPU should clear this bit. */
-#define ENUM_USB_EPI_TXCSR_P_STALSNT         (_ADI_MSK(0x00000020,uint16_t))  /* SENTSTALL: This bit is set when a STALL handshake is transmitted */
+#define BITM_USB_EPI_TXCSR_P_SENTSTALL       (_ADI_MSK(0x00000020,uint16_t))  /* Sent STALL */
+#define ENUM_USB_EPI_TXCSR_P_NO_STALSNT      (_ADI_MSK(0x00000000,uint16_t))  /* SENTSTALL: No Status */
+#define ENUM_USB_EPI_TXCSR_P_STALSNT         (_ADI_MSK(0x00000020,uint16_t))  /* SENTSTALL: STALL Handshake Transmitted */
 
-#define BITM_USB_EPI_TXCSR_P_SENDSTALL       (_ADI_MSK(0x00000010,uint16_t))
-#define ENUM_USB_EPI_TXCSR_P_NO_STALL        (_ADI_MSK(0x00000000,uint16_t))  /* SENDSTALL: The CPU clears this bit to terminate the stall condition */
-#define ENUM_USB_EPI_TXCSR_P_STALL           (_ADI_MSK(0x00000010,uint16_t))  /* SENDSTALL:  */
+#define BITM_USB_EPI_TXCSR_P_SENDSTALL       (_ADI_MSK(0x00000010,uint16_t))  /* Send STALL */
+#define ENUM_USB_EPI_TXCSR_P_NO_STALL        (_ADI_MSK(0x00000000,uint16_t))  /* SENDSTALL: No Request */
+#define ENUM_USB_EPI_TXCSR_P_STALL           (_ADI_MSK(0x00000010,uint16_t))  /* SENDSTALL: Request STALL Handshake Transmission */
 
-#define BITM_USB_EPI_TXCSR_P_FLUSHFIFO       (_ADI_MSK(0x00000008,uint16_t))
-#define ENUM_USB_EPI_TXCSR_P_NO_FLUSH        (_ADI_MSK(0x00000000,uint16_t))  /* FLUSHFIFO:  */
-#define ENUM_USB_EPI_TXCSR_P_FLUSH           (_ADI_MSK(0x00000008,uint16_t))  /* FLUSHFIFO:  */
+#define BITM_USB_EPI_TXCSR_P_FLUSHFIFO       (_ADI_MSK(0x00000008,uint16_t))  /* Flush Endpoint FIFO */
+#define ENUM_USB_EPI_TXCSR_P_NO_FLUSH        (_ADI_MSK(0x00000000,uint16_t))  /* FLUSHFIFO: No Flush */
+#define ENUM_USB_EPI_TXCSR_P_FLUSH           (_ADI_MSK(0x00000008,uint16_t))  /* FLUSHFIFO: Flush endpoint FIFO */
 
-#define BITM_USB_EPI_TXCSR_P_URUNERR         (_ADI_MSK(0x00000004,uint16_t))
-#define ENUM_USB_EPI_TXCSR_P_NO_URUNERR      (_ADI_MSK(0x00000000,uint16_t))  /* URUNERR: The CPU should clear this bit. */
-#define ENUM_USB_EPI_TXCSR_P_URUNERR         (_ADI_MSK(0x00000004,uint16_t))  /* URUNERR: Set if an IN token is received when TxPktRdy is not set */
+#define BITM_USB_EPI_TXCSR_P_URUNERR         (_ADI_MSK(0x00000004,uint16_t))  /* Underrun Error */
+#define ENUM_USB_EPI_TXCSR_P_NO_URUNERR      (_ADI_MSK(0x00000000,uint16_t))  /* URUNERR: No Status */
+#define ENUM_USB_EPI_TXCSR_P_URUNERR         (_ADI_MSK(0x00000004,uint16_t))  /* URUNERR: Underrun Error */
 
-#define BITM_USB_EPI_TXCSR_P_NEFIFO          (_ADI_MSK(0x00000002,uint16_t))
-#define ENUM_USB_EPI_TXCSR_P_NO_FIFONE       (_ADI_MSK(0x00000000,uint16_t))  /* NEFIFO:  */
-#define ENUM_USB_EPI_TXCSR_P_FIFONE          (_ADI_MSK(0x00000002,uint16_t))  /* NEFIFO: Set when there is at least 1 packet in the TX FIFO. */
+#define BITM_USB_EPI_TXCSR_P_NEFIFO          (_ADI_MSK(0x00000002,uint16_t))  /* Not Empty FIFO */
+#define ENUM_USB_EPI_TXCSR_P_NO_FIFONE       (_ADI_MSK(0x00000000,uint16_t))  /* NEFIFO: FIFO Empty */
+#define ENUM_USB_EPI_TXCSR_P_FIFONE          (_ADI_MSK(0x00000002,uint16_t))  /* NEFIFO: FIFO Not Empty */
 
-#define BITM_USB_EPI_TXCSR_P_TXPKTRDY        (_ADI_MSK(0x00000001,uint16_t))
-#define ENUM_USB_EPI_TXCSR_P_NO_PKTRDY       (_ADI_MSK(0x00000000,uint16_t))  /* TXPKTRDY:  */
-#define ENUM_USB_EPI_TXCSR_P_PKTRDY          (_ADI_MSK(0x00000001,uint16_t))  /* TXPKTRDY:  */
+#define BITM_USB_EPI_TXCSR_P_TXPKTRDY        (_ADI_MSK(0x00000001,uint16_t))  /* Tx Packet Ready */
+#define ENUM_USB_EPI_TXCSR_P_NO_PKTRDY       (_ADI_MSK(0x00000000,uint16_t))  /* TXPKTRDY: No Tx Packet */
+#define ENUM_USB_EPI_TXCSR_P_PKTRDY          (_ADI_MSK(0x00000001,uint16_t))  /* TXPKTRDY: Tx Packet in Endpoint FIFO */
 
 /* ------------------------------------------------------------------------------------------------------------------------
         USB_EPI_TXCSR_H                      Pos/Masks                        Description
    ------------------------------------------------------------------------------------------------------------------------ */
-#define BITP_USB_EPI_TXCSR_H_AUTOSET         15
-#define BITP_USB_EPI_TXCSR_H_DMAREQEN        12
-#define BITP_USB_EPI_TXCSR_H_FRCDATATGL      11
-#define BITP_USB_EPI_TXCSR_H_DMAREQMODE      10
-#define BITP_USB_EPI_TXCSR_H_DATGLEN          9
-#define BITP_USB_EPI_TXCSR_H_DATGL            8
-#define BITP_USB_EPI_TXCSR_H_NAKTOINCMP       7
-#define BITP_USB_EPI_TXCSR_H_CLRDATATGL       6
-#define BITP_USB_EPI_TXCSR_H_RXSTALL          5
-#define BITP_USB_EPI_TXCSR_H_SETUPPKT         4
-#define BITP_USB_EPI_TXCSR_H_FLUSHFIFO        3
-#define BITP_USB_EPI_TXCSR_H_TXTOERR          2
-#define BITP_USB_EPI_TXCSR_H_NEFIFO           1
-#define BITP_USB_EPI_TXCSR_H_TXPKTRDY         0
+#define BITP_USB_EPI_TXCSR_H_AUTOSET         15                               /* TxPkRdy Autoset Enable */
+#define BITP_USB_EPI_TXCSR_H_DMAREQEN        12                               /* DMA Request Enable Tx EP */
+#define BITP_USB_EPI_TXCSR_H_FRCDATATGL      11                               /* Force Data Toggle */
+#define BITP_USB_EPI_TXCSR_H_DMAREQMODE      10                               /* DMA Mode Select */
+#define BITP_USB_EPI_TXCSR_H_DATGLEN          9                               /* Data Toggle Write Enable */
+#define BITP_USB_EPI_TXCSR_H_DATGL            8                               /* Data Toggle */
+#define BITP_USB_EPI_TXCSR_H_NAKTOINCMP       7                               /* NAK Timeout Incomplete */
+#define BITP_USB_EPI_TXCSR_H_CLRDATATGL       6                               /* Clear Endpoint Data Toggle */
+#define BITP_USB_EPI_TXCSR_H_RXSTALL          5                               /* Rx STALL */
+#define BITP_USB_EPI_TXCSR_H_SETUPPKT         4                               /* Setup Packet */
+#define BITP_USB_EPI_TXCSR_H_FLUSHFIFO        3                               /* Flush Endpoint FIFO */
+#define BITP_USB_EPI_TXCSR_H_TXTOERR          2                               /* Tx Timeout Error */
+#define BITP_USB_EPI_TXCSR_H_NEFIFO           1                               /* Not Empty FIFO */
+#define BITP_USB_EPI_TXCSR_H_TXPKTRDY         0                               /* Tx Packet Ready */
 
-#define BITM_USB_EPI_TXCSR_H_AUTOSET         (_ADI_MSK(0x00008000,uint16_t))
-#define ENUM_USB_EPI_TXCSR_H_NO_AUTOSET      (_ADI_MSK(0x00000000,uint16_t))  /* AUTOSET:  */
-#define ENUM_USB_EPI_TXCSR_H_AUTOSET         (_ADI_MSK(0x00008000,uint16_t))  /* AUTOSET: Autoset TxPktRdy when max data pkt size loaded into FIFO */
+#define BITM_USB_EPI_TXCSR_H_AUTOSET         (_ADI_MSK(0x00008000,uint16_t))  /* TxPkRdy Autoset Enable */
+#define ENUM_USB_EPI_TXCSR_H_NO_AUTOSET      (_ADI_MSK(0x00000000,uint16_t))  /* AUTOSET: Disable Autoset */
+#define ENUM_USB_EPI_TXCSR_H_AUTOSET         (_ADI_MSK(0x00008000,uint16_t))  /* AUTOSET: Enable Autoset */
 
-#define BITM_USB_EPI_TXCSR_H_DMAREQEN        (_ADI_MSK(0x00001000,uint16_t))
-#define ENUM_USB_EPI_TXCSR_H_DMAREQDIS       (_ADI_MSK(0x00000000,uint16_t))  /* DMAREQEN:  */
-#define ENUM_USB_EPI_TXCSR_H_DMAREQEN        (_ADI_MSK(0x00001000,uint16_t))  /* DMAREQEN: Set this bit to enable DMA requests for this TX endpoint. */
+#define BITM_USB_EPI_TXCSR_H_DMAREQEN        (_ADI_MSK(0x00001000,uint16_t))  /* DMA Request Enable Tx EP */
+#define ENUM_USB_EPI_TXCSR_H_DMAREQDIS       (_ADI_MSK(0x00000000,uint16_t))  /* DMAREQEN: Disable DMA Request */
+#define ENUM_USB_EPI_TXCSR_H_DMAREQEN        (_ADI_MSK(0x00001000,uint16_t))  /* DMAREQEN: Enable DMA Request */
 
-#define BITM_USB_EPI_TXCSR_H_FRCDATATGL      (_ADI_MSK(0x00000800,uint16_t))
-#define ENUM_USB_EPI_TXCSR_H_NO_FRCTGL       (_ADI_MSK(0x00000000,uint16_t))  /* FRCDATATGL:  */
-#define ENUM_USB_EPI_TXCSR_H_FRCTGL          (_ADI_MSK(0x00000800,uint16_t))  /* FRCDATATGL:  */
+#define BITM_USB_EPI_TXCSR_H_FRCDATATGL      (_ADI_MSK(0x00000800,uint16_t))  /* Force Data Toggle */
+#define ENUM_USB_EPI_TXCSR_H_NO_FRCTGL       (_ADI_MSK(0x00000000,uint16_t))  /* FRCDATATGL: No Action */
+#define ENUM_USB_EPI_TXCSR_H_FRCTGL          (_ADI_MSK(0x00000800,uint16_t))  /* FRCDATATGL: Toggle Endpoint Data */
 
-#define BITM_USB_EPI_TXCSR_H_DMAREQMODE      (_ADI_MSK(0x00000400,uint16_t))
-#define ENUM_USB_EPI_TXCSR_H_DMARQMODE0      (_ADI_MSK(0x00000000,uint16_t))  /* DMAREQMODE: Clear this bit to select DMA request mode 0. */
-#define ENUM_USB_EPI_TXCSR_H_DMARQMODE1      (_ADI_MSK(0x00000400,uint16_t))  /* DMAREQMODE: Set this bit to select DMA request mode 1. */
+#define BITM_USB_EPI_TXCSR_H_DMAREQMODE      (_ADI_MSK(0x00000400,uint16_t))  /* DMA Mode Select */
+#define ENUM_USB_EPI_TXCSR_H_DMARQMODE0      (_ADI_MSK(0x00000000,uint16_t))  /* DMAREQMODE: DMA Request Mode 0 */
+#define ENUM_USB_EPI_TXCSR_H_DMARQMODE1      (_ADI_MSK(0x00000400,uint16_t))  /* DMAREQMODE: DMA Request Mode 1 */
 
-#define BITM_USB_EPI_TXCSR_H_DATGLEN         (_ADI_MSK(0x00000200,uint16_t))
-#define ENUM_USB_EPI_TXCSR_H_NO_DATGLEN      (_ADI_MSK(0x00000000,uint16_t))  /* DATGLEN: Automatically cleared once the new value is written. */
-#define ENUM_USB_EPI_TXCSR_H_DATGLEN         (_ADI_MSK(0x00000200,uint16_t))  /* DATGLEN: Allow the Data Toggle bit to be written */
+#define BITM_USB_EPI_TXCSR_H_DATGLEN         (_ADI_MSK(0x00000200,uint16_t))  /* Data Toggle Write Enable */
+#define ENUM_USB_EPI_TXCSR_H_NO_DATGLEN      (_ADI_MSK(0x00000000,uint16_t))  /* DATGLEN: Disable Write to DATGL */
+#define ENUM_USB_EPI_TXCSR_H_DATGLEN         (_ADI_MSK(0x00000200,uint16_t))  /* DATGLEN: Enable Write to DATGL */
 
-#define BITM_USB_EPI_TXCSR_H_DATGL           (_ADI_MSK(0x00000100,uint16_t))
-#define ENUM_USB_EPI_TXCSR_H_NO_DATGL        (_ADI_MSK(0x00000000,uint16_t))  /* DATGL: Always returns 0. */
-#define ENUM_USB_EPI_TXCSR_H_DATGL           (_ADI_MSK(0x00000100,uint16_t))  /* DATGL: Indicates the state of the TX endpoint data toggle */
+#define BITM_USB_EPI_TXCSR_H_DATGL           (_ADI_MSK(0x00000100,uint16_t))  /* Data Toggle */
+#define ENUM_USB_EPI_TXCSR_H_NO_DATGL        (_ADI_MSK(0x00000000,uint16_t))  /* DATGL: DATA0 is set */
+#define ENUM_USB_EPI_TXCSR_H_DATGL           (_ADI_MSK(0x00000100,uint16_t))  /* DATGL: DATA1 is set */
 
-#define BITM_USB_EPI_TXCSR_H_NAKTOINCMP      (_ADI_MSK(0x00000080,uint16_t))
-#define ENUM_USB_EPI_TXCSR_H_NO_NAKTO        (_ADI_MSK(0x00000000,uint16_t))  /* NAKTOINCMP:  */
-#define ENUM_USB_EPI_TXCSR_H_NAKTO           (_ADI_MSK(0x00000080,uint16_t))  /* NAKTOINCMP:  */
+#define BITM_USB_EPI_TXCSR_H_NAKTOINCMP      (_ADI_MSK(0x00000080,uint16_t))  /* NAK Timeout Incomplete */
+#define ENUM_USB_EPI_TXCSR_H_NO_NAKTO        (_ADI_MSK(0x00000000,uint16_t))  /* NAKTOINCMP: No Status */
+#define ENUM_USB_EPI_TXCSR_H_NAKTO           (_ADI_MSK(0x00000080,uint16_t))  /* NAKTOINCMP: NAK Timeout Over Maximum */
 
-#define BITM_USB_EPI_TXCSR_H_CLRDATATGL      (_ADI_MSK(0x00000040,uint16_t))
-#define ENUM_USB_EPI_TXCSR_H_NO_CLRTGL       (_ADI_MSK(0x00000000,uint16_t))  /* CLRDATATGL:  */
-#define ENUM_USB_EPI_TXCSR_H_CLRTGL          (_ADI_MSK(0x00000040,uint16_t))  /* CLRDATATGL:  */
+#define BITM_USB_EPI_TXCSR_H_CLRDATATGL      (_ADI_MSK(0x00000040,uint16_t))  /* Clear Endpoint Data Toggle */
+#define ENUM_USB_EPI_TXCSR_H_NO_CLRTGL       (_ADI_MSK(0x00000000,uint16_t))  /* CLRDATATGL: No Action */
+#define ENUM_USB_EPI_TXCSR_H_CLRTGL          (_ADI_MSK(0x00000040,uint16_t))  /* CLRDATATGL: Reset EP Data Toggle to 0 */
 
-#define BITM_USB_EPI_TXCSR_H_RXSTALL         (_ADI_MSK(0x00000020,uint16_t))
-#define ENUM_USB_EPI_TXCSR_H_NO_RXSTALL      (_ADI_MSK(0x00000000,uint16_t))  /* RXSTALL: Cleared by CPU */
-#define ENUM_USB_EPI_TXCSR_H_RXSTALL         (_ADI_MSK(0x00000020,uint16_t))  /* RXSTALL:  */
+#define BITM_USB_EPI_TXCSR_H_RXSTALL         (_ADI_MSK(0x00000020,uint16_t))  /* Rx STALL */
+#define ENUM_USB_EPI_TXCSR_H_NO_RXSTALL      (_ADI_MSK(0x00000000,uint16_t))  /* RXSTALL: No Status */
+#define ENUM_USB_EPI_TXCSR_H_RXSTALL         (_ADI_MSK(0x00000020,uint16_t))  /* RXSTALL: Stall Received from Device */
 
-#define BITM_USB_EPI_TXCSR_H_SETUPPKT        (_ADI_MSK(0x00000010,uint16_t))
-#define ENUM_USB_EPI_TXCSR_H_NO_SETUPPK      (_ADI_MSK(0x00000000,uint16_t))  /* SETUPPKT:  */
-#define ENUM_USB_EPI_TXCSR_H_SETUPPKT        (_ADI_MSK(0x00000010,uint16_t))  /* SETUPPKT:  */
+#define BITM_USB_EPI_TXCSR_H_SETUPPKT        (_ADI_MSK(0x00000010,uint16_t))  /* Setup Packet */
+#define ENUM_USB_EPI_TXCSR_H_NO_SETUPPK      (_ADI_MSK(0x00000000,uint16_t))  /* SETUPPKT: No Request */
+#define ENUM_USB_EPI_TXCSR_H_SETUPPKT        (_ADI_MSK(0x00000010,uint16_t))  /* SETUPPKT: Send SETUP Token */
 
-#define BITM_USB_EPI_TXCSR_H_FLUSHFIFO       (_ADI_MSK(0x00000008,uint16_t))
-#define ENUM_USB_EPI_TXCSR_H_NO_FLUSH        (_ADI_MSK(0x00000000,uint16_t))  /* FLUSHFIFO:  */
-#define ENUM_USB_EPI_TXCSR_H_FLUSH           (_ADI_MSK(0x00000008,uint16_t))  /* FLUSHFIFO:  */
+#define BITM_USB_EPI_TXCSR_H_FLUSHFIFO       (_ADI_MSK(0x00000008,uint16_t))  /* Flush Endpoint FIFO */
+#define ENUM_USB_EPI_TXCSR_H_NO_FLUSH        (_ADI_MSK(0x00000000,uint16_t))  /* FLUSHFIFO: No Flush */
+#define ENUM_USB_EPI_TXCSR_H_FLUSH           (_ADI_MSK(0x00000008,uint16_t))  /* FLUSHFIFO: Flush endpoint FIFO */
 
-#define BITM_USB_EPI_TXCSR_H_TXTOERR         (_ADI_MSK(0x00000004,uint16_t))
-#define ENUM_USB_EPI_TXCSR_H_NO_TXTOERR      (_ADI_MSK(0x00000000,uint16_t))  /* TXTOERR: The CPU should clear this bit */
-#define ENUM_USB_EPI_TXCSR_H_TXTOERR         (_ADI_MSK(0x00000004,uint16_t))  /* TXTOERR: Set when there is at least 1 packet in the TX FIFO */
+#define BITM_USB_EPI_TXCSR_H_TXTOERR         (_ADI_MSK(0x00000004,uint16_t))  /* Tx Timeout Error */
+#define ENUM_USB_EPI_TXCSR_H_NO_TXTOERR      (_ADI_MSK(0x00000000,uint16_t))  /* TXTOERR: No Status */
+#define ENUM_USB_EPI_TXCSR_H_TXTOERR         (_ADI_MSK(0x00000004,uint16_t))  /* TXTOERR: Tx Timeout Error */
 
-#define BITM_USB_EPI_TXCSR_H_NEFIFO          (_ADI_MSK(0x00000002,uint16_t))
-#define ENUM_USB_EPI_TXCSR_H_NO_NEFIFO       (_ADI_MSK(0x00000000,uint16_t))  /* NEFIFO:  */
-#define ENUM_USB_EPI_TXCSR_H_NEFIFO          (_ADI_MSK(0x00000002,uint16_t))  /* NEFIFO: Set when there is at least 1 packet in the TX FIFO. */
+#define BITM_USB_EPI_TXCSR_H_NEFIFO          (_ADI_MSK(0x00000002,uint16_t))  /* Not Empty FIFO */
+#define ENUM_USB_EPI_TXCSR_H_NO_NEFIFO       (_ADI_MSK(0x00000000,uint16_t))  /* NEFIFO: FIFO Empty */
+#define ENUM_USB_EPI_TXCSR_H_NEFIFO          (_ADI_MSK(0x00000002,uint16_t))  /* NEFIFO: FIFO Not Empty */
 
-#define BITM_USB_EPI_TXCSR_H_TXPKTRDY        (_ADI_MSK(0x00000001,uint16_t))
-#define ENUM_USB_EPI_TXCSR_H_NO_PKTRDY       (_ADI_MSK(0x00000000,uint16_t))  /* TXPKTRDY:  */
-#define ENUM_USB_EPI_TXCSR_H_PKTRDY          (_ADI_MSK(0x00000001,uint16_t))  /* TXPKTRDY:  */
+#define BITM_USB_EPI_TXCSR_H_TXPKTRDY        (_ADI_MSK(0x00000001,uint16_t))  /* Tx Packet Ready */
+#define ENUM_USB_EPI_TXCSR_H_NO_PKTRDY       (_ADI_MSK(0x00000000,uint16_t))  /* TXPKTRDY: No Tx Packet */
+#define ENUM_USB_EPI_TXCSR_H_PKTRDY          (_ADI_MSK(0x00000001,uint16_t))  /* TXPKTRDY: Tx Packet in Endpoint FIFO */
 
 /* ------------------------------------------------------------------------------------------------------------------------
         USB_EP0I_CSR_P                       Pos/Masks                        Description
    ------------------------------------------------------------------------------------------------------------------------ */
-#define BITP_USB_EP0I_CSR_P_FLUSHFIFO         8
-#define BITP_USB_EP0I_CSR_P_SSETUPEND         7
-#define BITP_USB_EP0I_CSR_P_SPKTRDY           6
-#define BITP_USB_EP0I_CSR_P_SENDSTALL         5
-#define BITP_USB_EP0I_CSR_P_SETUPEND          4
-#define BITP_USB_EP0I_CSR_P_DATAEND           3
-#define BITP_USB_EP0I_CSR_P_SENTSTALL         2
-#define BITP_USB_EP0I_CSR_P_TXPKTRDY          1
-#define BITP_USB_EP0I_CSR_P_RXPKTRDY          0
+#define BITP_USB_EP0I_CSR_P_FLUSHFIFO         8                               /* Flush Endpoint FIFO */
+#define BITP_USB_EP0I_CSR_P_SSETUPEND         7                               /* Service Setup End */
+#define BITP_USB_EP0I_CSR_P_SPKTRDY           6                               /* Service Rx Packet Ready */
+#define BITP_USB_EP0I_CSR_P_SENDSTALL         5                               /* Send Stall */
+#define BITP_USB_EP0I_CSR_P_SETUPEND          4                               /* Setup End */
+#define BITP_USB_EP0I_CSR_P_DATAEND           3                               /* Data End */
+#define BITP_USB_EP0I_CSR_P_SENTSTALL         2                               /* Sent Stall */
+#define BITP_USB_EP0I_CSR_P_TXPKTRDY          1                               /* Tx Packet Ready */
+#define BITP_USB_EP0I_CSR_P_RXPKTRDY          0                               /* Rx Packet Ready */
 
-#define BITM_USB_EP0I_CSR_P_FLUSHFIFO        (_ADI_MSK(0x00000100,uint16_t))
-#define ENUM_USB_EP0I_CSR_P_NO_FLUSH         (_ADI_MSK(0x00000000,uint16_t))  /* FLUSHFIFO:  */
-#define ENUM_USB_EP0I_CSR_P_FLUSH            (_ADI_MSK(0x00000100,uint16_t))  /* FLUSHFIFO:  */
+#define BITM_USB_EP0I_CSR_P_FLUSHFIFO        (_ADI_MSK(0x00000100,uint16_t))  /* Flush Endpoint FIFO */
+#define ENUM_USB_EP0I_CSR_P_NO_FLUSH         (_ADI_MSK(0x00000000,uint16_t))  /* FLUSHFIFO: No Flush */
+#define ENUM_USB_EP0I_CSR_P_FLUSH            (_ADI_MSK(0x00000100,uint16_t))  /* FLUSHFIFO: Flush Endpoint FIFO */
 
-#define BITM_USB_EP0I_CSR_P_SSETUPEND        (_ADI_MSK(0x00000080,uint16_t))
-#define ENUM_USB_EP0I_CSR_P_NOSSETUPEND      (_ADI_MSK(0x00000000,uint16_t))  /* SSETUPEND: This bit is cleared automatically. */
-#define ENUM_USB_EP0I_CSR_P_SSETUPEND        (_ADI_MSK(0x00000080,uint16_t))  /* SSETUPEND: Setting this bit will clear the SetupEnd bit. */
+#define BITM_USB_EP0I_CSR_P_SSETUPEND        (_ADI_MSK(0x00000080,uint16_t))  /* Service Setup End */
+#define ENUM_USB_EP0I_CSR_P_NOSSETUPEND      (_ADI_MSK(0x00000000,uint16_t))  /* SSETUPEND: No Action */
+#define ENUM_USB_EP0I_CSR_P_SSETUPEND        (_ADI_MSK(0x00000080,uint16_t))  /* SSETUPEND: Clear SETUPEND Bit */
 
-#define BITM_USB_EP0I_CSR_P_SPKTRDY          (_ADI_MSK(0x00000040,uint16_t))
-#define ENUM_USB_EP0I_CSR_P_NO_SPKTRDY       (_ADI_MSK(0x00000000,uint16_t))  /* SPKTRDY: This bit is cleared automatically. */
-#define ENUM_USB_EP0I_CSR_P_SPKTRDY          (_ADI_MSK(0x00000040,uint16_t))  /* SPKTRDY: Setting this bit will clear RxPktRdy. */
+#define BITM_USB_EP0I_CSR_P_SPKTRDY          (_ADI_MSK(0x00000040,uint16_t))  /* Service Rx Packet Ready */
+#define ENUM_USB_EP0I_CSR_P_NO_SPKTRDY       (_ADI_MSK(0x00000000,uint16_t))  /* SPKTRDY: No Action */
+#define ENUM_USB_EP0I_CSR_P_SPKTRDY          (_ADI_MSK(0x00000040,uint16_t))  /* SPKTRDY: Clear RXPKTRDY Bit */
 
-#define BITM_USB_EP0I_CSR_P_SENDSTALL        (_ADI_MSK(0x00000020,uint16_t))
-#define ENUM_USB_EP0I_CSR_P_NO_STALL         (_ADI_MSK(0x00000000,uint16_t))  /* SENDSTALL:  */
-#define ENUM_USB_EP0I_CSR_P_STALL            (_ADI_MSK(0x00000020,uint16_t))  /* SENDSTALL: Terminate the current transaction. */
+#define BITM_USB_EP0I_CSR_P_SENDSTALL        (_ADI_MSK(0x00000020,uint16_t))  /* Send Stall */
+#define ENUM_USB_EP0I_CSR_P_NO_STALL         (_ADI_MSK(0x00000000,uint16_t))  /* SENDSTALL: No Action */
+#define ENUM_USB_EP0I_CSR_P_STALL            (_ADI_MSK(0x00000020,uint16_t))  /* SENDSTALL: Terminate Current Transaction */
 
-#define BITM_USB_EP0I_CSR_P_SETUPEND         (_ADI_MSK(0x00000010,uint16_t))
-#define ENUM_USB_EP0I_CSR_P_NO_SETUPEND      (_ADI_MSK(0x00000000,uint16_t))  /* SETUPEND:  */
-#define ENUM_USB_EP0I_CSR_P_SETUPEND         (_ADI_MSK(0x00000010,uint16_t))  /* SETUPEND:  */
+#define BITM_USB_EP0I_CSR_P_SETUPEND         (_ADI_MSK(0x00000010,uint16_t))  /* Setup End */
+#define ENUM_USB_EP0I_CSR_P_NO_SETUPEND      (_ADI_MSK(0x00000000,uint16_t))  /* SETUPEND: No Status */
+#define ENUM_USB_EP0I_CSR_P_SETUPEND         (_ADI_MSK(0x00000010,uint16_t))  /* SETUPEND: Setup Ended before DATAEND */
 
-#define BITM_USB_EP0I_CSR_P_DATAEND          (_ADI_MSK(0x00000008,uint16_t))
-#define ENUM_USB_EP0I_CSR_P_NO_DATAEND       (_ADI_MSK(0x00000000,uint16_t))  /* DATAEND: This bit is cleared automatically. */
-#define ENUM_USB_EP0I_CSR_P_DATAEND          (_ADI_MSK(0x00000008,uint16_t))  /* DATAEND: This bit for the various peripheral mode conditions */
+#define BITM_USB_EP0I_CSR_P_DATAEND          (_ADI_MSK(0x00000008,uint16_t))  /* Data End */
+#define ENUM_USB_EP0I_CSR_P_NO_DATAEND       (_ADI_MSK(0x00000000,uint16_t))  /* DATAEND: No Status */
+#define ENUM_USB_EP0I_CSR_P_DATAEND          (_ADI_MSK(0x00000008,uint16_t))  /* DATAEND: Data End Condition */
 
-#define BITM_USB_EP0I_CSR_P_SENTSTALL        (_ADI_MSK(0x00000004,uint16_t))
-#define ENUM_USB_EP0I_CSR_P_NO_STALSNT       (_ADI_MSK(0x00000000,uint16_t))  /* SENTSTALL: The CPU should clear this bit. */
-#define ENUM_USB_EP0I_CSR_P_STALSNT          (_ADI_MSK(0x00000004,uint16_t))  /* SENTSTALL: This bit is set when a STALL handshake is transmitted. */
+#define BITM_USB_EP0I_CSR_P_SENTSTALL        (_ADI_MSK(0x00000004,uint16_t))  /* Sent Stall */
+#define ENUM_USB_EP0I_CSR_P_NO_STALSNT       (_ADI_MSK(0x00000000,uint16_t))  /* SENTSTALL: No Status */
+#define ENUM_USB_EP0I_CSR_P_STALSNT          (_ADI_MSK(0x00000004,uint16_t))  /* SENTSTALL: Transmitted STALL Handshake */
 
-#define BITM_USB_EP0I_CSR_P_TXPKTRDY         (_ADI_MSK(0x00000002,uint16_t))
+#define BITM_USB_EP0I_CSR_P_TXPKTRDY         (_ADI_MSK(0x00000002,uint16_t))  /* Tx Packet Ready */
 #define ENUM_USB_EP0I_CSR_P_NO_TXPKTRDY      (_ADI_MSK(0x00000000,uint16_t))  /* TXPKTRDY:  */
 #define ENUM_USB_EP0I_CSR_P_TXPKTRDY         (_ADI_MSK(0x00000002,uint16_t))  /* TXPKTRDY: Set this bit after loading a data packet into the FIFO */
 
-#define BITM_USB_EP0I_CSR_P_RXPKTRDY         (_ADI_MSK(0x00000001,uint16_t))
-#define ENUM_USB_EP0I_CSR_P_NO_PKTRDY        (_ADI_MSK(0x00000000,uint16_t))  /* RXPKTRDY: Cleared by writing the Serviced RxPktRdy bit. */
-#define ENUM_USB_EP0I_CSR_P_PKTRDY           (_ADI_MSK(0x00000001,uint16_t))  /* RXPKTRDY: Set when a data packet has been received. */
+#define BITM_USB_EP0I_CSR_P_RXPKTRDY         (_ADI_MSK(0x00000001,uint16_t))  /* Rx Packet Ready */
+#define ENUM_USB_EP0I_CSR_P_NO_PKTRDY        (_ADI_MSK(0x00000000,uint16_t))  /* RXPKTRDY: No Rx Packet */
+#define ENUM_USB_EP0I_CSR_P_PKTRDY           (_ADI_MSK(0x00000001,uint16_t))  /* RXPKTRDY: Rx Packet in Endpoint FIFO */
 
 /* ------------------------------------------------------------------------------------------------------------------------
         USB_EP0I_CSR_H                       Pos/Masks                        Description
    ------------------------------------------------------------------------------------------------------------------------ */
-#define BITP_USB_EP0I_CSR_H_DISPING          11
-#define BITP_USB_EP0I_CSR_H_DATGLEN          10
-#define BITP_USB_EP0I_CSR_H_DATGL             9
-#define BITP_USB_EP0I_CSR_H_FLUSHFIFO         8
-#define BITP_USB_EP0I_CSR_H_NAKTO             7
-#define BITP_USB_EP0I_CSR_H_STATUSPKT         6
-#define BITP_USB_EP0I_CSR_H_REQPKT            5
-#define BITP_USB_EP0I_CSR_H_TOERR             4
-#define BITP_USB_EP0I_CSR_H_SETUPPKT          3
-#define BITP_USB_EP0I_CSR_H_RXSTALL           2
-#define BITP_USB_EP0I_CSR_H_TXPKTRDY          1
-#define BITP_USB_EP0I_CSR_H_RXPKTRDY          0
+#define BITP_USB_EP0I_CSR_H_DISPING          11                               /* Disable Ping */
+#define BITP_USB_EP0I_CSR_H_DATGLEN          10                               /* Data Toggle Write Enable */
+#define BITP_USB_EP0I_CSR_H_DATGL             9                               /* Data Toggle */
+#define BITP_USB_EP0I_CSR_H_FLUSHFIFO         8                               /* Flush Endpoint FIFO */
+#define BITP_USB_EP0I_CSR_H_NAKTO             7                               /* NAK Timeout */
+#define BITP_USB_EP0I_CSR_H_STATUSPKT         6                               /* Status Packet */
+#define BITP_USB_EP0I_CSR_H_REQPKT            5                               /* Request Packet */
+#define BITP_USB_EP0I_CSR_H_TOERR             4                               /* Timeout Error */
+#define BITP_USB_EP0I_CSR_H_SETUPPKT          3                               /* Setup Packet */
+#define BITP_USB_EP0I_CSR_H_RXSTALL           2                               /* Rx Stall */
+#define BITP_USB_EP0I_CSR_H_TXPKTRDY          1                               /* Tx Packet Ready */
+#define BITP_USB_EP0I_CSR_H_RXPKTRDY          0                               /* Rx Packet Ready */
 
-#define BITM_USB_EP0I_CSR_H_DISPING          (_ADI_MSK(0x00000800,uint16_t))
-#define ENUM_USB_EP0I_CSR_H_NO_DISPING       (_ADI_MSK(0x00000000,uint16_t))  /* DISPING:  */
-#define ENUM_USB_EP0I_CSR_H_DISPING          (_ADI_MSK(0x00000800,uint16_t))  /* DISPING: Set this bit to issue PING tokens for HS transfers */
+#define BITM_USB_EP0I_CSR_H_DISPING          (_ADI_MSK(0x00000800,uint16_t))  /* Disable Ping */
+#define ENUM_USB_EP0I_CSR_H_NO_DISPING       (_ADI_MSK(0x00000000,uint16_t))  /* DISPING: Issue PING tokens */
+#define ENUM_USB_EP0I_CSR_H_DISPING          (_ADI_MSK(0x00000800,uint16_t))  /* DISPING: Do not issue PING */
 
-#define BITM_USB_EP0I_CSR_H_DATGLEN          (_ADI_MSK(0x00000400,uint16_t))
-#define ENUM_USB_EP0I_CSR_H_NO_DATGLEN       (_ADI_MSK(0x00000000,uint16_t))  /* DATGLEN: cannot set DATGL bit */
-#define ENUM_USB_EP0I_CSR_H_DATGLEN          (_ADI_MSK(0x00000400,uint16_t))  /* DATGLEN: can set DATGL bit */
+#define BITM_USB_EP0I_CSR_H_DATGLEN          (_ADI_MSK(0x00000400,uint16_t))  /* Data Toggle Write Enable */
+#define ENUM_USB_EP0I_CSR_H_NO_DATGLEN       (_ADI_MSK(0x00000000,uint16_t))  /* DATGLEN: Disable Write to DATGL */
+#define ENUM_USB_EP0I_CSR_H_DATGLEN          (_ADI_MSK(0x00000400,uint16_t))  /* DATGLEN: Enable Write to DATGL */
 
-#define BITM_USB_EP0I_CSR_H_DATGL            (_ADI_MSK(0x00000200,uint16_t))
-#define ENUM_USB_EP0I_CSR_H_NO_DATATGL       (_ADI_MSK(0x00000000,uint16_t))  /* DATGL: DATA0 is set */
-#define ENUM_USB_EP0I_CSR_H_DATATGL          (_ADI_MSK(0x00000200,uint16_t))  /* DATGL: DATA1 is set */
+#define BITM_USB_EP0I_CSR_H_DATGL            (_ADI_MSK(0x00000200,uint16_t))  /* Data Toggle */
+#define ENUM_USB_EP0I_CSR_H_NO_DATATGL       (_ADI_MSK(0x00000000,uint16_t))  /* DATGL: DATA0 is Set */
+#define ENUM_USB_EP0I_CSR_H_DATATGL          (_ADI_MSK(0x00000200,uint16_t))  /* DATGL: DATA1 is Set */
 
-#define BITM_USB_EP0I_CSR_H_FLUSHFIFO        (_ADI_MSK(0x00000100,uint16_t))
-#define ENUM_USB_EP0I_CSR_H_NO_FLUSH         (_ADI_MSK(0x00000000,uint16_t))  /* FLUSHFIFO:  */
-#define ENUM_USB_EP0I_CSR_H_FLUSH            (_ADI_MSK(0x00000100,uint16_t))  /* FLUSHFIFO: Set this bit to flush EP0 FIFO */
+#define BITM_USB_EP0I_CSR_H_FLUSHFIFO        (_ADI_MSK(0x00000100,uint16_t))  /* Flush Endpoint FIFO */
+#define ENUM_USB_EP0I_CSR_H_NO_FLUSH         (_ADI_MSK(0x00000000,uint16_t))  /* FLUSHFIFO: No Flush */
+#define ENUM_USB_EP0I_CSR_H_FLUSH            (_ADI_MSK(0x00000100,uint16_t))  /* FLUSHFIFO: Flush Endpoint FIFO */
 
-#define BITM_USB_EP0I_CSR_H_NAKTO            (_ADI_MSK(0x00000080,uint16_t))
-#define ENUM_USB_EP0I_CSR_H_NO_NAKTO         (_ADI_MSK(0x00000000,uint16_t))  /* NAKTO:  */
-#define ENUM_USB_EP0I_CSR_H_NAKTO            (_ADI_MSK(0x00000080,uint16_t))  /* NAKTO: Set by USB if EP0 halted due to NAK timeout */
+#define BITM_USB_EP0I_CSR_H_NAKTO            (_ADI_MSK(0x00000080,uint16_t))  /* NAK Timeout */
+#define ENUM_USB_EP0I_CSR_H_NO_NAKTO         (_ADI_MSK(0x00000000,uint16_t))  /* NAKTO: No Status */
+#define ENUM_USB_EP0I_CSR_H_NAKTO            (_ADI_MSK(0x00000080,uint16_t))  /* NAKTO: Endpoint Halted (NAK Timeout) */
 
-#define BITM_USB_EP0I_CSR_H_STATUSPKT        (_ADI_MSK(0x00000040,uint16_t))
-#define ENUM_USB_EP0I_CSR_H_NO_STATPKT       (_ADI_MSK(0x00000000,uint16_t))  /* STATUSPKT:  */
-#define ENUM_USB_EP0I_CSR_H_STATPKT          (_ADI_MSK(0x00000040,uint16_t))  /* STATUSPKT: Set this bit to request Status transaction */
+#define BITM_USB_EP0I_CSR_H_STATUSPKT        (_ADI_MSK(0x00000040,uint16_t))  /* Status Packet */
+#define ENUM_USB_EP0I_CSR_H_NO_STATPKT       (_ADI_MSK(0x00000000,uint16_t))  /* STATUSPKT: No Request */
+#define ENUM_USB_EP0I_CSR_H_STATPKT          (_ADI_MSK(0x00000040,uint16_t))  /* STATUSPKT: Request Status Transaction */
 
-#define BITM_USB_EP0I_CSR_H_REQPKT           (_ADI_MSK(0x00000020,uint16_t))
-#define ENUM_USB_EP0I_CSR_H_NO_REQPKT        (_ADI_MSK(0x00000000,uint16_t))  /* REQPKT:  */
-#define ENUM_USB_EP0I_CSR_H_REQPKT           (_ADI_MSK(0x00000020,uint16_t))  /* REQPKT: Set to send IN tokens to device */
+#define BITM_USB_EP0I_CSR_H_REQPKT           (_ADI_MSK(0x00000020,uint16_t))  /* Request Packet */
+#define ENUM_USB_EP0I_CSR_H_NO_REQPKT        (_ADI_MSK(0x00000000,uint16_t))  /* REQPKT: No Request */
+#define ENUM_USB_EP0I_CSR_H_REQPKT           (_ADI_MSK(0x00000020,uint16_t))  /* REQPKT: Send IN Tokens to Device */
 
-#define BITM_USB_EP0I_CSR_H_TOERR            (_ADI_MSK(0x00000010,uint16_t))
-#define ENUM_USB_EP0I_CSR_H_NO_TOERR         (_ADI_MSK(0x00000000,uint16_t))  /* TOERR:  */
-#define ENUM_USB_EP0I_CSR_H_TOERR            (_ADI_MSK(0x00000010,uint16_t))  /* TOERR: no response from device after 3 attempts */
+#define BITM_USB_EP0I_CSR_H_TOERR            (_ADI_MSK(0x00000010,uint16_t))  /* Timeout Error */
+#define ENUM_USB_EP0I_CSR_H_NO_TOERR         (_ADI_MSK(0x00000000,uint16_t))  /* TOERR: No Status */
+#define ENUM_USB_EP0I_CSR_H_TOERR            (_ADI_MSK(0x00000010,uint16_t))  /* TOERR: Timeout Error */
 
-#define BITM_USB_EP0I_CSR_H_SETUPPKT         (_ADI_MSK(0x00000008,uint16_t))
-#define ENUM_USB_EP0I_CSR_H_NO_SETUPPKT      (_ADI_MSK(0x00000000,uint16_t))  /* SETUPPKT:  */
-#define ENUM_USB_EP0I_CSR_H_SETUPPKT         (_ADI_MSK(0x00000008,uint16_t))  /* SETUPPKT: Set with TxPKtRdy to send SETUP token */
+#define BITM_USB_EP0I_CSR_H_SETUPPKT         (_ADI_MSK(0x00000008,uint16_t))  /* Setup Packet */
+#define ENUM_USB_EP0I_CSR_H_NO_SETUPPKT      (_ADI_MSK(0x00000000,uint16_t))  /* SETUPPKT: No Request */
+#define ENUM_USB_EP0I_CSR_H_SETUPPKT         (_ADI_MSK(0x00000008,uint16_t))  /* SETUPPKT: Send SETUP token */
 
-#define BITM_USB_EP0I_CSR_H_RXSTALL          (_ADI_MSK(0x00000004,uint16_t))
-#define ENUM_USB_EP0I_CSR_H_NO_RXSTALL       (_ADI_MSK(0x00000000,uint16_t))  /* RXSTALL:  */
-#define ENUM_USB_EP0I_CSR_H_RXSTALL          (_ADI_MSK(0x00000004,uint16_t))  /* RXSTALL: EP0 Stall Received from device */
+#define BITM_USB_EP0I_CSR_H_RXSTALL          (_ADI_MSK(0x00000004,uint16_t))  /* Rx Stall */
+#define ENUM_USB_EP0I_CSR_H_NO_RXSTALL       (_ADI_MSK(0x00000000,uint16_t))  /* RXSTALL: No Status */
+#define ENUM_USB_EP0I_CSR_H_RXSTALL          (_ADI_MSK(0x00000004,uint16_t))  /* RXSTALL: Stall Received from Device */
 
-#define BITM_USB_EP0I_CSR_H_TXPKTRDY         (_ADI_MSK(0x00000002,uint16_t))
-#define ENUM_USB_EP0I_CSR_H_NO_TXPKTRDY      (_ADI_MSK(0x00000000,uint16_t))  /* TXPKTRDY:  */
-#define ENUM_USB_EP0I_CSR_H_TXPKTRDY         (_ADI_MSK(0x00000002,uint16_t))  /* TXPKTRDY: TX packet in EP0 FIFO */
+#define BITM_USB_EP0I_CSR_H_TXPKTRDY         (_ADI_MSK(0x00000002,uint16_t))  /* Tx Packet Ready */
+#define ENUM_USB_EP0I_CSR_H_NO_TXPKTRDY      (_ADI_MSK(0x00000000,uint16_t))  /* TXPKTRDY: No Tx Packet */
+#define ENUM_USB_EP0I_CSR_H_TXPKTRDY         (_ADI_MSK(0x00000002,uint16_t))  /* TXPKTRDY: Tx Packet in Endpoint FIFO */
 
-#define BITM_USB_EP0I_CSR_H_RXPKTRDY         (_ADI_MSK(0x00000001,uint16_t))
-#define ENUM_USB_EP0I_CSR_H_NO_RXPKTRDY      (_ADI_MSK(0x00000000,uint16_t))  /* RXPKTRDY:  */
-#define ENUM_USB_EP0I_CSR_H_RXPKTRDY         (_ADI_MSK(0x00000001,uint16_t))  /* RXPKTRDY: RX Packet in EP0 FIFO */
+#define BITM_USB_EP0I_CSR_H_RXPKTRDY         (_ADI_MSK(0x00000001,uint16_t))  /* Rx Packet Ready */
+#define ENUM_USB_EP0I_CSR_H_NO_RXPKTRDY      (_ADI_MSK(0x00000000,uint16_t))  /* RXPKTRDY: No Rx Packet */
+#define ENUM_USB_EP0I_CSR_H_RXPKTRDY         (_ADI_MSK(0x00000001,uint16_t))  /* RXPKTRDY: Rx Packet in Endpoint FIFO */
 
 /* ------------------------------------------------------------------------------------------------------------------------
         USB_EPI_RXMAXP                       Pos/Masks                        Description
    ------------------------------------------------------------------------------------------------------------------------ */
-#define BITP_USB_EPI_RXMAXP_MULTM1           11
-#define BITP_USB_EPI_RXMAXP_MAXPAY            0                               /* Max number of bytes that may be transferred per transaction */
-#define BITM_USB_EPI_RXMAXP_MULTM1           (_ADI_MSK(0x00001800,uint16_t))
-#define BITM_USB_EPI_RXMAXP_MAXPAY           (_ADI_MSK(0x000007FF,uint16_t))  /* Max number of bytes that may be transferred per transaction */
+#define BITP_USB_EPI_RXMAXP_MULTM1           11                               /* Multi-Packets per Micro-frame */
+#define BITP_USB_EPI_RXMAXP_MAXPAY            0                               /* Maximum Payload */
+#define BITM_USB_EPI_RXMAXP_MULTM1           (_ADI_MSK(0x00001800,uint16_t))  /* Multi-Packets per Micro-frame */
+#define BITM_USB_EPI_RXMAXP_MAXPAY           (_ADI_MSK(0x000007FF,uint16_t))  /* Maximum Payload */
 
 /* ------------------------------------------------------------------------------------------------------------------------
         USB_EPI_RXCSR_H                      Pos/Masks                        Description
    ------------------------------------------------------------------------------------------------------------------------ */
-#define BITP_USB_EPI_RXCSR_H_AUTOCLR         15
-#define BITP_USB_EPI_RXCSR_H_AUTOREQ         14
-#define BITP_USB_EPI_RXCSR_H_DMAREQEN        13
-#define BITP_USB_EPI_RXCSR_H_PIDERR          12
-#define BITP_USB_EPI_RXCSR_H_DMAREQMODE      11
-#define BITP_USB_EPI_RXCSR_H_DATGLEN         10
-#define BITP_USB_EPI_RXCSR_H_DATGL            9
-#define BITP_USB_EPI_RXCSR_H_INCOMPRX         8
-#define BITP_USB_EPI_RXCSR_H_CLRDATATGL       7
-#define BITP_USB_EPI_RXCSR_H_RXSTALL          6
-#define BITP_USB_EPI_RXCSR_H_REQPKT           5
-#define BITP_USB_EPI_RXCSR_H_FLUSHFIFO        4
-#define BITP_USB_EPI_RXCSR_H_NAKTODERR        3
-#define BITP_USB_EPI_RXCSR_H_RXTOERR          2
-#define BITP_USB_EPI_RXCSR_H_FIFOFULL         1
-#define BITP_USB_EPI_RXCSR_H_RXPKTRDY         0
+#define BITP_USB_EPI_RXCSR_H_AUTOCLR         15                               /* Auto Clear Enable */
+#define BITP_USB_EPI_RXCSR_H_AUTOREQ         14                               /* Auto Request Clear Enable */
+#define BITP_USB_EPI_RXCSR_H_DMAREQEN        13                               /* DMA Request Enable Rx EP */
+#define BITP_USB_EPI_RXCSR_H_PIDERR          12                               /* Packet ID Error */
+#define BITP_USB_EPI_RXCSR_H_DMAREQMODE      11                               /* DMA Mode Select */
+#define BITP_USB_EPI_RXCSR_H_DATGLEN         10                               /* Data Toggle Write Enable */
+#define BITP_USB_EPI_RXCSR_H_DATGL            9                               /* Data Toggle */
+#define BITP_USB_EPI_RXCSR_H_INCOMPRX         8                               /* Incomplete Rx */
+#define BITP_USB_EPI_RXCSR_H_CLRDATATGL       7                               /* Clear Endpoint Data Toggle */
+#define BITP_USB_EPI_RXCSR_H_RXSTALL          6                               /* Rx STALL */
+#define BITP_USB_EPI_RXCSR_H_REQPKT           5                               /* Request Packet */
+#define BITP_USB_EPI_RXCSR_H_FLUSHFIFO        4                               /* Flush Endpoint FIFO */
+#define BITP_USB_EPI_RXCSR_H_NAKTODERR        3                               /* NAK Timeout Data Error */
+#define BITP_USB_EPI_RXCSR_H_RXTOERR          2                               /* Rx Timeout Error */
+#define BITP_USB_EPI_RXCSR_H_FIFOFULL         1                               /* FIFO Full */
+#define BITP_USB_EPI_RXCSR_H_RXPKTRDY         0                               /* Rx Packet Ready */
 
-#define BITM_USB_EPI_RXCSR_H_AUTOCLR         (_ADI_MSK(0x00008000,uint16_t))
-#define ENUM_USB_EPI_RXCSR_H_NO_AUTOCLR      (_ADI_MSK(0x00000000,uint16_t))  /* AUTOCLR:  */
-#define ENUM_USB_EPI_RXCSR_H_AUTOCLR         (_ADI_MSK(0x00008000,uint16_t))  /* AUTOCLR:  */
+#define BITM_USB_EPI_RXCSR_H_AUTOCLR         (_ADI_MSK(0x00008000,uint16_t))  /* Auto Clear Enable */
+#define ENUM_USB_EPI_RXCSR_H_NO_AUTOCLR      (_ADI_MSK(0x00000000,uint16_t))  /* AUTOCLR: Disable Auto Clear */
+#define ENUM_USB_EPI_RXCSR_H_AUTOCLR         (_ADI_MSK(0x00008000,uint16_t))  /* AUTOCLR: Enable Auto Clear */
 
-#define BITM_USB_EPI_RXCSR_H_AUTOREQ         (_ADI_MSK(0x00004000,uint16_t))
-#define ENUM_USB_EPI_RXCSR_H_NO_AUTOREQ      (_ADI_MSK(0x00000000,uint16_t))  /* AUTOREQ: Automatically cleared when a short packet is received. */
-#define ENUM_USB_EPI_RXCSR_H_AUTOREQ         (_ADI_MSK(0x00004000,uint16_t))  /* AUTOREQ: ReqPkt bit will be auto set when RxPktRdy bit is cleared */
+#define BITM_USB_EPI_RXCSR_H_AUTOREQ         (_ADI_MSK(0x00004000,uint16_t))  /* Auto Request Clear Enable */
+#define ENUM_USB_EPI_RXCSR_H_NO_AUTOREQ      (_ADI_MSK(0x00000000,uint16_t))  /* AUTOREQ: Disable Auto Request Clear */
+#define ENUM_USB_EPI_RXCSR_H_AUTOREQ         (_ADI_MSK(0x00004000,uint16_t))  /* AUTOREQ: Enable Auto Request Clear */
 
-#define BITM_USB_EPI_RXCSR_H_DMAREQEN        (_ADI_MSK(0x00002000,uint16_t))
-#define ENUM_USB_EPI_RXCSR_H_DMAREQDIS       (_ADI_MSK(0x00000000,uint16_t))  /* DMAREQEN: Disable DMA requests for the RX endpoint */
-#define ENUM_USB_EPI_RXCSR_H_DMAREQEN        (_ADI_MSK(0x00002000,uint16_t))  /* DMAREQEN: Enable DMA requests for the RX endpoint */
+#define BITM_USB_EPI_RXCSR_H_DMAREQEN        (_ADI_MSK(0x00002000,uint16_t))  /* DMA Request Enable Rx EP */
+#define ENUM_USB_EPI_RXCSR_H_DMAREQDIS       (_ADI_MSK(0x00000000,uint16_t))  /* DMAREQEN: Disable DMA Request */
+#define ENUM_USB_EPI_RXCSR_H_DMAREQEN        (_ADI_MSK(0x00002000,uint16_t))  /* DMAREQEN: Enable DMA Request */
 
-#define BITM_USB_EPI_RXCSR_H_PIDERR          (_ADI_MSK(0x00001000,uint16_t))
-#define ENUM_USB_EPI_RXCSR_H_NO_PIDERR       (_ADI_MSK(0x00000000,uint16_t))  /* PIDERR:  */
-#define ENUM_USB_EPI_RXCSR_H_PIDERR          (_ADI_MSK(0x00001000,uint16_t))  /* PIDERR:  */
+#define BITM_USB_EPI_RXCSR_H_PIDERR          (_ADI_MSK(0x00001000,uint16_t))  /* Packet ID Error */
+#define ENUM_USB_EPI_RXCSR_H_NO_PIDERR       (_ADI_MSK(0x00000000,uint16_t))  /* PIDERR: No Status */
+#define ENUM_USB_EPI_RXCSR_H_PIDERR          (_ADI_MSK(0x00001000,uint16_t))  /* PIDERR: PID Error */
 
-#define BITM_USB_EPI_RXCSR_H_DMAREQMODE      (_ADI_MSK(0x00000800,uint16_t))
-#define ENUM_USB_EPI_RXCSR_H_DMARQMODE0      (_ADI_MSK(0x00000000,uint16_t))  /* DMAREQMODE:  */
-#define ENUM_USB_EPI_RXCSR_H_DMARQMODE1      (_ADI_MSK(0x00000800,uint16_t))  /* DMAREQMODE:  */
+#define BITM_USB_EPI_RXCSR_H_DMAREQMODE      (_ADI_MSK(0x00000800,uint16_t))  /* DMA Mode Select */
+#define ENUM_USB_EPI_RXCSR_H_DMARQMODE0      (_ADI_MSK(0x00000000,uint16_t))  /* DMAREQMODE: DMA Request Mode 0 */
+#define ENUM_USB_EPI_RXCSR_H_DMARQMODE1      (_ADI_MSK(0x00000800,uint16_t))  /* DMAREQMODE: DMA Request Mode 1 */
 
-#define BITM_USB_EPI_RXCSR_H_DATGLEN         (_ADI_MSK(0x00000400,uint16_t))
-#define ENUM_USB_EPI_RXCSR_H_DATGLDIS        (_ADI_MSK(0x00000000,uint16_t))  /* DATGLEN:  */
-#define ENUM_USB_EPI_RXCSR_H_DATGLEN         (_ADI_MSK(0x00000400,uint16_t))  /* DATGLEN:  */
+#define BITM_USB_EPI_RXCSR_H_DATGLEN         (_ADI_MSK(0x00000400,uint16_t))  /* Data Toggle Write Enable */
+#define ENUM_USB_EPI_RXCSR_H_DATGLDIS        (_ADI_MSK(0x00000000,uint16_t))  /* DATGLEN: Disable Write to DATGL */
+#define ENUM_USB_EPI_RXCSR_H_DATGLEN         (_ADI_MSK(0x00000400,uint16_t))  /* DATGLEN: Enable Write to DATGL */
 
-#define BITM_USB_EPI_RXCSR_H_DATGL           (_ADI_MSK(0x00000200,uint16_t))
-#define ENUM_USB_EPI_RXCSR_H_NO_DATGL        (_ADI_MSK(0x00000000,uint16_t))  /* DATGL:  */
-#define ENUM_USB_EPI_RXCSR_H_DATGL           (_ADI_MSK(0x00000200,uint16_t))  /* DATGL:  */
+#define BITM_USB_EPI_RXCSR_H_DATGL           (_ADI_MSK(0x00000200,uint16_t))  /* Data Toggle */
+#define ENUM_USB_EPI_RXCSR_H_NO_DATGL        (_ADI_MSK(0x00000000,uint16_t))  /* DATGL: DATA0 is Set */
+#define ENUM_USB_EPI_RXCSR_H_DATGL           (_ADI_MSK(0x00000200,uint16_t))  /* DATGL: DATA1 is Set */
 
-#define BITM_USB_EPI_RXCSR_H_INCOMPRX        (_ADI_MSK(0x00000100,uint16_t))
-#define ENUM_USB_EPI_RXCSR_H_NO_INCOMP       (_ADI_MSK(0x00000000,uint16_t))  /* INCOMPRX:  */
-#define ENUM_USB_EPI_RXCSR_H_INCOMP          (_ADI_MSK(0x00000100,uint16_t))  /* INCOMPRX:  */
+#define BITM_USB_EPI_RXCSR_H_INCOMPRX        (_ADI_MSK(0x00000100,uint16_t))  /* Incomplete Rx */
+#define ENUM_USB_EPI_RXCSR_H_NO_INCOMP       (_ADI_MSK(0x00000000,uint16_t))  /* INCOMPRX: No Status */
+#define ENUM_USB_EPI_RXCSR_H_INCOMP          (_ADI_MSK(0x00000100,uint16_t))  /* INCOMPRX: Incomplete Rx */
 
-#define BITM_USB_EPI_RXCSR_H_CLRDATATGL      (_ADI_MSK(0x00000080,uint16_t))
-#define ENUM_USB_EPI_RXCSR_H_NO_CLRTGL       (_ADI_MSK(0x00000000,uint16_t))  /* CLRDATATGL:  */
-#define ENUM_USB_EPI_RXCSR_H_CLRTGL          (_ADI_MSK(0x00000080,uint16_t))  /* CLRDATATGL: If this bit is set, the data toggle bit will be cleared. */
+#define BITM_USB_EPI_RXCSR_H_CLRDATATGL      (_ADI_MSK(0x00000080,uint16_t))  /* Clear Endpoint Data Toggle */
+#define ENUM_USB_EPI_RXCSR_H_NO_CLRTGL       (_ADI_MSK(0x00000000,uint16_t))  /* CLRDATATGL: No Action */
+#define ENUM_USB_EPI_RXCSR_H_CLRTGL          (_ADI_MSK(0x00000080,uint16_t))  /* CLRDATATGL: Reset EP Data Toggle to 0 */
 
-#define BITM_USB_EPI_RXCSR_H_RXSTALL         (_ADI_MSK(0x00000040,uint16_t))
-#define ENUM_USB_EPI_RXCSR_H_NO_RXSTALL      (_ADI_MSK(0x00000000,uint16_t))  /* RXSTALL: The CPU should clear this bit. */
-#define ENUM_USB_EPI_RXCSR_H_RXSTALL         (_ADI_MSK(0x00000040,uint16_t))  /* RXSTALL: This bit is set when a STALL handshake is received. */
+#define BITM_USB_EPI_RXCSR_H_RXSTALL         (_ADI_MSK(0x00000040,uint16_t))  /* Rx STALL */
+#define ENUM_USB_EPI_RXCSR_H_NO_RXSTALL      (_ADI_MSK(0x00000000,uint16_t))  /* RXSTALL: No Status */
+#define ENUM_USB_EPI_RXCSR_H_RXSTALL         (_ADI_MSK(0x00000040,uint16_t))  /* RXSTALL: Stall Received from Device */
 
-#define BITM_USB_EPI_RXCSR_H_REQPKT          (_ADI_MSK(0x00000020,uint16_t))
-#define ENUM_USB_EPI_RXCSR_H_NO_REQPKT       (_ADI_MSK(0x00000000,uint16_t))  /* REQPKT: Cleared when RxPktRdy is set. */
-#define ENUM_USB_EPI_RXCSR_H_REQPKT          (_ADI_MSK(0x00000020,uint16_t))  /* REQPKT: Set to request an IN transaction. */
+#define BITM_USB_EPI_RXCSR_H_REQPKT          (_ADI_MSK(0x00000020,uint16_t))  /* Request Packet */
+#define ENUM_USB_EPI_RXCSR_H_NO_REQPKT       (_ADI_MSK(0x00000000,uint16_t))  /* REQPKT: No Request */
+#define ENUM_USB_EPI_RXCSR_H_REQPKT          (_ADI_MSK(0x00000020,uint16_t))  /* REQPKT: Send IN Tokens to Device */
 
-#define BITM_USB_EPI_RXCSR_H_FLUSHFIFO       (_ADI_MSK(0x00000010,uint16_t))
-#define ENUM_USB_EPI_RXCSR_H_NO_FLUSH        (_ADI_MSK(0x00000000,uint16_t))  /* FLUSHFIFO:  */
-#define ENUM_USB_EPI_RXCSR_H_FLUSH           (_ADI_MSK(0x00000010,uint16_t))  /* FLUSHFIFO:  */
+#define BITM_USB_EPI_RXCSR_H_FLUSHFIFO       (_ADI_MSK(0x00000010,uint16_t))  /* Flush Endpoint FIFO */
+#define ENUM_USB_EPI_RXCSR_H_NO_FLUSH        (_ADI_MSK(0x00000000,uint16_t))  /* FLUSHFIFO: No Flush */
+#define ENUM_USB_EPI_RXCSR_H_FLUSH           (_ADI_MSK(0x00000010,uint16_t))  /* FLUSHFIFO: Flush Endpoint FIFO */
 
-#define BITM_USB_EPI_RXCSR_H_NAKTODERR       (_ADI_MSK(0x00000008,uint16_t))
-#define ENUM_USB_EPI_RXCSR_H_NO_NAKTO        (_ADI_MSK(0x00000000,uint16_t))  /* NAKTODERR:  */
-#define ENUM_USB_EPI_RXCSR_H_NAKTO           (_ADI_MSK(0x00000008,uint16_t))  /* NAKTODERR:  */
+#define BITM_USB_EPI_RXCSR_H_NAKTODERR       (_ADI_MSK(0x00000008,uint16_t))  /* NAK Timeout Data Error */
+#define ENUM_USB_EPI_RXCSR_H_NO_NAKTO        (_ADI_MSK(0x00000000,uint16_t))  /* NAKTODERR: No Status */
+#define ENUM_USB_EPI_RXCSR_H_NAKTO           (_ADI_MSK(0x00000008,uint16_t))  /* NAKTODERR: NAK Timeout Data Error */
 
-#define BITM_USB_EPI_RXCSR_H_RXTOERR         (_ADI_MSK(0x00000004,uint16_t))
-#define ENUM_USB_EPI_RXCSR_H_NO_RXTOERR      (_ADI_MSK(0x00000000,uint16_t))  /* RXTOERR:  */
-#define ENUM_USB_EPI_RXCSR_H_RXTOERR         (_ADI_MSK(0x00000004,uint16_t))  /* RXTOERR: Set when no more packets can be loaded into the Rx FIFO */
+#define BITM_USB_EPI_RXCSR_H_RXTOERR         (_ADI_MSK(0x00000004,uint16_t))  /* Rx Timeout Error */
+#define ENUM_USB_EPI_RXCSR_H_NO_RXTOERR      (_ADI_MSK(0x00000000,uint16_t))  /* RXTOERR: No Status */
+#define ENUM_USB_EPI_RXCSR_H_RXTOERR         (_ADI_MSK(0x00000004,uint16_t))  /* RXTOERR: Rx Timeout Error */
 
-#define BITM_USB_EPI_RXCSR_H_FIFOFULL        (_ADI_MSK(0x00000002,uint16_t))
-#define ENUM_USB_EPI_RXCSR_H_NO_FIFOFUL      (_ADI_MSK(0x00000000,uint16_t))  /* FIFOFULL:  */
-#define ENUM_USB_EPI_RXCSR_H_FIFOFUL         (_ADI_MSK(0x00000002,uint16_t))  /* FIFOFULL: No more packets can be loaded into the Rx FIFO. */
+#define BITM_USB_EPI_RXCSR_H_FIFOFULL        (_ADI_MSK(0x00000002,uint16_t))  /* FIFO Full */
+#define ENUM_USB_EPI_RXCSR_H_NO_FIFOFUL      (_ADI_MSK(0x00000000,uint16_t))  /* FIFOFULL: No Status */
+#define ENUM_USB_EPI_RXCSR_H_FIFOFUL         (_ADI_MSK(0x00000002,uint16_t))  /* FIFOFULL: FIFO Full */
 
-#define BITM_USB_EPI_RXCSR_H_RXPKTRDY        (_ADI_MSK(0x00000001,uint16_t))
-#define ENUM_USB_EPI_RXCSR_H_NO_PKTRDY       (_ADI_MSK(0x00000000,uint16_t))  /* RXPKTRDY:  */
-#define ENUM_USB_EPI_RXCSR_H_PKTRDY          (_ADI_MSK(0x00000001,uint16_t))  /* RXPKTRDY: This bit is set when a data packet has been received */
+#define BITM_USB_EPI_RXCSR_H_RXPKTRDY        (_ADI_MSK(0x00000001,uint16_t))  /* Rx Packet Ready */
+#define ENUM_USB_EPI_RXCSR_H_NO_PKTRDY       (_ADI_MSK(0x00000000,uint16_t))  /* RXPKTRDY: No Rx Packet */
+#define ENUM_USB_EPI_RXCSR_H_PKTRDY          (_ADI_MSK(0x00000001,uint16_t))  /* RXPKTRDY: Rx Packet in Endpoint FIFO */
 
 /* ------------------------------------------------------------------------------------------------------------------------
         USB_EPI_RXCSR_P                      Pos/Masks                        Description
    ------------------------------------------------------------------------------------------------------------------------ */
-#define BITP_USB_EPI_RXCSR_P_AUTOCLR         15
-#define BITP_USB_EPI_RXCSR_P_ISO             14
-#define BITP_USB_EPI_RXCSR_P_DMAREQEN        13
-#define BITP_USB_EPI_RXCSR_P_DNYETPERR       12
-#define BITP_USB_EPI_RXCSR_P_DMAREQMODE      11
-#define BITP_USB_EPI_RXCSR_P_INCOMPRX         8
-#define BITP_USB_EPI_RXCSR_P_CLRDATATGL       7
-#define BITP_USB_EPI_RXCSR_P_SENTSTALL        6
-#define BITP_USB_EPI_RXCSR_P_SENDSTALL        5
-#define BITP_USB_EPI_RXCSR_P_FLUSHFIFO        4
-#define BITP_USB_EPI_RXCSR_P_DATAERR          3
-#define BITP_USB_EPI_RXCSR_P_ORUNERR          2
-#define BITP_USB_EPI_RXCSR_P_FIFOFULL         1
-#define BITP_USB_EPI_RXCSR_P_RXPKTRDY         0
+#define BITP_USB_EPI_RXCSR_P_AUTOCLR         15                               /* Auto Clear Enable */
+#define BITP_USB_EPI_RXCSR_P_ISO             14                               /* Isochronous Transfers */
+#define BITP_USB_EPI_RXCSR_P_DMAREQEN        13                               /* DMA Request Enable Rx EP */
+#define BITP_USB_EPI_RXCSR_P_DNYETPERR       12                               /* Disable NYET Handshake */
+#define BITP_USB_EPI_RXCSR_P_DMAREQMODE      11                               /* DMA Mode Select */
+#define BITP_USB_EPI_RXCSR_P_INCOMPRX         8                               /* Incomplete Rx */
+#define BITP_USB_EPI_RXCSR_P_CLRDATATGL       7                               /* Clear Endpoint Data Toggle */
+#define BITP_USB_EPI_RXCSR_P_SENTSTALL        6                               /* Sent STALL */
+#define BITP_USB_EPI_RXCSR_P_SENDSTALL        5                               /* Send STALL */
+#define BITP_USB_EPI_RXCSR_P_FLUSHFIFO        4                               /* Flush Endpoint FIFO */
+#define BITP_USB_EPI_RXCSR_P_DATAERR          3                               /* Data Error */
+#define BITP_USB_EPI_RXCSR_P_ORUNERR          2                               /* OUT Run Error */
+#define BITP_USB_EPI_RXCSR_P_FIFOFULL         1                               /* FIFO Full */
+#define BITP_USB_EPI_RXCSR_P_RXPKTRDY         0                               /* Rx Packet Ready */
 
-#define BITM_USB_EPI_RXCSR_P_AUTOCLR         (_ADI_MSK(0x00008000,uint16_t))
-#define ENUM_USB_EPI_RXCSR_P_NO_AUTOCLR      (_ADI_MSK(0x00000000,uint16_t))  /* AUTOCLR:  */
-#define ENUM_USB_EPI_RXCSR_P_AUTOCLR         (_ADI_MSK(0x00008000,uint16_t))  /* AUTOCLR:  */
+#define BITM_USB_EPI_RXCSR_P_AUTOCLR         (_ADI_MSK(0x00008000,uint16_t))  /* Auto Clear Enable */
+#define ENUM_USB_EPI_RXCSR_P_NO_AUTOCLR      (_ADI_MSK(0x00000000,uint16_t))  /* AUTOCLR: Disable Auto Clear */
+#define ENUM_USB_EPI_RXCSR_P_AUTOCLR         (_ADI_MSK(0x00008000,uint16_t))  /* AUTOCLR: Enable Auto Clear */
 
-#define BITM_USB_EPI_RXCSR_P_ISO             (_ADI_MSK(0x00004000,uint16_t))
+#define BITM_USB_EPI_RXCSR_P_ISO             (_ADI_MSK(0x00004000,uint16_t))  /* Isochronous Transfers */
 #define ENUM_USB_EPI_RXCSR_P_ISODIS          (_ADI_MSK(0x00000000,uint16_t))  /* ISO: This bit should be cleared for bulk or interrupt transfers. */
 #define ENUM_USB_EPI_RXCSR_P_ISOEN           (_ADI_MSK(0x00004000,uint16_t))  /* ISO: This bit should be set for isochronous transfers. */
 
-#define BITM_USB_EPI_RXCSR_P_DMAREQEN        (_ADI_MSK(0x00002000,uint16_t))
-#define ENUM_USB_EPI_RXCSR_P_DMAREQDIS       (_ADI_MSK(0x00000000,uint16_t))  /* DMAREQEN: Disable DMA requests for the RX endpoint. */
-#define ENUM_USB_EPI_RXCSR_P_DMAREQEN        (_ADI_MSK(0x00002000,uint16_t))  /* DMAREQEN: Enable DMA requests for the RX endpoint. */
+#define BITM_USB_EPI_RXCSR_P_DMAREQEN        (_ADI_MSK(0x00002000,uint16_t))  /* DMA Request Enable Rx EP */
+#define ENUM_USB_EPI_RXCSR_P_DMAREQDIS       (_ADI_MSK(0x00000000,uint16_t))  /* DMAREQEN: Disable DMA Request */
+#define ENUM_USB_EPI_RXCSR_P_DMAREQEN        (_ADI_MSK(0x00002000,uint16_t))  /* DMAREQEN: Enable DMA Request */
 
-#define BITM_USB_EPI_RXCSR_P_DNYETPERR       (_ADI_MSK(0x00001000,uint16_t))
-#define ENUM_USB_EPI_RXCSR_P_DNYTERREN       (_ADI_MSK(0x00000000,uint16_t))  /* DNYETPERR:  */
-#define ENUM_USB_EPI_RXCSR_P_DNYTERRDIS      (_ADI_MSK(0x00001000,uint16_t))  /* DNYETPERR:  */
+#define BITM_USB_EPI_RXCSR_P_DNYETPERR       (_ADI_MSK(0x00001000,uint16_t))  /* Disable NYET Handshake */
+#define ENUM_USB_EPI_RXCSR_P_DNYTERREN       (_ADI_MSK(0x00000000,uint16_t))  /* DNYETPERR: Enable NYET Handshake */
+#define ENUM_USB_EPI_RXCSR_P_DNYTERRDIS      (_ADI_MSK(0x00001000,uint16_t))  /* DNYETPERR: Disable NYET Handshake */
 
-#define BITM_USB_EPI_RXCSR_P_DMAREQMODE      (_ADI_MSK(0x00000800,uint16_t))
-#define ENUM_USB_EPI_RXCSR_P_DMARQMODE0      (_ADI_MSK(0x00000000,uint16_t))  /* DMAREQMODE: This bit is not used in peripheral mode. */
-#define ENUM_USB_EPI_RXCSR_P_DMARQMODE1      (_ADI_MSK(0x00000800,uint16_t))  /* DMAREQMODE:  */
+#define BITM_USB_EPI_RXCSR_P_DMAREQMODE      (_ADI_MSK(0x00000800,uint16_t))  /* DMA Mode Select */
+#define ENUM_USB_EPI_RXCSR_P_DMARQMODE0      (_ADI_MSK(0x00000000,uint16_t))  /* DMAREQMODE: DMA Request Mode 0 */
+#define ENUM_USB_EPI_RXCSR_P_DMARQMODE1      (_ADI_MSK(0x00000800,uint16_t))  /* DMAREQMODE: DMA Request Mode 1 */
 
-#define BITM_USB_EPI_RXCSR_P_INCOMPRX        (_ADI_MSK(0x00000100,uint16_t))
-#define ENUM_USB_EPI_RXCSR_P_NO_INCOMP       (_ADI_MSK(0x00000000,uint16_t))  /* INCOMPRX:  */
-#define ENUM_USB_EPI_RXCSR_P_INCOMP          (_ADI_MSK(0x00000100,uint16_t))  /* INCOMPRX:  */
+#define BITM_USB_EPI_RXCSR_P_INCOMPRX        (_ADI_MSK(0x00000100,uint16_t))  /* Incomplete Rx */
+#define ENUM_USB_EPI_RXCSR_P_NO_INCOMP       (_ADI_MSK(0x00000000,uint16_t))  /* INCOMPRX: No Status */
+#define ENUM_USB_EPI_RXCSR_P_INCOMP          (_ADI_MSK(0x00000100,uint16_t))  /* INCOMPRX: Incomplete Rx */
 
-#define BITM_USB_EPI_RXCSR_P_CLRDATATGL      (_ADI_MSK(0x00000080,uint16_t))
-#define ENUM_USB_EPI_RXCSR_P_NO_CLRTGL       (_ADI_MSK(0x00000000,uint16_t))  /* CLRDATATGL:  */
-#define ENUM_USB_EPI_RXCSR_P_CLRTGL          (_ADI_MSK(0x00000080,uint16_t))  /* CLRDATATGL: If this bit is set, the data toggle bit will be cleared. */
+#define BITM_USB_EPI_RXCSR_P_CLRDATATGL      (_ADI_MSK(0x00000080,uint16_t))  /* Clear Endpoint Data Toggle */
+#define ENUM_USB_EPI_RXCSR_P_NO_CLRTGL       (_ADI_MSK(0x00000000,uint16_t))  /* CLRDATATGL: No Action */
+#define ENUM_USB_EPI_RXCSR_P_CLRTGL          (_ADI_MSK(0x00000080,uint16_t))  /* CLRDATATGL: Reset EP Data Toggle to 0 */
 
-#define BITM_USB_EPI_RXCSR_P_SENTSTALL       (_ADI_MSK(0x00000040,uint16_t))
-#define ENUM_USB_EPI_RXCSR_P_NO_STALSNT      (_ADI_MSK(0x00000000,uint16_t))  /* SENTSTALL: The CPU should clear this bit. */
-#define ENUM_USB_EPI_RXCSR_P_STALSNT         (_ADI_MSK(0x00000040,uint16_t))  /* SENTSTALL: This bit is set when a STALL handshake is transmitted */
+#define BITM_USB_EPI_RXCSR_P_SENTSTALL       (_ADI_MSK(0x00000040,uint16_t))  /* Sent STALL */
+#define ENUM_USB_EPI_RXCSR_P_NO_STALSNT      (_ADI_MSK(0x00000000,uint16_t))  /* SENTSTALL: No Status */
+#define ENUM_USB_EPI_RXCSR_P_STALSNT         (_ADI_MSK(0x00000040,uint16_t))  /* SENTSTALL: STALL Handshake Transmitted */
 
-#define BITM_USB_EPI_RXCSR_P_SENDSTALL       (_ADI_MSK(0x00000020,uint16_t))
-#define ENUM_USB_EPI_RXCSR_P_NO_STALL        (_ADI_MSK(0x00000000,uint16_t))  /* SENDSTALL: The CPU clears this bit to terminate the stall condition. */
-#define ENUM_USB_EPI_RXCSR_P_STALL           (_ADI_MSK(0x00000020,uint16_t))  /* SENDSTALL: This bit should be set to send a STALL handshake */
+#define BITM_USB_EPI_RXCSR_P_SENDSTALL       (_ADI_MSK(0x00000020,uint16_t))  /* Send STALL */
+#define ENUM_USB_EPI_RXCSR_P_NO_STALL        (_ADI_MSK(0x00000000,uint16_t))  /* SENDSTALL: No Action */
+#define ENUM_USB_EPI_RXCSR_P_STALL           (_ADI_MSK(0x00000020,uint16_t))  /* SENDSTALL: Request STALL Handshake */
 
-#define BITM_USB_EPI_RXCSR_P_FLUSHFIFO       (_ADI_MSK(0x00000010,uint16_t))
-#define ENUM_USB_EPI_RXCSR_P_NO_FLUSH        (_ADI_MSK(0x00000000,uint16_t))  /* FLUSHFIFO:  */
-#define ENUM_USB_EPI_RXCSR_P_FLUSH           (_ADI_MSK(0x00000010,uint16_t))  /* FLUSHFIFO:  */
+#define BITM_USB_EPI_RXCSR_P_FLUSHFIFO       (_ADI_MSK(0x00000010,uint16_t))  /* Flush Endpoint FIFO */
+#define ENUM_USB_EPI_RXCSR_P_NO_FLUSH        (_ADI_MSK(0x00000000,uint16_t))  /* FLUSHFIFO: No Flush */
+#define ENUM_USB_EPI_RXCSR_P_FLUSH           (_ADI_MSK(0x00000010,uint16_t))  /* FLUSHFIFO: Flush Endpoint FIFO */
 
-#define BITM_USB_EPI_RXCSR_P_DATAERR         (_ADI_MSK(0x00000008,uint16_t))
-#define ENUM_USB_EPI_RXCSR_P_NO_DATAERR      (_ADI_MSK(0x00000000,uint16_t))  /* DATAERR: Cleared when RxPktRdy is cleared. */
-#define ENUM_USB_EPI_RXCSR_P_DATAERR         (_ADI_MSK(0x00000008,uint16_t))  /* DATAERR:  */
+#define BITM_USB_EPI_RXCSR_P_DATAERR         (_ADI_MSK(0x00000008,uint16_t))  /* Data Error */
+#define ENUM_USB_EPI_RXCSR_P_NO_DATAERR      (_ADI_MSK(0x00000000,uint16_t))  /* DATAERR: No Status */
+#define ENUM_USB_EPI_RXCSR_P_DATAERR         (_ADI_MSK(0x00000008,uint16_t))  /* DATAERR: Data Error */
 
-#define BITM_USB_EPI_RXCSR_P_ORUNERR         (_ADI_MSK(0x00000004,uint16_t))
-#define ENUM_USB_EPI_RXCSR_P_NO_ORUNERR      (_ADI_MSK(0x00000000,uint16_t))  /* ORUNERR:  */
-#define ENUM_USB_EPI_RXCSR_P_ORUNERR         (_ADI_MSK(0x00000004,uint16_t))  /* ORUNERR: Set if an OUT packet cannot be loaded into the Rx FIFO. */
+#define BITM_USB_EPI_RXCSR_P_ORUNERR         (_ADI_MSK(0x00000004,uint16_t))  /* OUT Run Error */
+#define ENUM_USB_EPI_RXCSR_P_NO_ORUNERR      (_ADI_MSK(0x00000000,uint16_t))  /* ORUNERR: No Status */
+#define ENUM_USB_EPI_RXCSR_P_ORUNERR         (_ADI_MSK(0x00000004,uint16_t))  /* ORUNERR: OUT Run Error */
 
-#define BITM_USB_EPI_RXCSR_P_FIFOFULL        (_ADI_MSK(0x00000002,uint16_t))
-#define ENUM_USB_EPI_RXCSR_P_NO_FIFOFUL      (_ADI_MSK(0x00000000,uint16_t))  /* FIFOFULL:  */
-#define ENUM_USB_EPI_RXCSR_P_FIFOFUL         (_ADI_MSK(0x00000002,uint16_t))  /* FIFOFULL: No more packets can be loaded into the Rx FIFO. */
+#define BITM_USB_EPI_RXCSR_P_FIFOFULL        (_ADI_MSK(0x00000002,uint16_t))  /* FIFO Full */
+#define ENUM_USB_EPI_RXCSR_P_NO_FIFOFUL      (_ADI_MSK(0x00000000,uint16_t))  /* FIFOFULL: No Status */
+#define ENUM_USB_EPI_RXCSR_P_FIFOFUL         (_ADI_MSK(0x00000002,uint16_t))  /* FIFOFULL: FIFO Full */
 
-#define BITM_USB_EPI_RXCSR_P_RXPKTRDY        (_ADI_MSK(0x00000001,uint16_t))
-#define ENUM_USB_EPI_RXCSR_P_NO_PKTRDY       (_ADI_MSK(0x00000000,uint16_t))  /* RXPKTRDY:  */
-#define ENUM_USB_EPI_RXCSR_P_PKTRDY          (_ADI_MSK(0x00000001,uint16_t))  /* RXPKTRDY:  */
+#define BITM_USB_EPI_RXCSR_P_RXPKTRDY        (_ADI_MSK(0x00000001,uint16_t))  /* Rx Packet Ready */
+#define ENUM_USB_EPI_RXCSR_P_NO_PKTRDY       (_ADI_MSK(0x00000000,uint16_t))  /* RXPKTRDY: No Rx Packet */
+#define ENUM_USB_EPI_RXCSR_P_PKTRDY          (_ADI_MSK(0x00000001,uint16_t))  /* RXPKTRDY: Rx Packet in Endpoint FIFO */
 
 /* ------------------------------------------------------------------------------------------------------------------------
         USB_EP0I_CNT                         Pos/Masks                        Description
    ------------------------------------------------------------------------------------------------------------------------ */
-#define BITP_USB_EP0I_CNT_RXCNT               0
-#define BITM_USB_EP0I_CNT_RXCNT              (_ADI_MSK(0x0000007F,uint16_t))
+#define BITP_USB_EP0I_CNT_RXCNT               0                               /* Rx Byte Count Value */
+#define BITM_USB_EP0I_CNT_RXCNT              (_ADI_MSK(0x0000007F,uint16_t))  /* Rx Byte Count Value */
 
 /* ------------------------------------------------------------------------------------------------------------------------
         USB_EPI_RXCNT                        Pos/Masks                        Description
    ------------------------------------------------------------------------------------------------------------------------ */
-#define BITP_USB_EPI_RXCNT_EPRXCNT            0
-#define BITM_USB_EPI_RXCNT_EPRXCNT           (_ADI_MSK(0x00003FFF,uint16_t))
+#define BITP_USB_EPI_RXCNT_EPRXCNT            0                               /* EP Rx Count */
+#define BITM_USB_EPI_RXCNT_EPRXCNT           (_ADI_MSK(0x00003FFF,uint16_t))  /* EP Rx Count */
 
 /* ------------------------------------------------------------------------------------------------------------------------
         USB_EPI_TXTYPE                       Pos/Masks                        Description
    ------------------------------------------------------------------------------------------------------------------------ */
-#define BITP_USB_EPI_TXTYPE_SPEED             6                               /* The operating speed of the target peripheral device */
-#define BITP_USB_EPI_TXTYPE_PROTOCOL          4                               /* Protocol */
+#define BITP_USB_EPI_TXTYPE_SPEED             6                               /* Speed of Operation Value */
+#define BITP_USB_EPI_TXTYPE_PROTOCOL          4                               /* Protocol for Transfer */
 #define BITP_USB_EPI_TXTYPE_TGTEP             0                               /* Target Endpoint Number */
 
-#define BITM_USB_EPI_TXTYPE_SPEED            (_ADI_MSK(0x000000C0,uint8_t))   /* The operating speed of the target peripheral device */
-#define ENUM_USB_EPI_TXTYPE_UNUSED           (_ADI_MSK(0x00000000,uint8_t))   /* SPEED: Unused - same speed as the core */
+#define BITM_USB_EPI_TXTYPE_SPEED            (_ADI_MSK(0x000000C0,uint8_t))   /* Speed of Operation Value */
+#define ENUM_USB_EPI_TXTYPE_UNUSED           (_ADI_MSK(0x00000000,uint8_t))   /* SPEED: Same Speed as the Core */
 #define ENUM_USB_EPI_TXTYPE_HIGHSPEED        (_ADI_MSK(0x00000040,uint8_t))   /* SPEED: High Speed */
 #define ENUM_USB_EPI_TXTYPE_FULLSPEED        (_ADI_MSK(0x00000080,uint8_t))   /* SPEED: Full Speed */
 #define ENUM_USB_EPI_TXTYPE_LOWSPEED         (_ADI_MSK(0x000000C0,uint8_t))   /* SPEED: Low Speed */
 
-#define BITM_USB_EPI_TXTYPE_PROTOCOL         (_ADI_MSK(0x00000030,uint8_t))   /* Protocol */
+#define BITM_USB_EPI_TXTYPE_PROTOCOL         (_ADI_MSK(0x00000030,uint8_t))   /* Protocol for Transfer */
 #define ENUM_USB_EPI_TXTYPE_CONTROL          (_ADI_MSK(0x00000000,uint8_t))   /* PROTOCOL: Control */
 #define ENUM_USB_EPI_TXTYPE_ISO              (_ADI_MSK(0x00000010,uint8_t))   /* PROTOCOL: Isochronous */
 #define ENUM_USB_EPI_TXTYPE_BULK             (_ADI_MSK(0x00000020,uint8_t))   /* PROTOCOL: Bulk */
 #define ENUM_USB_EPI_TXTYPE_INT              (_ADI_MSK(0x00000030,uint8_t))   /* PROTOCOL: Interrupt */
 
 #define BITM_USB_EPI_TXTYPE_TGTEP            (_ADI_MSK(0x0000000F,uint8_t))   /* Target Endpoint Number */
-#define ENUM_USB_EPI_TXTYPE_TGTEP0           (_ADI_MSK(0x00000000,uint8_t))   /* TGTEP:  */
-#define ENUM_USB_EPI_TXTYPE_TGTEP1           (_ADI_MSK(0x00000001,uint8_t))   /* TGTEP:  */
-#define ENUM_USB_EPI_TXTYPE_TGTEP10          (_ADI_MSK(0x0000000A,uint8_t))   /* TGTEP:  */
-#define ENUM_USB_EPI_TXTYPE_TGTEP11          (_ADI_MSK(0x0000000B,uint8_t))   /* TGTEP:  */
-#define ENUM_USB_EPI_TXTYPE_TGTEP12          (_ADI_MSK(0x0000000C,uint8_t))   /* TGTEP:  */
-#define ENUM_USB_EPI_TXTYPE_TGTEP13          (_ADI_MSK(0x0000000D,uint8_t))   /* TGTEP:  */
-#define ENUM_USB_EPI_TXTYPE_TGTEP14          (_ADI_MSK(0x0000000E,uint8_t))   /* TGTEP:  */
-#define ENUM_USB_EPI_TXTYPE_TGTEP15          (_ADI_MSK(0x0000000F,uint8_t))   /* TGTEP:  */
-#define ENUM_USB_EPI_TXTYPE_TGTEP2           (_ADI_MSK(0x00000002,uint8_t))   /* TGTEP:  */
-#define ENUM_USB_EPI_TXTYPE_TGTEP3           (_ADI_MSK(0x00000003,uint8_t))   /* TGTEP:  */
-#define ENUM_USB_EPI_TXTYPE_TGTEP4           (_ADI_MSK(0x00000004,uint8_t))   /* TGTEP:  */
-#define ENUM_USB_EPI_TXTYPE_TGTEP5           (_ADI_MSK(0x00000005,uint8_t))   /* TGTEP:  */
-#define ENUM_USB_EPI_TXTYPE_TGTEP6           (_ADI_MSK(0x00000006,uint8_t))   /* TGTEP:  */
-#define ENUM_USB_EPI_TXTYPE_TGTEP7           (_ADI_MSK(0x00000007,uint8_t))   /* TGTEP:  */
-#define ENUM_USB_EPI_TXTYPE_TGTEP8           (_ADI_MSK(0x00000008,uint8_t))   /* TGTEP:  */
-#define ENUM_USB_EPI_TXTYPE_TGTEP9           (_ADI_MSK(0x00000009,uint8_t))   /* TGTEP:  */
+#define ENUM_USB_EPI_TXTYPE_TGTEP0           (_ADI_MSK(0x00000000,uint8_t))   /* TGTEP: Endpoint 0 */
+#define ENUM_USB_EPI_TXTYPE_TGTEP1           (_ADI_MSK(0x00000001,uint8_t))   /* TGTEP: Endpoint 1 */
+#define ENUM_USB_EPI_TXTYPE_TGTEP10          (_ADI_MSK(0x0000000A,uint8_t))   /* TGTEP: Endpoint 10 */
+#define ENUM_USB_EPI_TXTYPE_TGTEP11          (_ADI_MSK(0x0000000B,uint8_t))   /* TGTEP: Endpoint 11 */
+#define ENUM_USB_EPI_TXTYPE_TGTEP12          (_ADI_MSK(0x0000000C,uint8_t))   /* TGTEP: Endpoint 12 */
+#define ENUM_USB_EPI_TXTYPE_TGTEP13          (_ADI_MSK(0x0000000D,uint8_t))   /* TGTEP: Endpoint 13 */
+#define ENUM_USB_EPI_TXTYPE_TGTEP14          (_ADI_MSK(0x0000000E,uint8_t))   /* TGTEP: Endpoint 14 */
+#define ENUM_USB_EPI_TXTYPE_TGTEP15          (_ADI_MSK(0x0000000F,uint8_t))   /* TGTEP: Endpoint 15 */
+#define ENUM_USB_EPI_TXTYPE_TGTEP2           (_ADI_MSK(0x00000002,uint8_t))   /* TGTEP: Endpoint 2 */
+#define ENUM_USB_EPI_TXTYPE_TGTEP3           (_ADI_MSK(0x00000003,uint8_t))   /* TGTEP: Endpoint 3 */
+#define ENUM_USB_EPI_TXTYPE_TGTEP4           (_ADI_MSK(0x00000004,uint8_t))   /* TGTEP: Endpoint 4 */
+#define ENUM_USB_EPI_TXTYPE_TGTEP5           (_ADI_MSK(0x00000005,uint8_t))   /* TGTEP: Endpoint 5 */
+#define ENUM_USB_EPI_TXTYPE_TGTEP6           (_ADI_MSK(0x00000006,uint8_t))   /* TGTEP: Endpoint 6 */
+#define ENUM_USB_EPI_TXTYPE_TGTEP7           (_ADI_MSK(0x00000007,uint8_t))   /* TGTEP: Endpoint 7 */
+#define ENUM_USB_EPI_TXTYPE_TGTEP8           (_ADI_MSK(0x00000008,uint8_t))   /* TGTEP: Endpoint 8 */
+#define ENUM_USB_EPI_TXTYPE_TGTEP9           (_ADI_MSK(0x00000009,uint8_t))   /* TGTEP: Endpoint 9 */
 
 /* ------------------------------------------------------------------------------------------------------------------------
         USB_EP0I_TYPE                        Pos/Masks                        Description
    ------------------------------------------------------------------------------------------------------------------------ */
-#define BITP_USB_EP0I_TYPE_SPEED              0                               /* Operating speed of the device */
-#define BITM_USB_EP0I_TYPE_SPEED             (_ADI_MSK(0x00000003,uint8_t))   /* Operating speed of the device */
+#define BITP_USB_EP0I_TYPE_SPEED              0                               /* Speed of Operation Value */
+#define BITM_USB_EP0I_TYPE_SPEED             (_ADI_MSK(0x00000003,uint8_t))   /* Speed of Operation Value */
 
 /* ------------------------------------------------------------------------------------------------------------------------
         USB_EP0I_NAKLIMIT                    Pos/Masks                        Description
    ------------------------------------------------------------------------------------------------------------------------ */
-#define BITP_USB_EP0I_NAKLIMIT_VALUE          0
-#define BITM_USB_EP0I_NAKLIMIT_VALUE         (_ADI_MSK(0x0000001F,uint8_t))
+#define BITP_USB_EP0I_NAKLIMIT_VALUE          0                               /* Endpoint 0 Timeout Value (in Frames) */
+#define BITM_USB_EP0I_NAKLIMIT_VALUE         (_ADI_MSK(0x0000001F,uint8_t))   /* Endpoint 0 Timeout Value (in Frames) */
 
 /* ------------------------------------------------------------------------------------------------------------------------
         USB_EPI_RXTYPE                       Pos/Masks                        Description
    ------------------------------------------------------------------------------------------------------------------------ */
-#define BITP_USB_EPI_RXTYPE_SPEED             6                               /* Operating speed of the target peripheral device */
-#define BITP_USB_EPI_RXTYPE_PROTOCOL          4                               /* Protocol */
+#define BITP_USB_EPI_RXTYPE_SPEED             6                               /* Speed of Operation Value */
+#define BITP_USB_EPI_RXTYPE_PROTOCOL          4                               /* Protocol for Transfer */
 #define BITP_USB_EPI_RXTYPE_TGTEP             0                               /* Target Endpoint Number */
 
-#define BITM_USB_EPI_RXTYPE_SPEED            (_ADI_MSK(0x000000C0,uint8_t))   /* Operating speed of the target peripheral device */
-#define ENUM_USB_EPI_RXTYPE_UNUSED           (_ADI_MSK(0x00000000,uint8_t))   /* SPEED: Unused - same speed as the core */
+#define BITM_USB_EPI_RXTYPE_SPEED            (_ADI_MSK(0x000000C0,uint8_t))   /* Speed of Operation Value */
+#define ENUM_USB_EPI_RXTYPE_UNUSED           (_ADI_MSK(0x00000000,uint8_t))   /* SPEED: Same Speed as the Core */
 #define ENUM_USB_EPI_RXTYPE_HIGHSPEED        (_ADI_MSK(0x00000040,uint8_t))   /* SPEED: High Speed */
 #define ENUM_USB_EPI_RXTYPE_FULLSPEED        (_ADI_MSK(0x00000080,uint8_t))   /* SPEED: Full Speed */
 #define ENUM_USB_EPI_RXTYPE_LOWSPEED         (_ADI_MSK(0x000000C0,uint8_t))   /* SPEED: Low Speed */
 
-#define BITM_USB_EPI_RXTYPE_PROTOCOL         (_ADI_MSK(0x00000030,uint8_t))   /* Protocol */
+#define BITM_USB_EPI_RXTYPE_PROTOCOL         (_ADI_MSK(0x00000030,uint8_t))   /* Protocol for Transfer */
 #define ENUM_USB_EPI_RXTYPE_CONTROL          (_ADI_MSK(0x00000000,uint8_t))   /* PROTOCOL: Control */
 #define ENUM_USB_EPI_RXTYPE_ISO              (_ADI_MSK(0x00000010,uint8_t))   /* PROTOCOL: Isochronous */
 #define ENUM_USB_EPI_RXTYPE_BULK             (_ADI_MSK(0x00000020,uint8_t))   /* PROTOCOL: Bulk */
 #define ENUM_USB_EPI_RXTYPE_INT              (_ADI_MSK(0x00000030,uint8_t))   /* PROTOCOL: Interrupt */
 
 #define BITM_USB_EPI_RXTYPE_TGTEP            (_ADI_MSK(0x0000000F,uint8_t))   /* Target Endpoint Number */
-#define ENUM_USB_EPI_RXTYPE_TGTEP0           (_ADI_MSK(0x00000000,uint8_t))   /* TGTEP:  */
-#define ENUM_USB_EPI_RXTYPE_TGTEP1           (_ADI_MSK(0x00000001,uint8_t))   /* TGTEP:  */
-#define ENUM_USB_EPI_RXTYPE_TGTEP10          (_ADI_MSK(0x0000000A,uint8_t))   /* TGTEP:  */
-#define ENUM_USB_EPI_RXTYPE_TGTEP11          (_ADI_MSK(0x0000000B,uint8_t))   /* TGTEP:  */
-#define ENUM_USB_EPI_RXTYPE_TGTEP12          (_ADI_MSK(0x0000000C,uint8_t))   /* TGTEP:  */
-#define ENUM_USB_EPI_RXTYPE_TGTEP13          (_ADI_MSK(0x0000000D,uint8_t))   /* TGTEP:  */
-#define ENUM_USB_EPI_RXTYPE_TGTEP14          (_ADI_MSK(0x0000000E,uint8_t))   /* TGTEP:  */
-#define ENUM_USB_EPI_RXTYPE_TGTEP15          (_ADI_MSK(0x0000000F,uint8_t))   /* TGTEP:  */
-#define ENUM_USB_EPI_RXTYPE_TGTEP2           (_ADI_MSK(0x00000002,uint8_t))   /* TGTEP:  */
-#define ENUM_USB_EPI_RXTYPE_TGTEP3           (_ADI_MSK(0x00000003,uint8_t))   /* TGTEP:  */
-#define ENUM_USB_EPI_RXTYPE_TGTEP4           (_ADI_MSK(0x00000004,uint8_t))   /* TGTEP:  */
-#define ENUM_USB_EPI_RXTYPE_TGTEP5           (_ADI_MSK(0x00000005,uint8_t))   /* TGTEP:  */
-#define ENUM_USB_EPI_RXTYPE_TGTEP6           (_ADI_MSK(0x00000006,uint8_t))   /* TGTEP:  */
-#define ENUM_USB_EPI_RXTYPE_TGTEP7           (_ADI_MSK(0x00000007,uint8_t))   /* TGTEP:  */
-#define ENUM_USB_EPI_RXTYPE_TGTEP8           (_ADI_MSK(0x00000008,uint8_t))   /* TGTEP:  */
-#define ENUM_USB_EPI_RXTYPE_TGTEP9           (_ADI_MSK(0x00000009,uint8_t))   /* TGTEP:  */
+#define ENUM_USB_EPI_RXTYPE_TGTEP0           (_ADI_MSK(0x00000000,uint8_t))   /* TGTEP: Endpoint 0 */
+#define ENUM_USB_EPI_RXTYPE_TGTEP1           (_ADI_MSK(0x00000001,uint8_t))   /* TGTEP: Endpoint 1 */
+#define ENUM_USB_EPI_RXTYPE_TGTEP10          (_ADI_MSK(0x0000000A,uint8_t))   /* TGTEP: Endpoint 10 */
+#define ENUM_USB_EPI_RXTYPE_TGTEP11          (_ADI_MSK(0x0000000B,uint8_t))   /* TGTEP: Endpoint 11 */
+#define ENUM_USB_EPI_RXTYPE_TGTEP12          (_ADI_MSK(0x0000000C,uint8_t))   /* TGTEP: Endpoint 12 */
+#define ENUM_USB_EPI_RXTYPE_TGTEP13          (_ADI_MSK(0x0000000D,uint8_t))   /* TGTEP: Endpoint 13 */
+#define ENUM_USB_EPI_RXTYPE_TGTEP14          (_ADI_MSK(0x0000000E,uint8_t))   /* TGTEP: Endpoint 14 */
+#define ENUM_USB_EPI_RXTYPE_TGTEP15          (_ADI_MSK(0x0000000F,uint8_t))   /* TGTEP: Endpoint 15 */
+#define ENUM_USB_EPI_RXTYPE_TGTEP2           (_ADI_MSK(0x00000002,uint8_t))   /* TGTEP: Endpoint 2 */
+#define ENUM_USB_EPI_RXTYPE_TGTEP3           (_ADI_MSK(0x00000003,uint8_t))   /* TGTEP: Endpoint 3 */
+#define ENUM_USB_EPI_RXTYPE_TGTEP4           (_ADI_MSK(0x00000004,uint8_t))   /* TGTEP: Endpoint 4 */
+#define ENUM_USB_EPI_RXTYPE_TGTEP5           (_ADI_MSK(0x00000005,uint8_t))   /* TGTEP: Endpoint 5 */
+#define ENUM_USB_EPI_RXTYPE_TGTEP6           (_ADI_MSK(0x00000006,uint8_t))   /* TGTEP: Endpoint 6 */
+#define ENUM_USB_EPI_RXTYPE_TGTEP7           (_ADI_MSK(0x00000007,uint8_t))   /* TGTEP: Endpoint 7 */
+#define ENUM_USB_EPI_RXTYPE_TGTEP8           (_ADI_MSK(0x00000008,uint8_t))   /* TGTEP: Endpoint 8 */
+#define ENUM_USB_EPI_RXTYPE_TGTEP9           (_ADI_MSK(0x00000009,uint8_t))   /* TGTEP: Endpoint 9 */
 
 /* ------------------------------------------------------------------------------------------------------------------------
         USB_EP0I_CFGDATA                     Pos/Masks                        Description
    ------------------------------------------------------------------------------------------------------------------------ */
-#define BITP_USB_EP0I_CFGDATA_MPRX            7                               /* Automatic Splitting of Received Bulk Packets */
-#define BITP_USB_EP0I_CFGDATA_MPTX            6                               /* Automatic Splitting of Transmitted Bulk Packets */
-#define BITP_USB_EP0I_CFGDATA_BIGEND          5                               /* Big Endian Configuration */
-#define BITP_USB_EP0I_CFGDATA_HBRX            4                               /* High Bandwidth Rx ISO Endpoint Support */
-#define BITP_USB_EP0I_CFGDATA_HBTX            3                               /* High Bandwidth Tx ISO Endpoint Support */
-#define BITP_USB_EP0I_CFGDATA_DYNFIFO         2                               /* Dynamic FIFO Sizing */
+#define BITP_USB_EP0I_CFGDATA_MPRX            7                               /* Multi-Packet Aggregate for Rx Enable */
+#define BITP_USB_EP0I_CFGDATA_MPTX            6                               /* Multi-Packet Split for Tx Enable */
+#define BITP_USB_EP0I_CFGDATA_BIGEND          5                               /* Big Endian Data */
+#define BITP_USB_EP0I_CFGDATA_HBRX            4                               /* High Bandwidth Rx Enable */
+#define BITP_USB_EP0I_CFGDATA_HBTX            3                               /* High Bandwidth Tx Enable */
+#define BITP_USB_EP0I_CFGDATA_DYNFIFO         2                               /* Dynamic FIFO Size Enable */
 #define BITP_USB_EP0I_CFGDATA_SOFTCON         1                               /* Soft Connect Enable */
 #define BITP_USB_EP0I_CFGDATA_UTMIWID         0                               /* UTMI Data Width */
 
-#define BITM_USB_EP0I_CFGDATA_MPRX           (_ADI_MSK(0x00000080,uint8_t))   /* Automatic Splitting of Received Bulk Packets */
-#define ENUM_USB_EP0I_CFGDATA_MPRXDIS        (_ADI_MSK(0x00000000,uint8_t))   /* MPRX: Received bulk packets is disabled */
-#define ENUM_USB_EP0I_CFGDATA_MPRXEN         (_ADI_MSK(0x00000080,uint8_t))   /* MPRX: Received bulk packets is enabled */
+#define BITM_USB_EP0I_CFGDATA_MPRX           (_ADI_MSK(0x00000080,uint8_t))   /* Multi-Packet Aggregate for Rx Enable */
+#define ENUM_USB_EP0I_CFGDATA_MPRXDIS        (_ADI_MSK(0x00000000,uint8_t))   /* MPRX: No Aggregate Rx Bulk Packets */
+#define ENUM_USB_EP0I_CFGDATA_MPRXEN         (_ADI_MSK(0x00000080,uint8_t))   /* MPRX: Aggregate Rx Bulk Packets */
 
-#define BITM_USB_EP0I_CFGDATA_MPTX           (_ADI_MSK(0x00000040,uint8_t))   /* Automatic Splitting of Transmitted Bulk Packets */
-#define ENUM_USB_EP0I_CFGDATA_MPTXDIS        (_ADI_MSK(0x00000000,uint8_t))   /* MPTX: automatic splitting of transmitted bulk packets is disabled */
-#define ENUM_USB_EP0I_CFGDATA_MPTXEN         (_ADI_MSK(0x00000040,uint8_t))   /* MPTX: automatic splitting of transmitted bulk packets is enabled */
+#define BITM_USB_EP0I_CFGDATA_MPTX           (_ADI_MSK(0x00000040,uint8_t))   /* Multi-Packet Split for Tx Enable */
+#define ENUM_USB_EP0I_CFGDATA_MPTXDIS        (_ADI_MSK(0x00000000,uint8_t))   /* MPTX: No Split Tx Bulk Packets */
+#define ENUM_USB_EP0I_CFGDATA_MPTXEN         (_ADI_MSK(0x00000040,uint8_t))   /* MPTX: Split Tx Bulk Packets */
 
-#define BITM_USB_EP0I_CFGDATA_BIGEND         (_ADI_MSK(0x00000020,uint8_t))   /* Big Endian Configuration */
-#define ENUM_USB_EP0I_CFGDATA_BIGENDDIS      (_ADI_MSK(0x00000000,uint8_t))   /* BIGEND: Big endian diabled (little endian) */
-#define ENUM_USB_EP0I_CFGDATA_BIGENDEN       (_ADI_MSK(0x00000020,uint8_t))   /* BIGEND: Big endian configuration */
+#define BITM_USB_EP0I_CFGDATA_BIGEND         (_ADI_MSK(0x00000020,uint8_t))   /* Big Endian Data */
+#define ENUM_USB_EP0I_CFGDATA_BIGENDDIS      (_ADI_MSK(0x00000000,uint8_t))   /* BIGEND: Little Endian Configuration */
+#define ENUM_USB_EP0I_CFGDATA_BIGENDEN       (_ADI_MSK(0x00000020,uint8_t))   /* BIGEND: Big Endian Configuration */
 
-#define BITM_USB_EP0I_CFGDATA_HBRX           (_ADI_MSK(0x00000010,uint8_t))   /* High Bandwidth Rx ISO Endpoint Support */
-#define ENUM_USB_EP0I_CFGDATA_HBRXDIS        (_ADI_MSK(0x00000000,uint8_t))   /* HBRX: high bandwidth Rx ISO Endpoint support is disabled */
-#define ENUM_USB_EP0I_CFGDATA_HBRXEN         (_ADI_MSK(0x00000010,uint8_t))   /* HBRX: high bandwidth Rx ISO Endpoint support is enabled */
+#define BITM_USB_EP0I_CFGDATA_HBRX           (_ADI_MSK(0x00000010,uint8_t))   /* High Bandwidth Rx Enable */
+#define ENUM_USB_EP0I_CFGDATA_HBRXDIS        (_ADI_MSK(0x00000000,uint8_t))   /* HBRX: No High Bandwidth Rx */
+#define ENUM_USB_EP0I_CFGDATA_HBRXEN         (_ADI_MSK(0x00000010,uint8_t))   /* HBRX: High Bandwidth Rx */
 
-#define BITM_USB_EP0I_CFGDATA_HBTX           (_ADI_MSK(0x00000008,uint8_t))   /* High Bandwidth Tx ISO Endpoint Support */
-#define ENUM_USB_EP0I_CFGDATA_HBTXDIS        (_ADI_MSK(0x00000000,uint8_t))   /* HBTX: high bandwidth Tx ISO Endpoint support is disabled */
-#define ENUM_USB_EP0I_CFGDATA_HBTXEN         (_ADI_MSK(0x00000008,uint8_t))   /* HBTX: high bandwidth Tx ISO Endpoint support is enabled */
+#define BITM_USB_EP0I_CFGDATA_HBTX           (_ADI_MSK(0x00000008,uint8_t))   /* High Bandwidth Tx Enable */
+#define ENUM_USB_EP0I_CFGDATA_HBTXDIS        (_ADI_MSK(0x00000000,uint8_t))   /* HBTX: No High Bandwidth Tx */
+#define ENUM_USB_EP0I_CFGDATA_HBTXEN         (_ADI_MSK(0x00000008,uint8_t))   /* HBTX: High Bandwidth Tx */
 
-#define BITM_USB_EP0I_CFGDATA_DYNFIFO        (_ADI_MSK(0x00000004,uint8_t))   /* Dynamic FIFO Sizing */
-#define ENUM_USB_EP0I_CFGDATA_DYNSZDIS       (_ADI_MSK(0x00000000,uint8_t))   /* DYNFIFO:  */
-#define ENUM_USB_EP0I_CFGDATA_DYNSZEN        (_ADI_MSK(0x00000004,uint8_t))   /* DYNFIFO: Dynamic FIFO sizing option is selected */
+#define BITM_USB_EP0I_CFGDATA_DYNFIFO        (_ADI_MSK(0x00000004,uint8_t))   /* Dynamic FIFO Size Enable */
+#define ENUM_USB_EP0I_CFGDATA_DYNSZDIS       (_ADI_MSK(0x00000000,uint8_t))   /* DYNFIFO: No Dynamic FIFO Size */
+#define ENUM_USB_EP0I_CFGDATA_DYNSZEN        (_ADI_MSK(0x00000004,uint8_t))   /* DYNFIFO: Dynamic FIFO Size */
 
 #define BITM_USB_EP0I_CFGDATA_SOFTCON        (_ADI_MSK(0x00000002,uint8_t))   /* Soft Connect Enable */
-#define ENUM_USB_EP0I_CFGDATA_SFTCONDIS      (_ADI_MSK(0x00000000,uint8_t))   /* SOFTCON: soft connect is disabled */
-#define ENUM_USB_EP0I_CFGDATA_SFTCONEN       (_ADI_MSK(0x00000002,uint8_t))   /* SOFTCON: Soft connect is enabled */
+#define ENUM_USB_EP0I_CFGDATA_SFTCONDIS      (_ADI_MSK(0x00000000,uint8_t))   /* SOFTCON: No Soft Connect */
+#define ENUM_USB_EP0I_CFGDATA_SFTCONEN       (_ADI_MSK(0x00000002,uint8_t))   /* SOFTCON: Soft Connect */
 
 #define BITM_USB_EP0I_CFGDATA_UTMIWID        (_ADI_MSK(0x00000001,uint8_t))   /* UTMI Data Width */
-#define ENUM_USB_EP0I_CFGDATA_UTMIWID8       (_ADI_MSK(0x00000000,uint8_t))   /* UTMIWID: 8-bit UTMI data width */
-#define ENUM_USB_EP0I_CFGDATA_UTMIWID16      (_ADI_MSK(0x00000001,uint8_t))   /* UTMIWID: 16-bit UTMI data width */
+#define ENUM_USB_EP0I_CFGDATA_UTMIWID8       (_ADI_MSK(0x00000000,uint8_t))   /* UTMIWID: 8-bit UTMI Data Width */
+#define ENUM_USB_EP0I_CFGDATA_UTMIWID16      (_ADI_MSK(0x00000001,uint8_t))   /* UTMIWID: 16-bit UTMI Data Width */
 
 /* ------------------------------------------------------------------------------------------------------------------------
         USB_DEV_CTL                          Pos/Masks                        Description
    ------------------------------------------------------------------------------------------------------------------------ */
-#define BITP_USB_DEV_CTL_BDEVICE              7                               /* Controller Device Type */
-#define BITP_USB_DEV_CTL_FSDEV                6                               /* Full or High Speed Device Detect */
-#define BITP_USB_DEV_CTL_LSDEV                5                               /* Low Speed Device Detect */
-#define BITP_USB_DEV_CTL_VBUS                 3                               /* VBus Level */
-#define BITP_USB_DEV_CTL_HOSTMODE             2                               /* Host Mode */
-#define BITP_USB_DEV_CTL_HOSTREQ              1                               /* Host Negotiation */
-#define BITP_USB_DEV_CTL_SESSION              0
+#define BITP_USB_DEV_CTL_BDEVICE              7                               /* A or B Devices Indicator */
+#define BITP_USB_DEV_CTL_FSDEV                6                               /* Full or High-Speed Indicator */
+#define BITP_USB_DEV_CTL_LSDEV                5                               /* Low-Speed Indicator */
+#define BITP_USB_DEV_CTL_VBUS                 3                               /* VBUS Level Indicator */
+#define BITP_USB_DEV_CTL_HOSTMODE             2                               /* Host Mode Indicator */
+#define BITP_USB_DEV_CTL_HOSTREQ              1                               /* Host Negotiation Request */
+#define BITP_USB_DEV_CTL_SESSION              0                               /* Session Indicator */
 
-#define BITM_USB_DEV_CTL_BDEVICE             (_ADI_MSK(0x00000080,uint8_t))   /* Controller Device Type */
-#define ENUM_USB_DEV_CTL_ADEVICE             (_ADI_MSK(0x00000000,uint8_t))   /* BDEVICE: A-device */
-#define ENUM_USB_DEV_CTL_BDEVICE             (_ADI_MSK(0x00000080,uint8_t))   /* BDEVICE: B-device */
+#define BITM_USB_DEV_CTL_BDEVICE             (_ADI_MSK(0x00000080,uint8_t))   /* A or B Devices Indicator */
+#define ENUM_USB_DEV_CTL_ADEVICE             (_ADI_MSK(0x00000000,uint8_t))   /* BDEVICE: A Device Detected */
+#define ENUM_USB_DEV_CTL_BDEVICE             (_ADI_MSK(0x00000080,uint8_t))   /* BDEVICE: B Device Detected */
 
-#define BITM_USB_DEV_CTL_FSDEV               (_ADI_MSK(0x00000040,uint8_t))   /* Full or High Speed Device Detect */
-#define ENUM_USB_DEV_CTL_NO_FSDEV            (_ADI_MSK(0x00000000,uint8_t))   /* FSDEV:  */
-#define ENUM_USB_DEV_CTL_FSDEV               (_ADI_MSK(0x00000040,uint8_t))   /* FSDEV: Set when a full or high-speed device has been detected */
+#define BITM_USB_DEV_CTL_FSDEV               (_ADI_MSK(0x00000040,uint8_t))   /* Full or High-Speed Indicator */
+#define ENUM_USB_DEV_CTL_NO_FSDEV            (_ADI_MSK(0x00000000,uint8_t))   /* FSDEV: Not Detected */
+#define ENUM_USB_DEV_CTL_FSDEV               (_ADI_MSK(0x00000040,uint8_t))   /* FSDEV: Full or High Speed Detected */
 
-#define BITM_USB_DEV_CTL_LSDEV               (_ADI_MSK(0x00000020,uint8_t))   /* Low Speed Device Detect */
-#define ENUM_USB_DEV_CTL_NO_LSDEV            (_ADI_MSK(0x00000000,uint8_t))   /* LSDEV:  */
-#define ENUM_USB_DEV_CTL_LSDEV               (_ADI_MSK(0x00000020,uint8_t))   /* LSDEV: Set when a low-speed device has been detected */
+#define BITM_USB_DEV_CTL_LSDEV               (_ADI_MSK(0x00000020,uint8_t))   /* Low-Speed Indicator */
+#define ENUM_USB_DEV_CTL_NO_LSDEV            (_ADI_MSK(0x00000000,uint8_t))   /* LSDEV: Not Detected */
+#define ENUM_USB_DEV_CTL_LSDEV               (_ADI_MSK(0x00000020,uint8_t))   /* LSDEV: Low Speed Detected */
 
-#define BITM_USB_DEV_CTL_VBUS                (_ADI_MSK(0x00000018,uint8_t))   /* VBus Level */
+#define BITM_USB_DEV_CTL_VBUS                (_ADI_MSK(0x00000018,uint8_t))   /* VBUS Level Indicator */
 #define ENUM_USB_DEV_CTL_VBUS_BS             (_ADI_MSK(0x00000000,uint8_t))   /* VBUS: Below SessionEnd */
 #define ENUM_USB_DEV_CTL_VBUS_ASBA           (_ADI_MSK(0x00000008,uint8_t))   /* VBUS: Above SessionEnd, below AValid */
-#define ENUM_USB_DEV_CTL_VBUS_AABV           (_ADI_MSK(0x00000010,uint8_t))   /* VBUS: Above AValid, below VBusValid */
-#define ENUM_USB_DEV_CTL_VBUS_AV             (_ADI_MSK(0x00000018,uint8_t))   /* VBUS: Above VBusValid */
+#define ENUM_USB_DEV_CTL_VBUS_AABV           (_ADI_MSK(0x00000010,uint8_t))   /* VBUS: Above AValid, below VBUSValid */
+#define ENUM_USB_DEV_CTL_VBUS_AV             (_ADI_MSK(0x00000018,uint8_t))   /* VBUS: Above VBUSValid */
 
-#define BITM_USB_DEV_CTL_HOSTMODE            (_ADI_MSK(0x00000004,uint8_t))   /* Host Mode */
-#define ENUM_USB_DEV_CTL_NO_HOSTMODE         (_ADI_MSK(0x00000000,uint8_t))   /* HOSTMODE:  */
-#define ENUM_USB_DEV_CTL_HOSTMODE            (_ADI_MSK(0x00000004,uint8_t))   /* HOSTMODE: This read-only bit is set when the core is acting as a host. */
+#define BITM_USB_DEV_CTL_HOSTMODE            (_ADI_MSK(0x00000004,uint8_t))   /* Host Mode Indicator */
+#define ENUM_USB_DEV_CTL_NO_HOSTMODE         (_ADI_MSK(0x00000000,uint8_t))   /* HOSTMODE: Peripheral Mode */
+#define ENUM_USB_DEV_CTL_HOSTMODE            (_ADI_MSK(0x00000004,uint8_t))   /* HOSTMODE: Host Mode */
 
-#define BITM_USB_DEV_CTL_HOSTREQ             (_ADI_MSK(0x00000002,uint8_t))   /* Host Negotiation */
-#define ENUM_USB_DEV_CTL_NO_HOSTREQ          (_ADI_MSK(0x00000000,uint8_t))   /* HOSTREQ: Cleared when host negotiation is completed */
-#define ENUM_USB_DEV_CTL_HOSTREQ             (_ADI_MSK(0x00000002,uint8_t))   /* HOSTREQ:  */
+#define BITM_USB_DEV_CTL_HOSTREQ             (_ADI_MSK(0x00000002,uint8_t))   /* Host Negotiation Request */
+#define ENUM_USB_DEV_CTL_NO_HOSTREQ          (_ADI_MSK(0x00000000,uint8_t))   /* HOSTREQ: No Request */
+#define ENUM_USB_DEV_CTL_HOSTREQ             (_ADI_MSK(0x00000002,uint8_t))   /* HOSTREQ: Place Request */
 
-#define BITM_USB_DEV_CTL_SESSION             (_ADI_MSK(0x00000001,uint8_t))
-#define ENUM_USB_DEV_CTL_NO_SESSION          (_ADI_MSK(0x00000000,uint8_t))   /* SESSION:  */
-#define ENUM_USB_DEV_CTL_SESSION             (_ADI_MSK(0x00000001,uint8_t))   /* SESSION:  */
+#define BITM_USB_DEV_CTL_SESSION             (_ADI_MSK(0x00000001,uint8_t))   /* Session Indicator */
+#define ENUM_USB_DEV_CTL_NO_SESSION          (_ADI_MSK(0x00000000,uint8_t))   /* SESSION: Not Detected */
+#define ENUM_USB_DEV_CTL_SESSION             (_ADI_MSK(0x00000001,uint8_t))   /* SESSION: Detected Session */
 
 /* ------------------------------------------------------------------------------------------------------------------------
         USB_TXFIFOSZ                         Pos/Masks                        Description
    ------------------------------------------------------------------------------------------------------------------------ */
-#define BITP_USB_TXFIFOSZ_DPB                 4                               /* Enables Double Packet Buffering */
+#define BITP_USB_TXFIFOSZ_DPB                 4                               /* Double Packet Buffering Enable */
 #define BITP_USB_TXFIFOSZ_SZ                  0                               /* Maximum Packet Size */
 
-#define BITM_USB_TXFIFOSZ_DPB                (_ADI_MSK(0x00000010,uint8_t))   /* Enables Double Packet Buffering */
+#define BITM_USB_TXFIFOSZ_DPB                (_ADI_MSK(0x00000010,uint8_t))   /* Double Packet Buffering Enable */
 #define ENUM_USB_TXFIFOSZ_DPNDIS             (_ADI_MSK(0x00000000,uint8_t))   /* DPB: Single Packet Buffering */
 #define ENUM_USB_TXFIFOSZ_DPBEN              (_ADI_MSK(0x00000010,uint8_t))   /* DPB: Double Packet Buffering */
 
 #define BITM_USB_TXFIFOSZ_SZ                 (_ADI_MSK(0x0000000F,uint8_t))   /* Maximum Packet Size */
-#define ENUM_USB_TXFIFOSZ_SZ8                (_ADI_MSK(0x00000000,uint8_t))   /* SZ:  */
-#define ENUM_USB_TXFIFOSZ_SZ16               (_ADI_MSK(0x00000001,uint8_t))   /* SZ:  */
-#define ENUM_USB_TXFIFOSZ_SZ32               (_ADI_MSK(0x00000002,uint8_t))   /* SZ:  */
-#define ENUM_USB_TXFIFOSZ_SZ64               (_ADI_MSK(0x00000003,uint8_t))   /* SZ:  */
-#define ENUM_USB_TXFIFOSZ_SZ128              (_ADI_MSK(0x00000004,uint8_t))   /* SZ:  */
-#define ENUM_USB_TXFIFOSZ_SZ256              (_ADI_MSK(0x00000005,uint8_t))   /* SZ:  */
-#define ENUM_USB_TXFIFOSZ_SZ512              (_ADI_MSK(0x00000006,uint8_t))   /* SZ:  */
-#define ENUM_USB_TXFIFOSZ_SZ1024             (_ADI_MSK(0x00000007,uint8_t))   /* SZ:  */
-#define ENUM_USB_TXFIFOSZ_SZ2048             (_ADI_MSK(0x00000008,uint8_t))   /* SZ:  */
-#define ENUM_USB_TXFIFOSZ_SZ4096             (_ADI_MSK(0x00000009,uint8_t))   /* SZ:  */
+#define ENUM_USB_TXFIFOSZ_SZ8                (_ADI_MSK(0x00000000,uint8_t))   /* SZ: PktSz=8, DPB0=8, DPB1=16 */
+#define ENUM_USB_TXFIFOSZ_SZ16               (_ADI_MSK(0x00000001,uint8_t))   /* SZ: PktSz=16, DPB0=16, DPB1=32 */
+#define ENUM_USB_TXFIFOSZ_SZ32               (_ADI_MSK(0x00000002,uint8_t))   /* SZ: PktSz=32, DPB0=32, DPB1=64 */
+#define ENUM_USB_TXFIFOSZ_SZ64               (_ADI_MSK(0x00000003,uint8_t))   /* SZ: PktSz=64, DPB0=64, DPB1=128 */
+#define ENUM_USB_TXFIFOSZ_SZ128              (_ADI_MSK(0x00000004,uint8_t))   /* SZ: PktSz=128, DPB0=128, DPB1=256 */
+#define ENUM_USB_TXFIFOSZ_SZ256              (_ADI_MSK(0x00000005,uint8_t))   /* SZ: PktSz=256, DPB0=256, DPB1=512 */
+#define ENUM_USB_TXFIFOSZ_SZ512              (_ADI_MSK(0x00000006,uint8_t))   /* SZ: PktSz=512, DPB0=512, DPB1=1024 */
+#define ENUM_USB_TXFIFOSZ_SZ1024             (_ADI_MSK(0x00000007,uint8_t))   /* SZ: PktSz=1024, DPB0=1024, DPB1=2048 */
+#define ENUM_USB_TXFIFOSZ_SZ2048             (_ADI_MSK(0x00000008,uint8_t))   /* SZ: PktSz=2048, DPB0=2048, DPB1=4096 */
+#define ENUM_USB_TXFIFOSZ_SZ4096             (_ADI_MSK(0x00000009,uint8_t))   /* SZ: PktSz=4096, DPB0=4096, DPB1=8192 */
 
 /* ------------------------------------------------------------------------------------------------------------------------
         USB_RXFIFOSZ                         Pos/Masks                        Description
    ------------------------------------------------------------------------------------------------------------------------ */
-#define BITP_USB_RXFIFOSZ_DPB                 4                               /* Enables Double Packet Buffering */
+#define BITP_USB_RXFIFOSZ_DPB                 4                               /* Double Packet Buffering Enable */
 #define BITP_USB_RXFIFOSZ_SZ                  0                               /* Maximum Packet Size */
 
-#define BITM_USB_RXFIFOSZ_DPB                (_ADI_MSK(0x00000010,uint8_t))   /* Enables Double Packet Buffering */
+#define BITM_USB_RXFIFOSZ_DPB                (_ADI_MSK(0x00000010,uint8_t))   /* Double Packet Buffering Enable */
 #define ENUM_USB_RXFIFOSZ_DPBDIS             (_ADI_MSK(0x00000000,uint8_t))   /* DPB: Single Packet Buffering */
 #define ENUM_USB_RXFIFOSZ_DPBEN              (_ADI_MSK(0x00000010,uint8_t))   /* DPB: Double Packet Buffering */
 
 #define BITM_USB_RXFIFOSZ_SZ                 (_ADI_MSK(0x0000000F,uint8_t))   /* Maximum Packet Size */
-#define ENUM_USB_RXFIFOSZ_SZ8                (_ADI_MSK(0x00000000,uint8_t))   /* SZ:  */
-#define ENUM_USB_RXFIFOSZ_SZ16               (_ADI_MSK(0x00000001,uint8_t))   /* SZ:  */
-#define ENUM_USB_RXFIFOSZ_SZ32               (_ADI_MSK(0x00000002,uint8_t))   /* SZ:  */
-#define ENUM_USB_RXFIFOSZ_SZ64               (_ADI_MSK(0x00000003,uint8_t))   /* SZ:  */
-#define ENUM_USB_RXFIFOSZ_SZ128              (_ADI_MSK(0x00000004,uint8_t))   /* SZ:  */
-#define ENUM_USB_RXFIFOSZ_SZ256              (_ADI_MSK(0x00000005,uint8_t))   /* SZ:  */
-#define ENUM_USB_RXFIFOSZ_SZ512              (_ADI_MSK(0x00000006,uint8_t))   /* SZ:  */
-#define ENUM_USB_RXFIFOSZ_SZ1024             (_ADI_MSK(0x00000007,uint8_t))   /* SZ:  */
-#define ENUM_USB_RXFIFOSZ_SZ2048             (_ADI_MSK(0x00000008,uint8_t))   /* SZ:  */
-#define ENUM_USB_RXFIFOSZ_SZ4096             (_ADI_MSK(0x00000009,uint8_t))   /* SZ:  */
+#define ENUM_USB_RXFIFOSZ_SZ8                (_ADI_MSK(0x00000000,uint8_t))   /* SZ: PktSz=8, DPB0=8, DPB1=16 */
+#define ENUM_USB_RXFIFOSZ_SZ16               (_ADI_MSK(0x00000001,uint8_t))   /* SZ: PktSz=16, DPB0=16, DPB1=32 */
+#define ENUM_USB_RXFIFOSZ_SZ32               (_ADI_MSK(0x00000002,uint8_t))   /* SZ: PktSz=32, DPB0=32, DPB1=64 */
+#define ENUM_USB_RXFIFOSZ_SZ64               (_ADI_MSK(0x00000003,uint8_t))   /* SZ: PktSz=64, DPB0=64, DPB1=128 */
+#define ENUM_USB_RXFIFOSZ_SZ128              (_ADI_MSK(0x00000004,uint8_t))   /* SZ: PktSz=128, DPB0=128, DPB1=256 */
+#define ENUM_USB_RXFIFOSZ_SZ256              (_ADI_MSK(0x00000005,uint8_t))   /* SZ: PktSz=256, DPB0=256, DPB1=512 */
+#define ENUM_USB_RXFIFOSZ_SZ512              (_ADI_MSK(0x00000006,uint8_t))   /* SZ: PktSz=512, DPB0=512, DPB1=1024 */
+#define ENUM_USB_RXFIFOSZ_SZ1024             (_ADI_MSK(0x00000007,uint8_t))   /* SZ: PktSz=1024, DPB0=1024, DPB1=2048 */
+#define ENUM_USB_RXFIFOSZ_SZ2048             (_ADI_MSK(0x00000008,uint8_t))   /* SZ: PktSz=2048, DPB0=2048, DPB1=4096 */
+#define ENUM_USB_RXFIFOSZ_SZ4096             (_ADI_MSK(0x00000009,uint8_t))   /* SZ: PktSz=4096, DPB0=4096, DPB1=8192 */
 
 /* ------------------------------------------------------------------------------------------------------------------------
         USB_TXFIFOADDR                       Pos/Masks                        Description
    ------------------------------------------------------------------------------------------------------------------------ */
-#define BITP_USB_TXFIFOADDR_VALUE             0
-#define BITM_USB_TXFIFOADDR_VALUE            (_ADI_MSK(0x00001FFF,uint16_t))
+#define BITP_USB_TXFIFOADDR_VALUE             0                               /* Tx FIFO Start Address */
+#define BITM_USB_TXFIFOADDR_VALUE            (_ADI_MSK(0x00001FFF,uint16_t))  /* Tx FIFO Start Address */
 
 /* ------------------------------------------------------------------------------------------------------------------------
         USB_RXFIFOADDR                       Pos/Masks                        Description
    ------------------------------------------------------------------------------------------------------------------------ */
-#define BITP_USB_RXFIFOADDR_VALUE             0
-#define BITM_USB_RXFIFOADDR_VALUE            (_ADI_MSK(0x00000FFF,uint16_t))
-
-/* ------------------------------------------------------------------------------------------------------------------------
-        USB_VENDSTAT                         Pos/Masks                        Description
-   ------------------------------------------------------------------------------------------------------------------------ */
-#define BITP_USB_VENDSTAT_VSTATUS             0
-#define BITM_USB_VENDSTAT_VSTATUS            (_ADI_MSK(0x0000000F,uint32_t))
-
-/* ------------------------------------------------------------------------------------------------------------------------
-        USB_HWVERS                           Pos/Masks                        Description
-   ------------------------------------------------------------------------------------------------------------------------ */
-#define BITP_USB_HWVERS_RC                   15                               /* Release Candidate */
-#define BITP_USB_HWVERS_MAJOR                10                               /* Major version number */
-#define BITP_USB_HWVERS_MINOR                 0                               /* Minor version number */
-
-#define BITM_USB_HWVERS_RC                   (_ADI_MSK(0x00008000,uint16_t))  /* Release Candidate */
-#define ENUM_USB_HWVERS_NO_RC                (_ADI_MSK(0x00000000,uint16_t))  /* RC: Official Release Version */
-#define ENUM_USB_HWVERS_RC                   (_ADI_MSK(0x00008000,uint16_t))  /* RC: Release Candidate */
-#define BITM_USB_HWVERS_MAJOR                (_ADI_MSK(0x00007C00,uint16_t))  /* Major version number */
-#define BITM_USB_HWVERS_MINOR                (_ADI_MSK(0x000003FF,uint16_t))  /* Minor version number */
+#define BITP_USB_RXFIFOADDR_VALUE             0                               /* Rx FIFO Start Address */
+#define BITM_USB_RXFIFOADDR_VALUE            (_ADI_MSK(0x00000FFF,uint16_t))  /* Rx FIFO Start Address */
 
 /* ------------------------------------------------------------------------------------------------------------------------
         USB_EPINFO                           Pos/Masks                        Description
    ------------------------------------------------------------------------------------------------------------------------ */
-#define BITP_USB_EPINFO_RXEP                  4                               /* Number of RX endpoints excluding EP0 */
-#define BITP_USB_EPINFO_TXEP                  0                               /* Number of TX endpoints excluding EP0 */
-#define BITM_USB_EPINFO_RXEP                 (_ADI_MSK(0x000000F0,uint8_t))   /* Number of RX endpoints excluding EP0 */
-#define BITM_USB_EPINFO_TXEP                 (_ADI_MSK(0x0000000F,uint8_t))   /* Number of TX endpoints excluding EP0 */
+#define BITP_USB_EPINFO_RXEP                  4                               /* Rx Endpoints */
+#define BITP_USB_EPINFO_TXEP                  0                               /* Tx Endpoints */
+#define BITM_USB_EPINFO_RXEP                 (_ADI_MSK(0x000000F0,uint8_t))   /* Rx Endpoints */
+#define BITM_USB_EPINFO_TXEP                 (_ADI_MSK(0x0000000F,uint8_t))   /* Tx Endpoints */
 
 /* ------------------------------------------------------------------------------------------------------------------------
         USB_RAMINFO                          Pos/Masks                        Description
    ------------------------------------------------------------------------------------------------------------------------ */
-#define BITP_USB_RAMINFO_DMACHANS             4                               /* Number of DMA Channels */
-#define BITP_USB_RAMINFO_RAMBITS              0                               /* Number of RAM Address Bits */
-#define BITM_USB_RAMINFO_DMACHANS            (_ADI_MSK(0x000000F0,uint8_t))   /* Number of DMA Channels */
-#define BITM_USB_RAMINFO_RAMBITS             (_ADI_MSK(0x0000000F,uint8_t))   /* Number of RAM Address Bits */
+#define BITP_USB_RAMINFO_DMACHANS             4                               /* DMA Channels */
+#define BITP_USB_RAMINFO_RAMBITS              0                               /* RAM Address Bits */
+#define BITM_USB_RAMINFO_DMACHANS            (_ADI_MSK(0x000000F0,uint8_t))   /* DMA Channels */
+#define BITM_USB_RAMINFO_RAMBITS             (_ADI_MSK(0x0000000F,uint8_t))   /* RAM Address Bits */
 
 /* ------------------------------------------------------------------------------------------------------------------------
         USB_LINKINFO                         Pos/Masks                        Description
    ------------------------------------------------------------------------------------------------------------------------ */
-#define BITP_USB_LINKINFO_WTCON               4
-#define BITP_USB_LINKINFO_WTID                0
-#define BITM_USB_LINKINFO_WTCON              (_ADI_MSK(0x000000F0,uint8_t))
-#define BITM_USB_LINKINFO_WTID               (_ADI_MSK(0x0000000F,uint8_t))
+#define BITP_USB_LINKINFO_WTCON               4                               /* Wait for Connect/Disconnect */
+#define BITP_USB_LINKINFO_WTID                0                               /* Wait from ID Pull-up */
+#define BITM_USB_LINKINFO_WTCON              (_ADI_MSK(0x000000F0,uint8_t))   /* Wait for Connect/Disconnect */
+#define BITM_USB_LINKINFO_WTID               (_ADI_MSK(0x0000000F,uint8_t))   /* Wait from ID Pull-up */
 
 /* ------------------------------------------------------------------------------------------------------------------------
         USB_SOFT_RST                         Pos/Masks                        Description
    ------------------------------------------------------------------------------------------------------------------------ */
-#define BITP_USB_SOFT_RST_RSTX                1
-#define BITP_USB_SOFT_RST_RST                 0
+#define BITP_USB_SOFT_RST_RSTX                1                               /* Reset USB XCLK Domain */
+#define BITP_USB_SOFT_RST_RST                 0                               /* Reset USB CLK Domain */
 
-#define BITM_USB_SOFT_RST_RSTX               (_ADI_MSK(0x00000002,uint8_t))
-#define ENUM_USB_SOFT_RST_NO_RSTX            (_ADI_MSK(0x00000000,uint8_t))   /* RSTX: This bit is self clearing. */
-#define ENUM_USB_SOFT_RST_RSTX               (_ADI_MSK(0x00000002,uint8_t))   /* RSTX: Resets logic in the UTMI XCLK domain. */
+#define BITM_USB_SOFT_RST_RSTX               (_ADI_MSK(0x00000002,uint8_t))   /* Reset USB XCLK Domain */
+#define ENUM_USB_SOFT_RST_NO_RSTX            (_ADI_MSK(0x00000000,uint8_t))   /* RSTX: No Reset */
+#define ENUM_USB_SOFT_RST_RSTX               (_ADI_MSK(0x00000002,uint8_t))   /* RSTX: Reset USB XCLK Domain */
 
-#define BITM_USB_SOFT_RST_RST                (_ADI_MSK(0x00000001,uint8_t))
-#define ENUM_USB_SOFT_RST_NO_RST             (_ADI_MSK(0x00000000,uint8_t))   /* RST:  */
-#define ENUM_USB_SOFT_RST_RST                (_ADI_MSK(0x00000001,uint8_t))   /* RST: Resets logic in the CLK domain. */
-
-/* ------------------------------------------------------------------------------------------------------------------------
-        USB_TXFUNCADDR                       Pos/Masks                        Description
-   ------------------------------------------------------------------------------------------------------------------------ */
-#define BITP_USB_TXFUNCADDR_VALUE             0                               /* Address of target device for this endpoint */
-#define BITM_USB_TXFUNCADDR_VALUE            (_ADI_MSK(0x0000007F,uint8_t))   /* Address of target device for this endpoint */
+#define BITM_USB_SOFT_RST_RST                (_ADI_MSK(0x00000001,uint8_t))   /* Reset USB CLK Domain */
+#define ENUM_USB_SOFT_RST_NO_RST             (_ADI_MSK(0x00000000,uint8_t))   /* RST: No Reset */
+#define ENUM_USB_SOFT_RST_RST                (_ADI_MSK(0x00000001,uint8_t))   /* RST: Reset USB CLK Domain */
 
 /* ------------------------------------------------------------------------------------------------------------------------
-        USB_TXHUBADDR                        Pos/Masks                        Description
+        USB_MP_TXFUNCADDR                    Pos/Masks                        Description
    ------------------------------------------------------------------------------------------------------------------------ */
-#define BITP_USB_TXHUBADDR_MULTTRANS          7                               /* Multiple Transaction Translators */
-#define BITP_USB_TXHUBADDR_ADDR               0                               /* Address of the hub which this device is connected */
-#define BITM_USB_TXHUBADDR_MULTTRANS         (_ADI_MSK(0x00000080,uint8_t))   /* Multiple Transaction Translators */
-#define BITM_USB_TXHUBADDR_ADDR              (_ADI_MSK(0x0000007F,uint8_t))   /* Address of the hub which this device is connected */
+#define BITP_USB_MP_TXFUNCADDR_VALUE          0                               /* Tx Function Address Value */
+#define BITM_USB_MP_TXFUNCADDR_VALUE         (_ADI_MSK(0x0000007F,uint8_t))   /* Tx Function Address Value */
 
 /* ------------------------------------------------------------------------------------------------------------------------
-        USB_TXHUBPORT                        Pos/Masks                        Description
+        USB_MP_TXHUBADDR                     Pos/Masks                        Description
    ------------------------------------------------------------------------------------------------------------------------ */
-#define BITP_USB_TXHUBPORT_VALUE              0                               /* Hub port of target device for this endpoint */
-#define BITM_USB_TXHUBPORT_VALUE             (_ADI_MSK(0x0000007F,uint8_t))   /* Hub port of target device for this endpoint */
+#define BITP_USB_MP_TXHUBADDR_MULTTRANS       7                               /* Multiple Transaction Translators */
+#define BITP_USB_MP_TXHUBADDR_ADDR            0                               /* Hub Address Value */
+#define BITM_USB_MP_TXHUBADDR_MULTTRANS      (_ADI_MSK(0x00000080,uint8_t))   /* Multiple Transaction Translators */
+#define BITM_USB_MP_TXHUBADDR_ADDR           (_ADI_MSK(0x0000007F,uint8_t))   /* Hub Address Value */
 
 /* ------------------------------------------------------------------------------------------------------------------------
-        USB_RXFUNCADDR                       Pos/Masks                        Description
+        USB_MP_TXHUBPORT                     Pos/Masks                        Description
    ------------------------------------------------------------------------------------------------------------------------ */
-#define BITP_USB_RXFUNCADDR_VALUE             0                               /* Address of target device for this endpoint */
-#define BITM_USB_RXFUNCADDR_VALUE            (_ADI_MSK(0x0000007F,uint8_t))   /* Address of target device for this endpoint */
+#define BITP_USB_MP_TXHUBPORT_VALUE           0                               /* Hub Port Value */
+#define BITM_USB_MP_TXHUBPORT_VALUE          (_ADI_MSK(0x0000007F,uint8_t))   /* Hub Port Value */
 
 /* ------------------------------------------------------------------------------------------------------------------------
-        USB_RXHUBADDR                        Pos/Masks                        Description
+        USB_MP_RXFUNCADDR                    Pos/Masks                        Description
    ------------------------------------------------------------------------------------------------------------------------ */
-#define BITP_USB_RXHUBADDR_MULTTRANS          7                               /* Multiple Transaction translators */
-#define BITP_USB_RXHUBADDR_ADDR               0                               /* Address of the hub which this device is connected */
-#define BITM_USB_RXHUBADDR_MULTTRANS         (_ADI_MSK(0x00000080,uint8_t))   /* Multiple Transaction translators */
-#define BITM_USB_RXHUBADDR_ADDR              (_ADI_MSK(0x0000007F,uint8_t))   /* Address of the hub which this device is connected */
+#define BITP_USB_MP_RXFUNCADDR_VALUE          0                               /* Rx Function Address Value */
+#define BITM_USB_MP_RXFUNCADDR_VALUE         (_ADI_MSK(0x0000007F,uint8_t))   /* Rx Function Address Value */
 
 /* ------------------------------------------------------------------------------------------------------------------------
-        USB_RXHUBPORT                        Pos/Masks                        Description
+        USB_MP_RXHUBADDR                     Pos/Masks                        Description
    ------------------------------------------------------------------------------------------------------------------------ */
-#define BITP_USB_RXHUBPORT_VALUE              0                               /* Hub port of target device for this endpoint */
-#define BITM_USB_RXHUBPORT_VALUE             (_ADI_MSK(0x0000007F,uint8_t))   /* Hub port of target device for this endpoint */
+#define BITP_USB_MP_RXHUBADDR_MULTTRANS       7                               /* Multiple Transaction Translators */
+#define BITP_USB_MP_RXHUBADDR_ADDR            0                               /* Hub Address Value */
+#define BITM_USB_MP_RXHUBADDR_MULTTRANS      (_ADI_MSK(0x00000080,uint8_t))   /* Multiple Transaction Translators */
+#define BITM_USB_MP_RXHUBADDR_ADDR           (_ADI_MSK(0x0000007F,uint8_t))   /* Hub Address Value */
 
 /* ------------------------------------------------------------------------------------------------------------------------
-        USB_EP0_CSR_H                        Pos/Masks                        Description
+        USB_MP_RXHUBPORT                     Pos/Masks                        Description
    ------------------------------------------------------------------------------------------------------------------------ */
-#define BITP_USB_EP0_CSR_H_DISPING           11
-#define BITP_USB_EP0_CSR_H_DATGLEN           10
-#define BITP_USB_EP0_CSR_H_DATGL              9
-#define BITP_USB_EP0_CSR_H_FLUSHFIFO          8
-#define BITP_USB_EP0_CSR_H_NAKTO              7
-#define BITP_USB_EP0_CSR_H_STATUSPKT          6
-#define BITP_USB_EP0_CSR_H_REQPKT             5
-#define BITP_USB_EP0_CSR_H_TOERR              4
-#define BITP_USB_EP0_CSR_H_SETUPPKT           3
-#define BITP_USB_EP0_CSR_H_RXSTALL            2
-#define BITP_USB_EP0_CSR_H_TXPKTRDY           1
-#define BITP_USB_EP0_CSR_H_RXPKTRDY           0
-
-#define BITM_USB_EP0_CSR_H_DISPING           (_ADI_MSK(0x00000800,uint16_t))
-#define ENUM_USB_EP0_CSR_H_NO_DISPING        (_ADI_MSK(0x00000000,uint16_t))  /* DISPING:  */
-#define ENUM_USB_EP0_CSR_H_DISPING           (_ADI_MSK(0x00000800,uint16_t))  /* DISPING: Set this bit to issue PING tokens for HS transfers */
-
-#define BITM_USB_EP0_CSR_H_DATGLEN           (_ADI_MSK(0x00000400,uint16_t))
-#define ENUM_USB_EP0_CSR_H_NO_DATGLEN        (_ADI_MSK(0x00000000,uint16_t))  /* DATGLEN: cannot set DATGL bit */
-#define ENUM_USB_EP0_CSR_H_DATGLEN           (_ADI_MSK(0x00000400,uint16_t))  /* DATGLEN: can set DATGL bit */
-
-#define BITM_USB_EP0_CSR_H_DATGL             (_ADI_MSK(0x00000200,uint16_t))
-#define ENUM_USB_EP0_CSR_H_NO_DATATGL        (_ADI_MSK(0x00000000,uint16_t))  /* DATGL: DATA0 is set */
-#define ENUM_USB_EP0_CSR_H_DATATGL           (_ADI_MSK(0x00000200,uint16_t))  /* DATGL: DATA1 is set */
-
-#define BITM_USB_EP0_CSR_H_FLUSHFIFO         (_ADI_MSK(0x00000100,uint16_t))
-#define ENUM_USB_EP0_CSR_H_NO_FLUSH          (_ADI_MSK(0x00000000,uint16_t))  /* FLUSHFIFO:  */
-#define ENUM_USB_EP0_CSR_H_FLUSH             (_ADI_MSK(0x00000100,uint16_t))  /* FLUSHFIFO: Set this bit to flush EP0 FIFO */
-
-#define BITM_USB_EP0_CSR_H_NAKTO             (_ADI_MSK(0x00000080,uint16_t))
-#define ENUM_USB_EP0_CSR_H_NO_NAKTO          (_ADI_MSK(0x00000000,uint16_t))  /* NAKTO:  */
-#define ENUM_USB_EP0_CSR_H_NAKTO             (_ADI_MSK(0x00000080,uint16_t))  /* NAKTO: Set by USB if EP0 halted due to NAK timeout */
-
-#define BITM_USB_EP0_CSR_H_STATUSPKT         (_ADI_MSK(0x00000040,uint16_t))
-#define ENUM_USB_EP0_CSR_H_NO_STATPKT        (_ADI_MSK(0x00000000,uint16_t))  /* STATUSPKT:  */
-#define ENUM_USB_EP0_CSR_H_STATPKT           (_ADI_MSK(0x00000040,uint16_t))  /* STATUSPKT: Set this bit to request Status transaction */
-
-#define BITM_USB_EP0_CSR_H_REQPKT            (_ADI_MSK(0x00000020,uint16_t))
-#define ENUM_USB_EP0_CSR_H_NO_REQPKT         (_ADI_MSK(0x00000000,uint16_t))  /* REQPKT:  */
-#define ENUM_USB_EP0_CSR_H_REQPKT            (_ADI_MSK(0x00000020,uint16_t))  /* REQPKT: Set to send IN tokens to device */
-
-#define BITM_USB_EP0_CSR_H_TOERR             (_ADI_MSK(0x00000010,uint16_t))
-#define ENUM_USB_EP0_CSR_H_NO_TOERR          (_ADI_MSK(0x00000000,uint16_t))  /* TOERR:  */
-#define ENUM_USB_EP0_CSR_H_TOERR             (_ADI_MSK(0x00000010,uint16_t))  /* TOERR: no response from device after 3 attempts */
-
-#define BITM_USB_EP0_CSR_H_SETUPPKT          (_ADI_MSK(0x00000008,uint16_t))
-#define ENUM_USB_EP0_CSR_H_NO_SETUPPKT       (_ADI_MSK(0x00000000,uint16_t))  /* SETUPPKT:  */
-#define ENUM_USB_EP0_CSR_H_SETUPPKT          (_ADI_MSK(0x00000008,uint16_t))  /* SETUPPKT: Set with TxPKtRdy to send SETUP token */
-
-#define BITM_USB_EP0_CSR_H_RXSTALL           (_ADI_MSK(0x00000004,uint16_t))
-#define ENUM_USB_EP0_CSR_H_NO_RXSTALL        (_ADI_MSK(0x00000000,uint16_t))  /* RXSTALL:  */
-#define ENUM_USB_EP0_CSR_H_RXSTALL           (_ADI_MSK(0x00000004,uint16_t))  /* RXSTALL: EP0 Stall Received from device */
-
-#define BITM_USB_EP0_CSR_H_TXPKTRDY          (_ADI_MSK(0x00000002,uint16_t))
-#define ENUM_USB_EP0_CSR_H_NO_TXPKTRDY       (_ADI_MSK(0x00000000,uint16_t))  /* TXPKTRDY:  */
-#define ENUM_USB_EP0_CSR_H_TXPKTRDY          (_ADI_MSK(0x00000002,uint16_t))  /* TXPKTRDY: TX packet in EP0 FIFO */
-
-#define BITM_USB_EP0_CSR_H_RXPKTRDY          (_ADI_MSK(0x00000001,uint16_t))
-#define ENUM_USB_EP0_CSR_H_NO_RXPKTRDY       (_ADI_MSK(0x00000000,uint16_t))  /* RXPKTRDY:  */
-#define ENUM_USB_EP0_CSR_H_RXPKTRDY          (_ADI_MSK(0x00000001,uint16_t))  /* RXPKTRDY: RX Packet in EP0 FIFO */
-
-/* ------------------------------------------------------------------------------------------------------------------------
-        USB_EP0_CSR_P                        Pos/Masks                        Description
-   ------------------------------------------------------------------------------------------------------------------------ */
-#define BITP_USB_EP0_CSR_P_FLUSHFIFO          8
-#define BITP_USB_EP0_CSR_P_SSETUPEND          7
-#define BITP_USB_EP0_CSR_P_SPKTRDY            6
-#define BITP_USB_EP0_CSR_P_SENDSTALL          5
-#define BITP_USB_EP0_CSR_P_SETUPEND           4
-#define BITP_USB_EP0_CSR_P_DATAEND            3
-#define BITP_USB_EP0_CSR_P_SENTSTALL          2
-#define BITP_USB_EP0_CSR_P_TXPKTRDY           1
-#define BITP_USB_EP0_CSR_P_RXPKTRDY           0
-
-#define BITM_USB_EP0_CSR_P_FLUSHFIFO         (_ADI_MSK(0x00000100,uint16_t))
-#define ENUM_USB_EP0_CSR_P_NO_FLUSH          (_ADI_MSK(0x00000000,uint16_t))  /* FLUSHFIFO:  */
-#define ENUM_USB_EP0_CSR_P_FLUSH             (_ADI_MSK(0x00000100,uint16_t))  /* FLUSHFIFO:  */
-
-#define BITM_USB_EP0_CSR_P_SSETUPEND         (_ADI_MSK(0x00000080,uint16_t))
-#define ENUM_USB_EP0_CSR_P_NOSSETUPEND       (_ADI_MSK(0x00000000,uint16_t))  /* SSETUPEND: This bit is cleared automatically. */
-#define ENUM_USB_EP0_CSR_P_SSETUPEND         (_ADI_MSK(0x00000080,uint16_t))  /* SSETUPEND: Setting this bit will clear the SetupEnd bit. */
-
-#define BITM_USB_EP0_CSR_P_SPKTRDY           (_ADI_MSK(0x00000040,uint16_t))
-#define ENUM_USB_EP0_CSR_P_NO_SPKTRDY        (_ADI_MSK(0x00000000,uint16_t))  /* SPKTRDY: This bit is cleared automatically. */
-#define ENUM_USB_EP0_CSR_P_SPKTRDY           (_ADI_MSK(0x00000040,uint16_t))  /* SPKTRDY: Setting this bit will clear RxPktRdy. */
-
-#define BITM_USB_EP0_CSR_P_SENDSTALL         (_ADI_MSK(0x00000020,uint16_t))
-#define ENUM_USB_EP0_CSR_P_NO_STALL          (_ADI_MSK(0x00000000,uint16_t))  /* SENDSTALL:  */
-#define ENUM_USB_EP0_CSR_P_STALL             (_ADI_MSK(0x00000020,uint16_t))  /* SENDSTALL: Terminate the current transaction. */
-
-#define BITM_USB_EP0_CSR_P_SETUPEND          (_ADI_MSK(0x00000010,uint16_t))
-#define ENUM_USB_EP0_CSR_P_NO_SETUPEND       (_ADI_MSK(0x00000000,uint16_t))  /* SETUPEND:  */
-#define ENUM_USB_EP0_CSR_P_SETUPEND          (_ADI_MSK(0x00000010,uint16_t))  /* SETUPEND:  */
-
-#define BITM_USB_EP0_CSR_P_DATAEND           (_ADI_MSK(0x00000008,uint16_t))
-#define ENUM_USB_EP0_CSR_P_NO_DATAEND        (_ADI_MSK(0x00000000,uint16_t))  /* DATAEND: This bit is cleared automatically. */
-#define ENUM_USB_EP0_CSR_P_DATAEND           (_ADI_MSK(0x00000008,uint16_t))  /* DATAEND: This bit for the various peripheral mode conditions */
-
-#define BITM_USB_EP0_CSR_P_SENTSTALL         (_ADI_MSK(0x00000004,uint16_t))
-#define ENUM_USB_EP0_CSR_P_NO_STALSNT        (_ADI_MSK(0x00000000,uint16_t))  /* SENTSTALL: The CPU should clear this bit. */
-#define ENUM_USB_EP0_CSR_P_STALSNT           (_ADI_MSK(0x00000004,uint16_t))  /* SENTSTALL: This bit is set when a STALL handshake is transmitted. */
-
-#define BITM_USB_EP0_CSR_P_TXPKTRDY          (_ADI_MSK(0x00000002,uint16_t))
-#define ENUM_USB_EP0_CSR_P_NO_TXPKTRDY       (_ADI_MSK(0x00000000,uint16_t))  /* TXPKTRDY:  */
-#define ENUM_USB_EP0_CSR_P_TXPKTRDY          (_ADI_MSK(0x00000002,uint16_t))  /* TXPKTRDY: Set this bit after loading a data packet into the FIFO */
-
-#define BITM_USB_EP0_CSR_P_RXPKTRDY          (_ADI_MSK(0x00000001,uint16_t))
-#define ENUM_USB_EP0_CSR_P_NO_PKTRDY         (_ADI_MSK(0x00000000,uint16_t))  /* RXPKTRDY: Cleared by writing the Serviced RxPktRdy bit. */
-#define ENUM_USB_EP0_CSR_P_PKTRDY            (_ADI_MSK(0x00000001,uint16_t))  /* RXPKTRDY: Set when a data packet has been received. */
-
-/* ------------------------------------------------------------------------------------------------------------------------
-        USB_EP0_CNT                          Pos/Masks                        Description
-   ------------------------------------------------------------------------------------------------------------------------ */
-#define BITP_USB_EP0_CNT_RXCNT                0
-#define BITM_USB_EP0_CNT_RXCNT               (_ADI_MSK(0x0000007F,uint16_t))
-
-/* ------------------------------------------------------------------------------------------------------------------------
-        USB_EP0_TYPE                         Pos/Masks                        Description
-   ------------------------------------------------------------------------------------------------------------------------ */
-#define BITP_USB_EP0_TYPE_SPEED               0                               /* Operating speed of the device */
-#define BITM_USB_EP0_TYPE_SPEED              (_ADI_MSK(0x00000003,uint8_t))   /* Operating speed of the device */
-
-/* ------------------------------------------------------------------------------------------------------------------------
-        USB_EP0_NAKLIMIT                     Pos/Masks                        Description
-   ------------------------------------------------------------------------------------------------------------------------ */
-#define BITP_USB_EP0_NAKLIMIT_VALUE           0
-#define BITM_USB_EP0_NAKLIMIT_VALUE          (_ADI_MSK(0x0000001F,uint8_t))
-
-/* ------------------------------------------------------------------------------------------------------------------------
-        USB_EP0_CFGDATA                      Pos/Masks                        Description
-   ------------------------------------------------------------------------------------------------------------------------ */
-#define BITP_USB_EP0_CFGDATA_MPRX             7                               /* Automatic Splitting of Received Bulk Packets */
-#define BITP_USB_EP0_CFGDATA_MPTX             6                               /* Automatic Splitting of Transmitted Bulk Packets */
-#define BITP_USB_EP0_CFGDATA_BIGEND           5                               /* Big Endian Configuration */
-#define BITP_USB_EP0_CFGDATA_HBRX             4                               /* High Bandwidth Rx ISO Endpoint Support */
-#define BITP_USB_EP0_CFGDATA_HBTX             3                               /* High Bandwidth Tx ISO Endpoint Support */
-#define BITP_USB_EP0_CFGDATA_DYNFIFO          2                               /* Dynamic FIFO Sizing */
-#define BITP_USB_EP0_CFGDATA_SOFTCON          1                               /* Soft Connect Enable */
-#define BITP_USB_EP0_CFGDATA_UTMIWID          0                               /* UTMI Data Width */
-
-#define BITM_USB_EP0_CFGDATA_MPRX            (_ADI_MSK(0x00000080,uint8_t))   /* Automatic Splitting of Received Bulk Packets */
-#define ENUM_USB_EP0_CFGDATA_MPRXDIS         (_ADI_MSK(0x00000000,uint8_t))   /* MPRX: Received bulk packets is disabled */
-#define ENUM_USB_EP0_CFGDATA_MPRXEN          (_ADI_MSK(0x00000080,uint8_t))   /* MPRX: Received bulk packets is enabled */
-
-#define BITM_USB_EP0_CFGDATA_MPTX            (_ADI_MSK(0x00000040,uint8_t))   /* Automatic Splitting of Transmitted Bulk Packets */
-#define ENUM_USB_EP0_CFGDATA_MPTXDIS         (_ADI_MSK(0x00000000,uint8_t))   /* MPTX: automatic splitting of transmitted bulk packets is disabled */
-#define ENUM_USB_EP0_CFGDATA_MPTXEN          (_ADI_MSK(0x00000040,uint8_t))   /* MPTX: automatic splitting of transmitted bulk packets is enabled */
-
-#define BITM_USB_EP0_CFGDATA_BIGEND          (_ADI_MSK(0x00000020,uint8_t))   /* Big Endian Configuration */
-#define ENUM_USB_EP0_CFGDATA_BIGENDDIS       (_ADI_MSK(0x00000000,uint8_t))   /* BIGEND: Big endian diabled (little endian) */
-#define ENUM_USB_EP0_CFGDATA_BIGENDEN        (_ADI_MSK(0x00000020,uint8_t))   /* BIGEND: Big endian configuration */
-
-#define BITM_USB_EP0_CFGDATA_HBRX            (_ADI_MSK(0x00000010,uint8_t))   /* High Bandwidth Rx ISO Endpoint Support */
-#define ENUM_USB_EP0_CFGDATA_HBRXDIS         (_ADI_MSK(0x00000000,uint8_t))   /* HBRX: high bandwidth Rx ISO Endpoint support is disabled */
-#define ENUM_USB_EP0_CFGDATA_HBRXEN          (_ADI_MSK(0x00000010,uint8_t))   /* HBRX: high bandwidth Rx ISO Endpoint support is enabled */
-
-#define BITM_USB_EP0_CFGDATA_HBTX            (_ADI_MSK(0x00000008,uint8_t))   /* High Bandwidth Tx ISO Endpoint Support */
-#define ENUM_USB_EP0_CFGDATA_HBTXDIS         (_ADI_MSK(0x00000000,uint8_t))   /* HBTX: high bandwidth Tx ISO Endpoint support is disabled */
-#define ENUM_USB_EP0_CFGDATA_HBTXEN          (_ADI_MSK(0x00000008,uint8_t))   /* HBTX: high bandwidth Tx ISO Endpoint support is enabled */
-
-#define BITM_USB_EP0_CFGDATA_DYNFIFO         (_ADI_MSK(0x00000004,uint8_t))   /* Dynamic FIFO Sizing */
-#define ENUM_USB_EP0_CFGDATA_DYNSZDIS        (_ADI_MSK(0x00000000,uint8_t))   /* DYNFIFO:  */
-#define ENUM_USB_EP0_CFGDATA_DYNSZEN         (_ADI_MSK(0x00000004,uint8_t))   /* DYNFIFO: Dynamic FIFO sizing option is selected */
-
-#define BITM_USB_EP0_CFGDATA_SOFTCON         (_ADI_MSK(0x00000002,uint8_t))   /* Soft Connect Enable */
-#define ENUM_USB_EP0_CFGDATA_SFTCONDIS       (_ADI_MSK(0x00000000,uint8_t))   /* SOFTCON: soft connect is disabled */
-#define ENUM_USB_EP0_CFGDATA_SFTCONEN        (_ADI_MSK(0x00000002,uint8_t))   /* SOFTCON: Soft connect is enabled */
-
-#define BITM_USB_EP0_CFGDATA_UTMIWID         (_ADI_MSK(0x00000001,uint8_t))   /* UTMI Data Width */
-#define ENUM_USB_EP0_CFGDATA_UTMIWID8        (_ADI_MSK(0x00000000,uint8_t))   /* UTMIWID: 8-bit UTMI data width */
-#define ENUM_USB_EP0_CFGDATA_UTMIWID16       (_ADI_MSK(0x00000001,uint8_t))   /* UTMIWID: 16-bit UTMI data width */
+#define BITP_USB_MP_RXHUBPORT_VALUE           0                               /* Hub Port Value */
+#define BITM_USB_MP_RXHUBPORT_VALUE          (_ADI_MSK(0x0000007F,uint8_t))   /* Hub Port Value */
 
 /* ------------------------------------------------------------------------------------------------------------------------
         USB_EP_TXMAXP                        Pos/Masks                        Description
    ------------------------------------------------------------------------------------------------------------------------ */
-#define BITP_USB_EP_TXMAXP_MULTM1            11                               /* Num of ISO or INT packets that may be sent per microframe */
-#define BITP_USB_EP_TXMAXP_MAXPAY             0                               /* Max number of bytes that may be transferred per transaction */
-#define BITM_USB_EP_TXMAXP_MULTM1            (_ADI_MSK(0x00001800,uint16_t))  /* Num of ISO or INT packets that may be sent per microframe */
-#define BITM_USB_EP_TXMAXP_MAXPAY            (_ADI_MSK(0x000007FF,uint16_t))  /* Max number of bytes that may be transferred per transaction */
+#define BITP_USB_EP_TXMAXP_MULTM1            11                               /* Multi-Packets per Micro-frame */
+#define BITP_USB_EP_TXMAXP_MAXPAY             0                               /* Maximum Payload */
+#define BITM_USB_EP_TXMAXP_MULTM1            (_ADI_MSK(0x00001800,uint16_t))  /* Multi-Packets per Micro-frame */
+#define BITM_USB_EP_TXMAXP_MAXPAY            (_ADI_MSK(0x000007FF,uint16_t))  /* Maximum Payload */
+
+/* ------------------------------------------------------------------------------------------------------------------------
+        USB_EP0_CSR_H                        Pos/Masks                        Description
+   ------------------------------------------------------------------------------------------------------------------------ */
+#define BITP_USB_EP0_CSR_H_DISPING           11                               /* Disable Ping */
+#define BITP_USB_EP0_CSR_H_DATGLEN           10                               /* Data Toggle Write Enable */
+#define BITP_USB_EP0_CSR_H_DATGL              9                               /* Data Toggle */
+#define BITP_USB_EP0_CSR_H_FLUSHFIFO          8                               /* Flush Endpoint FIFO */
+#define BITP_USB_EP0_CSR_H_NAKTO              7                               /* NAK Timeout */
+#define BITP_USB_EP0_CSR_H_STATUSPKT          6                               /* Status Packet */
+#define BITP_USB_EP0_CSR_H_REQPKT             5                               /* Request Packet */
+#define BITP_USB_EP0_CSR_H_TOERR              4                               /* Timeout Error */
+#define BITP_USB_EP0_CSR_H_SETUPPKT           3                               /* Setup Packet */
+#define BITP_USB_EP0_CSR_H_RXSTALL            2                               /* Rx Stall */
+#define BITP_USB_EP0_CSR_H_TXPKTRDY           1                               /* Tx Packet Ready */
+#define BITP_USB_EP0_CSR_H_RXPKTRDY           0                               /* Rx Packet Ready */
+
+#define BITM_USB_EP0_CSR_H_DISPING           (_ADI_MSK(0x00000800,uint16_t))  /* Disable Ping */
+#define ENUM_USB_EP0_CSR_H_NO_DISPING        (_ADI_MSK(0x00000000,uint16_t))  /* DISPING: Issue PING tokens */
+#define ENUM_USB_EP0_CSR_H_DISPING           (_ADI_MSK(0x00000800,uint16_t))  /* DISPING: Do not issue PING */
+
+#define BITM_USB_EP0_CSR_H_DATGLEN           (_ADI_MSK(0x00000400,uint16_t))  /* Data Toggle Write Enable */
+#define ENUM_USB_EP0_CSR_H_NO_DATGLEN        (_ADI_MSK(0x00000000,uint16_t))  /* DATGLEN: Disable Write to DATGL */
+#define ENUM_USB_EP0_CSR_H_DATGLEN           (_ADI_MSK(0x00000400,uint16_t))  /* DATGLEN: Enable Write to DATGL */
+
+#define BITM_USB_EP0_CSR_H_DATGL             (_ADI_MSK(0x00000200,uint16_t))  /* Data Toggle */
+#define ENUM_USB_EP0_CSR_H_NO_DATATGL        (_ADI_MSK(0x00000000,uint16_t))  /* DATGL: DATA0 is Set */
+#define ENUM_USB_EP0_CSR_H_DATATGL           (_ADI_MSK(0x00000200,uint16_t))  /* DATGL: DATA1 is Set */
+
+#define BITM_USB_EP0_CSR_H_FLUSHFIFO         (_ADI_MSK(0x00000100,uint16_t))  /* Flush Endpoint FIFO */
+#define ENUM_USB_EP0_CSR_H_NO_FLUSH          (_ADI_MSK(0x00000000,uint16_t))  /* FLUSHFIFO: No Flush */
+#define ENUM_USB_EP0_CSR_H_FLUSH             (_ADI_MSK(0x00000100,uint16_t))  /* FLUSHFIFO: Flush Endpoint FIFO */
+
+#define BITM_USB_EP0_CSR_H_NAKTO             (_ADI_MSK(0x00000080,uint16_t))  /* NAK Timeout */
+#define ENUM_USB_EP0_CSR_H_NO_NAKTO          (_ADI_MSK(0x00000000,uint16_t))  /* NAKTO: No Status */
+#define ENUM_USB_EP0_CSR_H_NAKTO             (_ADI_MSK(0x00000080,uint16_t))  /* NAKTO: Endpoint Halted (NAK Timeout) */
+
+#define BITM_USB_EP0_CSR_H_STATUSPKT         (_ADI_MSK(0x00000040,uint16_t))  /* Status Packet */
+#define ENUM_USB_EP0_CSR_H_NO_STATPKT        (_ADI_MSK(0x00000000,uint16_t))  /* STATUSPKT: No Request */
+#define ENUM_USB_EP0_CSR_H_STATPKT           (_ADI_MSK(0x00000040,uint16_t))  /* STATUSPKT: Request Status Transaction */
+
+#define BITM_USB_EP0_CSR_H_REQPKT            (_ADI_MSK(0x00000020,uint16_t))  /* Request Packet */
+#define ENUM_USB_EP0_CSR_H_NO_REQPKT         (_ADI_MSK(0x00000000,uint16_t))  /* REQPKT: No Request */
+#define ENUM_USB_EP0_CSR_H_REQPKT            (_ADI_MSK(0x00000020,uint16_t))  /* REQPKT: Send IN Tokens to Device */
+
+#define BITM_USB_EP0_CSR_H_TOERR             (_ADI_MSK(0x00000010,uint16_t))  /* Timeout Error */
+#define ENUM_USB_EP0_CSR_H_NO_TOERR          (_ADI_MSK(0x00000000,uint16_t))  /* TOERR: No Status */
+#define ENUM_USB_EP0_CSR_H_TOERR             (_ADI_MSK(0x00000010,uint16_t))  /* TOERR: Timeout Error */
+
+#define BITM_USB_EP0_CSR_H_SETUPPKT          (_ADI_MSK(0x00000008,uint16_t))  /* Setup Packet */
+#define ENUM_USB_EP0_CSR_H_NO_SETUPPKT       (_ADI_MSK(0x00000000,uint16_t))  /* SETUPPKT: No Request */
+#define ENUM_USB_EP0_CSR_H_SETUPPKT          (_ADI_MSK(0x00000008,uint16_t))  /* SETUPPKT: Send SETUP token */
+
+#define BITM_USB_EP0_CSR_H_RXSTALL           (_ADI_MSK(0x00000004,uint16_t))  /* Rx Stall */
+#define ENUM_USB_EP0_CSR_H_NO_RXSTALL        (_ADI_MSK(0x00000000,uint16_t))  /* RXSTALL: No Status */
+#define ENUM_USB_EP0_CSR_H_RXSTALL           (_ADI_MSK(0x00000004,uint16_t))  /* RXSTALL: Stall Received from Device */
+
+#define BITM_USB_EP0_CSR_H_TXPKTRDY          (_ADI_MSK(0x00000002,uint16_t))  /* Tx Packet Ready */
+#define ENUM_USB_EP0_CSR_H_NO_TXPKTRDY       (_ADI_MSK(0x00000000,uint16_t))  /* TXPKTRDY: No Tx Packet */
+#define ENUM_USB_EP0_CSR_H_TXPKTRDY          (_ADI_MSK(0x00000002,uint16_t))  /* TXPKTRDY: Tx Packet in Endpoint FIFO */
+
+#define BITM_USB_EP0_CSR_H_RXPKTRDY          (_ADI_MSK(0x00000001,uint16_t))  /* Rx Packet Ready */
+#define ENUM_USB_EP0_CSR_H_NO_RXPKTRDY       (_ADI_MSK(0x00000000,uint16_t))  /* RXPKTRDY: No Rx Packet */
+#define ENUM_USB_EP0_CSR_H_RXPKTRDY          (_ADI_MSK(0x00000001,uint16_t))  /* RXPKTRDY: Rx Packet in Endpoint FIFO */
 
 /* ------------------------------------------------------------------------------------------------------------------------
         USB_EP_TXCSR_H                       Pos/Masks                        Description
    ------------------------------------------------------------------------------------------------------------------------ */
-#define BITP_USB_EP_TXCSR_H_AUTOSET          15
-#define BITP_USB_EP_TXCSR_H_DMAREQEN         12
-#define BITP_USB_EP_TXCSR_H_FRCDATATGL       11
-#define BITP_USB_EP_TXCSR_H_DMAREQMODE       10
-#define BITP_USB_EP_TXCSR_H_DATGLEN           9
-#define BITP_USB_EP_TXCSR_H_DATGL             8
-#define BITP_USB_EP_TXCSR_H_NAKTOINCMP        7
-#define BITP_USB_EP_TXCSR_H_CLRDATATGL        6
-#define BITP_USB_EP_TXCSR_H_RXSTALL           5
-#define BITP_USB_EP_TXCSR_H_SETUPPKT          4
-#define BITP_USB_EP_TXCSR_H_FLUSHFIFO         3
-#define BITP_USB_EP_TXCSR_H_TXTOERR           2
-#define BITP_USB_EP_TXCSR_H_NEFIFO            1
-#define BITP_USB_EP_TXCSR_H_TXPKTRDY          0
+#define BITP_USB_EP_TXCSR_H_AUTOSET          15                               /* TxPkRdy Autoset Enable */
+#define BITP_USB_EP_TXCSR_H_DMAREQEN         12                               /* DMA Request Enable Tx EP */
+#define BITP_USB_EP_TXCSR_H_FRCDATATGL       11                               /* Force Data Toggle */
+#define BITP_USB_EP_TXCSR_H_DMAREQMODE       10                               /* DMA Mode Select */
+#define BITP_USB_EP_TXCSR_H_DATGLEN           9                               /* Data Toggle Write Enable */
+#define BITP_USB_EP_TXCSR_H_DATGL             8                               /* Data Toggle */
+#define BITP_USB_EP_TXCSR_H_NAKTOINCMP        7                               /* NAK Timeout Incomplete */
+#define BITP_USB_EP_TXCSR_H_CLRDATATGL        6                               /* Clear Endpoint Data Toggle */
+#define BITP_USB_EP_TXCSR_H_RXSTALL           5                               /* Rx STALL */
+#define BITP_USB_EP_TXCSR_H_SETUPPKT          4                               /* Setup Packet */
+#define BITP_USB_EP_TXCSR_H_FLUSHFIFO         3                               /* Flush Endpoint FIFO */
+#define BITP_USB_EP_TXCSR_H_TXTOERR           2                               /* Tx Timeout Error */
+#define BITP_USB_EP_TXCSR_H_NEFIFO            1                               /* Not Empty FIFO */
+#define BITP_USB_EP_TXCSR_H_TXPKTRDY          0                               /* Tx Packet Ready */
 
-#define BITM_USB_EP_TXCSR_H_AUTOSET          (_ADI_MSK(0x00008000,uint16_t))
-#define ENUM_USB_EP_TXCSR_H_NO_AUTOSET       (_ADI_MSK(0x00000000,uint16_t))  /* AUTOSET:  */
-#define ENUM_USB_EP_TXCSR_H_AUTOSET          (_ADI_MSK(0x00008000,uint16_t))  /* AUTOSET: Autoset TxPktRdy when max data pkt size loaded into FIFO */
+#define BITM_USB_EP_TXCSR_H_AUTOSET          (_ADI_MSK(0x00008000,uint16_t))  /* TxPkRdy Autoset Enable */
+#define ENUM_USB_EP_TXCSR_H_NO_AUTOSET       (_ADI_MSK(0x00000000,uint16_t))  /* AUTOSET: Disable Autoset */
+#define ENUM_USB_EP_TXCSR_H_AUTOSET          (_ADI_MSK(0x00008000,uint16_t))  /* AUTOSET: Enable Autoset */
 
-#define BITM_USB_EP_TXCSR_H_DMAREQEN         (_ADI_MSK(0x00001000,uint16_t))
-#define ENUM_USB_EP_TXCSR_H_DMAREQDIS        (_ADI_MSK(0x00000000,uint16_t))  /* DMAREQEN:  */
-#define ENUM_USB_EP_TXCSR_H_DMAREQEN         (_ADI_MSK(0x00001000,uint16_t))  /* DMAREQEN: Set this bit to enable DMA requests for this TX endpoint. */
+#define BITM_USB_EP_TXCSR_H_DMAREQEN         (_ADI_MSK(0x00001000,uint16_t))  /* DMA Request Enable Tx EP */
+#define ENUM_USB_EP_TXCSR_H_DMAREQDIS        (_ADI_MSK(0x00000000,uint16_t))  /* DMAREQEN: Disable DMA Request */
+#define ENUM_USB_EP_TXCSR_H_DMAREQEN         (_ADI_MSK(0x00001000,uint16_t))  /* DMAREQEN: Enable DMA Request */
 
-#define BITM_USB_EP_TXCSR_H_FRCDATATGL       (_ADI_MSK(0x00000800,uint16_t))
-#define ENUM_USB_EP_TXCSR_H_NO_FRCTGL        (_ADI_MSK(0x00000000,uint16_t))  /* FRCDATATGL:  */
-#define ENUM_USB_EP_TXCSR_H_FRCTGL           (_ADI_MSK(0x00000800,uint16_t))  /* FRCDATATGL:  */
+#define BITM_USB_EP_TXCSR_H_FRCDATATGL       (_ADI_MSK(0x00000800,uint16_t))  /* Force Data Toggle */
+#define ENUM_USB_EP_TXCSR_H_NO_FRCTGL        (_ADI_MSK(0x00000000,uint16_t))  /* FRCDATATGL: No Action */
+#define ENUM_USB_EP_TXCSR_H_FRCTGL           (_ADI_MSK(0x00000800,uint16_t))  /* FRCDATATGL: Toggle Endpoint Data */
 
-#define BITM_USB_EP_TXCSR_H_DMAREQMODE       (_ADI_MSK(0x00000400,uint16_t))
-#define ENUM_USB_EP_TXCSR_H_DMARQMODE0       (_ADI_MSK(0x00000000,uint16_t))  /* DMAREQMODE: Clear this bit to select DMA request mode 0. */
-#define ENUM_USB_EP_TXCSR_H_DMARQMODE1       (_ADI_MSK(0x00000400,uint16_t))  /* DMAREQMODE: Set this bit to select DMA request mode 1. */
+#define BITM_USB_EP_TXCSR_H_DMAREQMODE       (_ADI_MSK(0x00000400,uint16_t))  /* DMA Mode Select */
+#define ENUM_USB_EP_TXCSR_H_DMARQMODE0       (_ADI_MSK(0x00000000,uint16_t))  /* DMAREQMODE: DMA Request Mode 0 */
+#define ENUM_USB_EP_TXCSR_H_DMARQMODE1       (_ADI_MSK(0x00000400,uint16_t))  /* DMAREQMODE: DMA Request Mode 1 */
 
-#define BITM_USB_EP_TXCSR_H_DATGLEN          (_ADI_MSK(0x00000200,uint16_t))
-#define ENUM_USB_EP_TXCSR_H_NO_DATGLEN       (_ADI_MSK(0x00000000,uint16_t))  /* DATGLEN: Automatically cleared once the new value is written. */
-#define ENUM_USB_EP_TXCSR_H_DATGLEN          (_ADI_MSK(0x00000200,uint16_t))  /* DATGLEN: Allow the Data Toggle bit to be written */
+#define BITM_USB_EP_TXCSR_H_DATGLEN          (_ADI_MSK(0x00000200,uint16_t))  /* Data Toggle Write Enable */
+#define ENUM_USB_EP_TXCSR_H_NO_DATGLEN       (_ADI_MSK(0x00000000,uint16_t))  /* DATGLEN: Disable Write to DATGL */
+#define ENUM_USB_EP_TXCSR_H_DATGLEN          (_ADI_MSK(0x00000200,uint16_t))  /* DATGLEN: Enable Write to DATGL */
 
-#define BITM_USB_EP_TXCSR_H_DATGL            (_ADI_MSK(0x00000100,uint16_t))
-#define ENUM_USB_EP_TXCSR_H_NO_DATGL         (_ADI_MSK(0x00000000,uint16_t))  /* DATGL: Always returns 0. */
-#define ENUM_USB_EP_TXCSR_H_DATGL            (_ADI_MSK(0x00000100,uint16_t))  /* DATGL: Indicates the state of the TX endpoint data toggle */
+#define BITM_USB_EP_TXCSR_H_DATGL            (_ADI_MSK(0x00000100,uint16_t))  /* Data Toggle */
+#define ENUM_USB_EP_TXCSR_H_NO_DATGL         (_ADI_MSK(0x00000000,uint16_t))  /* DATGL: DATA0 is set */
+#define ENUM_USB_EP_TXCSR_H_DATGL            (_ADI_MSK(0x00000100,uint16_t))  /* DATGL: DATA1 is set */
 
-#define BITM_USB_EP_TXCSR_H_NAKTOINCMP       (_ADI_MSK(0x00000080,uint16_t))
-#define ENUM_USB_EP_TXCSR_H_NO_NAKTO         (_ADI_MSK(0x00000000,uint16_t))  /* NAKTOINCMP:  */
-#define ENUM_USB_EP_TXCSR_H_NAKTO            (_ADI_MSK(0x00000080,uint16_t))  /* NAKTOINCMP:  */
+#define BITM_USB_EP_TXCSR_H_NAKTOINCMP       (_ADI_MSK(0x00000080,uint16_t))  /* NAK Timeout Incomplete */
+#define ENUM_USB_EP_TXCSR_H_NO_NAKTO         (_ADI_MSK(0x00000000,uint16_t))  /* NAKTOINCMP: No Status */
+#define ENUM_USB_EP_TXCSR_H_NAKTO            (_ADI_MSK(0x00000080,uint16_t))  /* NAKTOINCMP: NAK Timeout Over Maximum */
 
-#define BITM_USB_EP_TXCSR_H_CLRDATATGL       (_ADI_MSK(0x00000040,uint16_t))
-#define ENUM_USB_EP_TXCSR_H_NO_CLRTGL        (_ADI_MSK(0x00000000,uint16_t))  /* CLRDATATGL:  */
-#define ENUM_USB_EP_TXCSR_H_CLRTGL           (_ADI_MSK(0x00000040,uint16_t))  /* CLRDATATGL:  */
+#define BITM_USB_EP_TXCSR_H_CLRDATATGL       (_ADI_MSK(0x00000040,uint16_t))  /* Clear Endpoint Data Toggle */
+#define ENUM_USB_EP_TXCSR_H_NO_CLRTGL        (_ADI_MSK(0x00000000,uint16_t))  /* CLRDATATGL: No Action */
+#define ENUM_USB_EP_TXCSR_H_CLRTGL           (_ADI_MSK(0x00000040,uint16_t))  /* CLRDATATGL: Reset EP Data Toggle to 0 */
 
-#define BITM_USB_EP_TXCSR_H_RXSTALL          (_ADI_MSK(0x00000020,uint16_t))
-#define ENUM_USB_EP_TXCSR_H_NO_RXSTALL       (_ADI_MSK(0x00000000,uint16_t))  /* RXSTALL: Cleared by CPU */
-#define ENUM_USB_EP_TXCSR_H_RXSTALL          (_ADI_MSK(0x00000020,uint16_t))  /* RXSTALL:  */
+#define BITM_USB_EP_TXCSR_H_RXSTALL          (_ADI_MSK(0x00000020,uint16_t))  /* Rx STALL */
+#define ENUM_USB_EP_TXCSR_H_NO_RXSTALL       (_ADI_MSK(0x00000000,uint16_t))  /* RXSTALL: No Status */
+#define ENUM_USB_EP_TXCSR_H_RXSTALL          (_ADI_MSK(0x00000020,uint16_t))  /* RXSTALL: Stall Received from Device */
 
-#define BITM_USB_EP_TXCSR_H_SETUPPKT         (_ADI_MSK(0x00000010,uint16_t))
-#define ENUM_USB_EP_TXCSR_H_NO_SETUPPK       (_ADI_MSK(0x00000000,uint16_t))  /* SETUPPKT:  */
-#define ENUM_USB_EP_TXCSR_H_SETUPPKT         (_ADI_MSK(0x00000010,uint16_t))  /* SETUPPKT:  */
+#define BITM_USB_EP_TXCSR_H_SETUPPKT         (_ADI_MSK(0x00000010,uint16_t))  /* Setup Packet */
+#define ENUM_USB_EP_TXCSR_H_NO_SETUPPK       (_ADI_MSK(0x00000000,uint16_t))  /* SETUPPKT: No Request */
+#define ENUM_USB_EP_TXCSR_H_SETUPPKT         (_ADI_MSK(0x00000010,uint16_t))  /* SETUPPKT: Send SETUP Token */
 
-#define BITM_USB_EP_TXCSR_H_FLUSHFIFO        (_ADI_MSK(0x00000008,uint16_t))
-#define ENUM_USB_EP_TXCSR_H_NO_FLUSH         (_ADI_MSK(0x00000000,uint16_t))  /* FLUSHFIFO:  */
-#define ENUM_USB_EP_TXCSR_H_FLUSH            (_ADI_MSK(0x00000008,uint16_t))  /* FLUSHFIFO:  */
+#define BITM_USB_EP_TXCSR_H_FLUSHFIFO        (_ADI_MSK(0x00000008,uint16_t))  /* Flush Endpoint FIFO */
+#define ENUM_USB_EP_TXCSR_H_NO_FLUSH         (_ADI_MSK(0x00000000,uint16_t))  /* FLUSHFIFO: No Flush */
+#define ENUM_USB_EP_TXCSR_H_FLUSH            (_ADI_MSK(0x00000008,uint16_t))  /* FLUSHFIFO: Flush endpoint FIFO */
 
-#define BITM_USB_EP_TXCSR_H_TXTOERR          (_ADI_MSK(0x00000004,uint16_t))
-#define ENUM_USB_EP_TXCSR_H_NO_TXTOERR       (_ADI_MSK(0x00000000,uint16_t))  /* TXTOERR: The CPU should clear this bit */
-#define ENUM_USB_EP_TXCSR_H_TXTOERR          (_ADI_MSK(0x00000004,uint16_t))  /* TXTOERR: Set when there is at least 1 packet in the TX FIFO */
+#define BITM_USB_EP_TXCSR_H_TXTOERR          (_ADI_MSK(0x00000004,uint16_t))  /* Tx Timeout Error */
+#define ENUM_USB_EP_TXCSR_H_NO_TXTOERR       (_ADI_MSK(0x00000000,uint16_t))  /* TXTOERR: No Status */
+#define ENUM_USB_EP_TXCSR_H_TXTOERR          (_ADI_MSK(0x00000004,uint16_t))  /* TXTOERR: Tx Timeout Error */
 
-#define BITM_USB_EP_TXCSR_H_NEFIFO           (_ADI_MSK(0x00000002,uint16_t))
-#define ENUM_USB_EP_TXCSR_H_NO_NEFIFO        (_ADI_MSK(0x00000000,uint16_t))  /* NEFIFO:  */
-#define ENUM_USB_EP_TXCSR_H_NEFIFO           (_ADI_MSK(0x00000002,uint16_t))  /* NEFIFO: Set when there is at least 1 packet in the TX FIFO. */
+#define BITM_USB_EP_TXCSR_H_NEFIFO           (_ADI_MSK(0x00000002,uint16_t))  /* Not Empty FIFO */
+#define ENUM_USB_EP_TXCSR_H_NO_NEFIFO        (_ADI_MSK(0x00000000,uint16_t))  /* NEFIFO: FIFO Empty */
+#define ENUM_USB_EP_TXCSR_H_NEFIFO           (_ADI_MSK(0x00000002,uint16_t))  /* NEFIFO: FIFO Not Empty */
 
-#define BITM_USB_EP_TXCSR_H_TXPKTRDY         (_ADI_MSK(0x00000001,uint16_t))
-#define ENUM_USB_EP_TXCSR_H_NO_PKTRDY        (_ADI_MSK(0x00000000,uint16_t))  /* TXPKTRDY:  */
-#define ENUM_USB_EP_TXCSR_H_PKTRDY           (_ADI_MSK(0x00000001,uint16_t))  /* TXPKTRDY:  */
+#define BITM_USB_EP_TXCSR_H_TXPKTRDY         (_ADI_MSK(0x00000001,uint16_t))  /* Tx Packet Ready */
+#define ENUM_USB_EP_TXCSR_H_NO_PKTRDY        (_ADI_MSK(0x00000000,uint16_t))  /* TXPKTRDY: No Tx Packet */
+#define ENUM_USB_EP_TXCSR_H_PKTRDY           (_ADI_MSK(0x00000001,uint16_t))  /* TXPKTRDY: Tx Packet in Endpoint FIFO */
+
+/* ------------------------------------------------------------------------------------------------------------------------
+        USB_EP0_CSR_P                        Pos/Masks                        Description
+   ------------------------------------------------------------------------------------------------------------------------ */
+#define BITP_USB_EP0_CSR_P_FLUSHFIFO          8                               /* Flush Endpoint FIFO */
+#define BITP_USB_EP0_CSR_P_SSETUPEND          7                               /* Service Setup End */
+#define BITP_USB_EP0_CSR_P_SPKTRDY            6                               /* Service Rx Packet Ready */
+#define BITP_USB_EP0_CSR_P_SENDSTALL          5                               /* Send Stall */
+#define BITP_USB_EP0_CSR_P_SETUPEND           4                               /* Setup End */
+#define BITP_USB_EP0_CSR_P_DATAEND            3                               /* Data End */
+#define BITP_USB_EP0_CSR_P_SENTSTALL          2                               /* Sent Stall */
+#define BITP_USB_EP0_CSR_P_TXPKTRDY           1                               /* Tx Packet Ready */
+#define BITP_USB_EP0_CSR_P_RXPKTRDY           0                               /* Rx Packet Ready */
+
+#define BITM_USB_EP0_CSR_P_FLUSHFIFO         (_ADI_MSK(0x00000100,uint16_t))  /* Flush Endpoint FIFO */
+#define ENUM_USB_EP0_CSR_P_NO_FLUSH          (_ADI_MSK(0x00000000,uint16_t))  /* FLUSHFIFO: No Flush */
+#define ENUM_USB_EP0_CSR_P_FLUSH             (_ADI_MSK(0x00000100,uint16_t))  /* FLUSHFIFO: Flush Endpoint FIFO */
+
+#define BITM_USB_EP0_CSR_P_SSETUPEND         (_ADI_MSK(0x00000080,uint16_t))  /* Service Setup End */
+#define ENUM_USB_EP0_CSR_P_NOSSETUPEND       (_ADI_MSK(0x00000000,uint16_t))  /* SSETUPEND: No Action */
+#define ENUM_USB_EP0_CSR_P_SSETUPEND         (_ADI_MSK(0x00000080,uint16_t))  /* SSETUPEND: Clear SETUPEND Bit */
+
+#define BITM_USB_EP0_CSR_P_SPKTRDY           (_ADI_MSK(0x00000040,uint16_t))  /* Service Rx Packet Ready */
+#define ENUM_USB_EP0_CSR_P_NO_SPKTRDY        (_ADI_MSK(0x00000000,uint16_t))  /* SPKTRDY: No Action */
+#define ENUM_USB_EP0_CSR_P_SPKTRDY           (_ADI_MSK(0x00000040,uint16_t))  /* SPKTRDY: Clear RXPKTRDY Bit */
+
+#define BITM_USB_EP0_CSR_P_SENDSTALL         (_ADI_MSK(0x00000020,uint16_t))  /* Send Stall */
+#define ENUM_USB_EP0_CSR_P_NO_STALL          (_ADI_MSK(0x00000000,uint16_t))  /* SENDSTALL: No Action */
+#define ENUM_USB_EP0_CSR_P_STALL             (_ADI_MSK(0x00000020,uint16_t))  /* SENDSTALL: Terminate Current Transaction */
+
+#define BITM_USB_EP0_CSR_P_SETUPEND          (_ADI_MSK(0x00000010,uint16_t))  /* Setup End */
+#define ENUM_USB_EP0_CSR_P_NO_SETUPEND       (_ADI_MSK(0x00000000,uint16_t))  /* SETUPEND: No Status */
+#define ENUM_USB_EP0_CSR_P_SETUPEND          (_ADI_MSK(0x00000010,uint16_t))  /* SETUPEND: Setup Ended before DATAEND */
+
+#define BITM_USB_EP0_CSR_P_DATAEND           (_ADI_MSK(0x00000008,uint16_t))  /* Data End */
+#define ENUM_USB_EP0_CSR_P_NO_DATAEND        (_ADI_MSK(0x00000000,uint16_t))  /* DATAEND: No Status */
+#define ENUM_USB_EP0_CSR_P_DATAEND           (_ADI_MSK(0x00000008,uint16_t))  /* DATAEND: Data End Condition */
+
+#define BITM_USB_EP0_CSR_P_SENTSTALL         (_ADI_MSK(0x00000004,uint16_t))  /* Sent Stall */
+#define ENUM_USB_EP0_CSR_P_NO_STALSNT        (_ADI_MSK(0x00000000,uint16_t))  /* SENTSTALL: No Status */
+#define ENUM_USB_EP0_CSR_P_STALSNT           (_ADI_MSK(0x00000004,uint16_t))  /* SENTSTALL: Transmitted STALL Handshake */
+
+#define BITM_USB_EP0_CSR_P_TXPKTRDY          (_ADI_MSK(0x00000002,uint16_t))  /* Tx Packet Ready */
+#define ENUM_USB_EP0_CSR_P_NO_TXPKTRDY       (_ADI_MSK(0x00000000,uint16_t))  /* TXPKTRDY:  */
+#define ENUM_USB_EP0_CSR_P_TXPKTRDY          (_ADI_MSK(0x00000002,uint16_t))  /* TXPKTRDY: Set this bit after loading a data packet into the FIFO */
+
+#define BITM_USB_EP0_CSR_P_RXPKTRDY          (_ADI_MSK(0x00000001,uint16_t))  /* Rx Packet Ready */
+#define ENUM_USB_EP0_CSR_P_NO_PKTRDY         (_ADI_MSK(0x00000000,uint16_t))  /* RXPKTRDY: No Rx Packet */
+#define ENUM_USB_EP0_CSR_P_PKTRDY            (_ADI_MSK(0x00000001,uint16_t))  /* RXPKTRDY: Rx Packet in Endpoint FIFO */
 
 /* ------------------------------------------------------------------------------------------------------------------------
         USB_EP_TXCSR_P                       Pos/Masks                        Description
    ------------------------------------------------------------------------------------------------------------------------ */
-#define BITP_USB_EP_TXCSR_P_AUTOSET          15
-#define BITP_USB_EP_TXCSR_P_ISO              14
-#define BITP_USB_EP_TXCSR_P_DMAREQEN         12
-#define BITP_USB_EP_TXCSR_P_FRCDATATGL       11
-#define BITP_USB_EP_TXCSR_P_DMAREQMODE       10
-#define BITP_USB_EP_TXCSR_P_INCOMPTX          7
-#define BITP_USB_EP_TXCSR_P_CLRDATATGL        6
-#define BITP_USB_EP_TXCSR_P_SENTSTALL         5
-#define BITP_USB_EP_TXCSR_P_SENDSTALL         4
-#define BITP_USB_EP_TXCSR_P_FLUSHFIFO         3
-#define BITP_USB_EP_TXCSR_P_URUNERR           2
-#define BITP_USB_EP_TXCSR_P_NEFIFO            1
-#define BITP_USB_EP_TXCSR_P_TXPKTRDY          0
+#define BITP_USB_EP_TXCSR_P_AUTOSET          15                               /* TxPkRdy Autoset Enable */
+#define BITP_USB_EP_TXCSR_P_ISO              14                               /* Isochronous Transfers Enable */
+#define BITP_USB_EP_TXCSR_P_DMAREQEN         12                               /* DMA Request Enable Tx EP */
+#define BITP_USB_EP_TXCSR_P_FRCDATATGL       11                               /* Force Data Toggle */
+#define BITP_USB_EP_TXCSR_P_DMAREQMODE       10                               /* DMA Mode Select */
+#define BITP_USB_EP_TXCSR_P_INCOMPTX          7                               /* Incomplete Tx */
+#define BITP_USB_EP_TXCSR_P_CLRDATATGL        6                               /* Clear Endpoint Data Toggle */
+#define BITP_USB_EP_TXCSR_P_SENTSTALL         5                               /* Sent STALL */
+#define BITP_USB_EP_TXCSR_P_SENDSTALL         4                               /* Send STALL */
+#define BITP_USB_EP_TXCSR_P_FLUSHFIFO         3                               /* Flush Endpoint FIFO */
+#define BITP_USB_EP_TXCSR_P_URUNERR           2                               /* Underrun Error */
+#define BITP_USB_EP_TXCSR_P_NEFIFO            1                               /* Not Empty FIFO */
+#define BITP_USB_EP_TXCSR_P_TXPKTRDY          0                               /* Tx Packet Ready */
 
-#define BITM_USB_EP_TXCSR_P_AUTOSET          (_ADI_MSK(0x00008000,uint16_t))
-#define ENUM_USB_EP_TXCSR_P_NO_AUTOSET       (_ADI_MSK(0x00000000,uint16_t))  /* AUTOSET:  */
-#define ENUM_USB_EP_TXCSR_P_AUTOSET          (_ADI_MSK(0x00008000,uint16_t))  /* AUTOSET:  */
+#define BITM_USB_EP_TXCSR_P_AUTOSET          (_ADI_MSK(0x00008000,uint16_t))  /* TxPkRdy Autoset Enable */
+#define ENUM_USB_EP_TXCSR_P_NO_AUTOSET       (_ADI_MSK(0x00000000,uint16_t))  /* AUTOSET: Disable Autoset */
+#define ENUM_USB_EP_TXCSR_P_AUTOSET          (_ADI_MSK(0x00008000,uint16_t))  /* AUTOSET: Enable Autoset */
 
-#define BITM_USB_EP_TXCSR_P_ISO              (_ADI_MSK(0x00004000,uint16_t))
-#define ENUM_USB_EP_TXCSR_P_ISODIS           (_ADI_MSK(0x00000000,uint16_t))  /* ISO: Disable the TX endpoint for isochronous transfers. */
-#define ENUM_USB_EP_TXCSR_P_ISOEN            (_ADI_MSK(0x00004000,uint16_t))  /* ISO: Enable the TX endpoint for isochronous transfers */
+#define BITM_USB_EP_TXCSR_P_ISO              (_ADI_MSK(0x00004000,uint16_t))  /* Isochronous Transfers Enable */
+#define ENUM_USB_EP_TXCSR_P_ISODIS           (_ADI_MSK(0x00000000,uint16_t))  /* ISO: Disable Tx EP Isochronous Transfers */
+#define ENUM_USB_EP_TXCSR_P_ISOEN            (_ADI_MSK(0x00004000,uint16_t))  /* ISO: Enable Tx EP Isochronous Transfers */
 
-#define BITM_USB_EP_TXCSR_P_DMAREQEN         (_ADI_MSK(0x00001000,uint16_t))
-#define ENUM_USB_EP_TXCSR_P_DMAREQDIS        (_ADI_MSK(0x00000000,uint16_t))  /* DMAREQEN: Diasable DMA requests. */
-#define ENUM_USB_EP_TXCSR_P_DMAREQEN         (_ADI_MSK(0x00001000,uint16_t))  /* DMAREQEN: Enable DMA requests. */
+#define BITM_USB_EP_TXCSR_P_DMAREQEN         (_ADI_MSK(0x00001000,uint16_t))  /* DMA Request Enable Tx EP */
+#define ENUM_USB_EP_TXCSR_P_DMAREQDIS        (_ADI_MSK(0x00000000,uint16_t))  /* DMAREQEN: Disable DMA Request */
+#define ENUM_USB_EP_TXCSR_P_DMAREQEN         (_ADI_MSK(0x00001000,uint16_t))  /* DMAREQEN: Enable DMA Request */
 
-#define BITM_USB_EP_TXCSR_P_FRCDATATGL       (_ADI_MSK(0x00000800,uint16_t))
-#define ENUM_USB_EP_TXCSR_P_NO_FRCTGL        (_ADI_MSK(0x00000000,uint16_t))  /* FRCDATATGL:  */
-#define ENUM_USB_EP_TXCSR_P_FRCTGL           (_ADI_MSK(0x00000800,uint16_t))  /* FRCDATATGL:  */
+#define BITM_USB_EP_TXCSR_P_FRCDATATGL       (_ADI_MSK(0x00000800,uint16_t))  /* Force Data Toggle */
+#define ENUM_USB_EP_TXCSR_P_NO_FRCTGL        (_ADI_MSK(0x00000000,uint16_t))  /* FRCDATATGL: No Action */
+#define ENUM_USB_EP_TXCSR_P_FRCTGL           (_ADI_MSK(0x00000800,uint16_t))  /* FRCDATATGL: Toggle Endpoint Data */
 
-#define BITM_USB_EP_TXCSR_P_DMAREQMODE       (_ADI_MSK(0x00000400,uint16_t))
-#define ENUM_USB_EP_TXCSR_P_DMARQMODE0       (_ADI_MSK(0x00000000,uint16_t))  /* DMAREQMODE: Clear this bit to select DMA request mode 0. */
-#define ENUM_USB_EP_TXCSR_P_DMARQMODE1       (_ADI_MSK(0x00000400,uint16_t))  /* DMAREQMODE: Set this bit to select DMA request mode 1. */
+#define BITM_USB_EP_TXCSR_P_DMAREQMODE       (_ADI_MSK(0x00000400,uint16_t))  /* DMA Mode Select */
+#define ENUM_USB_EP_TXCSR_P_DMARQMODE0       (_ADI_MSK(0x00000000,uint16_t))  /* DMAREQMODE: DMA Request Mode 0 */
+#define ENUM_USB_EP_TXCSR_P_DMARQMODE1       (_ADI_MSK(0x00000400,uint16_t))  /* DMAREQMODE: DMA Request Mode 1 */
 
-#define BITM_USB_EP_TXCSR_P_INCOMPTX         (_ADI_MSK(0x00000080,uint16_t))
-#define ENUM_USB_EP_TXCSR_P_NO_INCOMP        (_ADI_MSK(0x00000000,uint16_t))  /* INCOMPTX:  */
-#define ENUM_USB_EP_TXCSR_P_INCOMP           (_ADI_MSK(0x00000080,uint16_t))  /* INCOMPTX:  */
+#define BITM_USB_EP_TXCSR_P_INCOMPTX         (_ADI_MSK(0x00000080,uint16_t))  /* Incomplete Tx */
+#define ENUM_USB_EP_TXCSR_P_NO_INCOMP        (_ADI_MSK(0x00000000,uint16_t))  /* INCOMPTX: No Status */
+#define ENUM_USB_EP_TXCSR_P_INCOMP           (_ADI_MSK(0x00000080,uint16_t))  /* INCOMPTX: Incomplete Tx (Insufficient IN Tokens) */
 
-#define BITM_USB_EP_TXCSR_P_CLRDATATGL       (_ADI_MSK(0x00000040,uint16_t))
-#define ENUM_USB_EP_TXCSR_P_NO_CLRTGL        (_ADI_MSK(0x00000000,uint16_t))  /* CLRDATATGL:  */
-#define ENUM_USB_EP_TXCSR_P_CLRTGL           (_ADI_MSK(0x00000040,uint16_t))  /* CLRDATATGL:  */
+#define BITM_USB_EP_TXCSR_P_CLRDATATGL       (_ADI_MSK(0x00000040,uint16_t))  /* Clear Endpoint Data Toggle */
+#define ENUM_USB_EP_TXCSR_P_NO_CLRTGL        (_ADI_MSK(0x00000000,uint16_t))  /* CLRDATATGL: No Action */
+#define ENUM_USB_EP_TXCSR_P_CLRTGL           (_ADI_MSK(0x00000040,uint16_t))  /* CLRDATATGL: Reset EP Data Toggle to 0 */
 
-#define BITM_USB_EP_TXCSR_P_SENTSTALL        (_ADI_MSK(0x00000020,uint16_t))
-#define ENUM_USB_EP_TXCSR_P_NO_STALSNT       (_ADI_MSK(0x00000000,uint16_t))  /* SENTSTALL: The CPU should clear this bit. */
-#define ENUM_USB_EP_TXCSR_P_STALSNT          (_ADI_MSK(0x00000020,uint16_t))  /* SENTSTALL: This bit is set when a STALL handshake is transmitted */
+#define BITM_USB_EP_TXCSR_P_SENTSTALL        (_ADI_MSK(0x00000020,uint16_t))  /* Sent STALL */
+#define ENUM_USB_EP_TXCSR_P_NO_STALSNT       (_ADI_MSK(0x00000000,uint16_t))  /* SENTSTALL: No Status */
+#define ENUM_USB_EP_TXCSR_P_STALSNT          (_ADI_MSK(0x00000020,uint16_t))  /* SENTSTALL: STALL Handshake Transmitted */
 
-#define BITM_USB_EP_TXCSR_P_SENDSTALL        (_ADI_MSK(0x00000010,uint16_t))
-#define ENUM_USB_EP_TXCSR_P_NO_STALL         (_ADI_MSK(0x00000000,uint16_t))  /* SENDSTALL: The CPU clears this bit to terminate the stall condition */
-#define ENUM_USB_EP_TXCSR_P_STALL            (_ADI_MSK(0x00000010,uint16_t))  /* SENDSTALL:  */
+#define BITM_USB_EP_TXCSR_P_SENDSTALL        (_ADI_MSK(0x00000010,uint16_t))  /* Send STALL */
+#define ENUM_USB_EP_TXCSR_P_NO_STALL         (_ADI_MSK(0x00000000,uint16_t))  /* SENDSTALL: No Request */
+#define ENUM_USB_EP_TXCSR_P_STALL            (_ADI_MSK(0x00000010,uint16_t))  /* SENDSTALL: Request STALL Handshake Transmission */
 
-#define BITM_USB_EP_TXCSR_P_FLUSHFIFO        (_ADI_MSK(0x00000008,uint16_t))
-#define ENUM_USB_EP_TXCSR_P_NO_FLUSH         (_ADI_MSK(0x00000000,uint16_t))  /* FLUSHFIFO:  */
-#define ENUM_USB_EP_TXCSR_P_FLUSH            (_ADI_MSK(0x00000008,uint16_t))  /* FLUSHFIFO:  */
+#define BITM_USB_EP_TXCSR_P_FLUSHFIFO        (_ADI_MSK(0x00000008,uint16_t))  /* Flush Endpoint FIFO */
+#define ENUM_USB_EP_TXCSR_P_NO_FLUSH         (_ADI_MSK(0x00000000,uint16_t))  /* FLUSHFIFO: No Flush */
+#define ENUM_USB_EP_TXCSR_P_FLUSH            (_ADI_MSK(0x00000008,uint16_t))  /* FLUSHFIFO: Flush endpoint FIFO */
 
-#define BITM_USB_EP_TXCSR_P_URUNERR          (_ADI_MSK(0x00000004,uint16_t))
-#define ENUM_USB_EP_TXCSR_P_NO_URUNERR       (_ADI_MSK(0x00000000,uint16_t))  /* URUNERR: The CPU should clear this bit. */
-#define ENUM_USB_EP_TXCSR_P_URUNERR          (_ADI_MSK(0x00000004,uint16_t))  /* URUNERR: Set if an IN token is received when TxPktRdy is not set */
+#define BITM_USB_EP_TXCSR_P_URUNERR          (_ADI_MSK(0x00000004,uint16_t))  /* Underrun Error */
+#define ENUM_USB_EP_TXCSR_P_NO_URUNERR       (_ADI_MSK(0x00000000,uint16_t))  /* URUNERR: No Status */
+#define ENUM_USB_EP_TXCSR_P_URUNERR          (_ADI_MSK(0x00000004,uint16_t))  /* URUNERR: Underrun Error */
 
-#define BITM_USB_EP_TXCSR_P_NEFIFO           (_ADI_MSK(0x00000002,uint16_t))
-#define ENUM_USB_EP_TXCSR_P_NO_FIFONE        (_ADI_MSK(0x00000000,uint16_t))  /* NEFIFO:  */
-#define ENUM_USB_EP_TXCSR_P_FIFONE           (_ADI_MSK(0x00000002,uint16_t))  /* NEFIFO: Set when there is at least 1 packet in the TX FIFO. */
+#define BITM_USB_EP_TXCSR_P_NEFIFO           (_ADI_MSK(0x00000002,uint16_t))  /* Not Empty FIFO */
+#define ENUM_USB_EP_TXCSR_P_NO_FIFONE        (_ADI_MSK(0x00000000,uint16_t))  /* NEFIFO: FIFO Empty */
+#define ENUM_USB_EP_TXCSR_P_FIFONE           (_ADI_MSK(0x00000002,uint16_t))  /* NEFIFO: FIFO Not Empty */
 
-#define BITM_USB_EP_TXCSR_P_TXPKTRDY         (_ADI_MSK(0x00000001,uint16_t))
-#define ENUM_USB_EP_TXCSR_P_NO_PKTRDY        (_ADI_MSK(0x00000000,uint16_t))  /* TXPKTRDY:  */
-#define ENUM_USB_EP_TXCSR_P_PKTRDY           (_ADI_MSK(0x00000001,uint16_t))  /* TXPKTRDY:  */
+#define BITM_USB_EP_TXCSR_P_TXPKTRDY         (_ADI_MSK(0x00000001,uint16_t))  /* Tx Packet Ready */
+#define ENUM_USB_EP_TXCSR_P_NO_PKTRDY        (_ADI_MSK(0x00000000,uint16_t))  /* TXPKTRDY: No Tx Packet */
+#define ENUM_USB_EP_TXCSR_P_PKTRDY           (_ADI_MSK(0x00000001,uint16_t))  /* TXPKTRDY: Tx Packet in Endpoint FIFO */
 
 /* ------------------------------------------------------------------------------------------------------------------------
         USB_EP_RXMAXP                        Pos/Masks                        Description
    ------------------------------------------------------------------------------------------------------------------------ */
-#define BITP_USB_EP_RXMAXP_MULTM1            11
-#define BITP_USB_EP_RXMAXP_MAXPAY             0                               /* Max number of bytes that may be transferred per transaction */
-#define BITM_USB_EP_RXMAXP_MULTM1            (_ADI_MSK(0x00001800,uint16_t))
-#define BITM_USB_EP_RXMAXP_MAXPAY            (_ADI_MSK(0x000007FF,uint16_t))  /* Max number of bytes that may be transferred per transaction */
+#define BITP_USB_EP_RXMAXP_MULTM1            11                               /* Multi-Packets per Micro-frame */
+#define BITP_USB_EP_RXMAXP_MAXPAY             0                               /* Maximum Payload */
+#define BITM_USB_EP_RXMAXP_MULTM1            (_ADI_MSK(0x00001800,uint16_t))  /* Multi-Packets per Micro-frame */
+#define BITM_USB_EP_RXMAXP_MAXPAY            (_ADI_MSK(0x000007FF,uint16_t))  /* Maximum Payload */
 
 /* ------------------------------------------------------------------------------------------------------------------------
         USB_EP_RXCSR_H                       Pos/Masks                        Description
    ------------------------------------------------------------------------------------------------------------------------ */
-#define BITP_USB_EP_RXCSR_H_AUTOCLR          15
-#define BITP_USB_EP_RXCSR_H_AUTOREQ          14
-#define BITP_USB_EP_RXCSR_H_DMAREQEN         13
-#define BITP_USB_EP_RXCSR_H_PIDERR           12
-#define BITP_USB_EP_RXCSR_H_DMAREQMODE       11
-#define BITP_USB_EP_RXCSR_H_DATGLEN          10
-#define BITP_USB_EP_RXCSR_H_DATGL             9
-#define BITP_USB_EP_RXCSR_H_INCOMPRX          8
-#define BITP_USB_EP_RXCSR_H_CLRDATATGL        7
-#define BITP_USB_EP_RXCSR_H_RXSTALL           6
-#define BITP_USB_EP_RXCSR_H_REQPKT            5
-#define BITP_USB_EP_RXCSR_H_FLUSHFIFO         4
-#define BITP_USB_EP_RXCSR_H_NAKTODERR         3
-#define BITP_USB_EP_RXCSR_H_RXTOERR           2
-#define BITP_USB_EP_RXCSR_H_FIFOFULL          1
-#define BITP_USB_EP_RXCSR_H_RXPKTRDY          0
+#define BITP_USB_EP_RXCSR_H_AUTOCLR          15                               /* Auto Clear Enable */
+#define BITP_USB_EP_RXCSR_H_AUTOREQ          14                               /* Auto Request Clear Enable */
+#define BITP_USB_EP_RXCSR_H_DMAREQEN         13                               /* DMA Request Enable Rx EP */
+#define BITP_USB_EP_RXCSR_H_PIDERR           12                               /* Packet ID Error */
+#define BITP_USB_EP_RXCSR_H_DMAREQMODE       11                               /* DMA Mode Select */
+#define BITP_USB_EP_RXCSR_H_DATGLEN          10                               /* Data Toggle Write Enable */
+#define BITP_USB_EP_RXCSR_H_DATGL             9                               /* Data Toggle */
+#define BITP_USB_EP_RXCSR_H_INCOMPRX          8                               /* Incomplete Rx */
+#define BITP_USB_EP_RXCSR_H_CLRDATATGL        7                               /* Clear Endpoint Data Toggle */
+#define BITP_USB_EP_RXCSR_H_RXSTALL           6                               /* Rx STALL */
+#define BITP_USB_EP_RXCSR_H_REQPKT            5                               /* Request Packet */
+#define BITP_USB_EP_RXCSR_H_FLUSHFIFO         4                               /* Flush Endpoint FIFO */
+#define BITP_USB_EP_RXCSR_H_NAKTODERR         3                               /* NAK Timeout Data Error */
+#define BITP_USB_EP_RXCSR_H_RXTOERR           2                               /* Rx Timeout Error */
+#define BITP_USB_EP_RXCSR_H_FIFOFULL          1                               /* FIFO Full */
+#define BITP_USB_EP_RXCSR_H_RXPKTRDY          0                               /* Rx Packet Ready */
 
-#define BITM_USB_EP_RXCSR_H_AUTOCLR          (_ADI_MSK(0x00008000,uint16_t))
-#define ENUM_USB_EP_RXCSR_H_NO_AUTOCLR       (_ADI_MSK(0x00000000,uint16_t))  /* AUTOCLR:  */
-#define ENUM_USB_EP_RXCSR_H_AUTOCLR          (_ADI_MSK(0x00008000,uint16_t))  /* AUTOCLR:  */
+#define BITM_USB_EP_RXCSR_H_AUTOCLR          (_ADI_MSK(0x00008000,uint16_t))  /* Auto Clear Enable */
+#define ENUM_USB_EP_RXCSR_H_NO_AUTOCLR       (_ADI_MSK(0x00000000,uint16_t))  /* AUTOCLR: Disable Auto Clear */
+#define ENUM_USB_EP_RXCSR_H_AUTOCLR          (_ADI_MSK(0x00008000,uint16_t))  /* AUTOCLR: Enable Auto Clear */
 
-#define BITM_USB_EP_RXCSR_H_AUTOREQ          (_ADI_MSK(0x00004000,uint16_t))
-#define ENUM_USB_EP_RXCSR_H_NO_AUTOREQ       (_ADI_MSK(0x00000000,uint16_t))  /* AUTOREQ: Automatically cleared when a short packet is received. */
-#define ENUM_USB_EP_RXCSR_H_AUTOREQ          (_ADI_MSK(0x00004000,uint16_t))  /* AUTOREQ: ReqPkt bit will be auto set when RxPktRdy bit is cleared */
+#define BITM_USB_EP_RXCSR_H_AUTOREQ          (_ADI_MSK(0x00004000,uint16_t))  /* Auto Request Clear Enable */
+#define ENUM_USB_EP_RXCSR_H_NO_AUTOREQ       (_ADI_MSK(0x00000000,uint16_t))  /* AUTOREQ: Disable Auto Request Clear */
+#define ENUM_USB_EP_RXCSR_H_AUTOREQ          (_ADI_MSK(0x00004000,uint16_t))  /* AUTOREQ: Enable Auto Request Clear */
 
-#define BITM_USB_EP_RXCSR_H_DMAREQEN         (_ADI_MSK(0x00002000,uint16_t))
-#define ENUM_USB_EP_RXCSR_H_DMAREQDIS        (_ADI_MSK(0x00000000,uint16_t))  /* DMAREQEN: Disable DMA requests for the RX endpoint */
-#define ENUM_USB_EP_RXCSR_H_DMAREQEN         (_ADI_MSK(0x00002000,uint16_t))  /* DMAREQEN: Enable DMA requests for the RX endpoint */
+#define BITM_USB_EP_RXCSR_H_DMAREQEN         (_ADI_MSK(0x00002000,uint16_t))  /* DMA Request Enable Rx EP */
+#define ENUM_USB_EP_RXCSR_H_DMAREQDIS        (_ADI_MSK(0x00000000,uint16_t))  /* DMAREQEN: Disable DMA Request */
+#define ENUM_USB_EP_RXCSR_H_DMAREQEN         (_ADI_MSK(0x00002000,uint16_t))  /* DMAREQEN: Enable DMA Request */
 
-#define BITM_USB_EP_RXCSR_H_PIDERR           (_ADI_MSK(0x00001000,uint16_t))
-#define ENUM_USB_EP_RXCSR_H_NO_PIDERR        (_ADI_MSK(0x00000000,uint16_t))  /* PIDERR:  */
-#define ENUM_USB_EP_RXCSR_H_PIDERR           (_ADI_MSK(0x00001000,uint16_t))  /* PIDERR:  */
+#define BITM_USB_EP_RXCSR_H_PIDERR           (_ADI_MSK(0x00001000,uint16_t))  /* Packet ID Error */
+#define ENUM_USB_EP_RXCSR_H_NO_PIDERR        (_ADI_MSK(0x00000000,uint16_t))  /* PIDERR: No Status */
+#define ENUM_USB_EP_RXCSR_H_PIDERR           (_ADI_MSK(0x00001000,uint16_t))  /* PIDERR: PID Error */
 
-#define BITM_USB_EP_RXCSR_H_DMAREQMODE       (_ADI_MSK(0x00000800,uint16_t))
-#define ENUM_USB_EP_RXCSR_H_DMARQMODE0       (_ADI_MSK(0x00000000,uint16_t))  /* DMAREQMODE:  */
-#define ENUM_USB_EP_RXCSR_H_DMARQMODE1       (_ADI_MSK(0x00000800,uint16_t))  /* DMAREQMODE:  */
+#define BITM_USB_EP_RXCSR_H_DMAREQMODE       (_ADI_MSK(0x00000800,uint16_t))  /* DMA Mode Select */
+#define ENUM_USB_EP_RXCSR_H_DMARQMODE0       (_ADI_MSK(0x00000000,uint16_t))  /* DMAREQMODE: DMA Request Mode 0 */
+#define ENUM_USB_EP_RXCSR_H_DMARQMODE1       (_ADI_MSK(0x00000800,uint16_t))  /* DMAREQMODE: DMA Request Mode 1 */
 
-#define BITM_USB_EP_RXCSR_H_DATGLEN          (_ADI_MSK(0x00000400,uint16_t))
-#define ENUM_USB_EP_RXCSR_H_DATGLDIS         (_ADI_MSK(0x00000000,uint16_t))  /* DATGLEN:  */
-#define ENUM_USB_EP_RXCSR_H_DATGLEN          (_ADI_MSK(0x00000400,uint16_t))  /* DATGLEN:  */
+#define BITM_USB_EP_RXCSR_H_DATGLEN          (_ADI_MSK(0x00000400,uint16_t))  /* Data Toggle Write Enable */
+#define ENUM_USB_EP_RXCSR_H_DATGLDIS         (_ADI_MSK(0x00000000,uint16_t))  /* DATGLEN: Disable Write to DATGL */
+#define ENUM_USB_EP_RXCSR_H_DATGLEN          (_ADI_MSK(0x00000400,uint16_t))  /* DATGLEN: Enable Write to DATGL */
 
-#define BITM_USB_EP_RXCSR_H_DATGL            (_ADI_MSK(0x00000200,uint16_t))
-#define ENUM_USB_EP_RXCSR_H_NO_DATGL         (_ADI_MSK(0x00000000,uint16_t))  /* DATGL:  */
-#define ENUM_USB_EP_RXCSR_H_DATGL            (_ADI_MSK(0x00000200,uint16_t))  /* DATGL:  */
+#define BITM_USB_EP_RXCSR_H_DATGL            (_ADI_MSK(0x00000200,uint16_t))  /* Data Toggle */
+#define ENUM_USB_EP_RXCSR_H_NO_DATGL         (_ADI_MSK(0x00000000,uint16_t))  /* DATGL: DATA0 is Set */
+#define ENUM_USB_EP_RXCSR_H_DATGL            (_ADI_MSK(0x00000200,uint16_t))  /* DATGL: DATA1 is Set */
 
-#define BITM_USB_EP_RXCSR_H_INCOMPRX         (_ADI_MSK(0x00000100,uint16_t))
-#define ENUM_USB_EP_RXCSR_H_NO_INCOMP        (_ADI_MSK(0x00000000,uint16_t))  /* INCOMPRX:  */
-#define ENUM_USB_EP_RXCSR_H_INCOMP           (_ADI_MSK(0x00000100,uint16_t))  /* INCOMPRX:  */
+#define BITM_USB_EP_RXCSR_H_INCOMPRX         (_ADI_MSK(0x00000100,uint16_t))  /* Incomplete Rx */
+#define ENUM_USB_EP_RXCSR_H_NO_INCOMP        (_ADI_MSK(0x00000000,uint16_t))  /* INCOMPRX: No Status */
+#define ENUM_USB_EP_RXCSR_H_INCOMP           (_ADI_MSK(0x00000100,uint16_t))  /* INCOMPRX: Incomplete Rx */
 
-#define BITM_USB_EP_RXCSR_H_CLRDATATGL       (_ADI_MSK(0x00000080,uint16_t))
-#define ENUM_USB_EP_RXCSR_H_NO_CLRTGL        (_ADI_MSK(0x00000000,uint16_t))  /* CLRDATATGL:  */
-#define ENUM_USB_EP_RXCSR_H_CLRTGL           (_ADI_MSK(0x00000080,uint16_t))  /* CLRDATATGL: If this bit is set, the data toggle bit will be cleared. */
+#define BITM_USB_EP_RXCSR_H_CLRDATATGL       (_ADI_MSK(0x00000080,uint16_t))  /* Clear Endpoint Data Toggle */
+#define ENUM_USB_EP_RXCSR_H_NO_CLRTGL        (_ADI_MSK(0x00000000,uint16_t))  /* CLRDATATGL: No Action */
+#define ENUM_USB_EP_RXCSR_H_CLRTGL           (_ADI_MSK(0x00000080,uint16_t))  /* CLRDATATGL: Reset EP Data Toggle to 0 */
 
-#define BITM_USB_EP_RXCSR_H_RXSTALL          (_ADI_MSK(0x00000040,uint16_t))
-#define ENUM_USB_EP_RXCSR_H_NO_RXSTALL       (_ADI_MSK(0x00000000,uint16_t))  /* RXSTALL: The CPU should clear this bit. */
-#define ENUM_USB_EP_RXCSR_H_RXSTALL          (_ADI_MSK(0x00000040,uint16_t))  /* RXSTALL: This bit is set when a STALL handshake is received. */
+#define BITM_USB_EP_RXCSR_H_RXSTALL          (_ADI_MSK(0x00000040,uint16_t))  /* Rx STALL */
+#define ENUM_USB_EP_RXCSR_H_NO_RXSTALL       (_ADI_MSK(0x00000000,uint16_t))  /* RXSTALL: No Status */
+#define ENUM_USB_EP_RXCSR_H_RXSTALL          (_ADI_MSK(0x00000040,uint16_t))  /* RXSTALL: Stall Received from Device */
 
-#define BITM_USB_EP_RXCSR_H_REQPKT           (_ADI_MSK(0x00000020,uint16_t))
-#define ENUM_USB_EP_RXCSR_H_NO_REQPKT        (_ADI_MSK(0x00000000,uint16_t))  /* REQPKT: Cleared when RxPktRdy is set. */
-#define ENUM_USB_EP_RXCSR_H_REQPKT           (_ADI_MSK(0x00000020,uint16_t))  /* REQPKT: Set to request an IN transaction. */
+#define BITM_USB_EP_RXCSR_H_REQPKT           (_ADI_MSK(0x00000020,uint16_t))  /* Request Packet */
+#define ENUM_USB_EP_RXCSR_H_NO_REQPKT        (_ADI_MSK(0x00000000,uint16_t))  /* REQPKT: No Request */
+#define ENUM_USB_EP_RXCSR_H_REQPKT           (_ADI_MSK(0x00000020,uint16_t))  /* REQPKT: Send IN Tokens to Device */
 
-#define BITM_USB_EP_RXCSR_H_FLUSHFIFO        (_ADI_MSK(0x00000010,uint16_t))
-#define ENUM_USB_EP_RXCSR_H_NO_FLUSH         (_ADI_MSK(0x00000000,uint16_t))  /* FLUSHFIFO:  */
-#define ENUM_USB_EP_RXCSR_H_FLUSH            (_ADI_MSK(0x00000010,uint16_t))  /* FLUSHFIFO:  */
+#define BITM_USB_EP_RXCSR_H_FLUSHFIFO        (_ADI_MSK(0x00000010,uint16_t))  /* Flush Endpoint FIFO */
+#define ENUM_USB_EP_RXCSR_H_NO_FLUSH         (_ADI_MSK(0x00000000,uint16_t))  /* FLUSHFIFO: No Flush */
+#define ENUM_USB_EP_RXCSR_H_FLUSH            (_ADI_MSK(0x00000010,uint16_t))  /* FLUSHFIFO: Flush Endpoint FIFO */
 
-#define BITM_USB_EP_RXCSR_H_NAKTODERR        (_ADI_MSK(0x00000008,uint16_t))
-#define ENUM_USB_EP_RXCSR_H_NO_NAKTO         (_ADI_MSK(0x00000000,uint16_t))  /* NAKTODERR:  */
-#define ENUM_USB_EP_RXCSR_H_NAKTO            (_ADI_MSK(0x00000008,uint16_t))  /* NAKTODERR:  */
+#define BITM_USB_EP_RXCSR_H_NAKTODERR        (_ADI_MSK(0x00000008,uint16_t))  /* NAK Timeout Data Error */
+#define ENUM_USB_EP_RXCSR_H_NO_NAKTO         (_ADI_MSK(0x00000000,uint16_t))  /* NAKTODERR: No Status */
+#define ENUM_USB_EP_RXCSR_H_NAKTO            (_ADI_MSK(0x00000008,uint16_t))  /* NAKTODERR: NAK Timeout Data Error */
 
-#define BITM_USB_EP_RXCSR_H_RXTOERR          (_ADI_MSK(0x00000004,uint16_t))
-#define ENUM_USB_EP_RXCSR_H_NO_RXTOERR       (_ADI_MSK(0x00000000,uint16_t))  /* RXTOERR:  */
-#define ENUM_USB_EP_RXCSR_H_RXTOERR          (_ADI_MSK(0x00000004,uint16_t))  /* RXTOERR: Set when no more packets can be loaded into the Rx FIFO */
+#define BITM_USB_EP_RXCSR_H_RXTOERR          (_ADI_MSK(0x00000004,uint16_t))  /* Rx Timeout Error */
+#define ENUM_USB_EP_RXCSR_H_NO_RXTOERR       (_ADI_MSK(0x00000000,uint16_t))  /* RXTOERR: No Status */
+#define ENUM_USB_EP_RXCSR_H_RXTOERR          (_ADI_MSK(0x00000004,uint16_t))  /* RXTOERR: Rx Timeout Error */
 
-#define BITM_USB_EP_RXCSR_H_FIFOFULL         (_ADI_MSK(0x00000002,uint16_t))
-#define ENUM_USB_EP_RXCSR_H_NO_FIFOFUL       (_ADI_MSK(0x00000000,uint16_t))  /* FIFOFULL:  */
-#define ENUM_USB_EP_RXCSR_H_FIFOFUL          (_ADI_MSK(0x00000002,uint16_t))  /* FIFOFULL: No more packets can be loaded into the Rx FIFO. */
+#define BITM_USB_EP_RXCSR_H_FIFOFULL         (_ADI_MSK(0x00000002,uint16_t))  /* FIFO Full */
+#define ENUM_USB_EP_RXCSR_H_NO_FIFOFUL       (_ADI_MSK(0x00000000,uint16_t))  /* FIFOFULL: No Status */
+#define ENUM_USB_EP_RXCSR_H_FIFOFUL          (_ADI_MSK(0x00000002,uint16_t))  /* FIFOFULL: FIFO Full */
 
-#define BITM_USB_EP_RXCSR_H_RXPKTRDY         (_ADI_MSK(0x00000001,uint16_t))
-#define ENUM_USB_EP_RXCSR_H_NO_PKTRDY        (_ADI_MSK(0x00000000,uint16_t))  /* RXPKTRDY:  */
-#define ENUM_USB_EP_RXCSR_H_PKTRDY           (_ADI_MSK(0x00000001,uint16_t))  /* RXPKTRDY: This bit is set when a data packet has been received */
+#define BITM_USB_EP_RXCSR_H_RXPKTRDY         (_ADI_MSK(0x00000001,uint16_t))  /* Rx Packet Ready */
+#define ENUM_USB_EP_RXCSR_H_NO_PKTRDY        (_ADI_MSK(0x00000000,uint16_t))  /* RXPKTRDY: No Rx Packet */
+#define ENUM_USB_EP_RXCSR_H_PKTRDY           (_ADI_MSK(0x00000001,uint16_t))  /* RXPKTRDY: Rx Packet in Endpoint FIFO */
 
 /* ------------------------------------------------------------------------------------------------------------------------
         USB_EP_RXCSR_P                       Pos/Masks                        Description
    ------------------------------------------------------------------------------------------------------------------------ */
-#define BITP_USB_EP_RXCSR_P_AUTOCLR          15
-#define BITP_USB_EP_RXCSR_P_ISO              14
-#define BITP_USB_EP_RXCSR_P_DMAREQEN         13
-#define BITP_USB_EP_RXCSR_P_DNYETPERR        12
-#define BITP_USB_EP_RXCSR_P_DMAREQMODE       11
-#define BITP_USB_EP_RXCSR_P_INCOMPRX          8
-#define BITP_USB_EP_RXCSR_P_CLRDATATGL        7
-#define BITP_USB_EP_RXCSR_P_SENTSTALL         6
-#define BITP_USB_EP_RXCSR_P_SENDSTALL         5
-#define BITP_USB_EP_RXCSR_P_FLUSHFIFO         4
-#define BITP_USB_EP_RXCSR_P_DATAERR           3
-#define BITP_USB_EP_RXCSR_P_ORUNERR           2
-#define BITP_USB_EP_RXCSR_P_FIFOFULL          1
-#define BITP_USB_EP_RXCSR_P_RXPKTRDY          0
+#define BITP_USB_EP_RXCSR_P_AUTOCLR          15                               /* Auto Clear Enable */
+#define BITP_USB_EP_RXCSR_P_ISO              14                               /* Isochronous Transfers */
+#define BITP_USB_EP_RXCSR_P_DMAREQEN         13                               /* DMA Request Enable Rx EP */
+#define BITP_USB_EP_RXCSR_P_DNYETPERR        12                               /* Disable NYET Handshake */
+#define BITP_USB_EP_RXCSR_P_DMAREQMODE       11                               /* DMA Mode Select */
+#define BITP_USB_EP_RXCSR_P_INCOMPRX          8                               /* Incomplete Rx */
+#define BITP_USB_EP_RXCSR_P_CLRDATATGL        7                               /* Clear Endpoint Data Toggle */
+#define BITP_USB_EP_RXCSR_P_SENTSTALL         6                               /* Sent STALL */
+#define BITP_USB_EP_RXCSR_P_SENDSTALL         5                               /* Send STALL */
+#define BITP_USB_EP_RXCSR_P_FLUSHFIFO         4                               /* Flush Endpoint FIFO */
+#define BITP_USB_EP_RXCSR_P_DATAERR           3                               /* Data Error */
+#define BITP_USB_EP_RXCSR_P_ORUNERR           2                               /* OUT Run Error */
+#define BITP_USB_EP_RXCSR_P_FIFOFULL          1                               /* FIFO Full */
+#define BITP_USB_EP_RXCSR_P_RXPKTRDY          0                               /* Rx Packet Ready */
 
-#define BITM_USB_EP_RXCSR_P_AUTOCLR          (_ADI_MSK(0x00008000,uint16_t))
-#define ENUM_USB_EP_RXCSR_P_NO_AUTOCLR       (_ADI_MSK(0x00000000,uint16_t))  /* AUTOCLR:  */
-#define ENUM_USB_EP_RXCSR_P_AUTOCLR          (_ADI_MSK(0x00008000,uint16_t))  /* AUTOCLR:  */
+#define BITM_USB_EP_RXCSR_P_AUTOCLR          (_ADI_MSK(0x00008000,uint16_t))  /* Auto Clear Enable */
+#define ENUM_USB_EP_RXCSR_P_NO_AUTOCLR       (_ADI_MSK(0x00000000,uint16_t))  /* AUTOCLR: Disable Auto Clear */
+#define ENUM_USB_EP_RXCSR_P_AUTOCLR          (_ADI_MSK(0x00008000,uint16_t))  /* AUTOCLR: Enable Auto Clear */
 
-#define BITM_USB_EP_RXCSR_P_ISO              (_ADI_MSK(0x00004000,uint16_t))
+#define BITM_USB_EP_RXCSR_P_ISO              (_ADI_MSK(0x00004000,uint16_t))  /* Isochronous Transfers */
 #define ENUM_USB_EP_RXCSR_P_ISODIS           (_ADI_MSK(0x00000000,uint16_t))  /* ISO: This bit should be cleared for bulk or interrupt transfers. */
 #define ENUM_USB_EP_RXCSR_P_ISOEN            (_ADI_MSK(0x00004000,uint16_t))  /* ISO: This bit should be set for isochronous transfers. */
 
-#define BITM_USB_EP_RXCSR_P_DMAREQEN         (_ADI_MSK(0x00002000,uint16_t))
-#define ENUM_USB_EP_RXCSR_P_DMAREQDIS        (_ADI_MSK(0x00000000,uint16_t))  /* DMAREQEN: Disable DMA requests for the RX endpoint. */
-#define ENUM_USB_EP_RXCSR_P_DMAREQEN         (_ADI_MSK(0x00002000,uint16_t))  /* DMAREQEN: Enable DMA requests for the RX endpoint. */
+#define BITM_USB_EP_RXCSR_P_DMAREQEN         (_ADI_MSK(0x00002000,uint16_t))  /* DMA Request Enable Rx EP */
+#define ENUM_USB_EP_RXCSR_P_DMAREQDIS        (_ADI_MSK(0x00000000,uint16_t))  /* DMAREQEN: Disable DMA Request */
+#define ENUM_USB_EP_RXCSR_P_DMAREQEN         (_ADI_MSK(0x00002000,uint16_t))  /* DMAREQEN: Enable DMA Request */
 
-#define BITM_USB_EP_RXCSR_P_DNYETPERR        (_ADI_MSK(0x00001000,uint16_t))
-#define ENUM_USB_EP_RXCSR_P_DNYTERREN        (_ADI_MSK(0x00000000,uint16_t))  /* DNYETPERR:  */
-#define ENUM_USB_EP_RXCSR_P_DNYTERRDIS       (_ADI_MSK(0x00001000,uint16_t))  /* DNYETPERR:  */
+#define BITM_USB_EP_RXCSR_P_DNYETPERR        (_ADI_MSK(0x00001000,uint16_t))  /* Disable NYET Handshake */
+#define ENUM_USB_EP_RXCSR_P_DNYTERREN        (_ADI_MSK(0x00000000,uint16_t))  /* DNYETPERR: Enable NYET Handshake */
+#define ENUM_USB_EP_RXCSR_P_DNYTERRDIS       (_ADI_MSK(0x00001000,uint16_t))  /* DNYETPERR: Disable NYET Handshake */
 
-#define BITM_USB_EP_RXCSR_P_DMAREQMODE       (_ADI_MSK(0x00000800,uint16_t))
-#define ENUM_USB_EP_RXCSR_P_DMARQMODE0       (_ADI_MSK(0x00000000,uint16_t))  /* DMAREQMODE: This bit is not used in peripheral mode. */
-#define ENUM_USB_EP_RXCSR_P_DMARQMODE1       (_ADI_MSK(0x00000800,uint16_t))  /* DMAREQMODE:  */
+#define BITM_USB_EP_RXCSR_P_DMAREQMODE       (_ADI_MSK(0x00000800,uint16_t))  /* DMA Mode Select */
+#define ENUM_USB_EP_RXCSR_P_DMARQMODE0       (_ADI_MSK(0x00000000,uint16_t))  /* DMAREQMODE: DMA Request Mode 0 */
+#define ENUM_USB_EP_RXCSR_P_DMARQMODE1       (_ADI_MSK(0x00000800,uint16_t))  /* DMAREQMODE: DMA Request Mode 1 */
 
-#define BITM_USB_EP_RXCSR_P_INCOMPRX         (_ADI_MSK(0x00000100,uint16_t))
-#define ENUM_USB_EP_RXCSR_P_NO_INCOMP        (_ADI_MSK(0x00000000,uint16_t))  /* INCOMPRX:  */
-#define ENUM_USB_EP_RXCSR_P_INCOMP           (_ADI_MSK(0x00000100,uint16_t))  /* INCOMPRX:  */
+#define BITM_USB_EP_RXCSR_P_INCOMPRX         (_ADI_MSK(0x00000100,uint16_t))  /* Incomplete Rx */
+#define ENUM_USB_EP_RXCSR_P_NO_INCOMP        (_ADI_MSK(0x00000000,uint16_t))  /* INCOMPRX: No Status */
+#define ENUM_USB_EP_RXCSR_P_INCOMP           (_ADI_MSK(0x00000100,uint16_t))  /* INCOMPRX: Incomplete Rx */
 
-#define BITM_USB_EP_RXCSR_P_CLRDATATGL       (_ADI_MSK(0x00000080,uint16_t))
-#define ENUM_USB_EP_RXCSR_P_NO_CLRTGL        (_ADI_MSK(0x00000000,uint16_t))  /* CLRDATATGL:  */
-#define ENUM_USB_EP_RXCSR_P_CLRTGL           (_ADI_MSK(0x00000080,uint16_t))  /* CLRDATATGL: If this bit is set, the data toggle bit will be cleared. */
+#define BITM_USB_EP_RXCSR_P_CLRDATATGL       (_ADI_MSK(0x00000080,uint16_t))  /* Clear Endpoint Data Toggle */
+#define ENUM_USB_EP_RXCSR_P_NO_CLRTGL        (_ADI_MSK(0x00000000,uint16_t))  /* CLRDATATGL: No Action */
+#define ENUM_USB_EP_RXCSR_P_CLRTGL           (_ADI_MSK(0x00000080,uint16_t))  /* CLRDATATGL: Reset EP Data Toggle to 0 */
 
-#define BITM_USB_EP_RXCSR_P_SENTSTALL        (_ADI_MSK(0x00000040,uint16_t))
-#define ENUM_USB_EP_RXCSR_P_NO_STALSNT       (_ADI_MSK(0x00000000,uint16_t))  /* SENTSTALL: The CPU should clear this bit. */
-#define ENUM_USB_EP_RXCSR_P_STALSNT          (_ADI_MSK(0x00000040,uint16_t))  /* SENTSTALL: This bit is set when a STALL handshake is transmitted */
+#define BITM_USB_EP_RXCSR_P_SENTSTALL        (_ADI_MSK(0x00000040,uint16_t))  /* Sent STALL */
+#define ENUM_USB_EP_RXCSR_P_NO_STALSNT       (_ADI_MSK(0x00000000,uint16_t))  /* SENTSTALL: No Status */
+#define ENUM_USB_EP_RXCSR_P_STALSNT          (_ADI_MSK(0x00000040,uint16_t))  /* SENTSTALL: STALL Handshake Transmitted */
 
-#define BITM_USB_EP_RXCSR_P_SENDSTALL        (_ADI_MSK(0x00000020,uint16_t))
-#define ENUM_USB_EP_RXCSR_P_NO_STALL         (_ADI_MSK(0x00000000,uint16_t))  /* SENDSTALL: The CPU clears this bit to terminate the stall condition. */
-#define ENUM_USB_EP_RXCSR_P_STALL            (_ADI_MSK(0x00000020,uint16_t))  /* SENDSTALL: This bit should be set to send a STALL handshake */
+#define BITM_USB_EP_RXCSR_P_SENDSTALL        (_ADI_MSK(0x00000020,uint16_t))  /* Send STALL */
+#define ENUM_USB_EP_RXCSR_P_NO_STALL         (_ADI_MSK(0x00000000,uint16_t))  /* SENDSTALL: No Action */
+#define ENUM_USB_EP_RXCSR_P_STALL            (_ADI_MSK(0x00000020,uint16_t))  /* SENDSTALL: Request STALL Handshake */
 
-#define BITM_USB_EP_RXCSR_P_FLUSHFIFO        (_ADI_MSK(0x00000010,uint16_t))
-#define ENUM_USB_EP_RXCSR_P_NO_FLUSH         (_ADI_MSK(0x00000000,uint16_t))  /* FLUSHFIFO:  */
-#define ENUM_USB_EP_RXCSR_P_FLUSH            (_ADI_MSK(0x00000010,uint16_t))  /* FLUSHFIFO:  */
+#define BITM_USB_EP_RXCSR_P_FLUSHFIFO        (_ADI_MSK(0x00000010,uint16_t))  /* Flush Endpoint FIFO */
+#define ENUM_USB_EP_RXCSR_P_NO_FLUSH         (_ADI_MSK(0x00000000,uint16_t))  /* FLUSHFIFO: No Flush */
+#define ENUM_USB_EP_RXCSR_P_FLUSH            (_ADI_MSK(0x00000010,uint16_t))  /* FLUSHFIFO: Flush Endpoint FIFO */
 
-#define BITM_USB_EP_RXCSR_P_DATAERR          (_ADI_MSK(0x00000008,uint16_t))
-#define ENUM_USB_EP_RXCSR_P_NO_DATAERR       (_ADI_MSK(0x00000000,uint16_t))  /* DATAERR: Cleared when RxPktRdy is cleared. */
-#define ENUM_USB_EP_RXCSR_P_DATAERR          (_ADI_MSK(0x00000008,uint16_t))  /* DATAERR:  */
+#define BITM_USB_EP_RXCSR_P_DATAERR          (_ADI_MSK(0x00000008,uint16_t))  /* Data Error */
+#define ENUM_USB_EP_RXCSR_P_NO_DATAERR       (_ADI_MSK(0x00000000,uint16_t))  /* DATAERR: No Status */
+#define ENUM_USB_EP_RXCSR_P_DATAERR          (_ADI_MSK(0x00000008,uint16_t))  /* DATAERR: Data Error */
 
-#define BITM_USB_EP_RXCSR_P_ORUNERR          (_ADI_MSK(0x00000004,uint16_t))
-#define ENUM_USB_EP_RXCSR_P_NO_ORUNERR       (_ADI_MSK(0x00000000,uint16_t))  /* ORUNERR:  */
-#define ENUM_USB_EP_RXCSR_P_ORUNERR          (_ADI_MSK(0x00000004,uint16_t))  /* ORUNERR: Set if an OUT packet cannot be loaded into the Rx FIFO. */
+#define BITM_USB_EP_RXCSR_P_ORUNERR          (_ADI_MSK(0x00000004,uint16_t))  /* OUT Run Error */
+#define ENUM_USB_EP_RXCSR_P_NO_ORUNERR       (_ADI_MSK(0x00000000,uint16_t))  /* ORUNERR: No Status */
+#define ENUM_USB_EP_RXCSR_P_ORUNERR          (_ADI_MSK(0x00000004,uint16_t))  /* ORUNERR: OUT Run Error */
 
-#define BITM_USB_EP_RXCSR_P_FIFOFULL         (_ADI_MSK(0x00000002,uint16_t))
-#define ENUM_USB_EP_RXCSR_P_NO_FIFOFUL       (_ADI_MSK(0x00000000,uint16_t))  /* FIFOFULL:  */
-#define ENUM_USB_EP_RXCSR_P_FIFOFUL          (_ADI_MSK(0x00000002,uint16_t))  /* FIFOFULL: No more packets can be loaded into the Rx FIFO. */
+#define BITM_USB_EP_RXCSR_P_FIFOFULL         (_ADI_MSK(0x00000002,uint16_t))  /* FIFO Full */
+#define ENUM_USB_EP_RXCSR_P_NO_FIFOFUL       (_ADI_MSK(0x00000000,uint16_t))  /* FIFOFULL: No Status */
+#define ENUM_USB_EP_RXCSR_P_FIFOFUL          (_ADI_MSK(0x00000002,uint16_t))  /* FIFOFULL: FIFO Full */
 
-#define BITM_USB_EP_RXCSR_P_RXPKTRDY         (_ADI_MSK(0x00000001,uint16_t))
-#define ENUM_USB_EP_RXCSR_P_NO_PKTRDY        (_ADI_MSK(0x00000000,uint16_t))  /* RXPKTRDY:  */
-#define ENUM_USB_EP_RXCSR_P_PKTRDY           (_ADI_MSK(0x00000001,uint16_t))  /* RXPKTRDY:  */
+#define BITM_USB_EP_RXCSR_P_RXPKTRDY         (_ADI_MSK(0x00000001,uint16_t))  /* Rx Packet Ready */
+#define ENUM_USB_EP_RXCSR_P_NO_PKTRDY        (_ADI_MSK(0x00000000,uint16_t))  /* RXPKTRDY: No Rx Packet */
+#define ENUM_USB_EP_RXCSR_P_PKTRDY           (_ADI_MSK(0x00000001,uint16_t))  /* RXPKTRDY: Rx Packet in Endpoint FIFO */
+
+/* ------------------------------------------------------------------------------------------------------------------------
+        USB_EP0_CNT                          Pos/Masks                        Description
+   ------------------------------------------------------------------------------------------------------------------------ */
+#define BITP_USB_EP0_CNT_RXCNT                0                               /* Rx Byte Count Value */
+#define BITM_USB_EP0_CNT_RXCNT               (_ADI_MSK(0x0000007F,uint16_t))  /* Rx Byte Count Value */
 
 /* ------------------------------------------------------------------------------------------------------------------------
         USB_EP_RXCNT                         Pos/Masks                        Description
    ------------------------------------------------------------------------------------------------------------------------ */
-#define BITP_USB_EP_RXCNT_EPRXCNT             0
-#define BITM_USB_EP_RXCNT_EPRXCNT            (_ADI_MSK(0x00003FFF,uint16_t))
+#define BITP_USB_EP_RXCNT_EPRXCNT             0                               /* EP Rx Count */
+#define BITM_USB_EP_RXCNT_EPRXCNT            (_ADI_MSK(0x00003FFF,uint16_t))  /* EP Rx Count */
+
+/* ------------------------------------------------------------------------------------------------------------------------
+        USB_EP0_TYPE                         Pos/Masks                        Description
+   ------------------------------------------------------------------------------------------------------------------------ */
+#define BITP_USB_EP0_TYPE_SPEED               0                               /* Speed of Operation Value */
+#define BITM_USB_EP0_TYPE_SPEED              (_ADI_MSK(0x00000003,uint8_t))   /* Speed of Operation Value */
 
 /* ------------------------------------------------------------------------------------------------------------------------
         USB_EP_TXTYPE                        Pos/Masks                        Description
    ------------------------------------------------------------------------------------------------------------------------ */
-#define BITP_USB_EP_TXTYPE_SPEED              6                               /* The operating speed of the target peripheral device */
-#define BITP_USB_EP_TXTYPE_PROTOCOL           4                               /* Protocol */
+#define BITP_USB_EP_TXTYPE_SPEED              6                               /* Speed of Operation Value */
+#define BITP_USB_EP_TXTYPE_PROTOCOL           4                               /* Protocol for Transfer */
 #define BITP_USB_EP_TXTYPE_TGTEP              0                               /* Target Endpoint Number */
 
-#define BITM_USB_EP_TXTYPE_SPEED             (_ADI_MSK(0x000000C0,uint8_t))   /* The operating speed of the target peripheral device */
-#define ENUM_USB_EP_TXTYPE_UNUSED            (_ADI_MSK(0x00000000,uint8_t))   /* SPEED: Unused - same speed as the core */
+#define BITM_USB_EP_TXTYPE_SPEED             (_ADI_MSK(0x000000C0,uint8_t))   /* Speed of Operation Value */
+#define ENUM_USB_EP_TXTYPE_UNUSED            (_ADI_MSK(0x00000000,uint8_t))   /* SPEED: Same Speed as the Core */
 #define ENUM_USB_EP_TXTYPE_HIGHSPEED         (_ADI_MSK(0x00000040,uint8_t))   /* SPEED: High Speed */
 #define ENUM_USB_EP_TXTYPE_FULLSPEED         (_ADI_MSK(0x00000080,uint8_t))   /* SPEED: Full Speed */
 #define ENUM_USB_EP_TXTYPE_LOWSPEED          (_ADI_MSK(0x000000C0,uint8_t))   /* SPEED: Low Speed */
 
-#define BITM_USB_EP_TXTYPE_PROTOCOL          (_ADI_MSK(0x00000030,uint8_t))   /* Protocol */
+#define BITM_USB_EP_TXTYPE_PROTOCOL          (_ADI_MSK(0x00000030,uint8_t))   /* Protocol for Transfer */
 #define ENUM_USB_EP_TXTYPE_CONTROL           (_ADI_MSK(0x00000000,uint8_t))   /* PROTOCOL: Control */
 #define ENUM_USB_EP_TXTYPE_ISO               (_ADI_MSK(0x00000010,uint8_t))   /* PROTOCOL: Isochronous */
 #define ENUM_USB_EP_TXTYPE_BULK              (_ADI_MSK(0x00000020,uint8_t))   /* PROTOCOL: Bulk */
 #define ENUM_USB_EP_TXTYPE_INT               (_ADI_MSK(0x00000030,uint8_t))   /* PROTOCOL: Interrupt */
 
 #define BITM_USB_EP_TXTYPE_TGTEP             (_ADI_MSK(0x0000000F,uint8_t))   /* Target Endpoint Number */
-#define ENUM_USB_EP_TXTYPE_TGTEP0            (_ADI_MSK(0x00000000,uint8_t))   /* TGTEP:  */
-#define ENUM_USB_EP_TXTYPE_TGTEP1            (_ADI_MSK(0x00000001,uint8_t))   /* TGTEP:  */
-#define ENUM_USB_EP_TXTYPE_TGTEP10           (_ADI_MSK(0x0000000A,uint8_t))   /* TGTEP:  */
-#define ENUM_USB_EP_TXTYPE_TGTEP11           (_ADI_MSK(0x0000000B,uint8_t))   /* TGTEP:  */
-#define ENUM_USB_EP_TXTYPE_TGTEP12           (_ADI_MSK(0x0000000C,uint8_t))   /* TGTEP:  */
-#define ENUM_USB_EP_TXTYPE_TGTEP13           (_ADI_MSK(0x0000000D,uint8_t))   /* TGTEP:  */
-#define ENUM_USB_EP_TXTYPE_TGTEP14           (_ADI_MSK(0x0000000E,uint8_t))   /* TGTEP:  */
-#define ENUM_USB_EP_TXTYPE_TGTEP15           (_ADI_MSK(0x0000000F,uint8_t))   /* TGTEP:  */
-#define ENUM_USB_EP_TXTYPE_TGTEP2            (_ADI_MSK(0x00000002,uint8_t))   /* TGTEP:  */
-#define ENUM_USB_EP_TXTYPE_TGTEP3            (_ADI_MSK(0x00000003,uint8_t))   /* TGTEP:  */
-#define ENUM_USB_EP_TXTYPE_TGTEP4            (_ADI_MSK(0x00000004,uint8_t))   /* TGTEP:  */
-#define ENUM_USB_EP_TXTYPE_TGTEP5            (_ADI_MSK(0x00000005,uint8_t))   /* TGTEP:  */
-#define ENUM_USB_EP_TXTYPE_TGTEP6            (_ADI_MSK(0x00000006,uint8_t))   /* TGTEP:  */
-#define ENUM_USB_EP_TXTYPE_TGTEP7            (_ADI_MSK(0x00000007,uint8_t))   /* TGTEP:  */
-#define ENUM_USB_EP_TXTYPE_TGTEP8            (_ADI_MSK(0x00000008,uint8_t))   /* TGTEP:  */
-#define ENUM_USB_EP_TXTYPE_TGTEP9            (_ADI_MSK(0x00000009,uint8_t))   /* TGTEP:  */
+#define ENUM_USB_EP_TXTYPE_TGTEP0            (_ADI_MSK(0x00000000,uint8_t))   /* TGTEP: Endpoint 0 */
+#define ENUM_USB_EP_TXTYPE_TGTEP1            (_ADI_MSK(0x00000001,uint8_t))   /* TGTEP: Endpoint 1 */
+#define ENUM_USB_EP_TXTYPE_TGTEP10           (_ADI_MSK(0x0000000A,uint8_t))   /* TGTEP: Endpoint 10 */
+#define ENUM_USB_EP_TXTYPE_TGTEP11           (_ADI_MSK(0x0000000B,uint8_t))   /* TGTEP: Endpoint 11 */
+#define ENUM_USB_EP_TXTYPE_TGTEP12           (_ADI_MSK(0x0000000C,uint8_t))   /* TGTEP: Endpoint 12 */
+#define ENUM_USB_EP_TXTYPE_TGTEP13           (_ADI_MSK(0x0000000D,uint8_t))   /* TGTEP: Endpoint 13 */
+#define ENUM_USB_EP_TXTYPE_TGTEP14           (_ADI_MSK(0x0000000E,uint8_t))   /* TGTEP: Endpoint 14 */
+#define ENUM_USB_EP_TXTYPE_TGTEP15           (_ADI_MSK(0x0000000F,uint8_t))   /* TGTEP: Endpoint 15 */
+#define ENUM_USB_EP_TXTYPE_TGTEP2            (_ADI_MSK(0x00000002,uint8_t))   /* TGTEP: Endpoint 2 */
+#define ENUM_USB_EP_TXTYPE_TGTEP3            (_ADI_MSK(0x00000003,uint8_t))   /* TGTEP: Endpoint 3 */
+#define ENUM_USB_EP_TXTYPE_TGTEP4            (_ADI_MSK(0x00000004,uint8_t))   /* TGTEP: Endpoint 4 */
+#define ENUM_USB_EP_TXTYPE_TGTEP5            (_ADI_MSK(0x00000005,uint8_t))   /* TGTEP: Endpoint 5 */
+#define ENUM_USB_EP_TXTYPE_TGTEP6            (_ADI_MSK(0x00000006,uint8_t))   /* TGTEP: Endpoint 6 */
+#define ENUM_USB_EP_TXTYPE_TGTEP7            (_ADI_MSK(0x00000007,uint8_t))   /* TGTEP: Endpoint 7 */
+#define ENUM_USB_EP_TXTYPE_TGTEP8            (_ADI_MSK(0x00000008,uint8_t))   /* TGTEP: Endpoint 8 */
+#define ENUM_USB_EP_TXTYPE_TGTEP9            (_ADI_MSK(0x00000009,uint8_t))   /* TGTEP: Endpoint 9 */
+
+/* ------------------------------------------------------------------------------------------------------------------------
+        USB_EP0_NAKLIMIT                     Pos/Masks                        Description
+   ------------------------------------------------------------------------------------------------------------------------ */
+#define BITP_USB_EP0_NAKLIMIT_VALUE           0                               /* Endpoint 0 Timeout Value (in Frames) */
+#define BITM_USB_EP0_NAKLIMIT_VALUE          (_ADI_MSK(0x0000001F,uint8_t))   /* Endpoint 0 Timeout Value (in Frames) */
 
 /* ------------------------------------------------------------------------------------------------------------------------
         USB_EP_RXTYPE                        Pos/Masks                        Description
    ------------------------------------------------------------------------------------------------------------------------ */
-#define BITP_USB_EP_RXTYPE_SPEED              6                               /* Operating speed of the target peripheral device */
-#define BITP_USB_EP_RXTYPE_PROTOCOL           4                               /* Protocol */
+#define BITP_USB_EP_RXTYPE_SPEED              6                               /* Speed of Operation Value */
+#define BITP_USB_EP_RXTYPE_PROTOCOL           4                               /* Protocol for Transfer */
 #define BITP_USB_EP_RXTYPE_TGTEP              0                               /* Target Endpoint Number */
 
-#define BITM_USB_EP_RXTYPE_SPEED             (_ADI_MSK(0x000000C0,uint8_t))   /* Operating speed of the target peripheral device */
-#define ENUM_USB_EP_RXTYPE_UNUSED            (_ADI_MSK(0x00000000,uint8_t))   /* SPEED: Unused - same speed as the core */
+#define BITM_USB_EP_RXTYPE_SPEED             (_ADI_MSK(0x000000C0,uint8_t))   /* Speed of Operation Value */
+#define ENUM_USB_EP_RXTYPE_UNUSED            (_ADI_MSK(0x00000000,uint8_t))   /* SPEED: Same Speed as the Core */
 #define ENUM_USB_EP_RXTYPE_HIGHSPEED         (_ADI_MSK(0x00000040,uint8_t))   /* SPEED: High Speed */
 #define ENUM_USB_EP_RXTYPE_FULLSPEED         (_ADI_MSK(0x00000080,uint8_t))   /* SPEED: Full Speed */
 #define ENUM_USB_EP_RXTYPE_LOWSPEED          (_ADI_MSK(0x000000C0,uint8_t))   /* SPEED: Low Speed */
 
-#define BITM_USB_EP_RXTYPE_PROTOCOL          (_ADI_MSK(0x00000030,uint8_t))   /* Protocol */
+#define BITM_USB_EP_RXTYPE_PROTOCOL          (_ADI_MSK(0x00000030,uint8_t))   /* Protocol for Transfer */
 #define ENUM_USB_EP_RXTYPE_CONTROL           (_ADI_MSK(0x00000000,uint8_t))   /* PROTOCOL: Control */
 #define ENUM_USB_EP_RXTYPE_ISO               (_ADI_MSK(0x00000010,uint8_t))   /* PROTOCOL: Isochronous */
 #define ENUM_USB_EP_RXTYPE_BULK              (_ADI_MSK(0x00000020,uint8_t))   /* PROTOCOL: Bulk */
 #define ENUM_USB_EP_RXTYPE_INT               (_ADI_MSK(0x00000030,uint8_t))   /* PROTOCOL: Interrupt */
 
 #define BITM_USB_EP_RXTYPE_TGTEP             (_ADI_MSK(0x0000000F,uint8_t))   /* Target Endpoint Number */
-#define ENUM_USB_EP_RXTYPE_TGTEP0            (_ADI_MSK(0x00000000,uint8_t))   /* TGTEP:  */
-#define ENUM_USB_EP_RXTYPE_TGTEP1            (_ADI_MSK(0x00000001,uint8_t))   /* TGTEP:  */
-#define ENUM_USB_EP_RXTYPE_TGTEP10           (_ADI_MSK(0x0000000A,uint8_t))   /* TGTEP:  */
-#define ENUM_USB_EP_RXTYPE_TGTEP11           (_ADI_MSK(0x0000000B,uint8_t))   /* TGTEP:  */
-#define ENUM_USB_EP_RXTYPE_TGTEP12           (_ADI_MSK(0x0000000C,uint8_t))   /* TGTEP:  */
-#define ENUM_USB_EP_RXTYPE_TGTEP13           (_ADI_MSK(0x0000000D,uint8_t))   /* TGTEP:  */
-#define ENUM_USB_EP_RXTYPE_TGTEP14           (_ADI_MSK(0x0000000E,uint8_t))   /* TGTEP:  */
-#define ENUM_USB_EP_RXTYPE_TGTEP15           (_ADI_MSK(0x0000000F,uint8_t))   /* TGTEP:  */
-#define ENUM_USB_EP_RXTYPE_TGTEP2            (_ADI_MSK(0x00000002,uint8_t))   /* TGTEP:  */
-#define ENUM_USB_EP_RXTYPE_TGTEP3            (_ADI_MSK(0x00000003,uint8_t))   /* TGTEP:  */
-#define ENUM_USB_EP_RXTYPE_TGTEP4            (_ADI_MSK(0x00000004,uint8_t))   /* TGTEP:  */
-#define ENUM_USB_EP_RXTYPE_TGTEP5            (_ADI_MSK(0x00000005,uint8_t))   /* TGTEP:  */
-#define ENUM_USB_EP_RXTYPE_TGTEP6            (_ADI_MSK(0x00000006,uint8_t))   /* TGTEP:  */
-#define ENUM_USB_EP_RXTYPE_TGTEP7            (_ADI_MSK(0x00000007,uint8_t))   /* TGTEP:  */
-#define ENUM_USB_EP_RXTYPE_TGTEP8            (_ADI_MSK(0x00000008,uint8_t))   /* TGTEP:  */
-#define ENUM_USB_EP_RXTYPE_TGTEP9            (_ADI_MSK(0x00000009,uint8_t))   /* TGTEP:  */
+#define ENUM_USB_EP_RXTYPE_TGTEP0            (_ADI_MSK(0x00000000,uint8_t))   /* TGTEP: Endpoint 0 */
+#define ENUM_USB_EP_RXTYPE_TGTEP1            (_ADI_MSK(0x00000001,uint8_t))   /* TGTEP: Endpoint 1 */
+#define ENUM_USB_EP_RXTYPE_TGTEP10           (_ADI_MSK(0x0000000A,uint8_t))   /* TGTEP: Endpoint 10 */
+#define ENUM_USB_EP_RXTYPE_TGTEP11           (_ADI_MSK(0x0000000B,uint8_t))   /* TGTEP: Endpoint 11 */
+#define ENUM_USB_EP_RXTYPE_TGTEP12           (_ADI_MSK(0x0000000C,uint8_t))   /* TGTEP: Endpoint 12 */
+#define ENUM_USB_EP_RXTYPE_TGTEP13           (_ADI_MSK(0x0000000D,uint8_t))   /* TGTEP: Endpoint 13 */
+#define ENUM_USB_EP_RXTYPE_TGTEP14           (_ADI_MSK(0x0000000E,uint8_t))   /* TGTEP: Endpoint 14 */
+#define ENUM_USB_EP_RXTYPE_TGTEP15           (_ADI_MSK(0x0000000F,uint8_t))   /* TGTEP: Endpoint 15 */
+#define ENUM_USB_EP_RXTYPE_TGTEP2            (_ADI_MSK(0x00000002,uint8_t))   /* TGTEP: Endpoint 2 */
+#define ENUM_USB_EP_RXTYPE_TGTEP3            (_ADI_MSK(0x00000003,uint8_t))   /* TGTEP: Endpoint 3 */
+#define ENUM_USB_EP_RXTYPE_TGTEP4            (_ADI_MSK(0x00000004,uint8_t))   /* TGTEP: Endpoint 4 */
+#define ENUM_USB_EP_RXTYPE_TGTEP5            (_ADI_MSK(0x00000005,uint8_t))   /* TGTEP: Endpoint 5 */
+#define ENUM_USB_EP_RXTYPE_TGTEP6            (_ADI_MSK(0x00000006,uint8_t))   /* TGTEP: Endpoint 6 */
+#define ENUM_USB_EP_RXTYPE_TGTEP7            (_ADI_MSK(0x00000007,uint8_t))   /* TGTEP: Endpoint 7 */
+#define ENUM_USB_EP_RXTYPE_TGTEP8            (_ADI_MSK(0x00000008,uint8_t))   /* TGTEP: Endpoint 8 */
+#define ENUM_USB_EP_RXTYPE_TGTEP9            (_ADI_MSK(0x00000009,uint8_t))   /* TGTEP: Endpoint 9 */
+
+/* ------------------------------------------------------------------------------------------------------------------------
+        USB_EP0_CFGDATA                      Pos/Masks                        Description
+   ------------------------------------------------------------------------------------------------------------------------ */
+#define BITP_USB_EP0_CFGDATA_MPRX             7                               /* Multi-Packet Aggregate for Rx Enable */
+#define BITP_USB_EP0_CFGDATA_MPTX             6                               /* Multi-Packet Split for Tx Enable */
+#define BITP_USB_EP0_CFGDATA_BIGEND           5                               /* Big Endian Data */
+#define BITP_USB_EP0_CFGDATA_HBRX             4                               /* High Bandwidth Rx Enable */
+#define BITP_USB_EP0_CFGDATA_HBTX             3                               /* High Bandwidth Tx Enable */
+#define BITP_USB_EP0_CFGDATA_DYNFIFO          2                               /* Dynamic FIFO Size Enable */
+#define BITP_USB_EP0_CFGDATA_SOFTCON          1                               /* Soft Connect Enable */
+#define BITP_USB_EP0_CFGDATA_UTMIWID          0                               /* UTMI Data Width */
+
+#define BITM_USB_EP0_CFGDATA_MPRX            (_ADI_MSK(0x00000080,uint8_t))   /* Multi-Packet Aggregate for Rx Enable */
+#define ENUM_USB_EP0_CFGDATA_MPRXDIS         (_ADI_MSK(0x00000000,uint8_t))   /* MPRX: No Aggregate Rx Bulk Packets */
+#define ENUM_USB_EP0_CFGDATA_MPRXEN          (_ADI_MSK(0x00000080,uint8_t))   /* MPRX: Aggregate Rx Bulk Packets */
+
+#define BITM_USB_EP0_CFGDATA_MPTX            (_ADI_MSK(0x00000040,uint8_t))   /* Multi-Packet Split for Tx Enable */
+#define ENUM_USB_EP0_CFGDATA_MPTXDIS         (_ADI_MSK(0x00000000,uint8_t))   /* MPTX: No Split Tx Bulk Packets */
+#define ENUM_USB_EP0_CFGDATA_MPTXEN          (_ADI_MSK(0x00000040,uint8_t))   /* MPTX: Split Tx Bulk Packets */
+
+#define BITM_USB_EP0_CFGDATA_BIGEND          (_ADI_MSK(0x00000020,uint8_t))   /* Big Endian Data */
+#define ENUM_USB_EP0_CFGDATA_BIGENDDIS       (_ADI_MSK(0x00000000,uint8_t))   /* BIGEND: Little Endian Configuration */
+#define ENUM_USB_EP0_CFGDATA_BIGENDEN        (_ADI_MSK(0x00000020,uint8_t))   /* BIGEND: Big Endian Configuration */
+
+#define BITM_USB_EP0_CFGDATA_HBRX            (_ADI_MSK(0x00000010,uint8_t))   /* High Bandwidth Rx Enable */
+#define ENUM_USB_EP0_CFGDATA_HBRXDIS         (_ADI_MSK(0x00000000,uint8_t))   /* HBRX: No High Bandwidth Rx */
+#define ENUM_USB_EP0_CFGDATA_HBRXEN          (_ADI_MSK(0x00000010,uint8_t))   /* HBRX: High Bandwidth Rx */
+
+#define BITM_USB_EP0_CFGDATA_HBTX            (_ADI_MSK(0x00000008,uint8_t))   /* High Bandwidth Tx Enable */
+#define ENUM_USB_EP0_CFGDATA_HBTXDIS         (_ADI_MSK(0x00000000,uint8_t))   /* HBTX: No High Bandwidth Tx */
+#define ENUM_USB_EP0_CFGDATA_HBTXEN          (_ADI_MSK(0x00000008,uint8_t))   /* HBTX: High Bandwidth Tx */
+
+#define BITM_USB_EP0_CFGDATA_DYNFIFO         (_ADI_MSK(0x00000004,uint8_t))   /* Dynamic FIFO Size Enable */
+#define ENUM_USB_EP0_CFGDATA_DYNSZDIS        (_ADI_MSK(0x00000000,uint8_t))   /* DYNFIFO: No Dynamic FIFO Size */
+#define ENUM_USB_EP0_CFGDATA_DYNSZEN         (_ADI_MSK(0x00000004,uint8_t))   /* DYNFIFO: Dynamic FIFO Size */
+
+#define BITM_USB_EP0_CFGDATA_SOFTCON         (_ADI_MSK(0x00000002,uint8_t))   /* Soft Connect Enable */
+#define ENUM_USB_EP0_CFGDATA_SFTCONDIS       (_ADI_MSK(0x00000000,uint8_t))   /* SOFTCON: No Soft Connect */
+#define ENUM_USB_EP0_CFGDATA_SFTCONEN        (_ADI_MSK(0x00000002,uint8_t))   /* SOFTCON: Soft Connect */
+
+#define BITM_USB_EP0_CFGDATA_UTMIWID         (_ADI_MSK(0x00000001,uint8_t))   /* UTMI Data Width */
+#define ENUM_USB_EP0_CFGDATA_UTMIWID8        (_ADI_MSK(0x00000000,uint8_t))   /* UTMIWID: 8-bit UTMI Data Width */
+#define ENUM_USB_EP0_CFGDATA_UTMIWID16       (_ADI_MSK(0x00000001,uint8_t))   /* UTMIWID: 16-bit UTMI Data Width */
 
 /* ------------------------------------------------------------------------------------------------------------------------
         USB_DMA_IRQ                          Pos/Masks                        Description
    ------------------------------------------------------------------------------------------------------------------------ */
-#define BITP_USB_DMA_IRQ_D7                   7
-#define BITP_USB_DMA_IRQ_D6                   6
-#define BITP_USB_DMA_IRQ_D5                   5
-#define BITP_USB_DMA_IRQ_D4                   4
-#define BITP_USB_DMA_IRQ_D3                   3
-#define BITP_USB_DMA_IRQ_D2                   2
-#define BITP_USB_DMA_IRQ_D1                   1
-#define BITP_USB_DMA_IRQ_D0                   0
-#define BITM_USB_DMA_IRQ_D7                  (_ADI_MSK(0x00000080,uint8_t))
-#define BITM_USB_DMA_IRQ_D6                  (_ADI_MSK(0x00000040,uint8_t))
-#define BITM_USB_DMA_IRQ_D5                  (_ADI_MSK(0x00000020,uint8_t))
-#define BITM_USB_DMA_IRQ_D4                  (_ADI_MSK(0x00000010,uint8_t))
-#define BITM_USB_DMA_IRQ_D3                  (_ADI_MSK(0x00000008,uint8_t))
-#define BITM_USB_DMA_IRQ_D2                  (_ADI_MSK(0x00000004,uint8_t))
-#define BITM_USB_DMA_IRQ_D1                  (_ADI_MSK(0x00000002,uint8_t))
-#define BITM_USB_DMA_IRQ_D0                  (_ADI_MSK(0x00000001,uint8_t))
+#define BITP_USB_DMA_IRQ_D7                   7                               /* DMA 7 Interrupt Pending Status */
+#define BITP_USB_DMA_IRQ_D6                   6                               /* DMA 6 Interrupt Pending Status */
+#define BITP_USB_DMA_IRQ_D5                   5                               /* DMA 5 Interrupt Pending Status */
+#define BITP_USB_DMA_IRQ_D4                   4                               /* DMA 4 Interrupt Pending Status */
+#define BITP_USB_DMA_IRQ_D3                   3                               /* DMA 3 Interrupt Pending Status */
+#define BITP_USB_DMA_IRQ_D2                   2                               /* DMA 2 Interrupt Pending Status */
+#define BITP_USB_DMA_IRQ_D1                   1                               /* DMA 1 Interrupt Pending Status */
+#define BITP_USB_DMA_IRQ_D0                   0                               /* DMA 0 Interrupt Pending Status */
+#define BITM_USB_DMA_IRQ_D7                  (_ADI_MSK(0x00000080,uint8_t))   /* DMA 7 Interrupt Pending Status */
+#define BITM_USB_DMA_IRQ_D6                  (_ADI_MSK(0x00000040,uint8_t))   /* DMA 6 Interrupt Pending Status */
+#define BITM_USB_DMA_IRQ_D5                  (_ADI_MSK(0x00000020,uint8_t))   /* DMA 5 Interrupt Pending Status */
+#define BITM_USB_DMA_IRQ_D4                  (_ADI_MSK(0x00000010,uint8_t))   /* DMA 4 Interrupt Pending Status */
+#define BITM_USB_DMA_IRQ_D3                  (_ADI_MSK(0x00000008,uint8_t))   /* DMA 3 Interrupt Pending Status */
+#define BITM_USB_DMA_IRQ_D2                  (_ADI_MSK(0x00000004,uint8_t))   /* DMA 2 Interrupt Pending Status */
+#define BITM_USB_DMA_IRQ_D1                  (_ADI_MSK(0x00000002,uint8_t))   /* DMA 1 Interrupt Pending Status */
+#define BITM_USB_DMA_IRQ_D0                  (_ADI_MSK(0x00000001,uint8_t))   /* DMA 0 Interrupt Pending Status */
 
 /* ------------------------------------------------------------------------------------------------------------------------
         USB_DMA_CTL                          Pos/Masks                        Description
    ------------------------------------------------------------------------------------------------------------------------ */
 #define BITP_USB_DMA_CTL_BRSTM                9                               /* Burst Mode */
 #define BITP_USB_DMA_CTL_ERR                  8                               /* Bus Error */
-#define BITP_USB_DMA_CTL_EP                   4                               /* DMA Endpoint Assignment */
+#define BITP_USB_DMA_CTL_EP                   4                               /* DMA Channel Endpoint Assignment */
 #define BITP_USB_DMA_CTL_IE                   3                               /* DMA Interrupt Enable */
 #define BITP_USB_DMA_CTL_MODE                 2                               /* DMA Mode */
 #define BITP_USB_DMA_CTL_DIR                  1                               /* DMA Transfer Direction */
 #define BITP_USB_DMA_CTL_EN                   0                               /* DMA Enable */
 
 #define BITM_USB_DMA_CTL_BRSTM               (_ADI_MSK(0x00000600,uint16_t))  /* Burst Mode */
-#define ENUM_USB_DMA_CTL_BRSTM00             (_ADI_MSK(0x00000000,uint16_t))  /* BRSTM: Bursts of unspecified length */
-#define ENUM_USB_DMA_CTL_BRSTM01             (_ADI_MSK(0x00000200,uint16_t))  /* BRSTM: INCR4 or unspecified length */
-#define ENUM_USB_DMA_CTL_BRSTM10             (_ADI_MSK(0x00000400,uint16_t))  /* BRSTM: INCR8, INCR4, or unspecified length */
-#define ENUM_USB_DMA_CTL_BRSTM11             (_ADI_MSK(0x00000600,uint16_t))  /* BRSTM: INCR16, INCR8, INCR4, or unspecified length */
+#define ENUM_USB_DMA_CTL_BRSTM00             (_ADI_MSK(0x00000000,uint16_t))  /* BRSTM: Unspecified Length */
+#define ENUM_USB_DMA_CTL_BRSTM01             (_ADI_MSK(0x00000200,uint16_t))  /* BRSTM: INCR4 or Unspecified Length */
+#define ENUM_USB_DMA_CTL_BRSTM10             (_ADI_MSK(0x00000400,uint16_t))  /* BRSTM: INCR8, INCR4, or Unspecified Length */
+#define ENUM_USB_DMA_CTL_BRSTM11             (_ADI_MSK(0x00000600,uint16_t))  /* BRSTM: INCR16, INCR8, INCR4, or Unspecified Length */
 
 #define BITM_USB_DMA_CTL_ERR                 (_ADI_MSK(0x00000100,uint16_t))  /* Bus Error */
-#define ENUM_USB_DMA_CTL_NO_DMAERR           (_ADI_MSK(0x00000000,uint16_t))  /* ERR: No Error */
-#define ENUM_USB_DMA_CTL_DMAERR              (_ADI_MSK(0x00000100,uint16_t))  /* ERR: Error Occurred */
+#define ENUM_USB_DMA_CTL_NO_DMAERR           (_ADI_MSK(0x00000000,uint16_t))  /* ERR: No Status */
+#define ENUM_USB_DMA_CTL_DMAERR              (_ADI_MSK(0x00000100,uint16_t))  /* ERR: Bus Error */
 
-#define BITM_USB_DMA_CTL_EP                  (_ADI_MSK(0x000000F0,uint16_t))  /* DMA Endpoint Assignment */
-#define ENUM_USB_DMA_CTL_DMAEP0              (_ADI_MSK(0x00000000,uint16_t))  /* EP:  */
-#define ENUM_USB_DMA_CTL_DMAEP1              (_ADI_MSK(0x00000010,uint16_t))  /* EP:  */
-#define ENUM_USB_DMA_CTL_DMAEP10             (_ADI_MSK(0x000000A0,uint16_t))  /* EP:  */
-#define ENUM_USB_DMA_CTL_DMAEP11             (_ADI_MSK(0x000000B0,uint16_t))  /* EP:  */
-#define ENUM_USB_DMA_CTL_DMAEP12             (_ADI_MSK(0x000000C0,uint16_t))  /* EP:  */
-#define ENUM_USB_DMA_CTL_DMAEP13             (_ADI_MSK(0x000000D0,uint16_t))  /* EP:  */
-#define ENUM_USB_DMA_CTL_DMAEP14             (_ADI_MSK(0x000000E0,uint16_t))  /* EP:  */
-#define ENUM_USB_DMA_CTL_DMAEP15             (_ADI_MSK(0x000000F0,uint16_t))  /* EP:  */
-#define ENUM_USB_DMA_CTL_DMAEP2              (_ADI_MSK(0x00000020,uint16_t))  /* EP:  */
-#define ENUM_USB_DMA_CTL_DMAEP3              (_ADI_MSK(0x00000030,uint16_t))  /* EP:  */
-#define ENUM_USB_DMA_CTL_DMAEP4              (_ADI_MSK(0x00000040,uint16_t))  /* EP:  */
-#define ENUM_USB_DMA_CTL_DMAEP5              (_ADI_MSK(0x00000050,uint16_t))  /* EP:  */
-#define ENUM_USB_DMA_CTL_DMAEP6              (_ADI_MSK(0x00000060,uint16_t))  /* EP:  */
-#define ENUM_USB_DMA_CTL_DMAEP7              (_ADI_MSK(0x00000070,uint16_t))  /* EP:  */
-#define ENUM_USB_DMA_CTL_DMAEP8              (_ADI_MSK(0x00000080,uint16_t))  /* EP:  */
-#define ENUM_USB_DMA_CTL_DMAEP9              (_ADI_MSK(0x00000090,uint16_t))  /* EP:  */
+#define BITM_USB_DMA_CTL_EP                  (_ADI_MSK(0x000000F0,uint16_t))  /* DMA Channel Endpoint Assignment */
+#define ENUM_USB_DMA_CTL_DMAEP0              (_ADI_MSK(0x00000000,uint16_t))  /* EP: Endpoint 0 */
+#define ENUM_USB_DMA_CTL_DMAEP1              (_ADI_MSK(0x00000010,uint16_t))  /* EP: Endpoint 1 */
+#define ENUM_USB_DMA_CTL_DMAEP10             (_ADI_MSK(0x000000A0,uint16_t))  /* EP: Endpoint 10 */
+#define ENUM_USB_DMA_CTL_DMAEP11             (_ADI_MSK(0x000000B0,uint16_t))  /* EP: Endpoint 11 */
+#define ENUM_USB_DMA_CTL_DMAEP12             (_ADI_MSK(0x000000C0,uint16_t))  /* EP: Endpoint 12 */
+#define ENUM_USB_DMA_CTL_DMAEP13             (_ADI_MSK(0x000000D0,uint16_t))  /* EP: Endpoint 13 */
+#define ENUM_USB_DMA_CTL_DMAEP14             (_ADI_MSK(0x000000E0,uint16_t))  /* EP: Endpoint 14 */
+#define ENUM_USB_DMA_CTL_DMAEP15             (_ADI_MSK(0x000000F0,uint16_t))  /* EP: Endpoint 15 */
+#define ENUM_USB_DMA_CTL_DMAEP2              (_ADI_MSK(0x00000020,uint16_t))  /* EP: Endpoint 2 */
+#define ENUM_USB_DMA_CTL_DMAEP3              (_ADI_MSK(0x00000030,uint16_t))  /* EP: Endpoint 3 */
+#define ENUM_USB_DMA_CTL_DMAEP4              (_ADI_MSK(0x00000040,uint16_t))  /* EP: Endpoint 4 */
+#define ENUM_USB_DMA_CTL_DMAEP5              (_ADI_MSK(0x00000050,uint16_t))  /* EP: Endpoint 5 */
+#define ENUM_USB_DMA_CTL_DMAEP6              (_ADI_MSK(0x00000060,uint16_t))  /* EP: Endpoint 6 */
+#define ENUM_USB_DMA_CTL_DMAEP7              (_ADI_MSK(0x00000070,uint16_t))  /* EP: Endpoint 7 */
+#define ENUM_USB_DMA_CTL_DMAEP8              (_ADI_MSK(0x00000080,uint16_t))  /* EP: Endpoint 8 */
+#define ENUM_USB_DMA_CTL_DMAEP9              (_ADI_MSK(0x00000090,uint16_t))  /* EP: Endpoint 9 */
 
 #define BITM_USB_DMA_CTL_IE                  (_ADI_MSK(0x00000008,uint16_t))  /* DMA Interrupt Enable */
-#define ENUM_USB_DMA_CTL_DMAINTDIS           (_ADI_MSK(0x00000000,uint16_t))  /* IE: Interrupt Disable */
-#define ENUM_USB_DMA_CTL_DMAINTEN            (_ADI_MSK(0x00000008,uint16_t))  /* IE: Interrupt Enable */
+#define ENUM_USB_DMA_CTL_DMAINTDIS           (_ADI_MSK(0x00000000,uint16_t))  /* IE: Disable Interrupt */
+#define ENUM_USB_DMA_CTL_DMAINTEN            (_ADI_MSK(0x00000008,uint16_t))  /* IE: Enable Interrupt */
 
 #define BITM_USB_DMA_CTL_MODE                (_ADI_MSK(0x00000004,uint16_t))  /* DMA Mode */
-#define ENUM_USB_DMA_CTL_DMAMODE0            (_ADI_MSK(0x00000000,uint16_t))  /* MODE:  */
-#define ENUM_USB_DMA_CTL_DMAMODE1            (_ADI_MSK(0x00000004,uint16_t))  /* MODE: DMA mode 1 can only be used with Bulk endpoints */
+#define ENUM_USB_DMA_CTL_DMAMODE0            (_ADI_MSK(0x00000000,uint16_t))  /* MODE: DMA Mode 0 */
+#define ENUM_USB_DMA_CTL_DMAMODE1            (_ADI_MSK(0x00000004,uint16_t))  /* MODE: DMA Mode 1 */
 
 #define BITM_USB_DMA_CTL_DIR                 (_ADI_MSK(0x00000002,uint16_t))  /* DMA Transfer Direction */
-#define ENUM_USB_DMA_CTL_DMADIR_RX           (_ADI_MSK(0x00000000,uint16_t))  /* DIR: DMA Write = RX Endpoint */
-#define ENUM_USB_DMA_CTL_DMADIR_TX           (_ADI_MSK(0x00000002,uint16_t))  /* DIR: DMA Read = TX Endpoint */
+#define ENUM_USB_DMA_CTL_DMADIR_RX           (_ADI_MSK(0x00000000,uint16_t))  /* DIR: DMA Write (for Rx Endpoint) */
+#define ENUM_USB_DMA_CTL_DMADIR_TX           (_ADI_MSK(0x00000002,uint16_t))  /* DIR: DMA Read (for Tx Endpoint) */
 
 #define BITM_USB_DMA_CTL_EN                  (_ADI_MSK(0x00000001,uint16_t))  /* DMA Enable */
-#define ENUM_USB_DMA_CTL_DMADIS              (_ADI_MSK(0x00000000,uint16_t))  /* EN: Disable */
-#define ENUM_USB_DMA_CTL_DMAEN               (_ADI_MSK(0x00000001,uint16_t))  /* EN: Enable DMA and cause transfer to begin */
+#define ENUM_USB_DMA_CTL_DMADIS              (_ADI_MSK(0x00000000,uint16_t))  /* EN: Disable DMA */
+#define ENUM_USB_DMA_CTL_DMAEN               (_ADI_MSK(0x00000001,uint16_t))  /* EN: Enable DMA (Start Transfer) */
 
 /* ------------------------------------------------------------------------------------------------------------------------
         USB_CT_UCH                           Pos/Masks                        Description
    ------------------------------------------------------------------------------------------------------------------------ */
-#define BITP_USB_CT_UCH_VALUE                 0
-#define BITM_USB_CT_UCH_VALUE                (_ADI_MSK(0x00007FFF,uint16_t))
+#define BITP_USB_CT_UCH_VALUE                 0                               /* Chirp Timeout Value */
+#define BITM_USB_CT_UCH_VALUE                (_ADI_MSK(0x00007FFF,uint16_t))  /* Chirp Timeout Value */
 
 /* ------------------------------------------------------------------------------------------------------------------------
         USB_CT_HHSRTN                        Pos/Masks                        Description
    ------------------------------------------------------------------------------------------------------------------------ */
-#define BITP_USB_CT_HHSRTN_VALUE              0
-#define BITM_USB_CT_HHSRTN_VALUE             (_ADI_MSK(0x00007FFF,uint16_t))
+#define BITP_USB_CT_HHSRTN_VALUE              0                               /* Host High Speed Return to Normal Value */
+#define BITM_USB_CT_HHSRTN_VALUE             (_ADI_MSK(0x00007FFF,uint16_t))  /* Host High Speed Return to Normal Value */
 
 /* ------------------------------------------------------------------------------------------------------------------------
         USB_CT_HSBT                          Pos/Masks                        Description
@@ -15619,116 +15442,114 @@
 #define BITP_USB_LPM_ATTR_EP                 12                               /* Endpoint */
 #define BITP_USB_LPM_ATTR_RMTWAK              8                               /* Remote Wakeup Enable */
 #define BITP_USB_LPM_ATTR_HIRD                4                               /* Host Initiated Resume Duration */
-#define BITP_USB_LPM_ATTR_LINKSTATE           0
+#define BITP_USB_LPM_ATTR_LINKSTATE           0                               /* Link State */
 #define BITM_USB_LPM_ATTR_EP                 (_ADI_MSK(0x0000F000,uint16_t))  /* Endpoint */
 
 #define BITM_USB_LPM_ATTR_RMTWAK             (_ADI_MSK(0x00000100,uint16_t))  /* Remote Wakeup Enable */
-#define ENUM_USB_LPM_ATTR_RMTWAKDIS          (_ADI_MSK(0x00000000,uint16_t))  /* RMTWAK:  */
-#define ENUM_USB_LPM_ATTR_RMTWAKEN           (_ADI_MSK(0x00000100,uint16_t))  /* RMTWAK:  */
+#define ENUM_USB_LPM_ATTR_RMTWAKDIS          (_ADI_MSK(0x00000000,uint16_t))  /* RMTWAK: Disable Remote Wakeup */
+#define ENUM_USB_LPM_ATTR_RMTWAKEN           (_ADI_MSK(0x00000100,uint16_t))  /* RMTWAK: Enable Remote Wakeup */
 #define BITM_USB_LPM_ATTR_HIRD               (_ADI_MSK(0x000000F0,uint16_t))  /* Host Initiated Resume Duration */
 
-#define BITM_USB_LPM_ATTR_LINKSTATE          (_ADI_MSK(0x0000000F,uint16_t))
+#define BITM_USB_LPM_ATTR_LINKSTATE          (_ADI_MSK(0x0000000F,uint16_t))  /* Link State */
 #define ENUM_USB_LPM_ATTR_LNKSTATE_SSL1      (_ADI_MSK(0x00000001,uint16_t))  /* LINKSTATE: Sleep State (L1) */
 
 /* ------------------------------------------------------------------------------------------------------------------------
         USB_LPM_CTL                          Pos/Masks                        Description
    ------------------------------------------------------------------------------------------------------------------------ */
-#define BITP_USB_LPM_CTL_NAK                  4
-#define BITP_USB_LPM_CTL_EN                   2
-#define BITP_USB_LPM_CTL_RESUME               1
+#define BITP_USB_LPM_CTL_NAK                  4                               /* LPM NAK Enable */
+#define BITP_USB_LPM_CTL_EN                   2                               /* LPM Enable */
+#define BITP_USB_LPM_CTL_RESUME               1                               /* LPM Resume (Remote Wakeup) */
 #define BITP_USB_LPM_CTL_TX                   0
-#define BITM_USB_LPM_CTL_NAK                 (_ADI_MSK(0x00000010,uint8_t))
-#define BITM_USB_LPM_CTL_EN                  (_ADI_MSK(0x0000000C,uint8_t))
-#define BITM_USB_LPM_CTL_RESUME              (_ADI_MSK(0x00000002,uint8_t))
+#define BITM_USB_LPM_CTL_NAK                 (_ADI_MSK(0x00000010,uint8_t))   /* LPM NAK Enable */
+#define BITM_USB_LPM_CTL_EN                  (_ADI_MSK(0x0000000C,uint8_t))   /* LPM Enable */
+#define BITM_USB_LPM_CTL_RESUME              (_ADI_MSK(0x00000002,uint8_t))   /* LPM Resume (Remote Wakeup) */
 #define BITM_USB_LPM_CTL_TX                  (_ADI_MSK(0x00000001,uint8_t))
 
 /* ------------------------------------------------------------------------------------------------------------------------
         USB_LPM_IEN                          Pos/Masks                        Description
    ------------------------------------------------------------------------------------------------------------------------ */
-#define BITP_USB_LPM_IEN_LPMERR               5
-#define BITP_USB_LPM_IEN_LPMRES               4
-#define BITP_USB_LPM_IEN_LPMNC                3
-#define BITP_USB_LPM_IEN_LPMACK               2
-#define BITP_USB_LPM_IEN_LPMNY                1
-#define BITP_USB_LPM_IEN_LPMST                0
-#define BITM_USB_LPM_IEN_LPMERR              (_ADI_MSK(0x00000020,uint8_t))
-#define BITM_USB_LPM_IEN_LPMRES              (_ADI_MSK(0x00000010,uint8_t))
-#define BITM_USB_LPM_IEN_LPMNC               (_ADI_MSK(0x00000008,uint8_t))
-#define BITM_USB_LPM_IEN_LPMACK              (_ADI_MSK(0x00000004,uint8_t))
-#define BITM_USB_LPM_IEN_LPMNY               (_ADI_MSK(0x00000002,uint8_t))
-#define BITM_USB_LPM_IEN_LPMST               (_ADI_MSK(0x00000001,uint8_t))
+#define BITP_USB_LPM_IEN_LPMERR               5                               /* LPM Error Interrupt Enable */
+#define BITP_USB_LPM_IEN_LPMRES               4                               /* LPM Resume Interrupt Enable */
+#define BITP_USB_LPM_IEN_LPMNC                3                               /* LPM NYET Control Interrupt Enable */
+#define BITP_USB_LPM_IEN_LPMACK               2                               /* LPM ACK Interrupt Enable */
+#define BITP_USB_LPM_IEN_LPMNY                1                               /* LPM NYET Interrupt Enable */
+#define BITP_USB_LPM_IEN_LPMST                0                               /* LPM STALL Interrupt Enable */
+#define BITM_USB_LPM_IEN_LPMERR              (_ADI_MSK(0x00000020,uint8_t))   /* LPM Error Interrupt Enable */
+#define BITM_USB_LPM_IEN_LPMRES              (_ADI_MSK(0x00000010,uint8_t))   /* LPM Resume Interrupt Enable */
+#define BITM_USB_LPM_IEN_LPMNC               (_ADI_MSK(0x00000008,uint8_t))   /* LPM NYET Control Interrupt Enable */
+#define BITM_USB_LPM_IEN_LPMACK              (_ADI_MSK(0x00000004,uint8_t))   /* LPM ACK Interrupt Enable */
+#define BITM_USB_LPM_IEN_LPMNY               (_ADI_MSK(0x00000002,uint8_t))   /* LPM NYET Interrupt Enable */
+#define BITM_USB_LPM_IEN_LPMST               (_ADI_MSK(0x00000001,uint8_t))   /* LPM STALL Interrupt Enable */
 
 /* ------------------------------------------------------------------------------------------------------------------------
         USB_LPM_IRQ                          Pos/Masks                        Description
    ------------------------------------------------------------------------------------------------------------------------ */
-#define BITP_USB_LPM_IRQ_LPMERR               5
-#define BITP_USB_LPM_IRQ_LPMRES               4
-#define BITP_USB_LPM_IRQ_LPMNC                3
-#define BITP_USB_LPM_IRQ_LPMACK               2
-#define BITP_USB_LPM_IRQ_LPMNY                1
+#define BITP_USB_LPM_IRQ_LPMERR               5                               /* LPM Error Interrupt */
+#define BITP_USB_LPM_IRQ_LPMRES               4                               /* LPM Resume Interrupt */
+#define BITP_USB_LPM_IRQ_LPMNC                3                               /* LPM NYET Control Interrupt */
+#define BITP_USB_LPM_IRQ_LPMACK               2                               /* LPM ACK Interrupt */
+#define BITP_USB_LPM_IRQ_LPMNY                1                               /* LPM NYET Interrupt */
 #define BITP_USB_LPM_IRQ_LPMST                0
-#define BITM_USB_LPM_IRQ_LPMERR              (_ADI_MSK(0x00000020,uint8_t))
-#define BITM_USB_LPM_IRQ_LPMRES              (_ADI_MSK(0x00000010,uint8_t))
-#define BITM_USB_LPM_IRQ_LPMNC               (_ADI_MSK(0x00000008,uint8_t))
-#define BITM_USB_LPM_IRQ_LPMACK              (_ADI_MSK(0x00000004,uint8_t))
-#define BITM_USB_LPM_IRQ_LPMNY               (_ADI_MSK(0x00000002,uint8_t))
+#define BITM_USB_LPM_IRQ_LPMERR              (_ADI_MSK(0x00000020,uint8_t))   /* LPM Error Interrupt */
+#define BITM_USB_LPM_IRQ_LPMRES              (_ADI_MSK(0x00000010,uint8_t))   /* LPM Resume Interrupt */
+#define BITM_USB_LPM_IRQ_LPMNC               (_ADI_MSK(0x00000008,uint8_t))   /* LPM NYET Control Interrupt */
+#define BITM_USB_LPM_IRQ_LPMACK              (_ADI_MSK(0x00000004,uint8_t))   /* LPM ACK Interrupt */
+#define BITM_USB_LPM_IRQ_LPMNY               (_ADI_MSK(0x00000002,uint8_t))   /* LPM NYET Interrupt */
 #define BITM_USB_LPM_IRQ_LPMST               (_ADI_MSK(0x00000001,uint8_t))
 
 /* ------------------------------------------------------------------------------------------------------------------------
         USB_LPM_FADDR                        Pos/Masks                        Description
    ------------------------------------------------------------------------------------------------------------------------ */
-#define BITP_USB_LPM_FADDR_VALUE              0                               /* Function Address */
-#define BITM_USB_LPM_FADDR_VALUE             (_ADI_MSK(0x0000007F,uint8_t))   /* Function Address */
+#define BITP_USB_LPM_FADDR_VALUE              0                               /* Function Address Value */
+#define BITM_USB_LPM_FADDR_VALUE             (_ADI_MSK(0x0000007F,uint8_t))   /* Function Address Value */
 
 /* ------------------------------------------------------------------------------------------------------------------------
         USB_VBUS_CTL                         Pos/Masks                        Description
    ------------------------------------------------------------------------------------------------------------------------ */
-#define BITP_USB_VBUS_CTL_DRV                 4                               /* State of the UTMI+ DrvVbus signal from the controller */
-#define BITP_USB_VBUS_CTL_DRVINT              3                               /* DrvVbusInt Interrupt */
-#define BITP_USB_VBUS_CTL_DRVIEN              2                               /* Enable DrvVbus Interrupt */
-#define BITP_USB_VBUS_CTL_DRVOD               1                               /* Make DrvVbus Output Open Drain */
-#define BITP_USB_VBUS_CTL_INVDRV              0                               /* Invert DrvVbus Output */
-#define BITM_USB_VBUS_CTL_DRV                (_ADI_MSK(0x00000010,uint8_t))   /* State of the UTMI+ DrvVbus signal from the controller */
-#define BITM_USB_VBUS_CTL_DRVINT             (_ADI_MSK(0x00000008,uint8_t))   /* DrvVbusInt Interrupt */
-#define BITM_USB_VBUS_CTL_DRVIEN             (_ADI_MSK(0x00000004,uint8_t))   /* Enable DrvVbus Interrupt */
-#define BITM_USB_VBUS_CTL_DRVOD              (_ADI_MSK(0x00000002,uint8_t))   /* Make DrvVbus Output Open Drain */
-#define BITM_USB_VBUS_CTL_INVDRV             (_ADI_MSK(0x00000001,uint8_t))   /* Invert DrvVbus Output */
+#define BITP_USB_VBUS_CTL_DRV                 4                               /* VBUS Drive */
+#define BITP_USB_VBUS_CTL_DRVINT              3                               /* VBUS Drive Interrupt */
+#define BITP_USB_VBUS_CTL_DRVIEN              2                               /* VBUS Drive Interrupt Enable */
+#define BITP_USB_VBUS_CTL_DRVOD               1                               /* VBUS Drive Open Drain */
+#define BITP_USB_VBUS_CTL_INVDRV              0                               /* VBUS Invert Drive */
+#define BITM_USB_VBUS_CTL_DRV                (_ADI_MSK(0x00000010,uint8_t))   /* VBUS Drive */
+#define BITM_USB_VBUS_CTL_DRVINT             (_ADI_MSK(0x00000008,uint8_t))   /* VBUS Drive Interrupt */
+#define BITM_USB_VBUS_CTL_DRVIEN             (_ADI_MSK(0x00000004,uint8_t))   /* VBUS Drive Interrupt Enable */
+#define BITM_USB_VBUS_CTL_DRVOD              (_ADI_MSK(0x00000002,uint8_t))   /* VBUS Drive Open Drain */
+#define BITM_USB_VBUS_CTL_INVDRV             (_ADI_MSK(0x00000001,uint8_t))   /* VBUS Invert Drive */
 
 /* ------------------------------------------------------------------------------------------------------------------------
         USB_BAT_CHG                          Pos/Masks                        Description
    ------------------------------------------------------------------------------------------------------------------------ */
-#define BITP_USB_BAT_CHG_DEDCHG               4                               /* Determine if Attached device is a Dedicated Charging Port */
-#define BITP_USB_BAT_CHG_CHGDET               3                               /* Sense Charging Port */
-#define BITP_USB_BAT_CHG_SNSCHGDET            2                               /* Enable Charger Detection. */
+#define BITP_USB_BAT_CHG_DEDCHG               4                               /* Dedicated Charging Port */
+#define BITP_USB_BAT_CHG_CHGDET               3                               /* Charging Port Detected */
+#define BITP_USB_BAT_CHG_SNSCHGDET            2                               /* Sense Charger Detection */
 #define BITP_USB_BAT_CHG_CONDET               1                               /* Connected Detected */
-#define BITP_USB_BAT_CHG_SNSCONDET            0                               /* Enables Connection Detection */
-#define BITM_USB_BAT_CHG_DEDCHG              (_ADI_MSK(0x00000010,uint8_t))   /* Determine if Attached device is a Dedicated Charging Port */
-#define BITM_USB_BAT_CHG_CHGDET              (_ADI_MSK(0x00000008,uint8_t))   /* Sense Charging Port */
-#define BITM_USB_BAT_CHG_SNSCHGDET           (_ADI_MSK(0x00000004,uint8_t))   /* Enable Charger Detection. */
+#define BITP_USB_BAT_CHG_SNSCONDET            0                               /* Sense Connection Detection */
+#define BITM_USB_BAT_CHG_DEDCHG              (_ADI_MSK(0x00000010,uint8_t))   /* Dedicated Charging Port */
+#define BITM_USB_BAT_CHG_CHGDET              (_ADI_MSK(0x00000008,uint8_t))   /* Charging Port Detected */
+#define BITM_USB_BAT_CHG_SNSCHGDET           (_ADI_MSK(0x00000004,uint8_t))   /* Sense Charger Detection */
 #define BITM_USB_BAT_CHG_CONDET              (_ADI_MSK(0x00000002,uint8_t))   /* Connected Detected */
-#define BITM_USB_BAT_CHG_SNSCONDET           (_ADI_MSK(0x00000001,uint8_t))   /* Enables Connection Detection */
+#define BITM_USB_BAT_CHG_SNSCONDET           (_ADI_MSK(0x00000001,uint8_t))   /* Sense Connection Detection */
 
 /* ------------------------------------------------------------------------------------------------------------------------
         USB_PHY_CTL                          Pos/Masks                        Description
    ------------------------------------------------------------------------------------------------------------------------ */
-#define BITP_USB_PHY_CTL_CNOS                 2                               /* Clock Non-Overlap Spacing */
+#define BITP_USB_PHY_CTL_EN                   7                               /* PHY Enable */
 #define BITP_USB_PHY_CTL_RESTORE              1                               /* Restore from Hibernate */
 #define BITP_USB_PHY_CTL_HIBER                0                               /* Hibernate */
-#define BITM_USB_PHY_CTL_CNOS                (_ADI_MSK(0x0000000C,uint8_t))   /* Clock Non-Overlap Spacing */
+#define BITM_USB_PHY_CTL_EN                  (_ADI_MSK(0x00000080,uint8_t))   /* PHY Enable */
 #define BITM_USB_PHY_CTL_RESTORE             (_ADI_MSK(0x00000002,uint8_t))   /* Restore from Hibernate */
 #define BITM_USB_PHY_CTL_HIBER               (_ADI_MSK(0x00000001,uint8_t))   /* Hibernate */
 
 /* ------------------------------------------------------------------------------------------------------------------------
         USB_PLL_OSC                          Pos/Masks                        Description
    ------------------------------------------------------------------------------------------------------------------------ */
-#define BITP_USB_PLL_OSC_PLLSTABLE           14
-#define BITP_USB_PLL_OSC_PLLMSEL              7
-#define BITP_USB_PLL_OSC_PLLM                 1
-#define BITP_USB_PLL_OSC_DIVCLKIN             0
-#define BITM_USB_PLL_OSC_PLLSTABLE           (_ADI_MSK(0x00004000,uint16_t))
-#define BITM_USB_PLL_OSC_PLLMSEL             (_ADI_MSK(0x00000080,uint16_t))
-#define BITM_USB_PLL_OSC_PLLM                (_ADI_MSK(0x0000007E,uint16_t))
-#define BITM_USB_PLL_OSC_DIVCLKIN            (_ADI_MSK(0x00000001,uint16_t))
+#define BITP_USB_PLL_OSC_PLLMSEL              7                               /* PLL Multiplier Select */
+#define BITP_USB_PLL_OSC_PLLM                 1                               /* PLL Multiplier Value */
+#define BITP_USB_PLL_OSC_DIVCLKIN             0                               /* Divide CLKIN */
+#define BITM_USB_PLL_OSC_PLLMSEL             (_ADI_MSK(0x00000080,uint16_t))  /* PLL Multiplier Select */
+#define BITM_USB_PLL_OSC_PLLM                (_ADI_MSK(0x0000007E,uint16_t))  /* PLL Multiplier Value */
+#define BITM_USB_PLL_OSC_DIVCLKIN            (_ADI_MSK(0x00000001,uint16_t))  /* Divide CLKIN */
 
 /* ==================================================
         Data Memory Unit Registers
@@ -15864,6 +15685,7 @@
 #define BITP_DCPLB_DATA_L2_CHBL              13                               /* CPLB L2 Cacheable */
 #define BITP_DCPLB_DATA_L1_CHBL              12                               /* CPLB L1 Cacheable */
 #define BITP_DCPLB_DATA_DIRTY                 7                               /* CPLB DIRTY */
+#define BITP_DCPLB_DATA_L1SRAM                5                               /* CPLB L1SRAM */
 #define BITP_DCPLB_DATA_SWRITE                4                               /* CPLB Supervisor Write */
 #define BITP_DCPLB_DATA_UWRITE                3                               /* CPLB User Write */
 #define BITP_DCPLB_DATA_UREAD                 2                               /* CPLB User Read */
@@ -15895,6 +15717,7 @@
 #define BITM_DCPLB_DATA_DIRTY                (_ADI_MSK(0x00000080,uint32_t))  /* CPLB DIRTY */
 #define ENUM_DCPLB_DATA_CLEAN                (_ADI_MSK(0x00000000,uint32_t))  /* DIRTY: Clean */
 #define ENUM_DCPLB_DATA_DIRTY                (_ADI_MSK(0x00000080,uint32_t))  /* DIRTY: Dirty */
+#define BITM_DCPLB_DATA_L1SRAM               (_ADI_MSK(0x00000020,uint32_t))  /* CPLB L1SRAM */
 
 #define BITM_DCPLB_DATA_SWRITE               (_ADI_MSK(0x00000010,uint32_t))  /* CPLB Supervisor Write */
 #define ENUM_DCPLB_DATA_NO_SWRITE            (_ADI_MSK(0x00000000,uint32_t))  /* SWRITE: No Write Access */
@@ -16071,6 +15894,7 @@
 #define BITP_ICPLB_DATA_PSIZE                16                               /* Page Size */
 #define BITP_ICPLB_DATA_L1_CHBL              12                               /* L1 Cacheable */
 #define BITP_ICPLB_DATA_LRUPRIO               8                               /* Least Recently Used Priority */
+#define BITP_ICPLB_DATA_L1SRAM                5                               /* CPLB L1SRAM */
 #define BITP_ICPLB_DATA_UREAD                 2                               /* Allow User Read */
 #define BITP_ICPLB_DATA_LOCK                  1                               /* CPLB Lock */
 #define BITP_ICPLB_DATA_VALID                 0                               /* CPLB Valid */
@@ -16092,6 +15916,7 @@
 #define BITM_ICPLB_DATA_LRUPRIO              (_ADI_MSK(0x00000100,uint32_t))  /* Least Recently Used Priority */
 #define ENUM_ICPLB_DATA_LRUPRIO_LO           (_ADI_MSK(0x00000000,uint32_t))  /* LRUPRIO: Low Importance */
 #define ENUM_ICPLB_DATA_LRUPRIO_HI           (_ADI_MSK(0x00000100,uint32_t))  /* LRUPRIO: High Importance */
+#define BITM_ICPLB_DATA_L1SRAM               (_ADI_MSK(0x00000020,uint32_t))  /* CPLB L1SRAM */
 
 #define BITM_ICPLB_DATA_UREAD                (_ADI_MSK(0x00000004,uint32_t))  /* Allow User Read */
 #define ENUM_ICPLB_DATA_NO_UREAD             (_ADI_MSK(0x00000000,uint32_t))  /* UREAD: No Read Access */
@@ -16288,7 +16113,7 @@
 #define BITM_CEC_SID_SID                     (_ADI_MSK(0x000000FF,uint32_t))  /* System Interrupt ID */
 
 /* ==================================================
-        Timer Registers
+        Core Timer Registers
    ================================================== */
 
 /* =========================
@@ -16305,20 +16130,20 @@
 /* ------------------------------------------------------------------------------------------------------------------------
         TCNTL                                Pos/Masks                        Description
    ------------------------------------------------------------------------------------------------------------------------ */
-#define BITP_TCNTL_INT                        3                               /* Timer generated interrupt (sticky) */
-#define BITP_TCNTL_AUTORLD                    2                               /* Timer auto reload */
-#define BITP_TCNTL_EN                         1                               /* Timer enable */
-#define BITP_TCNTL_PWR                        0                               /* Timer Low Power Control */
-#define BITM_TCNTL_INT                       (_ADI_MSK(0x00000008,uint32_t))  /* Timer generated interrupt (sticky) */
-#define BITM_TCNTL_AUTORLD                   (_ADI_MSK(0x00000004,uint32_t))  /* Timer auto reload */
-#define BITM_TCNTL_EN                        (_ADI_MSK(0x00000002,uint32_t))  /* Timer enable */
-#define BITM_TCNTL_PWR                       (_ADI_MSK(0x00000001,uint32_t))  /* Timer Low Power Control */
+#define BITP_TCNTL_INT                        3                               /* Interrupt Status (sticky) */
+#define BITP_TCNTL_AUTORLD                    2                               /* Auto Reload Enable */
+#define BITP_TCNTL_EN                         1                               /* Timer Enable */
+#define BITP_TCNTL_PWR                        0                               /* Low Power Mode Select */
+#define BITM_TCNTL_INT                       (_ADI_MSK(0x00000008,uint32_t))  /* Interrupt Status (sticky) */
+#define BITM_TCNTL_AUTORLD                   (_ADI_MSK(0x00000004,uint32_t))  /* Auto Reload Enable */
+#define BITM_TCNTL_EN                        (_ADI_MSK(0x00000002,uint32_t))  /* Timer Enable */
+#define BITM_TCNTL_PWR                       (_ADI_MSK(0x00000001,uint32_t))  /* Low Power Mode Select */
 
 /* ------------------------------------------------------------------------------------------------------------------------
         TSCALE                               Pos/Masks                        Description
    ------------------------------------------------------------------------------------------------------------------------ */
-#define BITP_TSCALE_SCALE                     0                               /* Scaling factor */
-#define BITM_TSCALE_SCALE                    (_ADI_MSK(0x000000FF,uint32_t))  /* Scaling factor */
+#define BITP_TSCALE_SCALE                     0                               /* Timer Scaling Value */
+#define BITM_TSCALE_SCALE                    (_ADI_MSK(0x000000FF,uint32_t))  /* Timer Scaling Value */
 
 /* ==================================================
         Debug Unit Registers
@@ -17377,11 +17202,36 @@
 #define PARAM_EPPI2_NUM_DATA                         18
 
 
-/* Motor Control PWM Unit Parameters */
+/* Pulse-Width Modulator Parameters */
 
+#define PARAM_PWM0_ASYM_DEADTIME                      0
+#define PARAM_PWM0_COMPRESS                           1
+#define PARAM_PWM0_DOUBLE_UPDATE                      0
+#define PARAM_PWM0_FULL_DUTY_REGS                     0
+#define PARAM_PWM0_HI_HP_REGS_PRIVATE                 1
+#define PARAM_PWM0_LO_HP_REGS                         0
 #define PARAM_PWM0_NUM_TRIP                           2
+#define PARAM_PWM0_NUM_TRIP_PINS                      2
+#define PARAM_PWM0_NUM_TRIP_TRIG                      0
+#define PARAM_PWM0_REVID_MAJOR                        0
+#define PARAM_PWM0_REVID_REV                          0
+#define PARAM_PWM1_ASYM_DEADTIME                      0
+#define PARAM_PWM1_COMPRESS                           1
+#define PARAM_PWM1_DOUBLE_UPDATE                      0
+#define PARAM_PWM1_FULL_DUTY_REGS                     0
+#define PARAM_PWM1_HI_HP_REGS_PRIVATE                 1
+#define PARAM_PWM1_LO_HP_REGS                         0
 #define PARAM_PWM1_NUM_TRIP                           2
+#define PARAM_PWM1_NUM_TRIP_PINS                      2
+#define PARAM_PWM1_NUM_TRIP_TRIG                      0
+#define PARAM_PWM1_REVID_MAJOR                        0
+#define PARAM_PWM1_REVID_REV                          0
 
+
+/* Video Subsystem Registers Parameters */
+
+#define PARAM_VID0_PIXC_ABSENT                        1
+#define PARAM_VID0_PVP_ABSENT                         1
 
 
 
@@ -17391,7 +17241,7 @@
 #define PARAM_SDU0_IDCODE_REVID                       0
 
 
-/* Ethernet MAC Register Definitions Parameters */
+/* Ethernet MAC Parameters */
 
 #define PARAM_EMAC0_NUM_RX                            2
 #define PARAM_EMAC0_NUM_TX                            2
@@ -17402,8 +17252,16 @@
 
 /* Serial Peripheral Interface Parameters */
 
-#define PARAM_SPI0_NUM_SEL                            8
-#define PARAM_SPI1_NUM_SEL                            8
+#define PARAM_SPI0_MEM_MAPPED                         0
+#define PARAM_SPI0_NUM_SEL                            7
+#define PARAM_SPI0_PTM_EXISTS                         1
+#define PARAM_SPI0_REVID_MAJOR                        3
+#define PARAM_SPI0_REVID_REV                          0
+#define PARAM_SPI1_MEM_MAPPED                         0
+#define PARAM_SPI1_NUM_SEL                            7
+#define PARAM_SPI1_PTM_EXISTS                         1
+#define PARAM_SPI1_REVID_MAJOR                        3
+#define PARAM_SPI1_REVID_REV                          0
 
 
 
@@ -17421,7 +17279,7 @@
 #define PARAM_DDR0_NUM_DATA                          16
 
 
-/* System Connection Block Parameters */
+/* System Cross Bar Parameters */
 
 #define PARAM_SCB0_NUM_MASTERS                        6
 #define PARAM_SCB0_NUM_SLOTS                         32
@@ -17500,9 +17358,13 @@
 
 
 
-/* Universal Serial Bus Multipoint High-speed Dual Role Controller Parameters */
+/* Universal Serial Bus Controller Parameters */
 
 #define PARAM_USB0_DMA_CHAN                           8
+#define PARAM_USB0_DYN_FIFO_SIZE                      1
+#define PARAM_USB0_FS_PHY                             0
+#define PARAM_USB0_HS_PHY                             1
+#define PARAM_USB0_LOOPBACK                           1
 #define PARAM_USB0_NUM_ENDPTS                        12
 #define PARAM_USB0_NUM_ENDPTS_MINUS_1                11
 
@@ -17695,7 +17557,7 @@
 #define MEM_END_EXTERNAL                0xBFFFFFFF
 #define MEM_SIZE_EXTERNAL               0xC0000000
 
-/* Shared DDR Memory (256 MB) */
+/* Shared DDR2 or LPDDR Memory (256 MB) */
 
 #define MEM_BASE_DDR                    0x00000000
 #define MEM_END_DDR                     0x0FFFFFFF
