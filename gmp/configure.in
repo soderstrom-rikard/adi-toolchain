@@ -2939,11 +2939,13 @@ AH_VERBATIM([HAVE_NATIVE],
 
 
 # Don't demand an m4 unless it's actually needed.
+#
+# Workaround problem with gmp/configure detecting flex output file
 if test $found_asm = yes; then
   GMP_PROG_M4
   GMP_M4_M4WRAP_SPURIOUS
 else
-  M4=m4-not-needed
+  : #M4=m4-not-needed
 fi
 
 # Only do the GMP_ASM checks if there's a .S or .asm wanting them.

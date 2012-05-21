@@ -29926,6 +29926,8 @@ fi
 
 
 # Don't demand an m4 unless it's actually needed.
+#
+# Workaround problem with gmp/configure detecting flex output file
 if test $found_asm = yes; then
 
 { echo "$as_me:$LINENO: checking for suitable m4" >&5
@@ -30007,7 +30009,7 @@ echo "define(<M4WRAP_SPURIOUS>,<$gmp_cv_m4_m4wrap_spurious>)" >> $gmp_tmpconfigm
 
 
 else
-  M4=m4-not-needed
+  : #M4=m4-not-needed
 fi
 
 # Only do the GMP_ASM checks if there's a .S or .asm wanting them.
