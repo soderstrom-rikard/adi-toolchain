@@ -36,7 +36,7 @@ START=$(date +%s)
 TIMESTAMP=`date +%Y%m%d`       # is YYYY_MMM_DD
 unset DATE_STAMP VERBOSE WARN
 
-PREREQ_FILE="autoconf automake awk /bin/sh bison cp echo flex gcc gettext grep ln m4 make makeinfo mkdir msgfmt mv rm sed tail wc which pkg-config Xvfb"
+PREREQ_FILE="autoconf automake awk /bin/sh bison cp echo flex gcc gettext grep ln m4 make makeinfo mkdir msgfmt mv rm sed tail wc which pkg-config"
 BINUTILS_VERSION=2.21
 GDB_VERSION=2.17
 NEWLIB_VERSION=${BINUTILS_VERSION}
@@ -280,6 +280,10 @@ if [ "${GDB_VERSION}" != "2.17" ] ; then
 	WITHOUT_X=true
 fi
 
+# if there is X graphical exists, then install Xvfb 
+if [ "${WITHOUT_X}" = "false" ] ; then
+	PREREQ_FILE="${PREREQ_FILE} Xvfb"
+fi
 # Make sure root does not build things
 if [ "$(id -u)" -eq 0 ]; then
 	echo "you should not build the toolchain as the 'root' user"
