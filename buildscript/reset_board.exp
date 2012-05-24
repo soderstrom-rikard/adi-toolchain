@@ -1,32 +1,10 @@
 #!/usr/bin/expect
-log_file reset_board_log
-send_user "Starting reset_board.exp\n"
-
+log_file reset_board_test_log
+send_user "Starting reset_board_test.exp\n"
+set send_slow {1 .1}
+set dxe_filename linux
 set ttydev /dev/ttyS0
-set send_slow {1 0.1}
 set password "blackfin"
-set sh_prompt "\[-@].*\[$>#]"
-set uboot_prompt "bfin>"
-set kernel_prompt "root:\[^>].*>"
-set download_file uImage
-set wait_log 0
-set board_type ""
-
-cd /home/test/work/cruise/test_scripts/toolchain
-
-if { $argc >= 1} {
-   set download_file     [lindex $argv 0]
-   send_log "\n#### download_file is $download_file\n"
-}
-
-if { $argc >= 2} {
-   set wait_log          [lindex $argv 1]
-   send_log "\n#### wait log is $wait_log \n"
-}
-
-if { $download_file == "uImage.normal"} {
-   set download_file  uImage
-}
 
 proc step { message } {
 
@@ -46,59 +24,45 @@ spawn su
 sleep .5
 while 1 {
    expect {
-      "Password:" {
+      -re "\[Pp]assword:" {
+         sleep .5
          send -s "$password\r"
          break
       }
 
       timeout {
-         puts "Fail . " 
-         break
+            send_user "Fail . " 
+            break
          }
      }
 }
  
 while 1 {
    expect {
-      -re "$sh_prompt" {
-         puts "su success.\n"
+      "#" {
+         send_user "su success.\n"
          break
       }
 
       timeout {
-         puts "Fail su as root. "
-         break
+            send_user "Fail su as root. "
+            break
          }
      }
 }
 set su_id $spawn_id
   
-send -s "date +%Y.%m.%d-%H:%M\r"
+
+send -s "reset_board 2\r"
 while 1 {
    expect {
-      -re "(\[0-9]{4}\\\.\[0-9]{2}\\\.\[0-9]{2}\\\-\[0-9]{2}:\[0-9]{2}).*$sh_prompt" {
-        set current_date $expect_out(1,string)
-        send_log "Date matched $current_date ."
-        break
+      -re "powering OFF.* ON" { 
+     break
       }
 
       timeout {
-        send_log "Failed date command."
-        break
-      }
-   }
-}
-
-send -s "./reset_board 2\r"
-while 1 {
-   expect {
-      -re "$sh_prompt" { 
-        break
-      }
-
-      timeout {
-        puts "Failed reset board." 
-        break
+            send_user "Failed reset board." 
+            break
          }
      }
 }
@@ -107,8 +71,6 @@ step "Start kermit"
 
 #step "Start up kermit on port $ttydev"
 # Now set up the kermit parameters.
-#  I want these all contained in this file to make it easier for users.
-#  This just builds up a list of commands which are sent to kermit.
 #
 set kparams     [list "set line $ttydev\r"]
 lappend kparams "set speed 57600\r"
@@ -124,24 +86,22 @@ lappend kparams "set window 5\r"
 lappend kparams "set escape 255\r"
 set nkparams [llength $kparams]
 
-set timeout 5
+set timeout 50
 spawn kermit
 # We need to save the id because resetting the board will overwrite it.
 set kermit_spawn_id $spawn_id
 
 while 1 {
-    expect {
-         "Type ?" { }
-         "ermit>" { break }
-	 "not found" {
-            send_log "ERROR: Failed to start up kermit"
-            exit
-	  }
-	  timeout {
-            send_log "ERROR: Time out starting up kermit"
-            exit
-	  }
-    }
+	expect {
+	        "Type ?" { }
+		"ermit>" { break }
+		"not found" {
+                   puts "ERROR: Failed to start up kermit"
+		}
+		timeout {
+                   puts "ERROR: Time out starting up kermit"
+		}
+	}
 }
 
 for {set i 0} {$i < $nkparams} {incr i} {
@@ -152,13 +112,11 @@ for {set i 0} {$i < $nkparams} {incr i} {
          "ermit>" { break }
 
          "\\?\[A-Z]" {
-            send_log "ERROR: Failed to set up kermit parameters"
-            exit
+            puts "ERROR: Failed to set up kermit parameters"
          }
 
          timeout {
-            send_log "ERROR: Time out setting up kermit parameters"
-            exit
+            puts "ERROR: Time out setting up kermit parameters"
          }
       }
    }
@@ -172,7 +130,7 @@ while 1 {
       }
 
       timeout {
-         send_log "\nERROR: Can't connect to serial port\n"
+         puts "\nERROR: Can't connect to serial port\n"
          exit
       }
    }
@@ -180,164 +138,35 @@ while 1 {
 
 step "Match the prompt info."
 
-set timeout 30
-while 1 {
+set timeout 50
+    while 1 {
         expect {
-           -re "Board: ADI (BF\[0-9]{3}).*board" {
-              set board_type $expect_out(1,string)
-              send_log "\nBoard type is $board_type.\n"
+            "Hit any key" {
+             send "\r"
+             break
+
             }
 
-            -re "Hit any key| \[0-5] " {
-              if { $board_type == "" } {
-              send -s "\r"
-              expect "$uboot_prompt" 
-              send -s "reset\r"
-              } else {
-              send "\r"
-              break
-              }
+            " 2 " {
+             send "\r"
+             break
             }
 
             timeout {
-              send "\r"
-              send_user "u-boot miss the hit any key prompt\n"
-              break
+             send "\r"
+             send_user "u-boot miss the hit any key prompt\n"
+             break
             }
         }
-}
+    }
 
-if { $board_type == "BF537" || $board_type == "BF533" || $board_type == "BF561" || $board_type == "BF538" || $board_type == "BF518" } {
-   set def_uart_port 0
-} elseif { $board_type == "BF548"  || $board_type == "BF527"  || $board_type == "BF526"  } {
-   set def_uart_port 1
-} else {
-   set def_uart_port 0
-}
 
-expect   "$uboot_prompt" 
-send "\r"
-expect   "$uboot_prompt"
-send -s "set ipaddr 10.100.4.50; set serverip 10.100.4.174; set gatewayip 10.100.4.174 \r"
-expect   "$uboot_prompt"
-send -s "set bootargs root=/dev/mtdblock0 rw earlyprintk=serial,uart0,57600 panic=3 ip=10.100.4.50 console=tty0 console=ttyBF$def_uart_port,57600 \r"
-expect   "$uboot_prompt"
-send -s "set tftp_boot tftp 0x2000000 $download_file\\; run addip \\; bootm 0x2000000\r"
-expect   "$uboot_prompt"
-send -s "set bootcmd run tftp_boot\r"
-expect   "$uboot_prompt"
-send -s "save\r"
-set timeout 20
-while 1 {
-   expect {
-      "$uboot_prompt" {
-         break
-      }
-
-      timeout {
-         send "print\r"
-         send_log "\nERROR: Can't save variables to board\n"
-         break
-      }
-   }
-}
-expect   "$uboot_prompt" 
-send "\r"
-expect  "$uboot_prompt"
-
-send -s "run tftp_boot\r"
-set timeout 180
-while 1 {
-      expect {
-
-         -re "Kernel panic" {
-            send_log "kernel panic detected... trying to recover from it"
-            break
-         }
-
-	 -re "$kernel_prompt" {
-            send_log "successful boot attempt"
-            break
-         }
-
-         -re "Linux version (.*) " {
-            set linux_version $expect_out(1,string)
-         }
-
-         # Look for gcc version N.N[.N[.N]]
-         -re "gcc version (\[0-9](\.\[0-9]+)+)" {
-            set gcc_version [lindex $expect_out(0,string) 2]
-         }
-
-         timeout {
-            send_log "failed boot attempt"
-            break
-         }
-      }
-}
-
-sleep 5
-send "\r"
-expect -re "$kernel_prompt"
-
-send -s "ls -l /bin/rcp /lib\r"
-while 1 {
-   sleep 3
-   expect {
-      -re "$kernel_prompt" {
-         send_log "ls success.\n"
-         break
-      }
-
-      timeout {
-         send_log "Fail to ls. "
-         break
-         }
-     }
-}
-#
-# Do this ifconfig again to make sure ethernet is configed if 
-# it is not set ready by passed in boot parameters.
-#
-send -s "ifconfig eth0 10.100.4.50\r"
-while 1 {
-   sleep 3
-   expect {
-      -re "$kernel_prompt" {
-         send_log "ifconfig set success.\n"
-         break
-      }
-
-      timeout {
-         send_log "Fail to do ifconfig. "
-         break
-         }
-     }
-}
-## For gfortran case itime_idate which needs real time.
-send -s "date $current_date\r"
-while 1 {
-   sleep 3
-   expect {
-      -re "$kernel_prompt" {
-         send_log "date set success.\n"
-         break
-      }
-
-      timeout {
-         send_log "Fail to do date. "
-         break
-         }
-     }
-}
-
-if { $wait_log == 1 } {
-set timeout 300000
-expect "testing hardware-fdpic done"
-}
+expect ">"
+send -s "\r"
+expect ">"
 
 log_file
  
-send_user "Ending reset_board.exp\n"
+send_user "Ending reset_board_test.exp\n"
 
 

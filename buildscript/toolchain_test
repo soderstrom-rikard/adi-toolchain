@@ -1,4 +1,4 @@
-#!/bin/sh 
+#!/bin/sh -x
 
 if [ -d /home/test/work/cruise ] ; then
 USER=/home/test/work/cruise
@@ -6,7 +6,10 @@ CHECKOUT=$USER/checkouts
 TOOLCHAIN_BUILDSCRIPT=$CHECKOUT/toolchain/buildscript
 TOOLCHAIN_SCRIPTS=$USER/test_scripts/toolchain
 TOOLCHAINBUILD=$TOOLCHAIN_SCRIPTS/toolchain-build
-LINUX_PATH=$CHECKOUT/uclinux-dist/linux-2.6.x
+KERNEL_PATH=$CHECKOUT/uclinux-dist
+OUTPUT_PATH=$KERNEL_PATH/images
+LINUX_PATH=$KERNEL_PATH/linux-2.6.x
+BUILD_TOOLCHAIN_KERNEL=build_toolchain_kernel
 HOST_CONFIG=SUSE
 else
 USER=/home/test
@@ -15,7 +18,10 @@ CHECKOUT=$SRC_ROOT
 TOOLCHAIN_BUILDSCRIPT=$CHECKOUT/toolchain/buildscript
 TOOLCHAIN_SCRIPTS=$TOOLCHAIN_BUILDSCRIPT
 TOOLCHAINBUILD=$USER/workspace/logs
-LINUX_PATH=$CHECKOUT/kernel/linux/linux-kernel
+KERNEL_PATH=$CHECKOUT/kernel
+OUTPUT_PATH=$KERNEL_PATH/output/images
+LINUX_PATH=$KERNEL_PATH/linux/linux-kernel
+BUILD_TOOLCHAIN_KERNEL=build_buildroot_kernel
 HOST_CONFIG=UBUNTU
 fi
 BASELINE=standard
@@ -32,7 +38,8 @@ MAIL_LIST=""
 
 TARGET_IP=10.100.4.50
 TARGET_KERNEL_CONFIG=normal
-TARGET_KERNEL_BUILD="shared_flat normal flat_lib fdpic_lib"
+#TARGET_KERNEL_BUILD="shared_flat normal flat_lib fdpic_lib"
+TARGET_KERNEL_BUILD="normal"
 if [ $# -gt 0 ] ; then
  if [ $1 = "normal" ] || [ $1 = "shared_flat" ] || [ $1 = "kgdb" ] || [ $1 = "smp" ] || [ $1 = "flat_lib" ] || [ $1 = "fdpic_lib" ] ; then
   TARGET_KERNEL_CONFIG=$1
@@ -42,7 +49,7 @@ if [ $# -gt 0 ] ; then
  fi
 fi
 
-$TOOLCHAIN_BUILDSCRIPT/set_tw_recycle.exp
+$TOOLCHAIN_BUILDSCRIPT/set_tw_recycle.exp >/dev/null  2>&1
  
 if [ -d /home/test/work/cruise ] ; then
 cp $TOOLCHAIN_BUILDSCRIPT/reset_board.exp $TOOLCHAIN_SCRIPTS
@@ -58,12 +65,7 @@ if [ $RUN -lt 5 ] ; then
 else       
   BOARD_CONFIG=`rsh -l root $TARGET_IP cat /proc/cpuinfo | grep 'board name' | awk  'BEGIN { FS="[ :-]" } {print $5"-"$6}'`
 
-  if [ -d /home/test/work/cruise ] ; then
   TOOLCHAIN_VERSION=`rsh -l root $TARGET_IP version | grep 'toolchain' | awk 'BEGIN { FS="[ :.]" } {print $7"."$8}'`
-  else
-
-  TOOLCHAIN_VERSION=`rsh -l root $TARGET_IP version | grep 'toolchain' | awk 'BEGIN { FS="[ :.]" } {print $8"."$9}'`
-  fi
 
 fi
 
@@ -136,50 +138,46 @@ log_test_results ()
 
 }
 
-
 ######## Do svn update and show svn info for each project.
 cd $CHECKOUT
-if [ `ls -a toolchain | grep -c .svn` -eq 1 ] ; then
+if [ `[ -d uclinux-dist ] && ls -a uclinux-dist | grep -c .svn` -gt 1 ] ; then
 cat  <<EOF
 ************** Testing is done on target with kernel config ($TARGET_KERNEL_CONFIG). *************
 ************** Testing $TOOLCHAIN_VERSION toolchain on $BOARD_CONFIG. ************
 ************** Host $HOST_CONFIG $HOST_IP. ***********
 
 ************** Tested toolchain svn info ***************
-`cd toolchain ; svn up `
-`cd toolchain ; svn info`
-************** Tested U-Boot svn info ******************
-`cd u-boot ; svn up `
-`cd u-boot ; svn info`
+`cd toolchain ; svn up; svn info `
+************** Tested U-Boot git info ******************
+`cd $SRC_ROOT/u-boot; echo -n "U-Boot "; git fetch ; git remote -v; git log -1`
 ************* Tested uclinux-dist svn info *************
-`cd uclinux-dist ;svn up ` 
-`cd uclinux-dist ;svn info`
-************* Tested linux svn info ********************
-`cd uclinux-dist/linux-2.6.x ; svn up `
-`cd uclinux-dist/linux-2.6.x ; svn info`
+`cd uclinux-dist ;svn up ; svn info` 
+************* Tested linux git info ********************
+`cd uclinux-dist/linux-2.6.x ;echo -n "linux "; git fetch ; git remote -v; git log -1 `
 
 EOF
-elif  [ `ls -a toolchain | grep -c .git` -eq 1 ] ; then
+elif  [` [ -d kernel ] && ls -a kernel | grep -c .git` -gt 1 ] ; then
 
 cat  <<EOF
 ************** Testing is done on target with kernel config ($TARGET_KERNEL_CONFIG). *************
 ************** Testing $TOOLCHAIN_VERSION toolchain on $BOARD_CONFIG. ************
 ************** Host $HOST_CONFIG $HOST_IP. ***********
 
-************** Tested toolchain git info ***************
-`cd $SRC_ROOT/toolchain ; echo -n "Toolchain "; git fetch; git log -1`
+************** Tested toolchain svn info ***************
+`cd $SRC_ROOT/toolchain ;svn up; svn info`
 ************** Tested U-Boot git info ******************
-`cd $SRC_ROOT/u-boot; echo -n "U-Boot "; git fetch ;git log -1`
-************* Tested uclinux-dist git info *************
-`cd $SRC_ROOT/kernel; echo -n "Uclinux-dist "; git fetch;  git log -1`
+`cd $SRC_ROOT/u-boot; echo -n "U-Boot "; git fetch ; git remote -v; git log -1`
+************* Tested Buildroot git info *************
+`cd $SRC_ROOT/kernel; echo -n "Buildroot "; git fetch; git remote -v; git log -1`
 ************* Tested linux git info ********************
-`cd $SRC_ROOT/kernel/linux/linux*; echo -n "Kernel "; git fetch;  git log -1`
+`cd $SRC_ROOT/kernel/linux/linux*; echo -n "Kernel "; git fetch; git remote -v; git log -1`
 
 EOF
 else
 echo "It can't recognize the repositary system! Neither svn nor git! \n"
 exit
 fi
+
 ######## Start building an up-to-date Toolchain here.
   cd $TOOLCHAIN_BUILDSCRIPT 
 
@@ -187,8 +185,8 @@ fi
 # ./BuildToolChain  -j 1 -w -s $CHECKOUT/toolchain -b $USER/temp -K $CHECKOUT/toolchain/kbuild_output  -u $CHECKOUT/u-boot -c $TOOLCHAIN_VERSION  -D
 
 # For trunk testing, use -k $CHECKOUT/uclinux-dist/linux-2.6.x.
-  ./BuildToolChain  -j 1 -w -s $CHECKOUT/toolchain -b $USER/temp -k $LINUX_PATH  -u $CHECKOUT/u-boot -c $TOOLCHAIN_VERSION -D \
-  -a UCLIBC_HAS_IPV6=y  -a UCLIBC_HAS_WCHAR=y 
+  ./BuildToolChain  -j 1 -w -s $CHECKOUT/toolchain -b $USER/temp -k $LINUX_PATH  -u $CHECKOUT/u-boot -c 4.3 -D \
+  -a UCLIBC_HAS_IPV6=y  -a UCLIBC_HAS_WCHAR=y  
 
   if [ $? != 0 ] ; then
   echo -e "\nFailed to build the toolchain in toolchain-$TIMESTAMP . exit!\n"     
@@ -220,20 +218,20 @@ if [ $BOARD_CONFIG != "NON_EXIST" ] ; then
   do
 
   cd $TOOLCHAIN_BUILDSCRIPT
-  rm $CHECKOUT/uclinux-dist/images/uImage                                >/dev/null  2>&1 
-  rm -f build_toolchain_kernel_log                              >/dev/null  2>&1
-  ./build_toolchain_kernel.exp $BOARD_CONFIG $config      >/dev/null  2>&1
-  cp ./build_toolchain_kernel_log $BUILD/build_toolchain_kernel_log.$config      
-  cp $CHECKOUT/uclinux-dist/images/uImage $BUILD/uImage.$config           
-  cp $CHECKOUT/uclinux-dist/images/uImage /tftpboot/uImage.$config       
+  rm $OUTPUT_PATH/uImage                                >/dev/null  2>&1 
+  rm -f ${BUILD_TOOLCHAIN_KERNEL}_log                              >/dev/null  2>&1
+  ./$BUILD_TOOLCHAIN_KERNEL.exp $BOARD_CONFIG $config      >/dev/null  2>&1
+  cp ./${BUILD_TOOLCHAIN_KERNEL}_log $BUILD/${BUILD_TOOLCHAIN_KERNEL}_log.$config      
+  cp $OUTPUT_PATH/uImage $BUILD/uImage.$config           
+  cp $OUTPUT_PATH/uImage /tftpboot/uImage.$config       
 
   
-  if [ -e $CHECKOUT/uclinux-dist/images/uImage ] && [ -e /tftpboot/uImage.$config ] ; then
+  if [ -e $OUTPUT_PATH/uImage ] && [ -e /tftpboot/uImage.$config ] ; then
        
          echo  "uImage.$config is built and copied."                           
   
          if  [ $config = "normal" ] ; then
-             cp $CHECKOUT/uclinux-dist/images/uImage /tftpboot/uImage
+             cp $OUTPUT_PATH/uImage /tftpboot/uImage
          fi
          
          if [ $config != "flat_lib" ] && [ $config != "fdpic_lib" ] ; then
@@ -251,9 +249,9 @@ if [ $BOARD_CONFIG != "NON_EXIST" ] ; then
   
   else
           if  [ $config = "normal" ] ; then
-              echo  "Build $config kernel fails in toolchain-$TIMESTAMP." >  /tmp/build_toolchain_kernel_log.tail
-              grep -nr  "Error" $TOOLCHAIN_BUILDSCRIPT/build_toolchain_kernel_log  -A 20 -B 30 | dos2unix  >>  /tmp/build_toolchain_kernel_log.tail
-              MAIL_LIST="/tmp/build_toolchain_kernel_log.tail "
+              echo  "Build $config kernel fails in toolchain-$TIMESTAMP." >  /tmp/${BUILD_TOOLCHAIN_KERNEL}_log.tail
+              grep -nr  "Error" $TOOLCHAIN_BUILDSCRIPT/${BUILD_TOOLCHAIN_KERNEL}_log  -A 20 -B 30 | dos2unix  >>  /tmp/${BUILD_TOOLCHAIN_KERNEL}_log.tail
+              MAIL_LIST="/tmp/$BUILD_TOOLCHAIN_KERNEL_log.tail "
               BUILD_KERNEL=1 
           fi
           
@@ -280,7 +278,8 @@ sleep 20
   ./toolchain-regtest -s $CHECKOUT/toolchain -o $TEST_TOOLCHAIN_DIR/bfin -b $USER/temp/regtest_build$TOOLCHAIN_VERSION -t uclinux -T $TARGET_IP -a -L
   find $USER/temp/regtest_build$TOOLCHAIN_VERSION/.  -maxdepth 1 -type d -regex .*build\[-0-9.\]*  -exec mv {} {}-uclinux \;
 
-#  $TOOLCHAIN_SCRIPTS/reset_board.exp uImage.$TARGET_KERNEL_CONFIG   >/dev/null  2>&1
+  $TOOLCHAIN_SCRIPTS/reset_board.exp uImage.$TARGET_KERNEL_CONFIG   >/dev/null  2>&1
+  sleep 200
 
   ./toolchain-regtest -s $CHECKOUT/toolchain -o $TEST_TOOLCHAIN_DIR/bfin -b $USER/temp/regtest_build$TOOLCHAIN_VERSION -t linux-uclibc -T $TARGET_IP -a -L   # \!gdb   
   find $USER/temp/regtest_build$TOOLCHAIN_VERSION/.  -maxdepth 1 -type d -regex .*build\[-0-9.\]*  -exec mv {} {}-linux-uclibc \;
@@ -309,12 +308,12 @@ sleep 20
   for toolchain_type in elf-sim uclinux linux-uclibc
   do
 
-  ./compare_toolchain_results $TOOLCHAINBUILD/$BASELINE/tests/$toolchain_type $BUILD/tests/$toolchain_type > $BUILD/tests/diff/$toolchain_type.diff
+  ./compare_toolchain_results $TOOLCHAINBUILD/$BASELINE/tests/$toolchain_type $BUILD/tests/$toolchain_type $COMPARE > $BUILD/tests/diff/$toolchain_type.diff
   if [ $? != 0 ] ; then
         TEST_RESULTS=1 
   fi
 
-  ./compare_toolchain_results $TOOLCHAINBUILD/$LASTRUN/tests/$toolchain_type $BUILD/tests/$toolchain_type > $BUILD/tests/diff/lastrun-$toolchain_type.diff 
+  ./compare_toolchain_results $TOOLCHAINBUILD/$LASTRUN/tests/$toolchain_type $BUILD/tests/$toolchain_type $COMPARE > $BUILD/tests/diff/lastrun-$toolchain_type.diff 
   if [ $? != 0 ] ; then
         COMPARE_LASTRUN_STATUS=1
         head -150 $BUILD/tests/diff/lastrun-$toolchain_type.diff > /tmp/lastrun-$toolchain_type.diff

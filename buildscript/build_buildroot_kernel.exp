@@ -1,10 +1,11 @@
 #!/usr/bin/expect
-log_file build_toolchain_kernel_log
-send_user "Starting build_toolchain_kernel.exp\n"
+log_file build_buildroot_kernel_log
+send_user "Starting build_buildroot_kernel.exp\n"
 
 set user /home/test/
 set src_root $user/workspace/src/kernel
 #set src_root $user/checkouts/uclinux-dist
+set board_defconfig bf609-ezkit_defconfig
 set ttydev /dev/ttyS0
 set send_slow {1 0.1}
 set kernel_config normal
@@ -50,6 +51,22 @@ proc step { message } {
 }
 
 set step_sequence_number 1
+
+step "Make default config"
+cd $src_root
+set timeout 300
+spawn make $board_defconfig
+while 1 {
+       expect {
+           "configuration written to" {}
+           eof { break }
+           timeout {
+               send_user "\n\nERROR: make default config timeout"
+               break
+           }
+       }
+}
+
 
 step "Make user space config"
 cd $src_root
@@ -178,4 +195,4 @@ if { $bfin_make_status == "failure" } {
 
 log_file
 
-send_user "Ending build_toolchain_kernel.exp\n"
+send_user "Ending build_buildroot_kernel.exp\n"
