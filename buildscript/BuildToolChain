@@ -565,10 +565,12 @@ build_curses()
 build_readline()
 {
 	pkgs_queued readline || return 0
-
+	
 	# help out mingw targets; some packages (like urjtag) like readline
 	if [ "${CBUILD}" = "${CHOST}" ] || check_lib readline ${CHOST} 2>/dev/null ; then
-		return 0
+		if echo $CBUILD | grep -qiv darwin ; then
+			return 0
+		fi
 	fi
 
 	PN="readline"
@@ -1512,6 +1514,10 @@ build_urjtag()
 		fi
 	}
 
+	if echo $CBUILD | grep -qi darwin ; then
+		at_make_args() { echo "LDFLAGS='-framework IOKit -framework CoreFoundation -lreadline -lncurses'"; }
+	fi
+
 	build_autotooled_pkg "${DIR_URJTAG_SOURCE}" \
 		--disable-shared --enable-static --enable-relocatable \
 		--with-libusb=1.0
@@ -1520,6 +1526,10 @@ build_urjtag()
 build_gdbproxy()
 {
 	pkgs_queued gdbproxy || return 0
+	
+	if echo $CBUILD | grep -qi darwin ; then
+		at_make_args() { echo "LDFLAGS='-lreadline -lncurses'"; }
+	fi
 
 	build_autotooled_pkg "${DIR_GDBPROXY_SOURCE}"
 }
