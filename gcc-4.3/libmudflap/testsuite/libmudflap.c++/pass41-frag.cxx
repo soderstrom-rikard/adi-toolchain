@@ -8,3 +8,5 @@ main (int argc, char *argv[])
     std::cout << myStr << std::endl;
     return 0;
 }
+
+/* { dg-do compile } */
