@@ -76,5 +76,5 @@ main ()
   return (0);
 }
 
-/* { dg-options "-fmudflap -lmudflap -DSCALE=5000" { target bfin*-*-* } } */
+/* { dg-options "-fmudflap -lmudflap -DSCALE=4000" { target bfin*-*-* } } */
 /* { dg-output "allocating.*freeing.*allocating.*freeing.*done" } */
