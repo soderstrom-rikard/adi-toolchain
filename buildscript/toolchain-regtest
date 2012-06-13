@@ -347,6 +347,12 @@ dorsh()
 		$(rsh -l root ${TARGET_IPADDR} "$@" 3>&1 1>&2 2>&3 </dev/null) \
 		2>&1) 2>&1
 }
+dorshq()
+{
+	# a simplified version of dorsh that doesn't provide any output
+	# and is less prone to sticking with the board in a bad state.
+	rsh -l root ${TARGET_IPADDR} "$@" &> /dev/null
+}
 run_rsh_nodie_stdout()
 {
 	log_it rsh -l root ${TARGET_IPADDR} "$@"
@@ -538,7 +544,7 @@ check_tests_OK()
 			fi
 
 			# make sure the board is not hung
-			if ! dorsh ls / >/dev/null 2>&1 ; then
+			if ! dorshq ls / ; then
 				: $(( timeout += 1 ))
 			else
 				timeout=0
