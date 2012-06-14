@@ -16,8 +16,8 @@
      File         :   defBF606.h
      Description  :   Register Definitions
 
-     Date         :   05-17-2012
-
+     Date         :   06-07-2012
+     Tag          :   BF60X_TOOLS_CCES_1_0_1
 
      Copyright (c) 2011-2012 Analog Devices, Inc.  All Rights Reserved.
      This software is proprietary and confidential to Analog Devices, Inc. and
@@ -78,7 +78,7 @@
 #define __ADI_HAS_SPI__           1
 #define __ADI_HAS_DMA__           1
 #define __ADI_HAS_ACM__           1
-#define __ADI_HAS_DDR__           1
+#define __ADI_HAS_DMC__           1
 #define __ADI_HAS_SCB__           1
 #define __ADI_HAS_L2CTL__         1
 #define __ADI_HAS_SEC__           1
@@ -11231,327 +11231,329 @@
    ================================================== */
 
 /* =========================
-        DDR0
+        DMC0
    ========================= */
-#define REG_DDR0_CTL                    0xFFC80004         /* DDR0 Control Register */
-#define REG_DDR0_STAT                   0xFFC80008         /* DDR0 Status Register */
-#define REG_DDR0_EFFCTL                 0xFFC8000C         /* DDR0 Efficiency Control Register */
-#define REG_DDR0_PRIO                   0xFFC80010         /* DDR0 Priority ID Register */
-#define REG_DDR0_PRIOMSK                0xFFC80014         /* DDR0 Priority ID Mask Register */
-#define REG_DDR0_CFG                    0xFFC80040         /* DDR0 Configuration Register */
-#define REG_DDR0_TR0                    0xFFC80044         /* DDR0 Timing 0 Register */
-#define REG_DDR0_TR1                    0xFFC80048         /* DDR0 Timing 1 Register */
-#define REG_DDR0_TR2                    0xFFC8004C         /* DDR0 Timing 2 Register */
-#define REG_DDR0_MSK                    0xFFC8005C         /* DDR0 Mask (Mode Register Shadow) Register */
-#define REG_DDR0_MR                     0xFFC80060         /* DDR0 Shadow MR Register */
-#define REG_DDR0_EMR1                   0xFFC80064         /* DDR0 Shadow EMR1 Register */
-#define REG_DDR0_EMR2                   0xFFC80068         /* DDR0 Shadow EMR2 Register */
-#define REG_DDR0_EMR3                   0xFFC8006C         /* DDR0 Shadow EMR3 Register */
-#define REG_DDR0_DLLCTL                 0xFFC80080         /* DDR0 DLL Control Register */
-#define REG_DDR0_PHY_CTL1               0xFFC80094         /* DDR0 PHY Control 1 Register */
-#define REG_DDR0_PHY_CTL3               0xFFC8009C         /* DDR0 PHY Control 3 Register */
-#define REG_DDR0_PADCTL                 0xFFC800C0         /* DDR0 PAD Control Register */
+#define REG_DMC0_CTL                    0xFFC80004         /* DMC0 Control Register */
+#define REG_DMC0_STAT                   0xFFC80008         /* DMC0 Status Register */
+#define REG_DMC0_EFFCTL                 0xFFC8000C         /* DMC0 Efficiency Control Register */
+#define REG_DMC0_PRIO                   0xFFC80010         /* DMC0 Priority ID Register */
+#define REG_DMC0_PRIOMSK                0xFFC80014         /* DMC0 Priority ID Mask Register */
+#define REG_DMC0_CFG                    0xFFC80040         /* DMC0 Configuration Register */
+#define REG_DMC0_TR0                    0xFFC80044         /* DMC0 Timing 0 Register */
+#define REG_DMC0_TR1                    0xFFC80048         /* DMC0 Timing 1 Register */
+#define REG_DMC0_TR2                    0xFFC8004C         /* DMC0 Timing 2 Register */
+#define REG_DMC0_MSK                    0xFFC8005C         /* DMC0 Mask (Mode Register Shadow) Register */
+#define REG_DMC0_MR                     0xFFC80060         /* DMC0 Shadow MR Register */
+#define REG_DMC0_EMR1                   0xFFC80064         /* DMC0 Shadow EMR1 Register */
+#define REG_DMC0_EMR2                   0xFFC80068         /* DMC0 Shadow EMR2 Register */
+#define REG_DMC0_EMR3                   0xFFC8006C         /* DMC0 Shadow EMR3 Register */
+#define REG_DMC0_DLLCTL                 0xFFC80080         /* DMC0 DLL Control Register */
+#define REG_DMC0_PHY_CTL0               0xFFC80090         /* DMC0 PHY Control 0 Register */
+#define REG_DMC0_PHY_CTL1               0xFFC80094         /* DMC0 PHY Control 1 Register */
+#define REG_DMC0_PHY_CTL2               0xFFC80098         /* DMC0 PHY Control 2 Register */
+#define REG_DMC0_PHY_CTL3               0xFFC8009C         /* DMC0 PHY Control 3 Register */
+#define REG_DMC0_PADCTL                 0xFFC800C0         /* DMC0 PAD Control Register */
 
 /* =========================
-        DDR
+        DMC
    ========================= */
 /* ------------------------------------------------------------------------------------------------------------------------
-        DDR_CTL                              Pos/Masks                        Description
+        DMC_CTL                              Pos/Masks                        Description
    ------------------------------------------------------------------------------------------------------------------------ */
-#define BITP_DDR_CTL_DLLCAL                  13                               /* DLL Calibration Start */
-#define BITP_DDR_CTL_PPREF                   12                               /* Postpone Refresh */
-#define BITP_DDR_CTL_RDTOWR                   9                               /* Read-to-Write Cycle */
-#define BITP_DDR_CTL_ADDRMODE                 8                               /* Addressing (Page/Bank) Mode */
-#define BITP_DDR_CTL_PREC                     6                               /* Precharge */
-#define BITP_DDR_CTL_DPDREQ                   5                               /* Deep Power Down Request */
-#define BITP_DDR_CTL_PDREQ                    4                               /* Power Down Request */
-#define BITP_DDR_CTL_SRREQ                    3                               /* Self Refresh Request */
-#define BITP_DDR_CTL_INIT                     2                               /* Initialize DRAM Start */
-#define BITP_DDR_CTL_LPDDR                    1                               /* Low Power DDR Mode */
-#define BITM_DDR_CTL_DLLCAL                  (_ADI_MSK(0x00002000,uint32_t))  /* DLL Calibration Start */
-#define BITM_DDR_CTL_PPREF                   (_ADI_MSK(0x00001000,uint32_t))  /* Postpone Refresh */
+#define BITP_DMC_CTL_DLLCAL                  13                               /* DLL Calibration Start */
+#define BITP_DMC_CTL_PPREF                   12                               /* Postpone Refresh */
+#define BITP_DMC_CTL_RDTOWR                   9                               /* Read-to-Write Cycle */
+#define BITP_DMC_CTL_ADDRMODE                 8                               /* Addressing (Page/Bank) Mode */
+#define BITP_DMC_CTL_PREC                     6                               /* Precharge */
+#define BITP_DMC_CTL_DPDREQ                   5                               /* Deep Power Down Request */
+#define BITP_DMC_CTL_PDREQ                    4                               /* Power Down Request */
+#define BITP_DMC_CTL_SRREQ                    3                               /* Self Refresh Request */
+#define BITP_DMC_CTL_INIT                     2                               /* Initialize DRAM Start */
+#define BITP_DMC_CTL_LPDDR                    1                               /* Low Power DDR Mode */
+#define BITM_DMC_CTL_DLLCAL                  (_ADI_MSK(0x00002000,uint32_t))  /* DLL Calibration Start */
+#define BITM_DMC_CTL_PPREF                   (_ADI_MSK(0x00001000,uint32_t))  /* Postpone Refresh */
 
-#define BITM_DDR_CTL_RDTOWR                  (_ADI_MSK(0x00000E00,uint32_t))  /* Read-to-Write Cycle */
-#define ENUM_DDR_CTL_RDTOWR0                 (_ADI_MSK(0x00000000,uint32_t))  /* RDTOWR: 0 Cycles Added */
-#define ENUM_DDR_CTL_RDTOWR1                 (_ADI_MSK(0x00000200,uint32_t))  /* RDTOWR: 1 Cycle Added */
-#define ENUM_DDR_CTL_RDTOWR2                 (_ADI_MSK(0x00000400,uint32_t))  /* RDTOWR: 2 Cycles Added */
-#define ENUM_DDR_CTL_RDTOWR3                 (_ADI_MSK(0x00000600,uint32_t))  /* RDTOWR: 3 Cycles Added */
-#define ENUM_DDR_CTL_RDTOWR4                 (_ADI_MSK(0x00000800,uint32_t))  /* RDTOWR: 4 Cycles Added */
-#define BITM_DDR_CTL_ADDRMODE                (_ADI_MSK(0x00000100,uint32_t))  /* Addressing (Page/Bank) Mode */
-#define BITM_DDR_CTL_PREC                    (_ADI_MSK(0x00000040,uint32_t))  /* Precharge */
-#define BITM_DDR_CTL_DPDREQ                  (_ADI_MSK(0x00000020,uint32_t))  /* Deep Power Down Request */
-#define BITM_DDR_CTL_PDREQ                   (_ADI_MSK(0x00000010,uint32_t))  /* Power Down Request */
-#define BITM_DDR_CTL_SRREQ                   (_ADI_MSK(0x00000008,uint32_t))  /* Self Refresh Request */
-#define BITM_DDR_CTL_INIT                    (_ADI_MSK(0x00000004,uint32_t))  /* Initialize DRAM Start */
-#define BITM_DDR_CTL_LPDDR                   (_ADI_MSK(0x00000002,uint32_t))  /* Low Power DDR Mode */
+#define BITM_DMC_CTL_RDTOWR                  (_ADI_MSK(0x00000E00,uint32_t))  /* Read-to-Write Cycle */
+#define ENUM_DMC_CTL_RDTOWR0                 (_ADI_MSK(0x00000000,uint32_t))  /* RDTOWR: 0 Cycles Added */
+#define ENUM_DMC_CTL_RDTOWR1                 (_ADI_MSK(0x00000200,uint32_t))  /* RDTOWR: 1 Cycle Added */
+#define ENUM_DMC_CTL_RDTOWR2                 (_ADI_MSK(0x00000400,uint32_t))  /* RDTOWR: 2 Cycles Added */
+#define ENUM_DMC_CTL_RDTOWR3                 (_ADI_MSK(0x00000600,uint32_t))  /* RDTOWR: 3 Cycles Added */
+#define ENUM_DMC_CTL_RDTOWR4                 (_ADI_MSK(0x00000800,uint32_t))  /* RDTOWR: 4 Cycles Added */
+#define BITM_DMC_CTL_ADDRMODE                (_ADI_MSK(0x00000100,uint32_t))  /* Addressing (Page/Bank) Mode */
+#define BITM_DMC_CTL_PREC                    (_ADI_MSK(0x00000040,uint32_t))  /* Precharge */
+#define BITM_DMC_CTL_DPDREQ                  (_ADI_MSK(0x00000020,uint32_t))  /* Deep Power Down Request */
+#define BITM_DMC_CTL_PDREQ                   (_ADI_MSK(0x00000010,uint32_t))  /* Power Down Request */
+#define BITM_DMC_CTL_SRREQ                   (_ADI_MSK(0x00000008,uint32_t))  /* Self Refresh Request */
+#define BITM_DMC_CTL_INIT                    (_ADI_MSK(0x00000004,uint32_t))  /* Initialize DRAM Start */
+#define BITM_DMC_CTL_LPDDR                   (_ADI_MSK(0x00000002,uint32_t))  /* Low Power DDR Mode */
 
 /* ------------------------------------------------------------------------------------------------------------------------
-        DDR_STAT                             Pos/Masks                        Description
+        DMC_STAT                             Pos/Masks                        Description
    ------------------------------------------------------------------------------------------------------------------------ */
-#define BITP_DDR_STAT_PHYRDPHASE             20                               /* PHY Read Phase */
-#define BITP_DDR_STAT_PENDREF                16                               /* Pending Refresh */
-#define BITP_DDR_STAT_DLLCALDONE             13                               /* DLL Calibration Done */
-#define BITP_DDR_STAT_DPDACK                  5                               /* Deep Powerdown Acknowledge */
-#define BITP_DDR_STAT_PDACK                   4                               /* Power Down Acknowledge */
-#define BITP_DDR_STAT_SRACK                   3                               /* Self Refresh Acknowledge */
-#define BITP_DDR_STAT_MEMINITDONE             1                               /* Memory Initialization Done */
-#define BITP_DDR_STAT_IDLE                    0                               /* Idle State */
-#define BITM_DDR_STAT_PHYRDPHASE             (_ADI_MSK(0x00F00000,uint32_t))  /* PHY Read Phase */
-#define BITM_DDR_STAT_PENDREF                (_ADI_MSK(0x000F0000,uint32_t))  /* Pending Refresh */
-#define BITM_DDR_STAT_DLLCALDONE             (_ADI_MSK(0x00002000,uint32_t))  /* DLL Calibration Done */
-#define BITM_DDR_STAT_DPDACK                 (_ADI_MSK(0x00000020,uint32_t))  /* Deep Powerdown Acknowledge */
-#define BITM_DDR_STAT_PDACK                  (_ADI_MSK(0x00000010,uint32_t))  /* Power Down Acknowledge */
-#define BITM_DDR_STAT_SRACK                  (_ADI_MSK(0x00000008,uint32_t))  /* Self Refresh Acknowledge */
-#define BITM_DDR_STAT_MEMINITDONE            (_ADI_MSK(0x00000002,uint32_t))  /* Memory Initialization Done */
-#define BITM_DDR_STAT_IDLE                   (_ADI_MSK(0x00000001,uint32_t))  /* Idle State */
+#define BITP_DMC_STAT_PHYRDPHASE             20                               /* PHY Read Phase */
+#define BITP_DMC_STAT_PENDREF                16                               /* Pending Refresh */
+#define BITP_DMC_STAT_DLLCALDONE             13                               /* DLL Calibration Done */
+#define BITP_DMC_STAT_DPDACK                  5                               /* Deep Powerdown Acknowledge */
+#define BITP_DMC_STAT_PDACK                   4                               /* Power Down Acknowledge */
+#define BITP_DMC_STAT_SRACK                   3                               /* Self Refresh Acknowledge */
+#define BITP_DMC_STAT_MEMINITDONE             1                               /* Memory Initialization Done */
+#define BITP_DMC_STAT_IDLE                    0                               /* Idle State */
+#define BITM_DMC_STAT_PHYRDPHASE             (_ADI_MSK(0x00F00000,uint32_t))  /* PHY Read Phase */
+#define BITM_DMC_STAT_PENDREF                (_ADI_MSK(0x000F0000,uint32_t))  /* Pending Refresh */
+#define BITM_DMC_STAT_DLLCALDONE             (_ADI_MSK(0x00002000,uint32_t))  /* DLL Calibration Done */
+#define BITM_DMC_STAT_DPDACK                 (_ADI_MSK(0x00000020,uint32_t))  /* Deep Powerdown Acknowledge */
+#define BITM_DMC_STAT_PDACK                  (_ADI_MSK(0x00000010,uint32_t))  /* Power Down Acknowledge */
+#define BITM_DMC_STAT_SRACK                  (_ADI_MSK(0x00000008,uint32_t))  /* Self Refresh Acknowledge */
+#define BITM_DMC_STAT_MEMINITDONE            (_ADI_MSK(0x00000002,uint32_t))  /* Memory Initialization Done */
+#define BITM_DMC_STAT_IDLE                   (_ADI_MSK(0x00000001,uint32_t))  /* Idle State */
 
 /* ------------------------------------------------------------------------------------------------------------------------
-        DDR_EFFCTL                           Pos/Masks                        Description
+        DMC_EFFCTL                           Pos/Masks                        Description
    ------------------------------------------------------------------------------------------------------------------------ */
-#define BITP_DDR_EFFCTL_IDLECYC              20                               /* Idle Cycle */
-#define BITP_DDR_EFFCTL_NUMREF               16                               /* Number of Refresh Commands */
-#define BITP_DDR_EFFCTL_PRECBANK7            15                               /* Precharge Bank 7 */
-#define BITP_DDR_EFFCTL_PRECBANK6            14                               /* Precharge Bank 6 */
-#define BITP_DDR_EFFCTL_PRECBANK5            13                               /* Precharge Bank 5 */
-#define BITP_DDR_EFFCTL_PRECBANK4            12                               /* Precharge Bank 4 */
-#define BITP_DDR_EFFCTL_PRECBANK3            11                               /* Precharge Bank 3 */
-#define BITP_DDR_EFFCTL_PRECBANK2            10                               /* Precharge Bank 2 */
-#define BITP_DDR_EFFCTL_PRECBANK1             9                               /* Precharge Bank 1 */
-#define BITP_DDR_EFFCTL_PRECBANK0             8                               /* Precharge Bank 0 */
-#define BITP_DDR_EFFCTL_WAITWRDATA            7                               /* Wait in Write Data Snapshot */
-#define BITP_DDR_EFFCTL_FULLWRDATA            6                               /* Wait for Full Write Data */
-#define BITM_DDR_EFFCTL_IDLECYC              (_ADI_MSK(0x00F00000,uint32_t))  /* Idle Cycle */
-#define BITM_DDR_EFFCTL_NUMREF               (_ADI_MSK(0x000F0000,uint32_t))  /* Number of Refresh Commands */
-#define BITM_DDR_EFFCTL_PRECBANK7            (_ADI_MSK(0x00008000,uint32_t))  /* Precharge Bank 7 */
-#define BITM_DDR_EFFCTL_PRECBANK6            (_ADI_MSK(0x00004000,uint32_t))  /* Precharge Bank 6 */
-#define BITM_DDR_EFFCTL_PRECBANK5            (_ADI_MSK(0x00002000,uint32_t))  /* Precharge Bank 5 */
-#define BITM_DDR_EFFCTL_PRECBANK4            (_ADI_MSK(0x00001000,uint32_t))  /* Precharge Bank 4 */
-#define BITM_DDR_EFFCTL_PRECBANK3            (_ADI_MSK(0x00000800,uint32_t))  /* Precharge Bank 3 */
-#define BITM_DDR_EFFCTL_PRECBANK2            (_ADI_MSK(0x00000400,uint32_t))  /* Precharge Bank 2 */
-#define BITM_DDR_EFFCTL_PRECBANK1            (_ADI_MSK(0x00000200,uint32_t))  /* Precharge Bank 1 */
-#define BITM_DDR_EFFCTL_PRECBANK0            (_ADI_MSK(0x00000100,uint32_t))  /* Precharge Bank 0 */
-#define BITM_DDR_EFFCTL_WAITWRDATA           (_ADI_MSK(0x00000080,uint32_t))  /* Wait in Write Data Snapshot */
-#define BITM_DDR_EFFCTL_FULLWRDATA           (_ADI_MSK(0x00000040,uint32_t))  /* Wait for Full Write Data */
+#define BITP_DMC_EFFCTL_IDLECYC              20                               /* Idle Cycle */
+#define BITP_DMC_EFFCTL_NUMREF               16                               /* Number of Refresh Commands */
+#define BITP_DMC_EFFCTL_PRECBANK7            15                               /* Precharge Bank 7 */
+#define BITP_DMC_EFFCTL_PRECBANK6            14                               /* Precharge Bank 6 */
+#define BITP_DMC_EFFCTL_PRECBANK5            13                               /* Precharge Bank 5 */
+#define BITP_DMC_EFFCTL_PRECBANK4            12                               /* Precharge Bank 4 */
+#define BITP_DMC_EFFCTL_PRECBANK3            11                               /* Precharge Bank 3 */
+#define BITP_DMC_EFFCTL_PRECBANK2            10                               /* Precharge Bank 2 */
+#define BITP_DMC_EFFCTL_PRECBANK1             9                               /* Precharge Bank 1 */
+#define BITP_DMC_EFFCTL_PRECBANK0             8                               /* Precharge Bank 0 */
+#define BITP_DMC_EFFCTL_WAITWRDATA            7                               /* Wait in Write Data Snapshot */
+#define BITP_DMC_EFFCTL_FULLWRDATA            6                               /* Wait for Full Write Data */
+#define BITM_DMC_EFFCTL_IDLECYC              (_ADI_MSK(0x00F00000,uint32_t))  /* Idle Cycle */
+#define BITM_DMC_EFFCTL_NUMREF               (_ADI_MSK(0x000F0000,uint32_t))  /* Number of Refresh Commands */
+#define BITM_DMC_EFFCTL_PRECBANK7            (_ADI_MSK(0x00008000,uint32_t))  /* Precharge Bank 7 */
+#define BITM_DMC_EFFCTL_PRECBANK6            (_ADI_MSK(0x00004000,uint32_t))  /* Precharge Bank 6 */
+#define BITM_DMC_EFFCTL_PRECBANK5            (_ADI_MSK(0x00002000,uint32_t))  /* Precharge Bank 5 */
+#define BITM_DMC_EFFCTL_PRECBANK4            (_ADI_MSK(0x00001000,uint32_t))  /* Precharge Bank 4 */
+#define BITM_DMC_EFFCTL_PRECBANK3            (_ADI_MSK(0x00000800,uint32_t))  /* Precharge Bank 3 */
+#define BITM_DMC_EFFCTL_PRECBANK2            (_ADI_MSK(0x00000400,uint32_t))  /* Precharge Bank 2 */
+#define BITM_DMC_EFFCTL_PRECBANK1            (_ADI_MSK(0x00000200,uint32_t))  /* Precharge Bank 1 */
+#define BITM_DMC_EFFCTL_PRECBANK0            (_ADI_MSK(0x00000100,uint32_t))  /* Precharge Bank 0 */
+#define BITM_DMC_EFFCTL_WAITWRDATA           (_ADI_MSK(0x00000080,uint32_t))  /* Wait in Write Data Snapshot */
+#define BITM_DMC_EFFCTL_FULLWRDATA           (_ADI_MSK(0x00000040,uint32_t))  /* Wait for Full Write Data */
 
 /* ------------------------------------------------------------------------------------------------------------------------
-        DDR_PRIO                             Pos/Masks                        Description
+        DMC_PRIO                             Pos/Masks                        Description
    ------------------------------------------------------------------------------------------------------------------------ */
-#define BITP_DDR_PRIO_ID2                    16                               /* ID2 Requiring Elevated Priority */
-#define BITP_DDR_PRIO_ID1                     0                               /* ID1 Requiring Elevated Priority */
-#define BITM_DDR_PRIO_ID2                    (_ADI_MSK(0xFFFF0000,uint32_t))  /* ID2 Requiring Elevated Priority */
-#define BITM_DDR_PRIO_ID1                    (_ADI_MSK(0x0000FFFF,uint32_t))  /* ID1 Requiring Elevated Priority */
+#define BITP_DMC_PRIO_ID2                    16                               /* ID2 Requiring Elevated Priority */
+#define BITP_DMC_PRIO_ID1                     0                               /* ID1 Requiring Elevated Priority */
+#define BITM_DMC_PRIO_ID2                    (_ADI_MSK(0xFFFF0000,uint32_t))  /* ID2 Requiring Elevated Priority */
+#define BITM_DMC_PRIO_ID1                    (_ADI_MSK(0x0000FFFF,uint32_t))  /* ID1 Requiring Elevated Priority */
 
 /* ------------------------------------------------------------------------------------------------------------------------
-        DDR_PRIOMSK                          Pos/Masks                        Description
+        DMC_PRIOMSK                          Pos/Masks                        Description
    ------------------------------------------------------------------------------------------------------------------------ */
-#define BITP_DDR_PRIOMSK_ID2MSK              16                               /* Mask for ID2 */
-#define BITP_DDR_PRIOMSK_ID1MSK               0                               /* Mask for ID1 */
-#define BITM_DDR_PRIOMSK_ID2MSK              (_ADI_MSK(0xFFFF0000,uint32_t))  /* Mask for ID2 */
-#define BITM_DDR_PRIOMSK_ID1MSK              (_ADI_MSK(0x0000FFFF,uint32_t))  /* Mask for ID1 */
+#define BITP_DMC_PRIOMSK_ID2MSK              16                               /* Mask for ID2 */
+#define BITP_DMC_PRIOMSK_ID1MSK               0                               /* Mask for ID1 */
+#define BITM_DMC_PRIOMSK_ID2MSK              (_ADI_MSK(0xFFFF0000,uint32_t))  /* Mask for ID2 */
+#define BITM_DMC_PRIOMSK_ID1MSK              (_ADI_MSK(0x0000FFFF,uint32_t))  /* Mask for ID1 */
 
 /* ------------------------------------------------------------------------------------------------------------------------
-        DDR_CFG                              Pos/Masks                        Description
+        DMC_CFG                              Pos/Masks                        Description
    ------------------------------------------------------------------------------------------------------------------------ */
-#define BITP_DDR_CFG_EXTBANK                 12                               /* External Banks */
-#define BITP_DDR_CFG_SDRSIZE                  8                               /* SDRAM Size */
-#define BITP_DDR_CFG_SDRWID                   4                               /* SDRAM Width */
-#define BITP_DDR_CFG_IFWID                    0                               /* Interface Width */
+#define BITP_DMC_CFG_EXTBANK                 12                               /* External Banks */
+#define BITP_DMC_CFG_SDRSIZE                  8                               /* SDRAM Size */
+#define BITP_DMC_CFG_SDRWID                   4                               /* SDRAM Width */
+#define BITP_DMC_CFG_IFWID                    0                               /* Interface Width */
 
-#define BITM_DDR_CFG_EXTBANK                 (_ADI_MSK(0x0000F000,uint32_t))  /* External Banks */
-#define ENUM_DDR_CFG_EXTBANK1                (_ADI_MSK(0x00000000,uint32_t))  /* EXTBANK: 1 External Bank */
+#define BITM_DMC_CFG_EXTBANK                 (_ADI_MSK(0x0000F000,uint32_t))  /* External Banks */
+#define ENUM_DMC_CFG_EXTBANK1                (_ADI_MSK(0x00000000,uint32_t))  /* EXTBANK: 1 External Bank */
 
-#define BITM_DDR_CFG_SDRSIZE                 (_ADI_MSK(0x00000F00,uint32_t))  /* SDRAM Size */
-#define ENUM_DDR_CFG_SDRSIZE64               (_ADI_MSK(0x00000000,uint32_t))  /* SDRSIZE: 64M Bit SDRAM (LPDDR Only) */
-#define ENUM_DDR_CFG_SDRSIZE128              (_ADI_MSK(0x00000100,uint32_t))  /* SDRSIZE: 128M Bit SDRAM (LPDDR Only) */
-#define ENUM_DDR_CFG_SDRSIZE256              (_ADI_MSK(0x00000200,uint32_t))  /* SDRSIZE: 256M Bit SDRAM */
-#define ENUM_DDR_CFG_SDRSIZE512              (_ADI_MSK(0x00000300,uint32_t))  /* SDRSIZE: 512M Bit SDRAM */
-#define ENUM_DDR_CFG_SDRSIZE1G               (_ADI_MSK(0x00000400,uint32_t))  /* SDRSIZE: 1G Bit SDRAM */
-#define ENUM_DDR_CFG_SDRSIZE2G               (_ADI_MSK(0x00000500,uint32_t))  /* SDRSIZE: 2G Bit SDRAM */
+#define BITM_DMC_CFG_SDRSIZE                 (_ADI_MSK(0x00000F00,uint32_t))  /* SDRAM Size */
+#define ENUM_DMC_CFG_SDRSIZE64               (_ADI_MSK(0x00000000,uint32_t))  /* SDRSIZE: 64M Bit SDRAM (LPDDR Only) */
+#define ENUM_DMC_CFG_SDRSIZE128              (_ADI_MSK(0x00000100,uint32_t))  /* SDRSIZE: 128M Bit SDRAM (LPDDR Only) */
+#define ENUM_DMC_CFG_SDRSIZE256              (_ADI_MSK(0x00000200,uint32_t))  /* SDRSIZE: 256M Bit SDRAM */
+#define ENUM_DMC_CFG_SDRSIZE512              (_ADI_MSK(0x00000300,uint32_t))  /* SDRSIZE: 512M Bit SDRAM */
+#define ENUM_DMC_CFG_SDRSIZE1G               (_ADI_MSK(0x00000400,uint32_t))  /* SDRSIZE: 1G Bit SDRAM */
+#define ENUM_DMC_CFG_SDRSIZE2G               (_ADI_MSK(0x00000500,uint32_t))  /* SDRSIZE: 2G Bit SDRAM */
 
-#define BITM_DDR_CFG_SDRWID                  (_ADI_MSK(0x000000F0,uint32_t))  /* SDRAM Width */
-#define ENUM_DDR_CFG_SDRWID16                (_ADI_MSK(0x00000020,uint32_t))  /* SDRWID: 16-Bit Wide SDRAM */
+#define BITM_DMC_CFG_SDRWID                  (_ADI_MSK(0x000000F0,uint32_t))  /* SDRAM Width */
+#define ENUM_DMC_CFG_SDRWID16                (_ADI_MSK(0x00000020,uint32_t))  /* SDRWID: 16-Bit Wide SDRAM */
 
-#define BITM_DDR_CFG_IFWID                   (_ADI_MSK(0x0000000F,uint32_t))  /* Interface Width */
-#define ENUM_DDR_CFG_IFWID16                 (_ADI_MSK(0x00000002,uint32_t))  /* IFWID: 16-Bit Wide Interface */
+#define BITM_DMC_CFG_IFWID                   (_ADI_MSK(0x0000000F,uint32_t))  /* Interface Width */
+#define ENUM_DMC_CFG_IFWID16                 (_ADI_MSK(0x00000002,uint32_t))  /* IFWID: 16-Bit Wide Interface */
 
 /* ------------------------------------------------------------------------------------------------------------------------
-        DDR_TR0                              Pos/Masks                        Description
+        DMC_TR0                              Pos/Masks                        Description
    ------------------------------------------------------------------------------------------------------------------------ */
-#define BITP_DDR_TR0_TMRD                    28                               /* Timing Mode Register Delay */
-#define BITP_DDR_TR0_TRC                     20                               /* Timing Row Cycle */
-#define BITP_DDR_TR0_TRAS                    12                               /* Timing Row Active Time */
-#define BITP_DDR_TR0_TRP                      8                               /* Timing RAS Precharge. */
-#define BITP_DDR_TR0_TWTR                     4                               /* Timing Write to Read */
-#define BITP_DDR_TR0_TRCD                     0                               /* Timing RAS to CAS Delay */
-#define BITM_DDR_TR0_TMRD                    (_ADI_MSK(0xF0000000,uint32_t))  /* Timing Mode Register Delay */
-#define BITM_DDR_TR0_TRC                     (_ADI_MSK(0x03F00000,uint32_t))  /* Timing Row Cycle */
-#define BITM_DDR_TR0_TRAS                    (_ADI_MSK(0x0001F000,uint32_t))  /* Timing Row Active Time */
-#define BITM_DDR_TR0_TRP                     (_ADI_MSK(0x00000F00,uint32_t))  /* Timing RAS Precharge. */
-#define BITM_DDR_TR0_TWTR                    (_ADI_MSK(0x000000F0,uint32_t))  /* Timing Write to Read */
-#define BITM_DDR_TR0_TRCD                    (_ADI_MSK(0x0000000F,uint32_t))  /* Timing RAS to CAS Delay */
+#define BITP_DMC_TR0_TMRD                    28                               /* Timing Mode Register Delay */
+#define BITP_DMC_TR0_TRC                     20                               /* Timing Row Cycle */
+#define BITP_DMC_TR0_TRAS                    12                               /* Timing Row Active Time */
+#define BITP_DMC_TR0_TRP                      8                               /* Timing RAS Precharge. */
+#define BITP_DMC_TR0_TWTR                     4                               /* Timing Write to Read */
+#define BITP_DMC_TR0_TRCD                     0                               /* Timing RAS to CAS Delay */
+#define BITM_DMC_TR0_TMRD                    (_ADI_MSK(0xF0000000,uint32_t))  /* Timing Mode Register Delay */
+#define BITM_DMC_TR0_TRC                     (_ADI_MSK(0x03F00000,uint32_t))  /* Timing Row Cycle */
+#define BITM_DMC_TR0_TRAS                    (_ADI_MSK(0x0001F000,uint32_t))  /* Timing Row Active Time */
+#define BITM_DMC_TR0_TRP                     (_ADI_MSK(0x00000F00,uint32_t))  /* Timing RAS Precharge. */
+#define BITM_DMC_TR0_TWTR                    (_ADI_MSK(0x000000F0,uint32_t))  /* Timing Write to Read */
+#define BITM_DMC_TR0_TRCD                    (_ADI_MSK(0x0000000F,uint32_t))  /* Timing RAS to CAS Delay */
 
 /* ------------------------------------------------------------------------------------------------------------------------
-        DDR_TR1                              Pos/Masks                        Description
+        DMC_TR1                              Pos/Masks                        Description
    ------------------------------------------------------------------------------------------------------------------------ */
-#define BITP_DDR_TR1_TRRD                    28                               /* Timing Read-Read Delay */
-#define BITP_DDR_TR1_TRFC                    16                               /* Timing Refresh-to-Command */
-#define BITP_DDR_TR1_TREF                     0                               /* Timing Refresh Interval */
-#define BITM_DDR_TR1_TRRD                    (_ADI_MSK(0x70000000,uint32_t))  /* Timing Read-Read Delay */
-#define BITM_DDR_TR1_TRFC                    (_ADI_MSK(0x00FF0000,uint32_t))  /* Timing Refresh-to-Command */
-#define BITM_DDR_TR1_TREF                    (_ADI_MSK(0x00003FFF,uint32_t))  /* Timing Refresh Interval */
+#define BITP_DMC_TR1_TRRD                    28                               /* Timing Read-Read Delay */
+#define BITP_DMC_TR1_TRFC                    16                               /* Timing Refresh-to-Command */
+#define BITP_DMC_TR1_TREF                     0                               /* Timing Refresh Interval */
+#define BITM_DMC_TR1_TRRD                    (_ADI_MSK(0x70000000,uint32_t))  /* Timing Read-Read Delay */
+#define BITM_DMC_TR1_TRFC                    (_ADI_MSK(0x00FF0000,uint32_t))  /* Timing Refresh-to-Command */
+#define BITM_DMC_TR1_TREF                    (_ADI_MSK(0x00003FFF,uint32_t))  /* Timing Refresh Interval */
 
 /* ------------------------------------------------------------------------------------------------------------------------
-        DDR_TR2                              Pos/Masks                        Description
+        DMC_TR2                              Pos/Masks                        Description
    ------------------------------------------------------------------------------------------------------------------------ */
-#define BITP_DDR_TR2_TCKE                    20                               /* Timing Clock Enable */
-#define BITP_DDR_TR2_TXP                     16                               /* Timing Exit Powerdown */
-#define BITP_DDR_TR2_TWR                     12                               /* Timing Write Recovery */
-#define BITP_DDR_TR2_TRTP                     8                               /* Timing Read-to-Precharge */
-#define BITP_DDR_TR2_TFAW                     0                               /* Timing Four-Activated-Window */
-#define BITM_DDR_TR2_TCKE                    (_ADI_MSK(0x00F00000,uint32_t))  /* Timing Clock Enable */
-#define BITM_DDR_TR2_TXP                     (_ADI_MSK(0x000F0000,uint32_t))  /* Timing Exit Powerdown */
-#define BITM_DDR_TR2_TWR                     (_ADI_MSK(0x0000F000,uint32_t))  /* Timing Write Recovery */
-#define BITM_DDR_TR2_TRTP                    (_ADI_MSK(0x00000F00,uint32_t))  /* Timing Read-to-Precharge */
-#define BITM_DDR_TR2_TFAW                    (_ADI_MSK(0x0000001F,uint32_t))  /* Timing Four-Activated-Window */
+#define BITP_DMC_TR2_TCKE                    20                               /* Timing Clock Enable */
+#define BITP_DMC_TR2_TXP                     16                               /* Timing Exit Powerdown */
+#define BITP_DMC_TR2_TWR                     12                               /* Timing Write Recovery */
+#define BITP_DMC_TR2_TRTP                     8                               /* Timing Read-to-Precharge */
+#define BITP_DMC_TR2_TFAW                     0                               /* Timing Four-Activated-Window */
+#define BITM_DMC_TR2_TCKE                    (_ADI_MSK(0x00F00000,uint32_t))  /* Timing Clock Enable */
+#define BITM_DMC_TR2_TXP                     (_ADI_MSK(0x000F0000,uint32_t))  /* Timing Exit Powerdown */
+#define BITM_DMC_TR2_TWR                     (_ADI_MSK(0x0000F000,uint32_t))  /* Timing Write Recovery */
+#define BITM_DMC_TR2_TRTP                    (_ADI_MSK(0x00000F00,uint32_t))  /* Timing Read-to-Precharge */
+#define BITM_DMC_TR2_TFAW                    (_ADI_MSK(0x0000001F,uint32_t))  /* Timing Four-Activated-Window */
 
 /* ------------------------------------------------------------------------------------------------------------------------
-        DDR_MSK                              Pos/Masks                        Description
+        DMC_MSK                              Pos/Masks                        Description
    ------------------------------------------------------------------------------------------------------------------------ */
-#define BITP_DDR_MSK_EMR3                    11                               /* Shadow EMR3 Unmask */
-#define BITP_DDR_MSK_EMR2                    10                               /* Shadow EMR2 Unmask */
-#define BITP_DDR_MSK_EMR1                     9                               /* Shadow EMR1 Unmask */
-#define BITP_DDR_MSK_MR                       8                               /* Shadow MR Unmask */
-#define BITM_DDR_MSK_EMR3                    (_ADI_MSK(0x00000800,uint32_t))  /* Shadow EMR3 Unmask */
-#define BITM_DDR_MSK_EMR2                    (_ADI_MSK(0x00000400,uint32_t))  /* Shadow EMR2 Unmask */
-#define BITM_DDR_MSK_EMR1                    (_ADI_MSK(0x00000200,uint32_t))  /* Shadow EMR1 Unmask */
-#define BITM_DDR_MSK_MR                      (_ADI_MSK(0x00000100,uint32_t))  /* Shadow MR Unmask */
+#define BITP_DMC_MSK_EMR3                    11                               /* Shadow EMR3 Unmask */
+#define BITP_DMC_MSK_EMR2                    10                               /* Shadow EMR2 Unmask */
+#define BITP_DMC_MSK_EMR1                     9                               /* Shadow EMR1 Unmask */
+#define BITP_DMC_MSK_MR                       8                               /* Shadow MR Unmask */
+#define BITM_DMC_MSK_EMR3                    (_ADI_MSK(0x00000800,uint32_t))  /* Shadow EMR3 Unmask */
+#define BITM_DMC_MSK_EMR2                    (_ADI_MSK(0x00000400,uint32_t))  /* Shadow EMR2 Unmask */
+#define BITM_DMC_MSK_EMR1                    (_ADI_MSK(0x00000200,uint32_t))  /* Shadow EMR1 Unmask */
+#define BITM_DMC_MSK_MR                      (_ADI_MSK(0x00000100,uint32_t))  /* Shadow MR Unmask */
 
 /* ------------------------------------------------------------------------------------------------------------------------
-        DDR_MR                               Pos/Masks                        Description
+        DMC_MR                               Pos/Masks                        Description
    ------------------------------------------------------------------------------------------------------------------------ */
-#define BITP_DDR_MR_PD                       12                               /* Active Powerdown Mode */
-#define BITP_DDR_MR_WRRECOV                   9                               /* Write Recovery */
-#define BITP_DDR_MR_DLLRST                    8                               /* DLL Reset */
-#define BITP_DDR_MR_CL                        4                               /* CAS Latency */
-#define BITP_DDR_MR_BLEN                      0                               /* Burst Length */
-#define BITM_DDR_MR_PD                       (_ADI_MSK(0x00001000,uint32_t))  /* Active Powerdown Mode */
-#define BITM_DDR_MR_WRRECOV                  (_ADI_MSK(0x00000E00,uint32_t))  /* Write Recovery */
-#define BITM_DDR_MR_DLLRST                   (_ADI_MSK(0x00000100,uint32_t))  /* DLL Reset */
+#define BITP_DMC_MR_PD                       12                               /* Active Powerdown Mode */
+#define BITP_DMC_MR_WRRECOV                   9                               /* Write Recovery */
+#define BITP_DMC_MR_DLLRST                    8                               /* DLL Reset */
+#define BITP_DMC_MR_CL                        4                               /* CAS Latency */
+#define BITP_DMC_MR_BLEN                      0                               /* Burst Length */
+#define BITM_DMC_MR_PD                       (_ADI_MSK(0x00001000,uint32_t))  /* Active Powerdown Mode */
+#define BITM_DMC_MR_WRRECOV                  (_ADI_MSK(0x00000E00,uint32_t))  /* Write Recovery */
+#define BITM_DMC_MR_DLLRST                   (_ADI_MSK(0x00000100,uint32_t))  /* DLL Reset */
 
-#define BITM_DDR_MR_CL                       (_ADI_MSK(0x00000070,uint32_t))  /* CAS Latency */
-#define ENUM_DDR_MR_CL2                      (_ADI_MSK(0x00000020,uint32_t))  /* CL: 2 clock cycle latency */
-#define ENUM_DDR_MR_CL3                      (_ADI_MSK(0x00000030,uint32_t))  /* CL: 3 clock cycle latency */
-#define ENUM_DDR_MR_CL4                      (_ADI_MSK(0x00000040,uint32_t))  /* CL: 4 clock cycle latency (DDR2) */
-#define ENUM_DDR_MR_CL5                      (_ADI_MSK(0x00000050,uint32_t))  /* CL: 5 clock cycle latency (DDR2) */
-#define ENUM_DDR_MR_CL6                      (_ADI_MSK(0x00000060,uint32_t))  /* CL: 6 clock cycle latency (DDR2) */
+#define BITM_DMC_MR_CL                       (_ADI_MSK(0x00000070,uint32_t))  /* CAS Latency */
+#define ENUM_DMC_MR_CL2                      (_ADI_MSK(0x00000020,uint32_t))  /* CL: 2 clock cycle latency */
+#define ENUM_DMC_MR_CL3                      (_ADI_MSK(0x00000030,uint32_t))  /* CL: 3 clock cycle latency */
+#define ENUM_DMC_MR_CL4                      (_ADI_MSK(0x00000040,uint32_t))  /* CL: 4 clock cycle latency (DDR2) */
+#define ENUM_DMC_MR_CL5                      (_ADI_MSK(0x00000050,uint32_t))  /* CL: 5 clock cycle latency (DDR2) */
+#define ENUM_DMC_MR_CL6                      (_ADI_MSK(0x00000060,uint32_t))  /* CL: 6 clock cycle latency (DDR2) */
 
-#define BITM_DDR_MR_BLEN                     (_ADI_MSK(0x00000007,uint32_t))  /* Burst Length */
-#define ENUM_DDR_MR_BLEN4                    (_ADI_MSK(0x00000002,uint32_t))  /* BLEN: 4-Bit Burst Length */
-#define ENUM_DDR_MR_BLEN8                    (_ADI_MSK(0x00000003,uint32_t))  /* BLEN: 8-Bit Burst Length */
+#define BITM_DMC_MR_BLEN                     (_ADI_MSK(0x00000007,uint32_t))  /* Burst Length */
+#define ENUM_DMC_MR_BLEN4                    (_ADI_MSK(0x00000002,uint32_t))  /* BLEN: 4-Bit Burst Length */
+#define ENUM_DMC_MR_BLEN8                    (_ADI_MSK(0x00000003,uint32_t))  /* BLEN: 8-Bit Burst Length */
 
 /* ------------------------------------------------------------------------------------------------------------------------
-        DDR_EMR1                             Pos/Masks                        Description
+        DMC_EMR1                             Pos/Masks                        Description
    ------------------------------------------------------------------------------------------------------------------------ */
-#define BITP_DDR_EMR1_QOFF                   12                               /* Output Buffer Enable */
-#define BITP_DDR_EMR1_DQS                    10                               /* DQS Enable */
-#define BITP_DDR_EMR1_RTT1                    6                               /* Termination Resistance 1 */
-#define BITP_DDR_EMR1_AL                      3                               /* Additive Latency */
-#define BITP_DDR_EMR1_RTT0                    2                               /* Termination Resistance 0. */
-#define BITP_DDR_EMR1_DIC                     1                               /* Output Driver Impedance Control */
-#define BITP_DDR_EMR1_DLLEN                   0                               /* DLL Enable */
-#define BITM_DDR_EMR1_QOFF                   (_ADI_MSK(0x00001000,uint32_t))  /* Output Buffer Enable */
-#define BITM_DDR_EMR1_DQS                    (_ADI_MSK(0x00000400,uint32_t))  /* DQS Enable */
+#define BITP_DMC_EMR1_QOFF                   12                               /* Output Buffer Enable */
+#define BITP_DMC_EMR1_DQS                    10                               /* DQS Enable */
+#define BITP_DMC_EMR1_RTT1                    6                               /* Termination Resistance 1 */
+#define BITP_DMC_EMR1_AL                      3                               /* Additive Latency */
+#define BITP_DMC_EMR1_RTT0                    2                               /* Termination Resistance 0. */
+#define BITP_DMC_EMR1_DIC                     1                               /* Output Driver Impedance Control */
+#define BITP_DMC_EMR1_DLLEN                   0                               /* DLL Enable */
+#define BITM_DMC_EMR1_QOFF                   (_ADI_MSK(0x00001000,uint32_t))  /* Output Buffer Enable */
+#define BITM_DMC_EMR1_DQS                    (_ADI_MSK(0x00000400,uint32_t))  /* DQS Enable */
 
-#define BITM_DDR_EMR1_RTT1                   (_ADI_MSK(0x00000040,uint32_t))  /* Termination Resistance 1 */
-#define ENUM_DDR_EMR1_RTT1_0                 (_ADI_MSK(0x00000000,uint32_t))  /* RTT1: Disable RTT1 */
-#define ENUM_DDR_EMR1_RTT1_1                 (_ADI_MSK(0x00000040,uint32_t))  /* RTT1: Enable RTT1 */
-#define BITM_DDR_EMR1_AL                     (_ADI_MSK(0x00000038,uint32_t))  /* Additive Latency */
+#define BITM_DMC_EMR1_RTT1                   (_ADI_MSK(0x00000040,uint32_t))  /* Termination Resistance 1 */
+#define ENUM_DMC_EMR1_RTT1_0                 (_ADI_MSK(0x00000000,uint32_t))  /* RTT1: Disable RTT1 */
+#define ENUM_DMC_EMR1_RTT1_1                 (_ADI_MSK(0x00000040,uint32_t))  /* RTT1: Enable RTT1 */
+#define BITM_DMC_EMR1_AL                     (_ADI_MSK(0x00000038,uint32_t))  /* Additive Latency */
 
-#define BITM_DDR_EMR1_RTT0                   (_ADI_MSK(0x00000004,uint32_t))  /* Termination Resistance 0. */
-#define ENUM_DDR_EMR1_RTT0_0                 (_ADI_MSK(0x00000000,uint32_t))  /* RTT0: Disable RTT0 */
-#define ENUM_DDR_EMR1_RTT0_1                 (_ADI_MSK(0x00000004,uint32_t))  /* RTT0: Enable RTT0 */
-#define BITM_DDR_EMR1_DIC                    (_ADI_MSK(0x00000002,uint32_t))  /* Output Driver Impedance Control */
-#define BITM_DDR_EMR1_DLLEN                  (_ADI_MSK(0x00000001,uint32_t))  /* DLL Enable */
+#define BITM_DMC_EMR1_RTT0                   (_ADI_MSK(0x00000004,uint32_t))  /* Termination Resistance 0. */
+#define ENUM_DMC_EMR1_RTT0_0                 (_ADI_MSK(0x00000000,uint32_t))  /* RTT0: Disable RTT0 */
+#define ENUM_DMC_EMR1_RTT0_1                 (_ADI_MSK(0x00000004,uint32_t))  /* RTT0: Enable RTT0 */
+#define BITM_DMC_EMR1_DIC                    (_ADI_MSK(0x00000002,uint32_t))  /* Output Driver Impedance Control */
+#define BITM_DMC_EMR1_DLLEN                  (_ADI_MSK(0x00000001,uint32_t))  /* DLL Enable */
 
 /* ------------------------------------------------------------------------------------------------------------------------
-        DDR_EMR2                             Pos/Masks                        Description
+        DMC_EMR2                             Pos/Masks                        Description
    ------------------------------------------------------------------------------------------------------------------------ */
-#define BITP_DDR_EMR2_SRF                     7                               /* High Temp. Self Refresh */
-#define BITP_DDR_EMR2_DS                      5                               /* Drive Strength */
-#define BITP_DDR_EMR2_TCSR                    3                               /* Temp. Comp. Self Refresh */
-#define BITP_DDR_EMR2_PASR                    0                               /* Partial Array Self Refresh */
-#define BITM_DDR_EMR2_SRF                    (_ADI_MSK(0x00000080,uint32_t))  /* High Temp. Self Refresh */
-#define BITM_DDR_EMR2_DS                     (_ADI_MSK(0x00000060,uint32_t))  /* Drive Strength */
-#define BITM_DDR_EMR2_TCSR                   (_ADI_MSK(0x00000018,uint32_t))  /* Temp. Comp. Self Refresh */
-#define BITM_DDR_EMR2_PASR                   (_ADI_MSK(0x00000007,uint32_t))  /* Partial Array Self Refresh */
+#define BITP_DMC_EMR2_SRF                     7                               /* High Temp. Self Refresh */
+#define BITP_DMC_EMR2_DS                      5                               /* Drive Strength */
+#define BITP_DMC_EMR2_TCSR                    3                               /* Temp. Comp. Self Refresh */
+#define BITP_DMC_EMR2_PASR                    0                               /* Partial Array Self Refresh */
+#define BITM_DMC_EMR2_SRF                    (_ADI_MSK(0x00000080,uint32_t))  /* High Temp. Self Refresh */
+#define BITM_DMC_EMR2_DS                     (_ADI_MSK(0x00000060,uint32_t))  /* Drive Strength */
+#define BITM_DMC_EMR2_TCSR                   (_ADI_MSK(0x00000018,uint32_t))  /* Temp. Comp. Self Refresh */
+#define BITM_DMC_EMR2_PASR                   (_ADI_MSK(0x00000007,uint32_t))  /* Partial Array Self Refresh */
 
 /* ------------------------------------------------------------------------------------------------------------------------
-        DDR_DLLCTL                           Pos/Masks                        Description
+        DMC_DLLCTL                           Pos/Masks                        Description
    ------------------------------------------------------------------------------------------------------------------------ */
-#define BITP_DDR_DLLCTL_DATACYC               8                               /* Data Cycles */
-#define BITP_DDR_DLLCTL_DLLCALRDCNT           0                               /* DLL Calibration RD Count */
+#define BITP_DMC_DLLCTL_DATACYC               8                               /* Data Cycles */
+#define BITP_DMC_DLLCTL_DLLCALRDCNT           0                               /* DLL Calibration RD Count */
 
-#define BITM_DDR_DLLCTL_DATACYC              (_ADI_MSK(0x00000F00,uint32_t))  /* Data Cycles */
-#define ENUM_DDR_DLLCTL_DATACYC2             (_ADI_MSK(0x00000200,uint32_t))  /* DATACYC: 2 Clock Cycles Latency */
-#define ENUM_DDR_DLLCTL_DATACYC3             (_ADI_MSK(0x00000300,uint32_t))  /* DATACYC: 3 Clock Cycles Latency */
-#define ENUM_DDR_DLLCTL_DATACYC4             (_ADI_MSK(0x00000400,uint32_t))  /* DATACYC: 4 Clock Cycles Latency */
-#define ENUM_DDR_DLLCTL_DATACYC5             (_ADI_MSK(0x00000500,uint32_t))  /* DATACYC: 5 Clock Cycles Latency */
-#define BITM_DDR_DLLCTL_DLLCALRDCNT          (_ADI_MSK(0x000000FF,uint32_t))  /* DLL Calibration RD Count */
+#define BITM_DMC_DLLCTL_DATACYC              (_ADI_MSK(0x00000F00,uint32_t))  /* Data Cycles */
+#define ENUM_DMC_DLLCTL_DATACYC2             (_ADI_MSK(0x00000200,uint32_t))  /* DATACYC: 2 Clock Cycles Latency */
+#define ENUM_DMC_DLLCTL_DATACYC3             (_ADI_MSK(0x00000300,uint32_t))  /* DATACYC: 3 Clock Cycles Latency */
+#define ENUM_DMC_DLLCTL_DATACYC4             (_ADI_MSK(0x00000400,uint32_t))  /* DATACYC: 4 Clock Cycles Latency */
+#define ENUM_DMC_DLLCTL_DATACYC5             (_ADI_MSK(0x00000500,uint32_t))  /* DATACYC: 5 Clock Cycles Latency */
+#define BITM_DMC_DLLCTL_DLLCALRDCNT          (_ADI_MSK(0x000000FF,uint32_t))  /* DLL Calibration RD Count */
 
 /* ------------------------------------------------------------------------------------------------------------------------
-        DDR_PHY_CTL1                         Pos/Masks                        Description
+        DMC_PHY_CTL1                         Pos/Masks                        Description
    ------------------------------------------------------------------------------------------------------------------------ */
-#define BITP_DDR_PHY_CTL1_CONTODTVAL         19                               /* Select ODT value on controller */
+#define BITP_DMC_PHY_CTL1_CONTODTVAL         19                               /* Select ODT value on controller */
 
-#define BITM_DDR_PHY_CTL1_CONTODTVAL         (_ADI_MSK(0x00080000,uint32_t))  /* Select ODT value on controller */
-#define ENUM_DDR_PHY_CTL1_ODT_75             (_ADI_MSK(0x00000000,uint32_t))  /* CONTODTVAL: 75 Ohms Termination */
-#define ENUM_DDR_PHY_CTL1_ODT_150            (_ADI_MSK(0x00080000,uint32_t))  /* CONTODTVAL: 150 Ohms Termination */
-
-/* ------------------------------------------------------------------------------------------------------------------------
-        DDR_PHY_CTL3                         Pos/Masks                        Description
-   ------------------------------------------------------------------------------------------------------------------------ */
-#define BITP_DDR_PHY_CTL3_OFST1              26                               /* Offset Parameter 1 */
-#define BITP_DDR_PHY_CTL3_OFST0              24                               /* Offset Parameter 0 */
-#define BITP_DDR_PHY_CTL3_ENODTDQS           10                               /* Enables controller ODT on read of DQS */
-#define BITP_DDR_PHY_CTL3_TMG1                7                               /* Timing Parameter 1 */
-#define BITP_DDR_PHY_CTL3_TMG0                6                               /* Timing Parameter 0 */
-#define BITP_DDR_PHY_CTL3_ENODTDQ             2                               /* Enables controller ODT on read of DQ */
-#define BITM_DDR_PHY_CTL3_OFST1              (_ADI_MSK(0x04000000,uint32_t))  /* Offset Parameter 1 */
-#define BITM_DDR_PHY_CTL3_OFST0              (_ADI_MSK(0x01000000,uint32_t))  /* Offset Parameter 0 */
-#define BITM_DDR_PHY_CTL3_ENODTDQS           (_ADI_MSK(0x00000400,uint32_t))  /* Enables controller ODT on read of DQS */
-#define BITM_DDR_PHY_CTL3_TMG1               (_ADI_MSK(0x00000080,uint32_t))  /* Timing Parameter 1 */
-#define BITM_DDR_PHY_CTL3_TMG0               (_ADI_MSK(0x00000040,uint32_t))  /* Timing Parameter 0 */
-#define BITM_DDR_PHY_CTL3_ENODTDQ            (_ADI_MSK(0x00000004,uint32_t))  /* Enables controller ODT on read of DQ */
+#define BITM_DMC_PHY_CTL1_CONTODTVAL         (_ADI_MSK(0x00080000,uint32_t))  /* Select ODT value on controller */
+#define ENUM_DMC_PHY_CTL1_ODT_75             (_ADI_MSK(0x00000000,uint32_t))  /* CONTODTVAL: 75 Ohms Termination */
+#define ENUM_DMC_PHY_CTL1_ODT_150            (_ADI_MSK(0x00080000,uint32_t))  /* CONTODTVAL: 150 Ohms Termination */
 
 /* ------------------------------------------------------------------------------------------------------------------------
-        DDR_PADCTL                           Pos/Masks                        Description
+        DMC_PHY_CTL3                         Pos/Masks                        Description
    ------------------------------------------------------------------------------------------------------------------------ */
-#define BITP_DDR_PADCTL_CKEOE                19                               /* CKE Output Enable */
-#define BITP_DDR_PADCTL_CKEPWD               18                               /* CKE pad receiver power down. */
-#define BITP_DDR_PADCTL_CKEODS               16                               /* CKE Output Drive Strength */
-#define BITP_DDR_PADCTL_CMDOE                15                               /* CMD Output Enable */
-#define BITP_DDR_PADCTL_CMDPWD               14                               /* CMD Powerdown */
-#define BITP_DDR_PADCTL_CMDODS               12                               /* CMD Output Drive Strength */
-#define BITP_DDR_PADCTL_CLKOE                11                               /* CLK Output Enable */
-#define BITP_DDR_PADCTL_CLKPWD               10                               /* CLK Powerdown */
-#define BITP_DDR_PADCTL_CLKODS                8                               /* Clock Output Drive Strength */
-#define BITP_DDR_PADCTL_DQSPWD                6                               /* DQ/DQS Powerdown */
-#define BITP_DDR_PADCTL_DQSODS                4                               /* DQS Output Drive Strength */
-#define BITP_DDR_PADCTL_DQPWD                 2                               /* DQ Powerdown. */
-#define BITP_DDR_PADCTL_DQODS                 0                               /* DQ Output Drive Strength */
-#define BITM_DDR_PADCTL_CKEOE                (_ADI_MSK(0x00080000,uint32_t))  /* CKE Output Enable */
-#define BITM_DDR_PADCTL_CKEPWD               (_ADI_MSK(0x00040000,uint32_t))  /* CKE pad receiver power down. */
-#define BITM_DDR_PADCTL_CKEODS               (_ADI_MSK(0x00030000,uint32_t))  /* CKE Output Drive Strength */
-#define BITM_DDR_PADCTL_CMDOE                (_ADI_MSK(0x00008000,uint32_t))  /* CMD Output Enable */
-#define BITM_DDR_PADCTL_CMDPWD               (_ADI_MSK(0x00004000,uint32_t))  /* CMD Powerdown */
-#define BITM_DDR_PADCTL_CMDODS               (_ADI_MSK(0x00003000,uint32_t))  /* CMD Output Drive Strength */
-#define BITM_DDR_PADCTL_CLKOE                (_ADI_MSK(0x00000800,uint32_t))  /* CLK Output Enable */
-#define BITM_DDR_PADCTL_CLKPWD               (_ADI_MSK(0x00000400,uint32_t))  /* CLK Powerdown */
-#define BITM_DDR_PADCTL_CLKODS               (_ADI_MSK(0x00000300,uint32_t))  /* Clock Output Drive Strength */
-#define BITM_DDR_PADCTL_DQSPWD               (_ADI_MSK(0x00000040,uint32_t))  /* DQ/DQS Powerdown */
-#define BITM_DDR_PADCTL_DQSODS               (_ADI_MSK(0x00000030,uint32_t))  /* DQS Output Drive Strength */
-#define BITM_DDR_PADCTL_DQPWD                (_ADI_MSK(0x00000004,uint32_t))  /* DQ Powerdown. */
-#define BITM_DDR_PADCTL_DQODS                (_ADI_MSK(0x00000003,uint32_t))  /* DQ Output Drive Strength */
+#define BITP_DMC_PHY_CTL3_OFST1              26                               /* Offset Parameter 1 */
+#define BITP_DMC_PHY_CTL3_OFST0              24                               /* Offset Parameter 0 */
+#define BITP_DMC_PHY_CTL3_ENODTDQS           10                               /* Enables controller ODT on read of DQS */
+#define BITP_DMC_PHY_CTL3_TMG1                7                               /* Timing Parameter 1 */
+#define BITP_DMC_PHY_CTL3_TMG0                6                               /* Timing Parameter 0 */
+#define BITP_DMC_PHY_CTL3_ENODTDQ             2                               /* Enables controller ODT on read of DQ */
+#define BITM_DMC_PHY_CTL3_OFST1              (_ADI_MSK(0x04000000,uint32_t))  /* Offset Parameter 1 */
+#define BITM_DMC_PHY_CTL3_OFST0              (_ADI_MSK(0x01000000,uint32_t))  /* Offset Parameter 0 */
+#define BITM_DMC_PHY_CTL3_ENODTDQS           (_ADI_MSK(0x00000400,uint32_t))  /* Enables controller ODT on read of DQS */
+#define BITM_DMC_PHY_CTL3_TMG1               (_ADI_MSK(0x00000080,uint32_t))  /* Timing Parameter 1 */
+#define BITM_DMC_PHY_CTL3_TMG0               (_ADI_MSK(0x00000040,uint32_t))  /* Timing Parameter 0 */
+#define BITM_DMC_PHY_CTL3_ENODTDQ            (_ADI_MSK(0x00000004,uint32_t))  /* Enables controller ODT on read of DQ */
+
+/* ------------------------------------------------------------------------------------------------------------------------
+        DMC_PADCTL                           Pos/Masks                        Description
+   ------------------------------------------------------------------------------------------------------------------------ */
+#define BITP_DMC_PADCTL_CKEOE                19                               /* CKE Output Enable */
+#define BITP_DMC_PADCTL_CKEPWD               18                               /* CKE pad receiver power down. */
+#define BITP_DMC_PADCTL_CKEODS               16                               /* CKE Output Drive Strength */
+#define BITP_DMC_PADCTL_CMDOE                15                               /* CMD Output Enable */
+#define BITP_DMC_PADCTL_CMDPWD               14                               /* CMD Powerdown */
+#define BITP_DMC_PADCTL_CMDODS               12                               /* CMD Output Drive Strength */
+#define BITP_DMC_PADCTL_CLKOE                11                               /* CLK Output Enable */
+#define BITP_DMC_PADCTL_CLKPWD               10                               /* CLK Powerdown */
+#define BITP_DMC_PADCTL_CLKODS                8                               /* Clock Output Drive Strength */
+#define BITP_DMC_PADCTL_DQSPWD                6                               /* DQ/DQS Powerdown */
+#define BITP_DMC_PADCTL_DQSODS                4                               /* DQS Output Drive Strength */
+#define BITP_DMC_PADCTL_DQPWD                 2                               /* DQ Powerdown. */
+#define BITP_DMC_PADCTL_DQODS                 0                               /* DQ Output Drive Strength */
+#define BITM_DMC_PADCTL_CKEOE                (_ADI_MSK(0x00080000,uint32_t))  /* CKE Output Enable */
+#define BITM_DMC_PADCTL_CKEPWD               (_ADI_MSK(0x00040000,uint32_t))  /* CKE pad receiver power down. */
+#define BITM_DMC_PADCTL_CKEODS               (_ADI_MSK(0x00030000,uint32_t))  /* CKE Output Drive Strength */
+#define BITM_DMC_PADCTL_CMDOE                (_ADI_MSK(0x00008000,uint32_t))  /* CMD Output Enable */
+#define BITM_DMC_PADCTL_CMDPWD               (_ADI_MSK(0x00004000,uint32_t))  /* CMD Powerdown */
+#define BITM_DMC_PADCTL_CMDODS               (_ADI_MSK(0x00003000,uint32_t))  /* CMD Output Drive Strength */
+#define BITM_DMC_PADCTL_CLKOE                (_ADI_MSK(0x00000800,uint32_t))  /* CLK Output Enable */
+#define BITM_DMC_PADCTL_CLKPWD               (_ADI_MSK(0x00000400,uint32_t))  /* CLK Powerdown */
+#define BITM_DMC_PADCTL_CLKODS               (_ADI_MSK(0x00000300,uint32_t))  /* Clock Output Drive Strength */
+#define BITM_DMC_PADCTL_DQSPWD               (_ADI_MSK(0x00000040,uint32_t))  /* DQ/DQS Powerdown */
+#define BITM_DMC_PADCTL_DQSODS               (_ADI_MSK(0x00000030,uint32_t))  /* DQS Output Drive Strength */
+#define BITM_DMC_PADCTL_DQPWD                (_ADI_MSK(0x00000004,uint32_t))  /* DQ Powerdown. */
+#define BITM_DMC_PADCTL_DQODS                (_ADI_MSK(0x00000003,uint32_t))  /* DQ Output Drive Strength */
 
 /* ==================================================
         System Cross Bar Registers
@@ -11892,10 +11894,10 @@
 /* ------------------------------------------------------------------------------------------------------------------------
         L2CTL_RFA                            Pos/Masks                        Description
    ------------------------------------------------------------------------------------------------------------------------ */
-#define BITP_L2CTL_RFA_ADDRHI                18                               /* Address High */
+#define BITP_L2CTL_RFA_ADDRHI                16                               /* Address High */
 #define BITP_L2CTL_RFA_ADDRLO                 0                               /* Address Low */
-#define BITM_L2CTL_RFA_ADDRHI                (_ADI_MSK(0xFFFC0000,uint32_t))  /* Address High */
-#define BITM_L2CTL_RFA_ADDRLO                (_ADI_MSK(0x0003FFFF,uint32_t))  /* Address Low */
+#define BITM_L2CTL_RFA_ADDRHI                (_ADI_MSK(0xFFFF0000,uint32_t))  /* Address High */
+#define BITM_L2CTL_RFA_ADDRLO                (_ADI_MSK(0x0000FFFF,uint32_t))  /* Address Low */
 
 /* ------------------------------------------------------------------------------------------------------------------------
         L2CTL_ET0                            Pos/Masks                        Description
@@ -13371,15 +13373,6 @@
 #define REG_EFS0_DAT5                   0xFFCC001C         /* EFS0 Data Register 5 */
 #define REG_EFS0_DAT6                   0xFFCC0020         /* EFS0 Data Register 6 */
 #define REG_EFS0_DAT7                   0xFFCC0024         /* EFS0 Data Register 7 */
-#define REG_EFS0_PGM0                   0xFFCC0028         /* EFS0 Program Register 0 */
-#define REG_EFS0_PGM1                   0xFFCC002C         /* EFS0 Program Register 1 */
-#define REG_EFS0_PGM2                   0xFFCC0030         /* EFS0 Program Register 2 */
-#define REG_EFS0_PGM3                   0xFFCC0034         /* EFS0 Program Register 3 */
-#define REG_EFS0_PGM4                   0xFFCC0038         /* EFS0 Program Register 4 */
-#define REG_EFS0_PGM5                   0xFFCC003C         /* EFS0 Program Register 5 */
-#define REG_EFS0_PGM6                   0xFFCC0040         /* EFS0 Program Register 6 */
-#define REG_EFS0_PGM7                   0xFFCC0044         /* EFS0 Program Register 7 */
-#define REG_EFS0_PGM_TIMING             0xFFCC007C         /* EFS0 Program Timing Config Register */
 
 /* =========================
         EFS
@@ -13387,24 +13380,8 @@
 /* ------------------------------------------------------------------------------------------------------------------------
         EFS_CTL                              Pos/Masks                        Description
    ------------------------------------------------------------------------------------------------------------------------ */
-#define BITP_EFS_CTL_PGM                      1                               /* Program */
 #define BITP_EFS_CTL_READ                     0                               /* Read */
-#define BITM_EFS_CTL_PGM                     (_ADI_MSK(0x00000002,uint32_t))  /* Program */
 #define BITM_EFS_CTL_READ                    (_ADI_MSK(0x00000001,uint32_t))  /* Read */
-
-/* ------------------------------------------------------------------------------------------------------------------------
-        EFS_PGM7                             Pos/Masks                        Description
-   ------------------------------------------------------------------------------------------------------------------------ */
-#define BITP_EFS_PGM7_WRPROT                 31                               /* Write Protect */
-#define BITP_EFS_PGM7_VALUE                   0                               /* Program value 7 */
-#define BITM_EFS_PGM7_WRPROT                 (_ADI_MSK(0x80000000,uint32_t))  /* Write Protect */
-#define BITM_EFS_PGM7_VALUE                  (_ADI_MSK(0x7FFFFFFF,uint32_t))  /* Program value 7 */
-
-/* ------------------------------------------------------------------------------------------------------------------------
-        EFS_PGM_TIMING                       Pos/Masks                        Description
-   ------------------------------------------------------------------------------------------------------------------------ */
-#define BITP_EFS_PGM_TIMING_PGMWAIT           0                               /* Program Bit Wait */
-#define BITM_EFS_PGM_TIMING_PGMWAIT          (_ADI_MSK(0x00000FFF,uint32_t))  /* Program Bit Wait */
 
 /* ==================================================
         Universal Serial Bus Controller Registers
@@ -13490,78 +13467,78 @@
 #define REG_USB0_FS_EOF1                0xFFCC107D         /* USB0 Full-Speed EOF 1 Register */
 #define REG_USB0_LS_EOF1                0xFFCC107E         /* USB0 Low-Speed EOF 1 Register */
 #define REG_USB0_SOFT_RST               0xFFCC107F         /* USB0 Software Reset Register */
-#define REG_USB0_MP0_TXFUNCADDR         0xFFCC1080         /* USB0 EPn Transmit Function Address Register */
-#define REG_USB0_MP1_TXFUNCADDR         0xFFCC1088         /* USB0 EPn Transmit Function Address Register */
-#define REG_USB0_MP2_TXFUNCADDR         0xFFCC1090         /* USB0 EPn Transmit Function Address Register */
-#define REG_USB0_MP3_TXFUNCADDR         0xFFCC1098         /* USB0 EPn Transmit Function Address Register */
-#define REG_USB0_MP4_TXFUNCADDR         0xFFCC10A0         /* USB0 EPn Transmit Function Address Register */
-#define REG_USB0_MP5_TXFUNCADDR         0xFFCC10A8         /* USB0 EPn Transmit Function Address Register */
-#define REG_USB0_MP6_TXFUNCADDR         0xFFCC10B0         /* USB0 EPn Transmit Function Address Register */
-#define REG_USB0_MP7_TXFUNCADDR         0xFFCC10B8         /* USB0 EPn Transmit Function Address Register */
-#define REG_USB0_MP8_TXFUNCADDR         0xFFCC10C0         /* USB0 EPn Transmit Function Address Register */
-#define REG_USB0_MP9_TXFUNCADDR         0xFFCC10C8         /* USB0 EPn Transmit Function Address Register */
-#define REG_USB0_MP10_TXFUNCADDR        0xFFCC10D0         /* USB0 EPn Transmit Function Address Register */
-#define REG_USB0_MP11_TXFUNCADDR        0xFFCC10D8         /* USB0 EPn Transmit Function Address Register */
-#define REG_USB0_MP0_TXHUBADDR          0xFFCC1082         /* USB0 EPn Transmit Hub Address Register */
-#define REG_USB0_MP1_TXHUBADDR          0xFFCC108A         /* USB0 EPn Transmit Hub Address Register */
-#define REG_USB0_MP2_TXHUBADDR          0xFFCC1092         /* USB0 EPn Transmit Hub Address Register */
-#define REG_USB0_MP3_TXHUBADDR          0xFFCC109A         /* USB0 EPn Transmit Hub Address Register */
-#define REG_USB0_MP4_TXHUBADDR          0xFFCC10A2         /* USB0 EPn Transmit Hub Address Register */
-#define REG_USB0_MP5_TXHUBADDR          0xFFCC10AA         /* USB0 EPn Transmit Hub Address Register */
-#define REG_USB0_MP6_TXHUBADDR          0xFFCC10B2         /* USB0 EPn Transmit Hub Address Register */
-#define REG_USB0_MP7_TXHUBADDR          0xFFCC10BA         /* USB0 EPn Transmit Hub Address Register */
-#define REG_USB0_MP8_TXHUBADDR          0xFFCC10C2         /* USB0 EPn Transmit Hub Address Register */
-#define REG_USB0_MP9_TXHUBADDR          0xFFCC10CA         /* USB0 EPn Transmit Hub Address Register */
-#define REG_USB0_MP10_TXHUBADDR         0xFFCC10D2         /* USB0 EPn Transmit Hub Address Register */
-#define REG_USB0_MP11_TXHUBADDR         0xFFCC10DA         /* USB0 EPn Transmit Hub Address Register */
-#define REG_USB0_MP0_TXHUBPORT          0xFFCC1083         /* USB0 EPn Transmit Hub Port Register */
-#define REG_USB0_MP1_TXHUBPORT          0xFFCC108B         /* USB0 EPn Transmit Hub Port Register */
-#define REG_USB0_MP2_TXHUBPORT          0xFFCC1093         /* USB0 EPn Transmit Hub Port Register */
-#define REG_USB0_MP3_TXHUBPORT          0xFFCC109B         /* USB0 EPn Transmit Hub Port Register */
-#define REG_USB0_MP4_TXHUBPORT          0xFFCC10A3         /* USB0 EPn Transmit Hub Port Register */
-#define REG_USB0_MP5_TXHUBPORT          0xFFCC10AB         /* USB0 EPn Transmit Hub Port Register */
-#define REG_USB0_MP6_TXHUBPORT          0xFFCC10B3         /* USB0 EPn Transmit Hub Port Register */
-#define REG_USB0_MP7_TXHUBPORT          0xFFCC10BB         /* USB0 EPn Transmit Hub Port Register */
-#define REG_USB0_MP8_TXHUBPORT          0xFFCC10C3         /* USB0 EPn Transmit Hub Port Register */
-#define REG_USB0_MP9_TXHUBPORT          0xFFCC10CB         /* USB0 EPn Transmit Hub Port Register */
-#define REG_USB0_MP10_TXHUBPORT         0xFFCC10D3         /* USB0 EPn Transmit Hub Port Register */
-#define REG_USB0_MP11_TXHUBPORT         0xFFCC10DB         /* USB0 EPn Transmit Hub Port Register */
-#define REG_USB0_MP0_RXFUNCADDR         0xFFCC1084         /* USB0 EPn Receive Function Address Register */
-#define REG_USB0_MP1_RXFUNCADDR         0xFFCC108C         /* USB0 EPn Receive Function Address Register */
-#define REG_USB0_MP2_RXFUNCADDR         0xFFCC1094         /* USB0 EPn Receive Function Address Register */
-#define REG_USB0_MP3_RXFUNCADDR         0xFFCC109C         /* USB0 EPn Receive Function Address Register */
-#define REG_USB0_MP4_RXFUNCADDR         0xFFCC10A4         /* USB0 EPn Receive Function Address Register */
-#define REG_USB0_MP5_RXFUNCADDR         0xFFCC10AC         /* USB0 EPn Receive Function Address Register */
-#define REG_USB0_MP6_RXFUNCADDR         0xFFCC10B4         /* USB0 EPn Receive Function Address Register */
-#define REG_USB0_MP7_RXFUNCADDR         0xFFCC10BC         /* USB0 EPn Receive Function Address Register */
-#define REG_USB0_MP8_RXFUNCADDR         0xFFCC10C4         /* USB0 EPn Receive Function Address Register */
-#define REG_USB0_MP9_RXFUNCADDR         0xFFCC10CC         /* USB0 EPn Receive Function Address Register */
-#define REG_USB0_MP10_RXFUNCADDR        0xFFCC10D4         /* USB0 EPn Receive Function Address Register */
-#define REG_USB0_MP11_RXFUNCADDR        0xFFCC10DC         /* USB0 EPn Receive Function Address Register */
-#define REG_USB0_MP0_RXHUBADDR          0xFFCC1086         /* USB0 EPn Receive Hub Address Register */
-#define REG_USB0_MP1_RXHUBADDR          0xFFCC108E         /* USB0 EPn Receive Hub Address Register */
-#define REG_USB0_MP2_RXHUBADDR          0xFFCC1096         /* USB0 EPn Receive Hub Address Register */
-#define REG_USB0_MP3_RXHUBADDR          0xFFCC109E         /* USB0 EPn Receive Hub Address Register */
-#define REG_USB0_MP4_RXHUBADDR          0xFFCC10A6         /* USB0 EPn Receive Hub Address Register */
-#define REG_USB0_MP5_RXHUBADDR          0xFFCC10AE         /* USB0 EPn Receive Hub Address Register */
-#define REG_USB0_MP6_RXHUBADDR          0xFFCC10B6         /* USB0 EPn Receive Hub Address Register */
-#define REG_USB0_MP7_RXHUBADDR          0xFFCC10BE         /* USB0 EPn Receive Hub Address Register */
-#define REG_USB0_MP8_RXHUBADDR          0xFFCC10C6         /* USB0 EPn Receive Hub Address Register */
-#define REG_USB0_MP9_RXHUBADDR          0xFFCC10CE         /* USB0 EPn Receive Hub Address Register */
-#define REG_USB0_MP10_RXHUBADDR         0xFFCC10D6         /* USB0 EPn Receive Hub Address Register */
-#define REG_USB0_MP11_RXHUBADDR         0xFFCC10DE         /* USB0 EPn Receive Hub Address Register */
-#define REG_USB0_MP0_RXHUBPORT          0xFFCC1087         /* USB0 EPn Receive Hub Port Register */
-#define REG_USB0_MP1_RXHUBPORT          0xFFCC108F         /* USB0 EPn Receive Hub Port Register */
-#define REG_USB0_MP2_RXHUBPORT          0xFFCC1097         /* USB0 EPn Receive Hub Port Register */
-#define REG_USB0_MP3_RXHUBPORT          0xFFCC109F         /* USB0 EPn Receive Hub Port Register */
-#define REG_USB0_MP4_RXHUBPORT          0xFFCC10A7         /* USB0 EPn Receive Hub Port Register */
-#define REG_USB0_MP5_RXHUBPORT          0xFFCC10AF         /* USB0 EPn Receive Hub Port Register */
-#define REG_USB0_MP6_RXHUBPORT          0xFFCC10B7         /* USB0 EPn Receive Hub Port Register */
-#define REG_USB0_MP7_RXHUBPORT          0xFFCC10BF         /* USB0 EPn Receive Hub Port Register */
-#define REG_USB0_MP8_RXHUBPORT          0xFFCC10C7         /* USB0 EPn Receive Hub Port Register */
-#define REG_USB0_MP9_RXHUBPORT          0xFFCC10CF         /* USB0 EPn Receive Hub Port Register */
-#define REG_USB0_MP10_RXHUBPORT         0xFFCC10D7         /* USB0 EPn Receive Hub Port Register */
-#define REG_USB0_MP11_RXHUBPORT         0xFFCC10DF         /* USB0 EPn Receive Hub Port Register */
+#define REG_USB0_MP0_TXFUNCADDR         0xFFCC1080         /* USB0 MPn Transmit Function Address Register */
+#define REG_USB0_MP1_TXFUNCADDR         0xFFCC1088         /* USB0 MPn Transmit Function Address Register */
+#define REG_USB0_MP2_TXFUNCADDR         0xFFCC1090         /* USB0 MPn Transmit Function Address Register */
+#define REG_USB0_MP3_TXFUNCADDR         0xFFCC1098         /* USB0 MPn Transmit Function Address Register */
+#define REG_USB0_MP4_TXFUNCADDR         0xFFCC10A0         /* USB0 MPn Transmit Function Address Register */
+#define REG_USB0_MP5_TXFUNCADDR         0xFFCC10A8         /* USB0 MPn Transmit Function Address Register */
+#define REG_USB0_MP6_TXFUNCADDR         0xFFCC10B0         /* USB0 MPn Transmit Function Address Register */
+#define REG_USB0_MP7_TXFUNCADDR         0xFFCC10B8         /* USB0 MPn Transmit Function Address Register */
+#define REG_USB0_MP8_TXFUNCADDR         0xFFCC10C0         /* USB0 MPn Transmit Function Address Register */
+#define REG_USB0_MP9_TXFUNCADDR         0xFFCC10C8         /* USB0 MPn Transmit Function Address Register */
+#define REG_USB0_MP10_TXFUNCADDR        0xFFCC10D0         /* USB0 MPn Transmit Function Address Register */
+#define REG_USB0_MP11_TXFUNCADDR        0xFFCC10D8         /* USB0 MPn Transmit Function Address Register */
+#define REG_USB0_MP0_TXHUBADDR          0xFFCC1082         /* USB0 MPn Transmit Hub Address Register */
+#define REG_USB0_MP1_TXHUBADDR          0xFFCC108A         /* USB0 MPn Transmit Hub Address Register */
+#define REG_USB0_MP2_TXHUBADDR          0xFFCC1092         /* USB0 MPn Transmit Hub Address Register */
+#define REG_USB0_MP3_TXHUBADDR          0xFFCC109A         /* USB0 MPn Transmit Hub Address Register */
+#define REG_USB0_MP4_TXHUBADDR          0xFFCC10A2         /* USB0 MPn Transmit Hub Address Register */
+#define REG_USB0_MP5_TXHUBADDR          0xFFCC10AA         /* USB0 MPn Transmit Hub Address Register */
+#define REG_USB0_MP6_TXHUBADDR          0xFFCC10B2         /* USB0 MPn Transmit Hub Address Register */
+#define REG_USB0_MP7_TXHUBADDR          0xFFCC10BA         /* USB0 MPn Transmit Hub Address Register */
+#define REG_USB0_MP8_TXHUBADDR          0xFFCC10C2         /* USB0 MPn Transmit Hub Address Register */
+#define REG_USB0_MP9_TXHUBADDR          0xFFCC10CA         /* USB0 MPn Transmit Hub Address Register */
+#define REG_USB0_MP10_TXHUBADDR         0xFFCC10D2         /* USB0 MPn Transmit Hub Address Register */
+#define REG_USB0_MP11_TXHUBADDR         0xFFCC10DA         /* USB0 MPn Transmit Hub Address Register */
+#define REG_USB0_MP0_TXHUBPORT          0xFFCC1083         /* USB0 MPn Transmit Hub Port Register */
+#define REG_USB0_MP1_TXHUBPORT          0xFFCC108B         /* USB0 MPn Transmit Hub Port Register */
+#define REG_USB0_MP2_TXHUBPORT          0xFFCC1093         /* USB0 MPn Transmit Hub Port Register */
+#define REG_USB0_MP3_TXHUBPORT          0xFFCC109B         /* USB0 MPn Transmit Hub Port Register */
+#define REG_USB0_MP4_TXHUBPORT          0xFFCC10A3         /* USB0 MPn Transmit Hub Port Register */
+#define REG_USB0_MP5_TXHUBPORT          0xFFCC10AB         /* USB0 MPn Transmit Hub Port Register */
+#define REG_USB0_MP6_TXHUBPORT          0xFFCC10B3         /* USB0 MPn Transmit Hub Port Register */
+#define REG_USB0_MP7_TXHUBPORT          0xFFCC10BB         /* USB0 MPn Transmit Hub Port Register */
+#define REG_USB0_MP8_TXHUBPORT          0xFFCC10C3         /* USB0 MPn Transmit Hub Port Register */
+#define REG_USB0_MP9_TXHUBPORT          0xFFCC10CB         /* USB0 MPn Transmit Hub Port Register */
+#define REG_USB0_MP10_TXHUBPORT         0xFFCC10D3         /* USB0 MPn Transmit Hub Port Register */
+#define REG_USB0_MP11_TXHUBPORT         0xFFCC10DB         /* USB0 MPn Transmit Hub Port Register */
+#define REG_USB0_MP0_RXFUNCADDR         0xFFCC1084         /* USB0 MPn Receive Function Address Register */
+#define REG_USB0_MP1_RXFUNCADDR         0xFFCC108C         /* USB0 MPn Receive Function Address Register */
+#define REG_USB0_MP2_RXFUNCADDR         0xFFCC1094         /* USB0 MPn Receive Function Address Register */
+#define REG_USB0_MP3_RXFUNCADDR         0xFFCC109C         /* USB0 MPn Receive Function Address Register */
+#define REG_USB0_MP4_RXFUNCADDR         0xFFCC10A4         /* USB0 MPn Receive Function Address Register */
+#define REG_USB0_MP5_RXFUNCADDR         0xFFCC10AC         /* USB0 MPn Receive Function Address Register */
+#define REG_USB0_MP6_RXFUNCADDR         0xFFCC10B4         /* USB0 MPn Receive Function Address Register */
+#define REG_USB0_MP7_RXFUNCADDR         0xFFCC10BC         /* USB0 MPn Receive Function Address Register */
+#define REG_USB0_MP8_RXFUNCADDR         0xFFCC10C4         /* USB0 MPn Receive Function Address Register */
+#define REG_USB0_MP9_RXFUNCADDR         0xFFCC10CC         /* USB0 MPn Receive Function Address Register */
+#define REG_USB0_MP10_RXFUNCADDR        0xFFCC10D4         /* USB0 MPn Receive Function Address Register */
+#define REG_USB0_MP11_RXFUNCADDR        0xFFCC10DC         /* USB0 MPn Receive Function Address Register */
+#define REG_USB0_MP0_RXHUBADDR          0xFFCC1086         /* USB0 MPn Receive Hub Address Register */
+#define REG_USB0_MP1_RXHUBADDR          0xFFCC108E         /* USB0 MPn Receive Hub Address Register */
+#define REG_USB0_MP2_RXHUBADDR          0xFFCC1096         /* USB0 MPn Receive Hub Address Register */
+#define REG_USB0_MP3_RXHUBADDR          0xFFCC109E         /* USB0 MPn Receive Hub Address Register */
+#define REG_USB0_MP4_RXHUBADDR          0xFFCC10A6         /* USB0 MPn Receive Hub Address Register */
+#define REG_USB0_MP5_RXHUBADDR          0xFFCC10AE         /* USB0 MPn Receive Hub Address Register */
+#define REG_USB0_MP6_RXHUBADDR          0xFFCC10B6         /* USB0 MPn Receive Hub Address Register */
+#define REG_USB0_MP7_RXHUBADDR          0xFFCC10BE         /* USB0 MPn Receive Hub Address Register */
+#define REG_USB0_MP8_RXHUBADDR          0xFFCC10C6         /* USB0 MPn Receive Hub Address Register */
+#define REG_USB0_MP9_RXHUBADDR          0xFFCC10CE         /* USB0 MPn Receive Hub Address Register */
+#define REG_USB0_MP10_RXHUBADDR         0xFFCC10D6         /* USB0 MPn Receive Hub Address Register */
+#define REG_USB0_MP11_RXHUBADDR         0xFFCC10DE         /* USB0 MPn Receive Hub Address Register */
+#define REG_USB0_MP0_RXHUBPORT          0xFFCC1087         /* USB0 MPn Receive Hub Port Register */
+#define REG_USB0_MP1_RXHUBPORT          0xFFCC108F         /* USB0 MPn Receive Hub Port Register */
+#define REG_USB0_MP2_RXHUBPORT          0xFFCC1097         /* USB0 MPn Receive Hub Port Register */
+#define REG_USB0_MP3_RXHUBPORT          0xFFCC109F         /* USB0 MPn Receive Hub Port Register */
+#define REG_USB0_MP4_RXHUBPORT          0xFFCC10A7         /* USB0 MPn Receive Hub Port Register */
+#define REG_USB0_MP5_RXHUBPORT          0xFFCC10AF         /* USB0 MPn Receive Hub Port Register */
+#define REG_USB0_MP6_RXHUBPORT          0xFFCC10B7         /* USB0 MPn Receive Hub Port Register */
+#define REG_USB0_MP7_RXHUBPORT          0xFFCC10BF         /* USB0 MPn Receive Hub Port Register */
+#define REG_USB0_MP8_RXHUBPORT          0xFFCC10C7         /* USB0 MPn Receive Hub Port Register */
+#define REG_USB0_MP9_RXHUBPORT          0xFFCC10CF         /* USB0 MPn Receive Hub Port Register */
+#define REG_USB0_MP10_RXHUBPORT         0xFFCC10D7         /* USB0 MPn Receive Hub Port Register */
+#define REG_USB0_MP11_RXHUBPORT         0xFFCC10DF         /* USB0 MPn Receive Hub Port Register */
 #define REG_USB0_EP0_TXMAXP             0xFFCC1100         /* USB0 EPn Transmit Maximum Packet Length Register */
 #define REG_USB0_EP1_TXMAXP             0xFFCC1110         /* USB0 EPn Transmit Maximum Packet Length Register */
 #define REG_USB0_EP2_TXMAXP             0xFFCC1120         /* USB0 EPn Transmit Maximum Packet Length Register */
@@ -15459,11 +15436,11 @@
 #define BITP_USB_LPM_CTL_NAK                  4                               /* LPM NAK Enable */
 #define BITP_USB_LPM_CTL_EN                   2                               /* LPM Enable */
 #define BITP_USB_LPM_CTL_RESUME               1                               /* LPM Resume (Remote Wakeup) */
-#define BITP_USB_LPM_CTL_TX                   0
+#define BITP_USB_LPM_CTL_TX                   0                               /* LPM Transmit */
 #define BITM_USB_LPM_CTL_NAK                 (_ADI_MSK(0x00000010,uint8_t))   /* LPM NAK Enable */
 #define BITM_USB_LPM_CTL_EN                  (_ADI_MSK(0x0000000C,uint8_t))   /* LPM Enable */
 #define BITM_USB_LPM_CTL_RESUME              (_ADI_MSK(0x00000002,uint8_t))   /* LPM Resume (Remote Wakeup) */
-#define BITM_USB_LPM_CTL_TX                  (_ADI_MSK(0x00000001,uint8_t))
+#define BITM_USB_LPM_CTL_TX                  (_ADI_MSK(0x00000001,uint8_t))   /* LPM Transmit */
 
 /* ------------------------------------------------------------------------------------------------------------------------
         USB_LPM_IEN                          Pos/Masks                        Description
@@ -17273,10 +17250,10 @@
 
 /* DDR Parameters */
 
-#define PARAM_DDR0_NUM_ADDR                          14
-#define PARAM_DDR0_NUM_BA                             3
-#define PARAM_DDR0_NUM_CS                             1
-#define PARAM_DDR0_NUM_DATA                          16
+#define PARAM_DMC0_NUM_ADDR                          14
+#define PARAM_DMC0_NUM_BA                             3
+#define PARAM_DMC0_NUM_CS                             1
+#define PARAM_DMC0_NUM_DATA                          16
 
 
 /* System Cross Bar Parameters */

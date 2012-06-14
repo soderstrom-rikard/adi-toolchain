@@ -4,7 +4,8 @@
 <!-- ******  ADSP-BF606-proc.xml                                            -->
 <!-- ********************************************************************** -->
 <!--                                                                        -->
-<!-- Date         :   05-17-2012                                            -->
+<!-- Date         :   06-07-2012                                            -->
+<!-- Tag          :   BF60X_TOOLS_CCES_1_0_1                                -->
 <!--                                                                        -->
 <!-- Copyright (c) 2011-2012 Analog Devices, Inc.  All Rights Reserved.     -->
 <!-- This software is proprietary and confidential to Analog Devices, Inc.  -->
@@ -16,9 +17,10 @@
 
 <cces-proc-xml schema-version="1" name="ADSP-BF606-proc.xml">
 
-<!-- CCES 1.0 Update 1 Version 1 -->
+<!-- CCES 1.0 Update 1 Version 2 -->
 
-<version file-version="1.0.1.1"/>
+<version file-version="1.0.1.2"/>
+
 
 <!-- ********************************************************************** -->
 <!-- ******* Register set for ADSP-BF606                                    -->
@@ -32,7 +34,7 @@
 	<!-- *********************************************** -->
 	<!-- Where to obtain the <register-core-definitions> -->
 	<!-- *********************************************** -->
-<register-core-file name="ADSP-EDN-core.xml" prefix="EDN"/>
+<register-core-file name="ADSP-BF60x-core.xml" prefix="BF60x"/>
 
 	<!-- ************************ -->
 	<!-- MMR register definitions -->
@@ -12697,121 +12699,121 @@
 
 
 <!-- ************** -->
-<!-- ***  DDR0  *** -->
+<!-- ***  DMC0  *** -->
 <!-- ************** -->
 
-<register name="DDR0_CTL"                        read-address="0xFFC80004" write-address="0xFFC80004" bit-size="32" type="IO" mask="FFFFFFFF" group="DDR0" description="DDR0 Control Register" />
-   <register name="DDR0_CTL.DLLCAL"              parent="DDR0_CTL" bit-position="13" bit-size="1" description="DLL Calibration Start" />
-   <register name="DDR0_CTL.PPREF"               parent="DDR0_CTL" bit-position="12" bit-size="1" description="Postpone Refresh" />
-   <register name="DDR0_CTL.RDTOWR"              parent="DDR0_CTL" bit-position="9" bit-size="3" description="Read-to-Write Cycle" />
-   <register name="DDR0_CTL.ADDRMODE"            parent="DDR0_CTL" bit-position="8" bit-size="1" description="Addressing (Page/Bank) Mode" />
-   <register name="DDR0_CTL.PREC"                parent="DDR0_CTL" bit-position="6" bit-size="1" description="Precharge" />
-   <register name="DDR0_CTL.DPDREQ"              parent="DDR0_CTL" bit-position="5" bit-size="1" description="Deep Power Down Request" />
-   <register name="DDR0_CTL.PDREQ"               parent="DDR0_CTL" bit-position="4" bit-size="1" description="Power Down Request" />
-   <register name="DDR0_CTL.SRREQ"               parent="DDR0_CTL" bit-position="3" bit-size="1" description="Self Refresh Request" />
-   <register name="DDR0_CTL.INIT"                parent="DDR0_CTL" bit-position="2" bit-size="1" description="Initialize DRAM Start" />
-   <register name="DDR0_CTL.LPDDR"               parent="DDR0_CTL" bit-position="1" bit-size="1" description="Low Power DDR Mode" />
-<register name="DDR0_STAT"                       read-address="0xFFC80008" write-address="0xFFC80008" bit-size="32" type="IO" mask="FFFFFFFF" group="DDR0" description="DDR0 Status Register" />
-   <register name="DDR0_STAT.PHYRDPHASE"         parent="DDR0_STAT" bit-position="20" bit-size="4" description="PHY Read Phase" />
-   <register name="DDR0_STAT.PENDREF"            parent="DDR0_STAT" bit-position="16" bit-size="4" description="Pending Refresh" />
-   <register name="DDR0_STAT.DLLCALDONE"         parent="DDR0_STAT" bit-position="13" bit-size="1" description="DLL Calibration Done" />
-   <register name="DDR0_STAT.DPDACK"             parent="DDR0_STAT" bit-position="5" bit-size="1" description="Deep Powerdown Acknowledge" />
-   <register name="DDR0_STAT.PDACK"              parent="DDR0_STAT" bit-position="4" bit-size="1" description="Power Down Acknowledge" />
-   <register name="DDR0_STAT.SRACK"              parent="DDR0_STAT" bit-position="3" bit-size="1" description="Self Refresh Acknowledge" />
-   <register name="DDR0_STAT.MEMINITDONE"        parent="DDR0_STAT" bit-position="1" bit-size="1" description="Memory Initialization Done" />
-   <register name="DDR0_STAT.IDLE"               parent="DDR0_STAT" bit-position="0" bit-size="1" description="Idle State" />
-<register name="DDR0_EFFCTL"                     read-address="0xFFC8000C" write-address="0xFFC8000C" bit-size="32" type="IO" mask="FFFFFFFF" group="DDR0" description="DDR0 Efficiency Control Register" />
-   <register name="DDR0_EFFCTL.IDLECYC"          parent="DDR0_EFFCTL" bit-position="20" bit-size="4" description="Idle Cycle" />
-   <register name="DDR0_EFFCTL.NUMREF"           parent="DDR0_EFFCTL" bit-position="16" bit-size="4" description="Number of Refresh Commands" />
-   <register name="DDR0_EFFCTL.PRECBANK7"        parent="DDR0_EFFCTL" bit-position="15" bit-size="1" description="Precharge Bank 7" />
-   <register name="DDR0_EFFCTL.PRECBANK6"        parent="DDR0_EFFCTL" bit-position="14" bit-size="1" description="Precharge Bank 6" />
-   <register name="DDR0_EFFCTL.PRECBANK5"        parent="DDR0_EFFCTL" bit-position="13" bit-size="1" description="Precharge Bank 5" />
-   <register name="DDR0_EFFCTL.PRECBANK4"        parent="DDR0_EFFCTL" bit-position="12" bit-size="1" description="Precharge Bank 4" />
-   <register name="DDR0_EFFCTL.PRECBANK3"        parent="DDR0_EFFCTL" bit-position="11" bit-size="1" description="Precharge Bank 3" />
-   <register name="DDR0_EFFCTL.PRECBANK2"        parent="DDR0_EFFCTL" bit-position="10" bit-size="1" description="Precharge Bank 2" />
-   <register name="DDR0_EFFCTL.PRECBANK1"        parent="DDR0_EFFCTL" bit-position="9" bit-size="1" description="Precharge Bank 1" />
-   <register name="DDR0_EFFCTL.PRECBANK0"        parent="DDR0_EFFCTL" bit-position="8" bit-size="1" description="Precharge Bank 0" />
-   <register name="DDR0_EFFCTL.WAITWRDATA"       parent="DDR0_EFFCTL" bit-position="7" bit-size="1" description="Wait in Write Data Snapshot" />
-   <register name="DDR0_EFFCTL.FULLWRDATA"       parent="DDR0_EFFCTL" bit-position="6" bit-size="1" description="Wait for Full Write Data" />
-<register name="DDR0_PRIO"                       read-address="0xFFC80010" write-address="0xFFC80010" bit-size="32" type="IO" mask="FFFFFFFF" group="DDR0" description="DDR0 Priority ID Register" />
-   <register name="DDR0_PRIO.ID2"                parent="DDR0_PRIO" bit-position="16" bit-size="16" description="ID2 Requiring Elevated Priority" />
-   <register name="DDR0_PRIO.ID1"                parent="DDR0_PRIO" bit-position="0" bit-size="16" description="ID1 Requiring Elevated Priority" />
-<register name="DDR0_PRIOMSK"                    read-address="0xFFC80014" write-address="0xFFC80014" bit-size="32" type="IO" mask="FFFFFFFF" group="DDR0" description="DDR0 Priority ID Mask Register" />
-   <register name="DDR0_PRIOMSK.ID2MSK"          parent="DDR0_PRIOMSK" bit-position="16" bit-size="16" description="Mask for ID2" />
-   <register name="DDR0_PRIOMSK.ID1MSK"          parent="DDR0_PRIOMSK" bit-position="0" bit-size="16" description="Mask for ID1" />
-<register name="DDR0_CFG"                        read-address="0xFFC80040" write-address="0xFFC80040" bit-size="32" type="IO" mask="FFFFFFFF" group="DDR0" description="DDR0 Configuration Register" />
-   <register name="DDR0_CFG.EXTBANK"             parent="DDR0_CFG" bit-position="12" bit-size="4" description="External Banks" />
-   <register name="DDR0_CFG.SDRSIZE"             parent="DDR0_CFG" bit-position="8" bit-size="4" description="SDRAM Size" />
-   <register name="DDR0_CFG.SDRWID"              parent="DDR0_CFG" bit-position="4" bit-size="4" description="SDRAM Width" />
-   <register name="DDR0_CFG.IFWID"               parent="DDR0_CFG" bit-position="0" bit-size="4" description="Interface Width" />
-<register name="DDR0_TR0"                        read-address="0xFFC80044" write-address="0xFFC80044" bit-size="32" type="IO" mask="FFFFFFFF" group="DDR0" description="DDR0 Timing 0 Register" />
-   <register name="DDR0_TR0.TMRD"                parent="DDR0_TR0" bit-position="28" bit-size="4" description="Timing Mode Register Delay" />
-   <register name="DDR0_TR0.TRC"                 parent="DDR0_TR0" bit-position="20" bit-size="6" description="Timing Row Cycle" />
-   <register name="DDR0_TR0.TRAS"                parent="DDR0_TR0" bit-position="12" bit-size="5" description="Timing Row Active Time" />
-   <register name="DDR0_TR0.TRP"                 parent="DDR0_TR0" bit-position="8" bit-size="4" description="Timing RAS Precharge." />
-   <register name="DDR0_TR0.TWTR"                parent="DDR0_TR0" bit-position="4" bit-size="4" description="Timing Write to Read" />
-   <register name="DDR0_TR0.TRCD"                parent="DDR0_TR0" bit-position="0" bit-size="4" description="Timing RAS to CAS Delay" />
-<register name="DDR0_TR1"                        read-address="0xFFC80048" write-address="0xFFC80048" bit-size="32" type="IO" mask="FFFFFFFF" group="DDR0" description="DDR0 Timing 1 Register" />
-   <register name="DDR0_TR1.TRRD"                parent="DDR0_TR1" bit-position="28" bit-size="3" description="Timing Read-Read Delay" />
-   <register name="DDR0_TR1.TRFC"                parent="DDR0_TR1" bit-position="16" bit-size="8" description="Timing Refresh-to-Command" />
-   <register name="DDR0_TR1.TREF"                parent="DDR0_TR1" bit-position="0" bit-size="14" description="Timing Refresh Interval" />
-<register name="DDR0_TR2"                        read-address="0xFFC8004C" write-address="0xFFC8004C" bit-size="32" type="IO" mask="FFFFFFFF" group="DDR0" description="DDR0 Timing 2 Register" />
-   <register name="DDR0_TR2.TCKE"                parent="DDR0_TR2" bit-position="20" bit-size="4" description="Timing Clock Enable" />
-   <register name="DDR0_TR2.TXP"                 parent="DDR0_TR2" bit-position="16" bit-size="4" description="Timing Exit Powerdown" />
-   <register name="DDR0_TR2.TWR"                 parent="DDR0_TR2" bit-position="12" bit-size="4" description="Timing Write Recovery" />
-   <register name="DDR0_TR2.TRTP"                parent="DDR0_TR2" bit-position="8" bit-size="4" description="Timing Read-to-Precharge" />
-   <register name="DDR0_TR2.TFAW"                parent="DDR0_TR2" bit-position="0" bit-size="5" description="Timing Four-Activated-Window" />
-<register name="DDR0_MSK"                        read-address="0xFFC8005C" write-address="0xFFC8005C" bit-size="32" type="IO" mask="FFFFFFFF" group="DDR0" description="DDR0 Mask (Mode Register Shadow) Register" />
-   <register name="DDR0_MSK.EMR3"                parent="DDR0_MSK" bit-position="11" bit-size="1" description="Shadow EMR3 Unmask" />
-   <register name="DDR0_MSK.EMR2"                parent="DDR0_MSK" bit-position="10" bit-size="1" description="Shadow EMR2 Unmask" />
-   <register name="DDR0_MSK.EMR1"                parent="DDR0_MSK" bit-position="9" bit-size="1" description="Shadow EMR1 Unmask" />
-   <register name="DDR0_MSK.MR"                  parent="DDR0_MSK" bit-position="8" bit-size="1" description="Shadow MR Unmask" />
-<register name="DDR0_MR"                         read-address="0xFFC80060" write-address="0xFFC80060" bit-size="32" type="IO" mask="FFFFFFFF" group="DDR0" description="DDR0 Shadow MR Register" />
-   <register name="DDR0_MR.PD"                   parent="DDR0_MR" bit-position="12" bit-size="1" description="Active Powerdown Mode" />
-   <register name="DDR0_MR.WRRECOV"              parent="DDR0_MR" bit-position="9" bit-size="3" description="Write Recovery" />
-   <register name="DDR0_MR.DLLRST"               parent="DDR0_MR" bit-position="8" bit-size="1" description="DLL Reset" />
-   <register name="DDR0_MR.CL"                   parent="DDR0_MR" bit-position="4" bit-size="3" description="CAS Latency" />
-   <register name="DDR0_MR.BLEN"                 parent="DDR0_MR" bit-position="0" bit-size="3" description="Burst Length" />
-<register name="DDR0_EMR1"                       read-address="0xFFC80064" write-address="0xFFC80064" bit-size="32" type="IO" mask="FFFFFFFF" group="DDR0" description="DDR0 Shadow EMR1 Register" />
-   <register name="DDR0_EMR1.QOFF"               parent="DDR0_EMR1" bit-position="12" bit-size="1" description="Output Buffer Enable" />
-   <register name="DDR0_EMR1.DQS"                parent="DDR0_EMR1" bit-position="10" bit-size="1" description="DQS Enable" />
-   <register name="DDR0_EMR1.RTT1"               parent="DDR0_EMR1" bit-position="6" bit-size="1" description="Termination Resistance 1" />
-   <register name="DDR0_EMR1.AL"                 parent="DDR0_EMR1" bit-position="3" bit-size="3" description="Additive Latency" />
-   <register name="DDR0_EMR1.RTT0"               parent="DDR0_EMR1" bit-position="2" bit-size="1" description="Termination Resistance 0." />
-   <register name="DDR0_EMR1.DIC"                parent="DDR0_EMR1" bit-position="1" bit-size="1" description="Output Driver Impedance Control" />
-   <register name="DDR0_EMR1.DLLEN"              parent="DDR0_EMR1" bit-position="0" bit-size="1" description="DLL Enable" />
-<register name="DDR0_EMR2"                       read-address="0xFFC80068" write-address="0xFFC80068" bit-size="32" type="IO" mask="FFFFFFFF" group="DDR0" description="DDR0 Shadow EMR2 Register" />
-   <register name="DDR0_EMR2.SRF"                parent="DDR0_EMR2" bit-position="7" bit-size="1" description="High Temp. Self Refresh" />
-   <register name="DDR0_EMR2.DS"                 parent="DDR0_EMR2" bit-position="5" bit-size="2" description="Drive Strength" />
-   <register name="DDR0_EMR2.TCSR"               parent="DDR0_EMR2" bit-position="3" bit-size="2" description="Temp. Comp. Self Refresh" />
-   <register name="DDR0_EMR2.PASR"               parent="DDR0_EMR2" bit-position="0" bit-size="3" description="Partial Array Self Refresh" />
-<register name="DDR0_EMR3"                       read-address="0xFFC8006C" write-address="0xFFC8006C" bit-size="32" type="IO" mask="FFFFFFFF" group="DDR0" description="DDR0 Shadow EMR3 Register" />
-<register name="DDR0_DLLCTL"                     read-address="0xFFC80080" write-address="0xFFC80080" bit-size="32" type="IO" mask="FFFFFFFF" group="DDR0" description="DDR0 DLL Control Register" />
-   <register name="DDR0_DLLCTL.DATACYC"          parent="DDR0_DLLCTL" bit-position="8" bit-size="4" description="Data Cycles" />
-   <register name="DDR0_DLLCTL.DLLCALRDCNT"      parent="DDR0_DLLCTL" bit-position="0" bit-size="8" description="DLL Calibration RD Count" />
-<register name="DDR0_PHY_CTL1"                   read-address="0xFFC80094" write-address="0xFFC80094" bit-size="32" type="IO" mask="FFFFFFFF" group="DDR0" description="DDR0 PHY Control 1 Register" />
-   <register name="DDR0_PHY_CTL1.CONTODTVAL"     parent="DDR0_PHY_CTL1" bit-position="19" bit-size="1" description="Select ODT value on controller" />
-<register name="DDR0_PHY_CTL3"                   read-address="0xFFC8009C" write-address="0xFFC8009C" bit-size="32" type="IO" mask="FFFFFFFF" group="DDR0" description="DDR0 PHY Control 3 Register" />
-   <register name="DDR0_PHY_CTL3.OFST1"          parent="DDR0_PHY_CTL3" bit-position="26" bit-size="1" description="Offset Parameter 1" />
-   <register name="DDR0_PHY_CTL3.OFST0"          parent="DDR0_PHY_CTL3" bit-position="24" bit-size="1" description="Offset Parameter 0" />
-   <register name="DDR0_PHY_CTL3.ENODTDQS"       parent="DDR0_PHY_CTL3" bit-position="10" bit-size="1" description="Enables controller ODT on read of DQS" />
-   <register name="DDR0_PHY_CTL3.TMG1"           parent="DDR0_PHY_CTL3" bit-position="7" bit-size="1" description="Timing Parameter 1" />
-   <register name="DDR0_PHY_CTL3.TMG0"           parent="DDR0_PHY_CTL3" bit-position="6" bit-size="1" description="Timing Parameter 0" />
-   <register name="DDR0_PHY_CTL3.ENODTDQ"        parent="DDR0_PHY_CTL3" bit-position="2" bit-size="1" description="Enables controller ODT on read of DQ" />
-<register name="DDR0_PADCTL"                     read-address="0xFFC800C0" write-address="0xFFC800C0" bit-size="32" type="IO" mask="FFFFFFFF" group="DDR0" description="DDR0 PAD Control Register" />
-   <register name="DDR0_PADCTL.CKEOE"            parent="DDR0_PADCTL" bit-position="19" bit-size="1" description="CKE Output Enable" />
-   <register name="DDR0_PADCTL.CKEPWD"           parent="DDR0_PADCTL" bit-position="18" bit-size="1" description="CKE pad receiver power down." />
-   <register name="DDR0_PADCTL.CKEODS"           parent="DDR0_PADCTL" bit-position="16" bit-size="2" description="CKE Output Drive Strength" />
-   <register name="DDR0_PADCTL.CMDOE"            parent="DDR0_PADCTL" bit-position="15" bit-size="1" description="CMD Output Enable" />
-   <register name="DDR0_PADCTL.CMDPWD"           parent="DDR0_PADCTL" bit-position="14" bit-size="1" description="CMD Powerdown" />
-   <register name="DDR0_PADCTL.CMDODS"           parent="DDR0_PADCTL" bit-position="12" bit-size="2" description="CMD Output Drive Strength" />
-   <register name="DDR0_PADCTL.CLKOE"            parent="DDR0_PADCTL" bit-position="11" bit-size="1" description="CLK Output Enable" />
-   <register name="DDR0_PADCTL.CLKPWD"           parent="DDR0_PADCTL" bit-position="10" bit-size="1" description="CLK Powerdown" />
-   <register name="DDR0_PADCTL.CLKODS"           parent="DDR0_PADCTL" bit-position="8" bit-size="2" description="Clock Output Drive Strength" />
-   <register name="DDR0_PADCTL.DQSPWD"           parent="DDR0_PADCTL" bit-position="6" bit-size="1" description="DQ/DQS Powerdown" />
-   <register name="DDR0_PADCTL.DQSODS"           parent="DDR0_PADCTL" bit-position="4" bit-size="2" description="DQS Output Drive Strength" />
-   <register name="DDR0_PADCTL.DQPWD"            parent="DDR0_PADCTL" bit-position="2" bit-size="1" description="DQ Powerdown." />
-   <register name="DDR0_PADCTL.DQODS"            parent="DDR0_PADCTL" bit-position="0" bit-size="2" description="DQ Output Drive Strength" />
+<register name="DMC0_CTL"                        read-address="0xFFC80004" write-address="0xFFC80004" bit-size="32" type="IO" mask="FFFFFFFF" group="DMC0" description="DMC0 Control Register" />
+   <register name="DMC0_CTL.DLLCAL"              parent="DMC0_CTL" bit-position="13" bit-size="1" description="DLL Calibration Start" />
+   <register name="DMC0_CTL.PPREF"               parent="DMC0_CTL" bit-position="12" bit-size="1" description="Postpone Refresh" />
+   <register name="DMC0_CTL.RDTOWR"              parent="DMC0_CTL" bit-position="9" bit-size="3" description="Read-to-Write Cycle" />
+   <register name="DMC0_CTL.ADDRMODE"            parent="DMC0_CTL" bit-position="8" bit-size="1" description="Addressing (Page/Bank) Mode" />
+   <register name="DMC0_CTL.PREC"                parent="DMC0_CTL" bit-position="6" bit-size="1" description="Precharge" />
+   <register name="DMC0_CTL.DPDREQ"              parent="DMC0_CTL" bit-position="5" bit-size="1" description="Deep Power Down Request" />
+   <register name="DMC0_CTL.PDREQ"               parent="DMC0_CTL" bit-position="4" bit-size="1" description="Power Down Request" />
+   <register name="DMC0_CTL.SRREQ"               parent="DMC0_CTL" bit-position="3" bit-size="1" description="Self Refresh Request" />
+   <register name="DMC0_CTL.INIT"                parent="DMC0_CTL" bit-position="2" bit-size="1" description="Initialize DRAM Start" />
+   <register name="DMC0_CTL.LPDDR"               parent="DMC0_CTL" bit-position="1" bit-size="1" description="Low Power DDR Mode" />
+<register name="DMC0_STAT"                       read-address="0xFFC80008" write-address="0xFFC80008" bit-size="32" type="IO" mask="FFFFFFFF" group="DMC0" description="DMC0 Status Register" />
+   <register name="DMC0_STAT.PHYRDPHASE"         parent="DMC0_STAT" bit-position="20" bit-size="4" description="PHY Read Phase" />
+   <register name="DMC0_STAT.PENDREF"            parent="DMC0_STAT" bit-position="16" bit-size="4" description="Pending Refresh" />
+   <register name="DMC0_STAT.DLLCALDONE"         parent="DMC0_STAT" bit-position="13" bit-size="1" description="DLL Calibration Done" />
+   <register name="DMC0_STAT.DPDACK"             parent="DMC0_STAT" bit-position="5" bit-size="1" description="Deep Powerdown Acknowledge" />
+   <register name="DMC0_STAT.PDACK"              parent="DMC0_STAT" bit-position="4" bit-size="1" description="Power Down Acknowledge" />
+   <register name="DMC0_STAT.SRACK"              parent="DMC0_STAT" bit-position="3" bit-size="1" description="Self Refresh Acknowledge" />
+   <register name="DMC0_STAT.MEMINITDONE"        parent="DMC0_STAT" bit-position="1" bit-size="1" description="Memory Initialization Done" />
+   <register name="DMC0_STAT.IDLE"               parent="DMC0_STAT" bit-position="0" bit-size="1" description="Idle State" />
+<register name="DMC0_EFFCTL"                     read-address="0xFFC8000C" write-address="0xFFC8000C" bit-size="32" type="IO" mask="FFFFFFFF" group="DMC0" description="DMC0 Efficiency Control Register" />
+   <register name="DMC0_EFFCTL.IDLECYC"          parent="DMC0_EFFCTL" bit-position="20" bit-size="4" description="Idle Cycle" />
+   <register name="DMC0_EFFCTL.NUMREF"           parent="DMC0_EFFCTL" bit-position="16" bit-size="4" description="Number of Refresh Commands" />
+   <register name="DMC0_EFFCTL.PRECBANK7"        parent="DMC0_EFFCTL" bit-position="15" bit-size="1" description="Precharge Bank 7" />
+   <register name="DMC0_EFFCTL.PRECBANK6"        parent="DMC0_EFFCTL" bit-position="14" bit-size="1" description="Precharge Bank 6" />
+   <register name="DMC0_EFFCTL.PRECBANK5"        parent="DMC0_EFFCTL" bit-position="13" bit-size="1" description="Precharge Bank 5" />
+   <register name="DMC0_EFFCTL.PRECBANK4"        parent="DMC0_EFFCTL" bit-position="12" bit-size="1" description="Precharge Bank 4" />
+   <register name="DMC0_EFFCTL.PRECBANK3"        parent="DMC0_EFFCTL" bit-position="11" bit-size="1" description="Precharge Bank 3" />
+   <register name="DMC0_EFFCTL.PRECBANK2"        parent="DMC0_EFFCTL" bit-position="10" bit-size="1" description="Precharge Bank 2" />
+   <register name="DMC0_EFFCTL.PRECBANK1"        parent="DMC0_EFFCTL" bit-position="9" bit-size="1" description="Precharge Bank 1" />
+   <register name="DMC0_EFFCTL.PRECBANK0"        parent="DMC0_EFFCTL" bit-position="8" bit-size="1" description="Precharge Bank 0" />
+   <register name="DMC0_EFFCTL.WAITWRDATA"       parent="DMC0_EFFCTL" bit-position="7" bit-size="1" description="Wait in Write Data Snapshot" />
+   <register name="DMC0_EFFCTL.FULLWRDATA"       parent="DMC0_EFFCTL" bit-position="6" bit-size="1" description="Wait for Full Write Data" />
+<register name="DMC0_PRIO"                       read-address="0xFFC80010" write-address="0xFFC80010" bit-size="32" type="IO" mask="FFFFFFFF" group="DMC0" description="DMC0 Priority ID Register" />
+   <register name="DMC0_PRIO.ID2"                parent="DMC0_PRIO" bit-position="16" bit-size="16" description="ID2 Requiring Elevated Priority" />
+   <register name="DMC0_PRIO.ID1"                parent="DMC0_PRIO" bit-position="0" bit-size="16" description="ID1 Requiring Elevated Priority" />
+<register name="DMC0_PRIOMSK"                    read-address="0xFFC80014" write-address="0xFFC80014" bit-size="32" type="IO" mask="FFFFFFFF" group="DMC0" description="DMC0 Priority ID Mask Register" />
+   <register name="DMC0_PRIOMSK.ID2MSK"          parent="DMC0_PRIOMSK" bit-position="16" bit-size="16" description="Mask for ID2" />
+   <register name="DMC0_PRIOMSK.ID1MSK"          parent="DMC0_PRIOMSK" bit-position="0" bit-size="16" description="Mask for ID1" />
+<register name="DMC0_CFG"                        read-address="0xFFC80040" write-address="0xFFC80040" bit-size="32" type="IO" mask="FFFFFFFF" group="DMC0" description="DMC0 Configuration Register" />
+   <register name="DMC0_CFG.EXTBANK"             parent="DMC0_CFG" bit-position="12" bit-size="4" description="External Banks" />
+   <register name="DMC0_CFG.SDRSIZE"             parent="DMC0_CFG" bit-position="8" bit-size="4" description="SDRAM Size" />
+   <register name="DMC0_CFG.SDRWID"              parent="DMC0_CFG" bit-position="4" bit-size="4" description="SDRAM Width" />
+   <register name="DMC0_CFG.IFWID"               parent="DMC0_CFG" bit-position="0" bit-size="4" description="Interface Width" />
+<register name="DMC0_TR0"                        read-address="0xFFC80044" write-address="0xFFC80044" bit-size="32" type="IO" mask="FFFFFFFF" group="DMC0" description="DMC0 Timing 0 Register" />
+   <register name="DMC0_TR0.TMRD"                parent="DMC0_TR0" bit-position="28" bit-size="4" description="Timing Mode Register Delay" />
+   <register name="DMC0_TR0.TRC"                 parent="DMC0_TR0" bit-position="20" bit-size="6" description="Timing Row Cycle" />
+   <register name="DMC0_TR0.TRAS"                parent="DMC0_TR0" bit-position="12" bit-size="5" description="Timing Row Active Time" />
+   <register name="DMC0_TR0.TRP"                 parent="DMC0_TR0" bit-position="8" bit-size="4" description="Timing RAS Precharge." />
+   <register name="DMC0_TR0.TWTR"                parent="DMC0_TR0" bit-position="4" bit-size="4" description="Timing Write to Read" />
+   <register name="DMC0_TR0.TRCD"                parent="DMC0_TR0" bit-position="0" bit-size="4" description="Timing RAS to CAS Delay" />
+<register name="DMC0_TR1"                        read-address="0xFFC80048" write-address="0xFFC80048" bit-size="32" type="IO" mask="FFFFFFFF" group="DMC0" description="DMC0 Timing 1 Register" />
+   <register name="DMC0_TR1.TRRD"                parent="DMC0_TR1" bit-position="28" bit-size="3" description="Timing Read-Read Delay" />
+   <register name="DMC0_TR1.TRFC"                parent="DMC0_TR1" bit-position="16" bit-size="8" description="Timing Refresh-to-Command" />
+   <register name="DMC0_TR1.TREF"                parent="DMC0_TR1" bit-position="0" bit-size="14" description="Timing Refresh Interval" />
+<register name="DMC0_TR2"                        read-address="0xFFC8004C" write-address="0xFFC8004C" bit-size="32" type="IO" mask="FFFFFFFF" group="DMC0" description="DMC0 Timing 2 Register" />
+   <register name="DMC0_TR2.TCKE"                parent="DMC0_TR2" bit-position="20" bit-size="4" description="Timing Clock Enable" />
+   <register name="DMC0_TR2.TXP"                 parent="DMC0_TR2" bit-position="16" bit-size="4" description="Timing Exit Powerdown" />
+   <register name="DMC0_TR2.TWR"                 parent="DMC0_TR2" bit-position="12" bit-size="4" description="Timing Write Recovery" />
+   <register name="DMC0_TR2.TRTP"                parent="DMC0_TR2" bit-position="8" bit-size="4" description="Timing Read-to-Precharge" />
+   <register name="DMC0_TR2.TFAW"                parent="DMC0_TR2" bit-position="0" bit-size="5" description="Timing Four-Activated-Window" />
+<register name="DMC0_MSK"                        read-address="0xFFC8005C" write-address="0xFFC8005C" bit-size="32" type="IO" mask="FFFFFFFF" group="DMC0" description="DMC0 Mask (Mode Register Shadow) Register" />
+   <register name="DMC0_MSK.EMR3"                parent="DMC0_MSK" bit-position="11" bit-size="1" description="Shadow EMR3 Unmask" />
+   <register name="DMC0_MSK.EMR2"                parent="DMC0_MSK" bit-position="10" bit-size="1" description="Shadow EMR2 Unmask" />
+   <register name="DMC0_MSK.EMR1"                parent="DMC0_MSK" bit-position="9" bit-size="1" description="Shadow EMR1 Unmask" />
+   <register name="DMC0_MSK.MR"                  parent="DMC0_MSK" bit-position="8" bit-size="1" description="Shadow MR Unmask" />
+<register name="DMC0_MR"                         read-address="0xFFC80060" write-address="0xFFC80060" bit-size="32" type="IO" mask="FFFFFFFF" group="DMC0" description="DMC0 Shadow MR Register" />
+   <register name="DMC0_MR.PD"                   parent="DMC0_MR" bit-position="12" bit-size="1" description="Active Powerdown Mode" />
+   <register name="DMC0_MR.WRRECOV"              parent="DMC0_MR" bit-position="9" bit-size="3" description="Write Recovery" />
+   <register name="DMC0_MR.DLLRST"               parent="DMC0_MR" bit-position="8" bit-size="1" description="DLL Reset" />
+   <register name="DMC0_MR.CL"                   parent="DMC0_MR" bit-position="4" bit-size="3" description="CAS Latency" />
+   <register name="DMC0_MR.BLEN"                 parent="DMC0_MR" bit-position="0" bit-size="3" description="Burst Length" />
+<register name="DMC0_EMR1"                       read-address="0xFFC80064" write-address="0xFFC80064" bit-size="32" type="IO" mask="FFFFFFFF" group="DMC0" description="DMC0 Shadow EMR1 Register" />
+   <register name="DMC0_EMR1.QOFF"               parent="DMC0_EMR1" bit-position="12" bit-size="1" description="Output Buffer Enable" />
+   <register name="DMC0_EMR1.DQS"                parent="DMC0_EMR1" bit-position="10" bit-size="1" description="DQS Enable" />
+   <register name="DMC0_EMR1.RTT1"               parent="DMC0_EMR1" bit-position="6" bit-size="1" description="Termination Resistance 1" />
+   <register name="DMC0_EMR1.AL"                 parent="DMC0_EMR1" bit-position="3" bit-size="3" description="Additive Latency" />
+   <register name="DMC0_EMR1.RTT0"               parent="DMC0_EMR1" bit-position="2" bit-size="1" description="Termination Resistance 0." />
+   <register name="DMC0_EMR1.DIC"                parent="DMC0_EMR1" bit-position="1" bit-size="1" description="Output Driver Impedance Control" />
+   <register name="DMC0_EMR1.DLLEN"              parent="DMC0_EMR1" bit-position="0" bit-size="1" description="DLL Enable" />
+<register name="DMC0_EMR2"                       read-address="0xFFC80068" write-address="0xFFC80068" bit-size="32" type="IO" mask="FFFFFFFF" group="DMC0" description="DMC0 Shadow EMR2 Register" />
+   <register name="DMC0_EMR2.SRF"                parent="DMC0_EMR2" bit-position="7" bit-size="1" description="High Temp. Self Refresh" />
+   <register name="DMC0_EMR2.DS"                 parent="DMC0_EMR2" bit-position="5" bit-size="2" description="Drive Strength" />
+   <register name="DMC0_EMR2.TCSR"               parent="DMC0_EMR2" bit-position="3" bit-size="2" description="Temp. Comp. Self Refresh" />
+   <register name="DMC0_EMR2.PASR"               parent="DMC0_EMR2" bit-position="0" bit-size="3" description="Partial Array Self Refresh" />
+<register name="DMC0_EMR3"                       read-address="0xFFC8006C" write-address="0xFFC8006C" bit-size="32" type="IO" mask="FFFFFFFF" group="DMC0" description="DMC0 Shadow EMR3 Register" />
+<register name="DMC0_DLLCTL"                     read-address="0xFFC80080" write-address="0xFFC80080" bit-size="32" type="IO" mask="FFFFFFFF" group="DMC0" description="DMC0 DLL Control Register" />
+   <register name="DMC0_DLLCTL.DATACYC"          parent="DMC0_DLLCTL" bit-position="8" bit-size="4" description="Data Cycles" />
+   <register name="DMC0_DLLCTL.DLLCALRDCNT"      parent="DMC0_DLLCTL" bit-position="0" bit-size="8" description="DLL Calibration RD Count" />
+<register name="DMC0_PHY_CTL1"                   read-address="0xFFC80094" write-address="0xFFC80094" bit-size="32" type="IO" mask="FFFFFFFF" group="DMC0" description="DMC0 PHY Control 1 Register" />
+   <register name="DMC0_PHY_CTL1.CONTODTVAL"     parent="DMC0_PHY_CTL1" bit-position="19" bit-size="1" description="Select ODT value on controller" />
+<register name="DMC0_PHY_CTL3"                   read-address="0xFFC8009C" write-address="0xFFC8009C" bit-size="32" type="IO" mask="FFFFFFFF" group="DMC0" description="DMC0 PHY Control 3 Register" />
+   <register name="DMC0_PHY_CTL3.OFST1"          parent="DMC0_PHY_CTL3" bit-position="26" bit-size="1" description="Offset Parameter 1" />
+   <register name="DMC0_PHY_CTL3.OFST0"          parent="DMC0_PHY_CTL3" bit-position="24" bit-size="1" description="Offset Parameter 0" />
+   <register name="DMC0_PHY_CTL3.ENODTDQS"       parent="DMC0_PHY_CTL3" bit-position="10" bit-size="1" description="Enables controller ODT on read of DQS" />
+   <register name="DMC0_PHY_CTL3.TMG1"           parent="DMC0_PHY_CTL3" bit-position="7" bit-size="1" description="Timing Parameter 1" />
+   <register name="DMC0_PHY_CTL3.TMG0"           parent="DMC0_PHY_CTL3" bit-position="6" bit-size="1" description="Timing Parameter 0" />
+   <register name="DMC0_PHY_CTL3.ENODTDQ"        parent="DMC0_PHY_CTL3" bit-position="2" bit-size="1" description="Enables controller ODT on read of DQ" />
+<register name="DMC0_PADCTL"                     read-address="0xFFC800C0" write-address="0xFFC800C0" bit-size="32" type="IO" mask="FFFFFFFF" group="DMC0" description="DMC0 PAD Control Register" />
+   <register name="DMC0_PADCTL.CKEOE"            parent="DMC0_PADCTL" bit-position="19" bit-size="1" description="CKE Output Enable" />
+   <register name="DMC0_PADCTL.CKEPWD"           parent="DMC0_PADCTL" bit-position="18" bit-size="1" description="CKE pad receiver power down." />
+   <register name="DMC0_PADCTL.CKEODS"           parent="DMC0_PADCTL" bit-position="16" bit-size="2" description="CKE Output Drive Strength" />
+   <register name="DMC0_PADCTL.CMDOE"            parent="DMC0_PADCTL" bit-position="15" bit-size="1" description="CMD Output Enable" />
+   <register name="DMC0_PADCTL.CMDPWD"           parent="DMC0_PADCTL" bit-position="14" bit-size="1" description="CMD Powerdown" />
+   <register name="DMC0_PADCTL.CMDODS"           parent="DMC0_PADCTL" bit-position="12" bit-size="2" description="CMD Output Drive Strength" />
+   <register name="DMC0_PADCTL.CLKOE"            parent="DMC0_PADCTL" bit-position="11" bit-size="1" description="CLK Output Enable" />
+   <register name="DMC0_PADCTL.CLKPWD"           parent="DMC0_PADCTL" bit-position="10" bit-size="1" description="CLK Powerdown" />
+   <register name="DMC0_PADCTL.CLKODS"           parent="DMC0_PADCTL" bit-position="8" bit-size="2" description="Clock Output Drive Strength" />
+   <register name="DMC0_PADCTL.DQSPWD"           parent="DMC0_PADCTL" bit-position="6" bit-size="1" description="DQ/DQS Powerdown" />
+   <register name="DMC0_PADCTL.DQSODS"           parent="DMC0_PADCTL" bit-position="4" bit-size="2" description="DQS Output Drive Strength" />
+   <register name="DMC0_PADCTL.DQPWD"            parent="DMC0_PADCTL" bit-position="2" bit-size="1" description="DQ Powerdown." />
+   <register name="DMC0_PADCTL.DQODS"            parent="DMC0_PADCTL" bit-position="0" bit-size="2" description="DQ Output Drive Strength" />
 
 <!-- ************************** -->
 <!-- ***  System Cross Bar  *** -->
@@ -13153,8 +13155,8 @@
    <register name="L2CTL0_WPCR.WPC1"             parent="L2CTL0_WPCR" bit-position="8" bit-size="8" description="Write Priority Count 1" />
    <register name="L2CTL0_WPCR.WPC0"             parent="L2CTL0_WPCR" bit-position="0" bit-size="8" description="Write Priority Count 0" />
 <register name="L2CTL0_RFA"                      read-address="0xFFCA3024" write-address="0xFFCA3024" bit-size="32" type="IO" mask="FFFFFFFF" group="L2CTL0" description="L2CTL0 Refresh Address Register" />
-   <register name="L2CTL0_RFA.ADDRHI"            parent="L2CTL0_RFA" bit-position="18" bit-size="14" description="Address High" />
-   <register name="L2CTL0_RFA.ADDRLO"            parent="L2CTL0_RFA" bit-position="0" bit-size="18" description="Address Low" />
+   <register name="L2CTL0_RFA.ADDRHI"            parent="L2CTL0_RFA" bit-position="16" bit-size="16" description="Address High" />
+   <register name="L2CTL0_RFA.ADDRLO"            parent="L2CTL0_RFA" bit-position="0" bit-size="16" description="Address Low" />
 <register name="L2CTL0_ERRADDR0"                 read-address="0xFFCA3040" write-address="0xFFCA3040" bit-size="32" type="IO" mask="FFFFFFFF" group="L2CTL0" description="L2CTL0 ECC Error Address 0 Register" />
 <register name="L2CTL0_ERRADDR1"                 read-address="0xFFCA3044" write-address="0xFFCA3044" bit-size="32" type="IO" mask="FFFFFFFF" group="L2CTL0" description="L2CTL0 ECC Error Address 1 Register" />
 <register name="L2CTL0_ERRADDR2"                 read-address="0xFFCA3048" write-address="0xFFCA3048" bit-size="32" type="IO" mask="FFFFFFFF" group="L2CTL0" description="L2CTL0 ECC Error Address 2 Register" />
@@ -16780,173 +16782,173 @@
 <register name="USB0_SOFT_RST"                   read-address="0xFFCC107F" write-address="0xFFCC107F" bit-size="8"  type="IO" mask="FF"       group="USB0" description="USB0 Software Reset Register" />
    <register name="USB0_SOFT_RST.RSTX"           parent="USB0_SOFT_RST" bit-position="1" bit-size="1" description="Reset USB XCLK Domain" />
    <register name="USB0_SOFT_RST.RST"            parent="USB0_SOFT_RST" bit-position="0" bit-size="1" description="Reset USB CLK Domain" />
-<register name="USB0_MP0_TXFUNCADDR"             read-address="0xFFCC1080" write-address="0xFFCC1080" bit-size="8"  type="IO" mask="FF"       group="USB0" description="USB0 EPn Transmit Function Address Register" />
+<register name="USB0_MP0_TXFUNCADDR"             read-address="0xFFCC1080" write-address="0xFFCC1080" bit-size="8"  type="IO" mask="FF"       group="USB0" description="USB0 MPn Transmit Function Address Register" />
    <register name="USB0_MP0_TXFUNCADDR.VALUE"    parent="USB0_MP0_TXFUNCADDR" bit-position="0" bit-size="7" description="Tx Function Address Value" />
-<register name="USB0_MP1_TXFUNCADDR"             read-address="0xFFCC1088" write-address="0xFFCC1088" bit-size="8"  type="IO" mask="FF"       group="USB0" description="USB0 EPn Transmit Function Address Register" />
+<register name="USB0_MP1_TXFUNCADDR"             read-address="0xFFCC1088" write-address="0xFFCC1088" bit-size="8"  type="IO" mask="FF"       group="USB0" description="USB0 MPn Transmit Function Address Register" />
    <register name="USB0_MP1_TXFUNCADDR.VALUE"    parent="USB0_MP1_TXFUNCADDR" bit-position="0" bit-size="7" description="Tx Function Address Value" />
-<register name="USB0_MP2_TXFUNCADDR"             read-address="0xFFCC1090" write-address="0xFFCC1090" bit-size="8"  type="IO" mask="FF"       group="USB0" description="USB0 EPn Transmit Function Address Register" />
+<register name="USB0_MP2_TXFUNCADDR"             read-address="0xFFCC1090" write-address="0xFFCC1090" bit-size="8"  type="IO" mask="FF"       group="USB0" description="USB0 MPn Transmit Function Address Register" />
    <register name="USB0_MP2_TXFUNCADDR.VALUE"    parent="USB0_MP2_TXFUNCADDR" bit-position="0" bit-size="7" description="Tx Function Address Value" />
-<register name="USB0_MP3_TXFUNCADDR"             read-address="0xFFCC1098" write-address="0xFFCC1098" bit-size="8"  type="IO" mask="FF"       group="USB0" description="USB0 EPn Transmit Function Address Register" />
+<register name="USB0_MP3_TXFUNCADDR"             read-address="0xFFCC1098" write-address="0xFFCC1098" bit-size="8"  type="IO" mask="FF"       group="USB0" description="USB0 MPn Transmit Function Address Register" />
    <register name="USB0_MP3_TXFUNCADDR.VALUE"    parent="USB0_MP3_TXFUNCADDR" bit-position="0" bit-size="7" description="Tx Function Address Value" />
-<register name="USB0_MP4_TXFUNCADDR"             read-address="0xFFCC10A0" write-address="0xFFCC10A0" bit-size="8"  type="IO" mask="FF"       group="USB0" description="USB0 EPn Transmit Function Address Register" />
+<register name="USB0_MP4_TXFUNCADDR"             read-address="0xFFCC10A0" write-address="0xFFCC10A0" bit-size="8"  type="IO" mask="FF"       group="USB0" description="USB0 MPn Transmit Function Address Register" />
    <register name="USB0_MP4_TXFUNCADDR.VALUE"    parent="USB0_MP4_TXFUNCADDR" bit-position="0" bit-size="7" description="Tx Function Address Value" />
-<register name="USB0_MP5_TXFUNCADDR"             read-address="0xFFCC10A8" write-address="0xFFCC10A8" bit-size="8"  type="IO" mask="FF"       group="USB0" description="USB0 EPn Transmit Function Address Register" />
+<register name="USB0_MP5_TXFUNCADDR"             read-address="0xFFCC10A8" write-address="0xFFCC10A8" bit-size="8"  type="IO" mask="FF"       group="USB0" description="USB0 MPn Transmit Function Address Register" />
    <register name="USB0_MP5_TXFUNCADDR.VALUE"    parent="USB0_MP5_TXFUNCADDR" bit-position="0" bit-size="7" description="Tx Function Address Value" />
-<register name="USB0_MP6_TXFUNCADDR"             read-address="0xFFCC10B0" write-address="0xFFCC10B0" bit-size="8"  type="IO" mask="FF"       group="USB0" description="USB0 EPn Transmit Function Address Register" />
+<register name="USB0_MP6_TXFUNCADDR"             read-address="0xFFCC10B0" write-address="0xFFCC10B0" bit-size="8"  type="IO" mask="FF"       group="USB0" description="USB0 MPn Transmit Function Address Register" />
    <register name="USB0_MP6_TXFUNCADDR.VALUE"    parent="USB0_MP6_TXFUNCADDR" bit-position="0" bit-size="7" description="Tx Function Address Value" />
-<register name="USB0_MP7_TXFUNCADDR"             read-address="0xFFCC10B8" write-address="0xFFCC10B8" bit-size="8"  type="IO" mask="FF"       group="USB0" description="USB0 EPn Transmit Function Address Register" />
+<register name="USB0_MP7_TXFUNCADDR"             read-address="0xFFCC10B8" write-address="0xFFCC10B8" bit-size="8"  type="IO" mask="FF"       group="USB0" description="USB0 MPn Transmit Function Address Register" />
    <register name="USB0_MP7_TXFUNCADDR.VALUE"    parent="USB0_MP7_TXFUNCADDR" bit-position="0" bit-size="7" description="Tx Function Address Value" />
-<register name="USB0_MP8_TXFUNCADDR"             read-address="0xFFCC10C0" write-address="0xFFCC10C0" bit-size="8"  type="IO" mask="FF"       group="USB0" description="USB0 EPn Transmit Function Address Register" />
+<register name="USB0_MP8_TXFUNCADDR"             read-address="0xFFCC10C0" write-address="0xFFCC10C0" bit-size="8"  type="IO" mask="FF"       group="USB0" description="USB0 MPn Transmit Function Address Register" />
    <register name="USB0_MP8_TXFUNCADDR.VALUE"    parent="USB0_MP8_TXFUNCADDR" bit-position="0" bit-size="7" description="Tx Function Address Value" />
-<register name="USB0_MP9_TXFUNCADDR"             read-address="0xFFCC10C8" write-address="0xFFCC10C8" bit-size="8"  type="IO" mask="FF"       group="USB0" description="USB0 EPn Transmit Function Address Register" />
+<register name="USB0_MP9_TXFUNCADDR"             read-address="0xFFCC10C8" write-address="0xFFCC10C8" bit-size="8"  type="IO" mask="FF"       group="USB0" description="USB0 MPn Transmit Function Address Register" />
    <register name="USB0_MP9_TXFUNCADDR.VALUE"    parent="USB0_MP9_TXFUNCADDR" bit-position="0" bit-size="7" description="Tx Function Address Value" />
-<register name="USB0_MP10_TXFUNCADDR"            read-address="0xFFCC10D0" write-address="0xFFCC10D0" bit-size="8"  type="IO" mask="FF"       group="USB0" description="USB0 EPn Transmit Function Address Register" />
+<register name="USB0_MP10_TXFUNCADDR"            read-address="0xFFCC10D0" write-address="0xFFCC10D0" bit-size="8"  type="IO" mask="FF"       group="USB0" description="USB0 MPn Transmit Function Address Register" />
    <register name="USB0_MP10_TXFUNCADDR.VALUE"   parent="USB0_MP10_TXFUNCADDR" bit-position="0" bit-size="7" description="Tx Function Address Value" />
-<register name="USB0_MP11_TXFUNCADDR"            read-address="0xFFCC10D8" write-address="0xFFCC10D8" bit-size="8"  type="IO" mask="FF"       group="USB0" description="USB0 EPn Transmit Function Address Register" />
+<register name="USB0_MP11_TXFUNCADDR"            read-address="0xFFCC10D8" write-address="0xFFCC10D8" bit-size="8"  type="IO" mask="FF"       group="USB0" description="USB0 MPn Transmit Function Address Register" />
    <register name="USB0_MP11_TXFUNCADDR.VALUE"   parent="USB0_MP11_TXFUNCADDR" bit-position="0" bit-size="7" description="Tx Function Address Value" />
-<register name="USB0_MP0_TXHUBADDR"              read-address="0xFFCC1082" write-address="0xFFCC1082" bit-size="8"  type="IO" mask="FF"       group="USB0" description="USB0 EPn Transmit Hub Address Register" />
+<register name="USB0_MP0_TXHUBADDR"              read-address="0xFFCC1082" write-address="0xFFCC1082" bit-size="8"  type="IO" mask="FF"       group="USB0" description="USB0 MPn Transmit Hub Address Register" />
    <register name="USB0_MP0_TXHUBADDR.MULTTRANS" parent="USB0_MP0_TXHUBADDR" bit-position="7" bit-size="1" description="Multiple Transaction Translators" />
    <register name="USB0_MP0_TXHUBADDR.ADDR"      parent="USB0_MP0_TXHUBADDR" bit-position="0" bit-size="7" description="Hub Address Value" />
-<register name="USB0_MP1_TXHUBADDR"              read-address="0xFFCC108A" write-address="0xFFCC108A" bit-size="8"  type="IO" mask="FF"       group="USB0" description="USB0 EPn Transmit Hub Address Register" />
+<register name="USB0_MP1_TXHUBADDR"              read-address="0xFFCC108A" write-address="0xFFCC108A" bit-size="8"  type="IO" mask="FF"       group="USB0" description="USB0 MPn Transmit Hub Address Register" />
    <register name="USB0_MP1_TXHUBADDR.MULTTRANS" parent="USB0_MP1_TXHUBADDR" bit-position="7" bit-size="1" description="Multiple Transaction Translators" />
    <register name="USB0_MP1_TXHUBADDR.ADDR"      parent="USB0_MP1_TXHUBADDR" bit-position="0" bit-size="7" description="Hub Address Value" />
-<register name="USB0_MP2_TXHUBADDR"              read-address="0xFFCC1092" write-address="0xFFCC1092" bit-size="8"  type="IO" mask="FF"       group="USB0" description="USB0 EPn Transmit Hub Address Register" />
+<register name="USB0_MP2_TXHUBADDR"              read-address="0xFFCC1092" write-address="0xFFCC1092" bit-size="8"  type="IO" mask="FF"       group="USB0" description="USB0 MPn Transmit Hub Address Register" />
    <register name="USB0_MP2_TXHUBADDR.MULTTRANS" parent="USB0_MP2_TXHUBADDR" bit-position="7" bit-size="1" description="Multiple Transaction Translators" />
    <register name="USB0_MP2_TXHUBADDR.ADDR"      parent="USB0_MP2_TXHUBADDR" bit-position="0" bit-size="7" description="Hub Address Value" />
-<register name="USB0_MP3_TXHUBADDR"              read-address="0xFFCC109A" write-address="0xFFCC109A" bit-size="8"  type="IO" mask="FF"       group="USB0" description="USB0 EPn Transmit Hub Address Register" />
+<register name="USB0_MP3_TXHUBADDR"              read-address="0xFFCC109A" write-address="0xFFCC109A" bit-size="8"  type="IO" mask="FF"       group="USB0" description="USB0 MPn Transmit Hub Address Register" />
    <register name="USB0_MP3_TXHUBADDR.MULTTRANS" parent="USB0_MP3_TXHUBADDR" bit-position="7" bit-size="1" description="Multiple Transaction Translators" />
    <register name="USB0_MP3_TXHUBADDR.ADDR"      parent="USB0_MP3_TXHUBADDR" bit-position="0" bit-size="7" description="Hub Address Value" />
-<register name="USB0_MP4_TXHUBADDR"              read-address="0xFFCC10A2" write-address="0xFFCC10A2" bit-size="8"  type="IO" mask="FF"       group="USB0" description="USB0 EPn Transmit Hub Address Register" />
+<register name="USB0_MP4_TXHUBADDR"              read-address="0xFFCC10A2" write-address="0xFFCC10A2" bit-size="8"  type="IO" mask="FF"       group="USB0" description="USB0 MPn Transmit Hub Address Register" />
    <register name="USB0_MP4_TXHUBADDR.MULTTRANS" parent="USB0_MP4_TXHUBADDR" bit-position="7" bit-size="1" description="Multiple Transaction Translators" />
    <register name="USB0_MP4_TXHUBADDR.ADDR"      parent="USB0_MP4_TXHUBADDR" bit-position="0" bit-size="7" description="Hub Address Value" />
-<register name="USB0_MP5_TXHUBADDR"              read-address="0xFFCC10AA" write-address="0xFFCC10AA" bit-size="8"  type="IO" mask="FF"       group="USB0" description="USB0 EPn Transmit Hub Address Register" />
+<register name="USB0_MP5_TXHUBADDR"              read-address="0xFFCC10AA" write-address="0xFFCC10AA" bit-size="8"  type="IO" mask="FF"       group="USB0" description="USB0 MPn Transmit Hub Address Register" />
    <register name="USB0_MP5_TXHUBADDR.MULTTRANS" parent="USB0_MP5_TXHUBADDR" bit-position="7" bit-size="1" description="Multiple Transaction Translators" />
    <register name="USB0_MP5_TXHUBADDR.ADDR"      parent="USB0_MP5_TXHUBADDR" bit-position="0" bit-size="7" description="Hub Address Value" />
-<register name="USB0_MP6_TXHUBADDR"              read-address="0xFFCC10B2" write-address="0xFFCC10B2" bit-size="8"  type="IO" mask="FF"       group="USB0" description="USB0 EPn Transmit Hub Address Register" />
+<register name="USB0_MP6_TXHUBADDR"              read-address="0xFFCC10B2" write-address="0xFFCC10B2" bit-size="8"  type="IO" mask="FF"       group="USB0" description="USB0 MPn Transmit Hub Address Register" />
    <register name="USB0_MP6_TXHUBADDR.MULTTRANS" parent="USB0_MP6_TXHUBADDR" bit-position="7" bit-size="1" description="Multiple Transaction Translators" />
    <register name="USB0_MP6_TXHUBADDR.ADDR"      parent="USB0_MP6_TXHUBADDR" bit-position="0" bit-size="7" description="Hub Address Value" />
-<register name="USB0_MP7_TXHUBADDR"              read-address="0xFFCC10BA" write-address="0xFFCC10BA" bit-size="8"  type="IO" mask="FF"       group="USB0" description="USB0 EPn Transmit Hub Address Register" />
+<register name="USB0_MP7_TXHUBADDR"              read-address="0xFFCC10BA" write-address="0xFFCC10BA" bit-size="8"  type="IO" mask="FF"       group="USB0" description="USB0 MPn Transmit Hub Address Register" />
    <register name="USB0_MP7_TXHUBADDR.MULTTRANS" parent="USB0_MP7_TXHUBADDR" bit-position="7" bit-size="1" description="Multiple Transaction Translators" />
    <register name="USB0_MP7_TXHUBADDR.ADDR"      parent="USB0_MP7_TXHUBADDR" bit-position="0" bit-size="7" description="Hub Address Value" />
-<register name="USB0_MP8_TXHUBADDR"              read-address="0xFFCC10C2" write-address="0xFFCC10C2" bit-size="8"  type="IO" mask="FF"       group="USB0" description="USB0 EPn Transmit Hub Address Register" />
+<register name="USB0_MP8_TXHUBADDR"              read-address="0xFFCC10C2" write-address="0xFFCC10C2" bit-size="8"  type="IO" mask="FF"       group="USB0" description="USB0 MPn Transmit Hub Address Register" />
    <register name="USB0_MP8_TXHUBADDR.MULTTRANS" parent="USB0_MP8_TXHUBADDR" bit-position="7" bit-size="1" description="Multiple Transaction Translators" />
    <register name="USB0_MP8_TXHUBADDR.ADDR"      parent="USB0_MP8_TXHUBADDR" bit-position="0" bit-size="7" description="Hub Address Value" />
-<register name="USB0_MP9_TXHUBADDR"              read-address="0xFFCC10CA" write-address="0xFFCC10CA" bit-size="8"  type="IO" mask="FF"       group="USB0" description="USB0 EPn Transmit Hub Address Register" />
+<register name="USB0_MP9_TXHUBADDR"              read-address="0xFFCC10CA" write-address="0xFFCC10CA" bit-size="8"  type="IO" mask="FF"       group="USB0" description="USB0 MPn Transmit Hub Address Register" />
    <register name="USB0_MP9_TXHUBADDR.MULTTRANS" parent="USB0_MP9_TXHUBADDR" bit-position="7" bit-size="1" description="Multiple Transaction Translators" />
    <register name="USB0_MP9_TXHUBADDR.ADDR"      parent="USB0_MP9_TXHUBADDR" bit-position="0" bit-size="7" description="Hub Address Value" />
-<register name="USB0_MP10_TXHUBADDR"             read-address="0xFFCC10D2" write-address="0xFFCC10D2" bit-size="8"  type="IO" mask="FF"       group="USB0" description="USB0 EPn Transmit Hub Address Register" />
+<register name="USB0_MP10_TXHUBADDR"             read-address="0xFFCC10D2" write-address="0xFFCC10D2" bit-size="8"  type="IO" mask="FF"       group="USB0" description="USB0 MPn Transmit Hub Address Register" />
    <register name="USB0_MP10_TXHUBADDR.MULTTRANS" parent="USB0_MP10_TXHUBADDR" bit-position="7" bit-size="1" description="Multiple Transaction Translators" />
    <register name="USB0_MP10_TXHUBADDR.ADDR"     parent="USB0_MP10_TXHUBADDR" bit-position="0" bit-size="7" description="Hub Address Value" />
-<register name="USB0_MP11_TXHUBADDR"             read-address="0xFFCC10DA" write-address="0xFFCC10DA" bit-size="8"  type="IO" mask="FF"       group="USB0" description="USB0 EPn Transmit Hub Address Register" />
+<register name="USB0_MP11_TXHUBADDR"             read-address="0xFFCC10DA" write-address="0xFFCC10DA" bit-size="8"  type="IO" mask="FF"       group="USB0" description="USB0 MPn Transmit Hub Address Register" />
    <register name="USB0_MP11_TXHUBADDR.MULTTRANS" parent="USB0_MP11_TXHUBADDR" bit-position="7" bit-size="1" description="Multiple Transaction Translators" />
    <register name="USB0_MP11_TXHUBADDR.ADDR"     parent="USB0_MP11_TXHUBADDR" bit-position="0" bit-size="7" description="Hub Address Value" />
-<register name="USB0_MP0_TXHUBPORT"              read-address="0xFFCC1083" write-address="0xFFCC1083" bit-size="8"  type="IO" mask="FF"       group="USB0" description="USB0 EPn Transmit Hub Port Register" />
+<register name="USB0_MP0_TXHUBPORT"              read-address="0xFFCC1083" write-address="0xFFCC1083" bit-size="8"  type="IO" mask="FF"       group="USB0" description="USB0 MPn Transmit Hub Port Register" />
    <register name="USB0_MP0_TXHUBPORT.VALUE"     parent="USB0_MP0_TXHUBPORT" bit-position="0" bit-size="7" description="Hub Port Value" />
-<register name="USB0_MP1_TXHUBPORT"              read-address="0xFFCC108B" write-address="0xFFCC108B" bit-size="8"  type="IO" mask="FF"       group="USB0" description="USB0 EPn Transmit Hub Port Register" />
+<register name="USB0_MP1_TXHUBPORT"              read-address="0xFFCC108B" write-address="0xFFCC108B" bit-size="8"  type="IO" mask="FF"       group="USB0" description="USB0 MPn Transmit Hub Port Register" />
    <register name="USB0_MP1_TXHUBPORT.VALUE"     parent="USB0_MP1_TXHUBPORT" bit-position="0" bit-size="7" description="Hub Port Value" />
-<register name="USB0_MP2_TXHUBPORT"              read-address="0xFFCC1093" write-address="0xFFCC1093" bit-size="8"  type="IO" mask="FF"       group="USB0" description="USB0 EPn Transmit Hub Port Register" />
+<register name="USB0_MP2_TXHUBPORT"              read-address="0xFFCC1093" write-address="0xFFCC1093" bit-size="8"  type="IO" mask="FF"       group="USB0" description="USB0 MPn Transmit Hub Port Register" />
    <register name="USB0_MP2_TXHUBPORT.VALUE"     parent="USB0_MP2_TXHUBPORT" bit-position="0" bit-size="7" description="Hub Port Value" />
-<register name="USB0_MP3_TXHUBPORT"              read-address="0xFFCC109B" write-address="0xFFCC109B" bit-size="8"  type="IO" mask="FF"       group="USB0" description="USB0 EPn Transmit Hub Port Register" />
+<register name="USB0_MP3_TXHUBPORT"              read-address="0xFFCC109B" write-address="0xFFCC109B" bit-size="8"  type="IO" mask="FF"       group="USB0" description="USB0 MPn Transmit Hub Port Register" />
    <register name="USB0_MP3_TXHUBPORT.VALUE"     parent="USB0_MP3_TXHUBPORT" bit-position="0" bit-size="7" description="Hub Port Value" />
-<register name="USB0_MP4_TXHUBPORT"              read-address="0xFFCC10A3" write-address="0xFFCC10A3" bit-size="8"  type="IO" mask="FF"       group="USB0" description="USB0 EPn Transmit Hub Port Register" />
+<register name="USB0_MP4_TXHUBPORT"              read-address="0xFFCC10A3" write-address="0xFFCC10A3" bit-size="8"  type="IO" mask="FF"       group="USB0" description="USB0 MPn Transmit Hub Port Register" />
    <register name="USB0_MP4_TXHUBPORT.VALUE"     parent="USB0_MP4_TXHUBPORT" bit-position="0" bit-size="7" description="Hub Port Value" />
-<register name="USB0_MP5_TXHUBPORT"              read-address="0xFFCC10AB" write-address="0xFFCC10AB" bit-size="8"  type="IO" mask="FF"       group="USB0" description="USB0 EPn Transmit Hub Port Register" />
+<register name="USB0_MP5_TXHUBPORT"              read-address="0xFFCC10AB" write-address="0xFFCC10AB" bit-size="8"  type="IO" mask="FF"       group="USB0" description="USB0 MPn Transmit Hub Port Register" />
    <register name="USB0_MP5_TXHUBPORT.VALUE"     parent="USB0_MP5_TXHUBPORT" bit-position="0" bit-size="7" description="Hub Port Value" />
-<register name="USB0_MP6_TXHUBPORT"              read-address="0xFFCC10B3" write-address="0xFFCC10B3" bit-size="8"  type="IO" mask="FF"       group="USB0" description="USB0 EPn Transmit Hub Port Register" />
+<register name="USB0_MP6_TXHUBPORT"              read-address="0xFFCC10B3" write-address="0xFFCC10B3" bit-size="8"  type="IO" mask="FF"       group="USB0" description="USB0 MPn Transmit Hub Port Register" />
    <register name="USB0_MP6_TXHUBPORT.VALUE"     parent="USB0_MP6_TXHUBPORT" bit-position="0" bit-size="7" description="Hub Port Value" />
-<register name="USB0_MP7_TXHUBPORT"              read-address="0xFFCC10BB" write-address="0xFFCC10BB" bit-size="8"  type="IO" mask="FF"       group="USB0" description="USB0 EPn Transmit Hub Port Register" />
+<register name="USB0_MP7_TXHUBPORT"              read-address="0xFFCC10BB" write-address="0xFFCC10BB" bit-size="8"  type="IO" mask="FF"       group="USB0" description="USB0 MPn Transmit Hub Port Register" />
    <register name="USB0_MP7_TXHUBPORT.VALUE"     parent="USB0_MP7_TXHUBPORT" bit-position="0" bit-size="7" description="Hub Port Value" />
-<register name="USB0_MP8_TXHUBPORT"              read-address="0xFFCC10C3" write-address="0xFFCC10C3" bit-size="8"  type="IO" mask="FF"       group="USB0" description="USB0 EPn Transmit Hub Port Register" />
+<register name="USB0_MP8_TXHUBPORT"              read-address="0xFFCC10C3" write-address="0xFFCC10C3" bit-size="8"  type="IO" mask="FF"       group="USB0" description="USB0 MPn Transmit Hub Port Register" />
    <register name="USB0_MP8_TXHUBPORT.VALUE"     parent="USB0_MP8_TXHUBPORT" bit-position="0" bit-size="7" description="Hub Port Value" />
-<register name="USB0_MP9_TXHUBPORT"              read-address="0xFFCC10CB" write-address="0xFFCC10CB" bit-size="8"  type="IO" mask="FF"       group="USB0" description="USB0 EPn Transmit Hub Port Register" />
+<register name="USB0_MP9_TXHUBPORT"              read-address="0xFFCC10CB" write-address="0xFFCC10CB" bit-size="8"  type="IO" mask="FF"       group="USB0" description="USB0 MPn Transmit Hub Port Register" />
    <register name="USB0_MP9_TXHUBPORT.VALUE"     parent="USB0_MP9_TXHUBPORT" bit-position="0" bit-size="7" description="Hub Port Value" />
-<register name="USB0_MP10_TXHUBPORT"             read-address="0xFFCC10D3" write-address="0xFFCC10D3" bit-size="8"  type="IO" mask="FF"       group="USB0" description="USB0 EPn Transmit Hub Port Register" />
+<register name="USB0_MP10_TXHUBPORT"             read-address="0xFFCC10D3" write-address="0xFFCC10D3" bit-size="8"  type="IO" mask="FF"       group="USB0" description="USB0 MPn Transmit Hub Port Register" />
    <register name="USB0_MP10_TXHUBPORT.VALUE"    parent="USB0_MP10_TXHUBPORT" bit-position="0" bit-size="7" description="Hub Port Value" />
-<register name="USB0_MP11_TXHUBPORT"             read-address="0xFFCC10DB" write-address="0xFFCC10DB" bit-size="8"  type="IO" mask="FF"       group="USB0" description="USB0 EPn Transmit Hub Port Register" />
+<register name="USB0_MP11_TXHUBPORT"             read-address="0xFFCC10DB" write-address="0xFFCC10DB" bit-size="8"  type="IO" mask="FF"       group="USB0" description="USB0 MPn Transmit Hub Port Register" />
    <register name="USB0_MP11_TXHUBPORT.VALUE"    parent="USB0_MP11_TXHUBPORT" bit-position="0" bit-size="7" description="Hub Port Value" />
-<register name="USB0_MP0_RXFUNCADDR"             read-address="0xFFCC1084" write-address="0xFFCC1084" bit-size="8"  type="IO" mask="FF"       group="USB0" description="USB0 EPn Receive Function Address Register" />
+<register name="USB0_MP0_RXFUNCADDR"             read-address="0xFFCC1084" write-address="0xFFCC1084" bit-size="8"  type="IO" mask="FF"       group="USB0" description="USB0 MPn Receive Function Address Register" />
    <register name="USB0_MP0_RXFUNCADDR.VALUE"    parent="USB0_MP0_RXFUNCADDR" bit-position="0" bit-size="7" description="Rx Function Address Value" />
-<register name="USB0_MP1_RXFUNCADDR"             read-address="0xFFCC108C" write-address="0xFFCC108C" bit-size="8"  type="IO" mask="FF"       group="USB0" description="USB0 EPn Receive Function Address Register" />
+<register name="USB0_MP1_RXFUNCADDR"             read-address="0xFFCC108C" write-address="0xFFCC108C" bit-size="8"  type="IO" mask="FF"       group="USB0" description="USB0 MPn Receive Function Address Register" />
    <register name="USB0_MP1_RXFUNCADDR.VALUE"    parent="USB0_MP1_RXFUNCADDR" bit-position="0" bit-size="7" description="Rx Function Address Value" />
-<register name="USB0_MP2_RXFUNCADDR"             read-address="0xFFCC1094" write-address="0xFFCC1094" bit-size="8"  type="IO" mask="FF"       group="USB0" description="USB0 EPn Receive Function Address Register" />
+<register name="USB0_MP2_RXFUNCADDR"             read-address="0xFFCC1094" write-address="0xFFCC1094" bit-size="8"  type="IO" mask="FF"       group="USB0" description="USB0 MPn Receive Function Address Register" />
    <register name="USB0_MP2_RXFUNCADDR.VALUE"    parent="USB0_MP2_RXFUNCADDR" bit-position="0" bit-size="7" description="Rx Function Address Value" />
-<register name="USB0_MP3_RXFUNCADDR"             read-address="0xFFCC109C" write-address="0xFFCC109C" bit-size="8"  type="IO" mask="FF"       group="USB0" description="USB0 EPn Receive Function Address Register" />
+<register name="USB0_MP3_RXFUNCADDR"             read-address="0xFFCC109C" write-address="0xFFCC109C" bit-size="8"  type="IO" mask="FF"       group="USB0" description="USB0 MPn Receive Function Address Register" />
    <register name="USB0_MP3_RXFUNCADDR.VALUE"    parent="USB0_MP3_RXFUNCADDR" bit-position="0" bit-size="7" description="Rx Function Address Value" />
-<register name="USB0_MP4_RXFUNCADDR"             read-address="0xFFCC10A4" write-address="0xFFCC10A4" bit-size="8"  type="IO" mask="FF"       group="USB0" description="USB0 EPn Receive Function Address Register" />
+<register name="USB0_MP4_RXFUNCADDR"             read-address="0xFFCC10A4" write-address="0xFFCC10A4" bit-size="8"  type="IO" mask="FF"       group="USB0" description="USB0 MPn Receive Function Address Register" />
    <register name="USB0_MP4_RXFUNCADDR.VALUE"    parent="USB0_MP4_RXFUNCADDR" bit-position="0" bit-size="7" description="Rx Function Address Value" />
-<register name="USB0_MP5_RXFUNCADDR"             read-address="0xFFCC10AC" write-address="0xFFCC10AC" bit-size="8"  type="IO" mask="FF"       group="USB0" description="USB0 EPn Receive Function Address Register" />
+<register name="USB0_MP5_RXFUNCADDR"             read-address="0xFFCC10AC" write-address="0xFFCC10AC" bit-size="8"  type="IO" mask="FF"       group="USB0" description="USB0 MPn Receive Function Address Register" />
    <register name="USB0_MP5_RXFUNCADDR.VALUE"    parent="USB0_MP5_RXFUNCADDR" bit-position="0" bit-size="7" description="Rx Function Address Value" />
-<register name="USB0_MP6_RXFUNCADDR"             read-address="0xFFCC10B4" write-address="0xFFCC10B4" bit-size="8"  type="IO" mask="FF"       group="USB0" description="USB0 EPn Receive Function Address Register" />
+<register name="USB0_MP6_RXFUNCADDR"             read-address="0xFFCC10B4" write-address="0xFFCC10B4" bit-size="8"  type="IO" mask="FF"       group="USB0" description="USB0 MPn Receive Function Address Register" />
    <register name="USB0_MP6_RXFUNCADDR.VALUE"    parent="USB0_MP6_RXFUNCADDR" bit-position="0" bit-size="7" description="Rx Function Address Value" />
-<register name="USB0_MP7_RXFUNCADDR"             read-address="0xFFCC10BC" write-address="0xFFCC10BC" bit-size="8"  type="IO" mask="FF"       group="USB0" description="USB0 EPn Receive Function Address Register" />
+<register name="USB0_MP7_RXFUNCADDR"             read-address="0xFFCC10BC" write-address="0xFFCC10BC" bit-size="8"  type="IO" mask="FF"       group="USB0" description="USB0 MPn Receive Function Address Register" />
    <register name="USB0_MP7_RXFUNCADDR.VALUE"    parent="USB0_MP7_RXFUNCADDR" bit-position="0" bit-size="7" description="Rx Function Address Value" />
-<register name="USB0_MP8_RXFUNCADDR"             read-address="0xFFCC10C4" write-address="0xFFCC10C4" bit-size="8"  type="IO" mask="FF"       group="USB0" description="USB0 EPn Receive Function Address Register" />
+<register name="USB0_MP8_RXFUNCADDR"             read-address="0xFFCC10C4" write-address="0xFFCC10C4" bit-size="8"  type="IO" mask="FF"       group="USB0" description="USB0 MPn Receive Function Address Register" />
    <register name="USB0_MP8_RXFUNCADDR.VALUE"    parent="USB0_MP8_RXFUNCADDR" bit-position="0" bit-size="7" description="Rx Function Address Value" />
-<register name="USB0_MP9_RXFUNCADDR"             read-address="0xFFCC10CC" write-address="0xFFCC10CC" bit-size="8"  type="IO" mask="FF"       group="USB0" description="USB0 EPn Receive Function Address Register" />
+<register name="USB0_MP9_RXFUNCADDR"             read-address="0xFFCC10CC" write-address="0xFFCC10CC" bit-size="8"  type="IO" mask="FF"       group="USB0" description="USB0 MPn Receive Function Address Register" />
    <register name="USB0_MP9_RXFUNCADDR.VALUE"    parent="USB0_MP9_RXFUNCADDR" bit-position="0" bit-size="7" description="Rx Function Address Value" />
-<register name="USB0_MP10_RXFUNCADDR"            read-address="0xFFCC10D4" write-address="0xFFCC10D4" bit-size="8"  type="IO" mask="FF"       group="USB0" description="USB0 EPn Receive Function Address Register" />
+<register name="USB0_MP10_RXFUNCADDR"            read-address="0xFFCC10D4" write-address="0xFFCC10D4" bit-size="8"  type="IO" mask="FF"       group="USB0" description="USB0 MPn Receive Function Address Register" />
    <register name="USB0_MP10_RXFUNCADDR.VALUE"   parent="USB0_MP10_RXFUNCADDR" bit-position="0" bit-size="7" description="Rx Function Address Value" />
-<register name="USB0_MP11_RXFUNCADDR"            read-address="0xFFCC10DC" write-address="0xFFCC10DC" bit-size="8"  type="IO" mask="FF"       group="USB0" description="USB0 EPn Receive Function Address Register" />
+<register name="USB0_MP11_RXFUNCADDR"            read-address="0xFFCC10DC" write-address="0xFFCC10DC" bit-size="8"  type="IO" mask="FF"       group="USB0" description="USB0 MPn Receive Function Address Register" />
    <register name="USB0_MP11_RXFUNCADDR.VALUE"   parent="USB0_MP11_RXFUNCADDR" bit-position="0" bit-size="7" description="Rx Function Address Value" />
-<register name="USB0_MP0_RXHUBADDR"              read-address="0xFFCC1086" write-address="0xFFCC1086" bit-size="8"  type="IO" mask="FF"       group="USB0" description="USB0 EPn Receive Hub Address Register" />
+<register name="USB0_MP0_RXHUBADDR"              read-address="0xFFCC1086" write-address="0xFFCC1086" bit-size="8"  type="IO" mask="FF"       group="USB0" description="USB0 MPn Receive Hub Address Register" />
    <register name="USB0_MP0_RXHUBADDR.MULTTRANS" parent="USB0_MP0_RXHUBADDR" bit-position="7" bit-size="1" description="Multiple Transaction Translators" />
    <register name="USB0_MP0_RXHUBADDR.ADDR"      parent="USB0_MP0_RXHUBADDR" bit-position="0" bit-size="7" description="Hub Address Value" />
-<register name="USB0_MP1_RXHUBADDR"              read-address="0xFFCC108E" write-address="0xFFCC108E" bit-size="8"  type="IO" mask="FF"       group="USB0" description="USB0 EPn Receive Hub Address Register" />
+<register name="USB0_MP1_RXHUBADDR"              read-address="0xFFCC108E" write-address="0xFFCC108E" bit-size="8"  type="IO" mask="FF"       group="USB0" description="USB0 MPn Receive Hub Address Register" />
    <register name="USB0_MP1_RXHUBADDR.MULTTRANS" parent="USB0_MP1_RXHUBADDR" bit-position="7" bit-size="1" description="Multiple Transaction Translators" />
    <register name="USB0_MP1_RXHUBADDR.ADDR"      parent="USB0_MP1_RXHUBADDR" bit-position="0" bit-size="7" description="Hub Address Value" />
-<register name="USB0_MP2_RXHUBADDR"              read-address="0xFFCC1096" write-address="0xFFCC1096" bit-size="8"  type="IO" mask="FF"       group="USB0" description="USB0 EPn Receive Hub Address Register" />
+<register name="USB0_MP2_RXHUBADDR"              read-address="0xFFCC1096" write-address="0xFFCC1096" bit-size="8"  type="IO" mask="FF"       group="USB0" description="USB0 MPn Receive Hub Address Register" />
    <register name="USB0_MP2_RXHUBADDR.MULTTRANS" parent="USB0_MP2_RXHUBADDR" bit-position="7" bit-size="1" description="Multiple Transaction Translators" />
    <register name="USB0_MP2_RXHUBADDR.ADDR"      parent="USB0_MP2_RXHUBADDR" bit-position="0" bit-size="7" description="Hub Address Value" />
-<register name="USB0_MP3_RXHUBADDR"              read-address="0xFFCC109E" write-address="0xFFCC109E" bit-size="8"  type="IO" mask="FF"       group="USB0" description="USB0 EPn Receive Hub Address Register" />
+<register name="USB0_MP3_RXHUBADDR"              read-address="0xFFCC109E" write-address="0xFFCC109E" bit-size="8"  type="IO" mask="FF"       group="USB0" description="USB0 MPn Receive Hub Address Register" />
    <register name="USB0_MP3_RXHUBADDR.MULTTRANS" parent="USB0_MP3_RXHUBADDR" bit-position="7" bit-size="1" description="Multiple Transaction Translators" />
    <register name="USB0_MP3_RXHUBADDR.ADDR"      parent="USB0_MP3_RXHUBADDR" bit-position="0" bit-size="7" description="Hub Address Value" />
-<register name="USB0_MP4_RXHUBADDR"              read-address="0xFFCC10A6" write-address="0xFFCC10A6" bit-size="8"  type="IO" mask="FF"       group="USB0" description="USB0 EPn Receive Hub Address Register" />
+<register name="USB0_MP4_RXHUBADDR"              read-address="0xFFCC10A6" write-address="0xFFCC10A6" bit-size="8"  type="IO" mask="FF"       group="USB0" description="USB0 MPn Receive Hub Address Register" />
    <register name="USB0_MP4_RXHUBADDR.MULTTRANS" parent="USB0_MP4_RXHUBADDR" bit-position="7" bit-size="1" description="Multiple Transaction Translators" />
    <register name="USB0_MP4_RXHUBADDR.ADDR"      parent="USB0_MP4_RXHUBADDR" bit-position="0" bit-size="7" description="Hub Address Value" />
-<register name="USB0_MP5_RXHUBADDR"              read-address="0xFFCC10AE" write-address="0xFFCC10AE" bit-size="8"  type="IO" mask="FF"       group="USB0" description="USB0 EPn Receive Hub Address Register" />
+<register name="USB0_MP5_RXHUBADDR"              read-address="0xFFCC10AE" write-address="0xFFCC10AE" bit-size="8"  type="IO" mask="FF"       group="USB0" description="USB0 MPn Receive Hub Address Register" />
    <register name="USB0_MP5_RXHUBADDR.MULTTRANS" parent="USB0_MP5_RXHUBADDR" bit-position="7" bit-size="1" description="Multiple Transaction Translators" />
    <register name="USB0_MP5_RXHUBADDR.ADDR"      parent="USB0_MP5_RXHUBADDR" bit-position="0" bit-size="7" description="Hub Address Value" />
-<register name="USB0_MP6_RXHUBADDR"              read-address="0xFFCC10B6" write-address="0xFFCC10B6" bit-size="8"  type="IO" mask="FF"       group="USB0" description="USB0 EPn Receive Hub Address Register" />
+<register name="USB0_MP6_RXHUBADDR"              read-address="0xFFCC10B6" write-address="0xFFCC10B6" bit-size="8"  type="IO" mask="FF"       group="USB0" description="USB0 MPn Receive Hub Address Register" />
    <register name="USB0_MP6_RXHUBADDR.MULTTRANS" parent="USB0_MP6_RXHUBADDR" bit-position="7" bit-size="1" description="Multiple Transaction Translators" />
    <register name="USB0_MP6_RXHUBADDR.ADDR"      parent="USB0_MP6_RXHUBADDR" bit-position="0" bit-size="7" description="Hub Address Value" />
-<register name="USB0_MP7_RXHUBADDR"              read-address="0xFFCC10BE" write-address="0xFFCC10BE" bit-size="8"  type="IO" mask="FF"       group="USB0" description="USB0 EPn Receive Hub Address Register" />
+<register name="USB0_MP7_RXHUBADDR"              read-address="0xFFCC10BE" write-address="0xFFCC10BE" bit-size="8"  type="IO" mask="FF"       group="USB0" description="USB0 MPn Receive Hub Address Register" />
    <register name="USB0_MP7_RXHUBADDR.MULTTRANS" parent="USB0_MP7_RXHUBADDR" bit-position="7" bit-size="1" description="Multiple Transaction Translators" />
    <register name="USB0_MP7_RXHUBADDR.ADDR"      parent="USB0_MP7_RXHUBADDR" bit-position="0" bit-size="7" description="Hub Address Value" />
-<register name="USB0_MP8_RXHUBADDR"              read-address="0xFFCC10C6" write-address="0xFFCC10C6" bit-size="8"  type="IO" mask="FF"       group="USB0" description="USB0 EPn Receive Hub Address Register" />
+<register name="USB0_MP8_RXHUBADDR"              read-address="0xFFCC10C6" write-address="0xFFCC10C6" bit-size="8"  type="IO" mask="FF"       group="USB0" description="USB0 MPn Receive Hub Address Register" />
    <register name="USB0_MP8_RXHUBADDR.MULTTRANS" parent="USB0_MP8_RXHUBADDR" bit-position="7" bit-size="1" description="Multiple Transaction Translators" />
    <register name="USB0_MP8_RXHUBADDR.ADDR"      parent="USB0_MP8_RXHUBADDR" bit-position="0" bit-size="7" description="Hub Address Value" />
-<register name="USB0_MP9_RXHUBADDR"              read-address="0xFFCC10CE" write-address="0xFFCC10CE" bit-size="8"  type="IO" mask="FF"       group="USB0" description="USB0 EPn Receive Hub Address Register" />
+<register name="USB0_MP9_RXHUBADDR"              read-address="0xFFCC10CE" write-address="0xFFCC10CE" bit-size="8"  type="IO" mask="FF"       group="USB0" description="USB0 MPn Receive Hub Address Register" />
    <register name="USB0_MP9_RXHUBADDR.MULTTRANS" parent="USB0_MP9_RXHUBADDR" bit-position="7" bit-size="1" description="Multiple Transaction Translators" />
    <register name="USB0_MP9_RXHUBADDR.ADDR"      parent="USB0_MP9_RXHUBADDR" bit-position="0" bit-size="7" description="Hub Address Value" />
-<register name="USB0_MP10_RXHUBADDR"             read-address="0xFFCC10D6" write-address="0xFFCC10D6" bit-size="8"  type="IO" mask="FF"       group="USB0" description="USB0 EPn Receive Hub Address Register" />
+<register name="USB0_MP10_RXHUBADDR"             read-address="0xFFCC10D6" write-address="0xFFCC10D6" bit-size="8"  type="IO" mask="FF"       group="USB0" description="USB0 MPn Receive Hub Address Register" />
    <register name="USB0_MP10_RXHUBADDR.MULTTRANS" parent="USB0_MP10_RXHUBADDR" bit-position="7" bit-size="1" description="Multiple Transaction Translators" />
    <register name="USB0_MP10_RXHUBADDR.ADDR"     parent="USB0_MP10_RXHUBADDR" bit-position="0" bit-size="7" description="Hub Address Value" />
-<register name="USB0_MP11_RXHUBADDR"             read-address="0xFFCC10DE" write-address="0xFFCC10DE" bit-size="8"  type="IO" mask="FF"       group="USB0" description="USB0 EPn Receive Hub Address Register" />
+<register name="USB0_MP11_RXHUBADDR"             read-address="0xFFCC10DE" write-address="0xFFCC10DE" bit-size="8"  type="IO" mask="FF"       group="USB0" description="USB0 MPn Receive Hub Address Register" />
    <register name="USB0_MP11_RXHUBADDR.MULTTRANS" parent="USB0_MP11_RXHUBADDR" bit-position="7" bit-size="1" description="Multiple Transaction Translators" />
    <register name="USB0_MP11_RXHUBADDR.ADDR"     parent="USB0_MP11_RXHUBADDR" bit-position="0" bit-size="7" description="Hub Address Value" />
-<register name="USB0_MP0_RXHUBPORT"              read-address="0xFFCC1087" write-address="0xFFCC1087" bit-size="8"  type="IO" mask="FF"       group="USB0" description="USB0 EPn Receive Hub Port Register" />
+<register name="USB0_MP0_RXHUBPORT"              read-address="0xFFCC1087" write-address="0xFFCC1087" bit-size="8"  type="IO" mask="FF"       group="USB0" description="USB0 MPn Receive Hub Port Register" />
    <register name="USB0_MP0_RXHUBPORT.VALUE"     parent="USB0_MP0_RXHUBPORT" bit-position="0" bit-size="7" description="Hub Port Value" />
-<register name="USB0_MP1_RXHUBPORT"              read-address="0xFFCC108F" write-address="0xFFCC108F" bit-size="8"  type="IO" mask="FF"       group="USB0" description="USB0 EPn Receive Hub Port Register" />
+<register name="USB0_MP1_RXHUBPORT"              read-address="0xFFCC108F" write-address="0xFFCC108F" bit-size="8"  type="IO" mask="FF"       group="USB0" description="USB0 MPn Receive Hub Port Register" />
    <register name="USB0_MP1_RXHUBPORT.VALUE"     parent="USB0_MP1_RXHUBPORT" bit-position="0" bit-size="7" description="Hub Port Value" />
-<register name="USB0_MP2_RXHUBPORT"              read-address="0xFFCC1097" write-address="0xFFCC1097" bit-size="8"  type="IO" mask="FF"       group="USB0" description="USB0 EPn Receive Hub Port Register" />
+<register name="USB0_MP2_RXHUBPORT"              read-address="0xFFCC1097" write-address="0xFFCC1097" bit-size="8"  type="IO" mask="FF"       group="USB0" description="USB0 MPn Receive Hub Port Register" />
    <register name="USB0_MP2_RXHUBPORT.VALUE"     parent="USB0_MP2_RXHUBPORT" bit-position="0" bit-size="7" description="Hub Port Value" />
-<register name="USB0_MP3_RXHUBPORT"              read-address="0xFFCC109F" write-address="0xFFCC109F" bit-size="8"  type="IO" mask="FF"       group="USB0" description="USB0 EPn Receive Hub Port Register" />
+<register name="USB0_MP3_RXHUBPORT"              read-address="0xFFCC109F" write-address="0xFFCC109F" bit-size="8"  type="IO" mask="FF"       group="USB0" description="USB0 MPn Receive Hub Port Register" />
    <register name="USB0_MP3_RXHUBPORT.VALUE"     parent="USB0_MP3_RXHUBPORT" bit-position="0" bit-size="7" description="Hub Port Value" />
-<register name="USB0_MP4_RXHUBPORT"              read-address="0xFFCC10A7" write-address="0xFFCC10A7" bit-size="8"  type="IO" mask="FF"       group="USB0" description="USB0 EPn Receive Hub Port Register" />
+<register name="USB0_MP4_RXHUBPORT"              read-address="0xFFCC10A7" write-address="0xFFCC10A7" bit-size="8"  type="IO" mask="FF"       group="USB0" description="USB0 MPn Receive Hub Port Register" />
    <register name="USB0_MP4_RXHUBPORT.VALUE"     parent="USB0_MP4_RXHUBPORT" bit-position="0" bit-size="7" description="Hub Port Value" />
-<register name="USB0_MP5_RXHUBPORT"              read-address="0xFFCC10AF" write-address="0xFFCC10AF" bit-size="8"  type="IO" mask="FF"       group="USB0" description="USB0 EPn Receive Hub Port Register" />
+<register name="USB0_MP5_RXHUBPORT"              read-address="0xFFCC10AF" write-address="0xFFCC10AF" bit-size="8"  type="IO" mask="FF"       group="USB0" description="USB0 MPn Receive Hub Port Register" />
    <register name="USB0_MP5_RXHUBPORT.VALUE"     parent="USB0_MP5_RXHUBPORT" bit-position="0" bit-size="7" description="Hub Port Value" />
-<register name="USB0_MP6_RXHUBPORT"              read-address="0xFFCC10B7" write-address="0xFFCC10B7" bit-size="8"  type="IO" mask="FF"       group="USB0" description="USB0 EPn Receive Hub Port Register" />
+<register name="USB0_MP6_RXHUBPORT"              read-address="0xFFCC10B7" write-address="0xFFCC10B7" bit-size="8"  type="IO" mask="FF"       group="USB0" description="USB0 MPn Receive Hub Port Register" />
    <register name="USB0_MP6_RXHUBPORT.VALUE"     parent="USB0_MP6_RXHUBPORT" bit-position="0" bit-size="7" description="Hub Port Value" />
-<register name="USB0_MP7_RXHUBPORT"              read-address="0xFFCC10BF" write-address="0xFFCC10BF" bit-size="8"  type="IO" mask="FF"       group="USB0" description="USB0 EPn Receive Hub Port Register" />
+<register name="USB0_MP7_RXHUBPORT"              read-address="0xFFCC10BF" write-address="0xFFCC10BF" bit-size="8"  type="IO" mask="FF"       group="USB0" description="USB0 MPn Receive Hub Port Register" />
    <register name="USB0_MP7_RXHUBPORT.VALUE"     parent="USB0_MP7_RXHUBPORT" bit-position="0" bit-size="7" description="Hub Port Value" />
-<register name="USB0_MP8_RXHUBPORT"              read-address="0xFFCC10C7" write-address="0xFFCC10C7" bit-size="8"  type="IO" mask="FF"       group="USB0" description="USB0 EPn Receive Hub Port Register" />
+<register name="USB0_MP8_RXHUBPORT"              read-address="0xFFCC10C7" write-address="0xFFCC10C7" bit-size="8"  type="IO" mask="FF"       group="USB0" description="USB0 MPn Receive Hub Port Register" />
    <register name="USB0_MP8_RXHUBPORT.VALUE"     parent="USB0_MP8_RXHUBPORT" bit-position="0" bit-size="7" description="Hub Port Value" />
-<register name="USB0_MP9_RXHUBPORT"              read-address="0xFFCC10CF" write-address="0xFFCC10CF" bit-size="8"  type="IO" mask="FF"       group="USB0" description="USB0 EPn Receive Hub Port Register" />
+<register name="USB0_MP9_RXHUBPORT"              read-address="0xFFCC10CF" write-address="0xFFCC10CF" bit-size="8"  type="IO" mask="FF"       group="USB0" description="USB0 MPn Receive Hub Port Register" />
    <register name="USB0_MP9_RXHUBPORT.VALUE"     parent="USB0_MP9_RXHUBPORT" bit-position="0" bit-size="7" description="Hub Port Value" />
-<register name="USB0_MP10_RXHUBPORT"             read-address="0xFFCC10D7" write-address="0xFFCC10D7" bit-size="8"  type="IO" mask="FF"       group="USB0" description="USB0 EPn Receive Hub Port Register" />
+<register name="USB0_MP10_RXHUBPORT"             read-address="0xFFCC10D7" write-address="0xFFCC10D7" bit-size="8"  type="IO" mask="FF"       group="USB0" description="USB0 MPn Receive Hub Port Register" />
    <register name="USB0_MP10_RXHUBPORT.VALUE"    parent="USB0_MP10_RXHUBPORT" bit-position="0" bit-size="7" description="Hub Port Value" />
-<register name="USB0_MP11_RXHUBPORT"             read-address="0xFFCC10DF" write-address="0xFFCC10DF" bit-size="8"  type="IO" mask="FF"       group="USB0" description="USB0 EPn Receive Hub Port Register" />
+<register name="USB0_MP11_RXHUBPORT"             read-address="0xFFCC10DF" write-address="0xFFCC10DF" bit-size="8"  type="IO" mask="FF"       group="USB0" description="USB0 MPn Receive Hub Port Register" />
    <register name="USB0_MP11_RXHUBPORT.VALUE"    parent="USB0_MP11_RXHUBPORT" bit-position="0" bit-size="7" description="Hub Port Value" />
 <register name="USB0_EP0_TXMAXP"                 read-address="0xFFCC1100" write-address="0xFFCC1100" bit-size="16" type="IO" mask="FFFF"     group="USB0" description="USB0 EPn Transmit Maximum Packet Length Register" />
    <register name="USB0_EP0_TXMAXP.MULTM1"       parent="USB0_EP0_TXMAXP" bit-position="11" bit-size="2" description="Multi-Packets per Micro-frame" />
@@ -18049,7 +18051,7 @@
    <register name="USB0_LPM_CTL.NAK"             parent="USB0_LPM_CTL" bit-position="4" bit-size="1" description="LPM NAK Enable" />
    <register name="USB0_LPM_CTL.EN"              parent="USB0_LPM_CTL" bit-position="2" bit-size="2" description="LPM Enable" />
    <register name="USB0_LPM_CTL.RESUME"          parent="USB0_LPM_CTL" bit-position="1" bit-size="1" description="LPM Resume (Remote Wakeup)" />
-   <register name="USB0_LPM_CTL.TX"              parent="USB0_LPM_CTL" bit-position="0" bit-size="1" description="field" />
+   <register name="USB0_LPM_CTL.TX"              parent="USB0_LPM_CTL" bit-position="0" bit-size="1" description="LPM Transmit" />
 <register name="USB0_LPM_IEN"                    read-address="0xFFCC1363" write-address="0xFFCC1363" bit-size="8"  type="IO" mask="FF"       group="USB0" description="USB0 LPM Interrupt Enable Register" />
    <register name="USB0_LPM_IEN.LPMERR"          parent="USB0_LPM_IEN" bit-position="5" bit-size="1" description="LPM Error Interrupt Enable" />
    <register name="USB0_LPM_IEN.LPMRES"          parent="USB0_LPM_IEN" bit-position="4" bit-size="1" description="LPM Resume Interrupt Enable" />
@@ -18692,7 +18694,7 @@
 <!-- ***  Watchpoint Unit  *** -->
 <!-- ************************* -->
 
-<!-- ADSP-BF606 05-17-2012: deleted content from the auto-generated file here because it is an odd special case that exists in the core.xml being brought in -->
+<!-- ADSP-BF606 06-07-2012: deleted content from the auto-generated file here because it is an odd special case that exists in the core.xml being brought in -->
 
 
 <!-- ***************************** -->

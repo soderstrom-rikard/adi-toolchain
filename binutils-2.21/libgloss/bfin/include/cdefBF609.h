@@ -16,8 +16,8 @@
      File         :   cdefBF609.h
      Description  :   C register and bitfield definitions
 
-     Date         :   05-17-2012
-
+     Date         :   06-07-2012
+     Tag          :   BF60X_TOOLS_CCES_1_0_1
 
      Copyright (c) 2011-2012 Analog Devices, Inc.  All Rights Reserved.
      This software is proprietary and confidential to Analog Devices, Inc. and
@@ -1802,8 +1802,8 @@
 #define pREG_EMAC0_DMA_BUSMODE           ((volatile uint32_t *)REG_EMAC0_DMA_BUSMODE)            /* EMAC0 DMA Bus Mode Register */
 #define pREG_EMAC0_DMA_TXPOLL            ((volatile uint32_t *)REG_EMAC0_DMA_TXPOLL)             /* EMAC0 DMA Tx Poll Demand Register */
 #define pREG_EMAC0_DMA_RXPOLL            ((volatile uint32_t *)REG_EMAC0_DMA_RXPOLL)             /* EMAC0 DMA Rx Poll Demand register */
-#define pREG_EMAC0_DMA_RXDSC_ADDR        ((void * volatile *)REG_EMAC0_DMA_RXDSC_ADDR)           /* EMAC0 DMA Rx Descriptor List Address Register */
-#define pREG_EMAC0_DMA_TXDSC_ADDR        ((void * volatile *)REG_EMAC0_DMA_TXDSC_ADDR)           /* EMAC0 DMA Tx Descriptor List Address Register */
+#define pREG_EMAC0_DMA_RXDSC_ADDR        ((volatile uint32_t *)REG_EMAC0_DMA_RXDSC_ADDR)         /* EMAC0 DMA Rx Descriptor List Address Register */
+#define pREG_EMAC0_DMA_TXDSC_ADDR        ((volatile uint32_t *)REG_EMAC0_DMA_TXDSC_ADDR)         /* EMAC0 DMA Tx Descriptor List Address Register */
 #define pREG_EMAC0_DMA_STAT              ((volatile uint32_t *)REG_EMAC0_DMA_STAT)               /* EMAC0 DMA Status Register */
 #define pREG_EMAC0_DMA_OPMODE            ((volatile uint32_t *)REG_EMAC0_DMA_OPMODE)             /* EMAC0 DMA Operation Mode Register */
 #define pREG_EMAC0_DMA_IEN               ((volatile uint32_t *)REG_EMAC0_DMA_IEN)                /* EMAC0 DMA Interrupt Enable Register */
@@ -1811,10 +1811,10 @@
 #define pREG_EMAC0_DMA_RXIWDOG           ((volatile uint32_t *)REG_EMAC0_DMA_RXIWDOG)            /* EMAC0 DMA Rx Interrupt Watch Dog Register */
 #define pREG_EMAC0_DMA_BMMODE            ((volatile uint32_t *)REG_EMAC0_DMA_BMMODE)             /* EMAC0 DMA SCB Bus Mode Register */
 #define pREG_EMAC0_DMA_BMSTAT            ((volatile uint32_t *)REG_EMAC0_DMA_BMSTAT)             /* EMAC0 DMA SCB Status Register */
-#define pREG_EMAC0_DMA_TXDSC_CUR         ((void * volatile *)REG_EMAC0_DMA_TXDSC_CUR)            /* EMAC0 DMA Tx Descriptor Current Register */
-#define pREG_EMAC0_DMA_RXDSC_CUR         ((void * volatile *)REG_EMAC0_DMA_RXDSC_CUR)            /* EMAC0 DMA Rx Descriptor Current Register */
-#define pREG_EMAC0_DMA_TXBUF_CUR         ((void * volatile *)REG_EMAC0_DMA_TXBUF_CUR)            /* EMAC0 DMA Tx Buffer Current Register */
-#define pREG_EMAC0_DMA_RXBUF_CUR         ((void * volatile *)REG_EMAC0_DMA_RXBUF_CUR)            /* EMAC0 DMA Rx Buffer Current Register */
+#define pREG_EMAC0_DMA_TXDSC_CUR         ((volatile uint32_t *)REG_EMAC0_DMA_TXDSC_CUR)          /* EMAC0 DMA Tx Descriptor Current Register */
+#define pREG_EMAC0_DMA_RXDSC_CUR         ((volatile uint32_t *)REG_EMAC0_DMA_RXDSC_CUR)          /* EMAC0 DMA Rx Descriptor Current Register */
+#define pREG_EMAC0_DMA_TXBUF_CUR         ((volatile uint32_t *)REG_EMAC0_DMA_TXBUF_CUR)          /* EMAC0 DMA Tx Buffer Current Register */
+#define pREG_EMAC0_DMA_RXBUF_CUR         ((volatile uint32_t *)REG_EMAC0_DMA_RXBUF_CUR)          /* EMAC0 DMA Rx Buffer Current Register */
 
 /* =========================================================================
        EMAC1
@@ -1935,8 +1935,8 @@
 #define pREG_EMAC1_DMA_BUSMODE           ((volatile uint32_t *)REG_EMAC1_DMA_BUSMODE)            /* EMAC1 DMA Bus Mode Register */
 #define pREG_EMAC1_DMA_TXPOLL            ((volatile uint32_t *)REG_EMAC1_DMA_TXPOLL)             /* EMAC1 DMA Tx Poll Demand Register */
 #define pREG_EMAC1_DMA_RXPOLL            ((volatile uint32_t *)REG_EMAC1_DMA_RXPOLL)             /* EMAC1 DMA Rx Poll Demand register */
-#define pREG_EMAC1_DMA_RXDSC_ADDR        ((void * volatile *)REG_EMAC1_DMA_RXDSC_ADDR)           /* EMAC1 DMA Rx Descriptor List Address Register */
-#define pREG_EMAC1_DMA_TXDSC_ADDR        ((void * volatile *)REG_EMAC1_DMA_TXDSC_ADDR)           /* EMAC1 DMA Tx Descriptor List Address Register */
+#define pREG_EMAC1_DMA_RXDSC_ADDR        ((volatile uint32_t *)REG_EMAC1_DMA_RXDSC_ADDR)         /* EMAC1 DMA Rx Descriptor List Address Register */
+#define pREG_EMAC1_DMA_TXDSC_ADDR        ((volatile uint32_t *)REG_EMAC1_DMA_TXDSC_ADDR)         /* EMAC1 DMA Tx Descriptor List Address Register */
 #define pREG_EMAC1_DMA_STAT              ((volatile uint32_t *)REG_EMAC1_DMA_STAT)               /* EMAC1 DMA Status Register */
 #define pREG_EMAC1_DMA_OPMODE            ((volatile uint32_t *)REG_EMAC1_DMA_OPMODE)             /* EMAC1 DMA Operation Mode Register */
 #define pREG_EMAC1_DMA_IEN               ((volatile uint32_t *)REG_EMAC1_DMA_IEN)                /* EMAC1 DMA Interrupt Enable Register */
@@ -1944,10 +1944,10 @@
 #define pREG_EMAC1_DMA_RXIWDOG           ((volatile uint32_t *)REG_EMAC1_DMA_RXIWDOG)            /* EMAC1 DMA Rx Interrupt Watch Dog Register */
 #define pREG_EMAC1_DMA_BMMODE            ((volatile uint32_t *)REG_EMAC1_DMA_BMMODE)             /* EMAC1 DMA SCB Bus Mode Register */
 #define pREG_EMAC1_DMA_BMSTAT            ((volatile uint32_t *)REG_EMAC1_DMA_BMSTAT)             /* EMAC1 DMA SCB Status Register */
-#define pREG_EMAC1_DMA_TXDSC_CUR         ((void * volatile *)REG_EMAC1_DMA_TXDSC_CUR)            /* EMAC1 DMA Tx Descriptor Current Register */
-#define pREG_EMAC1_DMA_RXDSC_CUR         ((void * volatile *)REG_EMAC1_DMA_RXDSC_CUR)            /* EMAC1 DMA Rx Descriptor Current Register */
-#define pREG_EMAC1_DMA_TXBUF_CUR         ((void * volatile *)REG_EMAC1_DMA_TXBUF_CUR)            /* EMAC1 DMA Tx Buffer Current Register */
-#define pREG_EMAC1_DMA_RXBUF_CUR         ((void * volatile *)REG_EMAC1_DMA_RXBUF_CUR)            /* EMAC1 DMA Rx Buffer Current Register */
+#define pREG_EMAC1_DMA_TXDSC_CUR         ((volatile uint32_t *)REG_EMAC1_DMA_TXDSC_CUR)          /* EMAC1 DMA Tx Descriptor Current Register */
+#define pREG_EMAC1_DMA_RXDSC_CUR         ((volatile uint32_t *)REG_EMAC1_DMA_RXDSC_CUR)          /* EMAC1 DMA Rx Descriptor Current Register */
+#define pREG_EMAC1_DMA_TXBUF_CUR         ((volatile uint32_t *)REG_EMAC1_DMA_TXBUF_CUR)          /* EMAC1 DMA Tx Buffer Current Register */
+#define pREG_EMAC1_DMA_RXBUF_CUR         ((volatile uint32_t *)REG_EMAC1_DMA_RXBUF_CUR)          /* EMAC1 DMA Rx Buffer Current Register */
 
 
 /* =========================================================================
@@ -3144,26 +3144,28 @@
 
 
 /* =========================================================================
-       DDR0
+       DMC0
    ========================================================================= */
-#define pREG_DDR0_CTL                    ((volatile uint32_t *)REG_DDR0_CTL)                     /* DDR0 Control Register */
-#define pREG_DDR0_STAT                   ((volatile uint32_t *)REG_DDR0_STAT)                    /* DDR0 Status Register */
-#define pREG_DDR0_EFFCTL                 ((volatile uint32_t *)REG_DDR0_EFFCTL)                  /* DDR0 Efficiency Control Register */
-#define pREG_DDR0_PRIO                   ((volatile uint32_t *)REG_DDR0_PRIO)                    /* DDR0 Priority ID Register */
-#define pREG_DDR0_PRIOMSK                ((volatile uint32_t *)REG_DDR0_PRIOMSK)                 /* DDR0 Priority ID Mask Register */
-#define pREG_DDR0_CFG                    ((volatile uint32_t *)REG_DDR0_CFG)                     /* DDR0 Configuration Register */
-#define pREG_DDR0_TR0                    ((volatile uint32_t *)REG_DDR0_TR0)                     /* DDR0 Timing 0 Register */
-#define pREG_DDR0_TR1                    ((volatile uint32_t *)REG_DDR0_TR1)                     /* DDR0 Timing 1 Register */
-#define pREG_DDR0_TR2                    ((volatile uint32_t *)REG_DDR0_TR2)                     /* DDR0 Timing 2 Register */
-#define pREG_DDR0_MSK                    ((volatile uint32_t *)REG_DDR0_MSK)                     /* DDR0 Mask (Mode Register Shadow) Register */
-#define pREG_DDR0_MR                     ((volatile uint32_t *)REG_DDR0_MR)                      /* DDR0 Shadow MR Register */
-#define pREG_DDR0_EMR1                   ((volatile uint32_t *)REG_DDR0_EMR1)                    /* DDR0 Shadow EMR1 Register */
-#define pREG_DDR0_EMR2                   ((volatile uint32_t *)REG_DDR0_EMR2)                    /* DDR0 Shadow EMR2 Register */
-#define pREG_DDR0_EMR3                   ((volatile uint32_t *)REG_DDR0_EMR3)                    /* DDR0 Shadow EMR3 Register */
-#define pREG_DDR0_DLLCTL                 ((volatile uint32_t *)REG_DDR0_DLLCTL)                  /* DDR0 DLL Control Register */
-#define pREG_DDR0_PHY_CTL1               ((volatile uint32_t *)REG_DDR0_PHY_CTL1)                /* DDR0 PHY Control 1 Register */
-#define pREG_DDR0_PHY_CTL3               ((volatile uint32_t *)REG_DDR0_PHY_CTL3)                /* DDR0 PHY Control 3 Register */
-#define pREG_DDR0_PADCTL                 ((volatile uint32_t *)REG_DDR0_PADCTL)                  /* DDR0 PAD Control Register */
+#define pREG_DMC0_CTL                    ((volatile uint32_t *)REG_DMC0_CTL)                     /* DMC0 Control Register */
+#define pREG_DMC0_STAT                   ((volatile uint32_t *)REG_DMC0_STAT)                    /* DMC0 Status Register */
+#define pREG_DMC0_EFFCTL                 ((volatile uint32_t *)REG_DMC0_EFFCTL)                  /* DMC0 Efficiency Control Register */
+#define pREG_DMC0_PRIO                   ((volatile uint32_t *)REG_DMC0_PRIO)                    /* DMC0 Priority ID Register */
+#define pREG_DMC0_PRIOMSK                ((volatile uint32_t *)REG_DMC0_PRIOMSK)                 /* DMC0 Priority ID Mask Register */
+#define pREG_DMC0_CFG                    ((volatile uint32_t *)REG_DMC0_CFG)                     /* DMC0 Configuration Register */
+#define pREG_DMC0_TR0                    ((volatile uint32_t *)REG_DMC0_TR0)                     /* DMC0 Timing 0 Register */
+#define pREG_DMC0_TR1                    ((volatile uint32_t *)REG_DMC0_TR1)                     /* DMC0 Timing 1 Register */
+#define pREG_DMC0_TR2                    ((volatile uint32_t *)REG_DMC0_TR2)                     /* DMC0 Timing 2 Register */
+#define pREG_DMC0_MSK                    ((volatile uint32_t *)REG_DMC0_MSK)                     /* DMC0 Mask (Mode Register Shadow) Register */
+#define pREG_DMC0_MR                     ((volatile uint32_t *)REG_DMC0_MR)                      /* DMC0 Shadow MR Register */
+#define pREG_DMC0_EMR1                   ((volatile uint32_t *)REG_DMC0_EMR1)                    /* DMC0 Shadow EMR1 Register */
+#define pREG_DMC0_EMR2                   ((volatile uint32_t *)REG_DMC0_EMR2)                    /* DMC0 Shadow EMR2 Register */
+#define pREG_DMC0_EMR3                   ((volatile uint32_t *)REG_DMC0_EMR3)                    /* DMC0 Shadow EMR3 Register */
+#define pREG_DMC0_DLLCTL                 ((volatile uint32_t *)REG_DMC0_DLLCTL)                  /* DMC0 DLL Control Register */
+#define pREG_DMC0_PHY_CTL0               ((volatile uint32_t *)REG_DMC0_PHY_CTL0)                /* DMC0 PHY Control 0 Register */
+#define pREG_DMC0_PHY_CTL1               ((volatile uint32_t *)REG_DMC0_PHY_CTL1)                /* DMC0 PHY Control 1 Register */
+#define pREG_DMC0_PHY_CTL2               ((volatile uint32_t *)REG_DMC0_PHY_CTL2)                /* DMC0 PHY Control 2 Register */
+#define pREG_DMC0_PHY_CTL3               ((volatile uint32_t *)REG_DMC0_PHY_CTL3)                /* DMC0 PHY Control 3 Register */
+#define pREG_DMC0_PADCTL                 ((volatile uint32_t *)REG_DMC0_PADCTL)                  /* DMC0 PAD Control Register */
 
 
 /* =========================================================================
@@ -3896,15 +3898,6 @@
 #define pREG_EFS0_DAT5                   ((volatile uint32_t *)REG_EFS0_DAT5)                    /* EFS0 Data Register 5 */
 #define pREG_EFS0_DAT6                   ((volatile uint32_t *)REG_EFS0_DAT6)                    /* EFS0 Data Register 6 */
 #define pREG_EFS0_DAT7                   ((volatile uint32_t *)REG_EFS0_DAT7)                    /* EFS0 Data Register 7 */
-#define pREG_EFS0_PGM0                   ((volatile uint32_t *)REG_EFS0_PGM0)                    /* EFS0 Program Register 0 */
-#define pREG_EFS0_PGM1                   ((volatile uint32_t *)REG_EFS0_PGM1)                    /* EFS0 Program Register 1 */
-#define pREG_EFS0_PGM2                   ((volatile uint32_t *)REG_EFS0_PGM2)                    /* EFS0 Program Register 2 */
-#define pREG_EFS0_PGM3                   ((volatile uint32_t *)REG_EFS0_PGM3)                    /* EFS0 Program Register 3 */
-#define pREG_EFS0_PGM4                   ((volatile uint32_t *)REG_EFS0_PGM4)                    /* EFS0 Program Register 4 */
-#define pREG_EFS0_PGM5                   ((volatile uint32_t *)REG_EFS0_PGM5)                    /* EFS0 Program Register 5 */
-#define pREG_EFS0_PGM6                   ((volatile uint32_t *)REG_EFS0_PGM6)                    /* EFS0 Program Register 6 */
-#define pREG_EFS0_PGM7                   ((volatile uint32_t *)REG_EFS0_PGM7)                    /* EFS0 Program Register 7 */
-#define pREG_EFS0_PGM_TIMING             ((volatile uint32_t *)REG_EFS0_PGM_TIMING)              /* EFS0 Program Timing Config Register */
 
 
 /* =========================================================================
@@ -3987,78 +3980,78 @@
 #define pREG_USB0_FS_EOF1                ((volatile  uint8_t *)REG_USB0_FS_EOF1)                 /* USB0 Full-Speed EOF 1 Register */
 #define pREG_USB0_LS_EOF1                ((volatile  uint8_t *)REG_USB0_LS_EOF1)                 /* USB0 Low-Speed EOF 1 Register */
 #define pREG_USB0_SOFT_RST               ((volatile  uint8_t *)REG_USB0_SOFT_RST)                /* USB0 Software Reset Register */
-#define pREG_USB0_MP0_TXFUNCADDR         ((volatile  uint8_t *)REG_USB0_MP0_TXFUNCADDR)          /* USB0 EPn Transmit Function Address Register */
-#define pREG_USB0_MP1_TXFUNCADDR         ((volatile  uint8_t *)REG_USB0_MP1_TXFUNCADDR)          /* USB0 EPn Transmit Function Address Register */
-#define pREG_USB0_MP2_TXFUNCADDR         ((volatile  uint8_t *)REG_USB0_MP2_TXFUNCADDR)          /* USB0 EPn Transmit Function Address Register */
-#define pREG_USB0_MP3_TXFUNCADDR         ((volatile  uint8_t *)REG_USB0_MP3_TXFUNCADDR)          /* USB0 EPn Transmit Function Address Register */
-#define pREG_USB0_MP4_TXFUNCADDR         ((volatile  uint8_t *)REG_USB0_MP4_TXFUNCADDR)          /* USB0 EPn Transmit Function Address Register */
-#define pREG_USB0_MP5_TXFUNCADDR         ((volatile  uint8_t *)REG_USB0_MP5_TXFUNCADDR)          /* USB0 EPn Transmit Function Address Register */
-#define pREG_USB0_MP6_TXFUNCADDR         ((volatile  uint8_t *)REG_USB0_MP6_TXFUNCADDR)          /* USB0 EPn Transmit Function Address Register */
-#define pREG_USB0_MP7_TXFUNCADDR         ((volatile  uint8_t *)REG_USB0_MP7_TXFUNCADDR)          /* USB0 EPn Transmit Function Address Register */
-#define pREG_USB0_MP8_TXFUNCADDR         ((volatile  uint8_t *)REG_USB0_MP8_TXFUNCADDR)          /* USB0 EPn Transmit Function Address Register */
-#define pREG_USB0_MP9_TXFUNCADDR         ((volatile  uint8_t *)REG_USB0_MP9_TXFUNCADDR)          /* USB0 EPn Transmit Function Address Register */
-#define pREG_USB0_MP10_TXFUNCADDR        ((volatile  uint8_t *)REG_USB0_MP10_TXFUNCADDR)         /* USB0 EPn Transmit Function Address Register */
-#define pREG_USB0_MP11_TXFUNCADDR        ((volatile  uint8_t *)REG_USB0_MP11_TXFUNCADDR)         /* USB0 EPn Transmit Function Address Register */
-#define pREG_USB0_MP0_TXHUBADDR          ((volatile  uint8_t *)REG_USB0_MP0_TXHUBADDR)           /* USB0 EPn Transmit Hub Address Register */
-#define pREG_USB0_MP1_TXHUBADDR          ((volatile  uint8_t *)REG_USB0_MP1_TXHUBADDR)           /* USB0 EPn Transmit Hub Address Register */
-#define pREG_USB0_MP2_TXHUBADDR          ((volatile  uint8_t *)REG_USB0_MP2_TXHUBADDR)           /* USB0 EPn Transmit Hub Address Register */
-#define pREG_USB0_MP3_TXHUBADDR          ((volatile  uint8_t *)REG_USB0_MP3_TXHUBADDR)           /* USB0 EPn Transmit Hub Address Register */
-#define pREG_USB0_MP4_TXHUBADDR          ((volatile  uint8_t *)REG_USB0_MP4_TXHUBADDR)           /* USB0 EPn Transmit Hub Address Register */
-#define pREG_USB0_MP5_TXHUBADDR          ((volatile  uint8_t *)REG_USB0_MP5_TXHUBADDR)           /* USB0 EPn Transmit Hub Address Register */
-#define pREG_USB0_MP6_TXHUBADDR          ((volatile  uint8_t *)REG_USB0_MP6_TXHUBADDR)           /* USB0 EPn Transmit Hub Address Register */
-#define pREG_USB0_MP7_TXHUBADDR          ((volatile  uint8_t *)REG_USB0_MP7_TXHUBADDR)           /* USB0 EPn Transmit Hub Address Register */
-#define pREG_USB0_MP8_TXHUBADDR          ((volatile  uint8_t *)REG_USB0_MP8_TXHUBADDR)           /* USB0 EPn Transmit Hub Address Register */
-#define pREG_USB0_MP9_TXHUBADDR          ((volatile  uint8_t *)REG_USB0_MP9_TXHUBADDR)           /* USB0 EPn Transmit Hub Address Register */
-#define pREG_USB0_MP10_TXHUBADDR         ((volatile  uint8_t *)REG_USB0_MP10_TXHUBADDR)          /* USB0 EPn Transmit Hub Address Register */
-#define pREG_USB0_MP11_TXHUBADDR         ((volatile  uint8_t *)REG_USB0_MP11_TXHUBADDR)          /* USB0 EPn Transmit Hub Address Register */
-#define pREG_USB0_MP0_TXHUBPORT          ((volatile  uint8_t *)REG_USB0_MP0_TXHUBPORT)           /* USB0 EPn Transmit Hub Port Register */
-#define pREG_USB0_MP1_TXHUBPORT          ((volatile  uint8_t *)REG_USB0_MP1_TXHUBPORT)           /* USB0 EPn Transmit Hub Port Register */
-#define pREG_USB0_MP2_TXHUBPORT          ((volatile  uint8_t *)REG_USB0_MP2_TXHUBPORT)           /* USB0 EPn Transmit Hub Port Register */
-#define pREG_USB0_MP3_TXHUBPORT          ((volatile  uint8_t *)REG_USB0_MP3_TXHUBPORT)           /* USB0 EPn Transmit Hub Port Register */
-#define pREG_USB0_MP4_TXHUBPORT          ((volatile  uint8_t *)REG_USB0_MP4_TXHUBPORT)           /* USB0 EPn Transmit Hub Port Register */
-#define pREG_USB0_MP5_TXHUBPORT          ((volatile  uint8_t *)REG_USB0_MP5_TXHUBPORT)           /* USB0 EPn Transmit Hub Port Register */
-#define pREG_USB0_MP6_TXHUBPORT          ((volatile  uint8_t *)REG_USB0_MP6_TXHUBPORT)           /* USB0 EPn Transmit Hub Port Register */
-#define pREG_USB0_MP7_TXHUBPORT          ((volatile  uint8_t *)REG_USB0_MP7_TXHUBPORT)           /* USB0 EPn Transmit Hub Port Register */
-#define pREG_USB0_MP8_TXHUBPORT          ((volatile  uint8_t *)REG_USB0_MP8_TXHUBPORT)           /* USB0 EPn Transmit Hub Port Register */
-#define pREG_USB0_MP9_TXHUBPORT          ((volatile  uint8_t *)REG_USB0_MP9_TXHUBPORT)           /* USB0 EPn Transmit Hub Port Register */
-#define pREG_USB0_MP10_TXHUBPORT         ((volatile  uint8_t *)REG_USB0_MP10_TXHUBPORT)          /* USB0 EPn Transmit Hub Port Register */
-#define pREG_USB0_MP11_TXHUBPORT         ((volatile  uint8_t *)REG_USB0_MP11_TXHUBPORT)          /* USB0 EPn Transmit Hub Port Register */
-#define pREG_USB0_MP0_RXFUNCADDR         ((volatile  uint8_t *)REG_USB0_MP0_RXFUNCADDR)          /* USB0 EPn Receive Function Address Register */
-#define pREG_USB0_MP1_RXFUNCADDR         ((volatile  uint8_t *)REG_USB0_MP1_RXFUNCADDR)          /* USB0 EPn Receive Function Address Register */
-#define pREG_USB0_MP2_RXFUNCADDR         ((volatile  uint8_t *)REG_USB0_MP2_RXFUNCADDR)          /* USB0 EPn Receive Function Address Register */
-#define pREG_USB0_MP3_RXFUNCADDR         ((volatile  uint8_t *)REG_USB0_MP3_RXFUNCADDR)          /* USB0 EPn Receive Function Address Register */
-#define pREG_USB0_MP4_RXFUNCADDR         ((volatile  uint8_t *)REG_USB0_MP4_RXFUNCADDR)          /* USB0 EPn Receive Function Address Register */
-#define pREG_USB0_MP5_RXFUNCADDR         ((volatile  uint8_t *)REG_USB0_MP5_RXFUNCADDR)          /* USB0 EPn Receive Function Address Register */
-#define pREG_USB0_MP6_RXFUNCADDR         ((volatile  uint8_t *)REG_USB0_MP6_RXFUNCADDR)          /* USB0 EPn Receive Function Address Register */
-#define pREG_USB0_MP7_RXFUNCADDR         ((volatile  uint8_t *)REG_USB0_MP7_RXFUNCADDR)          /* USB0 EPn Receive Function Address Register */
-#define pREG_USB0_MP8_RXFUNCADDR         ((volatile  uint8_t *)REG_USB0_MP8_RXFUNCADDR)          /* USB0 EPn Receive Function Address Register */
-#define pREG_USB0_MP9_RXFUNCADDR         ((volatile  uint8_t *)REG_USB0_MP9_RXFUNCADDR)          /* USB0 EPn Receive Function Address Register */
-#define pREG_USB0_MP10_RXFUNCADDR        ((volatile  uint8_t *)REG_USB0_MP10_RXFUNCADDR)         /* USB0 EPn Receive Function Address Register */
-#define pREG_USB0_MP11_RXFUNCADDR        ((volatile  uint8_t *)REG_USB0_MP11_RXFUNCADDR)         /* USB0 EPn Receive Function Address Register */
-#define pREG_USB0_MP0_RXHUBADDR          ((volatile  uint8_t *)REG_USB0_MP0_RXHUBADDR)           /* USB0 EPn Receive Hub Address Register */
-#define pREG_USB0_MP1_RXHUBADDR          ((volatile  uint8_t *)REG_USB0_MP1_RXHUBADDR)           /* USB0 EPn Receive Hub Address Register */
-#define pREG_USB0_MP2_RXHUBADDR          ((volatile  uint8_t *)REG_USB0_MP2_RXHUBADDR)           /* USB0 EPn Receive Hub Address Register */
-#define pREG_USB0_MP3_RXHUBADDR          ((volatile  uint8_t *)REG_USB0_MP3_RXHUBADDR)           /* USB0 EPn Receive Hub Address Register */
-#define pREG_USB0_MP4_RXHUBADDR          ((volatile  uint8_t *)REG_USB0_MP4_RXHUBADDR)           /* USB0 EPn Receive Hub Address Register */
-#define pREG_USB0_MP5_RXHUBADDR          ((volatile  uint8_t *)REG_USB0_MP5_RXHUBADDR)           /* USB0 EPn Receive Hub Address Register */
-#define pREG_USB0_MP6_RXHUBADDR          ((volatile  uint8_t *)REG_USB0_MP6_RXHUBADDR)           /* USB0 EPn Receive Hub Address Register */
-#define pREG_USB0_MP7_RXHUBADDR          ((volatile  uint8_t *)REG_USB0_MP7_RXHUBADDR)           /* USB0 EPn Receive Hub Address Register */
-#define pREG_USB0_MP8_RXHUBADDR          ((volatile  uint8_t *)REG_USB0_MP8_RXHUBADDR)           /* USB0 EPn Receive Hub Address Register */
-#define pREG_USB0_MP9_RXHUBADDR          ((volatile  uint8_t *)REG_USB0_MP9_RXHUBADDR)           /* USB0 EPn Receive Hub Address Register */
-#define pREG_USB0_MP10_RXHUBADDR         ((volatile  uint8_t *)REG_USB0_MP10_RXHUBADDR)          /* USB0 EPn Receive Hub Address Register */
-#define pREG_USB0_MP11_RXHUBADDR         ((volatile  uint8_t *)REG_USB0_MP11_RXHUBADDR)          /* USB0 EPn Receive Hub Address Register */
-#define pREG_USB0_MP0_RXHUBPORT          ((volatile  uint8_t *)REG_USB0_MP0_RXHUBPORT)           /* USB0 EPn Receive Hub Port Register */
-#define pREG_USB0_MP1_RXHUBPORT          ((volatile  uint8_t *)REG_USB0_MP1_RXHUBPORT)           /* USB0 EPn Receive Hub Port Register */
-#define pREG_USB0_MP2_RXHUBPORT          ((volatile  uint8_t *)REG_USB0_MP2_RXHUBPORT)           /* USB0 EPn Receive Hub Port Register */
-#define pREG_USB0_MP3_RXHUBPORT          ((volatile  uint8_t *)REG_USB0_MP3_RXHUBPORT)           /* USB0 EPn Receive Hub Port Register */
-#define pREG_USB0_MP4_RXHUBPORT          ((volatile  uint8_t *)REG_USB0_MP4_RXHUBPORT)           /* USB0 EPn Receive Hub Port Register */
-#define pREG_USB0_MP5_RXHUBPORT          ((volatile  uint8_t *)REG_USB0_MP5_RXHUBPORT)           /* USB0 EPn Receive Hub Port Register */
-#define pREG_USB0_MP6_RXHUBPORT          ((volatile  uint8_t *)REG_USB0_MP6_RXHUBPORT)           /* USB0 EPn Receive Hub Port Register */
-#define pREG_USB0_MP7_RXHUBPORT          ((volatile  uint8_t *)REG_USB0_MP7_RXHUBPORT)           /* USB0 EPn Receive Hub Port Register */
-#define pREG_USB0_MP8_RXHUBPORT          ((volatile  uint8_t *)REG_USB0_MP8_RXHUBPORT)           /* USB0 EPn Receive Hub Port Register */
-#define pREG_USB0_MP9_RXHUBPORT          ((volatile  uint8_t *)REG_USB0_MP9_RXHUBPORT)           /* USB0 EPn Receive Hub Port Register */
-#define pREG_USB0_MP10_RXHUBPORT         ((volatile  uint8_t *)REG_USB0_MP10_RXHUBPORT)          /* USB0 EPn Receive Hub Port Register */
-#define pREG_USB0_MP11_RXHUBPORT         ((volatile  uint8_t *)REG_USB0_MP11_RXHUBPORT)          /* USB0 EPn Receive Hub Port Register */
+#define pREG_USB0_MP0_TXFUNCADDR         ((volatile  uint8_t *)REG_USB0_MP0_TXFUNCADDR)          /* USB0 MPn Transmit Function Address Register */
+#define pREG_USB0_MP1_TXFUNCADDR         ((volatile  uint8_t *)REG_USB0_MP1_TXFUNCADDR)          /* USB0 MPn Transmit Function Address Register */
+#define pREG_USB0_MP2_TXFUNCADDR         ((volatile  uint8_t *)REG_USB0_MP2_TXFUNCADDR)          /* USB0 MPn Transmit Function Address Register */
+#define pREG_USB0_MP3_TXFUNCADDR         ((volatile  uint8_t *)REG_USB0_MP3_TXFUNCADDR)          /* USB0 MPn Transmit Function Address Register */
+#define pREG_USB0_MP4_TXFUNCADDR         ((volatile  uint8_t *)REG_USB0_MP4_TXFUNCADDR)          /* USB0 MPn Transmit Function Address Register */
+#define pREG_USB0_MP5_TXFUNCADDR         ((volatile  uint8_t *)REG_USB0_MP5_TXFUNCADDR)          /* USB0 MPn Transmit Function Address Register */
+#define pREG_USB0_MP6_TXFUNCADDR         ((volatile  uint8_t *)REG_USB0_MP6_TXFUNCADDR)          /* USB0 MPn Transmit Function Address Register */
+#define pREG_USB0_MP7_TXFUNCADDR         ((volatile  uint8_t *)REG_USB0_MP7_TXFUNCADDR)          /* USB0 MPn Transmit Function Address Register */
+#define pREG_USB0_MP8_TXFUNCADDR         ((volatile  uint8_t *)REG_USB0_MP8_TXFUNCADDR)          /* USB0 MPn Transmit Function Address Register */
+#define pREG_USB0_MP9_TXFUNCADDR         ((volatile  uint8_t *)REG_USB0_MP9_TXFUNCADDR)          /* USB0 MPn Transmit Function Address Register */
+#define pREG_USB0_MP10_TXFUNCADDR        ((volatile  uint8_t *)REG_USB0_MP10_TXFUNCADDR)         /* USB0 MPn Transmit Function Address Register */
+#define pREG_USB0_MP11_TXFUNCADDR        ((volatile  uint8_t *)REG_USB0_MP11_TXFUNCADDR)         /* USB0 MPn Transmit Function Address Register */
+#define pREG_USB0_MP0_TXHUBADDR          ((volatile  uint8_t *)REG_USB0_MP0_TXHUBADDR)           /* USB0 MPn Transmit Hub Address Register */
+#define pREG_USB0_MP1_TXHUBADDR          ((volatile  uint8_t *)REG_USB0_MP1_TXHUBADDR)           /* USB0 MPn Transmit Hub Address Register */
+#define pREG_USB0_MP2_TXHUBADDR          ((volatile  uint8_t *)REG_USB0_MP2_TXHUBADDR)           /* USB0 MPn Transmit Hub Address Register */
+#define pREG_USB0_MP3_TXHUBADDR          ((volatile  uint8_t *)REG_USB0_MP3_TXHUBADDR)           /* USB0 MPn Transmit Hub Address Register */
+#define pREG_USB0_MP4_TXHUBADDR          ((volatile  uint8_t *)REG_USB0_MP4_TXHUBADDR)           /* USB0 MPn Transmit Hub Address Register */
+#define pREG_USB0_MP5_TXHUBADDR          ((volatile  uint8_t *)REG_USB0_MP5_TXHUBADDR)           /* USB0 MPn Transmit Hub Address Register */
+#define pREG_USB0_MP6_TXHUBADDR          ((volatile  uint8_t *)REG_USB0_MP6_TXHUBADDR)           /* USB0 MPn Transmit Hub Address Register */
+#define pREG_USB0_MP7_TXHUBADDR          ((volatile  uint8_t *)REG_USB0_MP7_TXHUBADDR)           /* USB0 MPn Transmit Hub Address Register */
+#define pREG_USB0_MP8_TXHUBADDR          ((volatile  uint8_t *)REG_USB0_MP8_TXHUBADDR)           /* USB0 MPn Transmit Hub Address Register */
+#define pREG_USB0_MP9_TXHUBADDR          ((volatile  uint8_t *)REG_USB0_MP9_TXHUBADDR)           /* USB0 MPn Transmit Hub Address Register */
+#define pREG_USB0_MP10_TXHUBADDR         ((volatile  uint8_t *)REG_USB0_MP10_TXHUBADDR)          /* USB0 MPn Transmit Hub Address Register */
+#define pREG_USB0_MP11_TXHUBADDR         ((volatile  uint8_t *)REG_USB0_MP11_TXHUBADDR)          /* USB0 MPn Transmit Hub Address Register */
+#define pREG_USB0_MP0_TXHUBPORT          ((volatile  uint8_t *)REG_USB0_MP0_TXHUBPORT)           /* USB0 MPn Transmit Hub Port Register */
+#define pREG_USB0_MP1_TXHUBPORT          ((volatile  uint8_t *)REG_USB0_MP1_TXHUBPORT)           /* USB0 MPn Transmit Hub Port Register */
+#define pREG_USB0_MP2_TXHUBPORT          ((volatile  uint8_t *)REG_USB0_MP2_TXHUBPORT)           /* USB0 MPn Transmit Hub Port Register */
+#define pREG_USB0_MP3_TXHUBPORT          ((volatile  uint8_t *)REG_USB0_MP3_TXHUBPORT)           /* USB0 MPn Transmit Hub Port Register */
+#define pREG_USB0_MP4_TXHUBPORT          ((volatile  uint8_t *)REG_USB0_MP4_TXHUBPORT)           /* USB0 MPn Transmit Hub Port Register */
+#define pREG_USB0_MP5_TXHUBPORT          ((volatile  uint8_t *)REG_USB0_MP5_TXHUBPORT)           /* USB0 MPn Transmit Hub Port Register */
+#define pREG_USB0_MP6_TXHUBPORT          ((volatile  uint8_t *)REG_USB0_MP6_TXHUBPORT)           /* USB0 MPn Transmit Hub Port Register */
+#define pREG_USB0_MP7_TXHUBPORT          ((volatile  uint8_t *)REG_USB0_MP7_TXHUBPORT)           /* USB0 MPn Transmit Hub Port Register */
+#define pREG_USB0_MP8_TXHUBPORT          ((volatile  uint8_t *)REG_USB0_MP8_TXHUBPORT)           /* USB0 MPn Transmit Hub Port Register */
+#define pREG_USB0_MP9_TXHUBPORT          ((volatile  uint8_t *)REG_USB0_MP9_TXHUBPORT)           /* USB0 MPn Transmit Hub Port Register */
+#define pREG_USB0_MP10_TXHUBPORT         ((volatile  uint8_t *)REG_USB0_MP10_TXHUBPORT)          /* USB0 MPn Transmit Hub Port Register */
+#define pREG_USB0_MP11_TXHUBPORT         ((volatile  uint8_t *)REG_USB0_MP11_TXHUBPORT)          /* USB0 MPn Transmit Hub Port Register */
+#define pREG_USB0_MP0_RXFUNCADDR         ((volatile  uint8_t *)REG_USB0_MP0_RXFUNCADDR)          /* USB0 MPn Receive Function Address Register */
+#define pREG_USB0_MP1_RXFUNCADDR         ((volatile  uint8_t *)REG_USB0_MP1_RXFUNCADDR)          /* USB0 MPn Receive Function Address Register */
+#define pREG_USB0_MP2_RXFUNCADDR         ((volatile  uint8_t *)REG_USB0_MP2_RXFUNCADDR)          /* USB0 MPn Receive Function Address Register */
+#define pREG_USB0_MP3_RXFUNCADDR         ((volatile  uint8_t *)REG_USB0_MP3_RXFUNCADDR)          /* USB0 MPn Receive Function Address Register */
+#define pREG_USB0_MP4_RXFUNCADDR         ((volatile  uint8_t *)REG_USB0_MP4_RXFUNCADDR)          /* USB0 MPn Receive Function Address Register */
+#define pREG_USB0_MP5_RXFUNCADDR         ((volatile  uint8_t *)REG_USB0_MP5_RXFUNCADDR)          /* USB0 MPn Receive Function Address Register */
+#define pREG_USB0_MP6_RXFUNCADDR         ((volatile  uint8_t *)REG_USB0_MP6_RXFUNCADDR)          /* USB0 MPn Receive Function Address Register */
+#define pREG_USB0_MP7_RXFUNCADDR         ((volatile  uint8_t *)REG_USB0_MP7_RXFUNCADDR)          /* USB0 MPn Receive Function Address Register */
+#define pREG_USB0_MP8_RXFUNCADDR         ((volatile  uint8_t *)REG_USB0_MP8_RXFUNCADDR)          /* USB0 MPn Receive Function Address Register */
+#define pREG_USB0_MP9_RXFUNCADDR         ((volatile  uint8_t *)REG_USB0_MP9_RXFUNCADDR)          /* USB0 MPn Receive Function Address Register */
+#define pREG_USB0_MP10_RXFUNCADDR        ((volatile  uint8_t *)REG_USB0_MP10_RXFUNCADDR)         /* USB0 MPn Receive Function Address Register */
+#define pREG_USB0_MP11_RXFUNCADDR        ((volatile  uint8_t *)REG_USB0_MP11_RXFUNCADDR)         /* USB0 MPn Receive Function Address Register */
+#define pREG_USB0_MP0_RXHUBADDR          ((volatile  uint8_t *)REG_USB0_MP0_RXHUBADDR)           /* USB0 MPn Receive Hub Address Register */
+#define pREG_USB0_MP1_RXHUBADDR          ((volatile  uint8_t *)REG_USB0_MP1_RXHUBADDR)           /* USB0 MPn Receive Hub Address Register */
+#define pREG_USB0_MP2_RXHUBADDR          ((volatile  uint8_t *)REG_USB0_MP2_RXHUBADDR)           /* USB0 MPn Receive Hub Address Register */
+#define pREG_USB0_MP3_RXHUBADDR          ((volatile  uint8_t *)REG_USB0_MP3_RXHUBADDR)           /* USB0 MPn Receive Hub Address Register */
+#define pREG_USB0_MP4_RXHUBADDR          ((volatile  uint8_t *)REG_USB0_MP4_RXHUBADDR)           /* USB0 MPn Receive Hub Address Register */
+#define pREG_USB0_MP5_RXHUBADDR          ((volatile  uint8_t *)REG_USB0_MP5_RXHUBADDR)           /* USB0 MPn Receive Hub Address Register */
+#define pREG_USB0_MP6_RXHUBADDR          ((volatile  uint8_t *)REG_USB0_MP6_RXHUBADDR)           /* USB0 MPn Receive Hub Address Register */
+#define pREG_USB0_MP7_RXHUBADDR          ((volatile  uint8_t *)REG_USB0_MP7_RXHUBADDR)           /* USB0 MPn Receive Hub Address Register */
+#define pREG_USB0_MP8_RXHUBADDR          ((volatile  uint8_t *)REG_USB0_MP8_RXHUBADDR)           /* USB0 MPn Receive Hub Address Register */
+#define pREG_USB0_MP9_RXHUBADDR          ((volatile  uint8_t *)REG_USB0_MP9_RXHUBADDR)           /* USB0 MPn Receive Hub Address Register */
+#define pREG_USB0_MP10_RXHUBADDR         ((volatile  uint8_t *)REG_USB0_MP10_RXHUBADDR)          /* USB0 MPn Receive Hub Address Register */
+#define pREG_USB0_MP11_RXHUBADDR         ((volatile  uint8_t *)REG_USB0_MP11_RXHUBADDR)          /* USB0 MPn Receive Hub Address Register */
+#define pREG_USB0_MP0_RXHUBPORT          ((volatile  uint8_t *)REG_USB0_MP0_RXHUBPORT)           /* USB0 MPn Receive Hub Port Register */
+#define pREG_USB0_MP1_RXHUBPORT          ((volatile  uint8_t *)REG_USB0_MP1_RXHUBPORT)           /* USB0 MPn Receive Hub Port Register */
+#define pREG_USB0_MP2_RXHUBPORT          ((volatile  uint8_t *)REG_USB0_MP2_RXHUBPORT)           /* USB0 MPn Receive Hub Port Register */
+#define pREG_USB0_MP3_RXHUBPORT          ((volatile  uint8_t *)REG_USB0_MP3_RXHUBPORT)           /* USB0 MPn Receive Hub Port Register */
+#define pREG_USB0_MP4_RXHUBPORT          ((volatile  uint8_t *)REG_USB0_MP4_RXHUBPORT)           /* USB0 MPn Receive Hub Port Register */
+#define pREG_USB0_MP5_RXHUBPORT          ((volatile  uint8_t *)REG_USB0_MP5_RXHUBPORT)           /* USB0 MPn Receive Hub Port Register */
+#define pREG_USB0_MP6_RXHUBPORT          ((volatile  uint8_t *)REG_USB0_MP6_RXHUBPORT)           /* USB0 MPn Receive Hub Port Register */
+#define pREG_USB0_MP7_RXHUBPORT          ((volatile  uint8_t *)REG_USB0_MP7_RXHUBPORT)           /* USB0 MPn Receive Hub Port Register */
+#define pREG_USB0_MP8_RXHUBPORT          ((volatile  uint8_t *)REG_USB0_MP8_RXHUBPORT)           /* USB0 MPn Receive Hub Port Register */
+#define pREG_USB0_MP9_RXHUBPORT          ((volatile  uint8_t *)REG_USB0_MP9_RXHUBPORT)           /* USB0 MPn Receive Hub Port Register */
+#define pREG_USB0_MP10_RXHUBPORT         ((volatile  uint8_t *)REG_USB0_MP10_RXHUBPORT)          /* USB0 MPn Receive Hub Port Register */
+#define pREG_USB0_MP11_RXHUBPORT         ((volatile  uint8_t *)REG_USB0_MP11_RXHUBPORT)          /* USB0 MPn Receive Hub Port Register */
 #define pREG_USB0_EP0_TXMAXP             ((volatile uint16_t *)REG_USB0_EP0_TXMAXP)              /* USB0 EPn Transmit Maximum Packet Length Register */
 #define pREG_USB0_EP1_TXMAXP             ((volatile uint16_t *)REG_USB0_EP1_TXMAXP)              /* USB0 EPn Transmit Maximum Packet Length Register */
 #define pREG_USB0_EP2_TXMAXP             ((volatile uint16_t *)REG_USB0_EP2_TXMAXP)              /* USB0 EPn Transmit Maximum Packet Length Register */

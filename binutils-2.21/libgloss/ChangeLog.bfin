@@ -1,3 +1,14 @@
+2012-06-14  Stuart Henderson  <stuart.henderson@analog.com>
+
+	* bfin/include/cdefBF606.h : Sync with CCES
+	* bfin/include/cdefBF607.h : Sync with CCES
+	* bfin/include/cdefBF608.h : Sync with CCES
+	* bfin/include/cdefBF609.h : Sync with CCES
+	* bfin/include/defBF606.h : Sync with CCES
+	* bfin/include/defBF607.h : Sync with CCES
+	* bfin/include/defBF608.h : Sync with CCES
+	* bfin/include/defBF609.h : Sync with CCES
+
 2012-03-28  Stuart Henderson  <stuart.henderson@analog.com>
 
 	* bfin/Makefile.in: Add BF60x support.
