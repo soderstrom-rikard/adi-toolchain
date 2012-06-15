@@ -140,7 +140,7 @@ log_test_results ()
 
 ######## Do svn update and show svn info for each project.
 cd $CHECKOUT
-if [ `[ -d uclinux-dist ] && ls -a uclinux-dist | grep -c .svn` -gt 1 ] ; then
+if [ `[ -d uclinux-dist ] && ls -al uclinux-dist | grep ^d | grep -c .svn` -gt 0 ] ; then
 cat  <<EOF
 ************** Testing is done on target with kernel config ($TARGET_KERNEL_CONFIG). *************
 ************** Testing $TOOLCHAIN_VERSION toolchain on $BOARD_CONFIG. ************
@@ -149,14 +149,14 @@ cat  <<EOF
 ************** Tested toolchain svn info ***************
 `cd toolchain ; svn up; svn info `
 ************** Tested U-Boot git info ******************
-`cd $SRC_ROOT/u-boot; echo -n "U-Boot "; git fetch ; git remote -v; git log -1`
+`cd $SRC_ROOT/u-boot; echo -n "U-Boot "; git fetch ; git remote -v; git branch -a; git log -1`
 ************* Tested uclinux-dist svn info *************
 `cd uclinux-dist ;svn up ; svn info` 
 ************* Tested linux git info ********************
-`cd uclinux-dist/linux-2.6.x ;echo -n "linux "; git fetch ; git remote -v; git log -1 `
+`cd uclinux-dist/linux-2.6.x ;echo -n "linux "; git fetch ; git remote -v; git branch -a; git log -1 `
 
 EOF
-elif  [` [ -d kernel ] && ls -a kernel | grep -c .git` -gt 1 ] ; then
+elif  [ `[ -d kernel ] && ls -al kernel | grep ^d | grep -c .git` -gt 0 ] ; then
 
 cat  <<EOF
 ************** Testing is done on target with kernel config ($TARGET_KERNEL_CONFIG). *************
@@ -166,11 +166,11 @@ cat  <<EOF
 ************** Tested toolchain svn info ***************
 `cd $SRC_ROOT/toolchain ;svn up; svn info`
 ************** Tested U-Boot git info ******************
-`cd $SRC_ROOT/u-boot; echo -n "U-Boot "; git fetch ; git remote -v; git log -1`
+`cd $SRC_ROOT/u-boot; echo -n "U-Boot "; git fetch ; git remote -v; git branch -a; git log -1`
 ************* Tested Buildroot git info *************
-`cd $SRC_ROOT/kernel; echo -n "Buildroot "; git fetch; git remote -v; git log -1`
+`cd $SRC_ROOT/kernel; echo -n "Buildroot "; git fetch; git remote -v; git branch -a; git log -1`
 ************* Tested linux git info ********************
-`cd $SRC_ROOT/kernel/linux/linux*; echo -n "Kernel "; git fetch; git remote -v; git log -1`
+`cd $SRC_ROOT/kernel/linux/linux*; echo -n "Kernel "; git fetch; git remote -v; git branch -a; git log -1`
 
 EOF
 else
