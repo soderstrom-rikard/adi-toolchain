@@ -1,7 +1,7 @@
 /*
  * Simulator for Analog Devices Blackfin processors.
  *
- * Copyright 2005-2011 Mike Frysinger
+ * Copyright 2005-2012 Mike Frysinger
  * Copyright 2005-2011 Analog Devices, Inc.
  *
  * Licensed under the GPL 2 or later.
@@ -1064,23 +1064,23 @@ decode_CC2stat_0(DisasContext *dc, uint16_t iw0)
     if (D == 0) {
         switch (op) {
         case 0: /* CC = ASTAT[cbit] */
-            tcg_gen_ld_tl(cpu_cc, cpu_env, offsetof(CPUState, astat[cbit]));
+            tcg_gen_ld_tl(cpu_cc, cpu_env, offsetof(CPUArchState, astat[cbit]));
             break;
         case 1: /* CC |= ASTAT[cbit] */
             tmp = tcg_temp_new();
-            tcg_gen_ld_tl(tmp, cpu_env, offsetof(CPUState, astat[cbit]));
+            tcg_gen_ld_tl(tmp, cpu_env, offsetof(CPUArchState, astat[cbit]));
             tcg_gen_or_tl(cpu_cc, cpu_cc, tmp);
             tcg_temp_free(tmp);
             break;
         case 2: /* CC &= ASTAT[cbit] */
             tmp = tcg_temp_new();
-            tcg_gen_ld_tl(tmp, cpu_env, offsetof(CPUState, astat[cbit]));
+            tcg_gen_ld_tl(tmp, cpu_env, offsetof(CPUArchState, astat[cbit]));
             tcg_gen_and_tl(cpu_cc, cpu_cc, tmp);
             tcg_temp_free(tmp);
             break;
         case 3: /* CC ^= ASTAT[cbit] */
             tmp = tcg_temp_new();
-            tcg_gen_ld_tl(tmp, cpu_env, offsetof(CPUState, astat[cbit]));
+            tcg_gen_ld_tl(tmp, cpu_env, offsetof(CPUArchState, astat[cbit]));
             tcg_gen_xor_tl(cpu_cc, cpu_cc, tmp);
             tcg_temp_free(tmp);
             break;
@@ -1088,27 +1088,27 @@ decode_CC2stat_0(DisasContext *dc, uint16_t iw0)
     } else {
         switch (op) {
         case 0: /* ASTAT[cbit] = CC */
-            tcg_gen_st_tl(cpu_cc, cpu_env, offsetof(CPUState, astat[cbit]));
+            tcg_gen_st_tl(cpu_cc, cpu_env, offsetof(CPUArchState, astat[cbit]));
             break;
         case 1: /* ASTAT[cbit] |= CC */
             tmp = tcg_temp_new();
-            tcg_gen_ld_tl(tmp, cpu_env, offsetof(CPUState, astat[cbit]));
+            tcg_gen_ld_tl(tmp, cpu_env, offsetof(CPUArchState, astat[cbit]));
             tcg_gen_or_tl(tmp, tmp, cpu_cc);
-            tcg_gen_st_tl(tmp, cpu_env, offsetof(CPUState, astat[cbit]));
+            tcg_gen_st_tl(tmp, cpu_env, offsetof(CPUArchState, astat[cbit]));
             tcg_temp_free(tmp);
             break;
         case 2: /* ASTAT[cbit] &= CC */
             tmp = tcg_temp_new();
-            tcg_gen_ld_tl(tmp, cpu_env, offsetof(CPUState, astat[cbit]));
+            tcg_gen_ld_tl(tmp, cpu_env, offsetof(CPUArchState, astat[cbit]));
             tcg_gen_and_tl(tmp, tmp, cpu_cc);
-            tcg_gen_st_tl(tmp, cpu_env, offsetof(CPUState, astat[cbit]));
+            tcg_gen_st_tl(tmp, cpu_env, offsetof(CPUArchState, astat[cbit]));
             tcg_temp_free(tmp);
             break;
         case 3: /* ASTAT[cbit] ^= CC */
             tmp = tcg_temp_new();
-            tcg_gen_ld_tl(tmp, cpu_env, offsetof(CPUState, astat[cbit]));
+            tcg_gen_ld_tl(tmp, cpu_env, offsetof(CPUArchState, astat[cbit]));
             tcg_gen_xor_tl(tmp, tmp, cpu_cc);
-            tcg_gen_st_tl(tmp, cpu_env, offsetof(CPUState, astat[cbit]));
+            tcg_gen_st_tl(tmp, cpu_env, offsetof(CPUArchState, astat[cbit]));
             tcg_temp_free(tmp);
             break;
         }

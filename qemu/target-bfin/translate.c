@@ -1,7 +1,7 @@
 /*
  * Blackfin translation
  *
- * Copyright 2007-2011 Mike Frysinger
+ * Copyright 2007-2012 Mike Frysinger
  * Copyright 2007-2011 Analog Devices, Inc.
  *
  * Licensed under the Lesser GPL 2 or later.
@@ -55,11 +55,6 @@ static TCGv /*cpu_astat_op,*/ cpu_astat_arg[3];
 
 #include "gen-icount.h"
 
-void cpu_reset(CPUState *env)
-{
-    env->pc = 0xEF000000;
-}
-
 static inline void
 bfin_tcg_new_set3(TCGv *tcgv, unsigned int cnt, unsigned int offbase,
                   const char * const *names)
@@ -69,23 +64,23 @@ bfin_tcg_new_set3(TCGv *tcgv, unsigned int cnt, unsigned int offbase,
         tcgv[i] = tcg_global_mem_new(TCG_AREG0, offbase + (i * 4), names[i]);
 }
 #define bfin_tcg_new_set2(tcgv, cnt, reg, name_idx) \
-    bfin_tcg_new_set3(tcgv, cnt, offsetof(CPUState, reg), &greg_names[name_idx])
+    bfin_tcg_new_set3(tcgv, cnt, offsetof(CPUArchState, reg), &greg_names[name_idx])
 #define bfin_tcg_new_set(reg, name_idx) \
     bfin_tcg_new_set2(cpu_##reg, ARRAY_SIZE(cpu_##reg), reg, name_idx)
 #define bfin_tcg_new(reg, name_idx) \
     bfin_tcg_new_set2(&cpu_##reg, 1, reg, name_idx)
 
-CPUState *cpu_init(const char *cpu_model)
+CPUArchState *cpu_init(const char *cpu_model)
 {
-    CPUState *env;
+    BfinCPU *cpu;
+    CPUArchState *env;
     static int tcg_initialized = 0;
 
-    env = g_malloc0(sizeof(*env));
-    if (!env)
-        return NULL;
+    cpu = BFIN_CPU(object_new(TYPE_BFIN_CPU));
+    env = &cpu->env;
 
     cpu_exec_init(env);
-    cpu_reset(env);
+    cpu_reset(CPU(cpu));
 
     if (tcg_initialized)
         return env;
@@ -98,23 +93,23 @@ CPUState *cpu_init(const char *cpu_model)
     cpu_env = tcg_global_reg_new_ptr(TCG_AREG0, "env");
 
     cpu_pc = tcg_global_mem_new(TCG_AREG0,
-        offsetof(CPUState, pc), "PC");
+        offsetof(CPUArchState, pc), "PC");
     cpu_cc = tcg_global_mem_new(TCG_AREG0,
-        offsetof(CPUState, astat[ASTAT_CC]), "CC");
+        offsetof(CPUArchState, astat[ASTAT_CC]), "CC");
 
     /*cpu_astat_op = tcg_global_mem_new(TCG_AREG0,
-        offsetof(CPUState, astat_op), "astat_op");*/
+        offsetof(CPUArchState, astat_op), "astat_op");*/
     cpu_astat_arg[0] = tcg_global_mem_new(TCG_AREG0,
-        offsetof(CPUState, astat_arg[0]), "astat_arg[0]");
+        offsetof(CPUArchState, astat_arg[0]), "astat_arg[0]");
     cpu_astat_arg[1] = tcg_global_mem_new(TCG_AREG0,
-        offsetof(CPUState, astat_arg[1]), "astat_arg[1]");
+        offsetof(CPUArchState, astat_arg[1]), "astat_arg[1]");
     cpu_astat_arg[2] = tcg_global_mem_new(TCG_AREG0,
-        offsetof(CPUState, astat_arg[2]), "astat_arg[2]");
+        offsetof(CPUArchState, astat_arg[2]), "astat_arg[2]");
 
     cpu_areg[0] = tcg_global_mem_new_i64(TCG_AREG0,
-        offsetof(CPUState, areg[0]), "A0");
+        offsetof(CPUArchState, areg[0]), "A0");
     cpu_areg[1] = tcg_global_mem_new_i64(TCG_AREG0,
-        offsetof(CPUState, areg[1]), "A1");
+        offsetof(CPUArchState, areg[1]), "A1");
 
     bfin_tcg_new_set(dreg, 0);
     bfin_tcg_new_set(preg, 8);
@@ -143,7 +138,7 @@ CPUState *cpu_init(const char *cpu_model)
 }
 
 #define _astat_printf(bit) cpu_fprintf(f, "%s" #bit " ", (env->astat[ASTAT_##bit] ? "" : "~"))
-void cpu_dump_state(CPUState *env, FILE *f,
+void cpu_dump_state(CPUArchState *env, FILE *f,
                     int (*cpu_fprintf)(FILE *f, const char *fmt, ...),
                     int flags)
 {
@@ -571,7 +566,7 @@ static void _gen_divqs_st_aq(TCGv r, TCGv aq, TCGv div)
     tcg_gen_xor_tl(aq, r, div);
     tcg_gen_shri_tl(aq, aq, 15);
     tcg_gen_andi_tl(aq, aq, 1);
-    tcg_gen_st_tl(aq, cpu_env, offsetof(CPUState, astat[ASTAT_AQ]));
+    tcg_gen_st_tl(aq, cpu_env, offsetof(CPUArchState, astat[ASTAT_AQ]));
 }
 
 /* DIVQ ( Dreg, Dreg ) ;
@@ -607,7 +602,7 @@ static void gen_divq(TCGv pquo, TCGv src)
      *  r += af;
      */
     aq = tcg_temp_local_new();
-    tcg_gen_ld_tl(aq, cpu_env, offsetof(CPUState, astat[ASTAT_AQ]));
+    tcg_gen_ld_tl(aq, cpu_env, offsetof(CPUArchState, astat[ASTAT_AQ]));
 
     l = gen_new_label();
     r = tcg_temp_local_new();
@@ -945,7 +940,7 @@ static void gen_dagsubi(DisasContext *dc, int dagno, uint32_t M)
     tcg_temp_free(m);
 }
 
-#define _gen_astat_store(bit, reg) tcg_gen_st_tl(reg, cpu_env, offsetof(CPUState, astat[bit]))
+#define _gen_astat_store(bit, reg) tcg_gen_st_tl(reg, cpu_env, offsetof(CPUArchState, astat[bit]))
 
 static void _gen_astat_update_az(TCGv reg, TCGv tmp)
 {
@@ -1209,7 +1204,7 @@ static void gen_astat_store(DisasContext *dc, TCGv reg)
 
 static void interp_insn_bfin(DisasContext *dc);
 
-static void check_breakpoint(CPUState *env, DisasContext *dc)
+static void check_breakpoint(CPUArchState *env, DisasContext *dc)
 {
     CPUBreakpoint *bp;
 
@@ -1224,7 +1219,7 @@ static void check_breakpoint(CPUState *env, DisasContext *dc)
 }
 
 static void
-gen_intermediate_code_internal(CPUState *env, TranslationBlock *tb,
+gen_intermediate_code_internal(CPUArchState *env, TranslationBlock *tb,
                                int search_pc)
 {
     uint16_t *gen_opc_end;
@@ -1340,17 +1335,17 @@ gen_intermediate_code_internal(CPUState *env, TranslationBlock *tb,
 #endif
 }
 
-void gen_intermediate_code(CPUState *env, struct TranslationBlock *tb)
+void gen_intermediate_code(CPUArchState *env, struct TranslationBlock *tb)
 {
     gen_intermediate_code_internal(env, tb, 0);
 }
 
-void gen_intermediate_code_pc(CPUState *env, struct TranslationBlock *tb)
+void gen_intermediate_code_pc(CPUArchState *env, struct TranslationBlock *tb)
 {
     gen_intermediate_code_internal(env, tb, 1);
 }
 
-void restore_state_to_opc(CPUState *env, TranslationBlock *tb, int pc_pos)
+void restore_state_to_opc(CPUArchState *env, TranslationBlock *tb, int pc_pos)
 {
     env->pc = gen_opc_pc[pc_pos];
 }

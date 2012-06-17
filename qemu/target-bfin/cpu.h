@@ -1,7 +1,7 @@
 /*
  * Blackfin emulation
  *
- * Copyright 2007-2011 Mike Frysinger
+ * Copyright 2007-2012 Mike Frysinger
  * Copyright 2007-2011 Analog Devices, Inc.
  *
  * Licensed under the Lesser GPL 2 or later.
@@ -51,7 +51,7 @@ struct DisasContext;
 #define TARGET_PHYS_ADDR_SPACE_BITS 32
 #define TARGET_VIRT_ADDR_SPACE_BITS 32
 
-#define CPUState struct CPUBFINState
+#define CPUArchState struct CPUBfinState
 #define cpu_init cpu_bfin_init
 #define cpu_exec cpu_bfin_exec
 #define cpu_gen_code cpu_bfin_gen_code
@@ -76,7 +76,7 @@ enum {
     ASTAT_VS
 };
 
-typedef struct CPUBFINState {
+typedef struct CPUBfinState {
     CPU_COMMON
     int personality;
 
@@ -104,11 +104,11 @@ typedef struct CPUBFINState {
     uint32_t astat[32];
     /* ASTAT delayed helpers */
     uint32_t astat_op, astat_arg[3];
-} CPUBFINState;
+} CPUBfinState;
 #define spreg preg[6]
 #define fpreg preg[7]
 
-static inline uint32_t bfin_astat_read(CPUState *env)
+static inline uint32_t bfin_astat_read(CPUArchState *env)
 {
     unsigned int i, ret;
 
@@ -119,7 +119,7 @@ static inline uint32_t bfin_astat_read(CPUState *env)
     return ret;
 }
 
-static inline void bfin_astat_write(CPUState *env, uint32_t astat)
+static inline void bfin_astat_write(CPUArchState *env, uint32_t astat)
 {
     unsigned int i;
     for (i = 0; i < 32; ++i)
@@ -156,7 +156,7 @@ enum astat_ops {
 typedef void (*hwloop_callback)(struct DisasContext *dc, int loop);
 
 typedef struct DisasContext {
-    CPUState *env;
+    CPUArchState *env;
     struct TranslationBlock *tb;
     /* The current PC we're decoding (could be middle of parallel insn) */
     target_ulong pc;
@@ -177,9 +177,9 @@ typedef struct DisasContext {
     int mem_idx;
 } DisasContext;
 
-void do_interrupt(CPUState *env);
-CPUState *cpu_init(const char *cpu_model);
-int cpu_exec(CPUState *s);
+void do_interrupt(CPUArchState *env);
+CPUArchState *cpu_init(const char *cpu_model);
+int cpu_exec(CPUArchState *s);
 int cpu_bfin_signal_handler(int host_signum, void *pinfo, void *puc);
 
 extern const char * const greg_names[];
@@ -188,12 +188,12 @@ extern const char *get_allreg_name(int grp, int reg);
 #define MMU_KERNEL_IDX 0
 #define MMU_USER_IDX   1
 
-int cpu_bfin_handle_mmu_fault(CPUState *env, target_ulong address, int rw,
+int cpu_bfin_handle_mmu_fault(CPUArchState *env, target_ulong address, int rw,
                               int mmu_idx);
 #define cpu_handle_mmu_fault cpu_bfin_handle_mmu_fault
 
 #if defined(CONFIG_USER_ONLY)
-static inline void cpu_clone_regs(CPUState *env, target_ulong newsp)
+static inline void cpu_clone_regs(CPUArchState *env, target_ulong newsp)
 {
     if (newsp)
         env->spreg = newsp;
@@ -201,13 +201,14 @@ static inline void cpu_clone_regs(CPUState *env, target_ulong newsp)
 #endif
 
 #include "cpu-all.h"
+#include "cpu-qom.h"
 
-static inline int cpu_has_work(CPUState *env)
+static inline int cpu_has_work(CPUArchState *env)
 {
     return (env->interrupt_request & (CPU_INTERRUPT_HARD | CPU_INTERRUPT_NMI));
 }
 
-static inline int cpu_halted(CPUState *env)
+static inline int cpu_halted(CPUArchState *env)
 {
     if (!env->halted)
         return 0;
@@ -220,17 +221,17 @@ static inline int cpu_halted(CPUState *env)
 
 #include "exec-all.h"
 
-static inline void cpu_pc_from_tb(CPUState *env, TranslationBlock *tb)
+static inline void cpu_pc_from_tb(CPUArchState *env, TranslationBlock *tb)
 {
     env->pc = tb->pc;
 }
 
-static inline target_ulong cpu_get_pc(CPUState *env)
+static inline target_ulong cpu_get_pc(CPUArchState *env)
 {
     return env->pc;
 }
 
-static inline void cpu_get_tb_cpu_state(CPUState *env, target_ulong *pc,
+static inline void cpu_get_tb_cpu_state(CPUArchState *env, target_ulong *pc,
                                         target_ulong *cs_base, int *flags)
 {
     *pc = cpu_get_pc(env);

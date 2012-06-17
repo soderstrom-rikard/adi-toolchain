@@ -1,7 +1,7 @@
 /*
  * Blackfin helpers
  *
- * Copyright 2007-2011 Mike Frysinger
+ * Copyright 2007-2012 Mike Frysinger
  * Copyright 2007-2011 Analog Devices, Inc.
  *
  * Licensed under the Lesser GPL 2 or later.
@@ -22,12 +22,12 @@
 
 #if defined(CONFIG_USER_ONLY)
 
-void do_interrupt(CPUState *env)
+void do_interrupt(CPUArchState *env)
 {
     env->exception_index = -1;
 }
 
-int cpu_bfin_handle_mmu_fault(CPUState *env, target_ulong address, int rw,
+int cpu_bfin_handle_mmu_fault(CPUArchState *env, target_ulong address, int rw,
                               int mmu_idx)
 {
     env->exception_index = EXCP_DCPLB_VIOLATE;
