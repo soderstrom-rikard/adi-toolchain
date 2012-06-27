@@ -149,11 +149,11 @@ cat  <<EOF
 ************** Tested toolchain svn info ***************
 `cd toolchain ; svn up; svn info `
 ************** Tested U-Boot git info ******************
-`cd $SRC_ROOT/u-boot; echo -n "U-Boot "; git fetch ; git remote -v; git branch -a; git log -1`
+`cd u-boot; echo -n "U-Boot "; git pull ; git remote -v; git branch -a; git log -1`
 ************* Tested uclinux-dist svn info *************
 `cd uclinux-dist ;svn up ; svn info` 
 ************* Tested linux git info ********************
-`cd uclinux-dist/linux-2.6.x ;echo -n "linux "; git fetch ; git remote -v; git branch -a; git log -1 `
+`cd uclinux-dist/linux-2.6.x ;echo -n "linux "; git pull ; git remote -v;git branch -a; git log -1 `
 
 EOF
 elif  [ `[ -d kernel ] && ls -al kernel | grep ^d | grep -c .git` -gt 0 ] ; then
@@ -166,11 +166,11 @@ cat  <<EOF
 ************** Tested toolchain svn info ***************
 `cd $SRC_ROOT/toolchain ;svn up; svn info`
 ************** Tested U-Boot git info ******************
-`cd $SRC_ROOT/u-boot; echo -n "U-Boot "; git fetch ; git remote -v; git branch -a; git log -1`
+`cd $SRC_ROOT/u-boot; echo -n "U-Boot "; git pull ; git remote -v; git branch -a; git log -1`
 ************* Tested Buildroot git info *************
-`cd $SRC_ROOT/kernel; echo -n "Buildroot "; git fetch; git remote -v; git branch -a; git log -1`
+`cd $SRC_ROOT/kernel; echo -n "Buildroot "; git pull; git remote -v; git branch -a; git log -1`
 ************* Tested linux git info ********************
-`cd $SRC_ROOT/kernel/linux/linux*; echo -n "Kernel "; git fetch; git remote -v; git branch -a; git log -1`
+`cd $SRC_ROOT/kernel/linux/linux*; echo -n "Kernel "; git pull; git remote -v; git branch -a; git log -1`
 
 EOF
 else
@@ -278,7 +278,7 @@ sleep 20
   ./toolchain-regtest -s $CHECKOUT/toolchain -o $TEST_TOOLCHAIN_DIR/bfin -b $USER/temp/regtest_build$TOOLCHAIN_VERSION -t uclinux -T $TARGET_IP -a -L
   find $USER/temp/regtest_build$TOOLCHAIN_VERSION/.  -maxdepth 1 -type d -regex .*build\[-0-9.\]*  -exec mv {} {}-uclinux \;
 
-  $TOOLCHAIN_SCRIPTS/reset_board.exp uImage.$TARGET_KERNEL_CONFIG   >/dev/null  2>&1
+ # $TOOLCHAIN_SCRIPTS/reset_board.exp uImage.$TARGET_KERNEL_CONFIG   >/dev/null  2>&1
   sleep 200
 
   ./toolchain-regtest -s $CHECKOUT/toolchain -o $TEST_TOOLCHAIN_DIR/bfin -b $USER/temp/regtest_build$TOOLCHAIN_VERSION -t linux-uclibc -T $TARGET_IP -a -L   # \!gdb   
