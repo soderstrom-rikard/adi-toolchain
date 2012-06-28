@@ -351,7 +351,7 @@ dorshq()
 {
 	# a simplified version of dorsh that doesn't provide any output
 	# and is less prone to sticking with the board in a bad state.
-	rsh -l root ${TARGET_IPADDR} "$@" &> /dev/null
+	rsh -l root ${TARGET_IPADDR} "$@" > /dev/null 2>&1
 }
 run_rsh_nodie_stdout()
 {
