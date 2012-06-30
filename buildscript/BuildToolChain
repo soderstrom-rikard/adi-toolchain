@@ -701,48 +701,20 @@ build_gcc()
 	run_cmd rm -f \
 		$DIR_GCC_SOURCE/newlib \
 		$DIR_GCC_SOURCE/libgloss \
-		$DIR_GCC_SOURCE/mpfr \
-		$DIR_GCC_SOURCE/gmp \
-		$DIR_GCC_SOURCE/mpc \
-		$DIR_GCC_SOURCE/ppl \
-		$DIR_GCC_SOURCE/cloog \
 		${prefix}/${target}/sys-include
 	run_cmd ln -s runtime/usr/include ${prefix}/${target}/sys-include
 
-	epdir="$DIR_GCC_SOURCE/../gmp"
-	if [ -e "${epdir}"  ] ; then
-		epver=`"${epdir}"/configure --version | head -n1 | awk '{print $NF}'`
-		echo_date "${target}: gcc: linking gmp (${epver})"
-		run_cmd ln -snf ../gmp $DIR_GCC_SOURCE/
-	fi
-
-	epdir="$DIR_GCC_SOURCE/../mpfr"
-	if [ -e "${epdir}" ] ; then
-		epver=`"${epdir}"/configure --version | head -n1 | awk '{print $NF}'`
-		echo_date "${target}: gcc: linking mpfr (${epver})"
-		run_cmd ln -snf ../mpfr $DIR_GCC_SOURCE/
-	fi
-
-	epdir="$DIR_GCC_SOURCE/../mpc"
-	if [ -e "${epdir}"  ] ; then
-		epver=`"${epdir}"/configure --version | head -n1 | awk '{print $NF}'`
-		echo_date "${target}: gcc: linking mpc (${epver})"
-		run_cmd ln -snf ../mpc $DIR_GCC_SOURCE/
-	fi
-
-	epdir="$DIR_GCC_SOURCE/../ppl"
-	if [ -e "${epdir}" ] ; then
-		epver=`"${epdir}"/configure --version | head -n1 | awk '{print $NF}'`
-		echo_date "${target}: gcc: linking ppl (${epver})"
-		run_cmd ln -snf ../ppl $DIR_GCC_SOURCE/
-	fi
-
-	epdir="$DIR_GCC_SOURCE/../cloog"
-	if [ -e "${epdir}" ] ; then
-		epver=`"${epdir}"/configure --version | head -n1 | awk '{print $NF}'`
-		echo_date "${target}: gcc: linking cloog (${epver})"
-		run_cmd ln -snf ../cloog $DIR_GCC_SOURCE/
-	fi
+	local epkg
+	for epkg in gmp mpfr mpc ppl cloog ; do
+		run_cmd rm -f "${DIR_GCC_SOURCE}/${epkg}"
+		epdir="${DIR_GCC_SOURCE}/../${epkg}"
+		if [ -e "${epdir}"  ] ; then
+			epver=`"${epdir}"/configure --version | head -n1 | awk '{print $NF}'`
+			echo_date "${target}: gcc: linking ${epkg} (${epver})"
+			run_cmd ln -snf ../${epkg} "${DIR_GCC_SOURCE}"/
+			touch_tree "${epdir}"
+		fi
+	done
 
 	case ${target} in
 	bfin-elf)
