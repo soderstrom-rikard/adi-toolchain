@@ -79,8 +79,8 @@ CPUArchState *cpu_init(const char *cpu_model)
     cpu = BFIN_CPU(object_new(TYPE_BFIN_CPU));
     env = &cpu->env;
 
-    cpu_exec_init(env);
     cpu_reset(CPU(cpu));
+    qemu_init_vcpu(env);
 
     if (tcg_initialized)
         return env;
