@@ -20,6 +20,12 @@ check: all
 sim: $(SIM)
 	@fail=0 pass=0 ; \
 	timeout=`which timeout 2>/dev/null` && timeout+=" 10s" ; \
+	if addr=`cat /proc/sys/vm/mmap_min_addr 2>/dev/null` ; then \
+		if [ $$addr -ne 0 ] ; then \
+			printf '\n$(RED)Please run: sudo sysctl vm.mmap_min_addr=0$(NORMAL)\n\n' ; \
+			exit 1 ; \
+		fi ; \
+	fi ; \
 	rm -f $@.log ; \
 	for x in $^ ; do \
 		xx="$$timeout $(QEMU_USER) $$x" ; \
@@ -42,7 +48,8 @@ sim: $(SIM)
 		printf '%s\n%s: %s\n\n' "$$out" "$$res" $$x >> $@.log ; \
 		echo "$$cres: $$x" ; \
 	done ; \
-	printf '$(BLUE)SUMMARY$(NORMAL): %i/%i tests passed\n' $$pass $$(( pass + fail )) ; \
+	printf '$(BLUE)SUMMARY$(NORMAL): %i/%i tests passed (see %s for details)\n' \
+		$$pass $$(( pass + fail )) "`pwd`/$@.log" ; \
 	exit $$(( fail != 0 ))
 
 jtag: $(JTAG)
