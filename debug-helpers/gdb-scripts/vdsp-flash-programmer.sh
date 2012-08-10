@@ -37,6 +37,8 @@ info "Launching gdb"
 tmp=$(mktemp)
 cat << EOF > "${tmp}"
 
+set pagination off
+
 # Connect to the target
 target remote localhost:2000
 # Do it again for BF54x (hardware error needs clearing)
