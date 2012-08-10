@@ -278,7 +278,7 @@ define flrestore
 		else
 			set $stride = 1
 		end
-		set $max = $off + $len
+		set $max = $off + $len - 1
 
 		printf "Restoring %#x to %#x (%i bytes)\n", $off, $max, $len
 
@@ -309,6 +309,7 @@ define flrestore
 		set $i = AFP_Size
 		set $o = $off
 		set $O = $o
+		set $max = $max + 1
 		while $o < $max
 			if $o + $i > $max
 				set $i = $max - $o
@@ -371,7 +372,7 @@ define fldump
 		end
 		set $MAX = ((unsigned long *)AFP_SectorInfo)[AFP_NumSectors * 2 - 1]
 		if $argc > 2
-			set $max = $arg2
+			set $max = $O + $arg2
 		else
 			set $max = $MAX - $O
 		end
@@ -383,7 +384,7 @@ define fldump
 		set $o = $O
 		set $i = AFP_Size
 
-		printf "Dumping %#x to %#x (%#x bytes)\n", $o, $max, ($max - $O)
+		printf "Dumping %#x to %#x (%#x bytes)\n", $o, ($max - 1), ($max - $O)
 		shell rm -f $arg0
 		while $o < $max
 			if $o + $i > $max
