@@ -55,7 +55,7 @@ load
 source ${0%/*}/u-boot
 
 # Zero out the BSS(s)
-$(eval `${cross}readelf -l "${drv}" | awk '$1 == "LOAD" && $5 != $6 { print "echo mwl $(("$3"+"$5")) 0 $((("$6"-"$5")/4))" }'`)
+$(eval `${cross}readelf -l "${drv}" | awk '$1 == "LOAD" && $5 != $6 { print "echo mwl $(("$3"+"$5")) 0 $((("$6"-"$5")/4));" }'`)
 sanity_check_hwerr
 
 # Clear all breakpoints
