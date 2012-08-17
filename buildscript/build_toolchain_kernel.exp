@@ -84,6 +84,26 @@ send ".\r"
 expect ":"
 sleep 1
 
+send "/date\r"
+while 1 {
+    expect {
+        "Pattern not found" { break }
+        -re "date" {
+            send "d\r"
+            break
+        }
+        timeout { break }
+    }
+}
+expect ":"
+send "i\r"
+sleep 1
+send "date -s 2012.01.14-17:15:10\r"
+sleep 1
+send ".\r"
+expect ":"
+sleep 1
+
 send "/uptime\r"
 while 1 {
     expect {
