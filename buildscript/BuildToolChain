@@ -1198,7 +1198,8 @@ build_uclibc_core()
 	run_cmd $MAKE $ARGS -j 1
 
 	echo_date "${target}: uClibc: installing"
-	run_cmd $MAKE $ARGS install DESTDIR="${sysroot}" SUFFIX=${mlib1}
+	run_cmd $MAKE $ARGS install DESTDIR="${sysroot}" PREFIX="${sysroot}/${mlib1}"
+#	run_cmd $MAKE $ARGS install DESTDIR="${sysroot}" SUFFIX=${mlib1} PREFIX="${sysroot}/${mlib1}"
 
 	# Need a way to look at uClibc make system , and see what libs
 	# should be created
@@ -1241,6 +1242,7 @@ build_uclibc_config()
 	done
 	set_opt KERNEL_HEADERS \"$DIR_KBUILD_OUTPUT/usr/include\"
 	set_opt MULTILIB \"${mlib}\"
+	set_opt MULTILIB_DIR \"lib/${mlib}\"
 	set_opt UCLIBC_EXTRA_CFLAGS \"${extra_cflags} ${UCLIBC_CFLAGS} -Wa,--noexecstack\"
 	set_opt RUNTIME_PREFIX \"/\"
 	set_opt DEVEL_PREFIX \"/usr/\"
