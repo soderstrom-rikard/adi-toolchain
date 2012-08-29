@@ -12,3 +12,10 @@ config FORCE_OPTIONS_FOR_ARCH
 	default y
 	select ARCH_LITTLE_ENDIAN
 	select ARCH_HAS_NO_MMU
+
+config PHY_RAM_BASE_ADDRESS
+	hex "Physical RAM Base address"
+	default 0
+	help
+	  set physical RAM base address for fixed atomic functions.
+	  Some blackfin board has physical RAM start from non zero address.
