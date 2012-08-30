@@ -149,6 +149,11 @@
                id="com.analog.gnu.toolchain.blackfin.assembler.base"
                isAbstract="true"
                superClass="cdt.managedbuild.tool.gnu.assembler">
+			<option
+				command="-mcpu=${value}"
+				id="com.analog.gnu.toolchain.blackfin.c.assembler.options.proc"
+				valueType="string">
+			</option>
          </tool>
          <tool
                id="com.analog.gnu.toolchain.blackfin.c.compiler.base"
@@ -222,7 +227,7 @@
       <toolChain
             archList="all"
             id="com.analog.gnu.toolchain.blackfin.toolchain.bfin.elf.base"
-            name="Blackfin Bare Metal (bfin-elf)"
+            name="Blackfin Bare Metal GNU Toolchain (bfin-elf)"
             superClass="com.analog.gnu.toolchain.blackfin.bfin"
             targetTool="cdt.managedbuild.tool.gnu.c.linker;cdt.managedbuild.tool.gnu.cpp.linker;cdt.managedbuild.tool.gnu.archiver">
          <tool
@@ -281,7 +286,7 @@
       <toolChain
             archList="all"
             id="com.analog.gnu.toolchain.blackfin.toolchain.bfin.uclinux.base"
-            name="Blackfin Linux FLAT (bfin-uclinux)"
+            name="Blackfin Linux FLAT GNU Toolchain (bfin-uclinux)"
             superClass="com.analog.gnu.toolchain.blackfin.bfin"
             targetTool="cdt.managedbuild.tool.gnu.c.linker;cdt.managedbuild.tool.gnu.cpp.linker;cdt.managedbuild.tool.gnu.archiver">
          <tool
@@ -346,11 +351,17 @@
                   valueType="boolean">
             </option>
          </tool>
+         <tool
+               command="bfin-uclinux-ldr"
+               id="com.analog.gnu.toolchain.blackfin.uclinux.ldr"
+               isAbstract="false"
+               superClass="com.analog.gnu.toolchain.blackfin.ldr.base">
+         </tool>
       </toolChain>
       <toolChain
             archList="all"
             id="com.analog.gnu.toolchain.blackfin.toolchain.bfin.linux.uclibc.base"
-            name="Blackfin Linux FDPIC (bfin-linux-uclibc)"
+            name="Blackfin Linux FDPIC GNU Toolchain (bfin-linux-uclibc)"
             superClass="com.analog.gnu.toolchain.blackfin.bfin"
             targetTool="cdt.managedbuild.tool.gnu.c.linker;cdt.managedbuild.tool.gnu.cpp.linker;cdt.managedbuild.tool.gnu.archiver">
          <tool
@@ -398,6 +409,12 @@
                id="com.analog.gnu.toolchain.blackfin.linux.uclibc.cpp.linker"
                name="Blackfin FDPIC C++ Linker"
                superClass="com.analog.gnu.toolchain.blackfin.cpp.linker.base">
+         </tool>
+         <tool
+               command="bfin-linux-uclibc-ldr"
+               id="com.analog.gnu.toolchain.blackfin.linux.uclibc.ldr"
+               isAbstract="false"
+               superClass="com.analog.gnu.toolchain.blackfin.ldr.base">
          </tool>
       </toolChain>
       <projectType
@@ -792,7 +809,7 @@
             delegate="com.analog.gnu.toolchain.blackfin.debug.gdbjtag.GDBJtagLaunchConfigurationDelegate"
             id="gdb.app.elf.launchConfigurationType"
             modes="debug"
-            name="Blackfin Bare Metal Application (ELF) on JTAG Device"
+            name="Blackfin GNU Toolchain Bare Metal Application (ELF) on JTAG Device"
             public="true"
             sourceLocatorId="org.eclipse.cdt.debug.core.sourceLocator"
             sourcePathComputerId="org.eclipse.cdt.debug.core.sourcePathComputer">
@@ -801,7 +818,7 @@
             delegate="com.analog.gnu.toolchain.blackfin.debug.gdbjtag.GDBJtagLaunchConfigurationDelegate"
             id="gdb.app.elf.sim.launchConfigurationType"
             modes="debug"
-            name="Blackfin Bare Metal Application (ELF) on Simulator"
+            name="Blackfin GNU Toolchain Bare Metal Application (ELF) on Simulator"
             public="true"
             sourceLocatorId="org.eclipse.cdt.debug.core.sourceLocator"
             sourcePathComputerId="org.eclipse.cdt.debug.core.sourcePathComputer">
@@ -810,7 +827,7 @@
             delegate="com.analog.gnu.toolchain.blackfin.debug.gdbjtag.GDBJtagLaunchConfigurationDelegate"
             id="gdb.kernel.elf.launchConfigurationType"
             modes="debug"
-            name="Blackfin Linux Kernel (ELF)"
+            name="Blackfin GNU Toolchain Linux Kernel (ELF)"
             public="true"
             sourceLocatorId="org.eclipse.cdt.debug.core.sourceLocator"
             sourcePathComputerId="org.eclipse.cdt.debug.core.sourcePathComputer">
@@ -819,7 +836,7 @@
             delegate="com.analog.gnu.toolchain.blackfin.debug.gdbjtag.GDBJtagLaunchConfigurationDelegate"
             id="gdb.app.flat.launchConfigurationType"
             modes="debug"
-            name="Blackfin Linux Application (FLAT)"
+            name="Blackfin GNU Toolchain Linux Application (FLAT)"
             public="true"
             sourceLocatorId="org.eclipse.cdt.debug.core.sourceLocator"
             sourcePathComputerId="org.eclipse.cdt.debug.core.sourcePathComputer">
@@ -828,7 +845,7 @@
             delegate="com.analog.gnu.toolchain.blackfin.debug.gdbjtag.GDBJtagLaunchConfigurationDelegate"
             id="gdb.kernel.flat.launchConfigurationType"
             modes="debug"
-            name="Blackfin Linux Kernel (FLAT)"
+            name="Blackfin GNU Toolchain Linux Kernel (FLAT)"
             public="true"
             sourceLocatorId="org.eclipse.cdt.debug.core.sourceLocator"
             sourcePathComputerId="org.eclipse.cdt.debug.core.sourcePathComputer">
@@ -837,7 +854,7 @@
             delegate="com.analog.gnu.toolchain.blackfin.debug.gdbjtag.GDBJtagLaunchConfigurationDelegate"
             id="gdb.app.fdpic.launchConfigurationType"
             modes="debug"
-            name="Blackfin Linux Application (FDPIC)"
+            name="Blackfin GNU Toolchain Linux Application (FDPIC)"
             public="true"
             sourceLocatorId="org.eclipse.cdt.debug.core.sourceLocator"
             sourcePathComputerId="org.eclipse.cdt.debug.core.sourcePathComputer">
@@ -880,7 +897,7 @@
    <extension
          point="org.eclipse.debug.ui.launchShortcuts">
       <shortcut
-            label="Blackfin Linux Application (FLAT)"
+            label="Blackfin GNU Toolchain Linux Application (FLAT)"
             icon="icons/obj16/vdsp.gif"
             modes="run, debug"
             class="com.analog.gnu.toolchain.blackfin.launcher.FLATLaunchShortcut"
@@ -925,7 +942,7 @@
    <extension
          point="org.eclipse.debug.ui.launchShortcuts">
       <shortcut
-            label="Blackfin Linux Application (FDPIC)"
+            label="Blackfin GNU Toolchain Linux Application (FDPIC)"
             icon="icons/obj16/vdsp.gif"
             modes="run, debug"
             class="com.analog.gnu.toolchain.blackfin.launcher.FDPICLaunchShortcut"
@@ -970,7 +987,7 @@
    <extension
          point="org.eclipse.debug.ui.launchShortcuts">
       <shortcut
-            label="Blackfin Bare Metal Application (ELF) on JTAG Device"
+            label="Blackfin GNU Toolchain Bare Metal Application (ELF) on JTAG Device"
             icon="icons/obj16/vdsp.gif"
             modes="run, debug"
             class="com.analog.gnu.toolchain.blackfin.launcher.ELFLaunchShortcut"
@@ -1015,7 +1032,7 @@
    <extension
          point="org.eclipse.debug.ui.launchShortcuts">
       <shortcut
-            label="Blackfin Bare Metal Application (ELF) on Simulator"
+            label="Blackfin GNU Toolchain Bare Metal Application (ELF) on Simulator"
             icon="icons/obj16/vdsp.gif"
             modes="run, debug"
             class="com.analog.gnu.toolchain.blackfin.launcher.ELFSimLaunchShortcut"

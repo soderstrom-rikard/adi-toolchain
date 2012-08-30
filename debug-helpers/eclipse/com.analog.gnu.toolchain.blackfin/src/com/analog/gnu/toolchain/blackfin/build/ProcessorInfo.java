@@ -55,6 +55,9 @@ public class ProcessorInfo {
 	/** The IDDE xml filename to parse */
 	static final private String XML_FILENAME = "GnuToolchainProcessorInfo.xml";
 
+	/** The processor number of cores attribute used in getProcessorNumberOfCores() */
+	static final public String NUMBER_OF_CORES = "numberOfCores";
+
 	/**
 	 * This is the constructor that parses the ADSP-IDDE.xml file.
 	 */
@@ -84,6 +87,46 @@ public class ProcessorInfo {
 	 */
 	public final ArrayList<String> getAllProcessors() {
 		return getValuesForExpression("//processor/@name", xmlDoc);
+	}
+
+	/**
+	 * @param processor the processor name
+	 * @return the number of cores for that processor
+	 */
+	public final int getProcessorNumberOfCores(String processor) {
+		try	{
+			return Integer.parseInt(getValueForExpression(
+					"//processor[@name='" + processor + "']/@" + NUMBER_OF_CORES, xmlDoc));
+		}
+		catch(NumberFormatException nfe)	{
+			Utility.logError(Activator.getDefault(), "Error getting number of cores for " + processor, nfe);
+			return -1;
+		}
+	}
+
+	/**
+	 * A private helper method that returns the resulting string value for the
+	 * specified XPath expression.
+	 * 
+	 * @param expression the XPath query to execute
+	 * @param xmlDoc the XML document to query
+	 * @return The value of the query
+	 */
+	private String getValueForExpression(String expression, Document xmlDoc) {
+
+		String value = "";
+
+		try {
+			value = (String) xpathEvaluator.evaluate(expression, xmlDoc, XPathConstants.STRING);
+
+		}
+		catch (XPathExpressionException exception) {
+			Utility.logError(Activator.getDefault(),
+				"Failed to load attribute from product configuration file with expression: "
+					+ expression, exception);
+		}
+
+		return value;
 	}
 
 	/**
