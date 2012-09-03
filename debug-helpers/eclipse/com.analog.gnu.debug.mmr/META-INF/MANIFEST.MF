@@ -2,17 +2,16 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Memory Mapped Registers View
 Bundle-SymbolicName: com.analog.gnu.debug.mmr;singleton:=true
-Bundle-Version: 1.0.4
+Bundle-Version: 1.0.6.qualifier
 Bundle-Activator: com.analog.gnu.debug.core.registers.MMRViewUIPlugin
 Bundle-Vendor: Analog Devices, Inc.
-Bundle-Localization: plugin
-Bundle-RequiredExecutionEnvironment: J2SE-1.5
+Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Require-Bundle: org.eclipse.ui,
  org.eclipse.core.runtime,
  org.eclipse.debug.core,
  org.eclipse.debug.ui,
  org.eclipse.ui.workbench.texteditor
-Eclipse-LazyStart: true
+Bundle-ActivationPolicy: lazy
 Export-Package: com.analog.gnu.debug,
  com.analog.gnu.debug.core.registers,
  com.analog.gnu.debug.ui.views,
