@@ -1199,7 +1199,6 @@ build_uclibc_core()
 
 	echo_date "${target}: uClibc: installing"
 	run_cmd $MAKE $ARGS install DESTDIR="${sysroot}" PREFIX="${sysroot}/${mlib1}"
-#	run_cmd $MAKE $ARGS install DESTDIR="${sysroot}" SUFFIX=${mlib1} PREFIX="${sysroot}/${mlib1}"
 
 	# Need a way to look at uClibc make system , and see what libs
 	# should be created
