@@ -523,6 +523,10 @@ while 1 {
             send -s "Y\r"
         }
 
+        -re "ftp.*USER_INETUTILS_FTP.*\\\[.*]" {
+            send -s "Y\r"
+        }
+
         -re "mtd-utils.*USER_MTDUTILS.*\\\[.*]" {
             send -s "N\r"
         }
@@ -533,6 +537,10 @@ while 1 {
 
         -re "mke2fs.*USER_E2FSPROGS_MISC_MKE2FS.*\\\[.*]" {
             send -s "N\r"
+        }
+
+        -re "ftp.*USER_FTP_FTP_FTP.*\\\[.*]" {
+            send "N\r"
         }
 
         -re "strace.*USER_STRACE_STRACE.*\\\[.*]" {
