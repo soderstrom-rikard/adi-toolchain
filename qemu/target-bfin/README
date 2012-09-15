@@ -6,7 +6,7 @@ There are some things we don't bother handling in the port for speed reasons.
 If you want an accurate (but not as fast) simulator, then use the GNU sim as
 found in the GNU toolchain (part of gdb).
 
-Things we do not handle by design:
+Things we do not currently handle by design:
 
 	- invalid parallel instruction combinations
 		- no toolchain will output these

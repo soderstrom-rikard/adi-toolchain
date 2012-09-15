@@ -26,7 +26,9 @@ sim: $(SIM)
 			exit 1 ; \
 		fi ; \
 	fi ; \
+	[ "$(PWD)" == "`pwd`" ] && pwd="" || pwd="`pwd`/" ; \
 	rm -f $@.log ; \
+	printf 'Logging to $(BLUE)%s$(NORMAL)\n' "$${pwd}$@.log" ; \
 	for x in $^ ; do \
 		xx="$$timeout $(QEMU_USER) $$x" ; \
 		x=$${x%.x} ; \
@@ -49,7 +51,7 @@ sim: $(SIM)
 		echo "$$cres: $$x" ; \
 	done ; \
 	printf '$(BLUE)SUMMARY$(NORMAL): %i/%i tests passed (see %s for details)\n' \
-		$$pass $$(( pass + fail )) "`pwd`/$@.log" ; \
+		$$pass $$(( pass + fail )) "$${pwd}$@.log" ; \
 	exit $$(( fail != 0 ))
 
 jtag: $(JTAG)

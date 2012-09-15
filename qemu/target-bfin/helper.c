@@ -27,8 +27,8 @@ void do_interrupt(CPUArchState *env)
     env->exception_index = -1;
 }
 
-int cpu_bfin_handle_mmu_fault(CPUArchState *env, target_ulong address, int rw,
-                              int mmu_idx)
+int cpu_handle_mmu_fault(CPUArchState *env, target_ulong address, int rw,
+                         int mmu_idx)
 {
     env->exception_index = EXCP_DCPLB_VIOLATE;
     return 1;
