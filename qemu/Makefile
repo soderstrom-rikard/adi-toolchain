@@ -14,8 +14,10 @@ config-host.mak: $(SRC_PATH)/configure
 	@sed -n "/.*Configured with/s/[^:]*: //p" $@ | sh
 else
 config-host.mak:
+ifeq ($(findstring clean,$(MAKECMDGOALS)),)
 	@echo "Please call configure before running make!"
 	@exit 1
+endif
 endif
 
 GENERATED_HEADERS = config-host.h trace.h qemu-options.def
@@ -398,7 +400,9 @@ qemu-doc.dvi qemu-doc.html qemu-doc.info qemu-doc.pdf: \
 
 # Add a dependency on the generated files, so that they are always
 # rebuilt before other object files
+ifeq ($(findstring clean,$(MAKECMDGOALS)),)
 Makefile: $(GENERATED_HEADERS)
+endif
 
 # Include automatically generated dependency files
 # Dependencies in Makefile.objs files come from our recursive subdir rules
