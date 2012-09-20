@@ -1493,7 +1493,7 @@ build_urjtag()
 
 	build_autotooled_pkg "${DIR_URJTAG_SOURCE}" \
 		--disable-shared --enable-static --enable-relocatable \
-		--with-libusb=1.0
+		--with-libusb=1.0 --disable-python
 }
 
 build_gdbproxy()
