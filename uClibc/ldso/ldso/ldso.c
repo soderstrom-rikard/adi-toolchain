@@ -464,11 +464,13 @@ void *_dl_get_ready_to_run(struct elf_resolve *tpnt, DL_LOADADDR_TYPE load_addr,
 		_dl_progname = argv[0];
 	}
 
+#if 0
 #ifndef __LDSO_STANDALONE_SUPPORT__
 	if (_start == (void *) auxvt[AT_ENTRY].a_un.a_val) {
 		_dl_dprintf(_dl_debug_file, "Standalone execution is not enabled\n");
 		_dl_exit(1);
 	}
+#endif
 #endif
 
 	/* Start to build the tables of the modules that are required for
