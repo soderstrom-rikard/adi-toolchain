@@ -334,7 +334,9 @@
 
 /* When a reference to SYMBOL is encountered, the linker will emit a
    warning message MSG.  */
-#define link_warning(symbol, msg) \
+#define link_warning(symbol, msg) link_warning2(C_SYMBOL_NAME(symbol), msg)
+#define link_warning2(symbol, msg) link_warning3(symbol, msg)
+#define link_warning3(symbol, msg) \
   __make_section_unallocated (".gnu.warning." #symbol) \
   static const char __evoke_link_warning_##symbol[]	\
     __attribute__ ((used, section (".gnu.warning." #symbol __sec_comment))) \
