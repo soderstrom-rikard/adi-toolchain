@@ -1165,3 +1165,15 @@ extern const char __pthread_provide_wrappers;
 static const char *const __pthread_require_wrappers =
   &__pthread_provide_wrappers;
 #endif
+
+/* If pthread_create is present, libgcc_eh.a and libsupc++.a expects some other POSIX thread
+   functions to be present as well.  */
+PTHREAD_STATIC_FN_REQUIRE (pthread_mutex_lock)
+PTHREAD_STATIC_FN_REQUIRE (pthread_mutex_unlock)
+
+PTHREAD_STATIC_FN_REQUIRE (pthread_once)
+PTHREAD_STATIC_FN_REQUIRE (pthread_cancel)
+
+PTHREAD_STATIC_FN_REQUIRE (pthread_key_create)
+PTHREAD_STATIC_FN_REQUIRE (pthread_setspecific)
+PTHREAD_STATIC_FN_REQUIRE (pthread_getspecific)

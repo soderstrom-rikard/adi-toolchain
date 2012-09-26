@@ -532,4 +532,12 @@ extern void __linuxthreads_reap_event (void);
 
 extern int * __libc_pthread_init (const struct pthread_functions *functions);
 
+#ifndef PTHREAD_STATIC_FN_REQUIRE
+#ifdef SHARED
+# define PTHREAD_STATIC_FN_REQUIRE(name)
+#else
+# define PTHREAD_STATIC_FN_REQUIRE(name) __asm (".globl " #name);
+#endif
+#endif
+
 #endif /* internals.h */
