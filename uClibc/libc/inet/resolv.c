@@ -2616,7 +2616,7 @@ struct hostent *gethostbyname(const char *name)
 #endif
 }
 libc_hidden_def(gethostbyname)
-link_warning(gethostbyname, "gethostbyname is obsolescent, use getnameinfo() instead.");
+/*link_warning(gethostbyname, "gethostbyname is obsolescent, use getnameinfo() instead.");*/
 #endif /* L_gethostbyname */
 
 
