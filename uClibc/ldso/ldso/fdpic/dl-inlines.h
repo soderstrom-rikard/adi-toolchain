@@ -408,7 +408,7 @@ htab_find_slot(struct funcdesc_ht *htab, void *ptr, int insert)
 	return entry;
 }
 
-void *
+static __always_inline void *
 _dl_funcdesc_for (void *entry_point, void *got_value)
 {
 	struct elf_resolve *tpnt = ((void**)got_value)[2];
