@@ -479,14 +479,20 @@ extern int __pthread_attr_setguardsize __P ((pthread_attr_t *__attr,
 					     size_t __guardsize));
 extern int __pthread_attr_getguardsize __P ((__const pthread_attr_t *__attr,
 					     size_t *__guardsize));
+#if 0 /* uClibc: deprecated stuff disabled */
 extern int __pthread_attr_setstackaddr __P ((pthread_attr_t *__attr,
 					     void *__stackaddr));
 extern int __pthread_attr_getstackaddr __P ((__const pthread_attr_t *__attr,
 					     void **__stackaddr));
+#endif
 extern int __pthread_attr_setstacksize __P ((pthread_attr_t *__attr,
 					     size_t __stacksize));
 extern int __pthread_attr_getstacksize __P ((__const pthread_attr_t *__attr,
 					     size_t *__stacksize));
+extern int __pthread_attr_setstack __P ((pthread_attr_t *__attr,
+						 void *__stackaddr, size_t __stacksize));
+extern int __pthread_attr_getstack __P ((const pthread_attr_t *__attr,
+						 void **__stackaddr, size_t *__stacksize));
 extern int __pthread_getconcurrency __P ((void));
 extern int __pthread_setconcurrency __P ((int __level));
 extern void __pthread_kill_other_threads_np __P ((void));
