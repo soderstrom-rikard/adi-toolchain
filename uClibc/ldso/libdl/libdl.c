@@ -30,7 +30,6 @@
  */
 
 
-#include <ldso.h>
 #include <stdio.h>
 #include <string.h> /* Needed for 'strstr' prototype' */
 #include <stdbool.h>
@@ -50,6 +49,9 @@ extern void _dl_add_to_slotinfo(struct link_map  *l);
 __UCLIBC_MUTEX_STATIC(_dl_mutex, PTHREAD_RECURSIVE_MUTEX_INITIALIZER_NP);
 
 #ifdef SHARED
+
+#include <ldso.h>
+
 # if defined(USE_TLS) && USE_TLS
 # include <dl-tls.h>
 extern struct link_map *_dl_update_slotinfo(unsigned long int req_modid);
@@ -90,6 +92,10 @@ extern char *_dl_debug;
 
 #define _dl_malloc malloc
 #define _dl_free free
+
+#undef __SUPPORT_LD_DEBUG__
+
+#include <ldso.h>
 
 /* When libdl is linked as a static library, we need to replace all
  * the symbols that otherwise would have been loaded in from ldso... */

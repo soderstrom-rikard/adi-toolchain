@@ -14,6 +14,9 @@
 #ifdef SHARED
 #error "This file is not suitable for linking into dynamic libc"
 #else
+
+#define _dl_malloc malloc
+#define _dl_free free
 /* Include ldso symbols and functions used into static libc */
 #include "../../../ldso/ldso/dl-symbols.c"
 #endif
