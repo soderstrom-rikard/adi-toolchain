@@ -1400,7 +1400,13 @@ of this helper program; chances are you did not intend to run this program.\n\
 
 	/* Find the real malloc function and make ldso functions use that from now on */
 	_dl_malloc_function = (void* (*)(size_t)) (intptr_t) _dl_find_hash(__C_SYMBOL_PREFIX__ "malloc",
-			global_scope, NULL, ELF_RTYPE_CLASS_PLT, NULL);
+					global_scope, NULL,
+#ifdef __FDPIC__
+					ELF_RTYPE_CLASS_DLSYM
+#else
+					ELF_RTYPE_CLASS_PLT
+#endif
+					, NULL);
 
 #if defined(USE_TLS) && USE_TLS
 	/* Find the real functions and make ldso functions use them from now on */
