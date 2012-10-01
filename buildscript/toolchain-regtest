@@ -520,7 +520,7 @@ prepare_target()
 	if run_rsh_nodie_stdout ps | grep syslog | grep -q -v -e '-l 5' ; then
 		log_on_board "Setting syslogd"
 		run_rsh_nodie '> /var/log/messages'
-		run_rsh_nodie sed -i '"/^slog:/s:$: -l 5:"' /etc/inittab
+		run_rsh_nodie sed -i '"/\/sbin\/syslogd\ \-n/s:$: -l 5:"' /etc/inittab
 		run_rsh_nodie kill -HUP 1
 	fi
 
