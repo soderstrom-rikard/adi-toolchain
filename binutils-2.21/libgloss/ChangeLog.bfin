@@ -1,3 +1,10 @@
+2012-10-02  Stuart Henderson  <stuart.henderson@analog.com>
+
+	* bfin/bf606.ld: Change default memory map to core0.
+	* bfin/bf607.ld: Likewise.
+	* bfin/bf608.ld: Likewise.
+	* bfin/bf609.ld: Likewise.
+
 2012-06-14  Stuart Henderson  <stuart.henderson@analog.com>
 
 	* bfin/include/cdefBF606.h : Sync with CCES
