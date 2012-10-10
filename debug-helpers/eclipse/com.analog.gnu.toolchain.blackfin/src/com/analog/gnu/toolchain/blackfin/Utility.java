@@ -1,5 +1,5 @@
 /*******************************************************************************
- *  Copyright (c) 2010 Analog Devices, Inc.
+ *  Copyright (c) 2012 Analog Devices, Inc.
  *  All rights reserved. This program and the accompanying materials
  *  are made available under the terms of the Eclipse Public License v1.0
  *  which accompanies this distribution, and is available at
@@ -52,6 +52,9 @@ final public class Utility {
 	/** a regex that matches the compiler tool */
 	public final static String TOOLID_COMPILER = ".+\\.compiler(\\.\\d+)*";
 
+	/** a regex that matches the linker tool */
+	public final static String TOOLID_LINKER   = ".+\\.linker(\\.\\d+)*";
+
 	/** a regex that matches the processor switch option id */
 	public final static String OPTID_PROCESSOR = ".*\\.options\\.proc(\\.\\d+)*";
 	
@@ -68,7 +71,22 @@ final public class Utility {
 	private static final String ELF_GDB = "bfin-elf-gdb";
 	private static final String FLAT_GDB = "bfin-uclinux-gdb";
 	private static final String FDPIC_GDB = "bfin-linux-uclibc-gdb";
-	
+
+	/** ADSP-BF561 and ADSP-BF60x */
+	public static final String BF561 = "(?i)bf561";
+	public static final String BF60X = "(?i)bf60\\S*";
+
+	/** Ids for the Compiler and Linker Multi-core options */
+	public final static String OPTID_CPROJ_CC_MULTICORE_BF561   = ".*\\.c\\.compiler\\.options\\.mcore\\.bf561(\\.\\d+)*";
+	public final static String OPTID_CPROJ_LD_MULTICORE_BF561   = ".*\\.c\\.linker\\.options\\.mcore\\.bf561(\\.\\d+)*";
+	public final static String OPTID_CPPPROJ_CC_MULTICORE_BF561 = ".*\\.cpp\\.compiler\\.options\\.mcore\\.bf561(\\.\\d+)*";
+	public final static String OPTID_CPPPROJ_LD_MULTICORE_BF561 = ".*\\.cpp\\.linker\\.options\\.mcore\\.bf561(\\.\\d+)*";
+
+	public final static String OPTID_CPROJ_CC_MULTICORE   = ".*\\.c\\.compiler\\.options\\.mcore(\\.\\d+)*";
+	public final static String OPTID_CPROJ_LD_MULTICORE   = ".*\\.c\\.linker\\.options\\.mcore(\\.\\d+)*";
+	public final static String OPTID_CPPPROJ_CC_MULTICORE = ".*\\.cpp\\.compiler\\.options\\.mcore(\\.\\d+)*";
+	public final static String OPTID_CPPPROJ_LD_MULTICORE = ".*\\.cpp\\.linker\\.options\\.mcore(\\.\\d+)*";
+
 	/** Private constructor */
 	private Utility() { }
 	
@@ -146,7 +164,7 @@ final public class Utility {
 	}
 
 	/**
-	 * A simple helper method that retrives the IOption that
+	 * A simple helper method that retrieves the IOption that
 	 * matches the supplied ID
 	 * 
 	 * @param tool the tool to search
@@ -164,15 +182,81 @@ final public class Utility {
 	}
 
 	/**
+	 * Sets the default Multi-core option for ADSP-BF561 and ADSP-BF60x
+	 * 
+	 * @param cfg      The configuration
+	 * @param tool     The tool
+	 * @param procType The processor
+	 */
+	private static void setMultiCoreOptions(final IConfiguration cfg, final ITool tool, final String procType) {
+		// Set the default Multi-core option
+
+		if (procType.matches(BF561)) {
+			// Compiler tool
+			IOption opt = findOption(tool, OPTID_CPROJ_CC_MULTICORE_BF561);
+			if (opt != null) {
+				final String OPTID_CPROJ_MCOREA = "com.analog.gnu.toolchain.blackfin.c.compiler.options.mcorea";
+				ManagedBuildManager.setOption(cfg, tool, opt, OPTID_CPROJ_MCOREA);
+			}
+
+			opt = findOption(tool, OPTID_CPPPROJ_CC_MULTICORE_BF561);
+			if (opt != null) {
+				final String OPTID_CPPPROJ_MCOREA = "com.analog.gnu.toolchain.blackfin.cpp.compiler.options.mcorea";
+				ManagedBuildManager.setOption(cfg, tool, opt, OPTID_CPPPROJ_MCOREA);
+			}
+
+			// Linker tool
+			opt = findOption(tool, OPTID_CPROJ_LD_MULTICORE_BF561);
+			if (opt != null) {
+				final String OPTID_CPROJ_MCOREA = "com.analog.gnu.toolchain.blackfin.c.linker.options.mcorea";
+				ManagedBuildManager.setOption(cfg, tool, opt, OPTID_CPROJ_MCOREA);
+			}
+
+			opt = findOption(tool, OPTID_CPPPROJ_LD_MULTICORE_BF561);
+			if (opt != null) {
+				final String OPTID_CPPPROJ_MCOREA = "com.analog.gnu.toolchain.blackfin.cpp.linker.options.mcorea";
+				ManagedBuildManager.setOption(cfg, tool, opt, OPTID_CPPPROJ_MCOREA);
+			}
+		}
+		else if (procType.matches(BF60X)) {
+			// Compiler tool
+			IOption opt = findOption(tool, OPTID_CPROJ_CC_MULTICORE);
+			if (opt != null) {
+				final String OPTID_CPROJ_MCORE0 = "com.analog.gnu.toolchain.blackfin.c.compiler.options.mcore0";
+				ManagedBuildManager.setOption(cfg, tool, opt, OPTID_CPROJ_MCORE0);
+			}
+
+			opt = findOption(tool, OPTID_CPPPROJ_CC_MULTICORE);
+			if (opt != null) {
+				final String OPTID_CPPPROJ_MCORE0 = "com.analog.gnu.toolchain.blackfin.cpp.compiler.options.mcore0";
+				ManagedBuildManager.setOption(cfg, tool, opt, OPTID_CPPPROJ_MCORE0);
+			}
+
+			// Linker tool
+			opt = findOption(tool, OPTID_CPROJ_LD_MULTICORE);
+			if (opt != null) {
+				final String OPTID_CPROJ_MCORE0 = "com.analog.gnu.toolchain.blackfin.c.linker.options.mcore0";
+				ManagedBuildManager.setOption(cfg, tool, opt, OPTID_CPROJ_MCORE0);
+			}
+
+			opt = findOption(tool, OPTID_CPPPROJ_LD_MULTICORE);
+			if (opt != null) {
+				final String OPTID_CPPPROJ_MCORE0 = "com.analog.gnu.toolchain.blackfin.cpp.linker.options.mcore0";
+				ManagedBuildManager.setOption(cfg, tool, opt, OPTID_CPPPROJ_MCORE0);
+			}
+		}
+	}
+
+	/**
 	 * sets the processor and revision options for each tool in the tool chain
 	 * for each configuration in the project.
+	 * Also sets the default Multi-core options depending on processor
 	 * 
-	 * @param project Eclipse project to act upon
-	 * @param procType ADI processor type (e.g., "ADSP-21065L")
-	 * @param siRev silicon revision
+	 * @param project   Eclipse project to act upon
+	 * @param procType  ADI processor type (e.g., "ADSP-21065L")
+	 * @param siRev     silicon revision
 	 */
-	public static void setProcessorAndSiliconRevision(final IProject project, final String procType,
-		final String siRev) {
+	public static void setProcessorAndSiliconRevision(final IProject project, final String procType, final String siRev) {
 		//	In order to set the processor and revision options we need to get the 
 		// IResourceInfo object associated with each configuration of the project.  
 		// Therefore we need to access each configuration.  To get those we need to 
@@ -216,6 +300,7 @@ final public class Utility {
 				}
 				else {
 					ManagedBuildManager.setOption(cfg, tool, opt, procType.toLowerCase() + "-" + siRev);
+					setMultiCoreOptions(cfg, tool, procType);
 				}
 			}
 		}
@@ -300,7 +385,7 @@ final public class Utility {
 		}
 		return project;
 	}
-	
+
 	/**
 	 * Initializes the default settings for the tabs in the GDB JTAG
 	 * debugger plugin, based on the launch configuration type selected by the

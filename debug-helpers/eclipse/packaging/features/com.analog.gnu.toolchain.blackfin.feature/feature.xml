@@ -2,7 +2,7 @@
 <feature
       id="com.analog.gnu.toolchain.blackfin"
       label="Blackfin GNU Toolchain Feature"
-      version="1.0.6.qualifier"
+      version="1.0.7.qualifier"
       provider-name="Analog Devices, Inc."
       plugin="com.analog.gnu.toolchain.blackfin">
 

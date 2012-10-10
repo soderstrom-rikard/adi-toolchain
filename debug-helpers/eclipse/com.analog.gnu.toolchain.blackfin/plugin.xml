@@ -164,7 +164,83 @@
                   id="com.analog.gnu.toolchain.blackfin.c.compiler.options.proc"
                   valueType="string">
             </option>
-         </tool>
+            <optionCategory
+                id="com.analog.gnu.toolchain.blackfin.c.compiler.optioncategory.multicore"
+                name="Multi-core"
+                owner="com.analog.gnu.toolchain.blackfin.c.compiler.base">
+                <enablement
+                    type="ALL">
+                 <checkOption
+                       holderId="com.analog.gnu.toolchain.blackfin.c.compiler.base"
+                       isRegex="true"
+                       optionId="com.analog.gnu.toolchain.blackfin.c.compiler.options.proc"
+                       value="bf60.*">
+                 </checkOption>
+              </enablement>
+ 			</optionCategory>
+ 			<option
+ 			    applicabilityCalculator="com.analog.gnu.toolchain.blackfin.core.MultiCoreApplicabilityCalculator"
+				category="com.analog.gnu.toolchain.blackfin.c.compiler.optioncategory.multicore"
+				command="-mmulticore -mcore${value}"
+				id="com.analog.gnu.toolchain.blackfin.c.compiler.options.mcore"
+				isAbstract="false"
+				name="Target Core"
+				resourceFilter="all"
+				tip="Enable multicore support and build for a specified Core."
+				valueHandler="com.analog.gnu.toolchain.blackfin.core.MultiCoreValueHandler"
+				valueType="enumerated">
+				<enumeratedOptionValue
+			          command="-mmulticore -mcore0"
+			          id="com.analog.gnu.toolchain.blackfin.c.compiler.options.mcore0"
+			          isDefault="true"
+			          name="Core 0 (-mmulticore -mcore0)">
+				</enumeratedOptionValue>
+				<enumeratedOptionValue
+			          command="-mmulticore -mcore1"
+			          id="com.analog.gnu.toolchain.blackfin.c.compiler.options.mcore1"
+			          isDefault="false"
+			          name="Core 1 (-mmulticore -mcore1)">
+				</enumeratedOptionValue>
+ 			</option>
+ 			<optionCategory
+                id="com.analog.gnu.toolchain.blackfin.c.compiler.optioncategory.multicore.bf561"
+                name="Multi-core"
+                owner="com.analog.gnu.toolchain.blackfin.c.compiler.base">
+                <enablement
+                    type="ALL">
+                 <checkOption
+                       holderId="com.analog.gnu.toolchain.blackfin.c.compiler.base"
+                       isRegex="true"
+                       optionId="com.analog.gnu.toolchain.blackfin.c.compiler.options.proc"
+                       value="bf561.*">
+                 </checkOption>
+              </enablement>
+ 			</optionCategory>
+ 			<option
+ 			    applicabilityCalculator="com.analog.gnu.toolchain.blackfin.core.MultiCoreApplicabilityCalculator"
+				category="com.analog.gnu.toolchain.blackfin.c.compiler.optioncategory.multicore.bf561"
+				command="-mmulticore -mcore${value}"
+				id="com.analog.gnu.toolchain.blackfin.c.compiler.options.mcore.bf561"
+				isAbstract="false"
+				name="Target Core"
+				resourceFilter="all"
+				tip="Enable multicore support and build for a specified Core."
+				valueHandler="com.analog.gnu.toolchain.blackfin.core.MultiCoreValueHandler"
+				valueType="enumerated">
+				<enumeratedOptionValue
+			          command="-mmulticore -mcorea"
+			          id="com.analog.gnu.toolchain.blackfin.c.compiler.options.mcorea"
+			          isDefault="true"
+			          name="Core A (-mmulticore -mcorea)">
+				</enumeratedOptionValue>
+				<enumeratedOptionValue
+			          command="-mmulticore -mcoreb"
+			          id="com.analog.gnu.toolchain.blackfin.c.compiler.options.mcoreb"
+			          isDefault="false"
+			          name="Core B (-mmulticore -mcoreb)">
+				</enumeratedOptionValue>
+ 			</option>
+		</tool>
          <tool
                id="com.analog.gnu.toolchain.blackfin.c.linker.base"
                isAbstract="true"
@@ -183,6 +259,50 @@
                   id="com.analog.gnu.toolchain.blackfin.c.linker.options.proc"
                   valueType="string">
             </option>
+ 			<option
+ 			    applicabilityCalculator="com.analog.gnu.toolchain.blackfin.core.BF60XApplicabilityCalculator"
+				command="-mmulticore -mcore${value}"
+				id="com.analog.gnu.toolchain.blackfin.c.linker.options.mcore"
+				isAbstract="false"
+				name="Target Core"
+				resourceFilter="all"
+				tip="Enable multicore support and build for a specified Core."
+				valueType="enumerated">
+				<enumeratedOptionValue
+			          command="-mmulticore -mcore0"
+			          id="com.analog.gnu.toolchain.blackfin.c.linker.options.mcore0"
+			          isDefault="true"
+			          name="Core 0 (-mmulticore -mcore0)">
+				</enumeratedOptionValue>
+				<enumeratedOptionValue
+			          command="-mmulticore -mcore1"
+			          id="com.analog.gnu.toolchain.blackfin.c.linker.options.mcore1"
+			          isDefault="false"
+			          name="Core 1 (-mmulticore -mcore1)">
+				</enumeratedOptionValue>
+			</option>
+ 			<option
+ 			    applicabilityCalculator="com.analog.gnu.toolchain.blackfin.core.BF561ApplicabilityCalculator"
+				command="-mmulticore -mcore${value}"
+				id="com.analog.gnu.toolchain.blackfin.c.linker.options.mcore.bf561"
+				isAbstract="false"
+				name="Target Core"
+				resourceFilter="all"
+				tip="Enable multicore support and build for a specified Core."
+				valueType="enumerated">				
+				<enumeratedOptionValue
+			          command="-mmulticore -mcorea"
+			          id="com.analog.gnu.toolchain.blackfin.c.linker.options.mcorea"
+			          isDefault="true"
+			          name="Core A (-mmulticore -mcorea)">
+				</enumeratedOptionValue>
+				<enumeratedOptionValue
+			          command="-mmulticore -mcoreb"
+			          id="com.analog.gnu.toolchain.blackfin.c.linker.options.mcoreb"
+			          isDefault="false"
+			          name="Core B (-mmulticore -mcoreb)">
+				</enumeratedOptionValue>
+ 			</option>
          </tool>
          <tool
                id="com.analog.gnu.toolchain.blackfin.cpp.compiler.base"
@@ -193,6 +313,82 @@
                   id="com.analog.gnu.toolchain.blackfin.cpp.compiler.options.proc"
                   valueType="string">
             </option>
+            <optionCategory
+                id="com.analog.gnu.toolchain.blackfin.cpp.compiler.optioncategory.multicore"
+                name="Multi-core"
+                owner="com.analog.gnu.toolchain.blackfin.cpp.compiler.base">
+                <enablement
+                    type="ALL">
+                 <checkOption
+                       holderId="com.analog.gnu.toolchain.blackfin.cpp.compiler.base"
+                       isRegex="true"
+                       optionId="com.analog.gnu.toolchain.blackfin.cpp.compiler.options.proc"
+                       value="bf60.*">
+                 </checkOption>
+              </enablement>
+ 			</optionCategory>
+ 			<option
+ 			    applicabilityCalculator="com.analog.gnu.toolchain.blackfin.core.MultiCoreApplicabilityCalculator"
+				category="com.analog.gnu.toolchain.blackfin.cpp.compiler.optioncategory.multicore"
+				command="-mmulticore -mcore${value}"
+				id="com.analog.gnu.toolchain.blackfin.cpp.compiler.options.mcore"
+				isAbstract="false"
+				name="Target Core"
+				resourceFilter="all"
+				tip="Enable multicore support and build for a specified Core."
+				valueHandler="com.analog.gnu.toolchain.blackfin.core.MultiCoreValueHandler"
+				valueType="enumerated">
+				<enumeratedOptionValue
+                     command="-mmulticore -mcore0"
+                     id="com.analog.gnu.toolchain.blackfin.cpp.compiler.options.mcore0"
+                     isDefault="true"
+                     name="Core 0 (-mmulticore -mcore0)">
+				</enumeratedOptionValue>
+				<enumeratedOptionValue
+                     command="-mmulticore -mcore1"
+                     id="com.analog.gnu.toolchain.blackfin.cpp.compiler.options.mcore1"
+                     isDefault="false"
+                     name="Core 1 (-mmulticore -mcore1)">
+				</enumeratedOptionValue>
+ 			</option>
+ 			<optionCategory
+                id="com.analog.gnu.toolchain.blackfin.cpp.compiler.optioncategory.multicore.bf561"
+                name="Multi-core"
+                owner="com.analog.gnu.toolchain.blackfin.cpp.compiler.base">
+                <enablement
+                    type="ALL">
+                 <checkOption
+                       holderId="com.analog.gnu.toolchain.blackfin.cpp.compiler.base"
+                       isRegex="true"
+                       optionId="com.analog.gnu.toolchain.blackfin.cpp.compiler.options.proc"
+                       value="bf561.*">
+                 </checkOption>
+              </enablement>
+ 			</optionCategory>
+ 			<option
+ 			    applicabilityCalculator="com.analog.gnu.toolchain.blackfin.core.MultiCoreApplicabilityCalculator"
+				category="com.analog.gnu.toolchain.blackfin.cpp.compiler.optioncategory.multicore.bf561"
+				command="-mmulticore -mcore${value}"
+				id="com.analog.gnu.toolchain.blackfin.cpp.compiler.options.mcore.bf561"
+				isAbstract="false"
+				name="Target Core"
+				resourceFilter="all"
+				tip="Enable multicore support and build for a specified Core."
+				valueHandler="com.analog.gnu.toolchain.blackfin.core.MultiCoreValueHandler"
+				valueType="enumerated">
+				<enumeratedOptionValue
+                     command="-mmulticore -mcorea"
+                     id="com.analog.gnu.toolchain.blackfin.cpp.compiler.options.mcorea"
+                     isDefault="true"
+                     name="Core A (-mmulticore -mcorea)">
+				</enumeratedOptionValue>
+				<enumeratedOptionValue
+                     command="-mmulticore -mcoreb"
+                     id="com.analog.gnu.toolchain.blackfin.cpp.compiler.options.mcoreb"
+                     isDefault="false"
+                     name="Core B (-mmulticore -mcoreb)">
+				</enumeratedOptionValue>
+ 			</option>
          </tool>
          <tool
                id="com.analog.gnu.toolchain.blackfin.cpp.linker.base"
@@ -212,6 +408,50 @@
                   id="com.analog.gnu.toolchain.blackfin.cpp.linker.options.proc"
                   valueType="string">
             </option>
+ 			<option
+ 			    applicabilityCalculator="com.analog.gnu.toolchain.blackfin.core.BF60XApplicabilityCalculator"
+				command="-mmulticore -mcore${value}"
+				id="com.analog.gnu.toolchain.blackfin.cpp.linker.options.mcore"
+				isAbstract="false"
+				name="Target Core"
+				resourceFilter="all"
+				tip="Enable multicore support and build for a specified Core."
+				valueType="enumerated">
+				<enumeratedOptionValue
+                     command="-mmulticore -mcore0"
+                     id="com.analog.gnu.toolchain.blackfin.cpp.linker.options.mcore0"
+                     isDefault="true"
+                     name="Core 0 (-mmulticore -mcore0)">
+				</enumeratedOptionValue>
+				<enumeratedOptionValue
+                     command="-mmulticore -mcore1"
+                     id="com.analog.gnu.toolchain.blackfin.cpp.linker.options.mcore1"
+                     isDefault="false"
+                     name="Core 1 (-mmulticore -mcore1)">
+				</enumeratedOptionValue>
+			</option>
+			<option
+ 			    applicabilityCalculator="com.analog.gnu.toolchain.blackfin.core.BF561ApplicabilityCalculator"
+				command="-mmulticore -mcore${value}"
+				id="com.analog.gnu.toolchain.blackfin.cpp.linker.options.mcore.bf561"
+				isAbstract="false"
+				name="Target Core"
+				resourceFilter="all"
+				tip="Enable multicore support and build for a specified Core."
+				valueType="enumerated">				
+				<enumeratedOptionValue
+                     command="-mmulticore -mcorea"
+                     id="com.analog.gnu.toolchain.blackfin.cpp.linker.options.mcorea"
+                     isDefault="true"
+                     name="Core A (-mmulticore -mcorea)">
+				</enumeratedOptionValue>
+				<enumeratedOptionValue
+                     command="-mmulticore -mcoreb"
+                     id="com.analog.gnu.toolchain.blackfin.cpp.linker.options.mcoreb"
+                     isDefault="false"
+                     name="Core B (-mmulticore -mcoreb)">
+				</enumeratedOptionValue>
+ 			</option>
          </tool>
          <tool
                id="com.analog.gnu.toolchain.blackfin.ldr.base"

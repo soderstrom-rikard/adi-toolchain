@@ -30,5 +30,6 @@ import org.eclipse.cdt.managedbuilder.scannerconfig.IManagedScannerInfoCollector
  * 
  * @since 2.0
  */
+@SuppressWarnings("restriction")
 public class DefaultGCCScannerInfoCollector extends PerProjectSICollector implements IScannerInfoCollector3, IManagedScannerInfoCollector {
 }

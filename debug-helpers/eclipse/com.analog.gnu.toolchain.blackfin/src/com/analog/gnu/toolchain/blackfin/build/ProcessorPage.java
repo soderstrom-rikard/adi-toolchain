@@ -1,5 +1,5 @@
 /*******************************************************************************
- *  Copyright (c) 2010 Analog Devices, Inc.
+ *  Copyright (c) 2012 Analog Devices, Inc.
  *  All rights reserved. This program and the accompanying materials
  *  are made available under the terms of the Eclipse Public License v1.0
  *  which accompanies this distribution, and is available at
@@ -11,17 +11,13 @@
 package com.analog.gnu.toolchain.blackfin.build;
 import java.util.ArrayList;
 
-import org.eclipse.cdt.managedbuilder.core.IConfiguration;
-import org.eclipse.cdt.managedbuilder.core.IManagedBuildInfo;
 import org.eclipse.cdt.managedbuilder.core.IToolChain;
-import org.eclipse.cdt.managedbuilder.core.ManagedBuildManager;
 import org.eclipse.cdt.managedbuilder.ui.wizards.CDTConfigWizardPage;
 import org.eclipse.cdt.managedbuilder.ui.wizards.MBSCustomPage;
 import org.eclipse.cdt.managedbuilder.ui.wizards.MBSCustomPageManager;
 import org.eclipse.cdt.managedbuilder.ui.wizards.MBSWizardHandler;
 import org.eclipse.cdt.ui.wizards.CDTMainWizardPage;
 import org.eclipse.cdt.ui.wizards.EntryDescriptor;
-import org.eclipse.core.resources.IProject;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.wizard.IWizardPage;
 import org.eclipse.swt.SWT;

@@ -1,5 +1,5 @@
 /*******************************************************************************
- *  Copyright (c) 2009 Analog Devices, Inc.
+ *  Copyright (c) 2012 Analog Devices, Inc.
  *  All rights reserved. This program and the accompanying materials
  *  are made available under the terms of the Eclipse Public License v1.0
  *  which accompanies this distribution, and is available at
@@ -23,6 +23,7 @@ public class BlackfinElfParser extends GNUElfParser {
 	protected IGnuToolFactory createGNUToolFactory() {
 		return new BlackfinToolFactory(this);
 	}
+	@SuppressWarnings("rawtypes")
 	public Object getAdapter(Class adapter) {
 		if (adapter.equals(IGnuToolFactory.class)) {
 			if (toolFactory == null) {

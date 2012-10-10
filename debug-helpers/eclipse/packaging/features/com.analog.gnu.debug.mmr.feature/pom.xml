@@ -8,13 +8,13 @@
 	<parent>
 		<groupId>com.analog.gnu.blackfin</groupId>
 		<artifactId>gnu-blackfin-parent</artifactId>
-		<version>1.0.6-SNAPSHOT</version>
+		<version>1.0.7-SNAPSHOT</version>
 		<relativePath>../pom.xml</relativePath>
 	</parent>
 
 	<groupId>com.analog.gnu.debug.mmr.feature</groupId>
 	<artifactId>com.analog.gnu.debug.mmr.feature</artifactId>
-	<version>1.0.6-SNAPSHOT</version>
+	<version>1.0.7-SNAPSHOT</version>
 	<packaging>eclipse-feature</packaging>
 
 </project>

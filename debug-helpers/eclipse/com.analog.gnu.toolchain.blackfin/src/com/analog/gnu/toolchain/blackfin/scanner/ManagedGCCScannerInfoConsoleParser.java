@@ -28,6 +28,7 @@ import org.eclipse.cdt.make.internal.core.scannerconfig2.PerProjectSICollector;
 import org.eclipse.cdt.managedbuilder.core.IConfiguration;
 import org.eclipse.core.resources.IProject;
 
+@SuppressWarnings("restriction")
 public class ManagedGCCScannerInfoConsoleParser extends
 		GCCScannerInfoConsoleParser {
 	Boolean fManagedBuildOnState;

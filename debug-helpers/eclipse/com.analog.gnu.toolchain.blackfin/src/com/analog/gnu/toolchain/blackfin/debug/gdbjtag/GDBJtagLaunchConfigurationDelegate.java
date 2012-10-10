@@ -42,6 +42,7 @@ public class GDBJtagLaunchConfigurationDelegate extends AbstractCLaunchDelegate 
 		return Activator.PLUGIN_ID;
 	};
 
+	@SuppressWarnings("deprecation")
 	public void launch(ILaunchConfiguration configuration, String mode,
 			ILaunch launch, IProgressMonitor monitor) throws CoreException {
 		SubMonitor submonitor = SubMonitor.convert(monitor, 2);

@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Memory Mapped Registers View
 Bundle-SymbolicName: com.analog.gnu.debug.mmr;singleton:=true
-Bundle-Version: 1.0.6.qualifier
+Bundle-Version: 1.0.7.qualifier
 Bundle-Activator: com.analog.gnu.debug.core.registers.MMRViewUIPlugin
 Bundle-Vendor: Analog Devices, Inc.
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
