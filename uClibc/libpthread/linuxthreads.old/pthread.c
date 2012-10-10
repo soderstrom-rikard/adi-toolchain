@@ -384,6 +384,14 @@ static int *__libc_multiple_threads_ptr;
     startup of the C library.  */
 void __pthread_initialize_minimal(void)
 {
+  /* First of all init __pthread_handles[0] and [1].  */
+# if __LT_SPINLOCK_INIT != 0
+  __pthread_handles[0].h_lock = __LOCK_INITIALIZER;
+  __pthread_handles[1].h_lock = __LOCK_INITIALIZER;
+# endif
+  __pthread_handles[0].h_descr = &__pthread_initial_thread;
+  __pthread_handles[1].h_descr = &__pthread_manager_thread;
+
     /* If we have special thread_self processing, initialize
      * that for the main thread now.  */
 #ifdef INIT_THREAD_SELF
