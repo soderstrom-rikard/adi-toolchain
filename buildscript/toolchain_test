@@ -186,7 +186,7 @@ fi
 
 # For trunk testing, use -k $CHECKOUT/uclinux-dist/linux-2.6.x.
   ./BuildToolChain  -j 1 -w -s $CHECKOUT/toolchain -b $USER/temp -k $LINUX_PATH  -u $CHECKOUT/u-boot -c 4.3 -D \
-  -a UCLIBC_HAS_IPV6=y  -a UCLIBC_HAS_WCHAR=y  
+  -a UCLIBC_HAS_IPV6=y  -a UCLIBC_HAS_WCHAR=y -a UCLIBC_HAS_NFTW=y 
 
   if [ $? != 0 ] ; then
   echo -e "\nFailed to build the toolchain in toolchain-$TIMESTAMP . exit!\n"     
