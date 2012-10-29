@@ -911,7 +911,7 @@ prepare_target_solibs()
 		if [ -h $FILE ] ; then
 			LIB=`basename ${FILE}`
 			run_cmd $target_alias-strip --remove-section=.comment --remove-section=.note $FILE -o $GCC_BUILD/libs_for_target/${LIB}
-			BOARD_LIB=`run_rsh_nodie_stdout md5sum /lib/${LIB} | awk '{print $1}'`
+			BOARD_LIB=`run_rsh_nodie_stdout find / -name ${LIB} \| xargs md5sum | awk '{print $1}'`
 			TEST_LIB=`md5sum $GCC_BUILD/libs_for_target/${LIB} | awk '{print $1}'`
 			TEST_ORG_LIB=`md5sum ${FILE} | awk '{print $1}'`
 		#	echo "Lib (${LIB}) on board md5sum is: $BOARD_LIB "
