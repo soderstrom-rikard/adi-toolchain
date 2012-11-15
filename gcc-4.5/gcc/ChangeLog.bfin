@@ -1,3 +1,9 @@
+2012-11-15  Stuart Henderson  <Stuart.Henderson@analog.com>
+
+	* config/bfin/bfin.c (expand_prologue_reg_save): Save and set Lreg to zero
+	if Ireg is used.
+	(expand_epilogue_reg_restore): Restore L-regs if saved in prologue.
+
 2012-03-28  Stuart Henderson  <Stuart.Henderson@analog.com>
 
     * config/bfin/bfin.c (bfin_cpus): Add BF60x support.

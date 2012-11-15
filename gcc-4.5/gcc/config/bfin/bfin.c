@@ -399,6 +399,10 @@ struct bfin_cpu bfin_cpus[] =
 
 int splitting_for_sched, splitting_loops;
 
+static int scratchgenreg = 0;
+static bool restorescratch = false;
+static int l_to_save = 0;
+
 static void
 bfin_globalize_label (FILE *stream, const char *name)
 {
@@ -669,6 +673,9 @@ expand_prologue_reg_save (rtx spreg, int saveall, bool is_inthandler)
   int dregno, pregno;
   int total_consec = ndregs_consec + npregs_consec;
   int i, d_to_save;
+  restorescratch = false;
+  scratchgenreg = 0;
+  l_to_save = 0;
 
   if (saveall || is_inthandler)
     {
@@ -714,11 +721,16 @@ expand_prologue_reg_save (rtx spreg, int saveall, bool is_inthandler)
 	      subpat = gen_rtx_SET (VOIDmode, memref, gen_rtx_REG (word_mode,
 								   dregno++));
 	      d_to_save--;
+	      if (!scratchgenreg)
+	        scratchgenreg=dregno;
 	    }
 	  else
 	    {
 	      subpat = gen_rtx_SET (VOIDmode, memref, gen_rtx_REG (word_mode,
 								   pregno++));
+	      if (!scratchgenreg && pregno!=REG_SP && pregno!=REG_FP
+	          && !(TARGET_FDPIC && pregno==FDPIC_REGNO))
+	        scratchgenreg=pregno;
 	    }
 	  XVECEXP (pat, 0, i + 1) = subpat;
 	  RTX_FRAME_RELATED_P (subpat) = 1;
@@ -733,6 +745,8 @@ expand_prologue_reg_save (rtx spreg, int saveall, bool is_inthandler)
 	{
 	  rtx insn = emit_move_insn (predec, gen_rtx_REG (word_mode, dregno));
 	  RTX_FRAME_RELATED_P (insn) = 1;
+	  if (!scratchgenreg)
+	    scratchgenreg=dregno;
 	  ndregs--;
 	}
     }
@@ -742,6 +756,9 @@ expand_prologue_reg_save (rtx spreg, int saveall, bool is_inthandler)
 	{
 	  rtx insn = emit_move_insn (predec, gen_rtx_REG (word_mode, pregno));
 	  RTX_FRAME_RELATED_P (insn) = 1;
+	  if (!scratchgenreg && pregno!=REG_SP && pregno!=REG_FP
+              && !(TARGET_FDPIC && pregno==FDPIC_REGNO))
+	    scratchgenreg=pregno;
 	  npregs--;
 	}
     }
@@ -749,7 +766,8 @@ expand_prologue_reg_save (rtx spreg, int saveall, bool is_inthandler)
     if (saveall 
 	|| (is_inthandler
 	    && (df_regs_ever_live_p (i)
-		|| (!leaf_function_p () && call_used_regs[i]))))
+		|| (!leaf_function_p () && call_used_regs[i])))
+	|| (i >= REG_L0 && i <= REG_L3 && l_to_save&(1<<i-REG_L0)))
       {
 	rtx insn;
 	if (i == REG_A0 || i == REG_A1)
@@ -758,7 +776,30 @@ expand_prologue_reg_save (rtx spreg, int saveall, bool is_inthandler)
 	else
 	  insn = emit_move_insn (predec, gen_rtx_REG (SImode, i));
 	RTX_FRAME_RELATED_P (insn) = 1;
+	/* If we use I regs and the L regs are non-zero, we can end up with
+	   very broken behaviour. */
+	if (i >= REG_I0 && i <= REG_I3)
+	  l_to_save|=(1<<i-REG_I0);
       }
+  if (is_inthandler && l_to_save)
+	{
+	  rtx genreg;
+	  if (!scratchgenreg)
+	{
+	  /* No general registers used?  Seems unlikey, but just in case. */
+	  rtx insn = emit_move_insn (predec, gen_rtx_REG (word_mode, REG_R0));
+	  RTX_FRAME_RELATED_P (insn) = 1;
+	  restorescratch = true;
+	}
+	  genreg = gen_rtx_REG (SImode, scratchgenreg);
+	  emit_move_insn (genreg, GEN_INT (0));
+	for (i = REG_L0; i <= REG_L3; i++)
+	  if (l_to_save&(1<<i-REG_L0))
+	{
+	  rtx lreg = gen_rtx_REG (SImode, i);
+	  emit_move_insn (lreg, genreg);
+	}
+    }
 }
 
 /* Emit code to restore registers in the epilogue.  SAVEALL is nonzero if we
@@ -784,11 +825,17 @@ expand_epilogue_reg_restore (rtx spreg, bool saveall, bool is_inthandler)
      insns.  */
   MEM_VOLATILE_P (postinc) = 1;
 
+  if (is_inthandler && restorescratch)
+    {
+      emit_move_insn (gen_rtx_REG (word_mode, REG_R0), postinc);
+    }
+
   for (i = REG_CC - 1; i > REG_P7; i--)
     if (saveall
 	|| (is_inthandler
 	    && (df_regs_ever_live_p (i)
-		|| (!leaf_function_p () && call_used_regs[i]))))
+		|| (!leaf_function_p () && call_used_regs[i])))
+	|| (i >= REG_L0 && i <= REG_L3 && l_to_save&(1<<i-REG_L0)))
       {
 	if (i == REG_A0 || i == REG_A1)
 	  {
