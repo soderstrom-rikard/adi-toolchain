@@ -6,7 +6,7 @@ load_adi "bfin-fmt"
 # -s80000 is for gcc.dg/dg.exp/trampoline-1.c
 # now -s120000 for non-optimised libmudflap.c/heap-scalestress.c
 # if you change this value, also change gcc,stack_size below
-set_board_info ldflags "-Wl,-elf2flt=-s120000";
+set_board_info ldflags "-Wl,-elf2flt=-s200000";
 set_board_info use_binfmt_flat 1
 
 # Advertise slightly less than we actually have (see above) since a few
