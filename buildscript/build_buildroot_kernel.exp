@@ -182,6 +182,10 @@ while 1 {
             send -s "Y\r"
         }
 
+        -re "speex.*BR2_PACKAGE_SPEEX.*\\\[.*]" {
+            send "N\r"
+        }
+
         "\\\(*) \\\[*]" {
             sleep .05
             send "\r"
@@ -215,6 +219,14 @@ while 1 {
 
         -re "($anomalous_option) \\\[\[^\]]+/.]" {
             send "\r"
+        }
+
+        -re "Silicon Rev.* (\[0-9]+). $revision.*choice.*\\\[.*]" {
+            if { $board_type == "BF561-EZKIT" || $board_type == "BF527-EZKIT" } {
+                send "$expect_out(1,string)\r"
+            } else {
+                send "\r"
+            }
         }
 
         "\\\(*) \\\[*]" {
