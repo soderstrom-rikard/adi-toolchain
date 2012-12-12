@@ -145,7 +145,7 @@ set bfin_make_clean_status failure
 while 1 {
     expect {
         "Entering directory" { }
-        "Leaving directory" { set bfin_make_clean_status success }
+        "rm" { set bfin_make_clean_status success }
         "Error" {set bfin_make_clean_status failure }
         "/bin/sh" { }
         eof { break }
@@ -172,6 +172,11 @@ while 1 {
        }
 }
 
+cd  $src_root/testsuites/common
+source config_cut_app.exp
+
+cd  $src_root/testsuites/common
+source config_cut_kernel.exp
 
 step "Make user space config"
 cd $src_root
