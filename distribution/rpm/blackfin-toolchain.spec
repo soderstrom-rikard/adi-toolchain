@@ -31,9 +31,7 @@ Summary:      The GNU toolchain for the Blackfin processor
 License:      GPL
 Group:        Compilers
 Source:       bfin-gcc-%{gcc_main_ver}.tar.bz2
-%if %{optional_gcc}
 Source1:      bfin-gcc-%{gcc_addon_ver}.tar.bz2
-%endif
 Source2:      binutils.tar.bz2
 Source3:      kbuild.tar.bz2
 Source4:      buildscript.tar.bz2
@@ -129,13 +127,10 @@ gcc-%{gcc_addon_fullver} based toolchain.
 %endif
 
 %prep
-%if %{optional_gcc}
-%define extra_setup -a 1
-%endif
 %if %{windows_build}
 %define windows_setup -a 21 -a 22 -a 23
 %endif
-%setup -q -c %{name}-%{version} %{extra_setup} -a 2 -a 3 -a 4 -a 5 -a 6 -a 7 -a 8 -a 9 -a 10 -a 11 -a 12 -a 13 -a 14 -a 15 -a 16 -a 17 -a 18 -a 19 -a 20 %{windows_setup}
+%setup -q -c %{name}-%{version} -a 1 -a 2 -a 3 -a 4 -a 5 -a 6 -a 7 -a 8 -a 9 -a 10 -a 11 -a 12 -a 13 -a 14 -a 15 -a 16 -a 17 -a 18 -a 19 -a 20 %{windows_setup}
 %patch -p0
 
 %build
@@ -148,6 +143,9 @@ gcc-%{gcc_addon_fullver} based toolchain.
 %define gcc_build_opts %{gcc_opts} -S qemu
 %else
 %define gcc_build_opts %{gcc_opts}
+%endif
+%if %{windows_build}
+%define gcc_build_opts %{gcc_build_opts} -S u-boot
 %endif
 echo Building in $RPM_BUILD_ROOT
 ./buildscript/BuildToolChain %{extra_buildtoolchain_opts} \
@@ -225,7 +223,9 @@ rm -rf $RPM_BUILD_ROOT
 %{prefix}/bfin-uclinux/bin/bfin-uclinux-gccbug
 %{prefix}/bfin-uclinux/bin/bfin-uclinux-gcov%{EXEEXT}
 %{prefix}/bfin-uclinux/bin/bfin-uclinux-gdb%{EXEEXT}
+%if ! %{windows_build}
 %{prefix}/bfin-uclinux/bin/bfin-uclinux-gen_eth_addr%{EXEEXT}
+%endif
 %{prefix}/bfin-uclinux/bin/bfin-uclinux-gfortran%{EXEEXT}
 %{prefix}/bfin-uclinux/bin/bfin-uclinux-gdbtui%{EXEEXT}
 %if %{x_support}
@@ -234,7 +234,9 @@ rm -rf $RPM_BUILD_ROOT
 %{prefix}/bfin-uclinux/bin/bfin-uclinux-ldr%{EXEEXT}
 %{prefix}/bfin-uclinux/bin/bfin-uclinux-ld%{EXEEXT}
 %{prefix}/bfin-uclinux/bin/bfin-uclinux-ld.real%{EXEEXT}
+%if ! %{windows_build}
 %{prefix}/bfin-uclinux/bin/bfin-uclinux-mkimage%{EXEEXT}
+%endif
 %{prefix}/bfin-uclinux/bin/bfin-uclinux-nm%{EXEEXT}
 %{prefix}/bfin-uclinux/bin/bfin-uclinux-objcopy%{EXEEXT}
 %{prefix}/bfin-uclinux/bin/bfin-uclinux-objdump%{EXEEXT}
@@ -297,7 +299,9 @@ rm -rf $RPM_BUILD_ROOT
 %{prefix}/bfin-linux-uclibc/bin/bfin-linux-uclibc-gccbug
 %{prefix}/bfin-linux-uclibc/bin/bfin-linux-uclibc-gcov%{EXEEXT}
 %{prefix}/bfin-linux-uclibc/bin/bfin-linux-uclibc-gdb%{EXEEXT}
+%if ! %{windows_build}
 %{prefix}/bfin-linux-uclibc/bin/bfin-linux-uclibc-gen_eth_addr%{EXEEXT}
+%endif
 %{prefix}/bfin-linux-uclibc/bin/bfin-linux-uclibc-gfortran%{EXEEXT}
 %{prefix}/bfin-linux-uclibc/bin/bfin-linux-uclibc-gdbtui%{EXEEXT}
 %if %{x_support}
@@ -307,7 +311,9 @@ rm -rf $RPM_BUILD_ROOT
 %{prefix}/bfin-linux-uclibc/bin/bfin-linux-uclibc-ldconfig
 %{prefix}/bfin-linux-uclibc/bin/bfin-linux-uclibc-ldr%{EXEEXT}
 %{prefix}/bfin-linux-uclibc/bin/bfin-linux-uclibc-ldd
+%if ! %{windows_build}
 %{prefix}/bfin-linux-uclibc/bin/bfin-linux-uclibc-mkimage%{EXEEXT}
+%endif
 %{prefix}/bfin-linux-uclibc/bin/bfin-linux-uclibc-nm%{EXEEXT}
 %{prefix}/bfin-linux-uclibc/bin/bfin-linux-uclibc-objcopy%{EXEEXT}
 %{prefix}/bfin-linux-uclibc/bin/bfin-linux-uclibc-objdump%{EXEEXT}
