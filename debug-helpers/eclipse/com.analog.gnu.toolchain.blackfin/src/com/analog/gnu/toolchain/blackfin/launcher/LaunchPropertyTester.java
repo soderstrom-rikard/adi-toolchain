@@ -17,6 +17,7 @@ import org.eclipse.cdt.core.model.IBinary;
 import org.eclipse.cdt.core.model.ICElement;
 import org.eclipse.cdt.core.model.ICProject;
 import org.eclipse.cdt.managedbuilder.core.IManagedBuildInfo;
+import org.eclipse.cdt.managedbuilder.core.IProjectType;
 import org.eclipse.cdt.managedbuilder.core.ManagedBuildManager;
 import org.eclipse.core.expressions.PropertyTester;
 import org.eclipse.core.internal.resources.File;
@@ -148,10 +149,13 @@ public class LaunchPropertyTester extends PropertyTester {
 			}
 			if (project != null) {
 				IManagedBuildInfo buildInfo = ManagedBuildManager.getBuildInfo(project);
-				String projectTypeId = buildInfo.getManagedProject().getProjectType().getId();
-				if (projectTypeId.equals(id)) {
-					return true;
-				}				
+				IProjectType projectType = buildInfo.getManagedProject().getProjectType();
+				if (projectType != null) {
+					String projectTypeId = projectType.getId();
+					if (projectTypeId.equals(id)) {
+						return true;
+					}
+				}
 			}
 		}
 		return false;

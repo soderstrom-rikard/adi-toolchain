@@ -2,7 +2,7 @@
 <feature
       id="com.analog.gnu.debug.mmr"
       label="Memory Mapped Registers View Feature"
-      version="1.0.7.qualifier"
+      version="1.0.8.qualifier"
       provider-name="Analog Devices, Inc."
       plugin="com.analog.gnu.debug.mmr">
 
