@@ -2670,15 +2670,23 @@ fi
 
 ##########################################
 # Do we need librt
+# uClibc provides 2 versions of clock_gettime(), one with realtime
+# support and one without. This means that the clock_gettime() don't
+# need -lrt. We still need it for timer_create() so we check for this
+# function in addition.
 cat > $TMPC <<EOF
 #include <signal.h>
 #include <time.h>
-int main(void) { return clock_gettime(CLOCK_REALTIME, NULL); }
+int main(void) {
+  timer_create(CLOCK_REALTIME, NULL, NULL);
+  return clock_gettime(CLOCK_REALTIME, NULL);
+}
 EOF
 
 if compile_prog "" "" ; then
   :
-elif compile_prog "" "-lrt" ; then
+# we need pthread for static linking. use previous pthread test result
+elif compile_prog "" "-lrt $pthread_lib" ; then
   LIBS="-lrt $LIBS"
 fi
 
