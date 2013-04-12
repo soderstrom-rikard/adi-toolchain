@@ -52,6 +52,20 @@ if [ -d "${STAGEDIR}" ] ; then
 fi
 
 IFS=":"
+
+# Set CCACHE_PATH to avoid loop if the first found tool is ccache.
+
+CCACHE_PATH=""
+for p in ${PATH} ; do
+	[ "${p}" = "${mypath}" ] && continue
+	if [ -n "${CCACHE_PATH}" ] ; then
+		CCACHE_PATH=${CCACHE_PATH}:${p}
+	else
+		CCACHE_PATH=${p}
+	fi
+done
+export CCACHE_PATH
+
 for p in ${PATH} ; do
 	[ "${p}" = "${mypath}" ] && continue
 	[ ! -x "${p}/${tool}" ] && continue
