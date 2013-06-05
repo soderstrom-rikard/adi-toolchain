@@ -907,7 +907,7 @@ prepare_target_solibs()
 	run_cmd rm -f $GCC_BUILD/libs_for_target/*
 	t=`$target_alias-gcc -mcpu=${CPU_TYPE_REV} -print-file-name=libc.a`
 	t=`dirname $t`/../..
-	for FILE in `find $t/lib -type l '!' -name 'libthread_db*.so*' '!' -name 'libmudflap*.so*'`; do
+	for FILE in `find $t/lib -type l '!' -name 'lib*thread*.so*' '!' -name 'libmudflap*.so*'`; do
 		if [ -h $FILE ] ; then
 			LIB=`basename ${FILE}`
 			run_cmd $target_alias-strip --remove-section=.comment --remove-section=.note $FILE -o $GCC_BUILD/libs_for_target/${LIB}
