@@ -1,7 +1,7 @@
 /*
  * Blackfin helpers
  *
- * Copyright 2007-2012 Mike Frysinger
+ * Copyright 2007-2013 Mike Frysinger
  * Copyright 2007-2011 Analog Devices, Inc.
  *
  * Licensed under the Lesser GPL 2 or later.
@@ -17,8 +17,8 @@
 
 #include "config.h"
 #include "cpu.h"
-#include "exec-all.h"
-#include "host-utils.h"
+#include "exec/exec-all.h"
+#include "qemu/host-utils.h"
 
 #if defined(CONFIG_USER_ONLY)
 

@@ -1,13 +1,13 @@
 /*
  * QEMU Blackfin CPU
  *
- * Copyright 2007-2012 Mike Frysinger
+ * Copyright 2007-2013 Mike Frysinger
  * Copyright 2007-2011 Analog Devices, Inc.
  *
  * Licensed under the Lesser GPL 2 or later.
  */
 
-#include "cpu-qom.h"
+#include "cpu.h"
 #include "qemu-common.h"
 
 
@@ -22,9 +22,11 @@ static void bfin_cpu_reset(CPUState *s)
 
 static void bfin_cpu_initfn(Object *obj)
 {
+    CPUState *cs = CPU(obj);
     BfinCPU *cpu = BFIN_CPU(obj);
     CPUArchState *env = &cpu->env;
 
+    cs->env_ptr = env;
     cpu_exec_init(env);
 }
 

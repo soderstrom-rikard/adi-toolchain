@@ -1,7 +1,7 @@
 /*
  * Blackfin translation
  *
- * Copyright 2007-2012 Mike Frysinger
+ * Copyright 2007-2013 Mike Frysinger
  * Copyright 2007-2011 Analog Devices, Inc.
  *
  * Licensed under the Lesser GPL 2 or later.
@@ -15,8 +15,8 @@
 #include <inttypes.h>
 
 #include "cpu.h"
-#include "exec-all.h"
-#include "disas.h"
+#include "disas/disas.h"
+#include "exec/exec-all.h"
 #include "tcg-op.h"
 #include "qemu-common.h"
 #include "opcode/bfin.h"
@@ -53,7 +53,7 @@ static TCGv cpu_pc;
 static TCGv cpu_cc;
 static TCGv /*cpu_astat_op,*/ cpu_astat_arg[3];
 
-#include "gen-icount.h"
+#include "exec/gen-icount.h"
 
 static inline void
 bfin_tcg_new_set3(TCGv *tcgv, unsigned int cnt, unsigned int offbase,
@@ -211,16 +211,16 @@ static void gen_astat_update(DisasContext *, bool);
 
 static void gen_goto_tb(DisasContext *dc, int tb_num, TCGv dest)
 {
+/*
     TranslationBlock *tb;
     tb = dc->tb;
-/*
+
     if ((tb->pc & TARGET_PAGE_MASK) == (dest & TARGET_PAGE_MASK)) {
         tcg_gen_goto_tb(tb_num);
         tcg_gen_mov_tl(cpu_pc, dest);
         tcg_gen_exit_tb((long)tb + tb_num);
     } else */{
         gen_astat_update(dc, false);
-        tcg_gen_goto_tb(0);
         tcg_gen_mov_tl(cpu_pc, dest);
         tcg_gen_exit_tb(0);
     }
@@ -238,7 +238,7 @@ static void cec_exception(DisasContext *dc, int excp)
 {
     TCGv tmp = tcg_const_tl(excp);
     TCGv pc = tcg_const_tl(dc->pc);
-    gen_helper_raise_exception(tmp, pc);
+    gen_helper_raise_exception(cpu_env, tmp, pc);
     tcg_temp_free(tmp);
     dc->is_jmp = DISAS_UPDATE;
 }
@@ -265,7 +265,7 @@ static void gen_align_check(DisasContext *dc, TCGv addr, uint32_t len, bool inst
     excp = tcg_const_tl(inst ? EXCP_MISALIG_INST : EXCP_DATA_MISALGIN);
     pc = tcg_const_tl(dc->pc);
     tmp = tcg_const_tl(len);
-    gen_helper_memalign(excp, pc, addr, tmp);
+    gen_helper_memalign(cpu_env, excp, pc, addr, tmp);
     tcg_temp_free(tmp);
     tcg_temp_free(pc);
     tcg_temp_free(excp);
@@ -1186,14 +1186,14 @@ _astat_queue_state(DisasContext *dc, enum astat_ops op, unsigned int num,
 static void gen_astat_load(DisasContext *dc, TCGv reg)
 {
     gen_astat_update(dc, true);
-    gen_helper_astat_load(reg);
+    gen_helper_astat_load(reg, cpu_env);
 }
 
 static void gen_astat_store(DisasContext *dc, TCGv reg)
 {
     unsigned int i;
 
-    gen_helper_astat_store(reg);
+    gen_helper_astat_store(cpu_env, reg);
 
     dc->astat_op = ASTAT_OP_NONE;
     /*tcg_gen_movi_tl(cpu_astat_op, dc->astat_op);*/
@@ -1231,15 +1231,13 @@ gen_intermediate_code_internal(CPUArchState *env, TranslationBlock *tb,
     int num_insns;
     int max_insns;
 
-    qemu_log_try_set_file(stderr);
-
     pc_start = tb->pc;
     dc->env = env;
     dc->tb = tb;
     /* XXX: handle super/user mode here.  */
     dc->mem_idx = 0;
 
-    gen_opc_end = gen_opc_buf + OPC_MAX_SIZE;
+    gen_opc_end = tcg_ctx.gen_opc_buf + OPC_MAX_SIZE;
 
     dc->is_jmp = DISAS_NEXT;
     dc->pc = pc_start;
@@ -1254,20 +1252,20 @@ gen_intermediate_code_internal(CPUArchState *env, TranslationBlock *tb,
     if (max_insns == 0)
         max_insns = CF_COUNT_MASK;
 
-    gen_icount_start();
+    gen_tb_start();
     do {
         check_breakpoint(env, dc);
 
         if (search_pc) {
-            j = gen_opc_ptr - gen_opc_buf;
+            j = tcg_ctx.gen_opc_ptr - tcg_ctx.gen_opc_buf;
             if (lj < j) {
                 lj++;
                 while (lj < j)
-                    gen_opc_instr_start[lj++] = 0;
+                    tcg_ctx.gen_opc_instr_start[lj++] = 0;
             }
-            gen_opc_pc[lj] = dc->pc;
-            gen_opc_instr_start[lj] = 1;
-            gen_opc_icount[lj] = num_insns;
+            tcg_ctx.gen_opc_pc[lj] = dc->pc;
+            tcg_ctx.gen_opc_instr_start[lj] = 1;
+            tcg_ctx.gen_opc_icount[lj] = num_insns;
         }
 
         if (num_insns + 1 == max_insns && (tb->cflags & CF_LAST_IO))
@@ -1282,11 +1280,11 @@ gen_intermediate_code_internal(CPUArchState *env, TranslationBlock *tb,
 
         ++num_insns;
     } while (!dc->is_jmp &&
-        gen_opc_ptr < gen_opc_end &&
-        !env->singlestep_enabled &&
-        !singlestep &&
-        dc->pc < next_page_start &&
-        num_insns < max_insns);
+             tcg_ctx.gen_opc_ptr < gen_opc_end &&
+             !env->singlestep_enabled &&
+             !singlestep &&
+             dc->pc < next_page_start &&
+             num_insns < max_insns);
 
     if (tb->cflags & CF_LAST_IO)
         gen_io_end();
@@ -1295,44 +1293,43 @@ gen_intermediate_code_internal(CPUArchState *env, TranslationBlock *tb,
         cec_exception(dc, EXCP_DEBUG);
     } else {
         switch (dc->is_jmp) {
-            case DISAS_NEXT:
-                gen_gotoi_tb(dc, 1, dc->pc);
-                break;
-            default:
-            case DISAS_UPDATE:
-                /* indicate that the hash table must be used
-                   to find the next TB */
-                tcg_gen_exit_tb(0);
-                break;
-            case DISAS_CALL:
-            case DISAS_JUMP:
-            case DISAS_TB_JUMP:
-                /* nothing more to generate */
-                break;
+        case DISAS_NEXT:
+            gen_gotoi_tb(dc, 1, dc->pc);
+            break;
+        default:
+        case DISAS_UPDATE:
+            /* indicate that the hash table must be used
+               to find the next TB */
+            tcg_gen_exit_tb(0);
+            break;
+        case DISAS_CALL:
+        case DISAS_JUMP:
+        case DISAS_TB_JUMP:
+            /* nothing more to generate */
+            break;
         }
     }
 
-    gen_icount_end(tb, num_insns);
-    *gen_opc_ptr = INDEX_op_end;
-
-    if (search_pc) {
-        j = gen_opc_ptr - gen_opc_buf;
-        lj++;
-        while (lj <= j)
-            gen_opc_instr_start[lj++] = 0;
-    } else {
-        tb->size = dc->pc - pc_start;
-        tb->icount = num_insns;
-    }
+    gen_tb_end(tb, num_insns);
+    *tcg_ctx.gen_opc_ptr = INDEX_op_end;
 
 #ifdef DEBUG_DISAS
     if (qemu_loglevel_mask(CPU_LOG_TB_IN_ASM)) {
         qemu_log("----------------\n");
         qemu_log("IN: %s\n", lookup_symbol(pc_start));
-        log_target_disas(pc_start, dc->pc - pc_start, 0);
+        log_target_disas(env, pc_start, dc->pc - pc_start, 0);
         qemu_log("\n");
     }
 #endif
+    if (search_pc) {
+        j = tcg_ctx.gen_opc_ptr - tcg_ctx.gen_opc_buf;
+        lj++;
+        while (lj <= j)
+            tcg_ctx.gen_opc_instr_start[lj++] = 0;
+    } else {
+        tb->size = dc->pc - pc_start;
+        tb->icount = num_insns;
+    }
 }
 
 void gen_intermediate_code(CPUArchState *env, struct TranslationBlock *tb)
@@ -1347,7 +1344,7 @@ void gen_intermediate_code_pc(CPUArchState *env, struct TranslationBlock *tb)
 
 void restore_state_to_opc(CPUArchState *env, TranslationBlock *tb, int pc_pos)
 {
-    env->pc = gen_opc_pc[pc_pos];
+    env->pc = tcg_ctx.gen_opc_pc[pc_pos];
 }
 
 #include "bfin-sim.c"

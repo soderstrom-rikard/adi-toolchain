@@ -1,7 +1,7 @@
 /*
  * Blackfin emulation
  *
- * Copyright 2007-2012 Mike Frysinger
+ * Copyright 2007-2013 Mike Frysinger
  * Copyright 2007-2011 Analog Devices, Inc.
  *
  * Licensed under the Lesser GPL 2 or later.
@@ -14,11 +14,15 @@ struct DisasContext;
 
 #define TARGET_LONG_BITS 32
 
-#include "cpu-defs.h"
+#define ELF_MACHINE	EM_BLACKFIN
+
+#define CPUArchState struct CPUBfinState
+
+#include "config.h"
+#include "qemu-common.h"
+#include "exec/cpu-defs.h"
 
 #define TARGET_HAS_ICE 1
-
-#define ELF_MACHINE	EM_BLACKFIN
 
 #define EXCP_SYSCALL        0
 #define EXCP_SOFT_BP        1
@@ -53,7 +57,6 @@ struct DisasContext;
 #define TARGET_PHYS_ADDR_SPACE_BITS 32
 #define TARGET_VIRT_ADDR_SPACE_BITS 32
 
-#define CPUArchState struct CPUBfinState
 #define cpu_init cpu_bfin_init
 #define cpu_exec cpu_bfin_exec
 #define cpu_gen_code cpu_bfin_gen_code
@@ -202,26 +205,15 @@ static inline void cpu_clone_regs(CPUArchState *env, target_ulong newsp)
 }
 #endif
 
-#include "cpu-all.h"
+#include "exec/cpu-all.h"
 #include "cpu-qom.h"
 
-static inline int cpu_has_work(CPUArchState *env)
+static inline bool cpu_has_work(CPUState *cpu)
 {
-    return (env->interrupt_request & (CPU_INTERRUPT_HARD | CPU_INTERRUPT_NMI));
+    return (cpu->interrupt_request & (CPU_INTERRUPT_HARD | CPU_INTERRUPT_NMI));
 }
 
-static inline int cpu_halted(CPUArchState *env)
-{
-    if (!env->halted)
-        return 0;
-    if (env->interrupt_request & CPU_INTERRUPT_HARD) {
-        env->halted = 0;
-        return 0;
-    }
-    return EXCP_HALTED;
-}
-
-#include "exec-all.h"
+#include "exec/exec-all.h"
 
 static inline void cpu_pc_from_tb(CPUArchState *env, TranslationBlock *tb)
 {

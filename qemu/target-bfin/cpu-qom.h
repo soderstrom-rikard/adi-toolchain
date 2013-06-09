@@ -1,7 +1,7 @@
 /*
  * QEMU Blackfin CPU
  *
- * Copyright 2007-2012 Mike Frysinger
+ * Copyright 2007-2013 Mike Frysinger
  * Copyright 2007-2011 Analog Devices, Inc.
  *
  * Licensed under the Lesser GPL 2 or later.
@@ -10,8 +10,7 @@
 #ifndef QEMU_BFIN_CPU_QOM_H
 #define QEMU_BFIN_CPU_QOM_H
 
-#include "qemu/cpu.h"
-#include "cpu.h"
+#include "qom/cpu.h"
 
 #define TYPE_BFIN_CPU "bfin-cpu"
 
@@ -57,5 +56,6 @@ static inline BfinCPU *bfin_env_get_cpu(CPUArchState *env)
 
 #define ENV_GET_CPU(e) CPU(bfin_env_get_cpu(e))
 
+#define ENV_OFFSET offsetof(BfinCPU, env)
 
 #endif

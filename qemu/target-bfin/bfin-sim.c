@@ -1,7 +1,7 @@
 /*
  * Simulator for Analog Devices Blackfin processors.
  *
- * Copyright 2005-2012 Mike Frysinger
+ * Copyright 2005-2013 Mike Frysinger
  * Copyright 2005-2011 Analog Devices, Inc.
  *
  * Licensed under the GPL 2 or later.
@@ -4110,7 +4110,6 @@ decode_psedodbg_assert_0(DisasContext *dc, uint16_t iw0, uint16_t iw1)
     int dbgop    = ((iw0 >> (PseudoDbg_Assert_dbgop_bits - 16)) & PseudoDbg_Assert_dbgop_mask);
     int grp      = ((iw0 >> (PseudoDbg_Assert_grp_bits - 16)) & PseudoDbg_Assert_grp_mask);
     int regtest  = ((iw0 >> (PseudoDbg_Assert_regtest_bits - 16)) & PseudoDbg_Assert_regtest_mask);
-    const char *dbg_name, *dbg_appd;
     TCGv reg, exp, pc;
     bool istmp;
 
@@ -4120,13 +4119,9 @@ decode_psedodbg_assert_0(DisasContext *dc, uint16_t iw0, uint16_t iw1)
     if (dbgop == 0 || dbgop == 2) {
         /* DBGA (genreg_lo{grp,regtest}, imm{expected} */
         /* DBGAL (genreg{grp,regtest}, imm{expected} */
-        dbg_name = dbgop == 0 ? "DBGA" : "DBGAL";
-        dbg_appd = dbgop == 0 ? ".L" : "";
     } else if (dbgop == 1 || dbgop == 3) {
         /* DBGA (genreg_hi{grp,regtest}, imm{expected} */
         /* DBGAH (genreg{grp,regtest}, imm{expected} */
-        dbg_name = dbgop == 1 ? "DBGA" : "DBGAH";
-        dbg_appd = dbgop == 1 ? ".H" : "";
     } else {
         illegal_instruction(dc);
     }
@@ -4158,9 +4153,9 @@ decode_psedodbg_assert_0(DisasContext *dc, uint16_t iw0, uint16_t iw1)
     exp = tcg_const_tl(expected);
     pc = tcg_const_tl(dc->pc);
     if (dbgop & 1) {
-        gen_helper_dbga_h(pc, reg, exp);
+        gen_helper_dbga_h(cpu_env, pc, reg, exp);
     } else {
-        gen_helper_dbga_l(pc, reg, exp);
+        gen_helper_dbga_l(cpu_env, pc, reg, exp);
     }
 
     if (istmp) {
@@ -4186,7 +4181,7 @@ static uint32_t bfin_lduw_code(DisasContext *dc, target_ulong pc)
     }
 #endif
 
-    return lduw_code(pc);
+    return cpu_lduw_code(dc->cpu, pc);
 }
 
 /* Interpret a single 16bit/32bit insn; no parallel insn handling */

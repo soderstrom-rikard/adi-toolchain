@@ -1,17 +1,16 @@
 /*
  * Blackfin helpers
  *
- * Copyright 2007-2012 Mike Frysinger
+ * Copyright 2007-2013 Mike Frysinger
  * Copyright 2007-2011 Analog Devices, Inc.
  *
  * Licensed under the Lesser GPL 2 or later.
  */
 
 #include "cpu.h"
-#include "dyngen-exec.h"
 #include "helper.h"
 
-void helper_raise_exception(uint32_t excp, uint32_t pc)
+void HELPER(raise_exception)(CPUArchState *env, uint32_t excp, uint32_t pc)
 {
     env->exception_index = excp;
     if (pc != -1)
@@ -19,55 +18,58 @@ void helper_raise_exception(uint32_t excp, uint32_t pc)
     cpu_loop_exit(env);
 }
 
-void helper_memalign(uint32_t excp, uint32_t pc, uint32_t addr, uint32_t len)
+void HELPER(memalign)(CPUArchState *env, uint32_t excp, uint32_t pc,
+                      uint32_t addr, uint32_t len)
 {
     if ((addr & (len - 1)) == 0)
         return;
 
-    helper_raise_exception(excp, pc);
+    HELPER(raise_exception)(env, excp, pc);
 }
 
-void helper_dbga_l(uint32_t pc, uint32_t actual, uint32_t expected)
+void HELPER(dbga_l)(CPUArchState *env, uint32_t pc, uint32_t actual,
+                    uint32_t expected)
 {
     if ((actual & 0xffff) != expected)
-        helper_raise_exception(EXCP_DBGA, pc);
+        HELPER(raise_exception)(env, EXCP_DBGA, pc);
 }
 
-void helper_dbga_h(uint32_t pc, uint32_t actual, uint32_t expected)
+void HELPER(dbga_h)(CPUArchState *env, uint32_t pc, uint32_t actual,
+                    uint32_t expected)
 {
     if ((actual >> 16) != expected)
-        helper_raise_exception(EXCP_DBGA, pc);
+        HELPER(raise_exception)(env, EXCP_DBGA, pc);
 }
 
-void helper_outc(uint32_t ch)
+void HELPER(outc)(uint32_t ch)
 {
     putc(ch, stdout);
     if (ch == '\n')
         fflush(stdout);
 }
 
-void helper_dbg(uint32_t val, uint32_t grp, uint32_t reg)
+void HELPER(dbg)(uint32_t val, uint32_t grp, uint32_t reg)
 {
     printf("DBG : %s = 0x%08x\n", get_allreg_name(grp, reg), val);
 }
 
-void helper_dbg_areg(uint64_t val, uint32_t areg)
+void HELPER(dbg_areg)(uint64_t val, uint32_t areg)
 {
     printf("DBG : A%u = 0x%010"PRIx64"\n", areg, (val << 24) >> 24);
 }
 
-uint32_t helper_astat_load(void)
+uint32_t HELPER(astat_load)(CPUArchState *env)
 {
     return bfin_astat_read(env);
 }
 
-void helper_astat_store(uint32_t astat)
+void HELPER(astat_store)(CPUArchState *env, uint32_t astat)
 {
     bfin_astat_write(env, astat);
 }
 
 /* Count the number of bits set to 1 in the 32bit value */
-uint32_t helper_ones(uint32_t val)
+uint32_t HELPER(ones)(uint32_t val)
 {
     uint32_t i;
     uint32_t ret;
@@ -80,7 +82,7 @@ uint32_t helper_ones(uint32_t val)
 }
 
 /* Count number of leading bits that match the sign bit */
-uint32_t helper_signbits(uint32_t val, uint32_t size)
+uint32_t HELPER(signbits)(uint32_t val, uint32_t size)
 {
     uint32_t mask = 1 << (size - 1);
     uint32_t bit = val & mask;
@@ -100,7 +102,7 @@ uint32_t helper_signbits(uint32_t val, uint32_t size)
 }
 
 /* Count number of leading bits that match the sign bit */
-uint32_t helper_signbits_64(uint64_t val, uint32_t size)
+uint32_t HELPER(signbits_64)(uint64_t val, uint32_t size)
 {
     uint64_t mask = (uint64_t)1 << (size - 1);
     uint64_t bit = val & mask;
@@ -126,7 +128,7 @@ uint32_t helper_signbits_64(uint64_t val, uint32_t size)
    rather than worry about the circular buffers being used correctly.  Which
    isn't to say there isn't room for improvement here, just that we want to
    be conservative.  See also dagsub().  */
-uint32_t helper_dagadd(uint32_t I, uint32_t L, uint32_t B, uint32_t M)
+uint32_t HELPER(dagadd)(uint32_t I, uint32_t L, uint32_t B, uint32_t M)
 {
     uint64_t i = I;
     uint64_t l = L;
@@ -165,7 +167,7 @@ uint32_t helper_dagadd(uint32_t I, uint32_t L, uint32_t B, uint32_t M)
 }
 
 /* See dagadd() notes above.  */
-uint32_t helper_dagsub(uint32_t I, uint32_t L, uint32_t B, uint32_t M)
+uint32_t HELPER(dagsub)(uint32_t I, uint32_t L, uint32_t B, uint32_t M)
 {
     uint64_t i = I;
     uint64_t l = L;
@@ -205,7 +207,7 @@ uint32_t helper_dagsub(uint32_t I, uint32_t L, uint32_t B, uint32_t M)
     return res;
 }
 
-uint32_t helper_add_brev(uint32_t addend1, uint32_t addend2)
+uint32_t HELPER(add_brev)(uint32_t addend1, uint32_t addend2)
 {
     uint32_t mask, b, r;
     int i, cy;
