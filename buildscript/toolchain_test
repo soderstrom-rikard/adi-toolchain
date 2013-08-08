@@ -1,17 +1,5 @@
-#!/bin/sh 
+#!/bin/sh  
 
-if [ -d /home/test/work/cruise ] ; then
-USER=/home/test/work/cruise
-CHECKOUT=$USER/checkouts
-TOOLCHAIN_BUILDSCRIPT=$CHECKOUT/toolchain/buildscript
-TOOLCHAIN_SCRIPTS=$USER/test_scripts/toolchain
-TOOLCHAINBUILD=$TOOLCHAIN_SCRIPTS/toolchain-build
-KERNEL_PATH=$CHECKOUT/uclinux-dist
-OUTPUT_PATH=$KERNEL_PATH/images
-LINUX_PATH=$KERNEL_PATH/linux-2.6.x
-BUILD_TOOLCHAIN_KERNEL=build_toolchain_kernel
-HOST_CONFIG=SUSE
-else
 USER=/home/test
 SRC_ROOT=$USER/workspace/src
 CHECKOUT=$SRC_ROOT
@@ -22,8 +10,7 @@ KERNEL_PATH=$CHECKOUT/kernel
 OUTPUT_PATH=$KERNEL_PATH/output/images
 LINUX_PATH=$KERNEL_PATH/linux/linux-kernel
 BUILD_TOOLCHAIN_KERNEL=build_buildroot_kernel
-HOST_CONFIG=UBUNTU
-fi
+
 BASELINE=standard
 LASTRUN=lastrun
 THISRUN=thisrun
@@ -138,22 +125,21 @@ log_test_results ()
 
 }
 
-######## Do svn update and show svn info for each project.
+######## Do git pull and show git info for each project.
 cd $CHECKOUT
-
 cat  <<EOF
 ************** Testing is done on target with kernel config ($TARGET_KERNEL_CONFIG). *************
 ************** Testing $TOOLCHAIN_VERSION toolchain on $BOARD_CONFIG. ************
-************** Host $HOST_CONFIG $HOST_IP. ***********
+************** Host $HOST_IP. ***********
 
-************** Tested toolchain svn info ***************
-`cd $SRC_ROOT/toolchain ;svn up; svn info`
+************** Tested toolchain git info ***************
+`cd $SRC_ROOT/toolchain ;echo -n "U-Boot "; git pull ; git remote -v; git branch -a ; git log -1`
 ************** Tested U-Boot git info ******************
-`cd $SRC_ROOT/u-boot; echo -n "U-Boot "; git pull ; git remote -v; git branch -a; git log -1`
+`cd $SRC_ROOT/u-boot; echo -n "U-Boot "; git pull ; git remote -v; git branch -a ; git log -1`
 ************* Tested Buildroot git info *************
-`cd $SRC_ROOT/kernel; echo -n "Buildroot "; git pull; git remote -v; git branch -a; git log -1`
+`cd $SRC_ROOT/kernel; echo -n "Buildroot "; git pull; git remote -v; git branch -a ; git log -1`
 ************* Tested linux git info ********************
-`cd $SRC_ROOT/kernel/linux/linux*; echo -n "Kernel "; git pull; git remote -v; git branch -a; git log -1`
+`cd $SRC_ROOT/kernel/linux/linux-kernel; echo -n "Kernel "; git pull; git remote -v; git branch -a ; git log -1`
 
 EOF
 
@@ -163,9 +149,12 @@ EOF
 # For branch testing, use -K kbuild_output.
 # ./BuildToolChain  -j 1 -w -s $CHECKOUT/toolchain -b $USER/temp -K $CHECKOUT/toolchain/kbuild_output  -u $CHECKOUT/u-boot -c $TOOLCHAIN_VERSION  -D
 
+#  ./BuildToolChain  -j 1 -w -s $CHECKOUT/toolchain -b $USER/temp -K $CHECKOUT/toolchain/kbuild_output  -u $CHECKOUT/u-boot -c 4.3 -D \
+#  -a UCLIBC_HAS_IPV6=y  -a UCLIBC_HAS_WCHAR=y -a UCLIBC_HAS_NFTW=y 
+
 # For trunk testing, use -k $CHECKOUT/uclinux-dist/linux-2.6.x.
   ./BuildToolChain  -j 1 -w -s $CHECKOUT/toolchain -b $USER/temp -k $LINUX_PATH  -u $CHECKOUT/u-boot -c 4.3 -D \
-  -a UCLIBC_HAS_IPV6=y  -a UCLIBC_HAS_WCHAR=y -a UCLIBC_HAS_NFTW=y 
+  -a UCLIBC_HAS_IPV6=y  -a UCLIBC_HAS_WCHAR=y -a UCLIBC_HAS_NFTW=y -a UCLIBC_USE_NETLINK=y  -a UCLIBC_SUPPORT_AI_ADDRCONFIG=y  
 
   if [ $? != 0 ] ; then
   echo -e "\nFailed to build the toolchain in toolchain-$TIMESTAMP . exit!\n"     
@@ -257,7 +246,12 @@ sleep 20
   ./toolchain-regtest -s $CHECKOUT/toolchain -o $TEST_TOOLCHAIN_DIR/bfin -b $USER/temp/regtest_build$TOOLCHAIN_VERSION -t uclinux -T $TARGET_IP -a -L
   find $USER/temp/regtest_build$TOOLCHAIN_VERSION/.  -maxdepth 1 -type d -regex .*build\[-0-9.\]*  -exec mv {} {}-uclinux \;
 
- # $TOOLCHAIN_SCRIPTS/reset_board.exp uImage.$TARGET_KERNEL_CONFIG   >/dev/null  2>&1
+  $TOOLCHAIN_SCRIPTS/reset_board.exp uImage.$TARGET_KERNEL_CONFIG   >/dev/null  2>&1
+  sleep 200
+
+  ./toolchain-regtest -s $CHECKOUT/toolchain -o $TEST_TOOLCHAIN_DIR/bfin -b $USER/temp/regtest_build$TOOLCHAIN_VERSION -t uclinux -T $TARGET_IP -a -L libstdc++ libgomp
+
+  $TOOLCHAIN_SCRIPTS/reset_board.exp uImage.$TARGET_KERNEL_CONFIG   >/dev/null  2>&1
   sleep 200
 
   ./toolchain-regtest -s $CHECKOUT/toolchain -o $TEST_TOOLCHAIN_DIR/bfin -b $USER/temp/regtest_build$TOOLCHAIN_VERSION -t linux-uclibc -T $TARGET_IP -a -L   # \!gdb   
