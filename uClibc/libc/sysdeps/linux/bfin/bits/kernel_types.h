@@ -7,6 +7,8 @@
 
 #ifndef __ARCH_BFIN_POSIX_TYPES_H
 #define __ARCH_BFIN_POSIX_TYPES_H
+typedef long		__kernel_long_t;
+typedef unsigned long	__kernel_ulong_t;
 typedef unsigned short	__kernel_dev_t;
 typedef unsigned long	__kernel_ino_t;
 typedef unsigned short	__kernel_mode_t;
