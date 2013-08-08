@@ -3,7 +3,7 @@
 %define bfin_targ_strip %{prefix}/bfin-elf/bin/bfin-elf-strip
 %define EXEEXT %{nil}
 %define x_support 0
-%define extra_buildtoolchain_opts -a UCLIBC_HAS_IPV6=y -a UCLIBC_HAS_WCHAR=y -a UCLIBC_HAS_NFTW=y
+%define extra_buildtoolchain_opts -a UCLIBC_HAS_IPV6=y -a UCLIBC_HAS_WCHAR=y -a UCLIBC_HAS_NFTW=y -a UCLIBC_USE_NETLINK=y -a UCLIBC_SUPPORT_AI_ADDRCONFIG=y
 
 %define optional_gcc 0
 %define gcc_main_ver 4.3
