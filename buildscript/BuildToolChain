@@ -280,10 +280,6 @@ if [ "${GDB_VERSION}" != "2.17" ] ; then
 	WITHOUT_X=true
 fi
 
-# if there is X graphical exists, then install Xvfb 
-if [ "${WITHOUT_X}" = "false" ] ; then
-	PREREQ_FILE="${PREREQ_FILE} Xvfb"
-fi
 # Make sure root does not build things
 if [ "$(id -u)" -eq 0 ]; then
 	echo "you should not build the toolchain as the 'root' user"
