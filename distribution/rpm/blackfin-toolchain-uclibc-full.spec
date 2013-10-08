@@ -13,8 +13,8 @@
 
 Name:         blackfin-toolchain-uclibc-full
 URL:          http://blackfin.uclinux.org
-Version:      2012R1
-Release:      BETA1
+Version:      2013R1
+Release:      RC1
 Requires:     blackfin-toolchain
 Summary:      Wide character libraries for the GNU toolchain for the Blackfin processor
 License:      GPL

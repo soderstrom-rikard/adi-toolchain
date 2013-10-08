@@ -24,8 +24,8 @@
 
 Name:         blackfin-toolchain
 URL:          http://blackfin.uclinux.org
-Version:      2012R1
-Release:      BETA1
+Version:      2013R1
+Release:      RC1
 Obsoletes:    bfin-gcc
 Summary:      The GNU toolchain for the Blackfin processor
 License:      GPL
